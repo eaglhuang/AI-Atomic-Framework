@@ -1,0 +1,52 @@
+[control] backend=n/a intents=7244 committed=7244 duration_ms=50252 wall_clock_ms=50014.65
+[
+  {
+    "run_id": "sc-S3-control-sp-r1",
+    "mode": "control",
+    "status": "done",
+    "atm_backend": null,
+    "agents": [
+      "cursor:mock-s0",
+      "claude:mock-s1",
+      "codex:mock-s2",
+      "cursor:mock-s3",
+      "claude:mock-s4",
+      "codex:mock-s5",
+      "other:mock-s6",
+      "other:mock-s7"
+    ],
+    "next_hint": "atm-bench export --run-id sc-S3-control-sp-r1"
+  }
+]
+{
+  "run_id": "sc-S3-control-sp-r1",
+  "atm_backend": "none",
+  "export_dir": "/workspace/reports/atm-v2-harness/runs/sc-S3-control-sp-r1/export",
+  "reproducible": true,
+  "atm": null,
+  "control": {
+    "intents": 7244,
+    "decisions": {
+      "direct_write": 7244
+    },
+    "racy": 3339,
+    "lost_updates": 3008,
+    "wall_clock_ms": 50014.65,
+    "throughput_intents_per_s": 144.84,
+    "total_ms": {
+      "n": 7244,
+      "mean": 40.29,
+      "p50": 40.22,
+      "p95": 58.37,
+      "max": 61.51
+    },
+    "overhead_ms": {
+      "n": 7244,
+      "mean": 0.2,
+      "p50": 0.19,
+      "p95": 0.3,
+      "max": 1.19
+    }
+  },
+  "slowdown": null
+}

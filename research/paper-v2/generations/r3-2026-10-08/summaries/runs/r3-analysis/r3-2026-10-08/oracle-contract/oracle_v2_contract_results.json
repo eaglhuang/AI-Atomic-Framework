@@ -1,0 +1,401 @@
+{
+  "oracle_version": "c4-fullbytes-frame-v2",
+  "v1_version": "c3-effect-bytes-v1",
+  "base": "// fixture header\n// <region:r1>\nconst a = 1;\n// </region:r1>\nconst mid = 2;\n// <region:r2>\nconst b = 3;\n// </region:r2>\n",
+  "base_digest": "sha256:bbfb62bd9028ce54537ee8cb5a2b6b9bb4901151fd39d254b1d5cd242b121fed",
+  "all_pass": true,
+  "cases": [
+    {
+      "id": "C0_positive_control",
+      "review_item": "control",
+      "desc": "兩個合法插入，各在自己 region；最終 bytes 與手寫期望完全相同",
+      "expected_full_digest": "sha256:84aec1f102fa34bad6e6df42b572e8ee5862b384cc697413f32a8238e9a22df4",
+      "final_digest": "sha256:84aec1f102fa34bad6e6df42b572e8ee5862b384cc697413f32a8238e9a22df4",
+      "oracle_expected_digest": "sha256:84aec1f102fa34bad6e6df42b572e8ee5862b384cc697413f32a8238e9a22df4",
+      "full_bytes_exact": true,
+      "frame_ok": true,
+      "structure_ok": true,
+      "frame_first_diff": null,
+      "unchanged_base_lines": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "mask_ok": true,
+      "ref_matches_handwritten": true,
+      "ref_error": null,
+      "expected_verdicts": {
+        "c-i1": "correct",
+        "c-i2": "correct"
+      },
+      "actual_verdicts": {
+        "c-i1": "correct",
+        "c-i2": "correct"
+      },
+      "v1_verdicts": {
+        "c-i1": "correct",
+        "c-i2": "correct"
+      },
+      "pass": true,
+      "expected_full": "// fixture header\n// <region:r1>\nconst a = 1;\n// atm-edit c-i1 by agent:x\n// </region:r1>\nconst mid = 2;\n// <region:r2>\nconst b = 3;\n// atm-edit c-i2 by agent:y\n// </region:r2>\n",
+      "final": "// fixture header\n// <region:r1>\nconst a = 1;\n// atm-edit c-i1 by agent:x\n// </region:r1>\nconst mid = 2;\n// <region:r2>\nconst b = 3;\n// atm-edit c-i2 by agent:y\n// </region:r2>\n"
+    },
+    {
+      "id": "C1_marker_ok_neighbour_corrupted",
+      "review_item": "1 所有 marker 正確，但未授權的鄰近原文被改壞",
+      "desc": "marker 都在且位置正確，但 const mid = 2 被改成 3",
+      "expected_full_digest": "sha256:84aec1f102fa34bad6e6df42b572e8ee5862b384cc697413f32a8238e9a22df4",
+      "final_digest": "sha256:6d882970c3ce8623fe3449dd9cfba22a56fe3a532eaca0a01a684a999760b19f",
+      "oracle_expected_digest": "sha256:84aec1f102fa34bad6e6df42b572e8ee5862b384cc697413f32a8238e9a22df4",
+      "full_bytes_exact": false,
+      "frame_ok": false,
+      "structure_ok": true,
+      "frame_first_diff": {
+        "skeleton_line": 5,
+        "expected": "const mid = 2;",
+        "actual": "const mid = 3;"
+      },
+      "unchanged_base_lines": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "mask_ok": true,
+      "ref_matches_handwritten": true,
+      "ref_error": null,
+      "expected_verdicts": {
+        "c-i1": "frame_violation",
+        "c-i2": "frame_violation"
+      },
+      "actual_verdicts": {
+        "c-i1": "frame_violation",
+        "c-i2": "frame_violation"
+      },
+      "v1_verdicts": {
+        "c-i1": "correct",
+        "c-i2": "correct"
+      },
+      "pass": true,
+      "expected_full": "// fixture header\n// <region:r1>\nconst a = 1;\n// atm-edit c-i1 by agent:x\n// </region:r1>\nconst mid = 2;\n// <region:r2>\nconst b = 3;\n// atm-edit c-i2 by agent:y\n// </region:r2>\n",
+      "final": "// fixture header\n// <region:r1>\nconst a = 1;\n// atm-edit c-i1 by agent:x\n// </region:r1>\nconst mid = 3;\n// <region:r2>\nconst b = 3;\n// atm-edit c-i2 by agent:y\n// </region:r2>\n"
+    },
+    {
+      "id": "C2_effect_misplaced",
+      "review_item": "2 正確效果被放錯位置",
+      "desc": "c-i1 應在 r1，實際落在 r2",
+      "expected_full_digest": "sha256:d5b57ecc30c7fc158a133a9b5a9a13e10c4613d915367f5f7147538e1a134316",
+      "final_digest": "sha256:789e2a2cc49077d22684a8943c17bc5203f9ab8279a470f0b888e3e0e358a828",
+      "oracle_expected_digest": "sha256:d5b57ecc30c7fc158a133a9b5a9a13e10c4613d915367f5f7147538e1a134316",
+      "full_bytes_exact": false,
+      "frame_ok": true,
+      "structure_ok": true,
+      "frame_first_diff": null,
+      "unchanged_base_lines": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "mask_ok": true,
+      "ref_matches_handwritten": true,
+      "ref_error": null,
+      "expected_verdicts": {
+        "c-i1": "misplaced"
+      },
+      "actual_verdicts": {
+        "c-i1": "misplaced"
+      },
+      "v1_verdicts": {
+        "c-i1": "misplaced"
+      },
+      "pass": true,
+      "expected_full": "// fixture header\n// <region:r1>\nconst a = 1;\n// atm-edit c-i1 by agent:x\n// </region:r1>\nconst mid = 2;\n// <region:r2>\nconst b = 3;\n// </region:r2>\n",
+      "final": "// fixture header\n// <region:r1>\nconst a = 1;\n// </region:r1>\nconst mid = 2;\n// <region:r2>\nconst b = 3;\n// atm-edit c-i1 by agent:x\n// </region:r2>\n"
+    },
+    {
+      "id": "C3_region_tag_missing",
+      "review_item": "3 缺 region 標籤",
+      "desc": "marker 在，但 r1 的結束標籤被刪掉",
+      "expected_full_digest": "sha256:d5b57ecc30c7fc158a133a9b5a9a13e10c4613d915367f5f7147538e1a134316",
+      "final_digest": "sha256:e9cbbc1383927b05535c84284bc51ff571d105e98e7167b4387435e7ba8e8c67",
+      "oracle_expected_digest": "sha256:d5b57ecc30c7fc158a133a9b5a9a13e10c4613d915367f5f7147538e1a134316",
+      "full_bytes_exact": false,
+      "frame_ok": false,
+      "structure_ok": false,
+      "frame_first_diff": {
+        "skeleton_line": 4,
+        "expected": "// </region:r1>",
+        "actual": "const mid = 2;"
+      },
+      "unchanged_base_lines": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "mask_ok": true,
+      "ref_matches_handwritten": true,
+      "ref_error": null,
+      "expected_verdicts": {
+        "c-i1": "region_missing"
+      },
+      "actual_verdicts": {
+        "c-i1": "region_missing"
+      },
+      "v1_verdicts": {
+        "c-i1": "correct"
+      },
+      "pass": true,
+      "expected_full": "// fixture header\n// <region:r1>\nconst a = 1;\n// atm-edit c-i1 by agent:x\n// </region:r1>\nconst mid = 2;\n// <region:r2>\nconst b = 3;\n// </region:r2>\n",
+      "final": "// fixture header\n// <region:r1>\nconst a = 1;\n// atm-edit c-i1 by agent:x\nconst mid = 2;\n// <region:r2>\nconst b = 3;\n// </region:r2>\n"
+    },
+    {
+      "id": "C4_effect_duplicated",
+      "review_item": "4 相同效果重複出現",
+      "desc": "c-i1 在 r1 出現兩次",
+      "expected_full_digest": "sha256:d5b57ecc30c7fc158a133a9b5a9a13e10c4613d915367f5f7147538e1a134316",
+      "final_digest": "sha256:0ad49b522c9477245e543bc3f3d671589c4154ac326792b9fe6cdbc916c63f20",
+      "oracle_expected_digest": "sha256:d5b57ecc30c7fc158a133a9b5a9a13e10c4613d915367f5f7147538e1a134316",
+      "full_bytes_exact": false,
+      "frame_ok": true,
+      "structure_ok": true,
+      "frame_first_diff": null,
+      "unchanged_base_lines": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "mask_ok": true,
+      "ref_matches_handwritten": true,
+      "ref_error": null,
+      "expected_verdicts": {
+        "c-i1": "duplicate"
+      },
+      "actual_verdicts": {
+        "c-i1": "duplicate"
+      },
+      "v1_verdicts": {
+        "c-i1": "duplicate"
+      },
+      "pass": true,
+      "expected_full": "// fixture header\n// <region:r1>\nconst a = 1;\n// atm-edit c-i1 by agent:x\n// </region:r1>\nconst mid = 2;\n// <region:r2>\nconst b = 3;\n// </region:r2>\n",
+      "final": "// fixture header\n// <region:r1>\nconst a = 1;\n// atm-edit c-i1 by agent:x\n// atm-edit c-i1 by agent:x\n// </region:r1>\nconst mid = 2;\n// <region:r2>\nconst b = 3;\n// </region:r2>\n"
+    },
+    {
+      "id": "C5a_legal_delete",
+      "review_item": "5 合法刪除／替換，不應因 marker 消失而誤判",
+      "desc": "c-i1 插入後，已提交的 c-i2 合法刪除該行；最終＝base",
+      "expected_full_digest": "sha256:bbfb62bd9028ce54537ee8cb5a2b6b9bb4901151fd39d254b1d5cd242b121fed",
+      "final_digest": "sha256:bbfb62bd9028ce54537ee8cb5a2b6b9bb4901151fd39d254b1d5cd242b121fed",
+      "oracle_expected_digest": "sha256:bbfb62bd9028ce54537ee8cb5a2b6b9bb4901151fd39d254b1d5cd242b121fed",
+      "full_bytes_exact": true,
+      "frame_ok": true,
+      "structure_ok": true,
+      "frame_first_diff": null,
+      "unchanged_base_lines": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "mask_ok": true,
+      "ref_matches_handwritten": true,
+      "ref_error": null,
+      "expected_verdicts": {
+        "c-i1": "superseded",
+        "c-i2": "correct"
+      },
+      "actual_verdicts": {
+        "c-i1": "superseded",
+        "c-i2": "correct"
+      },
+      "v1_verdicts": {
+        "c-i1": "lost",
+        "c-i2": "n/a(no-op-kind)"
+      },
+      "pass": true,
+      "expected_full": "// fixture header\n// <region:r1>\nconst a = 1;\n// </region:r1>\nconst mid = 2;\n// <region:r2>\nconst b = 3;\n// </region:r2>\n",
+      "final": "// fixture header\n// <region:r1>\nconst a = 1;\n// </region:r1>\nconst mid = 2;\n// <region:r2>\nconst b = 3;\n// </region:r2>\n"
+    },
+    {
+      "id": "C5b_legal_replace_of_original",
+      "review_item": "5 合法刪除／替換，不應因 marker 消失而誤判",
+      "desc": "已提交的 c-i3 把原文 const b = 3; 合法替換",
+      "expected_full_digest": "sha256:3e6eae563f5634f26c98553c3fa148dba267dfd5438817ebfc8b66920326db97",
+      "final_digest": "sha256:3e6eae563f5634f26c98553c3fa148dba267dfd5438817ebfc8b66920326db97",
+      "oracle_expected_digest": "sha256:3e6eae563f5634f26c98553c3fa148dba267dfd5438817ebfc8b66920326db97",
+      "full_bytes_exact": true,
+      "frame_ok": true,
+      "structure_ok": true,
+      "frame_first_diff": null,
+      "unchanged_base_lines": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        8
+      ],
+      "mask_ok": true,
+      "ref_matches_handwritten": true,
+      "ref_error": null,
+      "expected_verdicts": {
+        "c-i3": "correct"
+      },
+      "actual_verdicts": {
+        "c-i3": "correct"
+      },
+      "v1_verdicts": {
+        "c-i3": "n/a(no-op-kind)"
+      },
+      "pass": true,
+      "expected_full": "// fixture header\n// <region:r1>\nconst a = 1;\n// </region:r1>\nconst mid = 2;\n// <region:r2>\nconst b = 4; // atm-edit c-i3 by agent:z\n// </region:r2>\n",
+      "final": "// fixture header\n// <region:r1>\nconst a = 1;\n// </region:r1>\nconst mid = 2;\n// <region:r2>\nconst b = 4; // atm-edit c-i3 by agent:z\n// </region:r2>\n"
+    },
+    {
+      "id": "C6_legal_supersede",
+      "review_item": "6 合法後續操作取代先前效果，不應算成 lost",
+      "desc": "c-i1 插入後，已提交的 c-i2 把 c-i1 那行換成自己的行",
+      "expected_full_digest": "sha256:dce67a46ca16f01b4635d1d6b34d5c165347a5c314536bf12cf7039ce6a66752",
+      "final_digest": "sha256:dce67a46ca16f01b4635d1d6b34d5c165347a5c314536bf12cf7039ce6a66752",
+      "oracle_expected_digest": "sha256:dce67a46ca16f01b4635d1d6b34d5c165347a5c314536bf12cf7039ce6a66752",
+      "full_bytes_exact": true,
+      "frame_ok": true,
+      "structure_ok": true,
+      "frame_first_diff": null,
+      "unchanged_base_lines": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "mask_ok": true,
+      "ref_matches_handwritten": true,
+      "ref_error": null,
+      "expected_verdicts": {
+        "c-i1": "superseded",
+        "c-i2": "correct"
+      },
+      "actual_verdicts": {
+        "c-i1": "superseded",
+        "c-i2": "correct"
+      },
+      "v1_verdicts": {
+        "c-i1": "lost",
+        "c-i2": "n/a(no-op-kind)"
+      },
+      "pass": true,
+      "expected_full": "// fixture header\n// <region:r1>\nconst a = 1;\n// atm-edit c-i2 by agent:y\n// </region:r1>\nconst mid = 2;\n// <region:r2>\nconst b = 3;\n// </region:r2>\n",
+      "final": "// fixture header\n// <region:r1>\nconst a = 1;\n// atm-edit c-i2 by agent:y\n// </region:r1>\nconst mid = 2;\n// <region:r2>\nconst b = 3;\n// </region:r2>\n"
+    },
+    {
+      "id": "N5_illegal_disappearance",
+      "review_item": "5 的負例（無授權刪除）",
+      "desc": "c-i1 已提交，沒有任何刪除操作，但最終檔沒有這行 → 必須是 lost",
+      "expected_full_digest": "sha256:d5b57ecc30c7fc158a133a9b5a9a13e10c4613d915367f5f7147538e1a134316",
+      "final_digest": "sha256:bbfb62bd9028ce54537ee8cb5a2b6b9bb4901151fd39d254b1d5cd242b121fed",
+      "oracle_expected_digest": "sha256:d5b57ecc30c7fc158a133a9b5a9a13e10c4613d915367f5f7147538e1a134316",
+      "full_bytes_exact": false,
+      "frame_ok": true,
+      "structure_ok": true,
+      "frame_first_diff": null,
+      "unchanged_base_lines": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "mask_ok": true,
+      "ref_matches_handwritten": true,
+      "ref_error": null,
+      "expected_verdicts": {
+        "c-i1": "lost"
+      },
+      "actual_verdicts": {
+        "c-i1": "lost"
+      },
+      "v1_verdicts": {
+        "c-i1": "lost"
+      },
+      "pass": true,
+      "expected_full": "// fixture header\n// <region:r1>\nconst a = 1;\n// atm-edit c-i1 by agent:x\n// </region:r1>\nconst mid = 2;\n// <region:r2>\nconst b = 3;\n// </region:r2>\n",
+      "final": "// fixture header\n// <region:r1>\nconst a = 1;\n// </region:r1>\nconst mid = 2;\n// <region:r2>\nconst b = 3;\n// </region:r2>\n"
+    },
+    {
+      "id": "N6_supersede_by_uncommitted",
+      "review_item": "6 的負例（取代者未提交）",
+      "desc": "c-i2 被 blocked，但最終檔卻用 c-i2 取代了 c-i1 → c-i1 lost、c-i2 blocked_leak",
+      "expected_full_digest": "sha256:d5b57ecc30c7fc158a133a9b5a9a13e10c4613d915367f5f7147538e1a134316",
+      "final_digest": "sha256:dce67a46ca16f01b4635d1d6b34d5c165347a5c314536bf12cf7039ce6a66752",
+      "oracle_expected_digest": "sha256:d5b57ecc30c7fc158a133a9b5a9a13e10c4613d915367f5f7147538e1a134316",
+      "full_bytes_exact": false,
+      "frame_ok": true,
+      "structure_ok": true,
+      "frame_first_diff": null,
+      "unchanged_base_lines": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "mask_ok": true,
+      "ref_matches_handwritten": true,
+      "ref_error": null,
+      "expected_verdicts": {
+        "c-i1": "lost",
+        "c-i2": "blocked_leak"
+      },
+      "actual_verdicts": {
+        "c-i1": "lost",
+        "c-i2": "blocked_leak"
+      },
+      "v1_verdicts": {
+        "c-i1": "lost",
+        "c-i2": "n/a(no-op-kind)"
+      },
+      "pass": true,
+      "expected_full": "// fixture header\n// <region:r1>\nconst a = 1;\n// atm-edit c-i1 by agent:x\n// </region:r1>\nconst mid = 2;\n// <region:r2>\nconst b = 3;\n// </region:r2>\n",
+      "final": "// fixture header\n// <region:r1>\nconst a = 1;\n// atm-edit c-i2 by agent:y\n// </region:r1>\nconst mid = 2;\n// <region:r2>\nconst b = 3;\n// </region:r2>\n"
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+[atm/mp] procs=8 intents=7244 committed=6639 lost=0 wall_clock_ms=50057.6 cas_conflicts=25896
+[
+  {
+    "run_id": "sc-S3-atm-p8-r1",
+    "mode": "atm",
+    "status": "done",
+    "atm_backend": "real",
+    "agents": [
+      "cursor:mock-s0",
+      "claude:mock-s1",
+      "codex:mock-s2",
+      "cursor:mock-s3",
+      "claude:mock-s4",
+      "codex:mock-s5",
+      "other:mock-s6",
+      "other:mock-s7"
+    ],
+    "next_hint": "atm-bench export --run-id sc-S3-atm-p8-r1"
+  }
+]
+{
+  "run_id": "sc-S3-atm-p8-r1",
+  "atm_backend": "real",
+  "export_dir": "/workspace/reports/atm-v2-harness/runs/sc-S3-atm-p8-r1/export",
+  "reproducible": true,
+  "atm": {
+    "intents": 7244,
+    "decisions": {
+      "composer_merge": 3001,
+      "hot_provisional": 1269,
+      "admit": 2369,
+      "reject": 605
+    },
+    "mean_wait_ms": 0,
+    "lost_updates": 0,
+    "wall_clock_ms": 50057.6,
+    "throughput_intents_per_s": 144.71,
+    "total_ms": {
+      "n": 7244,
+      "mean": 46.13,
+      "p50": 48,
+      "p95": 70.14,
+      "max": 126.26
+    },
+    "overhead_ms": {
+      "n": 7244,
+      "mean": 9.35,
+      "p50": 7.85,
+      "p95": 20.87,
+      "max": 78.41
+    }
+  },
+  "control": null,
+  "slowdown": null
+}

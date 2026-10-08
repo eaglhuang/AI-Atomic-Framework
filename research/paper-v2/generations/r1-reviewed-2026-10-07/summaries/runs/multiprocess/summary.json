@@ -1,0 +1,3384 @@
+{
+  "A": {
+    "control-sp": {
+      "label": "control single-process",
+      "runs": [
+        "mp-A-control-sp-r1",
+        "mp-A-control-sp-r2",
+        "mp-A-control-sp-r3"
+      ],
+      "reps": 3,
+      "backend": "none",
+      "params": {
+        "n_agents": 6,
+        "trial_count": 30,
+        "hot_ratio": 0.4,
+        "overlap": "med",
+        "hot_retry": "none",
+        "atm_writer": "sync",
+        "cold_atom_identity": "intent",
+        "cold_retry": "once",
+        "tick_interval_ms": 50,
+        "hold_ms_min": 20,
+        "hold_ms_max": 60
+      },
+      "scenario_hash": "80d54e045f6d",
+      "intents_per_rep": 168,
+      "wall_clock_ms": {
+        "mean": 1516.61,
+        "per_rep": [
+          1516.16,
+          1515.89,
+          1517.79
+        ]
+      },
+      "throughput_intents_per_s": 110.77,
+      "goodput_pass_per_s": 71.43,
+      "commits_per_rep": 168,
+      "oracle_pass_per_rep": 108.3,
+      "lost_updates_per_rep": 59.7,
+      "lost_update_rate_of_commits": 0.3552,
+      "success_rate_of_intents": 0.6448,
+      "rejects_per_rep": 0,
+      "timeouts_per_rep": 0,
+      "errors_per_rep": 0,
+      "racy_per_rep": 62,
+      "decision_hist": {
+        "direct_write": 504
+      },
+      "reason_hist": {
+        "racy_overwrite": 186,
+        "clean": 274,
+        "concurrent_no_clobber": 44
+      },
+      "atm_first_disposition_hist": {},
+      "per_decision": {
+        "direct_write": {
+          "n": 504,
+          "per_rep": 168,
+          "commits": 504,
+          "lost": 179,
+          "latency_ms": {
+            "n": 504,
+            "mean": 0,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0,
+            "max": 0
+          },
+          "wait_ms": {
+            "n": 504,
+            "mean": 0,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0,
+            "max": 0
+          },
+          "overhead_ms": {
+            "n": 504,
+            "mean": 0.2,
+            "p50": 0.19,
+            "p95": 0.3,
+            "p99": 0.49,
+            "max": 0.82
+          },
+          "total_ms": {
+            "n": 504,
+            "mean": 40.55,
+            "p50": 41.09,
+            "p95": 58.42,
+            "p99": 60.13,
+            "max": 61.02
+          }
+        }
+      },
+      "wait_ms_all": {
+        "n": 504,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "wait_ms_waited": {
+        "frac": 0,
+        "n": 0,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "wait_hist": {
+        "0": 504,
+        "(0,25]": 0,
+        "(25,50]": 0,
+        "(50,100]": 0,
+        "(100,200]": 0,
+        "(200,400]": 0,
+        "(400,800]": 0,
+        ">800": 0
+      },
+      "queue_rounds": {
+        "n": 0,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "latency_ms": {
+        "n": 504,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "broker_ms": {
+        "n": 504,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "apply_ms": {
+        "n": 504,
+        "mean": 0.11,
+        "p50": 0.11,
+        "p95": 0.18,
+        "p99": 0.28,
+        "max": 0.34
+      },
+      "total_ms": {
+        "n": 504,
+        "mean": 40.55,
+        "p50": 41.09,
+        "p95": 58.42,
+        "p99": 60.13,
+        "max": 61.02
+      },
+      "overhead_ms": {
+        "n": 504,
+        "mean": 0.2,
+        "p50": 0.19,
+        "p95": 0.3,
+        "p99": 0.49,
+        "max": 0.82
+      },
+      "hold_ms": {
+        "n": 504,
+        "mean": 40.36,
+        "p50": 40.92,
+        "p95": 58.25,
+        "p99": 59.97,
+        "max": 60.86
+      },
+      "schedule_lag_ms": {
+        "n": 504,
+        "mean": 3.6,
+        "p50": 0.67,
+        "p95": 18.59,
+        "p99": 27.07,
+        "max": 32.08
+      }
+    },
+    "control-p6": {
+      "label": "control 6 procs",
+      "runs": [
+        "mp-A-control-p6-r1",
+        "mp-A-control-p6-r2",
+        "mp-A-control-p6-r3"
+      ],
+      "reps": 3,
+      "backend": "none",
+      "params": {
+        "n_agents": 6,
+        "trial_count": 30,
+        "hot_ratio": 0.4,
+        "overlap": "med",
+        "hot_retry": "none",
+        "atm_writer": "sync",
+        "cold_atom_identity": "intent",
+        "cold_retry": "once",
+        "tick_interval_ms": 50,
+        "hold_ms_min": 20,
+        "hold_ms_max": 60
+      },
+      "scenario_hash": "80d54e045f6d",
+      "intents_per_rep": 168,
+      "wall_clock_ms": {
+        "mean": 1516.17,
+        "per_rep": [
+          1515.79,
+          1516.92,
+          1515.81
+        ]
+      },
+      "throughput_intents_per_s": 110.81,
+      "goodput_pass_per_s": 71.23,
+      "commits_per_rep": 168,
+      "oracle_pass_per_rep": 108,
+      "lost_updates_per_rep": 60,
+      "lost_update_rate_of_commits": 0.3571,
+      "success_rate_of_intents": 0.6429,
+      "rejects_per_rep": 0,
+      "timeouts_per_rep": 0,
+      "errors_per_rep": 0,
+      "racy_per_rep": 0,
+      "decision_hist": {
+        "direct_write": 504
+      },
+      "reason_hist": {
+        "clean": 504
+      },
+      "atm_first_disposition_hist": {},
+      "per_decision": {
+        "direct_write": {
+          "n": 504,
+          "per_rep": 168,
+          "commits": 504,
+          "lost": 180,
+          "latency_ms": {
+            "n": 504,
+            "mean": 0,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0,
+            "max": 0.01
+          },
+          "wait_ms": {
+            "n": 504,
+            "mean": 0,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0,
+            "max": 0
+          },
+          "overhead_ms": {
+            "n": 504,
+            "mean": 0.45,
+            "p50": 0.4,
+            "p95": 0.64,
+            "p99": 1.43,
+            "max": 1.82
+          },
+          "total_ms": {
+            "n": 504,
+            "mean": 40.88,
+            "p50": 41.67,
+            "p95": 58.67,
+            "p99": 60.72,
+            "max": 60.97
+          }
+        }
+      },
+      "wait_ms_all": {
+        "n": 504,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "wait_ms_waited": {
+        "frac": 0,
+        "n": 0,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "wait_hist": {
+        "0": 504,
+        "(0,25]": 0,
+        "(25,50]": 0,
+        "(50,100]": 0,
+        "(100,200]": 0,
+        "(200,400]": 0,
+        "(400,800]": 0,
+        ">800": 0
+      },
+      "queue_rounds": {
+        "n": 0,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "latency_ms": {
+        "n": 504,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0.01
+      },
+      "broker_ms": {
+        "n": 504,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "apply_ms": {
+        "n": 504,
+        "mean": 0.27,
+        "p50": 0.25,
+        "p95": 0.4,
+        "p99": 0.49,
+        "max": 0.89
+      },
+      "total_ms": {
+        "n": 504,
+        "mean": 40.88,
+        "p50": 41.67,
+        "p95": 58.67,
+        "p99": 60.72,
+        "max": 60.97
+      },
+      "overhead_ms": {
+        "n": 504,
+        "mean": 0.45,
+        "p50": 0.4,
+        "p95": 0.64,
+        "p99": 1.43,
+        "max": 1.82
+      },
+      "hold_ms": {
+        "n": 504,
+        "mean": 40.44,
+        "p50": 41.23,
+        "p95": 58.26,
+        "p99": 60.25,
+        "max": 60.3
+      },
+      "schedule_lag_ms": {
+        "n": 504,
+        "mean": 3.42,
+        "p50": -0.01,
+        "p95": 18.47,
+        "p99": 29.27,
+        "max": 31.66
+      },
+      "mp": {
+        "procs": 6,
+        "distinct_pids": [
+          6,
+          6,
+          6
+        ],
+        "worker_exit_nonzero": 0,
+        "worker_init_ms_mean": 0,
+        "worker_errors": 0,
+        "registry_txns": 0,
+        "txns_retried": 0,
+        "cas_conflicts": 0,
+        "cas_lock_busy": 0,
+        "cas_stale_generation": 0,
+        "naive_lock_busy": 0,
+        "txn_retries_max": 0,
+        "polls": 0,
+        "apply_lock_spins": 0,
+        "registry_residue": [
+          null,
+          null,
+          null
+        ],
+        "same_file_pairs": 105.7,
+        "same_region_pairs": 89.7,
+        "same_region_xproc_pairs": 89.7
+      }
+    },
+    "atm-sp": {
+      "label": "REAL ATM single-process",
+      "runs": [
+        "mp-A-atm-sp-r1",
+        "mp-A-atm-sp-r2",
+        "mp-A-atm-sp-r3"
+      ],
+      "reps": 3,
+      "backend": "real",
+      "params": {
+        "n_agents": 6,
+        "trial_count": 30,
+        "hot_ratio": 0.4,
+        "overlap": "med",
+        "hot_retry": "none",
+        "atm_writer": "sync",
+        "cold_atom_identity": "intent",
+        "cold_retry": "once",
+        "tick_interval_ms": 50,
+        "hold_ms_min": 20,
+        "hold_ms_max": 60
+      },
+      "scenario_hash": "80d54e045f6d",
+      "intents_per_rep": 168,
+      "wall_clock_ms": {
+        "mean": 1538.63,
+        "per_rep": [
+          1547.95,
+          1530.71,
+          1537.22
+        ]
+      },
+      "throughput_intents_per_s": 109.19,
+      "goodput_pass_per_s": 104.21,
+      "commits_per_rep": 160.3,
+      "oracle_pass_per_rep": 160.3,
+      "lost_updates_per_rep": 0,
+      "lost_update_rate_of_commits": 0,
+      "success_rate_of_intents": 0.9544,
+      "rejects_per_rep": 7.7,
+      "timeouts_per_rep": 0,
+      "errors_per_rep": 0,
+      "racy_per_rep": 0,
+      "decision_hist": {
+        "reject": 23,
+        "admit": 187,
+        "composer_merge": 182,
+        "hot_provisional": 112
+      },
+      "reason_hist": {
+        "atm_true_conflict": 23,
+        "atm_direct": 175,
+        "atm_compose+cas_rebase": 159,
+        "atm_direct+cas_rebase": 12,
+        "atm_provisional_write_lease": 107,
+        "atm_compose": 23,
+        "atm_provisional_write_lease+cas_rebase": 5
+      },
+      "atm_first_disposition_hist": {},
+      "per_decision": {
+        "reject": {
+          "n": 23,
+          "per_rep": 7.7,
+          "commits": 0,
+          "lost": 0,
+          "latency_ms": {
+            "n": 23,
+            "mean": 0.9,
+            "p50": 0.78,
+            "p95": 1.51,
+            "p99": 1.79,
+            "max": 1.79
+          },
+          "wait_ms": {
+            "n": 23,
+            "mean": 0,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0,
+            "max": 0
+          },
+          "overhead_ms": {
+            "n": 23,
+            "mean": 0.97,
+            "p50": 0.82,
+            "p95": 1.68,
+            "p99": 1.95,
+            "max": 1.95
+          },
+          "total_ms": {
+            "n": 23,
+            "mean": 0.97,
+            "p50": 0.82,
+            "p95": 1.68,
+            "p99": 1.95,
+            "max": 1.95
+          }
+        },
+        "admit": {
+          "n": 187,
+          "per_rep": 62.3,
+          "commits": 187,
+          "lost": 0,
+          "latency_ms": {
+            "n": 187,
+            "mean": 2.8,
+            "p50": 2.7,
+            "p95": 3.97,
+            "p99": 5.19,
+            "max": 5.45
+          },
+          "wait_ms": {
+            "n": 187,
+            "mean": 0,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0,
+            "max": 0
+          },
+          "overhead_ms": {
+            "n": 187,
+            "mean": 5,
+            "p50": 4.92,
+            "p95": 6.49,
+            "p99": 7.41,
+            "max": 7.53
+          },
+          "total_ms": {
+            "n": 187,
+            "mean": 46.21,
+            "p50": 47.15,
+            "p95": 64.5,
+            "p99": 65.74,
+            "max": 66.04
+          }
+        },
+        "composer_merge": {
+          "n": 182,
+          "per_rep": 60.7,
+          "commits": 182,
+          "lost": 0,
+          "latency_ms": {
+            "n": 182,
+            "mean": 2.97,
+            "p50": 2.89,
+            "p95": 4.23,
+            "p99": 5.34,
+            "max": 5.58
+          },
+          "wait_ms": {
+            "n": 182,
+            "mean": 0,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0,
+            "max": 0
+          },
+          "overhead_ms": {
+            "n": 182,
+            "mean": 5.29,
+            "p50": 5.12,
+            "p95": 6.66,
+            "p99": 9.64,
+            "max": 11.46
+          },
+          "total_ms": {
+            "n": 182,
+            "mean": 45.4,
+            "p50": 45.57,
+            "p95": 61.97,
+            "p99": 64.84,
+            "max": 67.1
+          }
+        },
+        "hot_provisional": {
+          "n": 112,
+          "per_rep": 37.3,
+          "commits": 112,
+          "lost": 0,
+          "latency_ms": {
+            "n": 112,
+            "mean": 2.86,
+            "p50": 2.69,
+            "p95": 4.41,
+            "p99": 6.8,
+            "max": 7.49
+          },
+          "wait_ms": {
+            "n": 112,
+            "mean": 0,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0,
+            "max": 0
+          },
+          "overhead_ms": {
+            "n": 112,
+            "mean": 5.24,
+            "p50": 4.91,
+            "p95": 7.91,
+            "p99": 10.2,
+            "max": 10.67
+          },
+          "total_ms": {
+            "n": 112,
+            "mean": 49.33,
+            "p50": 50.66,
+            "p95": 65.29,
+            "p99": 68.66,
+            "max": 71.6
+          }
+        }
+      },
+      "wait_ms_all": {
+        "n": 504,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "wait_ms_waited": {
+        "frac": 0,
+        "n": 0,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "wait_hist": {
+        "0": 504,
+        "(0,25]": 0,
+        "(25,50]": 0,
+        "(50,100]": 0,
+        "(100,200]": 0,
+        "(200,400]": 0,
+        "(400,800]": 0,
+        ">800": 0
+      },
+      "queue_rounds": {
+        "n": 0,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "latency_ms": {
+        "n": 504,
+        "mean": 2.79,
+        "p50": 2.74,
+        "p95": 4.06,
+        "p99": 5.45,
+        "max": 7.49
+      },
+      "broker_ms": {
+        "n": 504,
+        "mean": 2.79,
+        "p50": 2.74,
+        "p95": 4.06,
+        "p99": 5.45,
+        "max": 7.49
+      },
+      "apply_ms": {
+        "n": 504,
+        "mean": 2.09,
+        "p50": 2.03,
+        "p95": 3.19,
+        "p99": 3.87,
+        "max": 5.97
+      },
+      "total_ms": {
+        "n": 504,
+        "mean": 44.55,
+        "p50": 46.45,
+        "p95": 64.28,
+        "p99": 66.04,
+        "max": 71.6
+      },
+      "overhead_ms": {
+        "n": 504,
+        "mean": 4.98,
+        "p50": 4.94,
+        "p95": 6.62,
+        "p99": 9.04,
+        "max": 11.46
+      },
+      "hold_ms": {
+        "n": 504,
+        "mean": 39.57,
+        "p50": 40.98,
+        "p95": 58.87,
+        "p99": 60.93,
+        "max": 63.69
+      },
+      "schedule_lag_ms": {
+        "n": 504,
+        "mean": 19.15,
+        "p50": 11.26,
+        "p95": 68.86,
+        "p99": 106.41,
+        "max": 119.51
+      }
+    },
+    "atm-p6": {
+      "label": "REAL ATM 6 procs (CAS registry)",
+      "runs": [
+        "mp-A-atm-p6-r1",
+        "mp-A-atm-p6-r2",
+        "mp-A-atm-p6-r3"
+      ],
+      "reps": 3,
+      "backend": "real",
+      "params": {
+        "n_agents": 6,
+        "trial_count": 30,
+        "hot_ratio": 0.4,
+        "overlap": "med",
+        "hot_retry": "none",
+        "atm_writer": "sync",
+        "cold_atom_identity": "intent",
+        "cold_retry": "once",
+        "tick_interval_ms": 50,
+        "hold_ms_min": 20,
+        "hold_ms_max": 60
+      },
+      "scenario_hash": "80d54e045f6d",
+      "intents_per_rep": 168,
+      "wall_clock_ms": {
+        "mean": 1549.46,
+        "per_rep": [
+          1559.87,
+          1554.84,
+          1533.67
+        ]
+      },
+      "throughput_intents_per_s": 108.43,
+      "goodput_pass_per_s": 103.7,
+      "commits_per_rep": 160.7,
+      "oracle_pass_per_rep": 160.7,
+      "lost_updates_per_rep": 0,
+      "lost_update_rate_of_commits": 0,
+      "success_rate_of_intents": 0.9563,
+      "rejects_per_rep": 7.3,
+      "timeouts_per_rep": 0,
+      "errors_per_rep": 0,
+      "racy_per_rep": 0,
+      "decision_hist": {
+        "reject": 22,
+        "admit": 186,
+        "composer_merge": 179,
+        "hot_provisional": 117
+      },
+      "reason_hist": {
+        "atm_true_conflict": 22,
+        "atm_direct": 175,
+        "atm_compose+cas_rebase": 158,
+        "atm_direct+cas_rebase": 11,
+        "atm_provisional_write_lease": 114,
+        "atm_provisional_write_lease+cas_rebase": 3,
+        "atm_compose": 21
+      },
+      "atm_first_disposition_hist": {
+        "proposal-required": 120,
+        "direct": 199,
+        "compose": 167,
+        "true-conflict": 18
+      },
+      "per_decision": {
+        "reject": {
+          "n": 22,
+          "per_rep": 7.3,
+          "commits": 0,
+          "lost": 0,
+          "latency_ms": {
+            "n": 22,
+            "mean": 3.15,
+            "p50": 1.39,
+            "p95": 13.6,
+            "p99": 14.01,
+            "max": 14.01
+          },
+          "wait_ms": {
+            "n": 22,
+            "mean": 0,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0,
+            "max": 0
+          },
+          "overhead_ms": {
+            "n": 22,
+            "mean": 3.37,
+            "p50": 1.5,
+            "p95": 14.78,
+            "p99": 14.89,
+            "max": 14.89
+          },
+          "total_ms": {
+            "n": 22,
+            "mean": 3.37,
+            "p50": 1.5,
+            "p95": 14.78,
+            "p99": 14.89,
+            "max": 14.89
+          }
+        },
+        "admit": {
+          "n": 186,
+          "per_rep": 62,
+          "commits": 186,
+          "lost": 0,
+          "latency_ms": {
+            "n": 186,
+            "mean": 5.55,
+            "p50": 4.24,
+            "p95": 13.24,
+            "p99": 18.93,
+            "max": 27.23
+          },
+          "wait_ms": {
+            "n": 186,
+            "mean": 0,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0,
+            "max": 0
+          },
+          "overhead_ms": {
+            "n": 186,
+            "mean": 9.35,
+            "p50": 8.3,
+            "p95": 17.2,
+            "p99": 31.42,
+            "max": 31.92
+          },
+          "total_ms": {
+            "n": 186,
+            "mean": 49.15,
+            "p50": 50.81,
+            "p95": 67,
+            "p99": 80.7,
+            "max": 82.2
+          }
+        },
+        "composer_merge": {
+          "n": 179,
+          "per_rep": 59.7,
+          "commits": 179,
+          "lost": 0,
+          "latency_ms": {
+            "n": 179,
+            "mean": 6.14,
+            "p50": 4.65,
+            "p95": 14.04,
+            "p99": 23.46,
+            "max": 24
+          },
+          "wait_ms": {
+            "n": 179,
+            "mean": 0,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0,
+            "max": 0
+          },
+          "overhead_ms": {
+            "n": 179,
+            "mean": 9.84,
+            "p50": 8.29,
+            "p95": 20.84,
+            "p99": 28.53,
+            "max": 31.19
+          },
+          "total_ms": {
+            "n": 179,
+            "mean": 49.68,
+            "p50": 50.24,
+            "p95": 67.41,
+            "p99": 74.34,
+            "max": 80.04
+          }
+        },
+        "hot_provisional": {
+          "n": 117,
+          "per_rep": 39,
+          "commits": 117,
+          "lost": 0,
+          "latency_ms": {
+            "n": 117,
+            "mean": 6,
+            "p50": 3.95,
+            "p95": 20.28,
+            "p99": 23.52,
+            "max": 26.57
+          },
+          "wait_ms": {
+            "n": 117,
+            "mean": 0,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0,
+            "max": 0
+          },
+          "overhead_ms": {
+            "n": 117,
+            "mean": 9.74,
+            "p50": 7.33,
+            "p95": 26.29,
+            "p99": 30.5,
+            "max": 36.65
+          },
+          "total_ms": {
+            "n": 117,
+            "mean": 51.36,
+            "p50": 51.56,
+            "p95": 72.59,
+            "p99": 79.93,
+            "max": 82.49
+          }
+        }
+      },
+      "wait_ms_all": {
+        "n": 504,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "wait_ms_waited": {
+        "frac": 0,
+        "n": 0,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "wait_hist": {
+        "0": 504,
+        "(0,25]": 0,
+        "(25,50]": 0,
+        "(50,100]": 0,
+        "(100,200]": 0,
+        "(200,400]": 0,
+        "(400,800]": 0,
+        ">800": 0
+      },
+      "queue_rounds": {
+        "n": 0,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "latency_ms": {
+        "n": 504,
+        "mean": 5.76,
+        "p50": 4.24,
+        "p95": 14.66,
+        "p99": 23.01,
+        "max": 27.23
+      },
+      "broker_ms": {
+        "n": 504,
+        "mean": 5.76,
+        "p50": 4.24,
+        "p95": 14.66,
+        "p99": 23.01,
+        "max": 27.23
+      },
+      "apply_ms": {
+        "n": 504,
+        "mean": 3.44,
+        "p50": 2.94,
+        "p95": 7.4,
+        "p99": 12.27,
+        "max": 20.97
+      },
+      "total_ms": {
+        "n": 504,
+        "mean": 47.85,
+        "p50": 49.89,
+        "p95": 67.73,
+        "p99": 77.57,
+        "max": 82.49
+      },
+      "overhead_ms": {
+        "n": 504,
+        "mean": 9.35,
+        "p50": 7.93,
+        "p95": 19.69,
+        "p99": 30.18,
+        "max": 36.65
+      },
+      "hold_ms": {
+        "n": 504,
+        "mean": 38.5,
+        "p50": 40.22,
+        "p95": 58.23,
+        "p99": 60.22,
+        "max": 60.48
+      },
+      "schedule_lag_ms": {
+        "n": 504,
+        "mean": 18.69,
+        "p50": 10.64,
+        "p95": 62.89,
+        "p99": 81.55,
+        "max": 110.67
+      },
+      "mp": {
+        "procs": 6,
+        "distinct_pids": [
+          6,
+          6,
+          6
+        ],
+        "worker_exit_nonzero": 0,
+        "worker_init_ms_mean": 99.3,
+        "worker_errors": 0,
+        "registry_txns": 328.7,
+        "txns_retried": 154.7,
+        "cas_conflicts": 478.7,
+        "cas_lock_busy": 444,
+        "cas_stale_generation": 34.7,
+        "naive_lock_busy": 0,
+        "txn_retries_max": 14,
+        "polls": 0,
+        "apply_lock_spins": 0,
+        "registry_residue": [
+          0,
+          0,
+          0
+        ],
+        "same_file_pairs": 85,
+        "same_region_pairs": 74,
+        "same_region_xproc_pairs": 74
+      }
+    }
+  },
+  "B": {
+    "control-sp": {
+      "label": "control single-process",
+      "runs": [
+        "mp-B-control-sp-r1",
+        "mp-B-control-sp-r2",
+        "mp-B-control-sp-r3"
+      ],
+      "reps": 3,
+      "backend": "none",
+      "params": {
+        "n_agents": 8,
+        "trial_count": 40,
+        "hot_ratio": 1,
+        "overlap": "high",
+        "hot_retry": "none",
+        "atm_writer": "sync",
+        "cold_atom_identity": "intent",
+        "cold_retry": "once",
+        "tick_interval_ms": 50,
+        "hold_ms_min": 20,
+        "hold_ms_max": 60
+      },
+      "scenario_hash": "4186c1eb4247",
+      "intents_per_rep": 282,
+      "wall_clock_ms": {
+        "mean": 2023.99,
+        "per_rep": [
+          2024.54,
+          2023.5,
+          2023.93
+        ]
+      },
+      "throughput_intents_per_s": 139.33,
+      "goodput_pass_per_s": 40.02,
+      "commits_per_rep": 282,
+      "oracle_pass_per_rep": 81,
+      "lost_updates_per_rep": 201,
+      "lost_update_rate_of_commits": 0.7128,
+      "success_rate_of_intents": 0.2872,
+      "rejects_per_rep": 0,
+      "timeouts_per_rep": 0,
+      "errors_per_rep": 0,
+      "racy_per_rep": 226.7,
+      "decision_hist": {
+        "direct_write": 846
+      },
+      "reason_hist": {
+        "racy_overwrite": 680,
+        "clean": 109,
+        "concurrent_no_clobber": 57
+      },
+      "atm_first_disposition_hist": {},
+      "per_decision": {
+        "direct_write": {
+          "n": 846,
+          "per_rep": 282,
+          "commits": 846,
+          "lost": 603,
+          "latency_ms": {
+            "n": 846,
+            "mean": 0,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0,
+            "max": 0
+          },
+          "wait_ms": {
+            "n": 846,
+            "mean": 0,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0,
+            "max": 0
+          },
+          "overhead_ms": {
+            "n": 846,
+            "mean": 0.18,
+            "p50": 0.17,
+            "p95": 0.3,
+            "p99": 0.51,
+            "max": 0.82
+          },
+          "total_ms": {
+            "n": 846,
+            "mean": 40.46,
+            "p50": 40.77,
+            "p95": 58.94,
+            "p99": 60.32,
+            "max": 61.27
+          }
+        }
+      },
+      "wait_ms_all": {
+        "n": 846,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "wait_ms_waited": {
+        "frac": 0,
+        "n": 0,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "wait_hist": {
+        "0": 846,
+        "(0,25]": 0,
+        "(25,50]": 0,
+        "(50,100]": 0,
+        "(100,200]": 0,
+        "(200,400]": 0,
+        "(400,800]": 0,
+        ">800": 0
+      },
+      "queue_rounds": {
+        "n": 0,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "latency_ms": {
+        "n": 846,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "broker_ms": {
+        "n": 846,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "apply_ms": {
+        "n": 846,
+        "mean": 0.11,
+        "p50": 0.11,
+        "p95": 0.19,
+        "p99": 0.39,
+        "max": 0.75
+      },
+      "total_ms": {
+        "n": 846,
+        "mean": 40.46,
+        "p50": 40.77,
+        "p95": 58.94,
+        "p99": 60.32,
+        "max": 61.27
+      },
+      "overhead_ms": {
+        "n": 846,
+        "mean": 0.18,
+        "p50": 0.17,
+        "p95": 0.3,
+        "p99": 0.51,
+        "max": 0.82
+      },
+      "hold_ms": {
+        "n": 846,
+        "mean": 40.27,
+        "p50": 40.59,
+        "p95": 58.61,
+        "p99": 60.1,
+        "max": 61.11
+      },
+      "schedule_lag_ms": {
+        "n": 846,
+        "mean": 2.96,
+        "p50": 0.32,
+        "p95": 16.38,
+        "p99": 28.58,
+        "max": 39.51
+      }
+    },
+    "control-p8": {
+      "label": "control 8 procs",
+      "runs": [
+        "mp-B-control-p8-r1",
+        "mp-B-control-p8-r2",
+        "mp-B-control-p8-r3"
+      ],
+      "reps": 3,
+      "backend": "none",
+      "params": {
+        "n_agents": 8,
+        "trial_count": 40,
+        "hot_ratio": 1,
+        "overlap": "high",
+        "hot_retry": "none",
+        "atm_writer": "sync",
+        "cold_atom_identity": "intent",
+        "cold_retry": "once",
+        "tick_interval_ms": 50,
+        "hold_ms_min": 20,
+        "hold_ms_max": 60
+      },
+      "scenario_hash": "4186c1eb4247",
+      "intents_per_rep": 282,
+      "wall_clock_ms": {
+        "mean": 2024.1,
+        "per_rep": [
+          2023.73,
+          2024.49,
+          2024.08
+        ]
+      },
+      "throughput_intents_per_s": 139.32,
+      "goodput_pass_per_s": 40.02,
+      "commits_per_rep": 282,
+      "oracle_pass_per_rep": 81,
+      "lost_updates_per_rep": 201,
+      "lost_update_rate_of_commits": 0.7128,
+      "success_rate_of_intents": 0.2872,
+      "rejects_per_rep": 0,
+      "timeouts_per_rep": 0,
+      "errors_per_rep": 0,
+      "racy_per_rep": 0,
+      "decision_hist": {
+        "direct_write": 846
+      },
+      "reason_hist": {
+        "clean": 846
+      },
+      "atm_first_disposition_hist": {},
+      "per_decision": {
+        "direct_write": {
+          "n": 846,
+          "per_rep": 282,
+          "commits": 846,
+          "lost": 603,
+          "latency_ms": {
+            "n": 846,
+            "mean": 0,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0,
+            "max": 0.01
+          },
+          "wait_ms": {
+            "n": 846,
+            "mean": 0,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0,
+            "max": 0
+          },
+          "overhead_ms": {
+            "n": 846,
+            "mean": 0.44,
+            "p50": 0.39,
+            "p95": 0.62,
+            "p99": 1.47,
+            "max": 2.09
+          },
+          "total_ms": {
+            "n": 846,
+            "mean": 40.79,
+            "p50": 41.51,
+            "p95": 59.56,
+            "p99": 60.66,
+            "max": 61
+          }
+        }
+      },
+      "wait_ms_all": {
+        "n": 846,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "wait_ms_waited": {
+        "frac": 0,
+        "n": 0,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "wait_hist": {
+        "0": 846,
+        "(0,25]": 0,
+        "(25,50]": 0,
+        "(50,100]": 0,
+        "(100,200]": 0,
+        "(200,400]": 0,
+        "(400,800]": 0,
+        ">800": 0
+      },
+      "queue_rounds": {
+        "n": 0,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "latency_ms": {
+        "n": 846,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0.01
+      },
+      "broker_ms": {
+        "n": 846,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "apply_ms": {
+        "n": 846,
+        "mean": 0.26,
+        "p50": 0.24,
+        "p95": 0.38,
+        "p99": 0.49,
+        "max": 0.75
+      },
+      "total_ms": {
+        "n": 846,
+        "mean": 40.79,
+        "p50": 41.51,
+        "p95": 59.56,
+        "p99": 60.66,
+        "max": 61
+      },
+      "overhead_ms": {
+        "n": 846,
+        "mean": 0.44,
+        "p50": 0.39,
+        "p95": 0.62,
+        "p99": 1.47,
+        "max": 2.09
+      },
+      "hold_ms": {
+        "n": 846,
+        "mean": 40.35,
+        "p50": 40.58,
+        "p95": 59.2,
+        "p99": 60.24,
+        "max": 60.48
+      },
+      "schedule_lag_ms": {
+        "n": 846,
+        "mean": 2.97,
+        "p50": -0.02,
+        "p95": 16.51,
+        "p99": 29.98,
+        "max": 39.51
+      },
+      "mp": {
+        "procs": 8,
+        "distinct_pids": [
+          8,
+          8,
+          8
+        ],
+        "worker_exit_nonzero": 0,
+        "worker_init_ms_mean": 0,
+        "worker_errors": 0,
+        "registry_txns": 0,
+        "txns_retried": 0,
+        "cas_conflicts": 0,
+        "cas_lock_busy": 0,
+        "cas_stale_generation": 0,
+        "naive_lock_busy": 0,
+        "txn_retries_max": 0,
+        "polls": 0,
+        "apply_lock_spins": 0,
+        "registry_residue": [
+          null,
+          null,
+          null
+        ],
+        "same_file_pairs": 760,
+        "same_region_pairs": 245,
+        "same_region_xproc_pairs": 245
+      }
+    },
+    "atm-sp": {
+      "label": "REAL ATM single-process",
+      "runs": [
+        "mp-B-atm-sp-r1",
+        "mp-B-atm-sp-r2",
+        "mp-B-atm-sp-r3"
+      ],
+      "reps": 3,
+      "backend": "real",
+      "params": {
+        "n_agents": 8,
+        "trial_count": 40,
+        "hot_ratio": 1,
+        "overlap": "high",
+        "hot_retry": "none",
+        "atm_writer": "sync",
+        "cold_atom_identity": "intent",
+        "cold_retry": "once",
+        "tick_interval_ms": 50,
+        "hold_ms_min": 20,
+        "hold_ms_max": 60
+      },
+      "scenario_hash": "4186c1eb4247",
+      "intents_per_rep": 282,
+      "wall_clock_ms": {
+        "mean": 2046.91,
+        "per_rep": [
+          2052.01,
+          2039.41,
+          2049.3
+        ]
+      },
+      "throughput_intents_per_s": 137.77,
+      "goodput_pass_per_s": 105.36,
+      "commits_per_rep": 215.7,
+      "oracle_pass_per_rep": 215.7,
+      "lost_updates_per_rep": 0,
+      "lost_update_rate_of_commits": 0,
+      "success_rate_of_intents": 0.7648,
+      "rejects_per_rep": 66.3,
+      "timeouts_per_rep": 0,
+      "errors_per_rep": 0,
+      "racy_per_rep": 0,
+      "decision_hist": {
+        "composer_merge": 511,
+        "hot_provisional": 136,
+        "reject": 199
+      },
+      "reason_hist": {
+        "atm_compose+cas_rebase": 485,
+        "atm_provisional_write_lease": 111,
+        "atm_provisional_write_lease+cas_rebase": 25,
+        "atm_true_conflict": 199,
+        "atm_compose": 26
+      },
+      "atm_first_disposition_hist": {},
+      "per_decision": {
+        "composer_merge": {
+          "n": 511,
+          "per_rep": 170.3,
+          "commits": 511,
+          "lost": 0,
+          "latency_ms": {
+            "n": 511,
+            "mean": 3.17,
+            "p50": 3.02,
+            "p95": 4.77,
+            "p99": 5.61,
+            "max": 8.01
+          },
+          "wait_ms": {
+            "n": 511,
+            "mean": 0,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0,
+            "max": 0
+          },
+          "overhead_ms": {
+            "n": 511,
+            "mean": 5.49,
+            "p50": 5.31,
+            "p95": 7.24,
+            "p99": 8.52,
+            "max": 9.99
+          },
+          "total_ms": {
+            "n": 511,
+            "mean": 48.65,
+            "p50": 49.73,
+            "p95": 66.35,
+            "p99": 71.21,
+            "max": 75.28
+          }
+        },
+        "hot_provisional": {
+          "n": 136,
+          "per_rep": 45.3,
+          "commits": 136,
+          "lost": 0,
+          "latency_ms": {
+            "n": 136,
+            "mean": 3.01,
+            "p50": 2.71,
+            "p95": 4.86,
+            "p99": 8.07,
+            "max": 18.5
+          },
+          "wait_ms": {
+            "n": 136,
+            "mean": 0,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0,
+            "max": 0
+          },
+          "overhead_ms": {
+            "n": 136,
+            "mean": 5.48,
+            "p50": 5.08,
+            "p95": 7.9,
+            "p99": 11.23,
+            "max": 21.7
+          },
+          "total_ms": {
+            "n": 136,
+            "mean": 46.32,
+            "p50": 45.96,
+            "p95": 65.76,
+            "p99": 69.1,
+            "max": 69.83
+          }
+        },
+        "reject": {
+          "n": 199,
+          "per_rep": 66.3,
+          "commits": 0,
+          "lost": 0,
+          "latency_ms": {
+            "n": 199,
+            "mean": 0.93,
+            "p50": 0.9,
+            "p95": 1.53,
+            "p99": 2.31,
+            "max": 2.84
+          },
+          "wait_ms": {
+            "n": 199,
+            "mean": 0,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0,
+            "max": 0
+          },
+          "overhead_ms": {
+            "n": 199,
+            "mean": 1,
+            "p50": 0.96,
+            "p95": 1.64,
+            "p99": 2.53,
+            "max": 2.92
+          },
+          "total_ms": {
+            "n": 199,
+            "mean": 1,
+            "p50": 0.96,
+            "p95": 1.64,
+            "p99": 2.53,
+            "max": 2.92
+          }
+        }
+      },
+      "wait_ms_all": {
+        "n": 846,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "wait_ms_waited": {
+        "frac": 0,
+        "n": 0,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "wait_hist": {
+        "0": 846,
+        "(0,25]": 0,
+        "(25,50]": 0,
+        "(50,100]": 0,
+        "(100,200]": 0,
+        "(200,400]": 0,
+        "(400,800]": 0,
+        ">800": 0
+      },
+      "queue_rounds": {
+        "n": 0,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "latency_ms": {
+        "n": 846,
+        "mean": 2.62,
+        "p50": 2.73,
+        "p95": 4.54,
+        "p99": 5.61,
+        "max": 18.5
+      },
+      "broker_ms": {
+        "n": 846,
+        "mean": 2.62,
+        "p50": 2.73,
+        "p95": 4.54,
+        "p99": 5.61,
+        "max": 18.5
+      },
+      "apply_ms": {
+        "n": 846,
+        "mean": 1.73,
+        "p50": 1.99,
+        "p95": 3.11,
+        "p99": 3.99,
+        "max": 5.02
+      },
+      "total_ms": {
+        "n": 846,
+        "mean": 37.06,
+        "p50": 42.5,
+        "p95": 65.55,
+        "p99": 69.21,
+        "max": 75.28
+      },
+      "overhead_ms": {
+        "n": 846,
+        "mean": 4.43,
+        "p50": 4.98,
+        "p95": 7.08,
+        "p99": 8.56,
+        "max": 21.7
+      },
+      "hold_ms": {
+        "n": 846,
+        "mean": 32.63,
+        "p50": 36.64,
+        "p95": 59.96,
+        "p99": 63.9,
+        "max": 69.86
+      },
+      "schedule_lag_ms": {
+        "n": 846,
+        "mean": 13.88,
+        "p50": 7.82,
+        "p95": 43.17,
+        "p99": 65.98,
+        "max": 101.8
+      }
+    },
+    "atm-p8": {
+      "label": "REAL ATM 8 procs (CAS)",
+      "runs": [
+        "mp-B-atm-p8-r1",
+        "mp-B-atm-p8-r2",
+        "mp-B-atm-p8-r3"
+      ],
+      "reps": 3,
+      "backend": "real",
+      "params": {
+        "n_agents": 8,
+        "trial_count": 40,
+        "hot_ratio": 1,
+        "overlap": "high",
+        "hot_retry": "none",
+        "atm_writer": "sync",
+        "cold_atom_identity": "intent",
+        "cold_retry": "once",
+        "tick_interval_ms": 50,
+        "hold_ms_min": 20,
+        "hold_ms_max": 60
+      },
+      "scenario_hash": "4186c1eb4247",
+      "intents_per_rep": 282,
+      "wall_clock_ms": {
+        "mean": 2038.98,
+        "per_rep": [
+          2039.1,
+          2041.42,
+          2036.41
+        ]
+      },
+      "throughput_intents_per_s": 138.3,
+      "goodput_pass_per_s": 99.56,
+      "commits_per_rep": 203,
+      "oracle_pass_per_rep": 203,
+      "lost_updates_per_rep": 0,
+      "lost_update_rate_of_commits": 0,
+      "success_rate_of_intents": 0.7199,
+      "rejects_per_rep": 79,
+      "timeouts_per_rep": 0,
+      "errors_per_rep": 0,
+      "racy_per_rep": 0,
+      "decision_hist": {
+        "reject": 237,
+        "hot_provisional": 150,
+        "composer_merge": 459
+      },
+      "reason_hist": {
+        "atm_true_conflict": 237,
+        "atm_provisional_write_lease": 122,
+        "atm_compose+cas_rebase": 417,
+        "atm_provisional_write_lease+cas_rebase": 28,
+        "atm_compose": 42
+      },
+      "atm_first_disposition_hist": {
+        "proposal-required": 207,
+        "true-conflict": 177,
+        "compose": 462
+      },
+      "per_decision": {
+        "reject": {
+          "n": 237,
+          "per_rep": 79,
+          "commits": 0,
+          "lost": 0,
+          "latency_ms": {
+            "n": 237,
+            "mean": 3.17,
+            "p50": 1.4,
+            "p95": 14.19,
+            "p99": 19.56,
+            "max": 21.54
+          },
+          "wait_ms": {
+            "n": 237,
+            "mean": 0,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0,
+            "max": 0
+          },
+          "overhead_ms": {
+            "n": 237,
+            "mean": 3.31,
+            "p50": 1.55,
+            "p95": 14.92,
+            "p99": 19.75,
+            "max": 21.69
+          },
+          "total_ms": {
+            "n": 237,
+            "mean": 3.31,
+            "p50": 1.55,
+            "p95": 14.92,
+            "p99": 19.75,
+            "max": 21.69
+          }
+        },
+        "hot_provisional": {
+          "n": 150,
+          "per_rep": 50,
+          "commits": 150,
+          "lost": 0,
+          "latency_ms": {
+            "n": 150,
+            "mean": 5.32,
+            "p50": 3.94,
+            "p95": 12.77,
+            "p99": 20,
+            "max": 25.66
+          },
+          "wait_ms": {
+            "n": 150,
+            "mean": 0,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0,
+            "max": 0
+          },
+          "overhead_ms": {
+            "n": 150,
+            "mean": 9.14,
+            "p50": 7.73,
+            "p95": 18.6,
+            "p99": 24.66,
+            "max": 27.74
+          },
+          "total_ms": {
+            "n": 150,
+            "mean": 49.05,
+            "p50": 48.82,
+            "p95": 70.43,
+            "p99": 74.31,
+            "max": 74.67
+          }
+        },
+        "composer_merge": {
+          "n": 459,
+          "per_rep": 153,
+          "commits": 459,
+          "lost": 0,
+          "latency_ms": {
+            "n": 459,
+            "mean": 7.42,
+            "p50": 5.08,
+            "p95": 20.93,
+            "p99": 30.2,
+            "max": 40.19
+          },
+          "wait_ms": {
+            "n": 459,
+            "mean": 0,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0,
+            "max": 0
+          },
+          "overhead_ms": {
+            "n": 459,
+            "mean": 11.33,
+            "p50": 9.3,
+            "p95": 25.37,
+            "p99": 33.23,
+            "max": 49.78
+          },
+          "total_ms": {
+            "n": 459,
+            "mean": 51.8,
+            "p50": 51.2,
+            "p95": 73.05,
+            "p99": 84.2,
+            "max": 98.02
+          }
+        }
+      },
+      "wait_ms_all": {
+        "n": 846,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "wait_ms_waited": {
+        "frac": 0,
+        "n": 0,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "wait_hist": {
+        "0": 846,
+        "(0,25]": 0,
+        "(25,50]": 0,
+        "(50,100]": 0,
+        "(100,200]": 0,
+        "(200,400]": 0,
+        "(400,800]": 0,
+        ">800": 0
+      },
+      "queue_rounds": {
+        "n": 0,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "latency_ms": {
+        "n": 846,
+        "mean": 5.86,
+        "p50": 3.97,
+        "p95": 17.28,
+        "p99": 26.66,
+        "max": 40.19
+      },
+      "broker_ms": {
+        "n": 846,
+        "mean": 5.86,
+        "p50": 3.97,
+        "p95": 17.28,
+        "p99": 26.66,
+        "max": 40.19
+      },
+      "apply_ms": {
+        "n": 846,
+        "mean": 2.67,
+        "p50": 2.64,
+        "p95": 6.4,
+        "p99": 10.3,
+        "max": 21.25
+      },
+      "total_ms": {
+        "n": 846,
+        "mean": 37.73,
+        "p50": 42.85,
+        "p95": 69.59,
+        "p99": 80.07,
+        "max": 98.02
+      },
+      "overhead_ms": {
+        "n": 846,
+        "mean": 8.69,
+        "p50": 7.32,
+        "p95": 21.63,
+        "p99": 31.36,
+        "max": 49.78
+      },
+      "hold_ms": {
+        "n": 846,
+        "mean": 29.04,
+        "p50": 32.27,
+        "p95": 58.2,
+        "p99": 60.2,
+        "max": 60.66
+      },
+      "schedule_lag_ms": {
+        "n": 846,
+        "mean": 8.36,
+        "p50": 0.2,
+        "p95": 35.68,
+        "p99": 58.81,
+        "max": 81.83
+      },
+      "mp": {
+        "procs": 8,
+        "distinct_pids": [
+          8,
+          8,
+          8
+        ],
+        "worker_exit_nonzero": 0,
+        "worker_init_ms_mean": 124.5,
+        "worker_errors": 0,
+        "registry_txns": 485,
+        "txns_retried": 225.3,
+        "cas_conflicts": 750.3,
+        "cas_lock_busy": 694.3,
+        "cas_stale_generation": 56,
+        "naive_lock_busy": 0,
+        "txn_retries_max": 15,
+        "polls": 0,
+        "apply_lock_spins": 2.3,
+        "registry_residue": [
+          0,
+          0,
+          0
+        ],
+        "same_file_pairs": 399.3,
+        "same_region_pairs": 107.7,
+        "same_region_xproc_pairs": 107.7
+      }
+    },
+    "atm-p4": {
+      "label": "REAL ATM 4 procs × 2 agents (CAS)",
+      "runs": [
+        "mp-B-atm-p4-r1",
+        "mp-B-atm-p4-r2",
+        "mp-B-atm-p4-r3"
+      ],
+      "reps": 3,
+      "backend": "real",
+      "params": {
+        "n_agents": 8,
+        "trial_count": 40,
+        "hot_ratio": 1,
+        "overlap": "high",
+        "hot_retry": "none",
+        "atm_writer": "sync",
+        "cold_atom_identity": "intent",
+        "cold_retry": "once",
+        "tick_interval_ms": 50,
+        "hold_ms_min": 20,
+        "hold_ms_max": 60
+      },
+      "scenario_hash": "4186c1eb4247",
+      "intents_per_rep": 282,
+      "wall_clock_ms": {
+        "mean": 2039.22,
+        "per_rep": [
+          2033.24,
+          2043.94,
+          2040.47
+        ]
+      },
+      "throughput_intents_per_s": 138.29,
+      "goodput_pass_per_s": 100.69,
+      "commits_per_rep": 205.3,
+      "oracle_pass_per_rep": 205.3,
+      "lost_updates_per_rep": 0,
+      "lost_update_rate_of_commits": 0,
+      "success_rate_of_intents": 0.7281,
+      "rejects_per_rep": 76.7,
+      "timeouts_per_rep": 0,
+      "errors_per_rep": 0,
+      "racy_per_rep": 0,
+      "decision_hist": {
+        "reject": 230,
+        "hot_provisional": 155,
+        "composer_merge": 461
+      },
+      "reason_hist": {
+        "atm_true_conflict": 230,
+        "atm_provisional_write_lease": 124,
+        "atm_provisional_write_lease+cas_rebase": 31,
+        "atm_compose+cas_rebase": 415,
+        "atm_compose": 46
+      },
+      "atm_first_disposition_hist": {
+        "proposal-required": 173,
+        "compose": 476,
+        "true-conflict": 197
+      },
+      "per_decision": {
+        "reject": {
+          "n": 230,
+          "per_rep": 76.7,
+          "commits": 0,
+          "lost": 0,
+          "latency_ms": {
+            "n": 230,
+            "mean": 1.85,
+            "p50": 1.13,
+            "p95": 7.49,
+            "p99": 12.74,
+            "max": 14.37
+          },
+          "wait_ms": {
+            "n": 230,
+            "mean": 0,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0,
+            "max": 0
+          },
+          "overhead_ms": {
+            "n": 230,
+            "mean": 1.96,
+            "p50": 1.24,
+            "p95": 7.56,
+            "p99": 12.84,
+            "max": 15.28
+          },
+          "total_ms": {
+            "n": 230,
+            "mean": 1.96,
+            "p50": 1.24,
+            "p95": 7.56,
+            "p99": 12.84,
+            "max": 15.28
+          }
+        },
+        "hot_provisional": {
+          "n": 155,
+          "per_rep": 51.7,
+          "commits": 155,
+          "lost": 0,
+          "latency_ms": {
+            "n": 155,
+            "mean": 4.62,
+            "p50": 3.59,
+            "p95": 13.02,
+            "p99": 14.5,
+            "max": 16.91
+          },
+          "wait_ms": {
+            "n": 155,
+            "mean": 0,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0,
+            "max": 0
+          },
+          "overhead_ms": {
+            "n": 155,
+            "mean": 7.79,
+            "p50": 7.06,
+            "p95": 15.93,
+            "p99": 19.77,
+            "max": 20.4
+          },
+          "total_ms": {
+            "n": 155,
+            "mean": 48.17,
+            "p50": 47.6,
+            "p95": 66.69,
+            "p99": 73.77,
+            "max": 74.07
+          }
+        },
+        "composer_merge": {
+          "n": 461,
+          "per_rep": 153.7,
+          "commits": 461,
+          "lost": 0,
+          "latency_ms": {
+            "n": 461,
+            "mean": 5.93,
+            "p50": 4.36,
+            "p95": 14.52,
+            "p99": 25.93,
+            "max": 30.25
+          },
+          "wait_ms": {
+            "n": 461,
+            "mean": 0,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0,
+            "max": 0
+          },
+          "overhead_ms": {
+            "n": 461,
+            "mean": 9.2,
+            "p50": 7.84,
+            "p95": 17.92,
+            "p99": 29.49,
+            "max": 34.7
+          },
+          "total_ms": {
+            "n": 461,
+            "mean": 49.54,
+            "p50": 50.47,
+            "p95": 69.71,
+            "p99": 78.79,
+            "max": 83.51
+          }
+        }
+      },
+      "wait_ms_all": {
+        "n": 846,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "wait_ms_waited": {
+        "frac": 0,
+        "n": 0,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "wait_hist": {
+        "0": 846,
+        "(0,25]": 0,
+        "(25,50]": 0,
+        "(50,100]": 0,
+        "(100,200]": 0,
+        "(200,400]": 0,
+        "(400,800]": 0,
+        ">800": 0
+      },
+      "queue_rounds": {
+        "n": 0,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "latency_ms": {
+        "n": 846,
+        "mean": 4.58,
+        "p50": 3.45,
+        "p95": 12.22,
+        "p99": 20.08,
+        "max": 30.25
+      },
+      "broker_ms": {
+        "n": 846,
+        "mean": 4.58,
+        "p50": 3.45,
+        "p95": 12.22,
+        "p99": 20.08,
+        "max": 30.25
+      },
+      "apply_ms": {
+        "n": 846,
+        "mean": 2.26,
+        "p50": 2.32,
+        "p95": 5.26,
+        "p99": 7.25,
+        "max": 16.34
+      },
+      "total_ms": {
+        "n": 846,
+        "mean": 36.36,
+        "p50": 41.71,
+        "p95": 67.65,
+        "p99": 73.77,
+        "max": 83.51
+      },
+      "overhead_ms": {
+        "n": 846,
+        "mean": 6.97,
+        "p50": 6.39,
+        "p95": 15.75,
+        "p99": 25.86,
+        "max": 34.7
+      },
+      "hold_ms": {
+        "n": 846,
+        "mean": 29.38,
+        "p50": 32.53,
+        "p95": 57.94,
+        "p99": 60.26,
+        "max": 65.47
+      },
+      "schedule_lag_ms": {
+        "n": 846,
+        "mean": 7.7,
+        "p50": 0.59,
+        "p95": 32.19,
+        "p99": 53.09,
+        "max": 75.43
+      },
+      "mp": {
+        "procs": 4,
+        "distinct_pids": [
+          4,
+          4,
+          4
+        ],
+        "worker_exit_nonzero": 0,
+        "worker_init_ms_mean": 75.6,
+        "worker_errors": 0,
+        "registry_txns": 487.3,
+        "txns_retried": 188,
+        "cas_conflicts": 545,
+        "cas_lock_busy": 496.7,
+        "cas_stale_generation": 48.3,
+        "naive_lock_busy": 0,
+        "txn_retries_max": 15,
+        "polls": 0,
+        "apply_lock_spins": 3,
+        "registry_residue": [
+          0,
+          0,
+          0
+        ],
+        "same_file_pairs": 408.3,
+        "same_region_pairs": 111.3,
+        "same_region_xproc_pairs": 98.7
+      }
+    },
+    "atmloop-sp": {
+      "label": "REAL ATM + hot loop, single-process",
+      "runs": [
+        "mp-B-atmloop-sp-r1",
+        "mp-B-atmloop-sp-r2",
+        "mp-B-atmloop-sp-r3"
+      ],
+      "reps": 3,
+      "backend": "real",
+      "params": {
+        "n_agents": 8,
+        "trial_count": 40,
+        "hot_ratio": 1,
+        "overlap": "high",
+        "hot_retry": "loop",
+        "atm_writer": "sync",
+        "cold_atom_identity": "intent",
+        "cold_retry": "once",
+        "tick_interval_ms": 50,
+        "hold_ms_min": 20,
+        "hold_ms_max": 60
+      },
+      "scenario_hash": "4186c1eb4247",
+      "intents_per_rep": 282,
+      "wall_clock_ms": {
+        "mean": 2327.28,
+        "per_rep": [
+          2328.79,
+          2344.7,
+          2308.35
+        ]
+      },
+      "throughput_intents_per_s": 121.18,
+      "goodput_pass_per_s": 121.18,
+      "commits_per_rep": 282,
+      "oracle_pass_per_rep": 282,
+      "lost_updates_per_rep": 0,
+      "lost_update_rate_of_commits": 0,
+      "success_rate_of_intents": 1,
+      "rejects_per_rep": 0,
+      "timeouts_per_rep": 0,
+      "errors_per_rep": 0,
+      "racy_per_rep": 0,
+      "decision_hist": {
+        "composer_merge": 717,
+        "hot_provisional": 129
+      },
+      "reason_hist": {
+        "atm_compose+cas_rebase": 484,
+        "atm_provisional_write_lease": 79,
+        "overlay_wait_on_atm_true-conflict_then_compose+cas_rebase": 202,
+        "atm_provisional_write_lease+cas_rebase": 13,
+        "overlay_wait_on_atm_true-conflict_then_proposal-required": 34,
+        "overlay_wait_on_atm_true-conflict_then_compose": 10,
+        "atm_compose": 21,
+        "overlay_wait_on_atm_true-conflict_then_proposal-required+cas_rebase": 3
+      },
+      "atm_first_disposition_hist": {
+        "compose": 505,
+        "proposal-required": 92,
+        "true-conflict": 249
+      },
+      "per_decision": {
+        "composer_merge": {
+          "n": 717,
+          "per_rep": 239,
+          "commits": 717,
+          "lost": 0,
+          "latency_ms": {
+            "n": 717,
+            "mean": 10.94,
+            "p50": 3.43,
+            "p95": 45.09,
+            "p99": 65.76,
+            "max": 110.21
+          },
+          "wait_ms": {
+            "n": 717,
+            "mean": 7.8,
+            "p50": 0,
+            "p95": 41,
+            "p99": 60,
+            "max": 108
+          },
+          "overhead_ms": {
+            "n": 717,
+            "mean": 13.31,
+            "p50": 5.91,
+            "p95": 47.36,
+            "p99": 68.06,
+            "max": 113.28
+          },
+          "total_ms": {
+            "n": 717,
+            "mean": 57.49,
+            "p50": 55.36,
+            "p95": 96.77,
+            "p99": 111.23,
+            "max": 143.38
+          }
+        },
+        "hot_provisional": {
+          "n": 129,
+          "per_rep": 43,
+          "commits": 129,
+          "lost": 0,
+          "latency_ms": {
+            "n": 129,
+            "mean": 11.21,
+            "p50": 3.27,
+            "p95": 47.31,
+            "p99": 74.3,
+            "max": 98.36
+          },
+          "wait_ms": {
+            "n": 129,
+            "mean": 8.26,
+            "p50": 0,
+            "p95": 42,
+            "p99": 72,
+            "max": 95
+          },
+          "overhead_ms": {
+            "n": 129,
+            "mean": 13.62,
+            "p50": 5.67,
+            "p95": 49.88,
+            "p99": 76.87,
+            "max": 102.25
+          },
+          "total_ms": {
+            "n": 129,
+            "mean": 53.73,
+            "p50": 50.12,
+            "p95": 91.1,
+            "p99": 117.9,
+            "max": 128.04
+          }
+        }
+      },
+      "wait_ms_all": {
+        "n": 846,
+        "mean": 7.87,
+        "p50": 0,
+        "p95": 41,
+        "p99": 62,
+        "max": 108
+      },
+      "wait_ms_waited": {
+        "frac": 0.294,
+        "n": 249,
+        "mean": 26.73,
+        "p50": 24,
+        "p95": 59,
+        "p99": 80,
+        "max": 108
+      },
+      "wait_hist": {
+        "0": 597,
+        "(0,25]": 133,
+        "(25,50]": 93,
+        "(50,100]": 22,
+        "(100,200]": 1,
+        "(200,400]": 0,
+        "(400,800]": 0,
+        ">800": 0
+      },
+      "queue_rounds": {
+        "n": 249,
+        "mean": 1.78,
+        "p50": 1,
+        "p95": 4,
+        "p99": 5,
+        "max": 6
+      },
+      "latency_ms": {
+        "n": 846,
+        "mean": 10.98,
+        "p50": 3.4,
+        "p95": 45.09,
+        "p99": 65.9,
+        "max": 110.21
+      },
+      "broker_ms": {
+        "n": 846,
+        "mean": 3.11,
+        "p50": 2.95,
+        "p95": 5.09,
+        "p99": 6.53,
+        "max": 9.1
+      },
+      "apply_ms": {
+        "n": 846,
+        "mean": 2.31,
+        "p50": 2.2,
+        "p95": 3.44,
+        "p99": 4.54,
+        "max": 8.55
+      },
+      "total_ms": {
+        "n": 846,
+        "mean": 56.92,
+        "p50": 54.46,
+        "p95": 95.28,
+        "p99": 112.49,
+        "max": 143.38
+      },
+      "overhead_ms": {
+        "n": 846,
+        "mean": 13.36,
+        "p50": 5.88,
+        "p95": 47.36,
+        "p99": 68.25,
+        "max": 113.28
+      },
+      "hold_ms": {
+        "n": 846,
+        "mean": 43.56,
+        "p50": 43.35,
+        "p95": 62.26,
+        "p99": 66.75,
+        "max": 72.23
+      },
+      "schedule_lag_ms": {
+        "n": 846,
+        "mean": 133.88,
+        "p50": 118.64,
+        "p95": 304.15,
+        "p99": 374.68,
+        "max": 463.83
+      }
+    },
+    "atmloop-p8": {
+      "label": "REAL ATM + hot loop, 8 procs (CAS)",
+      "runs": [
+        "mp-B-atmloop-p8-r1",
+        "mp-B-atmloop-p8-r2",
+        "mp-B-atmloop-p8-r3"
+      ],
+      "reps": 3,
+      "backend": "real",
+      "params": {
+        "n_agents": 8,
+        "trial_count": 40,
+        "hot_ratio": 1,
+        "overlap": "high",
+        "hot_retry": "loop",
+        "atm_writer": "sync",
+        "cold_atom_identity": "intent",
+        "cold_retry": "once",
+        "tick_interval_ms": 50,
+        "hold_ms_min": 20,
+        "hold_ms_max": 60
+      },
+      "scenario_hash": "4186c1eb4247",
+      "intents_per_rep": 282,
+      "wall_clock_ms": {
+        "mean": 2448.59,
+        "per_rep": [
+          2359.7,
+          2648.46,
+          2337.62
+        ]
+      },
+      "throughput_intents_per_s": 115.54,
+      "goodput_pass_per_s": 115.54,
+      "commits_per_rep": 282,
+      "oracle_pass_per_rep": 282,
+      "lost_updates_per_rep": 0,
+      "lost_update_rate_of_commits": 0,
+      "success_rate_of_intents": 1,
+      "rejects_per_rep": 0,
+      "timeouts_per_rep": 0,
+      "errors_per_rep": 0,
+      "racy_per_rep": 0,
+      "decision_hist": {
+        "composer_merge": 696,
+        "hot_provisional": 150
+      },
+      "reason_hist": {
+        "overlay_wait_on_atm_proposal-required_then_compose+cas_rebase": 16,
+        "atm_provisional_write_lease": 96,
+        "atm_compose+cas_rebase": 417,
+        "overlay_wait_on_atm_compose_then_compose": 3,
+        "overlay_wait_on_atm_true-conflict_then_compose+cas_rebase": 174,
+        "atm_provisional_write_lease+cas_rebase": 16,
+        "overlay_wait_on_atm_true-conflict_then_proposal-required": 25,
+        "overlay_wait_on_atm_true-conflict_then_compose": 19,
+        "atm_compose": 38,
+        "overlay_wait_on_atm_compose_then_compose+cas_rebase": 28,
+        "overlay_wait_on_atm_compose_then_proposal-required": 2,
+        "overlay_wait_on_atm_true-conflict_then_proposal-required+cas_rebase": 7,
+        "overlay_wait_on_atm_proposal-required_then_proposal-required": 3,
+        "overlay_wait_on_atm_proposal-required_then_proposal-required+cas_rebase": 1,
+        "overlay_wait_on_atm_proposal-required_then_compose": 1
+      },
+      "atm_first_disposition_hist": {
+        "proposal-required": 154,
+        "compose": 467,
+        "true-conflict": 225
+      },
+      "per_decision": {
+        "composer_merge": {
+          "n": 696,
+          "per_rep": 232,
+          "commits": 696,
+          "lost": 0,
+          "latency_ms": {
+            "n": 696,
+            "mean": 18.07,
+            "p50": 9.23,
+            "p95": 59.06,
+            "p99": 100.12,
+            "max": 281.46
+          },
+          "wait_ms": {
+            "n": 696,
+            "mean": 12.69,
+            "p50": 0,
+            "p95": 59,
+            "p99": 100,
+            "max": 281
+          },
+          "overhead_ms": {
+            "n": 696,
+            "mean": 22.2,
+            "p50": 13.4,
+            "p95": 63.66,
+            "p99": 102.58,
+            "max": 286.76
+          },
+          "total_ms": {
+            "n": 696,
+            "mean": 62.63,
+            "p50": 57.94,
+            "p95": 108.15,
+            "p99": 153.96,
+            "max": 326
+          }
+        },
+        "hot_provisional": {
+          "n": 150,
+          "per_rep": 50,
+          "commits": 150,
+          "lost": 0,
+          "latency_ms": {
+            "n": 150,
+            "mean": 15.53,
+            "p50": 6.45,
+            "p95": 65.78,
+            "p99": 102.72,
+            "max": 118.4
+          },
+          "wait_ms": {
+            "n": 150,
+            "mean": 10.9,
+            "p50": 0,
+            "p95": 66,
+            "p99": 103,
+            "max": 118
+          },
+          "overhead_ms": {
+            "n": 150,
+            "mean": 19.37,
+            "p50": 10.74,
+            "p95": 68.8,
+            "p99": 106.75,
+            "max": 121.54
+          },
+          "total_ms": {
+            "n": 150,
+            "mean": 59.25,
+            "p50": 55.99,
+            "p95": 112.45,
+            "p99": 146.78,
+            "max": 163.76
+          }
+        }
+      },
+      "wait_ms_all": {
+        "n": 846,
+        "mean": 12.38,
+        "p50": 0,
+        "p95": 59,
+        "p99": 100,
+        "max": 281
+      },
+      "wait_ms_waited": {
+        "frac": 0.33,
+        "n": 279,
+        "mean": 37.53,
+        "p50": 31,
+        "p95": 86,
+        "p99": 162,
+        "max": 281
+      },
+      "wait_hist": {
+        "0": 567,
+        "(0,25]": 107,
+        "(25,50]": 107,
+        "(50,100]": 57,
+        "(100,200]": 7,
+        "(200,400]": 1,
+        "(400,800]": 0,
+        ">800": 0
+      },
+      "queue_rounds": {
+        "n": 279,
+        "mean": 1.59,
+        "p50": 1,
+        "p95": 4,
+        "p99": 5,
+        "max": 11
+      },
+      "latency_ms": {
+        "n": 846,
+        "mean": 17.62,
+        "p50": 8.54,
+        "p95": 60.11,
+        "p99": 100.44,
+        "max": 281.46
+      },
+      "broker_ms": {
+        "n": 846,
+        "mean": 5.27,
+        "p50": 3.64,
+        "p95": 17.86,
+        "p99": 28.74,
+        "max": 49.72
+      },
+      "apply_ms": {
+        "n": 846,
+        "mean": 3.94,
+        "p50": 3.18,
+        "p95": 7.99,
+        "p99": 14.12,
+        "max": 21.27
+      },
+      "total_ms": {
+        "n": 846,
+        "mean": 62.03,
+        "p50": 57.27,
+        "p95": 108.15,
+        "p99": 146.78,
+        "max": 326
+      },
+      "overhead_ms": {
+        "n": 846,
+        "mean": 21.7,
+        "p50": 12.84,
+        "p95": 66.1,
+        "p99": 106.21,
+        "max": 286.76
+      },
+      "hold_ms": {
+        "n": 846,
+        "mean": 40.33,
+        "p50": 40.49,
+        "p95": 59.19,
+        "p99": 60.24,
+        "max": 60.62
+      },
+      "schedule_lag_ms": {
+        "n": 846,
+        "mean": 178.82,
+        "p50": 146.5,
+        "p95": 478.91,
+        "p99": 675.17,
+        "max": 815.26
+      },
+      "mp": {
+        "procs": 8,
+        "distinct_pids": [
+          8,
+          8,
+          8
+        ],
+        "worker_exit_nonzero": 0,
+        "worker_init_ms_mean": 130.5,
+        "worker_errors": 0,
+        "registry_txns": 711.7,
+        "txns_retried": 340.7,
+        "cas_conflicts": 1237.3,
+        "cas_lock_busy": 1127.3,
+        "cas_stale_generation": 110,
+        "naive_lock_busy": 0,
+        "txn_retries_max": 20,
+        "polls": 729.7,
+        "apply_lock_spins": 4,
+        "registry_residue": [
+          0,
+          0,
+          0
+        ],
+        "same_file_pairs": 566.7,
+        "same_region_pairs": 121.7,
+        "same_region_xproc_pairs": 121.7
+      }
+    },
+    "atmnaive-p8": {
+      "label": "REAL ATM 8 procs, NAIVE registry (loadRegistry/saveRegistry)",
+      "runs": [
+        "mp-B-atmnaive-p8-r1",
+        "mp-B-atmnaive-p8-r2",
+        "mp-B-atmnaive-p8-r3"
+      ],
+      "reps": 3,
+      "backend": "real",
+      "params": {
+        "n_agents": 8,
+        "trial_count": 40,
+        "hot_ratio": 1,
+        "overlap": "high",
+        "hot_retry": "none",
+        "atm_writer": "sync",
+        "cold_atom_identity": "intent",
+        "cold_retry": "once",
+        "tick_interval_ms": 50,
+        "hold_ms_min": 20,
+        "hold_ms_max": 60
+      },
+      "scenario_hash": "4186c1eb4247",
+      "intents_per_rep": 282,
+      "wall_clock_ms": {
+        "mean": 2132.12,
+        "per_rep": [
+          2191.62,
+          2069.56,
+          2135.19
+        ]
+      },
+      "throughput_intents_per_s": 132.34,
+      "goodput_pass_per_s": 91.83,
+      "commits_per_rep": 195.7,
+      "oracle_pass_per_rep": 195.7,
+      "lost_updates_per_rep": 0,
+      "lost_update_rate_of_commits": 0,
+      "success_rate_of_intents": 0.6939,
+      "rejects_per_rep": 86.3,
+      "timeouts_per_rep": 0,
+      "errors_per_rep": 0,
+      "racy_per_rep": 0,
+      "decision_hist": {
+        "composer_merge": 559,
+        "hot_provisional": 28,
+        "reject": 259
+      },
+      "reason_hist": {
+        "atm_compose+cas_rebase": 434,
+        "atm_provisional_write_lease": 16,
+        "atm_true_conflict": 259,
+        "atm_compose": 125,
+        "atm_provisional_write_lease+cas_rebase": 12
+      },
+      "atm_first_disposition_hist": {
+        "proposal-required": 47,
+        "compose": 554,
+        "true-conflict": 245
+      },
+      "per_decision": {
+        "composer_merge": {
+          "n": 559,
+          "per_rep": 186.3,
+          "commits": 559,
+          "lost": 0,
+          "latency_ms": {
+            "n": 559,
+            "mean": 13.07,
+            "p50": 9.6,
+            "p95": 32.31,
+            "p99": 47.82,
+            "max": 87.86
+          },
+          "wait_ms": {
+            "n": 559,
+            "mean": 0,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0,
+            "max": 0
+          },
+          "overhead_ms": {
+            "n": 559,
+            "mean": 19.48,
+            "p50": 15.98,
+            "p95": 41.32,
+            "p99": 61.99,
+            "max": 93.71
+          },
+          "total_ms": {
+            "n": 559,
+            "mean": 59.19,
+            "p50": 58.55,
+            "p95": 82,
+            "p99": 102.9,
+            "max": 144.26
+          }
+        },
+        "hot_provisional": {
+          "n": 28,
+          "per_rep": 9.3,
+          "commits": 28,
+          "lost": 0,
+          "latency_ms": {
+            "n": 28,
+            "mean": 8.71,
+            "p50": 7.49,
+            "p95": 14.25,
+            "p99": 14.8,
+            "max": 14.8
+          },
+          "wait_ms": {
+            "n": 28,
+            "mean": 0,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0,
+            "max": 0
+          },
+          "overhead_ms": {
+            "n": 28,
+            "mean": 14.54,
+            "p50": 12.22,
+            "p95": 25.41,
+            "p99": 27.23,
+            "max": 27.23
+          },
+          "total_ms": {
+            "n": 28,
+            "mean": 51.47,
+            "p50": 49.9,
+            "p95": 72.21,
+            "p99": 74.75,
+            "max": 74.75
+          }
+        },
+        "reject": {
+          "n": 259,
+          "per_rep": 86.3,
+          "commits": 0,
+          "lost": 0,
+          "latency_ms": {
+            "n": 259,
+            "mean": 3.9,
+            "p50": 3.39,
+            "p95": 5.88,
+            "p99": 19.88,
+            "max": 21.49
+          },
+          "wait_ms": {
+            "n": 259,
+            "mean": 0,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0,
+            "max": 0
+          },
+          "overhead_ms": {
+            "n": 259,
+            "mean": 4.04,
+            "p50": 3.5,
+            "p95": 6.02,
+            "p99": 21.11,
+            "max": 22.46
+          },
+          "total_ms": {
+            "n": 259,
+            "mean": 4.04,
+            "p50": 3.5,
+            "p95": 6.02,
+            "p99": 21.11,
+            "max": 22.46
+          }
+        }
+      },
+      "wait_ms_all": {
+        "n": 846,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "wait_ms_waited": {
+        "frac": 0,
+        "n": 0,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "wait_hist": {
+        "0": 846,
+        "(0,25]": 0,
+        "(25,50]": 0,
+        "(50,100]": 0,
+        "(100,200]": 0,
+        "(200,400]": 0,
+        "(400,800]": 0,
+        ">800": 0
+      },
+      "queue_rounds": {
+        "n": 0,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "latency_ms": {
+        "n": 846,
+        "mean": 10.12,
+        "p50": 7.05,
+        "p95": 27.97,
+        "p99": 41.97,
+        "max": 87.86
+      },
+      "broker_ms": {
+        "n": 846,
+        "mean": 10.12,
+        "p50": 7.05,
+        "p95": 27.97,
+        "p99": 41.97,
+        "max": 87.86
+      },
+      "apply_ms": {
+        "n": 846,
+        "mean": 4.31,
+        "p50": 4.1,
+        "p95": 11.39,
+        "p99": 19.51,
+        "max": 37.76
+      },
+      "total_ms": {
+        "n": 846,
+        "mean": 42.05,
+        "p50": 50.53,
+        "p95": 77.77,
+        "p99": 94.59,
+        "max": 144.26
+      },
+      "overhead_ms": {
+        "n": 846,
+        "mean": 14.59,
+        "p50": 12.33,
+        "p95": 36.29,
+        "p99": 55.45,
+        "max": 93.71
+      },
+      "hold_ms": {
+        "n": 846,
+        "mean": 27.46,
+        "p50": 31.16,
+        "p95": 57.24,
+        "p99": 59.32,
+        "max": 60.36
+      },
+      "schedule_lag_ms": {
+        "n": 846,
+        "mean": 19.05,
+        "p50": 6.8,
+        "p95": 73.3,
+        "p99": 163.56,
+        "max": 234.58
+      },
+      "mp": {
+        "procs": 8,
+        "distinct_pids": [
+          8,
+          8,
+          8
+        ],
+        "worker_exit_nonzero": 0,
+        "worker_init_ms_mean": 128.1,
+        "worker_errors": 0,
+        "registry_txns": 477.7,
+        "txns_retried": 205.3,
+        "cas_conflicts": 0,
+        "cas_lock_busy": 0,
+        "cas_stale_generation": 0,
+        "naive_lock_busy": 570.7,
+        "txn_retries_max": 14,
+        "polls": 0,
+        "apply_lock_spins": 1.3,
+        "registry_residue": [
+          37,
+          26,
+          32
+        ],
+        "same_file_pairs": 396,
+        "same_region_pairs": 182.3,
+        "same_region_xproc_pairs": 182.3
+      }
+    },
+    "atmnolock-p8": {
+      "label": "REAL ATM 8 procs, CAS, apply-lock OFF",
+      "runs": [
+        "mp-B-atmnolock-p8-r1",
+        "mp-B-atmnolock-p8-r2",
+        "mp-B-atmnolock-p8-r3"
+      ],
+      "reps": 3,
+      "backend": "real",
+      "params": {
+        "n_agents": 8,
+        "trial_count": 40,
+        "hot_ratio": 1,
+        "overlap": "high",
+        "hot_retry": "none",
+        "atm_writer": "sync",
+        "cold_atom_identity": "intent",
+        "cold_retry": "once",
+        "tick_interval_ms": 50,
+        "hold_ms_min": 20,
+        "hold_ms_max": 60
+      },
+      "scenario_hash": "4186c1eb4247",
+      "intents_per_rep": 282,
+      "wall_clock_ms": {
+        "mean": 2040.22,
+        "per_rep": [
+          2036.85,
+          2035.87,
+          2047.95
+        ]
+      },
+      "throughput_intents_per_s": 138.22,
+      "goodput_pass_per_s": 98.35,
+      "commits_per_rep": 202.7,
+      "oracle_pass_per_rep": 200.7,
+      "lost_updates_per_rep": 2,
+      "lost_update_rate_of_commits": 0.0099,
+      "success_rate_of_intents": 0.7116,
+      "rejects_per_rep": 79.3,
+      "timeouts_per_rep": 0,
+      "errors_per_rep": 0,
+      "racy_per_rep": 0,
+      "decision_hist": {
+        "composer_merge": 461,
+        "hot_provisional": 147,
+        "reject": 238
+      },
+      "reason_hist": {
+        "atm_compose+cas_rebase": 410,
+        "atm_provisional_write_lease": 117,
+        "atm_true_conflict": 238,
+        "atm_provisional_write_lease+cas_rebase": 30,
+        "atm_compose": 51
+      },
+      "atm_first_disposition_hist": {
+        "proposal-required": 196,
+        "compose": 471,
+        "true-conflict": 179
+      },
+      "per_decision": {
+        "composer_merge": {
+          "n": 461,
+          "per_rep": 153.7,
+          "commits": 461,
+          "lost": 6,
+          "latency_ms": {
+            "n": 461,
+            "mean": 7.43,
+            "p50": 5.26,
+            "p95": 18.74,
+            "p99": 32.6,
+            "max": 42.83
+          },
+          "wait_ms": {
+            "n": 461,
+            "mean": 0,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0,
+            "max": 0
+          },
+          "overhead_ms": {
+            "n": 461,
+            "mean": 11.25,
+            "p50": 9.12,
+            "p95": 24.16,
+            "p99": 37.85,
+            "max": 50.66
+          },
+          "total_ms": {
+            "n": 461,
+            "mean": 51.8,
+            "p50": 52.59,
+            "p95": 71.91,
+            "p99": 81.95,
+            "max": 88.67
+          }
+        },
+        "hot_provisional": {
+          "n": 147,
+          "per_rep": 49,
+          "commits": 147,
+          "lost": 0,
+          "latency_ms": {
+            "n": 147,
+            "mean": 5.54,
+            "p50": 3.96,
+            "p95": 13.74,
+            "p99": 21.51,
+            "max": 51.11
+          },
+          "wait_ms": {
+            "n": 147,
+            "mean": 0,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0,
+            "max": 0
+          },
+          "overhead_ms": {
+            "n": 147,
+            "mean": 9.02,
+            "p50": 7.34,
+            "p95": 18.14,
+            "p99": 26.14,
+            "max": 54.35
+          },
+          "total_ms": {
+            "n": 147,
+            "mean": 48.41,
+            "p50": 47.31,
+            "p95": 66.68,
+            "p99": 75.09,
+            "max": 102.72
+          }
+        },
+        "reject": {
+          "n": 238,
+          "per_rep": 79.3,
+          "commits": 0,
+          "lost": 0,
+          "latency_ms": {
+            "n": 238,
+            "mean": 3.3,
+            "p50": 1.39,
+            "p95": 15.5,
+            "p99": 26.44,
+            "max": 37.85
+          },
+          "wait_ms": {
+            "n": 238,
+            "mean": 0,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0,
+            "max": 0
+          },
+          "overhead_ms": {
+            "n": 238,
+            "mean": 3.49,
+            "p50": 1.5,
+            "p95": 16.05,
+            "p99": 26.54,
+            "max": 39.5
+          },
+          "total_ms": {
+            "n": 238,
+            "mean": 3.49,
+            "p50": 1.5,
+            "p95": 16.05,
+            "p99": 26.54,
+            "max": 39.5
+          }
+        }
+      },
+      "wait_ms_all": {
+        "n": 846,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "wait_ms_waited": {
+        "frac": 0,
+        "n": 0,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "wait_hist": {
+        "0": 846,
+        "(0,25]": 0,
+        "(25,50]": 0,
+        "(50,100]": 0,
+        "(100,200]": 0,
+        "(200,400]": 0,
+        "(400,800]": 0,
+        ">800": 0
+      },
+      "queue_rounds": {
+        "n": 0,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "latency_ms": {
+        "n": 846,
+        "mean": 5.94,
+        "p50": 4.04,
+        "p95": 17,
+        "p99": 30.92,
+        "max": 51.11
+      },
+      "broker_ms": {
+        "n": 846,
+        "mean": 5.94,
+        "p50": 4.04,
+        "p95": 17,
+        "p99": 30.92,
+        "max": 51.11
+      },
+      "apply_ms": {
+        "n": 846,
+        "mean": 2.56,
+        "p50": 2.49,
+        "p95": 6.42,
+        "p99": 10.02,
+        "max": 28.59
+      },
+      "total_ms": {
+        "n": 846,
+        "mean": 37.62,
+        "p50": 42.31,
+        "p95": 69.22,
+        "p99": 79.35,
+        "max": 102.72
+      },
+      "overhead_ms": {
+        "n": 846,
+        "mean": 8.68,
+        "p50": 7.23,
+        "p95": 21.29,
+        "p99": 37.43,
+        "max": 54.35
+      },
+      "hold_ms": {
+        "n": 846,
+        "mean": 28.94,
+        "p50": 32.19,
+        "p95": 57.76,
+        "p99": 59.61,
+        "max": 60.47
+      },
+      "schedule_lag_ms": {
+        "n": 846,
+        "mean": 7.08,
+        "p50": 0.11,
+        "p95": 34.46,
+        "p99": 46.68,
+        "max": 68.76
+      },
+      "mp": {
+        "procs": 8,
+        "distinct_pids": [
+          8,
+          8,
+          8
+        ],
+        "worker_exit_nonzero": 0,
+        "worker_init_ms_mean": 128.5,
+        "worker_errors": 0,
+        "registry_txns": 484.7,
+        "txns_retried": 224.3,
+        "cas_conflicts": 736,
+        "cas_lock_busy": 678.3,
+        "cas_stale_generation": 57.7,
+        "naive_lock_busy": 0,
+        "txn_retries_max": 18,
+        "polls": 0,
+        "apply_lock_spins": 0,
+        "registry_residue": [
+          0,
+          0,
+          0
+        ],
+        "same_file_pairs": 380.7,
+        "same_region_pairs": 101.3,
+        "same_region_xproc_pairs": 101.3
+      }
+    }
+  }
+}

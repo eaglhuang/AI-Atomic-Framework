@@ -1,0 +1,854 @@
+{
+  "generated_at": "2026-10-06T09:55:41.493Z",
+  "atm_runs": [
+    {
+      "run_id": "cq-mock-a16-r1",
+      "atm_backend": "mock",
+      "atm_version": "mock-broker-0.1 (not ATM monorepo)",
+      "label": "MOCK ATM (in-process mock-broker)",
+      "scenario_seed": 42,
+      "scenario_hash": "02660e85e1d47ffc1b78b6f824399175efdf2cd1c304cedcb84a9b68b8c50161",
+      "params": {
+        "n_agents": 16,
+        "hot_ratio": 0,
+        "overlap": "cold-same-file",
+        "cold_policy": "queue",
+        "composer_enabled": true,
+        "trial_count": 60,
+        "tick_interval_ms": 50,
+        "hold_ms_min": 20,
+        "hold_ms_max": 60,
+        "jitter_ms": 15,
+        "idle_prob": 0.1,
+        "queue_timeout_ms": 15000,
+        "max_provisional_depth": 1,
+        "cold_atom_identity": "intent",
+        "cold_retry": "once"
+      },
+      "cli_version": "0.3.0-latency",
+      "node_version": "v24.21.0"
+    },
+    {
+      "run_id": "cq-mock-a16-r2",
+      "atm_backend": "mock",
+      "atm_version": "mock-broker-0.1 (not ATM monorepo)",
+      "label": "MOCK ATM (in-process mock-broker)",
+      "scenario_seed": 42,
+      "scenario_hash": "02660e85e1d47ffc1b78b6f824399175efdf2cd1c304cedcb84a9b68b8c50161",
+      "params": {
+        "n_agents": 16,
+        "hot_ratio": 0,
+        "overlap": "cold-same-file",
+        "cold_policy": "queue",
+        "composer_enabled": true,
+        "trial_count": 60,
+        "tick_interval_ms": 50,
+        "hold_ms_min": 20,
+        "hold_ms_max": 60,
+        "jitter_ms": 15,
+        "idle_prob": 0.1,
+        "queue_timeout_ms": 15000,
+        "max_provisional_depth": 1,
+        "cold_atom_identity": "intent",
+        "cold_retry": "once"
+      },
+      "cli_version": "0.3.0-latency",
+      "node_version": "v24.21.0"
+    },
+    {
+      "run_id": "cq-mock-a16-r3",
+      "atm_backend": "mock",
+      "atm_version": "mock-broker-0.1 (not ATM monorepo)",
+      "label": "MOCK ATM (in-process mock-broker)",
+      "scenario_seed": 42,
+      "scenario_hash": "02660e85e1d47ffc1b78b6f824399175efdf2cd1c304cedcb84a9b68b8c50161",
+      "params": {
+        "n_agents": 16,
+        "hot_ratio": 0,
+        "overlap": "cold-same-file",
+        "cold_policy": "queue",
+        "composer_enabled": true,
+        "trial_count": 60,
+        "tick_interval_ms": 50,
+        "hold_ms_min": 20,
+        "hold_ms_max": 60,
+        "jitter_ms": 15,
+        "idle_prob": 0.1,
+        "queue_timeout_ms": 15000,
+        "max_provisional_depth": 1,
+        "cold_atom_identity": "intent",
+        "cold_retry": "once"
+      },
+      "cli_version": "0.3.0-latency",
+      "node_version": "v24.21.0"
+    }
+  ],
+  "control_runs": [
+    {
+      "run_id": "cq-control-a16-r1",
+      "atm_backend": "none",
+      "atm_version": null,
+      "label": "CONTROL (no ATM / no broker)",
+      "scenario_seed": 42,
+      "scenario_hash": "02660e85e1d47ffc1b78b6f824399175efdf2cd1c304cedcb84a9b68b8c50161",
+      "params": {
+        "n_agents": 16,
+        "hot_ratio": 0,
+        "overlap": "cold-same-file",
+        "cold_policy": "queue",
+        "composer_enabled": true,
+        "trial_count": 60,
+        "tick_interval_ms": 50,
+        "hold_ms_min": 20,
+        "hold_ms_max": 60,
+        "jitter_ms": 15,
+        "idle_prob": 0.1,
+        "queue_timeout_ms": 15000,
+        "max_provisional_depth": 1,
+        "cold_atom_identity": "intent",
+        "cold_retry": "once"
+      },
+      "cli_version": "0.3.0-latency",
+      "node_version": "v24.21.0"
+    },
+    {
+      "run_id": "cq-control-a16-r2",
+      "atm_backend": "none",
+      "atm_version": null,
+      "label": "CONTROL (no ATM / no broker)",
+      "scenario_seed": 42,
+      "scenario_hash": "02660e85e1d47ffc1b78b6f824399175efdf2cd1c304cedcb84a9b68b8c50161",
+      "params": {
+        "n_agents": 16,
+        "hot_ratio": 0,
+        "overlap": "cold-same-file",
+        "cold_policy": "queue",
+        "composer_enabled": true,
+        "trial_count": 60,
+        "tick_interval_ms": 50,
+        "hold_ms_min": 20,
+        "hold_ms_max": 60,
+        "jitter_ms": 15,
+        "idle_prob": 0.1,
+        "queue_timeout_ms": 15000,
+        "max_provisional_depth": 1,
+        "cold_atom_identity": "intent",
+        "cold_retry": "once"
+      },
+      "cli_version": "0.3.0-latency",
+      "node_version": "v24.21.0"
+    },
+    {
+      "run_id": "cq-control-a16-r3",
+      "atm_backend": "none",
+      "atm_version": null,
+      "label": "CONTROL (no ATM / no broker)",
+      "scenario_seed": 42,
+      "scenario_hash": "02660e85e1d47ffc1b78b6f824399175efdf2cd1c304cedcb84a9b68b8c50161",
+      "params": {
+        "n_agents": 16,
+        "hot_ratio": 0,
+        "overlap": "cold-same-file",
+        "cold_policy": "queue",
+        "composer_enabled": true,
+        "trial_count": 60,
+        "tick_interval_ms": 50,
+        "hold_ms_min": 20,
+        "hold_ms_max": 60,
+        "jitter_ms": 15,
+        "idle_prob": 0.1,
+        "queue_timeout_ms": 15000,
+        "max_provisional_depth": 1,
+        "cold_atom_identity": "intent",
+        "cold_retry": "once"
+      },
+      "cli_version": "0.3.0-latency",
+      "node_version": "v24.21.0"
+    }
+  ],
+  "headline": {
+    "reps": {
+      "atm": 3,
+      "control": 3
+    },
+    "wall_clock_ms": {
+      "atm_mean": 7990.23,
+      "control_mean": 3028.31,
+      "delta_ms": 4961.92,
+      "slowdown_x": 2.64,
+      "atm_per_rep": [
+        8046.43,
+        7944.54,
+        7979.73
+      ],
+      "control_per_rep": [
+        3028.9,
+        3028.25,
+        3027.79
+      ]
+    },
+    "throughput_intents_per_s": {
+      "atm_mean": 110.01,
+      "control_mean": 290.26,
+      "slowdown_x": 2.64,
+      "atm_per_rep": [
+        109.24,
+        110.64,
+        110.15
+      ],
+      "control_per_rep": [
+        290.2,
+        290.27,
+        290.31
+      ]
+    },
+    "goodput_oracle_pass_per_s": {
+      "atm_mean": 110.01,
+      "control_mean": 21.13,
+      "ratio_atm_over_control": 5.21
+    },
+    "total_ms": {
+      "mean": {
+        "atm": 121.79,
+        "control": 40.16,
+        "delta_ms": 81.63,
+        "ratio": 3.03
+      },
+      "p95": {
+        "atm": 306.86,
+        "control": 58.25,
+        "delta_ms": 248.61,
+        "ratio": 5.27
+      }
+    },
+    "overhead_ms": {
+      "mean": {
+        "atm": 81.79,
+        "control": 0.14,
+        "delta_ms": 81.65,
+        "ratio": 584.21
+      },
+      "p95": {
+        "atm": 265.03,
+        "control": 0.26,
+        "delta_ms": 264.77,
+        "ratio": 1019.35
+      }
+    },
+    "atm_admission_latency_ms": {
+      "n": 2637,
+      "mean": 81.58,
+      "p50": 45.29,
+      "p95": 264.75,
+      "max": 558.73
+    },
+    "atm_broker_ms": {
+      "n": 2637,
+      "mean": 0.17,
+      "p50": 0.01,
+      "p95": 0.72,
+      "max": 1.18
+    },
+    "atm_wait_ms": {
+      "n": 2637,
+      "mean": 81.49,
+      "p50": 45,
+      "p95": 265,
+      "max": 559
+    }
+  },
+  "per_intent": {
+    "latency_ms": {
+      "mean": {
+        "atm": 81.58,
+        "control": 0,
+        "delta_ms": 81.58,
+        "ratio": null
+      },
+      "p50": {
+        "atm": 45.29,
+        "control": 0,
+        "delta_ms": 45.29,
+        "ratio": null
+      },
+      "p95": {
+        "atm": 264.75,
+        "control": 0,
+        "delta_ms": 264.75,
+        "ratio": null
+      },
+      "max": {
+        "atm": 558.73,
+        "control": 0.01,
+        "delta_ms": 558.72,
+        "ratio": 55873
+      }
+    },
+    "wait_ms": {
+      "mean": {
+        "atm": 81.49,
+        "control": 0,
+        "delta_ms": 81.49,
+        "ratio": null
+      },
+      "p50": {
+        "atm": 45,
+        "control": 0,
+        "delta_ms": 45,
+        "ratio": null
+      },
+      "p95": {
+        "atm": 265,
+        "control": 0,
+        "delta_ms": 265,
+        "ratio": null
+      },
+      "max": {
+        "atm": 559,
+        "control": 0,
+        "delta_ms": 559,
+        "ratio": null
+      }
+    },
+    "broker_ms": {
+      "mean": {
+        "atm": 0.17,
+        "control": 0,
+        "delta_ms": 0.17,
+        "ratio": null
+      },
+      "p50": {
+        "atm": 0.01,
+        "control": 0,
+        "delta_ms": 0.01,
+        "ratio": null
+      },
+      "p95": {
+        "atm": 0.72,
+        "control": 0,
+        "delta_ms": 0.72,
+        "ratio": null
+      },
+      "max": {
+        "atm": 1.18,
+        "control": 0,
+        "delta_ms": 1.18,
+        "ratio": null
+      }
+    },
+    "hold_ms": {
+      "mean": {
+        "atm": 40,
+        "control": 40.02,
+        "delta_ms": -0.02,
+        "ratio": 1
+      },
+      "p50": {
+        "atm": 40.36,
+        "control": 40.19,
+        "delta_ms": 0.17,
+        "ratio": 1
+      },
+      "p95": {
+        "atm": 58.13,
+        "control": 58.14,
+        "delta_ms": -0.01,
+        "ratio": 1
+      },
+      "max": {
+        "atm": 61.01,
+        "control": 60.94,
+        "delta_ms": 0.07,
+        "ratio": 1
+      }
+    },
+    "apply_ms": {
+      "mean": {
+        "atm": 0.13,
+        "control": 0.09,
+        "delta_ms": 0.04,
+        "ratio": 1.44
+      },
+      "p50": {
+        "atm": 0.13,
+        "control": 0.08,
+        "delta_ms": 0.05,
+        "ratio": 1.63
+      },
+      "p95": {
+        "atm": 0.21,
+        "control": 0.19,
+        "delta_ms": 0.02,
+        "ratio": 1.11
+      },
+      "max": {
+        "atm": 0.81,
+        "control": 0.66,
+        "delta_ms": 0.15,
+        "ratio": 1.23
+      }
+    },
+    "total_ms": {
+      "mean": {
+        "atm": 121.79,
+        "control": 40.16,
+        "delta_ms": 81.63,
+        "ratio": 3.03
+      },
+      "p50": {
+        "atm": 87.29,
+        "control": 40.34,
+        "delta_ms": 46.95,
+        "ratio": 2.16
+      },
+      "p95": {
+        "atm": 306.86,
+        "control": 58.25,
+        "delta_ms": 248.61,
+        "ratio": 5.27
+      },
+      "max": {
+        "atm": 583.01,
+        "control": 61.04,
+        "delta_ms": 521.97,
+        "ratio": 9.55
+      }
+    },
+    "overhead_ms": {
+      "mean": {
+        "atm": 81.79,
+        "control": 0.14,
+        "delta_ms": 81.65,
+        "ratio": 584.21
+      },
+      "p50": {
+        "atm": 45.57,
+        "control": 0.13,
+        "delta_ms": 45.44,
+        "ratio": 350.54
+      },
+      "p95": {
+        "atm": 265.03,
+        "control": 0.26,
+        "delta_ms": 264.77,
+        "ratio": 1019.35
+      },
+      "max": {
+        "atm": 558.97,
+        "control": 0.69,
+        "delta_ms": 558.28,
+        "ratio": 810.1
+      }
+    },
+    "schedule_lag_ms": {
+      "mean": {
+        "atm": 2186.84,
+        "control": 2.76,
+        "delta_ms": 2184.08,
+        "ratio": 792.33
+      },
+      "p50": {
+        "atm": 2051.1,
+        "control": 0.52,
+        "delta_ms": 2050.58,
+        "ratio": 3944.42
+      },
+      "p95": {
+        "atm": 4421.05,
+        "control": 15.51,
+        "delta_ms": 4405.54,
+        "ratio": 285.05
+      },
+      "max": {
+        "atm": 5030.85,
+        "control": 35.79,
+        "delta_ms": 4995.06,
+        "ratio": 140.57
+      }
+    }
+  },
+  "by_temperature": {
+    "cold": {
+      "latency_ms": {
+        "mean": {
+          "atm": 81.58,
+          "control": 0,
+          "delta_ms": 81.58,
+          "ratio": null
+        },
+        "p50": {
+          "atm": 45.29,
+          "control": 0,
+          "delta_ms": 45.29,
+          "ratio": null
+        },
+        "p95": {
+          "atm": 264.75,
+          "control": 0,
+          "delta_ms": 264.75,
+          "ratio": null
+        },
+        "max": {
+          "atm": 558.73,
+          "control": 0.01,
+          "delta_ms": 558.72,
+          "ratio": 55873
+        }
+      },
+      "total_ms": {
+        "mean": {
+          "atm": 121.79,
+          "control": 40.16,
+          "delta_ms": 81.63,
+          "ratio": 3.03
+        },
+        "p50": {
+          "atm": 87.29,
+          "control": 40.34,
+          "delta_ms": 46.95,
+          "ratio": 2.16
+        },
+        "p95": {
+          "atm": 306.86,
+          "control": 58.25,
+          "delta_ms": 248.61,
+          "ratio": 5.27
+        },
+        "max": {
+          "atm": 583.01,
+          "control": 61.04,
+          "delta_ms": 521.97,
+          "ratio": 9.55
+        }
+      },
+      "overhead_ms": {
+        "mean": {
+          "atm": 81.79,
+          "control": 0.14,
+          "delta_ms": 81.65,
+          "ratio": 584.21
+        },
+        "p50": {
+          "atm": 45.57,
+          "control": 0.13,
+          "delta_ms": 45.44,
+          "ratio": 350.54
+        },
+        "p95": {
+          "atm": 265.03,
+          "control": 0.26,
+          "delta_ms": 264.77,
+          "ratio": 1019.35
+        },
+        "max": {
+          "atm": 558.97,
+          "control": 0.69,
+          "delta_ms": 558.28,
+          "ratio": 810.1
+        }
+      },
+      "apply_ms": {
+        "mean": {
+          "atm": 0.13,
+          "control": 0.09,
+          "delta_ms": 0.04,
+          "ratio": 1.44
+        },
+        "p50": {
+          "atm": 0.13,
+          "control": 0.08,
+          "delta_ms": 0.05,
+          "ratio": 1.63
+        },
+        "p95": {
+          "atm": 0.21,
+          "control": 0.19,
+          "delta_ms": 0.02,
+          "ratio": 1.11
+        },
+        "max": {
+          "atm": 0.81,
+          "control": 0.66,
+          "delta_ms": 0.15,
+          "ratio": 1.23
+        }
+      },
+      "n": {
+        "atm": 2637,
+        "control": 2637
+      }
+    }
+  },
+  "paired_by": {
+    "all": {
+      "n": 2637,
+      "total_ms_delta": {
+        "n": 2637,
+        "mean": 81.63,
+        "p50": 45.49,
+        "p95": 265.27,
+        "max": 557.79
+      },
+      "overhead_ms_delta": {
+        "n": 2637,
+        "mean": 81.65,
+        "p50": 45.45,
+        "p95": 264.86,
+        "max": 558.69
+      }
+    },
+    "temperature:cold": {
+      "n": 2637,
+      "total_ms_delta": {
+        "n": 2637,
+        "mean": 81.63,
+        "p50": 45.49,
+        "p95": 265.27,
+        "max": 557.79
+      },
+      "overhead_ms_delta": {
+        "n": 2637,
+        "mean": 81.65,
+        "p50": 45.45,
+        "p95": 264.86,
+        "max": 558.69
+      }
+    },
+    "atm_decision:admit": {
+      "n": 810,
+      "total_ms_delta": {
+        "n": 810,
+        "mean": 0.05,
+        "p50": 0.05,
+        "p95": 1.03,
+        "max": 1.78
+      },
+      "overhead_ms_delta": {
+        "n": 810,
+        "mean": 0.06,
+        "p50": 0.05,
+        "p95": 0.19,
+        "max": 0.82
+      }
+    },
+    "atm_decision:cold_queue": {
+      "n": 1827,
+      "total_ms_delta": {
+        "n": 1827,
+        "mean": 117.79,
+        "p50": 93.77,
+        "p95": 298.12,
+        "max": 557.79
+      },
+      "overhead_ms_delta": {
+        "n": 1827,
+        "mean": 117.82,
+        "p50": 94.09,
+        "p95": 297.56,
+        "max": 558.69
+      }
+    }
+  },
+  "atm_by_decision": {
+    "admit": {
+      "n": 810,
+      "latency_ms": {
+        "n": 810,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0.01,
+        "max": 0.17
+      },
+      "wait_ms": {
+        "n": 810,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "max": 0
+      },
+      "apply_ms": {
+        "n": 810,
+        "mean": 0.13,
+        "p50": 0.13,
+        "p95": 0.21,
+        "max": 0.54
+      },
+      "total_ms": {
+        "n": 810,
+        "mean": 39.58,
+        "p50": 39.45,
+        "p95": 58.59,
+        "max": 60.95
+      },
+      "overhead_ms": {
+        "n": 810,
+        "mean": 0.19,
+        "p50": 0.18,
+        "p95": 0.31,
+        "max": 1.42
+      }
+    },
+    "cold_queue": {
+      "n": 1827,
+      "latency_ms": {
+        "n": 1827,
+        "mean": 117.74,
+        "p50": 93.99,
+        "p95": 297.4,
+        "max": 558.73
+      },
+      "wait_ms": {
+        "n": 1827,
+        "mean": 117.62,
+        "p50": 93,
+        "p95": 297,
+        "max": 559
+      },
+      "apply_ms": {
+        "n": 1827,
+        "mean": 0.13,
+        "p50": 0.13,
+        "p95": 0.21,
+        "max": 0.81
+      },
+      "total_ms": {
+        "n": 1827,
+        "mean": 158.23,
+        "p50": 135.23,
+        "p95": 342.53,
+        "max": 583.01
+      },
+      "overhead_ms": {
+        "n": 1827,
+        "mean": 117.96,
+        "p50": 94.23,
+        "p95": 297.65,
+        "max": 558.97
+      }
+    }
+  },
+  "control_by_decision": {
+    "direct_write": {
+      "n": 2637,
+      "latency_ms": {
+        "n": 2637,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "max": 0.01
+      },
+      "wait_ms": {
+        "n": 2637,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "max": 0
+      },
+      "apply_ms": {
+        "n": 2637,
+        "mean": 0.09,
+        "p50": 0.08,
+        "p95": 0.19,
+        "max": 0.66
+      },
+      "total_ms": {
+        "n": 2637,
+        "mean": 40.16,
+        "p50": 40.34,
+        "p95": 58.25,
+        "max": 61.04
+      },
+      "overhead_ms": {
+        "n": 2637,
+        "mean": 0.14,
+        "p50": 0.13,
+        "p95": 0.26,
+        "max": 0.69
+      }
+    }
+  },
+  "per_rep": {
+    "atm": [
+      {
+        "run_id": "cq-mock-a16-r1",
+        "wall_clock_ms": 8046.43,
+        "duration_ms_from_t0": null,
+        "intents": 879,
+        "committed": 879,
+        "oracle_pass": 879,
+        "throughput_intents_per_s": 109.24,
+        "throughput_committed_per_s": 109.24,
+        "goodput_oracle_pass_per_s": 109.24,
+        "sum_overhead_ms": 71467.7,
+        "sum_total_ms": 106612.57
+      },
+      {
+        "run_id": "cq-mock-a16-r2",
+        "wall_clock_ms": 7944.54,
+        "duration_ms_from_t0": null,
+        "intents": 879,
+        "committed": 879,
+        "oracle_pass": 879,
+        "throughput_intents_per_s": 110.64,
+        "throughput_committed_per_s": 110.64,
+        "goodput_oracle_pass_per_s": 110.64,
+        "sum_overhead_ms": 71589.98,
+        "sum_total_ms": 106757.72
+      },
+      {
+        "run_id": "cq-mock-a16-r3",
+        "wall_clock_ms": 7979.73,
+        "duration_ms_from_t0": null,
+        "intents": 879,
+        "committed": 879,
+        "oracle_pass": 879,
+        "throughput_intents_per_s": 110.15,
+        "throughput_committed_per_s": 110.15,
+        "goodput_oracle_pass_per_s": 110.15,
+        "sum_overhead_ms": 72615.08,
+        "sum_total_ms": 107778.31
+      }
+    ],
+    "control": [
+      {
+        "run_id": "cq-control-a16-r1",
+        "wall_clock_ms": 3028.9,
+        "duration_ms_from_t0": null,
+        "intents": 879,
+        "committed": 879,
+        "oracle_pass": 64,
+        "throughput_intents_per_s": 290.2,
+        "throughput_committed_per_s": 290.2,
+        "goodput_oracle_pass_per_s": 21.13,
+        "sum_overhead_ms": 124.76,
+        "sum_total_ms": 35300.75
+      },
+      {
+        "run_id": "cq-control-a16-r2",
+        "wall_clock_ms": 3028.25,
+        "duration_ms_from_t0": null,
+        "intents": 879,
+        "committed": 879,
+        "oracle_pass": 64,
+        "throughput_intents_per_s": 290.27,
+        "throughput_committed_per_s": 290.27,
+        "goodput_oracle_pass_per_s": 21.13,
+        "sum_overhead_ms": 122.77,
+        "sum_total_ms": 35306.63
+      },
+      {
+        "run_id": "cq-control-a16-r3",
+        "wall_clock_ms": 3027.79,
+        "duration_ms_from_t0": null,
+        "intents": 879,
+        "committed": 879,
+        "oracle_pass": 64,
+        "throughput_intents_per_s": 290.31,
+        "throughput_committed_per_s": 290.31,
+        "goodput_oracle_pass_per_s": 21.14,
+        "sum_overhead_ms": 126.47,
+        "sum_total_ms": 35287.33
+      }
+    ]
+  }
+}
