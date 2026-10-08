@@ -1,0 +1,30 @@
+{
+  "checklist": "E5",
+  "registered_at_cst": "2026-10-07 23:28:03 CST",
+  "banner": "DRAFT evidence — not a win claim; seeds registered BEFORE any E5 run",
+  "atm_pin": "5692474f7db70ab52a7a71c8af4867609e7e4b43",
+  "purpose": "Fault injection: context mismatch, stale CAS, kill, rollback fail, receipt loss; terminal class blocked|rolled-back|recovery-required",
+  "main_method": "--arm steward (clean control cells only)",
+  "fault_arms_note": "All injection cells are fault_ablation / non-competitors",
+  "injections": [
+    {"id": "context_mismatch", "expected_terminal": "blocked"},
+    {"id": "stale_cas", "expected_terminal": "blocked"},
+    {"id": "kill_mid_apply", "expected_terminal": "recovery-required"},
+    {"id": "rollback_ok", "expected_terminal": "rolled-back", "note": "failAfterWrites compensation success — not crash atomicity"},
+    {"id": "rollback_failure", "expected_terminal": "recovery-required"},
+    {"id": "receipt_loss", "expected_terminal": "recovery-required"}
+  ],
+  "harness_cells": {
+    "occ_exhaust": {"arm": "occ", "occ_max_retries": 0, "seeds": [11, 17, 23], "expected_terminal": "blocked", "count": 3},
+    "clean_steward": {"arm": "steward", "seeds": [11, 17, 23], "expected_terminal": "commit/correct", "count": 3, "role": "control_baseline"}
+  },
+  "probe_reps": [1, 2],
+  "probe_cells": 12,
+  "expected_cells": 18,
+  "workload_seeds_harness": [11, 17, 23],
+  "scheduler_seed_formula": "workload_seed + 1000",
+  "shared_knobs_harness": {
+    "agents": 3, "trials": 5, "hot_ratio": 1, "overlap": "high",
+    "compose_window_ms": 100, "hold_ms_min": 8, "hold_ms_max": 25, "tick_interval_ms": 15, "jitter_ms": 6
+  }
+}

@@ -7,9 +7,10 @@
 
 | Generation | 狀態 | ATM pin | SHA256SUMS sha256 | 檔案數 | 說明 |
 |------------|------|---------|-------------------|------:|------|
-| `generations/r1-reviewed-2026-10-07/` | **reviewed — NOT final**（外審 3×P0） | `5692474f7db70ab52a7a71c8af4867609e7e4b43` | `30d663c28f6c5a200988bb1e61a3c765408a43a668c5c575ee9aef8f0ced033f` | 274（不含 SHA256SUMS） | [GENERATION.md](./generations/r1-reviewed-2026-10-07/GENERATION.md) |
+| `generations/r1-reviewed-2026-10-07/` | **superseded by r2（保留、不可變）**（外審 3×P0） | `5692474f7db70ab52a7a71c8af4867609e7e4b43` | `30d663c28f6c5a200988bb1e61a3c765408a43a668c5c575ee9aef8f0ced033f` | 274（不含 SHA256SUMS） | [GENERATION.md](./generations/r1-reviewed-2026-10-07/GENERATION.md) |
+| `generations/r2-2026-10-08/` | **DRAFT — 回應 P0（未再外審）** | `5692474f7db70ab52a7a71c8af4867609e7e4b43` | `25d4a2936b52623665f8351138d6c65c7393f8793b67bac46b84c3a272ac87fe` | 309（不含 SHA256SUMS） | [GENERATION.md](./generations/r2-2026-10-08/GENERATION.md) |
 
-r1 簡寫：`R1=generations/r1-reviewed-2026-10-07`。
+r1 簡寫：`R1=generations/r1-reviewed-2026-10-07`。 r2 簡寫：`R2=generations/r2-2026-10-08`。驗證（唯讀）：r1 目錄執行 `bash verify.sh`（r1 腳本需 bash）；r2 目錄執行 `sh verify.sh` 或 `bash verify.sh`。
 
 ## 2. 審核紀錄（r1）
 
@@ -74,6 +75,29 @@ r1 簡寫：`R1=generations/r1-reviewed-2026-10-07`。
 | `archive/support-raw-r1/support-raw-r1-b.tgz` | 15,776,518 | `89fa2469003e95d1a2092a5f5bf0a8c1a939c8b715841dda826f6d915b386323` |
 
 先前 box-only 單檔 `/workspace/upload/box-only/support-raw-r1.tgz`（30,974,334 B，sha256 `6c47948671bdbe8842c1ee58db83ad2864ef8b980f6b2b1f4929840ec8073470`）**沒有**上傳。現在進 repo 的是上面兩個獨立 tarball，不是該單檔的位元組切割，其 sha256 不能用來核對這兩份檔案。
+
+## 7. r2 回應外審 P0（2026-10-08）
+
+> 完整對照與狀態見 `R2/GENERATION.md` §4。§3 中 r1 列的「P0」註記於 r2 的處置如下；r1 檔案本身未改。
+
+| 項目 | r2 位置 | 狀態 | 結論／數字 |
+|------|---------|------|-----------|
+| P0-1 E4 p2 s17 lost=1 | `R2/summaries/runs/r2-e4-forensics/E4_FORENSICS.md`、`R2/raw/r2-e4-forensics.tgz` | 鑑識完成 → **反例** | 真實多 process lost update（s17-t000-i0 被另一 process 的 s17-t000-i6 覆蓋，同 base 3c1ad38d）；主因 harness 未把 steward apply 納入 apply lock，促成因素 ATM pin steward apply 為 check-then-write／非原子寫入。replay r1cfg 75 run：4 失敗、6 lost、1 torn write；slock 75 run：0。slock 僅為 mitigation candidate |
+| P0-2 oracle presence-based | `R2/harness/src/oracle_v2.mjs`、`R2/harness/test/oracle_v2_contract.mjs`、`R2/summaries/runs/r2-analysis/r2-2026-10-08/oracle-rescore/` | 已修正 | full-bytes＋frame＋structure；10 個 contract 案例通過；r1 全部 stage 重評分 0 判定改變；r2 replay 1 cell 10 判定 correct→frame_violation（3164→3154） |
+| P0-3 reproduce／checksum | `R2/harness/reproduce.sh`、`R2/harness/tools/{verify,analyze,rerun,seal}.sh`、`R2/SHA256SUMS`、`R2/MANIFEST.json` | 已修正 | verify 嚴格唯讀（`sha256sum -c --strict`）；原始路徑、無 flattened seed 碰撞；r1 舊 `checksums.sha256`／`artifact_manifest.json` 不再攜帶 |
+| Phase 1 E 重建 | `R2/summaries/runs/r2-analysis/r2-2026-10-08/{tables,r1-extractors,cell-index}/` | 已完成 | E1 45/45、E2 150/150、E3 120/120、E4 18/18 cell 全欄一致；r1 E3/E4 extractor 輸出 IDENTICAL；547 cell index |
+| logical_id stub（E1/E2） | `…/logical-id-audit/` | 部分（稽核通過） | 200/200 cell：1 submit／1 terminal／≤1 correct；129 op 有多次 attempt（CAS retry） |
+| 草稿／F2 | `R2/paper/ATM_PAPER_V2_DRAFT_zh.md`、`R2/tables/F2_CORRECTNESS_TABLES.md` | 已更新（DRAFT） | 版本錨點更正；E4 改為反例表（p2/p4/p8/SP＝63/106、60/106、56/106、94/106，p2 lost=1） |
+| 未解決 | — | open | ATM 端 guard／部署契約、barrier 控制的 2-process 契約測試、真 logical_id／re-propose、process-local window、CI／統計、Phase 2–3、正文逐節同步 |
+
+r2 raw（deterministic tar＋`gzip -n`）：
+
+| 檔案 | bytes | sha256 |
+|------|------:|--------|
+| `R2/raw/r2-e4-forensics.tgz` | 8,181,088 | `dcabd78b8136622deea92e27de9ac2063bd8f9c7fd8d306e5f786fed358bab62` |
+| `R2/raw/r2-smoke.tgz` | 108,716 | `06f54986b642a4cba1f3d01bd7f4ce2bbb6a4596af77761498f1f8bcfeb4399b` |
+
+r2 不重複打包 r1 raw；r2 分析所讀之 r1 raw 即 §4 所列（亦見 `R2/R1_REFERENCES.md`）。
 
 ## 6. 不在 repo 的參照
 - ATM pin 原始碼：GitHub `eaglhuang/AI-Atomic-Framework` commit `5692474f7db70ab52a7a71c8af4867609e7e4b43`；box tarball `/workspace/atm-main-5692474f/atm-main.tar.gz` sha256 `1d498a397e6a5db119d40b8f539dc165cb0028fbfe9577f953023f8ec8d45795`。
