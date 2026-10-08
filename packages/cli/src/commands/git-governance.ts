@@ -1,6 +1,6 @@
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import {
   createForwardAttestation,
@@ -432,6 +432,10 @@ function withChangesLeftBehind<T>(result: T, cwd: string, taskId: string | null 
       .map((line) => line.slice(3).trim().replace(/^"|"$/g, '').replace(/\\/g, '/'))
       .map((entry) => entry.includes(' -> ') ? entry.split(' -> ')[1] : entry)
       .filter((entry) => entry && !entry.startsWith('.atm/'));
+    // Task card files land with their task's closeout, not with a delivery
+    // commit; listing one invited agents to revert their own card.
+    const cardPaths = readTaskCardPaths(cwd);
+    leftBehind = leftBehind.filter((entry) => !cardPaths.has(entry));
   } catch {
     return result;
   }
@@ -441,4 +445,20 @@ function withChangesLeftBehind<T>(result: T, cwd: string, taskId: string | null 
     ...shape,
     messages: [...(shape.messages ?? []), message('warning', 'ATM_GIT_COMMIT_CHANGES_LEFT_UNCOMMITTED', `The commit landed, but ${leftBehind.length} changed file(s) outside ${scope}'s scope were not included: ${leftBehind.slice(0, 10).join(', ')}${leftBehind.length > 10 ? ', ...' : ''}. Commit them under a task or quickfix that covers them, or revert them.`, { taskId: taskId ?? null, files: leftBehind })]
   } as T;
+}
+
+/** Card source paths of every task in the ledger (source.planPath). */
+function readTaskCardPaths(cwd: string): ReadonlySet<string> {
+  const tasksDir = path.join(cwd, '.atm', 'history', 'tasks');
+  const paths = new Set<string>();
+  if (!existsSync(tasksDir)) return paths;
+  for (const name of readdirSync(tasksDir).filter((entry) => entry.endsWith('.json'))) {
+    try {
+      const planPath = JSON.parse(readFileSync(path.join(tasksDir, name), 'utf8'))?.source?.planPath;
+      if (typeof planPath === 'string' && planPath.trim()) paths.add(planPath.trim().replace(/\\/g, '/').replace(/^\.\//, ''));
+    } catch {
+      // An unreadable ledger record simply contributes no card path.
+    }
+  }
+  return paths;
 }
