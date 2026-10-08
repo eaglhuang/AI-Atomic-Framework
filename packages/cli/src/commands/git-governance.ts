@@ -422,8 +422,9 @@ function readStagedFiles(cwd: string): readonly string[] {
  * changed files it left behind, so an agent does not assume every edit
  * landed. ATM's own runtime state under .atm/ is not reported.
  */
-function withChangesLeftBehind<T extends { ok?: boolean; messages?: readonly unknown[] }>(result: T, cwd: string, taskId: string | null | undefined): T {
-  if (taskId === undefined || result.ok === false) return result;
+function withChangesLeftBehind<T>(result: T, cwd: string, taskId: string | null | undefined): T {
+  const shape = result as { ok?: boolean; messages?: readonly unknown[] };
+  if (taskId === undefined || shape.ok === false) return result;
   let leftBehind: string[] = [];
   try {
     leftBehind = execFileSync('git', ['status', '--porcelain', '--untracked-files=all'], { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] })
@@ -437,7 +438,7 @@ function withChangesLeftBehind<T extends { ok?: boolean; messages?: readonly unk
   if (leftBehind.length === 0) return result;
   const scope = taskId ? `task ${taskId}` : 'this quickfix';
   return {
-    ...result,
-    messages: [...(result.messages ?? []), message('warning', 'ATM_GIT_COMMIT_CHANGES_LEFT_UNCOMMITTED', `The commit landed, but ${leftBehind.length} changed file(s) outside ${scope}'s scope were not included: ${leftBehind.slice(0, 10).join(', ')}${leftBehind.length > 10 ? ', ...' : ''}. Commit them under a task or quickfix that covers them, or revert them.`, { taskId: taskId ?? null, files: leftBehind })]
-  };
+    ...shape,
+    messages: [...(shape.messages ?? []), message('warning', 'ATM_GIT_COMMIT_CHANGES_LEFT_UNCOMMITTED', `The commit landed, but ${leftBehind.length} changed file(s) outside ${scope}'s scope were not included: ${leftBehind.slice(0, 10).join(', ')}${leftBehind.length > 10 ? ', ...' : ''}. Commit them under a task or quickfix that covers them, or revert them.`, { taskId: taskId ?? null, files: leftBehind })]
+  } as T;
 }
