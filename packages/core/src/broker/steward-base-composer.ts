@@ -8,6 +8,7 @@
 // a conflict is a fail-closed verdict for a steward-authored final patch, not a
 // guess at a merged result.
 import type { PatchProposal } from './types.ts';
+import { rebaseProposalsByRegionIdentity } from './steward-region-rebase.ts';
 import { parseUnifiedPatchHunks } from './unified-patch.ts';
 
 export type StewardCompositionBlockCode = 'compose-context-mismatch' | 'steward-final-patch-required' | 'compose-permutation-unstable';
@@ -36,6 +37,12 @@ interface ProposalEdit {
 const MAX_EXHAUSTIVE_PERMUTATION_PROPOSALS = 4;
 
 export function composeTextPatchesAgainstBase(filePath: string, before: string, proposals: readonly PatchProposal[]): BaseCompositionResult {
+  const declared = composeTextPatchesAtDeclaredLines(filePath, before, proposals);
+  if (declared.ok || declared.block.code !== 'compose-context-mismatch') return declared;
+  return rebaseProposalsByRegionIdentity(filePath, before, proposals) ?? declared;
+}
+
+function composeTextPatchesAtDeclaredLines(filePath: string, before: string, proposals: readonly PatchProposal[]): BaseCompositionResult {
   const lineEnding = /\r\n/.test(before) ? '\r\n' : '\n';
   const endsWithNewline = before.endsWith('\n');
   const baseLines = before.split(/\r?\n/);

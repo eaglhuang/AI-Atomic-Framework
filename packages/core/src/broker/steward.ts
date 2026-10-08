@@ -9,8 +9,11 @@ import { formatStewardCompositionBlock } from './steward-base-composer.ts';
 import {
   applyTransactionalStewardPlan,
   buildPatchProposalComposition,
-  buildStewardSemanticValidationReceipt
+  buildStewardSemanticValidationReceipt,
+  type TransactionalStewardApplyResult
 } from './steward-transactional-apply.ts';
+import { waitStewardRecomposeBackoff } from './steward-commit-guard.ts';
+import { resolveStewardCommitControls, withStewardApplyQueue } from './steward-apply-queue.ts';
 import type { VirtualAtomInUseRegistryDocument } from './registry.ts';
 import type { TeamBrokerRuntimeActivationHandshakeEvidence } from './team-lane.ts';
 import type {
@@ -162,6 +165,12 @@ export function planStewardApply(input: {
   };
   return { ok: plan.ok, plan };
 }
+export interface StewardRecomposePolicy {
+  readonly maxRecomposeAttempts?: number;
+  readonly recomposeBackoffMs?: number;
+  readonly recomposeJitterMs?: number;
+}
+
 export function applyStewardPlan(input: {
   readonly cwd: string;
   readonly stewardId: string;
@@ -169,11 +178,71 @@ export function applyStewardPlan(input: {
   readonly proposals: readonly PatchProposal[];
   readonly scopeFiles: readonly string[];
   readonly evidenceOutPath?: string | null;
+  /** Argument, then `ATM_STEWARD_RECOMPOSE_POLICY`, then `stewardCanonicalCommitPolicy`. Not a CLI flag. */
+  readonly recomposePolicy?: StewardRecomposePolicy;
+  /** Argument, then `ATM_STEWARD_COMMIT_LOCK_ROOT`. Not a CLI flag. */
+  readonly commitLockRoot?: string;
+  /** Argument, then `ATM_STEWARD_APPLY_QUEUE`. Not a CLI flag. The file lock stays the correctness backstop. */
+  readonly applyQueue?: boolean;
+  /** Argument, then `ATM_STEWARD_APPLY_QUEUE_ROOT`. Not a CLI flag. */
+  readonly applyQueueRoot?: string;
+  /** Argument, then `ATM_STEWARD_APPLY_QUEUE_WAIT_MS`. Not a CLI flag. */
+  readonly applyQueueWaitMs?: number;
+  /** Forwarded to the transactional apply. Not a CLI flag. */
+  readonly commitHooks?: {
+    readonly beforePrecheck?: () => void;
+    readonly afterPrecheck?: () => void;
+  };
 }): StewardApplyResult {
   const planResult = planStewardApply(input);
-  const transactional = planResult.ok
-    ? buildPatchProposalComposition({ cwd: input.cwd, mergePlan: input.mergePlan, proposals: input.proposals })
+  const controls = resolveStewardCommitControls(input);
+  const attemptBudget = controls.maxRecomposeAttempts + 1;
+  const outcome = planResult.ok
+    ? withStewardApplyQueue({
+      cwd: input.cwd,
+      targetPaths: planResult.plan.targetFiles.map((file) => path.resolve(input.cwd, file)),
+      enabled: controls.applyQueue,
+      queueRoot: controls.applyQueueRoot,
+      waitMs: controls.applyQueueWaitMs,
+      pollMs: controls.lockPollMs
+    }, () => {
+      let transactional = buildPatchProposalComposition({ cwd: input.cwd, mergePlan: input.mergePlan, proposals: input.proposals });
+      let apply: TransactionalStewardApplyResult | null = null;
+      let attemptsUsed = 0;
+      if (!transactional.blocked) {
+        const baseHead = readGitHeadCommit(input.cwd);
+        for (let attempt = 0; attempt < attemptBudget; attempt += 1) {
+          attemptsUsed = attempt + 1;
+          if (attempt > 0) {
+            waitStewardRecomposeBackoff(attempt, controls.recomposeBackoffMs, controls.recomposeJitterMs);
+            transactional = buildPatchProposalComposition({ cwd: input.cwd, mergePlan: input.mergePlan, proposals: input.proposals });
+            if (transactional.blocked) break;
+          }
+          const semanticValidation = buildStewardSemanticValidationReceipt({
+            plan: transactional.plan,
+            outputFiles: transactional.outputFiles
+          });
+          apply = applyTransactionalStewardPlan({
+            cwd: input.cwd,
+            stewardId: input.stewardId,
+            writerRole: 'neutral-steward',
+            plan: transactional.plan,
+            outputFiles: transactional.outputFiles,
+            scopeFiles: input.scopeFiles,
+            semanticValidation,
+            baseHead,
+            commitLockRoot: controls.lockRoot,
+            commitHooks: input.commitHooks
+          });
+          if (apply.ok || apply.receipt.verdict !== 're-compose') break;
+        }
+      }
+      return { transactional, apply, attemptsUsed };
+    })
     : null;
+  const transactional = outcome?.transactional ?? null;
+  const apply = outcome?.apply ?? null;
+  const attemptsUsed = outcome?.attemptsUsed ?? 0;
   if (!planResult.ok || transactional?.blocked) {
     const brokerOperationRun = buildStewardBrokerOperationRun({
       mergePlan: input.mergePlan,
@@ -198,21 +267,7 @@ export function applyStewardPlan(input: {
     if (input.evidenceOutPath) writeEvidenceFile(input.evidenceOutPath, evidence);
     return { ok: false, evidence };
   }
-  if (!transactional) throw new Error('steward composition missing after a successful plan');
-  const semanticValidation = buildStewardSemanticValidationReceipt({
-    plan: transactional.plan,
-    outputFiles: transactional.outputFiles
-  });
-  const apply = applyTransactionalStewardPlan({
-    cwd: input.cwd,
-    stewardId: input.stewardId,
-    writerRole: 'neutral-steward',
-    plan: transactional.plan,
-    outputFiles: transactional.outputFiles,
-    scopeFiles: input.scopeFiles,
-    semanticValidation,
-    baseHead: readGitHeadCommit(input.cwd)
-  });
+  if (!transactional || !apply) throw new Error('steward composition missing after a successful plan');
   const fileBeforeHashes = Object.fromEntries(apply.receipt.files.map((file) => [file.filePath, stripShaPrefix(file.beforeHash)]));
   const fileAfterHashes = Object.fromEntries(apply.receipt.files.map((file) => [file.filePath, stripShaPrefix(file.afterHash)]));
   const appliedFiles = apply.ok ? apply.receipt.files.map((file) => file.filePath).sort((left, right) => left.localeCompare(right)) : [];
@@ -232,7 +287,7 @@ export function applyStewardPlan(input: {
     fileBeforeHashes,
     fileAfterHashes,
     verdict: apply.ok ? 'applied' : 'blocked',
-    blockedReasons: apply.ok ? undefined : apply.receipt.blockedReasons,
+    blockedReasons: apply.ok ? undefined : recomposeTerminalReasons(apply, attemptsUsed, attemptBudget),
     brokerOperationRun
   });
   if (input.evidenceOutPath) writeEvidenceFile(input.evidenceOutPath, evidence);
@@ -519,6 +574,14 @@ function hashText(value: string): string {
 }
 function stripShaPrefix(value: string): string {
   return value.replace(/^sha256:/, '');
+}
+function recomposeTerminalReasons(
+  apply: TransactionalStewardApplyResult,
+  attemptsUsed: number,
+  attemptBudget: number
+): readonly string[] {
+  if (apply.receipt.verdict !== 're-compose' || attemptsUsed < attemptBudget) return apply.receipt.blockedReasons;
+  return apply.receipt.blockedReasons.map((reason) => `re-compose attempts exhausted after ${attemptsUsed} of ${attemptBudget}: ${reason}`);
 }
 export function readGitHeadCommit(cwd: string): string | null {
   const result = spawnSync('git', ['-C', cwd, 'rev-parse', '--verify', 'HEAD'], { encoding: 'utf8' });

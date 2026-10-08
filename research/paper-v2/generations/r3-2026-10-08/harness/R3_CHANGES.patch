@@ -1,0 +1,638 @@
+diff -ruN r2/REPRODUCE.md r3/REPRODUCE.md
+--- r2/REPRODUCE.md	2026-10-08 11:01:11.515142845 +0800
++++ r3/REPRODUCE.md	2026-10-08 11:01:11.519142845 +0800
+@@ -14,3 +14,16 @@
+ 從上傳的 generation 重跑 analyze：在 `harness/` 下依序解開 r1 `raw/*.tgz` 與 r2 `raw/*.tgz`（路徑皆為 `runs/<cell>/…`），再把 r1／r2 的 `summaries/runs/*` 放回 `runs/`，最後 `./reproduce.sh analyze /tmp/out`。
+ 
+ r2 新增的 MP 選項：`run-mp --steward-apply-lock on|off`（預設 off＝重現 r1 行為；on＝r2 候選緩解，標 `arm_role=mitigation_candidate`，不是 r1 主臂）。
++
++## r3（ATM PR #213 驗證，2026-10-08）
++
++```bash
++# 先依 runs/r3-validation/PINS.json 準備兩個 ATM pin（commit tarball 解壓；node_modules 同 5 個 symlink）
++./runs/r3-validation/run_r3.sh                 # barrier → replay(225) → matrix(45) → regression(180)；拒絕覆蓋既有 r3* run
++./runs/r3-validation/run_r3_sp_noise.sh        # 單 process E4 雜訊補測（30）
++node test/barrier_interleave.mjs --atm <ATM_MONOREPO> --out <dir> --reps 20 [--lregion selectors --fregion reducers]
++./reproduce.sh analyze runs/r3-analysis/<新空目錄>   # 唯讀；含 r3-compare/R3_TABLES.md
++```
++
++時間與機器負載會影響 MP 重播與延遲數字；barrier 測試為確定性（不依時序）。
++
+diff -ruN r2/analysis/cell_index.py r3/analysis/cell_index.py
+--- r2/analysis/cell_index.py	2026-10-08 11:01:11.515142845 +0800
++++ r3/analysis/cell_index.py	2026-10-08 11:01:11.519142845 +0800
+@@ -1,5 +1,5 @@
+ #!/usr/bin/env python3
+-"""r2 Phase 1 C/D: per-cell provenance index (read-only on runs/). One row per paper-relevant cell (r1 + r2)."""
++"""r2 Phase 1 C/D: per-cell provenance index (read-only on runs/). One row per paper-relevant cell (r1 + r2 + r3)."""
+ import json, os, re, sys, hashlib, glob
+ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ RUNS = os.path.join(ROOT, 'runs')
+@@ -9,7 +9,8 @@
+     for pat, a in [(r'^e1-', 'r1:raw/e1.tgz'), (r'^e2-', 'r1:raw/e2.tgz'), (r'^e3-', 'r1:raw/e3.tgz'), (r'^e4-', 'r1:raw/e4.tgz'),
+                    (r'^e5-', 'r1:raw/e5.tgz'), (r'^c4-', 'r1:raw/c.tgz'), (r'^d[1-5]-', 'r1:raw/d.tgz'), (r'^steward-', 'r1:raw/steward.tgz'),
+                    (r'^gaps-', 'r1:raw/gaps.tgz'), (r'^(composer-probe|b5-b8)$', 'r1:raw/b-probes.tgz'), (r'^r2f-', 'r2:raw/r2-e4-forensics.tgz'),
+-                   (r'^r2-smoke-', 'r2:raw/r2-smoke.tgz')]:
++                   (r'^r2-smoke-', 'r2:raw/r2-smoke.tgz'), (r'^r3v-', 'r3:raw/r3-replay.tgz'), (r'^r3m-', 'r3:raw/r3-matrix.tgz'),
++                   (r'^r3r-', 'r3:raw/r3-regression.tgz'), (r'^(r3s-|r3-smoke-)', 'r3:raw/r3-sp-noise-and-smoke.tgz')]:
+         if re.match(pat, c): return a
+     return None
+ SKIP = {'e1-pilot', 'e2-matrix', 'e3-sweep', 'e4-multiprocess', 'e5-fault', 'steward-writer'}
+@@ -35,6 +36,7 @@
+         atm_pin=pin.group(1) if pin else None, atm_version=av or None, cli_version=m.get('cli_version'), node_version=m.get('node_version'),
+         mp_ablation=m.get('mp_ablation'), oracle_runtime_v1=v1, oracle_runtime_v2=v2rt, oracle_v2_rescored=bool(v1),
+         harness_src=('r2 (pre runtime-oracle-v2 hook)' if c.startswith('r2f-') else 'r2' if c.startswith('r2-smoke-') else
++                     'r3 (r3 harness: runtime oracle v2 + commit-guard observer; see generations/r3 harness/)' if re.match(r'^(r3[vmrs]-|r3-smoke-)', c) else
+                      'r1-era (per-run harness source hash NOT recorded in r1; src was edited between stages)'),
+         n_event_files=len(ev), created_at=m.get('created_at')))
+ json.dump(dict(n=len(rows), cells=rows), open(os.path.join(OUT, 'CELL_INDEX.json'), 'w'), indent=1)
+diff -ruN r2/analysis/r3_compare.py r3/analysis/r3_compare.py
+--- r2/analysis/r3_compare.py	1970-01-01 08:00:00.000000000 +0800
++++ r3/analysis/r3_compare.py	2026-10-08 11:01:11.519142845 +0800
+@@ -0,0 +1,176 @@
++#!/usr/bin/env python3
++"""r3 analysis-only comparison (READ-ONLY on runs/*; writes only to --out).
++Inputs: oracle v2 artifact-only rescore (rescore_cells.json), per-run meta/events/compose_batches/steward_applies,
++barrier results (runs/r3-validation/barrier/*/barrier_result.json), PINS.json.
++Outputs: r3_summary.json + R3_TABLES.md.
++Definitions:
++  failed run      = any op with a failing v2 verdict, or any file frame/structure violation, foreign write or extra file.
++  lost effect     = v2 verdict 'lost' (committed/applied op whose effect is absent).
++  corrupted file  = file with frame or structure violation (incl. torn tails).
++  non-completion  = op not 'correct' and not failing (e.g. blocked_absent); counted in goodput as NOT done.
++  re-compose      = batch whose ATM canonical-commit guard was reached and base mismatched: observed as
++                    atm_commit_attempts>=2 (re-compose then applied) or attempts>=1 & blocked (re-compose then blocked).
++  goodput         = correct ops / wall-clock s (per run, then mean); also ratio-of-sums.
++  percentiles     = linear interpolation (numpy 'linear'); mean±sd is NOT a CI.
++"""
++import argparse, glob, json, os, re, statistics as st
++from collections import Counter, defaultdict
++ap = argparse.ArgumentParser(); ap.add_argument('--rescore', required=True); ap.add_argument('--out', required=True)
++ap.add_argument('--runs', default=os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'runs'))
++A = ap.parse_args(); os.makedirs(A.out, exist_ok=True); RUNS = A.runs
++RES = {r['cell']: r for r in json.load(open(A.rescore))['rows'] if r['mode'] == 'atm'}
++ARM_RE = re.compile(r'-(old|fixlock|fix)(?:-r\d+)?$')
++def pct(xs, q):
++  xs = sorted(xs)
++  if not xs: return None
++  k = (len(xs) - 1) * q; f = int(k); c = min(f + 1, len(xs) - 1); return xs[f] + (xs[c] - xs[f]) * (k - f)
++def stats(xs):
++  xs = [x for x in xs if x is not None]
++  return dict(n=len(xs), mean=round(st.mean(xs), 2) if xs else None, p50=round(pct(xs, .5), 2) if xs else None,
++              p95=round(pct(xs, .95), 2) if xs else None, sd=round(st.pstdev(xs), 2) if len(xs) > 1 else None)
++def jl(paths):
++  for p in paths:
++    for l in open(p):
++      l = l.strip()
++      if l: yield json.loads(l)
++def classify(b):
++  r = (b.get('blocked_reason') or '')
++  if b.get('steward_verdict') == 'applied': return 'applied_after_re-compose' if (b.get('atm_commit_attempts') or 0) >= 2 else 'applied'
++  if r.startswith('re-compose:'): return 'blocked:re-compose(exhausted)'
++  if r.startswith('recovery-required:'): return 'blocked:recovery-required'
++  pre = r.split(':')[0][:40] if r else 'none'
++  if 'canonical target base hash is stale' in r: pre = 'stale-precheck(unlocked)'
++  if (b.get('atm_commit_attempts') or 0) >= 1: return f'blocked:re-compose→{pre}'
++  return f'blocked:{pre}'
++def run_row(cell):
++  d = os.path.join(RUNS, cell); meta = json.load(open(os.path.join(d, 'meta.json'))); m = ARM_RE.search(cell)
++  arm = m.group(1) if m else None; res = RES.get(cell)
++  art = os.path.join(d, 'atm', 'artifacts'); ev = os.path.join(d, 'atm', 'events')
++  cb = sorted(glob.glob(os.path.join(art, 'compose_batches.w*.jsonl'))) or [os.path.join(ev, 'compose_batches.jsonl')]
++  cb = [p for p in cb if os.path.exists(p)]
++  batches = list(jl(cb)) if cb else []
++  sa = sorted(glob.glob(os.path.join(art, 'steward_applies*.jsonl'))); applies = list(jl(sa)) if sa else []
++  dec = [e for e in jl(sorted(glob.glob(os.path.join(ev, '*.jsonl')))) if e.get('event') == 'decision']
++  bcls, icls = Counter(), Counter()
++  for b in batches:
++    c = classify(b); bcls[c] += 1; icls[c] += len(b.get('intent_ids') or b.get('proposalIds') or [])
++  rc_events = sum(1 for b in batches if (b.get('atm_commit_attempts') or 0) >= 2 or ((b.get('atm_commit_attempts') or 0) >= 1 and b.get('steward_verdict') != 'applied'))
++  pin = '5692474f' if '5692474f' in (meta.get('atm_version') or '') else 'bea35380' if 'bea35380' in (meta.get('atm_version') or '') else None
++  wall = (meta.get('modes', {}).get('atm') or {}).get('wall_clock_ms')
++  fail = None
++  if res:
++    fail = bool(res['v2_fail'] or res['files_frame_violation'] or res['files_structure_violation'] or res['foreign_writes'] or res['extra_files'])
++  return dict(cell=cell, arm=arm, pin=pin, procs=meta.get('procs') or (meta.get('params') or {}).get('procs'),
++    seed=meta.get('workload_seed'), sched=meta.get('scheduler_seed'), process_model=meta.get('process_model'),
++    meta_arm=meta.get('arm'), mp_ablation=meta.get('mp_ablation'), scored=res is not None,
++    offered=res['n_ops'] if res else None, correct=res['v2_correct'] if res else None, lost=res['v2_lost'] if res else None,
++    v2_fail=res['v2_fail'] if res else None, by_verdict=res['v2_by_verdict'] if res else None,
++    frame_files=res['files_frame_violation'] if res else None, structure_files=res['files_structure_violation'] if res else None,
++    extra_files=res['extra_files'] if res else None, foreign_writes=res['foreign_writes'] if res else None, failed=fail,
++    wall_ms=wall, goodput=(res['v2_correct'] / (wall / 1000)) if res and wall else None,
++    batches=len(batches), batch_classes=dict(bcls), intent_classes=dict(icls), re_compose_events=rc_events,
++    lock_contention_polls=sum((b.get('atm_commit_lock_contention_polls') or 0) for b in batches),
++    sig_interleave=sum(1 for a in applies if a.get('interleave_suspect')), sig_drift=sum(1 for a in applies if a.get('post_write_drift')),
++    harness_lock_wait_ms=sum((a.get('lock_wait_ms') or 0) for a in applies),
++    total_ms=[e.get('total_ms') for e in dec], apply_ms=[e.get('apply_ms') for e in dec],
++    outcomes=dict(Counter(e.get('outcome') for e in dec)))
++def agg(rows):
++  rows = [r for r in rows if r['scored']]
++  if not rows: return None
++  s = lambda k: sum(r[k] or 0 for r in rows)
++  ic, bc = Counter(), Counter()
++  for r in rows: ic.update(r['intent_classes']); bc.update(r['batch_classes'])
++  wall = [r['wall_ms'] for r in rows]
++  return dict(runs=len(rows), failed_runs=sum(1 for r in rows if r['failed']), lost_effects=s('lost'),
++    corrupted_files=s('frame_files') + s('structure_files'), extra_files=sum(len(r['extra_files'] or []) for r in rows),
++    foreign_writes=sum(len(r['foreign_writes'] or []) for r in rows), offered=s('offered'), correct=s('correct'),
++    non_completion=s('offered') - s('correct') - sum((r['v2_fail'] or 0) for r in rows), v2_fail_ops=s('v2_fail'),
++    mean_correct_per_run=round(s('correct') / len(rows), 2), completion_rate=round(s('correct') / s('offered'), 4),
++    goodput_mean_per_run=round(st.mean([r['goodput'] for r in rows if r['goodput']]), 2),
++    goodput_ratio_of_sums=round(s('correct') / (sum(wall) / 1000), 2), wall_ms=stats(wall),
++    re_compose_events=s('re_compose_events'), lock_contention_polls=s('lock_contention_polls'),
++    sig_interleave=s('sig_interleave'), sig_drift=s('sig_drift'), batch_classes=dict(bc), intent_classes=dict(ic),
++    intent_total_ms=stats([x for r in rows for x in r['total_ms']]), intent_apply_ms=stats([x for r in rows for x in r['apply_ms']]))
++cells = sorted(c for c in os.listdir(RUNS) if re.match(r'r3[vmrs]-', c) and os.path.exists(os.path.join(RUNS, c, 'meta.json')))
++rows = [run_row(c) for c in cells]
++out = dict(definitions=__doc__, n_cells=len(rows), unscored=[r['cell'] for r in rows if not r['scored']])
++# replay
++rv = [r for r in rows if r['cell'].startswith('r3v-')]
++exact = lambda r: re.match(r'r3v-e4-p2-s17-(old|fix|fixlock)-r\d+$', r['cell']) or re.match(r'r3v-e4-p2-s17-g-', r['cell'])
++out['replay'] = {a: dict(all=agg([r for r in rv if r['arm'] == a]), p2_s17_35=agg([r for r in rv if r['arm'] == a and exact(r)]),
++                         **{f'grid_p{p}': agg([r for r in rv if r['arm'] == a and '-g-' in r['cell'] and r['procs'] == p]) for p in (2, 4, 8)})
++                 for a in ('old', 'fix', 'fixlock')}
++out['replay_failures'] = [{k: r[k] for k in ('cell', 'arm', 'lost', 'v2_fail', 'frame_files', 'structure_files', 'extra_files', 'foreign_writes', 'by_verdict', 'sig_interleave', 'sig_drift')} for r in rv if r['failed']]
++# matrix
++rm = [r for r in rows if r['cell'].startswith('r3m-')]
++def mtype(c):
++  return 'main_p2' if '-steward-p2-' in c else 'main_p4' if '-steward-p4-' in c else 'main_p8' if '-steward-p8-' in c else 'sp' if '-steward-sp-' in c else 'fault_naive_p8' if 'fault_naive' in c else 'fault_nolock_p8' if 'fault_nolock' in c else '?'
++out['matrix'] = {a: {t: agg([r for r in rm if r['arm'] == a and mtype(r['cell']) == t]) for t in ('main_p2', 'main_p4', 'main_p8', 'sp', 'fault_naive_p8', 'fault_nolock_p8')} for a in ('old', 'fix', 'fixlock')}
++out['matrix_failures'] = [{k: r[k] for k in ('cell', 'arm', 'lost', 'v2_fail', 'frame_files', 'structure_files', 'extra_files', 'by_verdict')} for r in rm if r['failed']]
++# regression (single process)
++rr = [r for r in rows if r['cell'].startswith('r3r-')]
++reg = {}
++for armname in ('steward', 'file_lock', 'occ', 'git_three_way', 'bare_composer'):
++  for wl in ('hot_conflict', 'hot_disjoint', 'cold', 'ALL'):
++    sel = lambda pin, rep=None: [r for r in rr if f'-{armname}-' in r['cell'] and (wl == 'ALL' or r['cell'].startswith(f'r3r-e2-{wl}-'))
++                                 and r['arm'] == pin and (rep is None or f'-r{rep}-' in r['cell'])]
++    o, f = agg(sel('old')), agg(sel('fix'))
++    if not o or not f: continue
++    d = {}
++    for k in ('intent_total_ms', 'intent_apply_ms', 'wall_ms'):
++      d[k] = {q: (round(f[k][q] - o[k][q], 2), round((f[k][q] - o[k][q]) / o[k][q] * 100, 1) if o[k][q] else None) for q in ('mean', 'p50', 'p95')}
++    # noise reference: same pin, rep1 vs rep2
++    noise = {}
++    for pin in ('old', 'fix'):
++      a1, a2 = agg(sel(pin, 1)), agg(sel(pin, 2))
++      if a1 and a2:
++        noise[pin] = {k: {q: round(a2[k][q] - a1[k][q], 2) for q in ('mean', 'p50', 'p95')} for k in ('intent_total_ms', 'intent_apply_ms')}
++    reg[f'{armname}/{wl}'] = dict(old=o, fix=f, delta_fix_minus_old=d, noise_rep2_minus_rep1=noise,
++      correctness_same=(o['correct'], o['lost_effects'], o['failed_runs']) == (f['correct'], f['lost_effects'], f['failed_runs']))
++out['regression'] = reg
++# SP noise addendum (r3s-*: 5 reps x seeds 11/17/23 x pin) + the 3 r3m SP cells per pin
++sp = [r for r in rows if r['cell'].startswith('r3s-') or '-steward-sp-' in r['cell']]
++out['sp_noise'] = {a: dict(agg=agg([r for r in sp if r['arm'] == a]),
++  per_seed={sd: sorted(r['correct'] for r in sp if r['arm'] == a and r['seed'] == sd) for sd in (11, 17, 23)}) for a in ('old', 'fix')}
++# barrier
++out['barrier'] = {os.path.basename(p): json.load(open(os.path.join(p, 'barrier_result.json')))['summary']
++                  for p in sorted(glob.glob(os.path.join(RUNS, 'r3-validation', 'barrier', '*')))}
++json.dump(out, open(os.path.join(A.out, 'r3_summary.json'), 'w'), indent=1, ensure_ascii=False)
++json.dump([{k: v for k, v in r.items() if k not in ('total_ms', 'apply_ms')} for r in rows], open(os.path.join(A.out, 'r3_cells.json'), 'w'), indent=1)
++# markdown
++L = ['# r3 驗證表（ATM PR #213 merge bea35380 vs 5692474f）', '', '> DRAFT。不主張勝出。由 `analysis/r3_compare.py` 從 raw 重建（唯讀）。定義見 r3_summary.json `definitions`。', '']
++def row(name, g):
++  if not g: return f'| {name} | – |'
++  return (f"| {name} | {g['runs']} | {g['failed_runs']} | {g['lost_effects']} | {g['corrupted_files']} | {g['extra_files']} | {g['offered']} | {g['correct']} | "
++          f"{g['non_completion']} | {g['completion_rate']:.3f} | {g['mean_correct_per_run']} | {g['re_compose_events']} | "
++          f"{g['wall_ms']['mean']} / {g['wall_ms']['p50']} / {g['wall_ms']['p95']} | {g['goodput_mean_per_run']} | {g['sig_interleave']}/{g['sig_drift']} |")
++H = ('| 組 | runs | failed runs | lost effects | corrupted files | extra files | offered | correct | non-completion | completion | correct/run | re-compose | wall ms mean/p50/p95 | goodput (correct/s) | 簽章 interleave/drift |',
++     '|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---:|---|')
++L += ['## 1. E4 replay（r2 forensics 同配置：每臂 75 runs，含 p2/s17 共 35 次）', '', *H]
++for a in ('old', 'fix', 'fixlock'):
++  for sub in ('all', 'p2_s17_35', 'grid_p2', 'grid_p4', 'grid_p8'): L.append(row(f'{a} · {sub}', out['replay'][a][sub]))
++L += ['', '臂：old＝5692474f＋harness steward lock off；fix＝bea35380＋off（主比較）；fixlock＝bea35380＋on（次要）。', '']
++L += ['### 1a. 非完成（intent 數，依最終 steward 結果分類）', '', '| 臂 | 分類 → intents |', '|---|---|']
++for a in ('old', 'fix', 'fixlock'):
++  ic = out['replay'][a]['all']['intent_classes'] if out['replay'][a]['all'] else {}
++  L.append(f"| {a} | " + '; '.join(f'{k}: {v}' for k, v in sorted(ic.items())) + ' |')
++L += ['', '## 2. E4 完整 cells（r1 同 seeds／flags）', '', *H]
++for a in ('old', 'fix', 'fixlock'):
++  for t, g in out['matrix'][a].items():
++    if g: L.append(row(f'{a} · {t}', g))
++L += ['', '### 2a. 單 process E4（sp）雜訊檢查：r3m 3 cells ＋ r3s 15 cells／pin（每 seed 6 次）', '', '| pin 臂 | runs | correct/offered | lost | failed runs | 每 seed correct 分布（s11 ; s17 ; s23） |', '|---|---:|---|---:|---:|---|']
++for a in ('old', 'fix'):
++  g = out['sp_noise'][a]['agg']; ps = out['sp_noise'][a]['per_seed']
++  if g: L.append(f"| {a} | {g['runs']} | {g['correct']}/{g['offered']} | {g['lost_effects']} | {g['failed_runs']} | {ps[11]} ; {ps[17]} ; {ps[23]} |")
++L += ['', '## 3. 單 process 回歸（E2 子集：3 workloads × 5 arms × seeds 11/17/23 × 2 reps）', '',
++      '| arm/workload | correct old→fix | lost old/fix | failed runs old/fix | total_ms mean old→fix (Δ%) | p50 Δ | p95 Δ | apply_ms mean Δ (Δ%) | apply p95 Δ | 雜訊參考（同 pin rep2−rep1，total mean） |', '|---|---|---|---|---|---|---|---|---|---|']
++for k, v in reg.items():
++  o, f, d = v['old'], v['fix'], v['delta_fix_minus_old']; n = v['noise_rep2_minus_rep1']
++  L.append(f"| {k} | {o['correct']}/{o['offered']} → {f['correct']}/{f['offered']} | {o['lost_effects']}/{f['lost_effects']} | {o['failed_runs']}/{f['failed_runs']} | "
++           f"{o['intent_total_ms']['mean']} → {f['intent_total_ms']['mean']} ({d['intent_total_ms']['mean'][1]}%) | {d['intent_total_ms']['p50'][0]} | {d['intent_total_ms']['p95'][0]} | "
++           f"{d['intent_apply_ms']['mean'][0]} ({d['intent_apply_ms']['mean'][1]}%) | {d['intent_apply_ms']['p95'][0]} | old {n.get('old', {}).get('intent_total_ms', {}).get('mean')} / fix {n.get('fix', {}).get('intent_total_ms', {}).get('mean')} |")
++L += ['', '## 4. Barrier 2-process 交錯測試（確定性）', '', '| 案例 | window hit | lost effects | follower 結果 | 最終＝leader-only | 最終＝兩者 full bytes | 殘留檔 | follower commit-guard 次數 |', '|---|---|---|---|---|---|---|---|']
++for k, b in out['barrier'].items():
++  L.append(f"| {k} | {b['window_hit']}/{b['reps']} | {b['lost_effects_total']} | {b['follower_classes']} | {b['final_equals_leader_only']} | {b.get('final_equals_both_full_bytes')} | {b['leftover_files']} | {b['follower_commit_guard_attempts']} |")
++open(os.path.join(A.out, 'R3_TABLES.md'), 'w').write('\n'.join(L) + '\n')
++print(json.dumps({a: {k: out['replay'][a]['all'][k] for k in ('runs', 'failed_runs', 'lost_effects', 'corrupted_files', 'correct', 'non_completion', 're_compose_events')} for a in out['replay'] if out['replay'][a]['all']}, indent=0))
+diff -ruN r2/analysis/rescore_oracle_v2.mjs r3/analysis/rescore_oracle_v2.mjs
+--- r2/analysis/rescore_oracle_v2.mjs	2026-10-08 11:01:11.515142845 +0800
++++ r3/analysis/rescore_oracle_v2.mjs	2026-10-08 11:01:11.519142845 +0800
+@@ -24,7 +24,7 @@
+ (function walk(d) { for (const f of readdirSync(d).sort()) { const p = join(d, f); if (statSync(p).isDirectory()) walk(p); else if (relative(FIXTURE, p) !== 'manifest.json') fixtureFiles.push(relative(FIXTURE, p)); } })(FIXTURE);
+ const baseOf = Object.fromEntries(fixtureFiles.map((f) => [f, readFileSync(join(FIXTURE, f), 'utf8')]));
+ 
+-const stageOf = (c) => (c.match(/^(e[1-5])-/)?.[1]) ?? (/^c4-/.test(c) ? 'c4' : /^d[1-5]-/.test(c) ? c.slice(0, 2) : /^steward-/.test(c) ? 'steward' : /^gaps-/.test(c) ? 'gaps' : /^r2f-/.test(c) ? 'r2-e4-forensics' : 'support');
++const stageOf = (c) => (c.match(/^(e[1-5])-/)?.[1]) ?? (/^c4-/.test(c) ? 'c4' : /^d[1-5]-/.test(c) ? c.slice(0, 2) : /^steward-/.test(c) ? 'steward' : /^gaps-/.test(c) ? 'gaps' : /^r2f-/.test(c) ? 'r2-e4-forensics' : /^r3v-/.test(c) ? 'r3-replay' : /^r3m-/.test(c) ? 'r3-matrix' : /^r3r-/.test(c) ? 'r3-regression' : /^r3s-/.test(c) ? 'r3-sp-noise' : /^r3-smoke/.test(c) ? 'r3-smoke' : 'support');
+ 
+ const rows = [], changes = [], skipped = [];
+ for (const cell of readdirSync(RUNS).sort()) {
+diff -ruN r2/runs/r3-validation/pin_record.py r3/runs/r3-validation/pin_record.py
+--- r2/runs/r3-validation/pin_record.py	1970-01-01 08:00:00.000000000 +0800
++++ r3/runs/r3-validation/pin_record.py	2026-10-08 11:01:11.523142845 +0800
+@@ -0,0 +1,43 @@
++#!/usr/bin/env python3
++"""r3: record both ATM pins (read-only). Output: PINS.json + PINS.md in argv[1] (default runs/r3-validation)."""
++import hashlib, json, os, subprocess, sys, tarfile
++OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.dirname(os.path.abspath(__file__))
++PINS = {
++  '5692474f': dict(role='baseline (r1/r2 pin; PR #198 merge)', dir='/workspace/atm-main-5692474f', sha='5692474f7db70ab52a7a71c8af4867609e7e4b43'),
++  'bea35380': dict(role='r3 pin (PR #213 merge; feature commit 4d7c9ed6287173f6f704e8d0a0d8a99683776bff; base main 53e6fdb0fca462212c7d1a26dcdfa74653cf4436)',
++                   dir='/workspace/atm-main-bea35380', sha='bea35380d7f381f998c9930fa95f01b999c7f208'),
++}
++H = lambda b: hashlib.sha256(b).hexdigest()
++def fh(p): return H(open(p, 'rb').read())
++def tree_hash(root, sub):
++  lines = []
++  for d, ds, fs in os.walk(os.path.join(root, sub)):
++    ds.sort(); ds[:] = [x for x in ds if x != 'node_modules']
++    for f in sorted(fs):
++      p = os.path.join(d, f); lines.append(f"{fh(p)}  {os.path.relpath(p, root)}")
++  return H('\n'.join(sorted(lines, key=lambda l: l[66:])).encode()), len(lines)
++res = {}
++for k, v in PINS.items():
++  root = os.path.join(v['dir'], f"AI-Atomic-Framework-{v['sha']}"); tgz = os.path.join(v['dir'], 'atm-main.tar.gz')
++  with tarfile.open(tgz) as t: tar_commit = t.pax_headers.get('comment')
++  core_hash, core_n = tree_hash(root, 'packages/core/src')
++  broker = os.path.join(root, 'packages/core/src/broker')
++  keyfiles = {f: fh(os.path.join(broker, f)) for f in sorted(os.listdir(broker))
++              if f.startswith('steward') or f in ('compose.ts', 'decision.ts', 'registry.ts', 'registry-store.ts', 'merge-plan.ts', 'unified-patch.ts')}
++  deps = {}
++  for n in sorted(os.listdir(os.path.join(root, 'node_modules'))):
++    p = os.path.join(root, 'node_modules', n); real = os.path.realpath(p)
++    pj = json.load(open(os.path.join(real, 'package.json')))
++    deps[n] = dict(symlink_target=os.readlink(p) if os.path.islink(p) else None, version=pj.get('version'), package_json_sha256=fh(os.path.join(real, 'package.json')))
++  res[k] = dict(role=v['role'], resolved_commit=v['sha'], tarball_url=f"https://codeload.github.com/eaglhuang/AI-Atomic-Framework/tar.gz/{v['sha']}",
++    tarball_path=tgz, tarball_bytes=os.path.getsize(tgz), tarball_sha256=fh(tgz), tarball_embedded_commit=tar_commit,
++    tarball_commit_matches=(tar_commit == v['sha']), tree=root, core_package_version=json.load(open(os.path.join(root, 'packages/core/package.json')))['version'],
++    packages_core_src_tree_sha256=core_hash, packages_core_src_files=core_n, broker_key_files_sha256=keyfiles, node_modules=deps,
++    install_mechanism='GitHub commit tarball (codeload) extracted on the box; node_modules = the same 5 symlinks as the 5692474f pin (ajv runtime deps only); selected per run via ATM_MONOREPO; no npm publish / tag / clone')
++a, b = res['5692474f'], res['bea35380']
++res['diff_core_broker'] = {f: ('added' if f not in a['broker_key_files_sha256'] else 'changed') for f in b['broker_key_files_sha256']
++                           if a['broker_key_files_sha256'].get(f) != b['broker_key_files_sha256'][f]}
++res['note'] = ('core/package.json version label is identical (0.1.2) at both pins; identify runs by meta atm_version source path (contains full SHA). '
++               'Other differences between the pins are outside packages/core (cli, tests, docs, scripts) and are not loaded by the harness.')
++json.dump(res, open(os.path.join(OUT, 'PINS.json'), 'w'), indent=1)
++print(json.dumps({k: (v['tarball_sha256'], v['tarball_commit_matches'], v['packages_core_src_tree_sha256']) for k, v in res.items() if k in PINS}, indent=0)); print(res['diff_core_broker'])
+diff -ruN r2/runs/r3-validation/run_r3.sh r3/runs/r3-validation/run_r3.sh
+--- r2/runs/r3-validation/run_r3.sh	1970-01-01 08:00:00.000000000 +0800
++++ r3/runs/r3-validation/run_r3.sh	2026-10-08 11:01:11.523142845 +0800
+@@ -0,0 +1,61 @@
++#!/usr/bin/env bash
++# r3 validation of ATM PR #213 (merge bea35380) — harness-only; both ATM pins read-only; new run ids only (r3*).
++# Arms (interleaved per run to share box conditions):
++#   old     = ATM 5692474f, harness --steward-apply-lock off   (same-time control; = r2 "r1cfg")
++#   fix     = ATM bea35380, harness --steward-apply-lock off   (MAIN r3 comparison: ATM itself must be safe)
++#   fixlock = ATM bea35380, harness --steward-apply-lock on    (secondary)
++# DRAFT evidence, not a win claim.
++set -euo pipefail
++ROOT="$(cd "$(dirname "$0")/../.." && pwd)"; cd "$ROOT"
++export PATH=/workspace/.nvm/versions/node/v24.21.0/bin:${PATH:-}
++OLD=/workspace/atm-main-5692474f/AI-Atomic-Framework-5692474f7db70ab52a7a71c8af4867609e7e4b43
++NEW=/workspace/atm-main-bea35380/AI-Atomic-Framework-bea35380d7f381f998c9930fa95f01b999c7f208
++D="$ROOT/runs/r3-validation"; LOG="$D/r3.log"
++PHASES=${PHASES:-"barrier replay matrix regression"}
++REPS_CELL=${REPS_CELL:-30}; REPS_GRID=${REPS_GRID:-5}; BARRIER_REPS=${BARRIER_REPS:-20}
++MP=(--atm-backend real --arm steward --compose-window-ms 100 --agents 8 --trials 5 --hot-ratio 1 --overlap high
++  --hold-ms-min 8 --hold-ms-max 25 --tick-interval-ms 15 --jitter-ms 6 --force)
++pin(){ case "$1" in old) echo "$OLD";; fix|fixlock) echo "$NEW";; esac; }
++slk(){ [ "$1" = fixlock ] && echo on || echo off; }
++guard(){ [ -e "runs/$1" ] && { echo "REFUSE: runs/$1 exists" | tee -a "$LOG"; exit 3; } || true; }
++mp(){ # rid arm procs seed registry applylock
++  guard "$1"
++  ATM_MONOREPO=$(pin "$2") node src/cli.mjs run-mp --run-id "$1" --mode atm --seed "$4" --scheduler-seed $(( $4 + 1000 )) --procs "$3" \
++    --registry-sync "$5" --apply-lock "$6" --steward-apply-lock "$(slk "$2")" "${MP[@]}" > "$D/stdout/$1.log" 2>&1 && rc=0 || rc=$?
++  echo "$1 rc=$rc $(grep -Eo 'oracle_correct[^ ]*' "$D/stdout/$1.log" | tail -1)" >> "$LOG"
++}
++sp(){ # rid arm-pin cli-arm seed hot overlap agents
++  guard "$1"
++  ATM_MONOREPO=$(pin "$2") node src/cli.mjs start --run-id "$1" --arm "$3" --seed "$4" --scheduler-seed $(( $4 + 1000 )) \
++    --hot-ratio "$5" --overlap "$6" --atm-backend real --compose-window-ms 100 --agents "$7" --trials 5 \
++    --hold-ms-min 8 --hold-ms-max 25 --tick-interval-ms 15 --jitter-ms 6 --force > "$D/stdout/$1.log" 2>&1 && rc=0 || rc=$?
++  echo "$1 rc=$rc" >> "$LOG"
++}
++mkdir -p "$D/stdout"; echo "start $(date '+%F %T %Z') phases=[$PHASES]" >> "$LOG"
++for ph in $PHASES; do echo "phase $ph $(date '+%T')" >> "$LOG"; case $ph in
++barrier)
++  for p in old:$OLD fix:$NEW; do for v in "reducers reducers" "selectors reducers"; do set -- $v
++    node test/barrier_interleave.mjs --atm "${p#*:}" --out "$D/barrier/${p%%:*}-L$1-F$2" --reps "$BARRIER_REPS" --lregion "$1" --fregion "$2" >> "$LOG" 2>&1
++  done; done;;
++replay)  # = r2 forensics config: 30 exact p2/s17 + grid p{2,4,8} x s{11,17,23} x 5  => 75 runs per arm (35 at p2/s17)
++  for r in $(seq -w 1 $REPS_CELL); do for a in old fix fixlock; do mp "r3v-e4-p2-s17-$a-r$r" $a 2 17 cas on; done; done
++  for procs in 2 4 8; do for seed in 11 17 23; do for r in $(seq -w 1 $REPS_GRID); do for a in old fix fixlock; do
++    mp "r3v-e4-p${procs}-s${seed}-g-$a-r$r" $a $procs $seed cas on; done; done; done; done;;
++matrix)  # = r1 E4 18 cells (same seeds/flags) at old and fix; main steward cells also at fixlock
++  for a in old fix fixlock; do
++    for procs in 2 4 8; do for seed in 11 17 23; do mp "r3m-e4-hot_conflict-steward-p${procs}-s${seed}-$a" $a $procs $seed cas on; done; done
++    [ $a = fixlock ] && continue
++    for seed in 11 17 23; do
++      guard "r3m-e4-hot_conflict-steward-sp-s${seed}-$a"
++      ATM_MONOREPO=$(pin $a) node src/cli.mjs start --run-id "r3m-e4-hot_conflict-steward-sp-s${seed}-$a" --seed $seed --scheduler-seed $((seed+1000)) "${MP[@]}" \
++        > "$D/stdout/r3m-e4-hot_conflict-steward-sp-s${seed}-$a.log" 2>&1 && rc=0 || rc=$?; echo "r3m-e4-hot_conflict-steward-sp-s${seed}-$a rc=$rc" >> "$LOG"
++      mp "r3m-e4-hot_conflict-fault_naive-p8-s${seed}-$a" $a 8 $seed naive on
++      mp "r3m-e4-hot_conflict-fault_nolock-p8-s${seed}-$a" $a 8 $seed cas off
++    done
++  done;;
++regression)  # single-process E2 subset: 3 workloads x 5 arms x seeds 11/17/23 x 2 reps, pins interleaved
++  for wl in hot_conflict:1:high hot_disjoint:1:low cold:0:low; do IFS=: read -r wid hot ov <<< "$wl"
++    for arm in steward file_lock occ git_three_way bare_composer; do for seed in 11 17 23; do for r in 1 2; do for a in old fix; do
++      sp "r3r-e2-${wid}-${arm}-s${seed}-r${r}-$a" $a $arm $seed $hot $ov 3; done; done; done; done; done;;
++esac; done
++echo "end $(date '+%F %T %Z')" >> "$LOG"
+diff -ruN r2/runs/r3-validation/run_r3_sp_noise.sh r3/runs/r3-validation/run_r3_sp_noise.sh
+--- r2/runs/r3-validation/run_r3_sp_noise.sh	1970-01-01 08:00:00.000000000 +0800
++++ r3/runs/r3-validation/run_r3_sp_noise.sh	2026-10-08 11:01:11.523142845 +0800
+@@ -0,0 +1,15 @@
++#!/usr/bin/env bash
++# r3 addendum (run after main r3 at 10:53): SP E4 noise check — 5 reps x seeds 11/17/23 x {old,fix}, same flags as r3m SP cells.
++set -euo pipefail
++ROOT="$(cd "$(dirname "$0")/../.." && pwd)"; cd "$ROOT"; export PATH=/workspace/.nvm/versions/node/v24.21.0/bin:${PATH:-}
++OLD=/workspace/atm-main-5692474f/AI-Atomic-Framework-5692474f7db70ab52a7a71c8af4867609e7e4b43
++NEW=/workspace/atm-main-bea35380/AI-Atomic-Framework-bea35380d7f381f998c9930fa95f01b999c7f208
++D="$ROOT/runs/r3-validation"; LOG="$D/r3.log"; echo "phase sp-noise $(date '+%F %T %Z')" >> "$LOG"
++for r in 1 2 3 4 5; do for seed in 11 17 23; do for a in old fix; do
++  rid="r3s-e4-steward-sp-s${seed}-r${r}-$a"; [ -e "runs/$rid" ] && { echo "REFUSE $rid"; exit 3; }
++  P=$([ $a = old ] && echo $OLD || echo $NEW)
++  ATM_MONOREPO=$P node src/cli.mjs start --run-id "$rid" --seed $seed --scheduler-seed $((seed+1000)) --atm-backend real --arm steward \
++    --compose-window-ms 100 --agents 8 --trials 5 --hot-ratio 1 --overlap high --hold-ms-min 8 --hold-ms-max 25 --tick-interval-ms 15 --jitter-ms 6 --force \
++    > "$D/stdout/$rid.log" 2>&1 && rc=0 || rc=$?; echo "$rid rc=$rc" >> "$LOG"
++done; done; done
++echo "end sp-noise $(date '+%F %T %Z')" >> "$LOG"
+diff -ruN r2/src/steward-writer.mjs r3/src/steward-writer.mjs
+--- r2/src/steward-writer.mjs	2026-10-08 11:01:11.515142845 +0800
++++ r3/src/steward-writer.mjs	2026-10-08 11:01:11.519142845 +0800
+@@ -7,7 +7,8 @@
+ //   Late joiner after close → NEW batch (never joins a closed window).
+ //   Scheduler = this ComposeWindowManager (harness), not ATM core.
+ import { createHash } from 'node:crypto';
+-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
++import fsMod, { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
++import { syncBuiltinESMExports } from 'node:module';
+ import { dirname, join } from 'node:path';
+ import { pathToFileURL } from 'node:url';
+ import { spawnSync } from 'node:child_process';
+@@ -20,8 +21,26 @@
+ 
+ const r2 = (x) => Math.round(x * 100) / 100;
+ 
++// r3 observation-only seam (no behaviour change): counts ATM bea35380+ canonical-commit-guard lock acquisitions
++// (mkdir <lockRoot>/<sha256(realpath)> succeeded = one commit attempt reached the base-hash compare) and EEXIST polls
++// (lock contention). At pins without the guard (e.g. 5692474f) both stay 0. Installed before ATM modules load.
++export const commitGuardObs = { acquires: 0, contention_polls: 0, installed: false };
++function installCommitGuardObserver() {
++  if (commitGuardObs.installed || process.env.ATM_BENCH_COMMIT_OBSERVER === '0') return;
++  const orig = fsMod.mkdirSync;
++  const re = /atm-steward-commit-locks[\\/][0-9a-f]{64}$/;
++  fsMod.mkdirSync = function (p, opts) {
++    const hit = typeof p === 'string' && re.test(p) && !(opts && opts.recursive);
++    try { const r = orig.call(this, p, opts); if (hit) commitGuardObs.acquires += 1; return r; }
++    catch (e) { if (hit && e?.code === 'EEXIST') commitGuardObs.contention_polls += 1; throw e; }
++  };
++  syncBuiltinESMExports();
++  commitGuardObs.installed = true;
++}
++
+ async function loadStewardApis() {
+   requireNodeForRealAtm();
++  installCommitGuardObserver();
+   const root = resolveAtmMonorepo();
+   const imp = (rel) => import(pathToFileURL(atmCoreBroker(rel)).href);
+   const [{ composeBrokerProposals }, { applyStewardPlan, readGitHeadCommit }] = await Promise.all([
+@@ -318,6 +337,7 @@
+     tel.lock_wait_ms = r2(performance.now() - t_req);
+     tel.t_start_epoch_ms = r2(performance.timeOrigin + performance.now());
+     tel.pre_apply_hash = readHash(key);
++    const obs0 = { a: commitGuardObs.acquires, c: commitGuardObs.contention_polls };
+     try {
+       const composed = api.composeBrokerProposals(proposals);
+       compose_verdict = composed.mergePlan?.verdict ?? null;
+@@ -359,6 +379,9 @@
+     }
+     tel.post_apply_hash = readHash(key);
+     tel.t_end_epoch_ms = r2(performance.timeOrigin + performance.now());
++    tel.atm_commit_attempts = commitGuardObs.acquires - obs0.a;            // r3: 0 = never reached guard (or no guard)
++    tel.atm_commit_lock_contention_polls = commitGuardObs.contention_polls - obs0.c;
++    tel.atm_commit_observer = commitGuardObs.installed;
+     };
+     if (this.applyLock) this.applyLock(key, doComposeApply); else doComposeApply();
+     tel.steward_verdict = steward_verdict;
+@@ -386,6 +409,8 @@
+       expected_source: win.expected_source,
+       thrown,
+       written,
++      atm_commit_attempts: tel.atm_commit_attempts ?? null,
++      atm_commit_lock_contention_polls: tel.atm_commit_lock_contention_polls ?? null,
+     };
+ 
+     // Dedicated compose_batch event (METRIC_DEFINITIONS §3 / checklist C2).
+@@ -422,6 +447,8 @@
+       base_digest,
+       written,
+       output_digest,
++      atm_commit_attempts: batch.atm_commit_attempts,                 // r3 observation-only
++      atm_commit_lock_contention_polls: batch.atm_commit_lock_contention_polls,
+       reason: steward_verdict === 'applied' ? 'steward_applied' : (blocked_reason || 'steward_blocked'),
+     };
+     try {
+diff -ruN r2/test/barrier_interleave.mjs r3/test/barrier_interleave.mjs
+--- r2/test/barrier_interleave.mjs	1970-01-01 08:00:00.000000000 +0800
++++ r3/test/barrier_interleave.mjs	2026-10-08 11:01:11.519142845 +0800
+@@ -0,0 +1,158 @@
++#!/usr/bin/env node
++// r3: deterministic, barrier-controlled 2-process interleaving test for the steward "after check, before write" window.
++// Harness-level only: ATM sources are NOT modified. The seam is a node:fs interception installed in each child
++// (module.syncBuiltinESMExports) that blocks on the FIRST canonical-mutation syscall, i.e. the first
++//   writeFileSync/openSync/renameSync whose path lies in the target file's directory (5692474f: the in-place canonical
++//   write; bea35380: the same-dir temp sibling), or mkdirSync under atm-steward-commit-locks (bea35380 lock acquire).
++// At both pins that point is after compose + the unlocked stale pre-check, and before any canonical byte changes.
++// Schedule (forced): both processes compose against the same base B and reach the seam; LEADER proceeds and
++// finishes applyStewardPlan; only then FOLLOWER proceeds. This is exactly the E4 r1/r2 lost-update interleaving.
++// Usage: node test/barrier_interleave.mjs --atm <ATM_MONOREPO> --out <dir> [--reps N]
++// Exit 0 always for a completed experiment; outcome is in <out>/barrier_result.json (pass/fail is per pin semantics).
++import fs from 'node:fs';
++import { syncBuiltinESMExports } from 'node:module';
++import { spawn } from 'node:child_process';
++import { createHash } from 'node:crypto';
++import { tmpdir } from 'node:os';
++import { dirname, join, resolve, basename } from 'node:path';
++import { fileURLToPath, pathToFileURL } from 'node:url';
++
++const HERE = dirname(fileURLToPath(import.meta.url));
++let FREGION = 'reducers'; let LREGION = 'reducers';
++const arg = (k, d = null) => { const i = process.argv.indexOf(k); return i > 0 ? process.argv[i + 1] : d; };
++const sha = (t) => `sha256:${createHash('sha256').update(t, 'utf8').digest('hex')}`;
++const sleep = (ms) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
++const TARGET = 'src/store.ts';
++const BASE = [
++  '// fixture for r3 barrier test', 'export const store = {};', '// <region:reducers>', '// base reducer line',
++  '// </region:reducers>', '// <region:selectors>', '// </region:selectors>', 'export default store;', '',
++].join('\n');
++
++async function child() {
++  const role = arg('--child'), wt = arg('--wt'), bar = arg('--bar');
++  const targetAbs = join(wt, TARGET); const targetDir = dirname(fs.realpathSync(targetAbs));
++  const log = { role, pid: process.pid, seam_fired: false, seam_op: null, seam_path: null, t: {} };
++  const t0 = Date.now(); const mark = (k) => { log.t[k] = Date.now() - t0; };
++  const orig = { writeFileSync: fs.writeFileSync, openSync: fs.openSync, renameSync: fs.renameSync, mkdirSync: fs.mkdirSync };
++  const touch = (n) => orig.writeFileSync(join(bar, n), String(process.pid));
++  const waitFor = (names, ms) => { const end = Date.now() + ms; while (Date.now() < end) { if (names.every((n) => fs.existsSync(join(bar, n)))) return true; sleep(2); } return false; };
++  const isCanonical = (op, p, flags) => {
++    if (typeof p !== 'string') return false;
++    const abs = resolve(p);
++    if (op === 'mkdirSync') return abs.includes('atm-steward-commit-locks');
++    if (op === 'openSync' && !(typeof flags === 'string' && /[wa+]/.test(flags))) return false;
++    try { return dirname(abs) === targetDir; } catch { return false; }
++  };
++  log.commit_guard_lock_acquires = 0; // bea35380: mkdir of <lockRoot>/<sha256(realpath)> = one canonical commit attempt
++  const seam = (op, p) => {
++    if (log.seam_fired) return;
++    log.seam_fired = true; log.seam_op = op; log.seam_path = p.startsWith(wt) ? p.slice(wt.length + 1) : basename(dirname(p)) + '/' + basename(p);
++    // Read BEFORE signalling arrival: no process can mutate the target until both have arrived.
++    log.disk_hash_at_seam = sha(fs.readFileSync(targetAbs, 'utf8'));
++    mark('seam_arrive'); touch(`arrive.${role}`);
++    log.both_arrived = waitFor(['arrive.leader', 'arrive.follower'], 15000); mark('both_arrived');
++    if (role === 'follower') { log.leader_done_seen = waitFor(['leader.done'], 15000); mark('follower_release'); }
++  };
++  for (const op of ['writeFileSync', 'openSync', 'renameSync', 'mkdirSync']) {
++    fs[op] = function (...a) {
++      const p = op === 'renameSync' ? a[1] : a[0];
++      if (isCanonical(op, String(p), a[1])) seam(op, String(p));
++      const r = orig[op].apply(this, a);
++      if (op === 'mkdirSync' && /atm-steward-commit-locks\/[0-9a-f]{64}$/.test(String(p)) && !a[1]?.recursive) log.commit_guard_lock_acquires += 1;
++      return r;
++    };
++  }
++  syncBuiltinESMExports();
++  const { makeMarkerProposal } = await import(pathToFileURL(join(HERE, '../src/steward-writer.mjs')).href);
++  const { atmCoreBroker } = await import(pathToFileURL(join(HERE, '../src/atm-resolve.mjs')).href);
++  const [{ composeBrokerProposals }, { applyStewardPlan, readGitHeadCommit }] = await Promise.all([
++    import(pathToFileURL(atmCoreBroker('compose.ts')).href), import(pathToFileURL(atmCoreBroker('steward.ts')).href)]);
++  const content = fs.readFileSync(targetAbs, 'utf8'); log.compose_base_hash = sha(content);
++  const intentId = `barrier-${role}`;
++  const region = role === 'follower' ? (arg('--fregion') || 'reducers') : (arg('--lregion') || 'reducers');
++  const proposal = makeMarkerProposal({ proposalId: `p-${role}`, actorId: `agent-${role}`, targetFile: TARGET, region,
++    content, baseCommit: readGitHeadCommit(wt), intentId });
++  touch(`ready.${role}`); log.both_ready = waitFor(['ready.leader', 'ready.follower'], 15000); mark('both_ready');
++  let result, thrown = null;
++  try {
++    const composed = composeBrokerProposals([proposal]);
++    result = applyStewardPlan({ cwd: wt, stewardId: 'neutral-write-steward', mergePlan: composed.mergePlan, proposals: [proposal],
++      scopeFiles: [TARGET], evidenceOutPath: join(bar, `evidence.${role}.json`) });
++  } catch (e) { thrown = String(e?.message || e); }
++  mark('apply_return');
++  if (role === 'leader') touch('leader.done');
++  const ev = result?.evidence ?? {};
++  Object.assign(log, { ok: !!result?.ok, verdict: ev.verdict ?? 'thrown', blockedReasons: ev.blockedReasons ?? (thrown ? [thrown] : []),
++    receipt_before: ev.fileBeforeHashes?.[TARGET] ?? null, receipt_after: ev.fileAfterHashes?.[TARGET] ?? null,
++    marker: proposal.patch.split('\n').find((l) => l.startsWith('+//') && !l.includes('</region:')).slice(1) });
++  process.stdout.write(JSON.stringify(log) + '\n');
++}
++
++function runChild(role, wt, bar, atm) {
++  return new Promise((res) => {
++    const p = spawn(process.execPath, [fileURLToPath(import.meta.url), '--child', role, '--wt', wt, '--bar', bar, '--fregion', FREGION, '--lregion', LREGION],
++      { env: { ...process.env, ATM_MONOREPO: atm }, stdio: ['ignore', 'pipe', 'pipe'] });
++    let out = '', err = ''; p.stdout.on('data', (d) => { out += d; }); p.stderr.on('data', (d) => { err += d; });
++    p.on('close', (code) => { let j = null; try { j = JSON.parse(out.trim().split('\n').pop()); } catch {} res({ code, j, err: err.slice(-2000) }); });
++  });
++}
++
++async function parent() {
++  const atm = resolve(arg('--atm')); const out = resolve(arg('--out')); const reps = Number(arg('--reps', '10')); FREGION = arg('--fregion', 'reducers'); LREGION = arg('--lregion', 'reducers');
++  fs.mkdirSync(out, { recursive: true });
++  const { initWorktreeGit } = await import(pathToFileURL(join(HERE, '../src/steward-writer.mjs')).href);
++  const pinSha = (atm.match(/[0-9a-f]{40}/) || [null])[0];
++  const runs = [];
++  for (let r = 1; r <= reps; r++) {
++    const base = fs.mkdtempSync(join(tmpdir(), 'r3-barrier-')); const wt = join(base, 'wt'), bar = join(base, 'bar');
++    fs.mkdirSync(join(wt, 'src'), { recursive: true }); fs.mkdirSync(bar);
++    fs.writeFileSync(join(wt, TARGET), BASE); initWorktreeGit(wt);
++    const [L, F] = await Promise.all([runChild('leader', wt, bar, atm), runChild('follower', wt, bar, atm)]);
++    const final = fs.readFileSync(join(wt, TARGET), 'utf8');
++    const leftovers = fs.readdirSync(join(wt, 'src')).filter((n) => n !== 'store.ts');
++    const l = L.j || {}, f = F.j || {};
++    const has = (m) => !!m && final.split('\n').includes(m);
++    const withLine = (lines, reg = LREGION, src = BASE) => { const a = src.split('\n'); const i = a.indexOf(`// </region:${reg}>`); a.splice(i, 0, ...lines); return a.join('\n'); };
++    const leaderOnly = withLine([l.marker]);
++    const bothDisjoint = FREGION !== LREGION && f.marker ? withLine([f.marker], FREGION, leaderOnly) : null;
++    const rec = {
++      rep: r, leader: l, follower: f, leader_exit: L.code, follower_exit: F.code, stderr: { leader: L.err, follower: F.err },
++      window_hit: !!(l.seam_fired && f.seam_fired && l.both_arrived && f.both_arrived && f.leader_done_seen
++        && l.disk_hash_at_seam === sha(BASE) && f.disk_hash_at_seam === sha(BASE) && l.compose_base_hash === sha(BASE) && f.compose_base_hash === sha(BASE)),
++      final_hash: sha(final), final_bytes: Buffer.byteLength(final), leftover_files: leftovers,
++      leader_marker_present: has(l.marker), follower_marker_present: has(f.marker),
++      final_equals_leader_only: final === leaderOnly,
++      final_equals_both_full_bytes: bothDisjoint !== null && final === bothDisjoint,
++    };
++    // Lost effect: a process reported `applied` but its effect is absent from the final bytes.
++    rec.lost_effects = [l, f].filter((x) => x.verdict === 'applied' && !has(x.marker)).map((x) => x.role);
++    rec.follower_class = f.verdict === 'applied' ? (has(f.marker) && has(l.marker)
++        ? (f.commit_guard_lock_acquires >= 2 ? 'applied_after_re-compose_both_present' : 'applied_both_present') : 'applied_overwrite')
++      : (String(f.blockedReasons?.[0] || '').startsWith('re-compose:') ? 'blocked_re-compose'
++        : String(f.blockedReasons?.[0] || '').startsWith('recovery-required:') ? 'blocked_recovery-required'
++        : /stale/.test(String(f.blockedReasons?.[0] || '')) ? 'blocked_stale_precheck'
++        : (f.commit_guard_lock_acquires >= 1 && String(f.blockedReasons?.[0] || '').startsWith('compose-context-mismatch'))
++          ? 'blocked_after_re-compose(compose-context-mismatch)' : 'blocked_other');
++    runs.push(rec); fs.rmSync(base, { recursive: true, force: true });
++    process.stderr.write(`rep ${r}: window_hit=${rec.window_hit} leader=${l.verdict} follower=${f.verdict}/${rec.follower_class} lost=${JSON.stringify(rec.lost_effects)}\n`);
++  }
++  const summary = {
++    test: 'r3-barrier-interleave-v1', variant: FREGION === LREGION ? `same-region(${LREGION})` : `leader-${LREGION}/follower-${FREGION}`, atm_monorepo: atm, atm_pin: pinSha, node: process.version, reps,
++    window_hit: runs.filter((x) => x.window_hit).length,
++    runs_with_lost_effect: runs.filter((x) => x.lost_effects.length).length,
++    lost_effects_total: runs.reduce((s, x) => s + x.lost_effects.length, 0),
++    leader_applied: runs.filter((x) => x.leader.verdict === 'applied').length,
++    follower_classes: runs.reduce((m, x) => { m[x.follower_class] = (m[x.follower_class] || 0) + 1; return m; }, {}),
++    final_equals_leader_only: runs.filter((x) => x.final_equals_leader_only).length,
++    final_equals_both_full_bytes: runs.filter((x) => x.final_equals_both_full_bytes).length,
++    leftover_files: runs.reduce((s, x) => s + x.leftover_files.length, 0),
++    seam_ops: [...new Set(runs.flatMap((x) => [x.leader.seam_op, x.follower.seam_op]))],
++    follower_commit_guard_attempts: [...new Set(runs.map((x) => x.follower.commit_guard_lock_acquires))],
++    leader_commit_guard_attempts: [...new Set(runs.map((x) => x.leader.commit_guard_lock_acquires))],
++    first_follower_reason: runs[0]?.follower?.blockedReasons?.[0] ?? null,
++  };
++  fs.writeFileSync(join(out, 'barrier_result.json'), JSON.stringify({ summary, runs }, null, 1));
++  console.log(JSON.stringify(summary));
++}
++
++if (arg('--child')) await child(); else await parent();
+diff -ruN r2/tools/analyze.sh r3/tools/analyze.sh
+--- r2/tools/analyze.sh	2026-10-08 11:01:11.515142845 +0800
++++ r3/tools/analyze.sh	2026-10-08 11:01:11.519142845 +0800
+@@ -1,6 +1,6 @@
+ #!/usr/bin/env bash
+ # ANALYSIS-ONLY. Rebuilds tables/re-scores from frozen raw cells. Never modifies runs/<cell>/ or any sealed generation.
+-# Usage: tools/analyze.sh [OUT_DIR]   (default: runs/r2-analysis/<timestamp>; refuses an existing non-empty OUT_DIR)
++# Usage: tools/analyze.sh [OUT_DIR]   (default: runs/r2-analysis/<timestamp>; refuses an existing non-empty OUT_DIR; any runs/*-analysis dir is excluded from the raw fingerprint)
+ set -euo pipefail
+ ROOT="$(cd "$(dirname "$0")/.." && pwd)"; cd "$ROOT"
+ export PATH="${NODE_BIN:-/workspace/.nvm/versions/node/v24.21.0/bin}:${PATH:-}"
+@@ -9,7 +9,7 @@
+ mkdir -p "$OUT"; OUT="$(cd "$OUT" && pwd)"
+ echo "== analyze → $OUT (raw read-only) =="
+ # fingerprint raw inputs before/after to prove read-only
+-snap(){ find runs -maxdepth 1 -mindepth 1 -type d ! -name 'r2-analysis' -print0 | sort -z | xargs -0 -I{} sh -c 'find "{}" -type f ! -path "*/.git/*" -printf "%P %s %T@\n"' | sha256sum | cut -d' ' -f1; }
++snap(){ find runs -maxdepth 1 -mindepth 1 -type d ! -name '*-analysis' -print0 | sort -z | xargs -0 -I{} sh -c 'find "{}" -type f ! -path "*/.git/*" -printf "%P %s %T@\n"' | sha256sum | cut -d' ' -f1; }
+ B=$(snap)
+ node test/oracle_v2_contract.mjs "$OUT/oracle-contract" > "$OUT/oracle-contract.log"
+ node analysis/rescore_oracle_v2.mjs --out="$OUT/oracle-rescore" > "$OUT/oracle-rescore.log"
+@@ -17,6 +17,8 @@
+ python3 analysis/rebuild_tables.py --out "$OUT/tables" --rescore "$OUT/oracle-rescore/rescore_cells.json" > "$OUT/tables.log"
+ python3 analysis/cell_index.py "$OUT/cell-index" > "$OUT/cell-index.log"
+ python3 analysis/logical_id_audit.py "$OUT/logical-id-audit" > "$OUT/logical-id-audit.log"
++# r3: ATM PR #213 validation comparison (only when r3 cells exist)
++if ls -d runs/r3[vmr]-* >/dev/null 2>&1; then python3 analysis/r3_compare.py --rescore "$OUT/oracle-rescore/rescore_cells.json" --out "$OUT/r3-compare" > "$OUT/r3-compare.log"; fi
+ # r1 extractors (E3/E4) re-run in a sandbox copy that writes only under $OUT; output diffed against r1 compare_raw
+ mkdir -p "$OUT/r1-extractors"
+ for pair in "e3-sweep/extract_e3.py:e3_compare_raw.json" "e4-multiprocess/extract_e4.py:e4_compare_raw.json"; do

@@ -3,6 +3,11 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync,
 import os from 'node:os';
 import path from 'node:path';
 import { sortProposalsForCompose } from './merge-plan.ts';
+import {
+  commitCanonicalFiles,
+  defaultStewardCommitLockRoot,
+  type StewardCommitFault
+} from './steward-commit-guard.ts';
 import { composeTextPatchesAgainstBase, type BaseCompositionResult, type StewardCompositionBlock } from './steward-base-composer.ts';
 import { applyUnifiedPatch, UnifiedPatchApplicationError } from './unified-patch.ts';
 import type {
@@ -41,7 +46,7 @@ export interface TransactionalStewardApplyReceipt {
   readonly baseHead: string | null;
   readonly memberAttribution: TransactionalCompositionPlan['memberAttribution'];
   readonly files: readonly TransactionalStewardFileReceipt[];
-  readonly verdict: 'applied' | 'blocked' | 'rolled-back';
+  readonly verdict: 'applied' | 'blocked' | 'rolled-back' | 're-compose' | 'recovery-required';
   readonly blockedReasons: readonly string[];
   readonly compensation?: {
     readonly restoredFiles: readonly string[];
@@ -270,12 +275,28 @@ export function applyTransactionalStewardPlan(input: {
   readonly semanticValidation: StewardSemanticValidationReceipt;
   readonly baseHead?: string | null;
   readonly failAfterWrites?: number;
+  /**
+   * Test seam. `beforePrecheck` runs before the unlocked stale check.
+   * `afterPrecheck` runs after that check and temp materialization, before the
+   * commit lock. Neither seam skips the commit guard or is a CLI option.
+   */
+  readonly commitHooks?: {
+    readonly beforePrecheck?: () => void;
+    readonly afterPrecheck?: () => void;
+  };
+  /** Directory for the cross-process commit locks. Defaults to `<cwd>/.atm/runtime/steward-commit-locks`. */
+  readonly commitLockRoot?: string;
+  readonly commitLockWaitMs?: number;
+  readonly commitLockPollMs?: number;
+  /** Test-only fault injected inside the canonical commit, never a CLI option. */
+  readonly commitFault?: StewardCommitFault;
 }): TransactionalStewardApplyResult {
   const cwd = path.resolve(input.cwd);
   const outputByPath = new Map(input.outputFiles.map((file) => [normalizePath(file.filePath), file]));
   const scopeSet = new Set(input.scopeFiles.map(normalizePath));
   const fileSlices = [...input.plan.fileSlices].sort((left, right) => left.filePath.localeCompare(right.filePath));
   const blockedReasons: string[] = [];
+  const staleReasons: string[] = [];
 
   if (input.writerRole !== 'neutral-steward') {
     blockedReasons.push('canonical writes require the neutral-steward writer role');
@@ -287,6 +308,8 @@ export function applyTransactionalStewardPlan(input: {
   if (input.semanticValidation.ok !== true || input.semanticValidation.candidateDigest !== candidateDigest || input.semanticValidation.outputDigest !== candidateDigest) {
     blockedReasons.push('semantic validation receipt does not authorize the exact composed candidate digest');
   }
+
+  input.commitHooks?.beforePrecheck?.();
 
   for (const slice of fileSlices) {
     if (!scopeSet.has(normalizePath(slice.filePath))) {
@@ -310,8 +333,9 @@ export function applyTransactionalStewardPlan(input: {
       continue;
     }
     const before = readFileSync(targetPath, 'utf8');
-    if (hashContent(before) !== slice.baseHash) {
-      blockedReasons.push(`canonical target base hash is stale: ${slice.filePath}`);
+    const observed = hashContent(before);
+    if (observed !== slice.baseHash) {
+      staleReasons.push(`re-compose: canonical target base hash is stale: ${slice.filePath} (expected ${slice.baseHash}, observed ${observed}). Re-read the file and compose again against the current bytes.`);
     }
   }
 
@@ -327,12 +351,21 @@ export function applyTransactionalStewardPlan(input: {
       })
     };
   }
+  if (staleReasons.length > 0) {
+    return {
+      ok: false,
+      receipt: buildReceipt(input, {
+        candidateDigest,
+        canonicalRoot: cwd,
+        files: [],
+        verdict: 're-compose',
+        blockedReasons: staleReasons
+      })
+    };
+  }
 
   const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-steward-apply-'));
-  const backups = new Map<string, string>();
-  const writtenFiles: string[] = [];
-  const receipts: TransactionalStewardFileReceipt[] = [];
-  let failedFile: string | null = null;
+  let materializeError: Error | null = null;
   try {
     // Materialize all candidates away from the canonical tree before any side effect.
     for (const slice of fileSlices) {
@@ -344,65 +377,95 @@ export function applyTransactionalStewardPlan(input: {
         throw new Error(`temporary output hash mismatch: ${slice.filePath}`);
       }
     }
-
-    let writeCount = 0;
-    for (const slice of fileSlices) {
-      const output = outputByPath.get(normalizePath(slice.filePath))!;
-      const targetPath = resolveInsideRoot(cwd, slice.filePath)!;
-      const before = readFileSync(targetPath, 'utf8');
-      backups.set(slice.filePath, before);
-      failedFile = slice.filePath;
-      if (input.failAfterWrites !== undefined && writeCount >= input.failAfterWrites) {
-        throw new Error(`injected apply failure before ${slice.filePath}`);
-      }
-      // The neutral steward is the only owner of this canonical write primitive.
-      writeFileSync(targetPath, output.content, 'utf8');
-      writeCount += 1;
-      writtenFiles.push(slice.filePath);
-      receipts.push({
-        filePath: slice.filePath,
-        beforeHash: hashContent(before),
-        afterHash: hashContent(output.content),
-        canonicalWriteCount: 1,
-        tempOutputHash: slice.outputHash
-      });
-    }
-    return {
-      ok: true,
-      receipt: buildReceipt(input, {
-        candidateDigest,
-        canonicalRoot: cwd,
-        files: receipts,
-        verdict: 'applied',
-        blockedReasons: []
-      })
-    };
   } catch (error) {
-    const restoredFiles: string[] = [];
-    for (const [filePath, content] of [...backups].reverse()) {
-      const targetPath = resolveInsideRoot(cwd, filePath);
-      if (!targetPath) continue;
-      writeFileSync(targetPath, content, 'utf8');
-      restoredFiles.push(filePath);
-    }
+    materializeError = error instanceof Error ? error : new Error(String(error));
+  } finally {
+    rmSync(tempRoot, { recursive: true, force: true });
+  }
+  if (materializeError) {
     return {
       ok: false,
       receipt: buildReceipt(input, {
         candidateDigest,
         canonicalRoot: cwd,
-        files: receipts,
+        files: [],
         verdict: 'rolled-back',
-        blockedReasons: [error instanceof Error ? error.message : String(error)],
+        blockedReasons: [materializeError.message],
         compensation: {
-          restoredFiles: restoredFiles.sort((left, right) => left.localeCompare(right)),
-          failedFile,
-          reason: writtenFiles.length > 0 ? 'restored canonical files after partial apply failure' : 'discarded materialized temp outputs before canonical write'
+          restoredFiles: [],
+          failedFile: null,
+          reason: 'discarded materialized temp outputs before canonical write'
         }
       })
     };
-  } finally {
-    rmSync(tempRoot, { recursive: true, force: true });
   }
+
+  // The barrier sits outside the commit lock so a peer can finish its own commit first.
+  input.commitHooks?.afterPrecheck?.();
+
+  const committed = commitCanonicalFiles({
+    entries: fileSlices.map((slice) => ({
+      filePath: slice.filePath,
+      targetPath: resolveInsideRoot(cwd, slice.filePath)!,
+      expectedBaseHash: slice.baseHash,
+      content: outputByPath.get(normalizePath(slice.filePath))!.content,
+      outputHash: slice.outputHash
+    })),
+    cwd,
+    lockRoot: input.commitLockRoot ?? defaultStewardCommitLockRoot(cwd),
+    lockWaitMs: input.commitLockWaitMs,
+    lockPollMs: input.commitLockPollMs,
+    failAfterWrites: input.failAfterWrites,
+    commitFault: input.commitFault
+  });
+  const files = committed.files.map((file): TransactionalStewardFileReceipt => ({
+    filePath: file.filePath,
+    beforeHash: file.beforeHash,
+    afterHash: file.afterHash,
+    canonicalWriteCount: 1,
+    tempOutputHash: file.outputHash
+  }));
+  if (committed.status === 'applied') {
+    return {
+      ok: true,
+      receipt: buildReceipt(input, {
+        candidateDigest,
+        canonicalRoot: cwd,
+        files,
+        verdict: 'applied',
+        blockedReasons: []
+      })
+    };
+  }
+  if (committed.status === 'rolled-back') {
+    return {
+      ok: false,
+      receipt: buildReceipt(input, {
+        candidateDigest,
+        canonicalRoot: cwd,
+        files,
+        verdict: 'rolled-back',
+        blockedReasons: [committed.reason],
+        compensation: {
+          restoredFiles: committed.restoredFiles,
+          failedFile: committed.failedFile,
+          reason: files.length > 0
+            ? 'restored canonical files after partial apply failure'
+            : 'discarded materialized temp outputs before canonical write'
+        }
+      })
+    };
+  }
+  return {
+    ok: false,
+    receipt: buildReceipt(input, {
+      candidateDigest,
+      canonicalRoot: cwd,
+      files: [],
+      verdict: committed.status,
+      blockedReasons: [committed.reason]
+    })
+  };
 }
 
 function buildReceipt(input: {

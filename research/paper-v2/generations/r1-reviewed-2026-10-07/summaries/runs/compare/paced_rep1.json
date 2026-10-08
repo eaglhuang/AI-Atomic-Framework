@@ -1,0 +1,919 @@
+{
+  "generated_at": "2026-10-06T09:42:36.685Z",
+  "atm_runs": [
+    {
+      "run_id": "small-atm-seed42",
+      "atm_backend": "real",
+      "atm_version": "@ai-atomic-framework/core@0.1.2 (source:/workspace/AI-Atomic-Framework/packages/core)",
+      "label": "REAL ATM (monorepo broker APIs)",
+      "scenario_seed": 42,
+      "scenario_hash": "80d54e045f6d9c41df591141d71062e52a464d12476ee696c9df79c33bd6efab",
+      "params": {
+        "n_agents": 6,
+        "hot_ratio": 0.4,
+        "overlap": "med",
+        "cold_policy": "queue",
+        "composer_enabled": true,
+        "trial_count": 30,
+        "tick_interval_ms": 50,
+        "hold_ms_min": 20,
+        "hold_ms_max": 60,
+        "jitter_ms": 15,
+        "idle_prob": 0.1,
+        "queue_timeout_ms": 2000,
+        "max_provisional_depth": 1
+      },
+      "cli_version": "0.3.0-latency",
+      "node_version": "v24.21.0"
+    }
+  ],
+  "control_runs": [
+    {
+      "run_id": "small-control-seed42",
+      "atm_backend": "none",
+      "atm_version": null,
+      "label": "CONTROL (no ATM / no broker)",
+      "scenario_seed": 42,
+      "scenario_hash": "80d54e045f6d9c41df591141d71062e52a464d12476ee696c9df79c33bd6efab",
+      "params": {
+        "n_agents": 6,
+        "hot_ratio": 0.4,
+        "overlap": "med",
+        "cold_policy": "queue",
+        "composer_enabled": true,
+        "trial_count": 30,
+        "tick_interval_ms": 50,
+        "hold_ms_min": 20,
+        "hold_ms_max": 60,
+        "jitter_ms": 15,
+        "idle_prob": 0.1,
+        "queue_timeout_ms": 2000,
+        "max_provisional_depth": 1
+      },
+      "cli_version": "0.3.0-latency",
+      "node_version": "v24.21.0"
+    }
+  ],
+  "headline": {
+    "reps": {
+      "atm": 1,
+      "control": 1
+    },
+    "wall_clock_ms": {
+      "atm_mean": 1557.15,
+      "control_mean": 1517.18,
+      "delta_ms": 39.97,
+      "slowdown_x": 1.03,
+      "atm_per_rep": [
+        1557.15
+      ],
+      "control_per_rep": [
+        1517.18
+      ]
+    },
+    "throughput_intents_per_s": {
+      "atm_mean": 107.89,
+      "control_mean": 110.73,
+      "slowdown_x": 1.03,
+      "atm_per_rep": [
+        107.89
+      ],
+      "control_per_rep": [
+        110.73
+      ]
+    },
+    "goodput_oracle_pass_per_s": {
+      "atm_mean": 103.39,
+      "control_mean": 71.18,
+      "ratio_atm_over_control": 1.45
+    },
+    "total_ms": {
+      "mean": {
+        "atm": 44.94,
+        "control": 40.57,
+        "delta_ms": 4.37,
+        "ratio": 1.11
+      },
+      "p95": {
+        "atm": 65.5,
+        "control": 58.82,
+        "delta_ms": 6.68,
+        "ratio": 1.11
+      }
+    },
+    "overhead_ms": {
+      "mean": {
+        "atm": 5.3,
+        "control": 0.2,
+        "delta_ms": 5.1,
+        "ratio": 26.5
+      },
+      "p95": {
+        "atm": 7.07,
+        "control": 0.29,
+        "delta_ms": 6.78,
+        "ratio": 24.38
+      }
+    },
+    "atm_admission_latency_ms": {
+      "n": 168,
+      "mean": 3.02,
+      "p50": 2.92,
+      "p95": 4.31,
+      "max": 6.08
+    },
+    "atm_broker_ms": {
+      "n": 168,
+      "mean": 3.02,
+      "p50": 2.92,
+      "p95": 4.31,
+      "max": 6.08
+    },
+    "atm_wait_ms": {
+      "n": 168,
+      "mean": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0
+    }
+  },
+  "per_intent": {
+    "latency_ms": {
+      "mean": {
+        "atm": 3.02,
+        "control": 0,
+        "delta_ms": 3.02,
+        "ratio": null
+      },
+      "p50": {
+        "atm": 2.92,
+        "control": 0,
+        "delta_ms": 2.92,
+        "ratio": null
+      },
+      "p95": {
+        "atm": 4.31,
+        "control": 0,
+        "delta_ms": 4.31,
+        "ratio": null
+      },
+      "max": {
+        "atm": 6.08,
+        "control": 0,
+        "delta_ms": 6.08,
+        "ratio": null
+      }
+    },
+    "wait_ms": {
+      "mean": {
+        "atm": 0,
+        "control": 0,
+        "delta_ms": 0,
+        "ratio": null
+      },
+      "p50": {
+        "atm": 0,
+        "control": 0,
+        "delta_ms": 0,
+        "ratio": null
+      },
+      "p95": {
+        "atm": 0,
+        "control": 0,
+        "delta_ms": 0,
+        "ratio": null
+      },
+      "max": {
+        "atm": 0,
+        "control": 0,
+        "delta_ms": 0,
+        "ratio": null
+      }
+    },
+    "broker_ms": {
+      "mean": {
+        "atm": 3.02,
+        "control": 0,
+        "delta_ms": 3.02,
+        "ratio": null
+      },
+      "p50": {
+        "atm": 2.92,
+        "control": 0,
+        "delta_ms": 2.92,
+        "ratio": null
+      },
+      "p95": {
+        "atm": 4.31,
+        "control": 0,
+        "delta_ms": 4.31,
+        "ratio": null
+      },
+      "max": {
+        "atm": 6.08,
+        "control": 0,
+        "delta_ms": 6.08,
+        "ratio": null
+      }
+    },
+    "hold_ms": {
+      "mean": {
+        "atm": 39.64,
+        "control": 40.37,
+        "delta_ms": -0.73,
+        "ratio": 0.98
+      },
+      "p50": {
+        "atm": 41.22,
+        "control": 41.21,
+        "delta_ms": 0.01,
+        "ratio": 1
+      },
+      "p95": {
+        "atm": 59.98,
+        "control": 58.63,
+        "delta_ms": 1.35,
+        "ratio": 1.02
+      },
+      "max": {
+        "atm": 61.64,
+        "control": 60.41,
+        "delta_ms": 1.23,
+        "ratio": 1.02
+      }
+    },
+    "apply_ms": {
+      "mean": {
+        "atm": 2.19,
+        "control": 0.11,
+        "delta_ms": 2.08,
+        "ratio": 19.91
+      },
+      "p50": {
+        "atm": 2.13,
+        "control": 0.11,
+        "delta_ms": 2.02,
+        "ratio": 19.36
+      },
+      "p95": {
+        "atm": 3.33,
+        "control": 0.18,
+        "delta_ms": 3.15,
+        "ratio": 18.5
+      },
+      "max": {
+        "atm": 5.09,
+        "control": 0.27,
+        "delta_ms": 4.82,
+        "ratio": 18.85
+      }
+    },
+    "total_ms": {
+      "mean": {
+        "atm": 44.94,
+        "control": 40.57,
+        "delta_ms": 4.37,
+        "ratio": 1.11
+      },
+      "p50": {
+        "atm": 46.35,
+        "control": 41.44,
+        "delta_ms": 4.91,
+        "ratio": 1.12
+      },
+      "p95": {
+        "atm": 65.5,
+        "control": 58.82,
+        "delta_ms": 6.68,
+        "ratio": 1.11
+      },
+      "max": {
+        "atm": 67.34,
+        "control": 60.57,
+        "delta_ms": 6.77,
+        "ratio": 1.11
+      }
+    },
+    "overhead_ms": {
+      "mean": {
+        "atm": 5.3,
+        "control": 0.2,
+        "delta_ms": 5.1,
+        "ratio": 26.5
+      },
+      "p50": {
+        "atm": 5.25,
+        "control": 0.19,
+        "delta_ms": 5.06,
+        "ratio": 27.63
+      },
+      "p95": {
+        "atm": 7.07,
+        "control": 0.29,
+        "delta_ms": 6.78,
+        "ratio": 24.38
+      },
+      "max": {
+        "atm": 9.44,
+        "control": 0.71,
+        "delta_ms": 8.73,
+        "ratio": 13.3
+      }
+    },
+    "schedule_lag_ms": {
+      "mean": {
+        "atm": 21.01,
+        "control": 3.96,
+        "delta_ms": 17.05,
+        "ratio": 5.31
+      },
+      "p50": {
+        "atm": 12.68,
+        "control": 1.04,
+        "delta_ms": 11.64,
+        "ratio": 12.19
+      },
+      "p95": {
+        "atm": 76.26,
+        "control": 18.62,
+        "delta_ms": 57.64,
+        "ratio": 4.1
+      },
+      "max": {
+        "atm": 125.41,
+        "control": 30.96,
+        "delta_ms": 94.45,
+        "ratio": 4.05
+      }
+    }
+  },
+  "by_temperature": {
+    "cold": {
+      "latency_ms": {
+        "mean": {
+          "atm": 3.09,
+          "control": 0,
+          "delta_ms": 3.09,
+          "ratio": null
+        },
+        "p50": {
+          "atm": 2.98,
+          "control": 0,
+          "delta_ms": 2.98,
+          "ratio": null
+        },
+        "p95": {
+          "atm": 4.29,
+          "control": 0,
+          "delta_ms": 4.29,
+          "ratio": null
+        },
+        "max": {
+          "atm": 5.27,
+          "control": 0,
+          "delta_ms": 5.27,
+          "ratio": null
+        }
+      },
+      "total_ms": {
+        "mean": {
+          "atm": 46.18,
+          "control": 39.76,
+          "delta_ms": 6.42,
+          "ratio": 1.16
+        },
+        "p50": {
+          "atm": 45.74,
+          "control": 40.17,
+          "delta_ms": 5.57,
+          "ratio": 1.14
+        },
+        "p95": {
+          "atm": 65.5,
+          "control": 58.82,
+          "delta_ms": 6.68,
+          "ratio": 1.11
+        },
+        "max": {
+          "atm": 67.34,
+          "control": 60.57,
+          "delta_ms": 6.77,
+          "ratio": 1.11
+        }
+      },
+      "overhead_ms": {
+        "mean": {
+          "atm": 5.47,
+          "control": 0.19,
+          "delta_ms": 5.28,
+          "ratio": 28.79
+        },
+        "p50": {
+          "atm": 5.28,
+          "control": 0.19,
+          "delta_ms": 5.09,
+          "ratio": 27.79
+        },
+        "p95": {
+          "atm": 6.97,
+          "control": 0.28,
+          "delta_ms": 6.69,
+          "ratio": 24.89
+        },
+        "max": {
+          "atm": 7.76,
+          "control": 0.3,
+          "delta_ms": 7.46,
+          "ratio": 25.87
+        }
+      },
+      "apply_ms": {
+        "mean": {
+          "atm": 2.31,
+          "control": 0.11,
+          "delta_ms": 2.2,
+          "ratio": 21
+        },
+        "p50": {
+          "atm": 2.15,
+          "control": 0.11,
+          "delta_ms": 2.04,
+          "ratio": 19.55
+        },
+        "p95": {
+          "atm": 3.41,
+          "control": 0.17,
+          "delta_ms": 3.24,
+          "ratio": 20.06
+        },
+        "max": {
+          "atm": 5.09,
+          "control": 0.23,
+          "delta_ms": 4.86,
+          "ratio": 22.13
+        }
+      },
+      "n": {
+        "atm": 112,
+        "control": 112
+      }
+    },
+    "hot": {
+      "latency_ms": {
+        "mean": {
+          "atm": 2.86,
+          "control": 0,
+          "delta_ms": 2.86,
+          "ratio": null
+        },
+        "p50": {
+          "atm": 2.77,
+          "control": 0,
+          "delta_ms": 2.77,
+          "ratio": null
+        },
+        "p95": {
+          "atm": 4.74,
+          "control": 0,
+          "delta_ms": 4.74,
+          "ratio": null
+        },
+        "max": {
+          "atm": 6.08,
+          "control": 0,
+          "delta_ms": 6.08,
+          "ratio": null
+        }
+      },
+      "total_ms": {
+        "mean": {
+          "atm": 42.47,
+          "control": 42.18,
+          "delta_ms": 0.29,
+          "ratio": 1.01
+        },
+        "p50": {
+          "atm": 47.28,
+          "control": 44.61,
+          "delta_ms": 2.67,
+          "ratio": 1.06
+        },
+        "p95": {
+          "atm": 65.88,
+          "control": 58.87,
+          "delta_ms": 7.01,
+          "ratio": 1.12
+        },
+        "max": {
+          "atm": 66,
+          "control": 60.44,
+          "delta_ms": 5.56,
+          "ratio": 1.09
+        }
+      },
+      "overhead_ms": {
+        "mean": {
+          "atm": 4.95,
+          "control": 0.21,
+          "delta_ms": 4.74,
+          "ratio": 23.57
+        },
+        "p50": {
+          "atm": 5.06,
+          "control": 0.19,
+          "delta_ms": 4.87,
+          "ratio": 26.63
+        },
+        "p95": {
+          "atm": 7.73,
+          "control": 0.36,
+          "delta_ms": 7.37,
+          "ratio": 21.47
+        },
+        "max": {
+          "atm": 9.44,
+          "control": 0.71,
+          "delta_ms": 8.73,
+          "ratio": 13.3
+        }
+      },
+      "apply_ms": {
+        "mean": {
+          "atm": 1.95,
+          "control": 0.11,
+          "delta_ms": 1.84,
+          "ratio": 17.73
+        },
+        "p50": {
+          "atm": 2.05,
+          "control": 0.11,
+          "delta_ms": 1.94,
+          "ratio": 18.64
+        },
+        "p95": {
+          "atm": 3.14,
+          "control": 0.22,
+          "delta_ms": 2.92,
+          "ratio": 14.27
+        },
+        "max": {
+          "atm": 4.12,
+          "control": 0.27,
+          "delta_ms": 3.85,
+          "ratio": 15.26
+        }
+      },
+      "n": {
+        "atm": 56,
+        "control": 56
+      }
+    }
+  },
+  "paired_by": {
+    "all": {
+      "n": 168,
+      "total_ms_delta": {
+        "n": 168,
+        "mean": 4.38,
+        "p50": 5.77,
+        "p95": 10.26,
+        "max": 15.02
+      },
+      "overhead_ms_delta": {
+        "n": 168,
+        "mean": 5.1,
+        "p50": 5.02,
+        "p95": 6.89,
+        "max": 9.01
+      }
+    },
+    "temperature:cold": {
+      "n": 112,
+      "total_ms_delta": {
+        "n": 112,
+        "mean": 6.42,
+        "p50": 5.81,
+        "p95": 11.25,
+        "max": 15.02
+      },
+      "overhead_ms_delta": {
+        "n": 112,
+        "mean": 5.28,
+        "p50": 5.04,
+        "p95": 6.79,
+        "max": 7.55
+      }
+    },
+    "temperature:hot": {
+      "n": 56,
+      "total_ms_delta": {
+        "n": 56,
+        "mean": 0.29,
+        "p50": 5.41,
+        "p95": 10.23,
+        "max": 12.7
+      },
+      "overhead_ms_delta": {
+        "n": 56,
+        "mean": 4.74,
+        "p50": 4.88,
+        "p95": 7.44,
+        "max": 9.01
+      }
+    },
+    "atm_decision:admit": {
+      "n": 61,
+      "total_ms_delta": {
+        "n": 61,
+        "mean": 6.45,
+        "p50": 5.81,
+        "p95": 11.25,
+        "max": 14.63
+      },
+      "overhead_ms_delta": {
+        "n": 61,
+        "mean": 5.16,
+        "p50": 4.97,
+        "p95": 6.79,
+        "max": 7.09
+      }
+    },
+    "atm_decision:composer_merge": {
+      "n": 62,
+      "total_ms_delta": {
+        "n": 62,
+        "mean": 6.39,
+        "p50": 5.83,
+        "p95": 9.81,
+        "max": 15.02
+      },
+      "overhead_ms_delta": {
+        "n": 62,
+        "mean": 5.48,
+        "p50": 5.32,
+        "p95": 7.08,
+        "max": 9.01
+      }
+    },
+    "atm_decision:hot_provisional": {
+      "n": 38,
+      "total_ms_delta": {
+        "n": 38,
+        "mean": 6.08,
+        "p50": 5.44,
+        "p95": 12.57,
+        "max": 12.7
+      },
+      "overhead_ms_delta": {
+        "n": 38,
+        "mean": 5.15,
+        "p50": 5.01,
+        "p95": 7.44,
+        "max": 8.39
+      }
+    },
+    "atm_decision:reject": {
+      "n": 7,
+      "total_ms_delta": {
+        "n": 7,
+        "mean": -40.78,
+        "p50": -43.73,
+        "p95": -20,
+        "max": -20
+      },
+      "overhead_ms_delta": {
+        "n": 7,
+        "mean": 0.88,
+        "p50": 0.75,
+        "p95": 1.48,
+        "max": 1.48
+      }
+    }
+  },
+  "atm_by_decision": {
+    "admit": {
+      "n": 61,
+      "latency_ms": {
+        "n": 61,
+        "mean": 3.03,
+        "p50": 2.88,
+        "p95": 4.25,
+        "max": 5.27
+      },
+      "wait_ms": {
+        "n": 61,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "max": 0
+      },
+      "apply_ms": {
+        "n": 61,
+        "mean": 2.25,
+        "p50": 2.13,
+        "p95": 3.33,
+        "max": 4.22
+      },
+      "total_ms": {
+        "n": 61,
+        "mean": 46.78,
+        "p50": 47.33,
+        "p95": 65.69,
+        "max": 67.34
+      },
+      "overhead_ms": {
+        "n": 61,
+        "mean": 5.34,
+        "p50": 5.13,
+        "p95": 6.97,
+        "max": 7.35
+      }
+    },
+    "composer_merge": {
+      "n": 62,
+      "latency_ms": {
+        "n": 62,
+        "mean": 3.2,
+        "p50": 3.08,
+        "p95": 4.29,
+        "max": 5.35
+      },
+      "wait_ms": {
+        "n": 62,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "max": 0
+      },
+      "apply_ms": {
+        "n": 62,
+        "mean": 2.42,
+        "p50": 2.24,
+        "p95": 3.9,
+        "max": 5.09
+      },
+      "total_ms": {
+        "n": 62,
+        "mean": 45.94,
+        "p50": 45.73,
+        "p95": 64.65,
+        "max": 66.05
+      },
+      "overhead_ms": {
+        "n": 62,
+        "mean": 5.68,
+        "p50": 5.48,
+        "p95": 7.25,
+        "max": 9.44
+      }
+    },
+    "hot_provisional": {
+      "n": 38,
+      "latency_ms": {
+        "n": 38,
+        "mean": 3.08,
+        "p50": 2.78,
+        "p95": 4.74,
+        "max": 6.08
+      },
+      "wait_ms": {
+        "n": 38,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "max": 0
+      },
+      "apply_ms": {
+        "n": 38,
+        "mean": 2.12,
+        "p50": 2.1,
+        "p95": 2.84,
+        "max": 3.14
+      },
+      "total_ms": {
+        "n": 38,
+        "mean": 48.45,
+        "p50": 48.31,
+        "p95": 65.93,
+        "max": 66
+      },
+      "overhead_ms": {
+        "n": 38,
+        "mean": 5.37,
+        "p50": 5.25,
+        "p95": 7.73,
+        "max": 9.1
+      }
+    },
+    "reject": {
+      "n": 7,
+      "latency_ms": {
+        "n": 7,
+        "mean": 0.99,
+        "p50": 0.88,
+        "p95": 1.45,
+        "max": 1.45
+      },
+      "wait_ms": {
+        "n": 7,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "max": 0
+      },
+      "apply_ms": {
+        "n": 7,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "max": 0
+      },
+      "total_ms": {
+        "n": 7,
+        "mean": 1.07,
+        "p50": 0.96,
+        "p95": 1.63,
+        "max": 1.63
+      },
+      "overhead_ms": {
+        "n": 7,
+        "mean": 1.07,
+        "p50": 0.96,
+        "p95": 1.63,
+        "max": 1.63
+      }
+    }
+  },
+  "control_by_decision": {
+    "direct_write": {
+      "n": 168,
+      "latency_ms": {
+        "n": 168,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "max": 0
+      },
+      "wait_ms": {
+        "n": 168,
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "max": 0
+      },
+      "apply_ms": {
+        "n": 168,
+        "mean": 0.11,
+        "p50": 0.11,
+        "p95": 0.18,
+        "max": 0.27
+      },
+      "total_ms": {
+        "n": 168,
+        "mean": 40.57,
+        "p50": 41.44,
+        "p95": 58.82,
+        "max": 60.57
+      },
+      "overhead_ms": {
+        "n": 168,
+        "mean": 0.2,
+        "p50": 0.19,
+        "p95": 0.29,
+        "max": 0.71
+      }
+    }
+  },
+  "per_rep": {
+    "atm": [
+      {
+        "run_id": "small-atm-seed42",
+        "wall_clock_ms": 1557.15,
+        "duration_ms_from_t0": null,
+        "intents": 168,
+        "committed": 161,
+        "oracle_pass": 161,
+        "throughput_intents_per_s": 107.89,
+        "throughput_committed_per_s": 103.39,
+        "goodput_oracle_pass_per_s": 103.39,
+        "sum_overhead_ms": 889.88,
+        "sum_total_ms": 7550.01
+      }
+    ],
+    "control": [
+      {
+        "run_id": "small-control-seed42",
+        "wall_clock_ms": 1517.18,
+        "duration_ms_from_t0": null,
+        "intents": 168,
+        "committed": 168,
+        "oracle_pass": 108,
+        "throughput_intents_per_s": 110.73,
+        "throughput_committed_per_s": 110.73,
+        "goodput_oracle_pass_per_s": 71.18,
+        "sum_overhead_ms": 33.37,
+        "sum_total_ms": 6814.99
+      }
+    ]
+  }
+}

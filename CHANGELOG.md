@@ -34,6 +34,61 @@ bridge after the paper-aligned public release.
 - **Paper quick-verify instructions** added to the public docs
   (`a823febb4`).
 
+### Fixed - steward lock across PID namespaces
+
+- **A live commit holder in another PID namespace is no longer treated as dead.**
+  The repo lock used to decide liveness from the recorded pid and `/proc`
+  start time. Both are local to the caller's PID namespace, so a waiter
+  sharing the working tree through `unshare` reclaimed the lock and overwrote
+  an acknowledged effect. The lock is now a kernel advisory lock on
+  `lock.sqlite` under `<repo>/.atm/runtime/steward-commit-locks`. It releases
+  when the holder exits and is visible across PID namespaces on the same
+  filesystem. Pid metadata is diagnostic only. If the lock cannot be taken,
+  the waiter returns `recovery-required` and does not write.
+- **Orphan `*.atm-tmp` siblings are removed only while the exclusive lock is held.**
+  A cleanup that cannot acquire the lock leaves a live writer's temp in place.
+- **Contending `applyStewardPlan` calls queue per target before composing.**
+  The queue is additional ordering. Correctness stays with the file lock and
+  the base-hash compare-and-swap. If the queue cannot be used, the apply
+  continues on the file lock. Set `ATM_STEWARD_APPLY_QUEUE=off` to skip it,
+  `ATM_STEWARD_COMMIT_LOCK_ROOT` to move the lock directory, and
+  `ATM_STEWARD_RECOMPOSE_POLICY` to a JSON object to change retry bounds.
+  Public CLI flags and the `applied` / `blocked` evidence enum are unchanged.
+
+### Fixed - steward region re-compose
+
+- **Concurrent steward apply completes disjoint region edits after hash drift.**
+  A proposal anchored to a stable region id is rebased onto the current file
+  when line numbers have moved. The same region, or a region whose anchored
+  lines already changed, stays blocked and is not overwritten. The unlocked
+  stale check now returns `re-compose` and enters that retry. Retries are
+  bounded by `stewardCanonicalCommitPolicy.maxRecomposeAttempts` (4 extra
+  attempts), with `recomposeBackoffMs` and `recomposeJitterMs`. Exhaustion is
+  public `blocked` and the reason starts with `re-compose attempts exhausted`.
+  The cross-process lock lives at `<repo>/.atm/runtime/steward-commit-locks`
+  so different temp directories share it. A dead holder or a reused pid (start
+  token mismatch) is reclaimed; a live holder that outlasts the wait is
+  `recovery-required`. Public CLI flags and the `applied` / `blocked` evidence
+  enum are unchanged.
+
+### Fixed - steward canonical commit
+
+- **Concurrent steward apply no longer silently drops or tears a committed
+  effect.** `applyTransactionalStewardPlan` used to re-read the target after
+  the stale check and still `writeFileSync` the composition from the old base.
+  Two OS processes could both pass that check; the later write replaced the
+  earlier effect, and a shorter overlapping write could leave a stale tail
+  byte. The commit now holds a per-file lock only around a base-hash
+  compare-and-swap and an atomic same-directory rename. A mismatch returns
+  transactional verdict `re-compose` and does not write. A live lock that
+  outlasts the wait returns `recovery-required`. `applyStewardPlan` recomposes
+  once and, if that still cannot commit, keeps the public evidence verdict
+  `blocked` with a reason prefixed `re-compose:` or `recovery-required:`.
+  Public CLI flags and the public `applied` / `blocked` evidence enum are
+  unchanged. Uncontended commit overhead on this host was about 0.09 ms per
+  file versus `writeFileSync` (commit mean 0.13 ms, apply mean 0.38 ms over
+  200 sequential JSON upserts).
+
 ### Fixed - CLI, hook, evidence, and release behavior
 
 - **Completion report detector narrowing** so ordinary governance
@@ -59,6 +114,17 @@ bridge after the paper-aligned public release.
   baseline.
 
 ### Daily log
+
+#### 2026-10-08
+
+- Closed the multi-process steward lost-update and torn-write window with a
+  per-file compare-and-swap and an atomic rename. Public steward evidence
+  remains `applied` or `blocked`; transactional receipts may now report
+  `re-compose` or `recovery-required`.
+- Region-anchored steward proposals now rebase onto the current file after
+  hash drift. Disjoint regions can both commit; the same region stays blocked.
+  Commit locks moved under the repo `.atm/runtime` directory, with bounded
+  re-compose retries and stale-holder reclaim.
 
 #### 2026-06-28
 

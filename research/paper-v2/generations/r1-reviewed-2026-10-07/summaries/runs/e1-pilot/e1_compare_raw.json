@@ -1,0 +1,2475 @@
+{
+  "banner": "pilot only \u2014 no win claims / no RQ2 main result",
+  "created_at_cst": "2026-10-07 Asia/Taipei",
+  "atm_pin": "5692474f7db70ab52a7a71c8af4867609e7e4b43",
+  "scale": {
+    "agents": 3,
+    "trials": 5,
+    "seeds": [
+      11,
+      17,
+      23
+    ],
+    "compose_window_ms": 100,
+    "hold_ms": [
+      8,
+      25
+    ]
+  },
+  "workloads": [
+    {
+      "id": "cold",
+      "hot_ratio": 0,
+      "overlap": "low"
+    },
+    {
+      "id": "hot_disjoint",
+      "hot_ratio": 1,
+      "overlap": "low"
+    },
+    {
+      "id": "hot_conflict",
+      "hot_ratio": 1,
+      "overlap": "high"
+    }
+  ],
+  "arms": [
+    "steward",
+    "file_lock",
+    "occ",
+    "git_three_way",
+    "bare_composer"
+  ],
+  "cells": [
+    {
+      "run": "e1-cold-steward-s11",
+      "workload": "cold",
+      "arm": "steward",
+      "arm_role": "main_method",
+      "rq": "RQ2",
+      "diagnostic": false,
+      "correctness_competitor": true,
+      "seed": 11,
+      "params": {
+        "hot_ratio": 0,
+        "overlap": "low",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 14,
+      "lost": 0,
+      "committed": 14,
+      "blocked": 0,
+      "rejects": 0,
+      "wall_clock_ms": 396.25,
+      "mean_wait_ms": 0.0,
+      "mean_admission_ms": 3.68,
+      "mean_overhead_ms": 25.05,
+      "intents": 14,
+      "duration_ms": 399
+    },
+    {
+      "run": "e1-cold-steward-s17",
+      "workload": "cold",
+      "arm": "steward",
+      "arm_role": "main_method",
+      "rq": "RQ2",
+      "diagnostic": false,
+      "correctness_competitor": true,
+      "seed": 17,
+      "params": {
+        "hot_ratio": 0,
+        "overlap": "low",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 11,
+      "lost": 0,
+      "committed": 11,
+      "blocked": 0,
+      "rejects": 0,
+      "wall_clock_ms": 360.73,
+      "mean_wait_ms": 0.0,
+      "mean_admission_ms": 3.7,
+      "mean_overhead_ms": 27.0,
+      "intents": 11,
+      "duration_ms": 366
+    },
+    {
+      "run": "e1-cold-steward-s23",
+      "workload": "cold",
+      "arm": "steward",
+      "arm_role": "main_method",
+      "rq": "RQ2",
+      "diagnostic": false,
+      "correctness_competitor": true,
+      "seed": 23,
+      "params": {
+        "hot_ratio": 0,
+        "overlap": "low",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 11,
+      "lost": 0,
+      "committed": 11,
+      "blocked": 0,
+      "rejects": 0,
+      "wall_clock_ms": 328.36,
+      "mean_wait_ms": 1.73,
+      "mean_admission_ms": 5.34,
+      "mean_overhead_ms": 27.81,
+      "intents": 11,
+      "duration_ms": 332
+    },
+    {
+      "run": "e1-cold-file_lock-s11",
+      "workload": "cold",
+      "arm": "file_lock",
+      "arm_role": "baseline_serial",
+      "rq": "RQ2-baseline",
+      "diagnostic": false,
+      "correctness_competitor": true,
+      "seed": 11,
+      "params": {
+        "hot_ratio": 0,
+        "overlap": "low",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 14,
+      "lost": 0,
+      "committed": 14,
+      "blocked": 0,
+      "rejects": 0,
+      "wall_clock_ms": 136.38,
+      "mean_wait_ms": 0.0,
+      "mean_admission_ms": 3.85,
+      "mean_overhead_ms": 6.81,
+      "intents": 14,
+      "duration_ms": 140
+    },
+    {
+      "run": "e1-cold-file_lock-s17",
+      "workload": "cold",
+      "arm": "file_lock",
+      "arm_role": "baseline_serial",
+      "rq": "RQ2-baseline",
+      "diagnostic": false,
+      "correctness_competitor": true,
+      "seed": 17,
+      "params": {
+        "hot_ratio": 0,
+        "overlap": "low",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 11,
+      "lost": 0,
+      "committed": 11,
+      "blocked": 0,
+      "rejects": 0,
+      "wall_clock_ms": 152.85,
+      "mean_wait_ms": 0.0,
+      "mean_admission_ms": 4.36,
+      "mean_overhead_ms": 7.2,
+      "intents": 11,
+      "duration_ms": 156
+    },
+    {
+      "run": "e1-cold-file_lock-s23",
+      "workload": "cold",
+      "arm": "file_lock",
+      "arm_role": "baseline_serial",
+      "rq": "RQ2-baseline",
+      "diagnostic": false,
+      "correctness_competitor": true,
+      "seed": 23,
+      "params": {
+        "hot_ratio": 0,
+        "overlap": "low",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 11,
+      "lost": 0,
+      "committed": 11,
+      "blocked": 0,
+      "rejects": 0,
+      "wall_clock_ms": 137.4,
+      "mean_wait_ms": 2.09,
+      "mean_admission_ms": 6.01,
+      "mean_overhead_ms": 9.07,
+      "intents": 11,
+      "duration_ms": 141
+    },
+    {
+      "run": "e1-cold-occ-s11",
+      "workload": "cold",
+      "arm": "occ",
+      "arm_role": "baseline_occ",
+      "rq": "RQ2-baseline",
+      "diagnostic": false,
+      "correctness_competitor": true,
+      "seed": 11,
+      "params": {
+        "hot_ratio": 0,
+        "overlap": "low",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 14,
+      "lost": 0,
+      "committed": 14,
+      "blocked": 0,
+      "rejects": 0,
+      "wall_clock_ms": 141.61,
+      "mean_wait_ms": 0.43,
+      "mean_admission_ms": 4.15,
+      "mean_overhead_ms": 8.29,
+      "intents": 14,
+      "duration_ms": 145
+    },
+    {
+      "run": "e1-cold-occ-s17",
+      "workload": "cold",
+      "arm": "occ",
+      "arm_role": "baseline_occ",
+      "rq": "RQ2-baseline",
+      "diagnostic": false,
+      "correctness_competitor": true,
+      "seed": 17,
+      "params": {
+        "hot_ratio": 0,
+        "overlap": "low",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 11,
+      "lost": 0,
+      "committed": 11,
+      "blocked": 0,
+      "rejects": 0,
+      "wall_clock_ms": 152.65,
+      "mean_wait_ms": 0.0,
+      "mean_admission_ms": 3.54,
+      "mean_overhead_ms": 8.04,
+      "intents": 11,
+      "duration_ms": 158
+    },
+    {
+      "run": "e1-cold-occ-s23",
+      "workload": "cold",
+      "arm": "occ",
+      "arm_role": "baseline_occ",
+      "rq": "RQ2-baseline",
+      "diagnostic": false,
+      "correctness_competitor": true,
+      "seed": 23,
+      "params": {
+        "hot_ratio": 0,
+        "overlap": "low",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 11,
+      "lost": 0,
+      "committed": 11,
+      "blocked": 0,
+      "rejects": 0,
+      "wall_clock_ms": 145.31,
+      "mean_wait_ms": 2.45,
+      "mean_admission_ms": 6.37,
+      "mean_overhead_ms": 10.96,
+      "intents": 11,
+      "duration_ms": 149
+    },
+    {
+      "run": "e1-cold-git_three_way-s11",
+      "workload": "cold",
+      "arm": "git_three_way",
+      "arm_role": "baseline_git",
+      "rq": "RQ2-baseline",
+      "diagnostic": false,
+      "correctness_competitor": true,
+      "seed": 11,
+      "params": {
+        "hot_ratio": 0,
+        "overlap": "low",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 14,
+      "lost": 0,
+      "committed": 14,
+      "blocked": 0,
+      "rejects": 0,
+      "wall_clock_ms": 701.84,
+      "mean_wait_ms": 0.64,
+      "mean_admission_ms": 3.92,
+      "mean_overhead_ms": 116.08,
+      "intents": 14,
+      "duration_ms": 707
+    },
+    {
+      "run": "e1-cold-git_three_way-s17",
+      "workload": "cold",
+      "arm": "git_three_way",
+      "arm_role": "baseline_git",
+      "rq": "RQ2-baseline",
+      "diagnostic": false,
+      "correctness_competitor": true,
+      "seed": 17,
+      "params": {
+        "hot_ratio": 0,
+        "overlap": "low",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 11,
+      "lost": 0,
+      "committed": 11,
+      "blocked": 0,
+      "rejects": 0,
+      "wall_clock_ms": 699.29,
+      "mean_wait_ms": 0.0,
+      "mean_admission_ms": 3.24,
+      "mean_overhead_ms": 115.08,
+      "intents": 11,
+      "duration_ms": 704
+    },
+    {
+      "run": "e1-cold-git_three_way-s23",
+      "workload": "cold",
+      "arm": "git_three_way",
+      "arm_role": "baseline_git",
+      "rq": "RQ2-baseline",
+      "diagnostic": false,
+      "correctness_competitor": true,
+      "seed": 23,
+      "params": {
+        "hot_ratio": 0,
+        "overlap": "low",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 11,
+      "lost": 0,
+      "committed": 11,
+      "blocked": 0,
+      "rejects": 0,
+      "wall_clock_ms": 571.92,
+      "mean_wait_ms": 1.18,
+      "mean_admission_ms": 5.37,
+      "mean_overhead_ms": 115.9,
+      "intents": 11,
+      "duration_ms": 574
+    },
+    {
+      "run": "e1-cold-bare_composer-s11",
+      "workload": "cold",
+      "arm": "bare_composer",
+      "arm_role": "baseline_bare_composer",
+      "rq": "RQ2-ablation",
+      "diagnostic": false,
+      "correctness_competitor": true,
+      "seed": 11,
+      "params": {
+        "hot_ratio": 0,
+        "overlap": "low",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 14,
+      "lost": 0,
+      "committed": 14,
+      "blocked": 0,
+      "rejects": 0,
+      "wall_clock_ms": 840.74,
+      "mean_wait_ms": 0.0,
+      "mean_admission_ms": 0.03,
+      "mean_overhead_ms": 138.88,
+      "intents": 14,
+      "duration_ms": 844
+    },
+    {
+      "run": "e1-cold-bare_composer-s17",
+      "workload": "cold",
+      "arm": "bare_composer",
+      "arm_role": "baseline_bare_composer",
+      "rq": "RQ2-ablation",
+      "diagnostic": false,
+      "correctness_competitor": true,
+      "seed": 17,
+      "params": {
+        "hot_ratio": 0,
+        "overlap": "low",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 11,
+      "lost": 0,
+      "committed": 11,
+      "blocked": 0,
+      "rejects": 0,
+      "wall_clock_ms": 828.26,
+      "mean_wait_ms": 0.0,
+      "mean_admission_ms": 0.03,
+      "mean_overhead_ms": 143.07,
+      "intents": 11,
+      "duration_ms": 832
+    },
+    {
+      "run": "e1-cold-bare_composer-s23",
+      "workload": "cold",
+      "arm": "bare_composer",
+      "arm_role": "baseline_bare_composer",
+      "rq": "RQ2-ablation",
+      "diagnostic": false,
+      "correctness_competitor": true,
+      "seed": 23,
+      "params": {
+        "hot_ratio": 0,
+        "overlap": "low",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 11,
+      "lost": 0,
+      "committed": 11,
+      "blocked": 0,
+      "rejects": 0,
+      "wall_clock_ms": 719.41,
+      "mean_wait_ms": 0.0,
+      "mean_admission_ms": 0.04,
+      "mean_overhead_ms": 143.58,
+      "intents": 11,
+      "duration_ms": 721
+    },
+    {
+      "run": "e1-hot_disjoint-steward-s11",
+      "workload": "hot_disjoint",
+      "arm": "steward",
+      "arm_role": "main_method",
+      "rq": "RQ2",
+      "diagnostic": false,
+      "correctness_competitor": true,
+      "seed": 11,
+      "params": {
+        "hot_ratio": 1,
+        "overlap": "low",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 14,
+      "lost": 0,
+      "committed": 14,
+      "blocked": 0,
+      "rejects": 0,
+      "wall_clock_ms": 517.82,
+      "mean_wait_ms": 13.57,
+      "mean_admission_ms": 17.21,
+      "mean_overhead_ms": 57.83,
+      "intents": 14,
+      "duration_ms": 523
+    },
+    {
+      "run": "e1-hot_disjoint-steward-s17",
+      "workload": "hot_disjoint",
+      "arm": "steward",
+      "arm_role": "main_method",
+      "rq": "RQ2",
+      "diagnostic": false,
+      "correctness_competitor": true,
+      "seed": 17,
+      "params": {
+        "hot_ratio": 1,
+        "overlap": "low",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 15,
+      "lost": 0,
+      "committed": 15,
+      "blocked": 0,
+      "rejects": 0,
+      "wall_clock_ms": 441.06,
+      "mean_wait_ms": 7.33,
+      "mean_admission_ms": 10.95,
+      "mean_overhead_ms": 38.07,
+      "intents": 15,
+      "duration_ms": 448
+    },
+    {
+      "run": "e1-hot_disjoint-steward-s23",
+      "workload": "hot_disjoint",
+      "arm": "steward",
+      "arm_role": "main_method",
+      "rq": "RQ2",
+      "diagnostic": false,
+      "correctness_competitor": true,
+      "seed": 23,
+      "params": {
+        "hot_ratio": 1,
+        "overlap": "low",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 11,
+      "lost": 0,
+      "committed": 11,
+      "blocked": 0,
+      "rejects": 0,
+      "wall_clock_ms": 386.81,
+      "mean_wait_ms": 0.0,
+      "mean_admission_ms": 3.76,
+      "mean_overhead_ms": 50.4,
+      "intents": 11,
+      "duration_ms": 391
+    },
+    {
+      "run": "e1-hot_disjoint-file_lock-s11",
+      "workload": "hot_disjoint",
+      "arm": "file_lock",
+      "arm_role": "baseline_serial",
+      "rq": "RQ2-baseline",
+      "diagnostic": false,
+      "correctness_competitor": true,
+      "seed": 11,
+      "params": {
+        "hot_ratio": 1,
+        "overlap": "low",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 14,
+      "lost": 0,
+      "committed": 14,
+      "blocked": 0,
+      "rejects": 0,
+      "wall_clock_ms": 164.29,
+      "mean_wait_ms": 2.64,
+      "mean_admission_ms": 6.44,
+      "mean_overhead_ms": 11.6,
+      "intents": 14,
+      "duration_ms": 168
+    },
+    {
+      "run": "e1-hot_disjoint-file_lock-s17",
+      "workload": "hot_disjoint",
+      "arm": "file_lock",
+      "arm_role": "baseline_serial",
+      "rq": "RQ2-baseline",
+      "diagnostic": false,
+      "correctness_competitor": true,
+      "seed": 17,
+      "params": {
+        "hot_ratio": 1,
+        "overlap": "low",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 15,
+      "lost": 0,
+      "committed": 15,
+      "blocked": 0,
+      "rejects": 0,
+      "wall_clock_ms": 152.85,
+      "mean_wait_ms": 1.27,
+      "mean_admission_ms": 4.88,
+      "mean_overhead_ms": 8.69,
+      "intents": 15,
+      "duration_ms": 159
+    },
+    {
+      "run": "e1-hot_disjoint-file_lock-s23",
+      "workload": "hot_disjoint",
+      "arm": "file_lock",
+      "arm_role": "baseline_serial",
+      "rq": "RQ2-baseline",
+      "diagnostic": false,
+      "correctness_competitor": true,
+      "seed": 23,
+      "params": {
+        "hot_ratio": 1,
+        "overlap": "low",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 11,
+      "lost": 0,
+      "committed": 11,
+      "blocked": 0,
+      "rejects": 0,
+      "wall_clock_ms": 155.26,
+      "mean_wait_ms": 0.73,
+      "mean_admission_ms": 4.32,
+      "mean_overhead_ms": 9.56,
+      "intents": 11,
+      "duration_ms": 159
+    },
+    {
+      "run": "e1-hot_disjoint-occ-s11",
+      "workload": "hot_disjoint",
+      "arm": "occ",
+      "arm_role": "baseline_occ",
+      "rq": "RQ2-baseline",
+      "diagnostic": false,
+      "correctness_competitor": true,
+      "seed": 11,
+      "params": {
+        "hot_ratio": 1,
+        "overlap": "low",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 14,
+      "lost": 0,
+      "committed": 14,
+      "blocked": 0,
+      "rejects": 0,
+      "wall_clock_ms": 153.86,
+      "mean_wait_ms": 1.29,
+      "mean_admission_ms": 4.95,
+      "mean_overhead_ms": 9.07,
+      "intents": 14,
+      "duration_ms": 159
+    },
+    {
+      "run": "e1-hot_disjoint-occ-s17",
+      "workload": "hot_disjoint",
+      "arm": "occ",
+      "arm_role": "baseline_occ",
+      "rq": "RQ2-baseline",
+      "diagnostic": false,
+      "correctness_competitor": true,
+      "seed": 17,
+      "params": {
+        "hot_ratio": 1,
+        "overlap": "low",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 15,
+      "lost": 0,
+      "committed": 15,
+      "blocked": 0,
+      "rejects": 0,
+      "wall_clock_ms": 144.36,
+      "mean_wait_ms": 0.27,
+      "mean_admission_ms": 3.73,
+      "mean_overhead_ms": 9.07,
+      "intents": 15,
+      "duration_ms": 152
+    },
+    {
+      "run": "e1-hot_disjoint-occ-s23",
+      "workload": "hot_disjoint",
+      "arm": "occ",
+      "arm_role": "baseline_occ",
+      "rq": "RQ2-baseline",
+      "diagnostic": false,
+      "correctness_competitor": true,
+      "seed": 23,
+      "params": {
+        "hot_ratio": 1,
+        "overlap": "low",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 11,
+      "lost": 0,
+      "committed": 11,
+      "blocked": 0,
+      "rejects": 0,
+      "wall_clock_ms": 126.21,
+      "mean_wait_ms": 0.0,
+      "mean_admission_ms": 3.77,
+      "mean_overhead_ms": 8.37,
+      "intents": 11,
+      "duration_ms": 130
+    },
+    {
+      "run": "e1-hot_disjoint-git_three_way-s11",
+      "workload": "hot_disjoint",
+      "arm": "git_three_way",
+      "arm_role": "baseline_git",
+      "rq": "RQ2-baseline",
+      "diagnostic": false,
+      "correctness_competitor": true,
+      "seed": 11,
+      "params": {
+        "hot_ratio": 1,
+        "overlap": "low",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 14,
+      "lost": 0,
+      "committed": 14,
+      "blocked": 0,
+      "rejects": 0,
+      "wall_clock_ms": 690.84,
+      "mean_wait_ms": 0.0,
+      "mean_admission_ms": 3.53,
+      "mean_overhead_ms": 113.52,
+      "intents": 14,
+      "duration_ms": 696
+    },
+    {
+      "run": "e1-hot_disjoint-git_three_way-s17",
+      "workload": "hot_disjoint",
+      "arm": "git_three_way",
+      "arm_role": "baseline_git",
+      "rq": "RQ2-baseline",
+      "diagnostic": false,
+      "correctness_competitor": true,
+      "seed": 17,
+      "params": {
+        "hot_ratio": 1,
+        "overlap": "low",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 15,
+      "lost": 0,
+      "committed": 15,
+      "blocked": 0,
+      "rejects": 0,
+      "wall_clock_ms": 696.39,
+      "mean_wait_ms": 0.0,
+      "mean_admission_ms": 3.49,
+      "mean_overhead_ms": 115.67,
+      "intents": 15,
+      "duration_ms": 704
+    },
+    {
+      "run": "e1-hot_disjoint-git_three_way-s23",
+      "workload": "hot_disjoint",
+      "arm": "git_three_way",
+      "arm_role": "baseline_git",
+      "rq": "RQ2-baseline",
+      "diagnostic": false,
+      "correctness_competitor": true,
+      "seed": 23,
+      "params": {
+        "hot_ratio": 1,
+        "overlap": "low",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 11,
+      "lost": 0,
+      "committed": 11,
+      "blocked": 0,
+      "rejects": 0,
+      "wall_clock_ms": 558.04,
+      "mean_wait_ms": 0.0,
+      "mean_admission_ms": 3.72,
+      "mean_overhead_ms": 113.68,
+      "intents": 11,
+      "duration_ms": 562
+    },
+    {
+      "run": "e1-hot_disjoint-bare_composer-s11",
+      "workload": "hot_disjoint",
+      "arm": "bare_composer",
+      "arm_role": "baseline_bare_composer",
+      "rq": "RQ2-ablation",
+      "diagnostic": false,
+      "correctness_competitor": true,
+      "seed": 11,
+      "params": {
+        "hot_ratio": 1,
+        "overlap": "low",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 14,
+      "lost": 0,
+      "committed": 14,
+      "blocked": 0,
+      "rejects": 0,
+      "wall_clock_ms": 839.48,
+      "mean_wait_ms": 0.0,
+      "mean_admission_ms": 0.03,
+      "mean_overhead_ms": 137.47,
+      "intents": 14,
+      "duration_ms": 843
+    },
+    {
+      "run": "e1-hot_disjoint-bare_composer-s17",
+      "workload": "hot_disjoint",
+      "arm": "bare_composer",
+      "arm_role": "baseline_bare_composer",
+      "rq": "RQ2-ablation",
+      "diagnostic": false,
+      "correctness_competitor": true,
+      "seed": 17,
+      "params": {
+        "hot_ratio": 1,
+        "overlap": "low",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 15,
+      "lost": 0,
+      "committed": 15,
+      "blocked": 0,
+      "rejects": 0,
+      "wall_clock_ms": 832.66,
+      "mean_wait_ms": 0.0,
+      "mean_admission_ms": 0.02,
+      "mean_overhead_ms": 136.76,
+      "intents": 15,
+      "duration_ms": 839
+    },
+    {
+      "run": "e1-hot_disjoint-bare_composer-s23",
+      "workload": "hot_disjoint",
+      "arm": "bare_composer",
+      "arm_role": "baseline_bare_composer",
+      "rq": "RQ2-ablation",
+      "diagnostic": false,
+      "correctness_competitor": true,
+      "seed": 23,
+      "params": {
+        "hot_ratio": 1,
+        "overlap": "low",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 11,
+      "lost": 0,
+      "committed": 11,
+      "blocked": 0,
+      "rejects": 0,
+      "wall_clock_ms": 710.93,
+      "mean_wait_ms": 0.0,
+      "mean_admission_ms": 0.04,
+      "mean_overhead_ms": 142.63,
+      "intents": 11,
+      "duration_ms": 715
+    },
+    {
+      "run": "e1-hot_conflict-steward-s11",
+      "workload": "hot_conflict",
+      "arm": "steward",
+      "arm_role": "main_method",
+      "rq": "RQ2",
+      "diagnostic": false,
+      "correctness_competitor": true,
+      "seed": 11,
+      "params": {
+        "hot_ratio": 1,
+        "overlap": "high",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 15,
+      "lost": 0,
+      "committed": 15,
+      "blocked": 0,
+      "rejects": 0,
+      "wall_clock_ms": 604.08,
+      "mean_wait_ms": 12.8,
+      "mean_admission_ms": 16.41,
+      "mean_overhead_ms": 66.03,
+      "intents": 15,
+      "duration_ms": 608
+    },
+    {
+      "run": "e1-hot_conflict-steward-s17",
+      "workload": "hot_conflict",
+      "arm": "steward",
+      "arm_role": "main_method",
+      "rq": "RQ2",
+      "diagnostic": false,
+      "correctness_competitor": true,
+      "seed": 17,
+      "params": {
+        "hot_ratio": 1,
+        "overlap": "high",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 13,
+      "lost": 0,
+      "committed": 13,
+      "blocked": 0,
+      "rejects": 0,
+      "wall_clock_ms": 474.51,
+      "mean_wait_ms": 7.31,
+      "mean_admission_ms": 10.43,
+      "mean_overhead_ms": 54.59,
+      "intents": 13,
+      "duration_ms": 479
+    },
+    {
+      "run": "e1-hot_conflict-steward-s23",
+      "workload": "hot_conflict",
+      "arm": "steward",
+      "arm_role": "main_method",
+      "rq": "RQ2",
+      "diagnostic": false,
+      "correctness_competitor": true,
+      "seed": 23,
+      "params": {
+        "hot_ratio": 1,
+        "overlap": "high",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 13,
+      "lost": 0,
+      "committed": 13,
+      "blocked": 0,
+      "rejects": 0,
+      "wall_clock_ms": 406.61,
+      "mean_wait_ms": 0.0,
+      "mean_admission_ms": 3.55,
+      "mean_overhead_ms": 53.84,
+      "intents": 13,
+      "duration_ms": 409
+    },
+    {
+      "run": "e1-hot_conflict-file_lock-s11",
+      "workload": "hot_conflict",
+      "arm": "file_lock",
+      "arm_role": "baseline_serial",
+      "rq": "RQ2-baseline",
+      "diagnostic": false,
+      "correctness_competitor": true,
+      "seed": 11,
+      "params": {
+        "hot_ratio": 1,
+        "overlap": "high",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 15,
+      "lost": 0,
+      "committed": 15,
+      "blocked": 0,
+      "rejects": 0,
+      "wall_clock_ms": 205.13,
+      "mean_wait_ms": 6.13,
+      "mean_admission_ms": 9.72,
+      "mean_overhead_ms": 18.79,
+      "intents": 15,
+      "duration_ms": 208
+    },
+    {
+      "run": "e1-hot_conflict-file_lock-s17",
+      "workload": "hot_conflict",
+      "arm": "file_lock",
+      "arm_role": "baseline_serial",
+      "rq": "RQ2-baseline",
+      "diagnostic": false,
+      "correctness_competitor": true,
+      "seed": 17,
+      "params": {
+        "hot_ratio": 1,
+        "overlap": "high",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 13,
+      "lost": 0,
+      "committed": 13,
+      "blocked": 0,
+      "rejects": 0,
+      "wall_clock_ms": 180.27,
+      "mean_wait_ms": 1.54,
+      "mean_admission_ms": 4.91,
+      "mean_overhead_ms": 15.66,
+      "intents": 13,
+      "duration_ms": 184
+    },
+    {
+      "run": "e1-hot_conflict-file_lock-s23",
+      "workload": "hot_conflict",
+      "arm": "file_lock",
+      "arm_role": "baseline_serial",
+      "rq": "RQ2-baseline",
+      "diagnostic": false,
+      "correctness_competitor": true,
+      "seed": 23,
+      "params": {
+        "hot_ratio": 1,
+        "overlap": "high",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 13,
+      "lost": 0,
+      "committed": 13,
+      "blocked": 0,
+      "rejects": 0,
+      "wall_clock_ms": 162.81,
+      "mean_wait_ms": 1.77,
+      "mean_admission_ms": 5.13,
+      "mean_overhead_ms": 15.29,
+      "intents": 13,
+      "duration_ms": 165
+    },
+    {
+      "run": "e1-hot_conflict-occ-s11",
+      "workload": "hot_conflict",
+      "arm": "occ",
+      "arm_role": "baseline_occ",
+      "rq": "RQ2-baseline",
+      "diagnostic": false,
+      "correctness_competitor": true,
+      "seed": 11,
+      "params": {
+        "hot_ratio": 1,
+        "overlap": "high",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 15,
+      "lost": 0,
+      "committed": 15,
+      "blocked": 0,
+      "rejects": 0,
+      "wall_clock_ms": 183.54,
+      "mean_wait_ms": 4.33,
+      "mean_admission_ms": 7.81,
+      "mean_overhead_ms": 12.65,
+      "intents": 15,
+      "duration_ms": 186
+    },
+    {
+      "run": "e1-hot_conflict-occ-s17",
+      "workload": "hot_conflict",
+      "arm": "occ",
+      "arm_role": "baseline_occ",
+      "rq": "RQ2-baseline",
+      "diagnostic": false,
+      "correctness_competitor": true,
+      "seed": 17,
+      "params": {
+        "hot_ratio": 1,
+        "overlap": "high",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 13,
+      "lost": 0,
+      "committed": 13,
+      "blocked": 0,
+      "rejects": 0,
+      "wall_clock_ms": 154.14,
+      "mean_wait_ms": 2.08,
+      "mean_admission_ms": 5.49,
+      "mean_overhead_ms": 10.53,
+      "intents": 13,
+      "duration_ms": 157
+    },
+    {
+      "run": "e1-hot_conflict-occ-s23",
+      "workload": "hot_conflict",
+      "arm": "occ",
+      "arm_role": "baseline_occ",
+      "rq": "RQ2-baseline",
+      "diagnostic": false,
+      "correctness_competitor": true,
+      "seed": 23,
+      "params": {
+        "hot_ratio": 1,
+        "overlap": "high",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 13,
+      "lost": 0,
+      "committed": 13,
+      "blocked": 0,
+      "rejects": 0,
+      "wall_clock_ms": 137.04,
+      "mean_wait_ms": 0.0,
+      "mean_admission_ms": 3.75,
+      "mean_overhead_ms": 9.49,
+      "intents": 13,
+      "duration_ms": 140
+    },
+    {
+      "run": "e1-hot_conflict-git_three_way-s11",
+      "workload": "hot_conflict",
+      "arm": "git_three_way",
+      "arm_role": "baseline_git",
+      "rq": "RQ2-baseline",
+      "diagnostic": false,
+      "correctness_competitor": true,
+      "seed": 11,
+      "params": {
+        "hot_ratio": 1,
+        "overlap": "high",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 15,
+      "lost": 0,
+      "committed": 15,
+      "blocked": 0,
+      "rejects": 0,
+      "wall_clock_ms": 821.5,
+      "mean_wait_ms": 16.87,
+      "mean_admission_ms": 20.01,
+      "mean_overhead_ms": 132.14,
+      "intents": 15,
+      "duration_ms": 824
+    },
+    {
+      "run": "e1-hot_conflict-git_three_way-s17",
+      "workload": "hot_conflict",
+      "arm": "git_three_way",
+      "arm_role": "baseline_git",
+      "rq": "RQ2-baseline",
+      "diagnostic": false,
+      "correctness_competitor": true,
+      "seed": 17,
+      "params": {
+        "hot_ratio": 1,
+        "overlap": "high",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 13,
+      "lost": 0,
+      "committed": 13,
+      "blocked": 0,
+      "rejects": 0,
+      "wall_clock_ms": 805.56,
+      "mean_wait_ms": 9.38,
+      "mean_admission_ms": 12.88,
+      "mean_overhead_ms": 124.18,
+      "intents": 13,
+      "duration_ms": 809
+    },
+    {
+      "run": "e1-hot_conflict-git_three_way-s23",
+      "workload": "hot_conflict",
+      "arm": "git_three_way",
+      "arm_role": "baseline_git",
+      "rq": "RQ2-baseline",
+      "diagnostic": false,
+      "correctness_competitor": true,
+      "seed": 23,
+      "params": {
+        "hot_ratio": 1,
+        "overlap": "high",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 13,
+      "lost": 0,
+      "committed": 13,
+      "blocked": 0,
+      "rejects": 0,
+      "wall_clock_ms": 688.28,
+      "mean_wait_ms": 0.0,
+      "mean_admission_ms": 3.45,
+      "mean_overhead_ms": 116.95,
+      "intents": 13,
+      "duration_ms": 691
+    },
+    {
+      "run": "e1-hot_conflict-bare_composer-s11",
+      "workload": "hot_conflict",
+      "arm": "bare_composer",
+      "arm_role": "baseline_bare_composer",
+      "rq": "RQ2-ablation",
+      "diagnostic": false,
+      "correctness_competitor": true,
+      "seed": 11,
+      "params": {
+        "hot_ratio": 1,
+        "overlap": "high",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 12,
+      "lost": 0,
+      "committed": 12,
+      "blocked": 3,
+      "rejects": 0,
+      "wall_clock_ms": 836.54,
+      "mean_wait_ms": 0.0,
+      "mean_admission_ms": 0.03,
+      "mean_overhead_ms": 139.4,
+      "intents": 15,
+      "duration_ms": 840
+    },
+    {
+      "run": "e1-hot_conflict-bare_composer-s17",
+      "workload": "hot_conflict",
+      "arm": "bare_composer",
+      "arm_role": "baseline_bare_composer",
+      "rq": "RQ2-ablation",
+      "diagnostic": false,
+      "correctness_competitor": true,
+      "seed": 17,
+      "params": {
+        "hot_ratio": 1,
+        "overlap": "high",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 11,
+      "lost": 0,
+      "committed": 11,
+      "blocked": 2,
+      "rejects": 0,
+      "wall_clock_ms": 826.39,
+      "mean_wait_ms": 0.0,
+      "mean_admission_ms": 0.03,
+      "mean_overhead_ms": 140.84,
+      "intents": 13,
+      "duration_ms": 830
+    },
+    {
+      "run": "e1-hot_conflict-bare_composer-s23",
+      "workload": "hot_conflict",
+      "arm": "bare_composer",
+      "arm_role": "baseline_bare_composer",
+      "rq": "RQ2-ablation",
+      "diagnostic": false,
+      "correctness_competitor": true,
+      "seed": 23,
+      "params": {
+        "hot_ratio": 1,
+        "overlap": "high",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 13,
+      "lost": 0,
+      "committed": 13,
+      "blocked": 0,
+      "rejects": 0,
+      "wall_clock_ms": 838.18,
+      "mean_wait_ms": 0.0,
+      "mean_admission_ms": 0.04,
+      "mean_overhead_ms": 142.02,
+      "intents": 13,
+      "duration_ms": 841
+    }
+  ],
+  "aggregates": [
+    {
+      "workload": "cold",
+      "arm": "steward",
+      "arm_role": "main_method",
+      "rq": "RQ2",
+      "competitor": true,
+      "n_seeds": 3,
+      "correct": {
+        "mean": 12.0,
+        "min": 11,
+        "max": 14,
+        "stdev": 1.41,
+        "values": [
+          14,
+          11,
+          11
+        ]
+      },
+      "lost": {
+        "mean": 0.0,
+        "min": 0,
+        "max": 0,
+        "stdev": 0.0,
+        "values": [
+          0,
+          0,
+          0
+        ]
+      },
+      "blocked": {
+        "mean": 0.0,
+        "min": 0,
+        "max": 0,
+        "stdev": 0.0,
+        "values": [
+          0,
+          0,
+          0
+        ]
+      },
+      "mean_admission_ms": {
+        "mean": 4.24,
+        "min": 3.68,
+        "max": 5.34,
+        "stdev": 0.78,
+        "values": [
+          3.68,
+          3.7,
+          5.34
+        ]
+      },
+      "mean_wait_ms": {
+        "mean": 0.58,
+        "min": 0.0,
+        "max": 1.73,
+        "stdev": 0.82,
+        "values": [
+          0.0,
+          0.0,
+          1.73
+        ]
+      },
+      "wall_clock_ms": {
+        "mean": 361.78,
+        "min": 328.36,
+        "max": 396.25,
+        "stdev": 27.73,
+        "values": [
+          396.25,
+          360.73,
+          328.36
+        ]
+      }
+    },
+    {
+      "workload": "cold",
+      "arm": "file_lock",
+      "arm_role": "baseline_serial",
+      "rq": "RQ2-baseline",
+      "competitor": true,
+      "n_seeds": 3,
+      "correct": {
+        "mean": 12.0,
+        "min": 11,
+        "max": 14,
+        "stdev": 1.41,
+        "values": [
+          14,
+          11,
+          11
+        ]
+      },
+      "lost": {
+        "mean": 0.0,
+        "min": 0,
+        "max": 0,
+        "stdev": 0.0,
+        "values": [
+          0,
+          0,
+          0
+        ]
+      },
+      "blocked": {
+        "mean": 0.0,
+        "min": 0,
+        "max": 0,
+        "stdev": 0.0,
+        "values": [
+          0,
+          0,
+          0
+        ]
+      },
+      "mean_admission_ms": {
+        "mean": 4.74,
+        "min": 3.85,
+        "max": 6.01,
+        "stdev": 0.92,
+        "values": [
+          3.85,
+          4.36,
+          6.01
+        ]
+      },
+      "mean_wait_ms": {
+        "mean": 0.7,
+        "min": 0.0,
+        "max": 2.09,
+        "stdev": 0.99,
+        "values": [
+          0.0,
+          0.0,
+          2.09
+        ]
+      },
+      "wall_clock_ms": {
+        "mean": 142.21,
+        "min": 136.38,
+        "max": 152.85,
+        "stdev": 7.54,
+        "values": [
+          136.38,
+          152.85,
+          137.4
+        ]
+      }
+    },
+    {
+      "workload": "cold",
+      "arm": "occ",
+      "arm_role": "baseline_occ",
+      "rq": "RQ2-baseline",
+      "competitor": true,
+      "n_seeds": 3,
+      "correct": {
+        "mean": 12.0,
+        "min": 11,
+        "max": 14,
+        "stdev": 1.41,
+        "values": [
+          14,
+          11,
+          11
+        ]
+      },
+      "lost": {
+        "mean": 0.0,
+        "min": 0,
+        "max": 0,
+        "stdev": 0.0,
+        "values": [
+          0,
+          0,
+          0
+        ]
+      },
+      "blocked": {
+        "mean": 0.0,
+        "min": 0,
+        "max": 0,
+        "stdev": 0.0,
+        "values": [
+          0,
+          0,
+          0
+        ]
+      },
+      "mean_admission_ms": {
+        "mean": 4.69,
+        "min": 3.54,
+        "max": 6.37,
+        "stdev": 1.22,
+        "values": [
+          4.15,
+          3.54,
+          6.37
+        ]
+      },
+      "mean_wait_ms": {
+        "mean": 0.96,
+        "min": 0.0,
+        "max": 2.45,
+        "stdev": 1.07,
+        "values": [
+          0.43,
+          0.0,
+          2.45
+        ]
+      },
+      "wall_clock_ms": {
+        "mean": 146.52,
+        "min": 141.61,
+        "max": 152.65,
+        "stdev": 4.59,
+        "values": [
+          141.61,
+          152.65,
+          145.31
+        ]
+      }
+    },
+    {
+      "workload": "cold",
+      "arm": "git_three_way",
+      "arm_role": "baseline_git",
+      "rq": "RQ2-baseline",
+      "competitor": true,
+      "n_seeds": 3,
+      "correct": {
+        "mean": 12.0,
+        "min": 11,
+        "max": 14,
+        "stdev": 1.41,
+        "values": [
+          14,
+          11,
+          11
+        ]
+      },
+      "lost": {
+        "mean": 0.0,
+        "min": 0,
+        "max": 0,
+        "stdev": 0.0,
+        "values": [
+          0,
+          0,
+          0
+        ]
+      },
+      "blocked": {
+        "mean": 0.0,
+        "min": 0,
+        "max": 0,
+        "stdev": 0.0,
+        "values": [
+          0,
+          0,
+          0
+        ]
+      },
+      "mean_admission_ms": {
+        "mean": 4.18,
+        "min": 3.24,
+        "max": 5.37,
+        "stdev": 0.89,
+        "values": [
+          3.92,
+          3.24,
+          5.37
+        ]
+      },
+      "mean_wait_ms": {
+        "mean": 0.61,
+        "min": 0.0,
+        "max": 1.18,
+        "stdev": 0.48,
+        "values": [
+          0.64,
+          0.0,
+          1.18
+        ]
+      },
+      "wall_clock_ms": {
+        "mean": 657.68,
+        "min": 571.92,
+        "max": 701.84,
+        "stdev": 60.65,
+        "values": [
+          701.84,
+          699.29,
+          571.92
+        ]
+      }
+    },
+    {
+      "workload": "cold",
+      "arm": "bare_composer",
+      "arm_role": "baseline_bare_composer",
+      "rq": "RQ2-ablation",
+      "competitor": true,
+      "n_seeds": 3,
+      "correct": {
+        "mean": 12.0,
+        "min": 11,
+        "max": 14,
+        "stdev": 1.41,
+        "values": [
+          14,
+          11,
+          11
+        ]
+      },
+      "lost": {
+        "mean": 0.0,
+        "min": 0,
+        "max": 0,
+        "stdev": 0.0,
+        "values": [
+          0,
+          0,
+          0
+        ]
+      },
+      "blocked": {
+        "mean": 0.0,
+        "min": 0,
+        "max": 0,
+        "stdev": 0.0,
+        "values": [
+          0,
+          0,
+          0
+        ]
+      },
+      "mean_admission_ms": {
+        "mean": 0.03,
+        "min": 0.03,
+        "max": 0.04,
+        "stdev": 0.0,
+        "values": [
+          0.03,
+          0.03,
+          0.04
+        ]
+      },
+      "mean_wait_ms": {
+        "mean": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "stdev": 0.0,
+        "values": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "wall_clock_ms": {
+        "mean": 796.14,
+        "min": 719.41,
+        "max": 840.74,
+        "stdev": 54.49,
+        "values": [
+          840.74,
+          828.26,
+          719.41
+        ]
+      }
+    },
+    {
+      "workload": "hot_disjoint",
+      "arm": "steward",
+      "arm_role": "main_method",
+      "rq": "RQ2",
+      "competitor": true,
+      "n_seeds": 3,
+      "correct": {
+        "mean": 13.33,
+        "min": 11,
+        "max": 15,
+        "stdev": 1.7,
+        "values": [
+          14,
+          15,
+          11
+        ]
+      },
+      "lost": {
+        "mean": 0.0,
+        "min": 0,
+        "max": 0,
+        "stdev": 0.0,
+        "values": [
+          0,
+          0,
+          0
+        ]
+      },
+      "blocked": {
+        "mean": 0.0,
+        "min": 0,
+        "max": 0,
+        "stdev": 0.0,
+        "values": [
+          0,
+          0,
+          0
+        ]
+      },
+      "mean_admission_ms": {
+        "mean": 10.64,
+        "min": 3.76,
+        "max": 17.21,
+        "stdev": 5.5,
+        "values": [
+          17.21,
+          10.95,
+          3.76
+        ]
+      },
+      "mean_wait_ms": {
+        "mean": 6.97,
+        "min": 0.0,
+        "max": 13.57,
+        "stdev": 5.55,
+        "values": [
+          13.57,
+          7.33,
+          0.0
+        ]
+      },
+      "wall_clock_ms": {
+        "mean": 448.56,
+        "min": 386.81,
+        "max": 517.82,
+        "stdev": 53.75,
+        "values": [
+          517.82,
+          441.06,
+          386.81
+        ]
+      }
+    },
+    {
+      "workload": "hot_disjoint",
+      "arm": "file_lock",
+      "arm_role": "baseline_serial",
+      "rq": "RQ2-baseline",
+      "competitor": true,
+      "n_seeds": 3,
+      "correct": {
+        "mean": 13.33,
+        "min": 11,
+        "max": 15,
+        "stdev": 1.7,
+        "values": [
+          14,
+          15,
+          11
+        ]
+      },
+      "lost": {
+        "mean": 0.0,
+        "min": 0,
+        "max": 0,
+        "stdev": 0.0,
+        "values": [
+          0,
+          0,
+          0
+        ]
+      },
+      "blocked": {
+        "mean": 0.0,
+        "min": 0,
+        "max": 0,
+        "stdev": 0.0,
+        "values": [
+          0,
+          0,
+          0
+        ]
+      },
+      "mean_admission_ms": {
+        "mean": 5.21,
+        "min": 4.32,
+        "max": 6.44,
+        "stdev": 0.9,
+        "values": [
+          6.44,
+          4.88,
+          4.32
+        ]
+      },
+      "mean_wait_ms": {
+        "mean": 1.55,
+        "min": 0.73,
+        "max": 2.64,
+        "stdev": 0.8,
+        "values": [
+          2.64,
+          1.27,
+          0.73
+        ]
+      },
+      "wall_clock_ms": {
+        "mean": 157.47,
+        "min": 152.85,
+        "max": 164.29,
+        "stdev": 4.92,
+        "values": [
+          164.29,
+          152.85,
+          155.26
+        ]
+      }
+    },
+    {
+      "workload": "hot_disjoint",
+      "arm": "occ",
+      "arm_role": "baseline_occ",
+      "rq": "RQ2-baseline",
+      "competitor": true,
+      "n_seeds": 3,
+      "correct": {
+        "mean": 13.33,
+        "min": 11,
+        "max": 15,
+        "stdev": 1.7,
+        "values": [
+          14,
+          15,
+          11
+        ]
+      },
+      "lost": {
+        "mean": 0.0,
+        "min": 0,
+        "max": 0,
+        "stdev": 0.0,
+        "values": [
+          0,
+          0,
+          0
+        ]
+      },
+      "blocked": {
+        "mean": 0.0,
+        "min": 0,
+        "max": 0,
+        "stdev": 0.0,
+        "values": [
+          0,
+          0,
+          0
+        ]
+      },
+      "mean_admission_ms": {
+        "mean": 4.15,
+        "min": 3.73,
+        "max": 4.95,
+        "stdev": 0.57,
+        "values": [
+          4.95,
+          3.73,
+          3.77
+        ]
+      },
+      "mean_wait_ms": {
+        "mean": 0.52,
+        "min": 0.0,
+        "max": 1.29,
+        "stdev": 0.56,
+        "values": [
+          1.29,
+          0.27,
+          0.0
+        ]
+      },
+      "wall_clock_ms": {
+        "mean": 141.48,
+        "min": 126.21,
+        "max": 153.86,
+        "stdev": 11.47,
+        "values": [
+          153.86,
+          144.36,
+          126.21
+        ]
+      }
+    },
+    {
+      "workload": "hot_disjoint",
+      "arm": "git_three_way",
+      "arm_role": "baseline_git",
+      "rq": "RQ2-baseline",
+      "competitor": true,
+      "n_seeds": 3,
+      "correct": {
+        "mean": 13.33,
+        "min": 11,
+        "max": 15,
+        "stdev": 1.7,
+        "values": [
+          14,
+          15,
+          11
+        ]
+      },
+      "lost": {
+        "mean": 0.0,
+        "min": 0,
+        "max": 0,
+        "stdev": 0.0,
+        "values": [
+          0,
+          0,
+          0
+        ]
+      },
+      "blocked": {
+        "mean": 0.0,
+        "min": 0,
+        "max": 0,
+        "stdev": 0.0,
+        "values": [
+          0,
+          0,
+          0
+        ]
+      },
+      "mean_admission_ms": {
+        "mean": 3.58,
+        "min": 3.49,
+        "max": 3.72,
+        "stdev": 0.1,
+        "values": [
+          3.53,
+          3.49,
+          3.72
+        ]
+      },
+      "mean_wait_ms": {
+        "mean": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "stdev": 0.0,
+        "values": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "wall_clock_ms": {
+        "mean": 648.42,
+        "min": 558.04,
+        "max": 696.39,
+        "stdev": 63.95,
+        "values": [
+          690.84,
+          696.39,
+          558.04
+        ]
+      }
+    },
+    {
+      "workload": "hot_disjoint",
+      "arm": "bare_composer",
+      "arm_role": "baseline_bare_composer",
+      "rq": "RQ2-ablation",
+      "competitor": true,
+      "n_seeds": 3,
+      "correct": {
+        "mean": 13.33,
+        "min": 11,
+        "max": 15,
+        "stdev": 1.7,
+        "values": [
+          14,
+          15,
+          11
+        ]
+      },
+      "lost": {
+        "mean": 0.0,
+        "min": 0,
+        "max": 0,
+        "stdev": 0.0,
+        "values": [
+          0,
+          0,
+          0
+        ]
+      },
+      "blocked": {
+        "mean": 0.0,
+        "min": 0,
+        "max": 0,
+        "stdev": 0.0,
+        "values": [
+          0,
+          0,
+          0
+        ]
+      },
+      "mean_admission_ms": {
+        "mean": 0.03,
+        "min": 0.02,
+        "max": 0.04,
+        "stdev": 0.01,
+        "values": [
+          0.03,
+          0.02,
+          0.04
+        ]
+      },
+      "mean_wait_ms": {
+        "mean": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "stdev": 0.0,
+        "values": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "wall_clock_ms": {
+        "mean": 794.36,
+        "min": 710.93,
+        "max": 839.48,
+        "stdev": 59.06,
+        "values": [
+          839.48,
+          832.66,
+          710.93
+        ]
+      }
+    },
+    {
+      "workload": "hot_conflict",
+      "arm": "steward",
+      "arm_role": "main_method",
+      "rq": "RQ2",
+      "competitor": true,
+      "n_seeds": 3,
+      "correct": {
+        "mean": 13.67,
+        "min": 13,
+        "max": 15,
+        "stdev": 0.94,
+        "values": [
+          15,
+          13,
+          13
+        ]
+      },
+      "lost": {
+        "mean": 0.0,
+        "min": 0,
+        "max": 0,
+        "stdev": 0.0,
+        "values": [
+          0,
+          0,
+          0
+        ]
+      },
+      "blocked": {
+        "mean": 0.0,
+        "min": 0,
+        "max": 0,
+        "stdev": 0.0,
+        "values": [
+          0,
+          0,
+          0
+        ]
+      },
+      "mean_admission_ms": {
+        "mean": 10.13,
+        "min": 3.55,
+        "max": 16.41,
+        "stdev": 5.25,
+        "values": [
+          16.41,
+          10.43,
+          3.55
+        ]
+      },
+      "mean_wait_ms": {
+        "mean": 6.7,
+        "min": 0.0,
+        "max": 12.8,
+        "stdev": 5.24,
+        "values": [
+          12.8,
+          7.31,
+          0.0
+        ]
+      },
+      "wall_clock_ms": {
+        "mean": 495.07,
+        "min": 406.61,
+        "max": 604.08,
+        "stdev": 81.92,
+        "values": [
+          604.08,
+          474.51,
+          406.61
+        ]
+      }
+    },
+    {
+      "workload": "hot_conflict",
+      "arm": "file_lock",
+      "arm_role": "baseline_serial",
+      "rq": "RQ2-baseline",
+      "competitor": true,
+      "n_seeds": 3,
+      "correct": {
+        "mean": 13.67,
+        "min": 13,
+        "max": 15,
+        "stdev": 0.94,
+        "values": [
+          15,
+          13,
+          13
+        ]
+      },
+      "lost": {
+        "mean": 0.0,
+        "min": 0,
+        "max": 0,
+        "stdev": 0.0,
+        "values": [
+          0,
+          0,
+          0
+        ]
+      },
+      "blocked": {
+        "mean": 0.0,
+        "min": 0,
+        "max": 0,
+        "stdev": 0.0,
+        "values": [
+          0,
+          0,
+          0
+        ]
+      },
+      "mean_admission_ms": {
+        "mean": 6.59,
+        "min": 4.91,
+        "max": 9.72,
+        "stdev": 2.22,
+        "values": [
+          9.72,
+          4.91,
+          5.13
+        ]
+      },
+      "mean_wait_ms": {
+        "mean": 3.15,
+        "min": 1.54,
+        "max": 6.13,
+        "stdev": 2.11,
+        "values": [
+          6.13,
+          1.54,
+          1.77
+        ]
+      },
+      "wall_clock_ms": {
+        "mean": 182.74,
+        "min": 162.81,
+        "max": 205.13,
+        "stdev": 17.36,
+        "values": [
+          205.13,
+          180.27,
+          162.81
+        ]
+      }
+    },
+    {
+      "workload": "hot_conflict",
+      "arm": "occ",
+      "arm_role": "baseline_occ",
+      "rq": "RQ2-baseline",
+      "competitor": true,
+      "n_seeds": 3,
+      "correct": {
+        "mean": 13.67,
+        "min": 13,
+        "max": 15,
+        "stdev": 0.94,
+        "values": [
+          15,
+          13,
+          13
+        ]
+      },
+      "lost": {
+        "mean": 0.0,
+        "min": 0,
+        "max": 0,
+        "stdev": 0.0,
+        "values": [
+          0,
+          0,
+          0
+        ]
+      },
+      "blocked": {
+        "mean": 0.0,
+        "min": 0,
+        "max": 0,
+        "stdev": 0.0,
+        "values": [
+          0,
+          0,
+          0
+        ]
+      },
+      "mean_admission_ms": {
+        "mean": 5.68,
+        "min": 3.75,
+        "max": 7.81,
+        "stdev": 1.66,
+        "values": [
+          7.81,
+          5.49,
+          3.75
+        ]
+      },
+      "mean_wait_ms": {
+        "mean": 2.14,
+        "min": 0.0,
+        "max": 4.33,
+        "stdev": 1.77,
+        "values": [
+          4.33,
+          2.08,
+          0.0
+        ]
+      },
+      "wall_clock_ms": {
+        "mean": 158.24,
+        "min": 137.04,
+        "max": 183.54,
+        "stdev": 19.2,
+        "values": [
+          183.54,
+          154.14,
+          137.04
+        ]
+      }
+    },
+    {
+      "workload": "hot_conflict",
+      "arm": "git_three_way",
+      "arm_role": "baseline_git",
+      "rq": "RQ2-baseline",
+      "competitor": true,
+      "n_seeds": 3,
+      "correct": {
+        "mean": 13.67,
+        "min": 13,
+        "max": 15,
+        "stdev": 0.94,
+        "values": [
+          15,
+          13,
+          13
+        ]
+      },
+      "lost": {
+        "mean": 0.0,
+        "min": 0,
+        "max": 0,
+        "stdev": 0.0,
+        "values": [
+          0,
+          0,
+          0
+        ]
+      },
+      "blocked": {
+        "mean": 0.0,
+        "min": 0,
+        "max": 0,
+        "stdev": 0.0,
+        "values": [
+          0,
+          0,
+          0
+        ]
+      },
+      "mean_admission_ms": {
+        "mean": 12.11,
+        "min": 3.45,
+        "max": 20.01,
+        "stdev": 6.78,
+        "values": [
+          20.01,
+          12.88,
+          3.45
+        ]
+      },
+      "mean_wait_ms": {
+        "mean": 8.75,
+        "min": 0.0,
+        "max": 16.87,
+        "stdev": 6.9,
+        "values": [
+          16.87,
+          9.38,
+          0.0
+        ]
+      },
+      "wall_clock_ms": {
+        "mean": 771.78,
+        "min": 688.28,
+        "max": 821.5,
+        "stdev": 59.4,
+        "values": [
+          821.5,
+          805.56,
+          688.28
+        ]
+      }
+    },
+    {
+      "workload": "hot_conflict",
+      "arm": "bare_composer",
+      "arm_role": "baseline_bare_composer",
+      "rq": "RQ2-ablation",
+      "competitor": true,
+      "n_seeds": 3,
+      "correct": {
+        "mean": 12.0,
+        "min": 11,
+        "max": 13,
+        "stdev": 0.82,
+        "values": [
+          12,
+          11,
+          13
+        ]
+      },
+      "lost": {
+        "mean": 0.0,
+        "min": 0,
+        "max": 0,
+        "stdev": 0.0,
+        "values": [
+          0,
+          0,
+          0
+        ]
+      },
+      "blocked": {
+        "mean": 1.67,
+        "min": 0,
+        "max": 3,
+        "stdev": 1.25,
+        "values": [
+          3,
+          2,
+          0
+        ]
+      },
+      "mean_admission_ms": {
+        "mean": 0.03,
+        "min": 0.03,
+        "max": 0.04,
+        "stdev": 0.0,
+        "values": [
+          0.03,
+          0.03,
+          0.04
+        ]
+      },
+      "mean_wait_ms": {
+        "mean": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "stdev": 0.0,
+        "values": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "wall_clock_ms": {
+        "mean": 833.7,
+        "min": 826.39,
+        "max": 838.18,
+        "stdev": 5.21,
+        "values": [
+          836.54,
+          826.39,
+          838.18
+        ]
+      }
+    }
+  ],
+  "diagnostics_optional": [
+    {
+      "run": "e1-diag-admission_only-s11",
+      "workload": "hot_conflict",
+      "arm": "admission_only",
+      "arm_role": "motivation",
+      "rq": "diagnostic",
+      "diagnostic": true,
+      "correctness_competitor": false,
+      "seed": 11,
+      "params": {
+        "hot_ratio": 1,
+        "overlap": "high",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 8,
+      "lost": 7,
+      "committed": 15,
+      "blocked": 0,
+      "rejects": 0,
+      "wall_clock_ms": 155.3,
+      "mean_wait_ms": 3.4,
+      "mean_admission_ms": 6.61,
+      "mean_overhead_ms": 8.87,
+      "intents": 15,
+      "duration_ms": 159
+    },
+    {
+      "run": "e1-diag-raw_overwrite-s11",
+      "workload": "hot_conflict",
+      "arm": "raw_overwrite",
+      "arm_role": "baseline_raw",
+      "rq": "diagnostic",
+      "diagnostic": true,
+      "correctness_competitor": false,
+      "seed": 11,
+      "params": {
+        "hot_ratio": 1,
+        "overlap": "high",
+        "compose_window_ms": 100,
+        "n_agents": 3,
+        "trial_count": 5
+      },
+      "correct": 8,
+      "lost": 7,
+      "committed": 15,
+      "blocked": 0,
+      "rejects": 0,
+      "wall_clock_ms": 101.83,
+      "mean_wait_ms": 0.0,
+      "mean_admission_ms": 0.0,
+      "mean_overhead_ms": 0.32,
+      "intents": 15,
+      "duration_ms": 105
+    }
+  ]
+}

@@ -3,6 +3,7 @@
 // proposer from acting as the neutral steward for its own proposal.
 import path from 'node:path';
 import { validateBrokerProposal } from './proposal.ts';
+import { proposalRegionIdentity } from './steward-region-rebase.ts';
 import type { StewardValidationIssue } from './steward.ts';
 import type { MergePlan, PatchProposal } from './types.ts';
 
@@ -65,7 +66,11 @@ export function validateStewardInputs(input: {
         issues.push({ code: 'stale-base-commit', detail: issue.detail });
       }
       if (issue.kind === 'file-hash-mismatch') {
-        issues.push({ code: 'file-hash-drift', detail: issue.detail });
+        const missingFile = issue.detail.includes('does not exist');
+        // 有穩定區域身分時，hash drift 交給區域重定，而不是在計畫階段直接結束。
+        if (missingFile || proposalRegionIdentity(proposal) === null) {
+          issues.push({ code: 'file-hash-drift', detail: issue.detail });
+        }
       }
       if (issue.kind === 'out-of-scope-target-file') {
         issues.push({ code: 'out-of-scope-target', detail: issue.detail });
