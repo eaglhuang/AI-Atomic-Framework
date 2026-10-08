@@ -34,6 +34,24 @@ bridge after the paper-aligned public release.
 - **Paper quick-verify instructions** added to the public docs
   (`a823febb4`).
 
+### Fixed - steward canonical commit
+
+- **Concurrent steward apply no longer silently drops or tears a committed
+  effect.** `applyTransactionalStewardPlan` used to re-read the target after
+  the stale check and still `writeFileSync` the composition from the old base.
+  Two OS processes could both pass that check; the later write replaced the
+  earlier effect, and a shorter overlapping write could leave a stale tail
+  byte. The commit now holds a per-file lock only around a base-hash
+  compare-and-swap and an atomic same-directory rename. A mismatch returns
+  transactional verdict `re-compose` and does not write. A live lock that
+  outlasts the wait returns `recovery-required`. `applyStewardPlan` recomposes
+  once and, if that still cannot commit, keeps the public evidence verdict
+  `blocked` with a reason prefixed `re-compose:` or `recovery-required:`.
+  Public CLI flags and the public `applied` / `blocked` evidence enum are
+  unchanged. Uncontended commit overhead on this host was about 0.09 ms per
+  file versus `writeFileSync` (commit mean 0.13 ms, apply mean 0.38 ms over
+  200 sequential JSON upserts).
+
 ### Fixed - CLI, hook, evidence, and release behavior
 
 - **Completion report detector narrowing** so ordinary governance
@@ -59,6 +77,13 @@ bridge after the paper-aligned public release.
   baseline.
 
 ### Daily log
+
+#### 2026-10-08
+
+- Closed the multi-process steward lost-update and torn-write window with a
+  per-file compare-and-swap and an atomic rename. Public steward evidence
+  remains `applied` or `blocked`; transactional receipts may now report
+  `re-compose` or `recovery-required`.
 
 #### 2026-06-28
 

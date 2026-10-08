@@ -359,6 +359,12 @@ try {
   check(transactional.plan.rollback.returnedQueueRequestIds.length === 1, 'transactional composer must return skipped members to queue');
   check(readFileSync(targetFile, 'utf8') === liveBeforeTransactional, 'transactional composer must not mutate live target file');
 
+  const concurrent = spawnSync(process.execPath, ['--strip-types', path.join(root, 'tests/core/steward-concurrent-commit.test.ts')], {
+    cwd: root,
+    encoding: 'utf8'
+  });
+  check(concurrent.status === 0, `concurrent steward commit regression must pass:\n${concurrent.stdout}\n${concurrent.stderr}`);
+
   console.log(`[broker-steward:${mode}] ok`);
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
