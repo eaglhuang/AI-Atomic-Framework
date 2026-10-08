@@ -131,20 +131,16 @@ export function readStagedJsonFile(cwd: LegacyValue, relativeFile: LegacyValue) 
 }
 
 export function readStagedFiles(cwd: LegacyValue) {
-  try {
     return runGitCommand(cwd, [
       "diff",
       "--cached",
       "--name-only",
       "--diff-filter=ACMRTD",
+      "-z",
     ])
-      .split(/\r?\n/)
-      .map(normalizeRelativePath)
+      .split("\0")
       .filter(Boolean)
       .sort((left: LegacyValue, right: LegacyValue) => left.localeCompare(right));
-  } catch {
-    return [];
-  }
 }
 
 /**
@@ -154,15 +150,10 @@ export function readStagedFiles(cwd: LegacyValue) {
  * authoritative.
  */
 export function readUnstagedFiles(cwd: LegacyValue) {
-  try {
-    return runGitCommand(cwd, ["diff", "--name-only", "--diff-filter=ACMRTD"])
-      .split(/\r?\n/)
-      .map(normalizeRelativePath)
+    return runGitCommand(cwd, ["diff", "--name-only", "--diff-filter=ACMRTD", "-z"])
+      .split("\0")
       .filter(Boolean)
       .sort((left: LegacyValue, right: LegacyValue) => left.localeCompare(right));
-  } catch {
-    return [];
-  }
 }
 
 export function rollbackNewlyStagedLiveIndexResidue(cwd: LegacyValue, stagedBeforeAttempt: LegacyValue) {

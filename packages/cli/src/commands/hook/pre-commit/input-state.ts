@@ -5,7 +5,7 @@ import { gitHeadEvidencePaths } from '../../git-head-evidence.ts';
 import { appendGitHeadEvidenceJsonl, hasMatchingWorktreeGitHeadEvidence } from '../../git-governance/implementation/git-head-evidence-transaction.ts';
 import { readFrameworkVersion } from '../../shared.ts';
 import { hookProvider, hookContractVersion } from '../git-hooks-installer.ts';
-import { normalizeRelativePath, runGit, runGitLines } from '../git-index-diagnostics.ts';
+import { normalizeRelativePath, runGit, runGitLines, runGitPathList } from '../git-index-diagnostics.ts';
 import type { CommandRunReport } from '../pre-push.ts';
 import {
   normalizeOptionalText,
@@ -29,14 +29,8 @@ interface TaskCardStatusFinding {
   readonly requiredCommand: string;
 }
 
-function uniqueSorted(values: readonly string[]): readonly string[] {
-  return [...new Set(values)].sort((left, right) => left.localeCompare(right));
-}
-
 export function readStagedFiles(cwd: string): readonly string[] {
-  return uniqueSorted(runGitLines(cwd, ['diff', '--cached', '--name-only', '--diff-filter=ACMRTD'])
-    .map(normalizeRelativePath)
-    .filter(Boolean));
+  return [...new Set(runGitPathList(cwd, ['diff', '--cached', '--name-only', '--diff-filter=ACMRTD']))].sort();
 }
 
 export function readStagedChangedLineCount(cwd: string, files: readonly string[]) {
