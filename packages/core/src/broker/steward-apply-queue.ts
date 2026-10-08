@@ -7,7 +7,8 @@
 import { createHash, randomBytes } from 'node:crypto';
 import { existsSync, mkdirSync, realpathSync, rmSync } from 'node:fs';
 import path from 'node:path';
-import { DatabaseSync } from 'node:sqlite';
+import type { DatabaseSync } from 'node:sqlite';
+import { loadDatabaseSync } from './sqlite-runtime.ts';
 import { defaultStewardCommitLockRoot, stewardCanonicalCommitPolicy } from './steward-commit-guard.ts';
 import { kernelAdvisoryLockIsFree } from './steward-kernel-lock.ts';
 
@@ -246,7 +247,7 @@ function queueKey(targetPath: string): string {
 }
 
 function openDatabase(dbPath: string): DatabaseSync {
-  const db = new DatabaseSync(dbPath, { timeout: 0 });
+  const db = new (loadDatabaseSync())(dbPath, { timeout: 0 });
   db.exec('PRAGMA busy_timeout = 0');
   // 佇列不是正確性後盾。關掉 fsync，讓沒有競爭的 apply 不必為隊伍票刷盤。
   db.exec('PRAGMA synchronous = OFF');
