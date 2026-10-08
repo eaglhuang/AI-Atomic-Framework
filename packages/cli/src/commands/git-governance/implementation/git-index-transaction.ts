@@ -174,19 +174,15 @@ export function rollbackNewlyStagedLiveIndexResidue(cwd: LegacyValue, stagedBefo
 }
 
 export function readStagedDiffNames(cwd: LegacyValue, diffFilter: LegacyValue) {
-  try {
-    return runGitCommand(cwd, [
+  return runGitCommand(cwd, [
       "diff",
       "--cached",
       "--name-only",
       `--diff-filter=${diffFilter}`,
+      "-z",
     ])
-      .split(/\r?\n/)
-      .map(normalizeRelativePath)
+      .split("\0")
       .filter(Boolean);
-  } catch {
-    return [];
-  }
 }
 
 export function isAllowedGovernanceArtifactPath(cwd: LegacyValue, filePath: LegacyValue, taskId: LegacyValue) {

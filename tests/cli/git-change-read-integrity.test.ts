@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, unlinkSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { stripTypeScriptTypes } from 'node:module';
@@ -21,6 +21,8 @@ const command = (cwd: string, args: string[]) => execFileSync('git', args, { cwd
 const normalize = (value: string) => value.replace(/\\/g, '/').replace(/^\.\//, '');
 const commitRead = new Function('runGitCommand', 'normalizeRelativePath',
   body(transaction, 'readStagedFiles') + ';return readStagedFiles;')(command, normalize);
+const deletionRead = new Function('runGitCommand', 'normalizeRelativePath',
+  body(transaction, 'readStagedDiffNames') + ';return readStagedDiffNames;')(command, normalize);
 const repo = mkdtempSync(path.join(os.tmpdir(), 'atm-git-read-integrity-'));
 try {
   command(repo, ['init', '-q']);
@@ -46,6 +48,11 @@ try {
   command(repo, ['add', '-u']);
   assert.deepEqual(commitRead(repo), [' leading.txt', ' renamed.txt']);
   assert.deepEqual(hookRead(repo), [' leading.txt', ' renamed.txt']);
+  unlinkSync(path.join(repo, names[1]));
+  command(repo, ['add', '-u']);
+  assert.deepEqual(deletionRead(repo, 'D').sort(), [names[0], names[1]].sort(),
+    'deletion scope reader must preserve the same path bytes as staged reader');
+  assert.throws(() => deletionRead(path.join(repo, 'missing'), 'D'), /Git|ENOENT|no such/i);
 } finally {
   rmSync(repo, { recursive: true, force: true });
 }
