@@ -74,6 +74,17 @@ Markdown backlog edits, JSON owner-map edits, generated files, unbounded
 patches, and incompatible anchors remain fail-closed; Broker does not guess a
 merge.
 
+Canonical commit is a compare-and-swap, not a check-then-write. Composition
+stays outside the lock. Under a per-file cross-process lock the steward
+re-reads the target and writes only when the bytes still match the compose
+base, by renaming a completed temporary sibling in the same directory. A
+mismatch does not write: the transactional receipt verdict is `re-compose`,
+and `applyStewardPlan` recomposes once against the current bytes. If that
+retry still cannot commit, or the commit lock stays held by a live owner, the
+public steward evidence verdict stays `blocked` and the reason starts with
+`re-compose:` or `recovery-required:`. Callers retry a `re-compose` result
+against the current file. There is no new CLI flag.
+
 ## Operator Flow
 
 1. Run `team plan` or `broker decision` and inspect the seven-layer trace.

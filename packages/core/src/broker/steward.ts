@@ -9,8 +9,10 @@ import { formatStewardCompositionBlock } from './steward-base-composer.ts';
 import {
   applyTransactionalStewardPlan,
   buildPatchProposalComposition,
-  buildStewardSemanticValidationReceipt
+  buildStewardSemanticValidationReceipt,
+  type TransactionalStewardApplyResult
 } from './steward-transactional-apply.ts';
+import { stewardCanonicalCommitPolicy } from './steward-commit-guard.ts';
 import type { VirtualAtomInUseRegistryDocument } from './registry.ts';
 import type { TeamBrokerRuntimeActivationHandshakeEvidence } from './team-lane.ts';
 import type {
@@ -171,9 +173,35 @@ export function applyStewardPlan(input: {
   readonly evidenceOutPath?: string | null;
 }): StewardApplyResult {
   const planResult = planStewardApply(input);
-  const transactional = planResult.ok
+  let transactional = planResult.ok
     ? buildPatchProposalComposition({ cwd: input.cwd, mergePlan: input.mergePlan, proposals: input.proposals })
     : null;
+  let apply: TransactionalStewardApplyResult | null = null;
+  if (planResult.ok && transactional && !transactional.blocked) {
+    const baseHead = readGitHeadCommit(input.cwd);
+    const attempts = stewardCanonicalCommitPolicy.maxRecomposeAttempts + 1;
+    for (let attempt = 0; attempt < attempts; attempt += 1) {
+      if (attempt > 0) {
+        transactional = buildPatchProposalComposition({ cwd: input.cwd, mergePlan: input.mergePlan, proposals: input.proposals });
+        if (transactional.blocked) break;
+      }
+      const semanticValidation = buildStewardSemanticValidationReceipt({
+        plan: transactional.plan,
+        outputFiles: transactional.outputFiles
+      });
+      apply = applyTransactionalStewardPlan({
+        cwd: input.cwd,
+        stewardId: input.stewardId,
+        writerRole: 'neutral-steward',
+        plan: transactional.plan,
+        outputFiles: transactional.outputFiles,
+        scopeFiles: input.scopeFiles,
+        semanticValidation,
+        baseHead
+      });
+      if (apply.ok || apply.receipt.verdict !== 're-compose') break;
+    }
+  }
   if (!planResult.ok || transactional?.blocked) {
     const brokerOperationRun = buildStewardBrokerOperationRun({
       mergePlan: input.mergePlan,
@@ -198,21 +226,7 @@ export function applyStewardPlan(input: {
     if (input.evidenceOutPath) writeEvidenceFile(input.evidenceOutPath, evidence);
     return { ok: false, evidence };
   }
-  if (!transactional) throw new Error('steward composition missing after a successful plan');
-  const semanticValidation = buildStewardSemanticValidationReceipt({
-    plan: transactional.plan,
-    outputFiles: transactional.outputFiles
-  });
-  const apply = applyTransactionalStewardPlan({
-    cwd: input.cwd,
-    stewardId: input.stewardId,
-    writerRole: 'neutral-steward',
-    plan: transactional.plan,
-    outputFiles: transactional.outputFiles,
-    scopeFiles: input.scopeFiles,
-    semanticValidation,
-    baseHead: readGitHeadCommit(input.cwd)
-  });
+  if (!transactional || !apply) throw new Error('steward composition missing after a successful plan');
   const fileBeforeHashes = Object.fromEntries(apply.receipt.files.map((file) => [file.filePath, stripShaPrefix(file.beforeHash)]));
   const fileAfterHashes = Object.fromEntries(apply.receipt.files.map((file) => [file.filePath, stripShaPrefix(file.afterHash)]));
   const appliedFiles = apply.ok ? apply.receipt.files.map((file) => file.filePath).sort((left, right) => left.localeCompare(right)) : [];
