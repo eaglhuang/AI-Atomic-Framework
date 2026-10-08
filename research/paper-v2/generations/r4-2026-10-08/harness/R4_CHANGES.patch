@@ -1,0 +1,828 @@
+diff -ruN r3/REPRODUCE.md r4/REPRODUCE.md
+--- r3/REPRODUCE.md	2026-10-08 15:08:40.479142845 +0800
++++ r4/REPRODUCE.md	2026-10-08 15:08:40.483142845 +0800
+@@ -27,3 +27,15 @@
+ 
+ 時間與機器負載會影響 MP 重播與延遲數字；barrier 測試為確定性（不依時序）。
+ 
++
++## r4（ATM PR #214 驗證，2026-10-08）
++
++```bash
++# 先依 runs/r4-validation/PINS.json 準備三個 ATM pin（5692474f、bea35380、2118bc66；commit tarball 解壓；node_modules 同 5 個 symlink）
++./runs/r4-validation/run_r4.sh                 # barrier → replay(450＝6 臂×75) → matrix(63) → regression(180) → faults；拒絕覆蓋既有 r4* run
++PHASES=barrier ./runs/r4-validation/run_r4.sh  # 只重跑 barrier（輸出目錄已存在時請先換 --out）
++node test/r4_fault_scenarios.mjs --pins "2118bc66=<tree>,bea35380=<tree>" --out <新目錄> --reps 10   # F1–F6；F6 需 `unshare -Urpf --mount-proc`
++./reproduce.sh analyze runs/r4-analysis/<新空目錄>   # 唯讀；含 r4-compare/R4_TABLES.md
++```
++
++注意：before-precheck barrier 正式結果為 v2（follower 進入檢查點後 leader 才提交）；v1 輸出保留為 `runs/r4-validation/barrier/superseded-v1-*`，不計入。消融臂以環境變數 `ATM_BENCH_RECOMPOSE_POLICY`（JSON）轉為 ATM 公開輸入 `recomposePolicy`；只有 (c) 能這樣關閉。
+Binary files r3/analysis/__pycache__/cell_index.cpython-313.pyc and r4/analysis/__pycache__/cell_index.cpython-313.pyc differ
+Binary files r3/analysis/__pycache__/r4_compare.cpython-313.pyc and r4/analysis/__pycache__/r4_compare.cpython-313.pyc differ
+diff -ruN r3/analysis/cell_index.py r4/analysis/cell_index.py
+--- r3/analysis/cell_index.py	2026-10-08 15:08:40.479142845 +0800
++++ r4/analysis/cell_index.py	2026-10-08 15:08:40.483142845 +0800
+@@ -1,5 +1,5 @@
+ #!/usr/bin/env python3
+-"""r2 Phase 1 C/D: per-cell provenance index (read-only on runs/). One row per paper-relevant cell (r1 + r2 + r3)."""
++"""r2 Phase 1 C/D: per-cell provenance index (read-only on runs/). One row per paper-relevant cell (r1 + r2 + r3 + r4)."""
+ import json, os, re, sys, hashlib, glob
+ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ RUNS = os.path.join(ROOT, 'runs')
+@@ -10,7 +10,8 @@
+                    (r'^e5-', 'r1:raw/e5.tgz'), (r'^c4-', 'r1:raw/c.tgz'), (r'^d[1-5]-', 'r1:raw/d.tgz'), (r'^steward-', 'r1:raw/steward.tgz'),
+                    (r'^gaps-', 'r1:raw/gaps.tgz'), (r'^(composer-probe|b5-b8)$', 'r1:raw/b-probes.tgz'), (r'^r2f-', 'r2:raw/r2-e4-forensics.tgz'),
+                    (r'^r2-smoke-', 'r2:raw/r2-smoke.tgz'), (r'^r3v-', 'r3:raw/r3-replay.tgz'), (r'^r3m-', 'r3:raw/r3-matrix.tgz'),
+-                   (r'^r3r-', 'r3:raw/r3-regression.tgz'), (r'^(r3s-|r3-smoke-)', 'r3:raw/r3-sp-noise-and-smoke.tgz')]:
++                   (r'^r3r-', 'r3:raw/r3-regression.tgz'), (r'^(r3s-|r3-smoke-)', 'r3:raw/r3-sp-noise-and-smoke.tgz'),
++                   (r'^r4v-.*-(old|fix|opt)-r\d+$', 'r4:raw/r4-replay-pins.tgz'), (r'^r4v-.*-(optlock|optr0|optr1)-r\d+$', 'r4:raw/r4-replay-secondary-ablation.tgz'), (r'^r4m-', 'r4:raw/r4-matrix.tgz'), (r'^r4r-', 'r4:raw/r4-regression.tgz')]:
+         if re.match(pat, c): return a
+     return None
+ SKIP = {'e1-pilot', 'e2-matrix', 'e3-sweep', 'e4-multiprocess', 'e5-fault', 'steward-writer'}
+@@ -37,6 +38,7 @@
+         mp_ablation=m.get('mp_ablation'), oracle_runtime_v1=v1, oracle_runtime_v2=v2rt, oracle_v2_rescored=bool(v1),
+         harness_src=('r2 (pre runtime-oracle-v2 hook)' if c.startswith('r2f-') else 'r2' if c.startswith('r2-smoke-') else
+                      'r3 (r3 harness: runtime oracle v2 + commit-guard observer; see generations/r3 harness/)' if re.match(r'^(r3[vmrs]-|r3-smoke-)', c) else
++                     'r4 (r4 harness: + tx-attempt counter via commitHooks.beforePrecheck, generalized lock observer, optional recomposePolicy env; see generations/r4 harness/)' if re.match(r'^r4[vmr]-', c) else
+                      'r1-era (per-run harness source hash NOT recorded in r1; src was edited between stages)'),
+         n_event_files=len(ev), created_at=m.get('created_at')))
+ json.dump(dict(n=len(rows), cells=rows), open(os.path.join(OUT, 'CELL_INDEX.json'), 'w'), indent=1)
+diff -ruN r3/analysis/r4_compare.py r4/analysis/r4_compare.py
+--- r3/analysis/r4_compare.py	1970-01-01 08:00:00.000000000 +0800
++++ r4/analysis/r4_compare.py	2026-10-08 15:08:40.483142845 +0800
+@@ -0,0 +1,209 @@
++#!/usr/bin/env python3
++"""r4 analysis-only comparison (READ-ONLY on runs/*; writes only to --out).
++Inputs: oracle v2 artifact-only rescore (rescore_cells.json), per-run meta/compose_batches/steward_applies/events,
++runs/r4-validation/barrier/*/barrier_result.json, runs/r4-validation/faults/fault_results.json, PINS.json.
++Outputs: r4_summary.json + r4_cells.json + R4_TABLES.md.
++Definitions (same as r3 unless noted):
++  completed intent = ATM `applied` and oracle v2 finds the effect in the final bytes (v2 'correct').
++  lost effect      = v2 verdict 'lost' (ATM acked `applied`, effect absent from final bytes). Counted per effect, not per failure.
++  blocked intent   = intent whose batch ended `blocked` (incl. after re-compose); completed + lost + blocked = total intents.
++  failed run       = any op with a failing v2 verdict, or any file frame/structure violation, foreign write or extra file.
++  corrupted file   = file with frame or structure violation (incl. torn tails).
++  attempts (r4)    = per batch max(atm_tx_attempts, atm_commit_attempts). atm_tx_attempts counts ATM's forwarded
++                     commitHooks.beforePrecheck calls (2118bc66+ only; = transactional apply attempts, incl. those that end at
++                     the unlocked early stale check); atm_commit_attempts counts commit-lock acquisitions (bea35380+). 5692474f: 0.
++  re-compose event = batch with attempts>=2, or attempts>=1 and final `blocked` (the first attempt returned re-compose).
++  re-compose success = batch `applied` with attempts>=2.
++  percentiles      = linear interpolation (numpy 'linear'); mean±sd is NOT a CI.
++"""
++import argparse, glob, json, os, re, statistics as st
++from collections import Counter
++ap = argparse.ArgumentParser(); ap.add_argument('--rescore', required=True); ap.add_argument('--out', required=True)
++ap.add_argument('--runs', default=os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'runs'))
++A = ap.parse_args(); os.makedirs(A.out, exist_ok=True); RUNS = A.runs
++RES = {r['cell']: r for r in json.load(open(A.rescore))['rows'] if r['mode'] == 'atm'}
++ARMS = ('old', 'fix', 'opt', 'optlock', 'optr0', 'optr1')
++ARM_RE = re.compile(r'-(old|fix|optlock|optr0|optr1|opt)(?:-r\d+)?$')
++PIN_OF = {'old': '5692474f', 'fix': 'bea35380', 'opt': '2118bc66', 'optlock': '2118bc66', 'optr0': '2118bc66', 'optr1': '2118bc66'}
++def pct(xs, q):
++  xs = sorted(xs)
++  if not xs: return None
++  k = (len(xs) - 1) * q; f = int(k); c = min(f + 1, len(xs) - 1); return xs[f] + (xs[c] - xs[f]) * (k - f)
++def stats(xs):
++  xs = [x for x in xs if x is not None]
++  return dict(n=len(xs), mean=round(st.mean(xs), 2) if xs else None, p50=round(pct(xs, .5), 2) if xs else None,
++              p95=round(pct(xs, .95), 2) if xs else None, p99=round(pct(xs, .99), 2) if xs else None, sd=round(st.pstdev(xs), 2) if len(xs) > 1 else None)
++def jl(paths):
++  for p in paths:
++    for l in open(p):
++      l = l.strip()
++      if l: yield json.loads(l)
++def attempts(b): return max(b.get('atm_tx_attempts') or 0, b.get('atm_commit_attempts') or 0)
++def reason_code(r):
++  if not r: return 'none'
++  if r.startswith('re-compose attempts exhausted'): return 're-compose-exhausted'
++  if r.startswith('recovery-required:'): return 'recovery-required'
++  if r.startswith('re-compose:'): return 're-compose(exhausted)'
++  if 'canonical target base hash is stale' in r: return 'stale-precheck(unlocked)'
++  if r.startswith('steward-final-patch-required'):
++    if 'both edit region' in r: return 'steward-final-patch-required/same-region-in-batch'
++    if 'changed after the proposal was anchored' in r: return 'steward-final-patch-required/region-changed'
++    if 'cover the same lines' in r: return 'steward-final-patch-required/overlapping-rebase'
++    if 'more than once' in r: return 'steward-final-patch-required/ambiguous-anchor'
++    return 'steward-final-patch-required/declared-line-overlap'
++  return r.split(':')[0][:40]
++def classify(b):
++  r = (b.get('blocked_reason') or ''); n = attempts(b)
++  if b.get('steward_verdict') == 'applied': return 'applied_after_re-compose' if n >= 2 else 'applied'
++  code = reason_code(r)
++  if code in ('re-compose-exhausted', 'recovery-required', 're-compose(exhausted)'): return f'blocked:{code}'
++  if n >= 1: return f'blocked:re-compose→{code}'
++  return f'blocked:{code}'
++def run_row(cell):
++  d = os.path.join(RUNS, cell); meta = json.load(open(os.path.join(d, 'meta.json'))); m = ARM_RE.search(cell)
++  arm = m.group(1) if m else None; res = RES.get(cell)
++  art = os.path.join(d, 'atm', 'artifacts'); ev = os.path.join(d, 'atm', 'events')
++  cb = sorted(glob.glob(os.path.join(art, 'compose_batches.w*.jsonl'))) or [os.path.join(ev, 'compose_batches.jsonl')]
++  cb = [p for p in cb if os.path.exists(p)]
++  batches = list(jl(cb)) if cb else []
++  sa = sorted(glob.glob(os.path.join(art, 'steward_applies*.jsonl'))); applies = list(jl(sa)) if sa else []
++  dec = [e for e in jl(sorted(glob.glob(os.path.join(ev, '*.jsonl')))) if e.get('event') == 'decision']
++  bcls, icls, att_b, att_i = Counter(), Counter(), Counter(), Counter()
++  for b in batches:
++    c = classify(b); k = len(b.get('intent_ids') or b.get('proposalIds') or [])
++    bcls[c] += 1; icls[c] += k; att_b[attempts(b)] += 1; att_i[attempts(b)] += k
++  rc_events = sum(1 for b in batches if attempts(b) >= 2 or (attempts(b) >= 1 and b.get('steward_verdict') != 'applied'))
++  rc_success = sum(1 for b in batches if attempts(b) >= 2 and b.get('steward_verdict') == 'applied')
++  av = meta.get('atm_version') or ''
++  pin = next((p for p in ('5692474f', 'bea35380', '2118bc66') if p in av), None)
++  pols = {json.dumps(b.get('recompose_policy'), sort_keys=True) for b in batches}
++  wall = (meta.get('modes', {}).get('atm') or {}).get('wall_clock_ms')
++  fail = None
++  if res: fail = bool(res['v2_fail'] or res['files_frame_violation'] or res['files_structure_violation'] or res['foreign_writes'] or res['extra_files'])
++  return dict(cell=cell, arm=arm, pin=pin, pin_expected=PIN_OF.get(arm), policies=sorted(pols), procs=meta.get('procs') or (meta.get('params') or {}).get('procs'),
++    seed=meta.get('workload_seed'), sched=meta.get('scheduler_seed'), scored=res is not None,
++    offered=res['n_ops'] if res else None, correct=res['v2_correct'] if res else None, lost=res['v2_lost'] if res else None,
++    v2_fail=res['v2_fail'] if res else None, by_verdict=res['v2_by_verdict'] if res else None,
++    frame_files=res['files_frame_violation'] if res else None, structure_files=res['files_structure_violation'] if res else None,
++    extra_files=res['extra_files'] if res else None, foreign_writes=res['foreign_writes'] if res else None, failed=fail,
++    wall_ms=wall, batches=len(batches), batch_classes=dict(bcls), intent_classes=dict(icls),
++    attempts_batches=dict(att_b), attempts_intents=dict(att_i), re_compose_events=rc_events, re_compose_success=rc_success,
++    re_compose_extra_attempts=sum(max(attempts(b) - 1, 0) for b in batches),
++    lock_contention_polls=sum((b.get('atm_commit_lock_contention_polls') or 0) for b in batches),
++    sig_interleave=sum(1 for a in applies if a.get('interleave_suspect')), sig_drift=sum(1 for a in applies if a.get('post_write_drift')),
++    total_ms=[e.get('total_ms') for e in dec], apply_ms=[e.get('apply_ms') for e in dec])
++def blocked_of(ic): return sum(v for k, v in ic.items() if k.startswith('blocked'))
++def agg(rows):
++  rows = [r for r in rows if r['scored']]
++  if not rows: return None
++  s = lambda k: sum(r[k] or 0 for r in rows)
++  ic, bc, ab, ai = Counter(), Counter(), Counter(), Counter()
++  for r in rows: ic.update(r['intent_classes']); bc.update(r['batch_classes']); ab.update(r['attempts_batches']); ai.update(r['attempts_intents'])
++  wall = [r['wall_ms'] for r in rows]
++  blocked = blocked_of(ic)
++  return dict(runs=len(rows), failed_runs=sum(1 for r in rows if r['failed']), lost_effects=s('lost'),
++    corrupted_files=s('frame_files') + s('structure_files'), extra_files=sum(len(r['extra_files'] or []) for r in rows),
++    foreign_writes=sum(len(r['foreign_writes'] or []) for r in rows), offered=s('offered'), correct=s('correct'), blocked_intents=blocked,
++    identity_ok=(s('correct') + s('lost') + blocked == s('offered')), v2_fail_ops=s('v2_fail'),
++    completion_rate=round(s('correct') / s('offered'), 4), mean_correct_per_run=round(s('correct') / len(rows), 2),
++    wall_ms=stats(wall), re_compose_events=s('re_compose_events'), re_compose_success=s('re_compose_success'),
++    re_compose_extra_attempts=s('re_compose_extra_attempts'), lock_contention_polls=s('lock_contention_polls'),
++    sig_interleave=s('sig_interleave'), sig_drift=s('sig_drift'), batches=s('batches'), batch_classes=dict(bc), intent_classes=dict(ic),
++    attempts_batches=dict(sorted(ab.items())), attempts_intents=dict(sorted(ai.items())),
++    intent_total_ms=stats([x for r in rows for x in r['total_ms']]), intent_apply_ms=stats([x for r in rows for x in r['apply_ms']]))
++cells = sorted(c for c in os.listdir(RUNS) if re.match(r'r4[vmr]-', c) and os.path.exists(os.path.join(RUNS, c, 'meta.json')))
++rows = [run_row(c) for c in cells]
++out = dict(definitions=__doc__, n_cells=len(rows), unscored=[r['cell'] for r in rows if not r['scored']],
++           pin_mismatch=[r['cell'] for r in rows if r['arm'] and r['pin'] != r['pin_expected']])
++rv = [r for r in rows if r['cell'].startswith('r4v-')]
++exact = lambda r: re.match(r'r4v-e4-p2-s17-[a-z0-9]+-r\d+$', r['cell']) or re.match(r'r4v-e4-p2-s17-g-', r['cell'])
++out['replay'] = {a: dict(all=agg([r for r in rv if r['arm'] == a]), p2_s17_35=agg([r for r in rv if r['arm'] == a and exact(r)]),
++                         **{f'grid_p{p}': agg([r for r in rv if r['arm'] == a and '-g-' in r['cell'] and r['procs'] == p]) for p in (2, 4, 8)})
++                 for a in ARMS}
++# paired per-run comparison (descriptive only; NOT a significance test): same config/seed/rep, arms interleaved in time
++def key_of(c): return ARM_RE.sub(lambda m: '-ARM' + (m.group(0)[len(m.group(1)) + 1:]), c)
++byk = {}
++for r in rv: byk.setdefault(key_of(r['cell']), {})[r['arm']] = r
++def paired(a, b):
++  ds = [byk[k][a]['correct'] - byk[k][b]['correct'] for k in byk if a in byk[k] and b in byk[k]]
++  return dict(pairs=len(ds), higher=sum(d > 0 for d in ds), equal=sum(d == 0 for d in ds), lower=sum(d < 0 for d in ds),
++              mean_diff_per_run=round(st.mean(ds), 2) if ds else None, sum_diff=sum(ds))
++out['paired_completed'] = {f'{a}_vs_{b}': paired(a, b) for a, b in (('opt', 'fix'), ('opt', 'old'), ('fix', 'old'), ('optr0', 'opt'), ('optr1', 'opt'), ('optr0', 'fix'), ('optlock', 'opt'))}
++out['replay_failures'] = [{k: r[k] for k in ('cell', 'arm', 'lost', 'v2_fail', 'frame_files', 'structure_files', 'extra_files', 'foreign_writes', 'by_verdict', 'sig_interleave', 'sig_drift')} for r in rv if r['failed']]
++rm = [r for r in rows if r['cell'].startswith('r4m-')]
++def mtype(c):
++  return 'main_p2' if '-steward-p2-' in c else 'main_p4' if '-steward-p4-' in c else 'main_p8' if '-steward-p8-' in c else 'sp' if '-steward-sp-' in c else 'fault_naive_p8' if 'fault_naive' in c else 'fault_nolock_p8' if 'fault_nolock' in c else '?'
++out['matrix'] = {a: {t: agg([r for r in rm if r['arm'] == a and mtype(r['cell']) == t]) for t in ('main_p2', 'main_p4', 'main_p8', 'sp', 'fault_naive_p8', 'fault_nolock_p8')} for a in ('old', 'fix', 'opt', 'optlock')}
++out['matrix_all'] = {a: agg([r for r in rm if r['arm'] == a and mtype(r['cell']) != 'sp']) for a in ('old', 'fix', 'opt', 'optlock')}
++out['matrix_failures'] = [{k: r[k] for k in ('cell', 'arm', 'lost', 'v2_fail', 'frame_files', 'structure_files', 'extra_files', 'by_verdict')} for r in rm if r['failed']]
++rr = [r for r in rows if r['cell'].startswith('r4r-')]
++reg = {}
++for armname in ('steward', 'file_lock', 'occ', 'git_three_way', 'bare_composer'):
++  for wl in ('hot_conflict', 'hot_disjoint', 'cold', 'ALL'):
++    sel = lambda pin, rep=None: [r for r in rr if f'-{armname}-' in r['cell'] and (wl == 'ALL' or r['cell'].startswith(f'r4r-e2-{wl}-'))
++                                 and r['arm'] == pin and (rep is None or f'-r{rep}-' in r['cell'])]
++    o, f = agg(sel('fix')), agg(sel('opt'))
++    if not o or not f: continue
++    d = {}
++    for k in ('intent_total_ms', 'intent_apply_ms', 'wall_ms'):
++      d[k] = {q: (round(f[k][q] - o[k][q], 2), round((f[k][q] - o[k][q]) / o[k][q] * 100, 1) if o[k][q] else None) for q in ('mean', 'p50', 'p95')}
++    noise = {}
++    for pin in ('fix', 'opt'):
++      a1, a2 = agg(sel(pin, 1)), agg(sel(pin, 2))
++      if a1 and a2: noise[pin] = {k: {q: round(a2[k][q] - a1[k][q], 2) for q in ('mean', 'p50', 'p95')} for k in ('intent_total_ms', 'intent_apply_ms')}
++    reg[f'{armname}/{wl}'] = dict(fix=o, opt=f, delta_opt_minus_fix=d, noise_rep2_minus_rep1=noise,
++      correctness_same=(o['correct'], o['lost_effects'], o['failed_runs']) == (f['correct'], f['lost_effects'], f['failed_runs']))
++out['regression'] = reg
++out['barrier'] = {os.path.basename(p): json.load(open(os.path.join(p, 'barrier_result.json')))['summary']
++                  for p in sorted(glob.glob(os.path.join(RUNS, 'r4-validation', 'barrier', '*')))}
++fp = os.path.join(RUNS, 'r4-validation', 'faults', 'fault_results.json')
++out['faults'] = json.load(open(fp))['summary'] if os.path.exists(fp) else None
++json.dump(out, open(os.path.join(A.out, 'r4_summary.json'), 'w'), indent=1, ensure_ascii=False)
++json.dump([{k: v for k, v in r.items() if k not in ('total_ms', 'apply_ms')} for r in rows], open(os.path.join(A.out, 'r4_cells.json'), 'w'), indent=1)
++# ---------------- markdown
++L = ['# r4 驗證表（ATM PR #214 merge 2118bc66 vs bea35380 vs 5692474f）', '',
++     '> DRAFT。不主張勝出。作者自行執行、未獨立重現。由 `analysis/r4_compare.py` 從 raw 重建（唯讀）。定義見 r4_summary.json `definitions`。', '']
++H = ('| 組 | 完成／總 intents | 失敗 runs／總 runs | 遺失效果 | blocked intents | 損壞檔 | 多餘檔 | re-compose 事件／成功 | 額外嘗試 | wall ms mean / p95 | intent total_ms mean / p95 |',
++     '|---|---|---|---:|---:|---:|---:|---|---:|---|---|')
++def row(name, g):
++  if not g: return f'| {name} | – |'
++  return (f"| {name} | {g['correct']}／{g['offered']}（{g['completion_rate']*100:.1f}%） | {g['failed_runs']}／{g['runs']} | {g['lost_effects']} | {g['blocked_intents']} | "
++          f"{g['corrupted_files']} | {g['extra_files']} | {g['re_compose_events']}／{g['re_compose_success']} | {g['re_compose_extra_attempts']} | "
++          f"{g['wall_ms']['mean']} / {g['wall_ms']['p95']} | {g['intent_total_ms']['mean']} / {g['intent_total_ms']['p95']} |")
++L += ['## 1. E4 重播（r3 同配置：每臂 75 runs，含 p2/s17 共 35 次；三 pin 同時段交錯）', '', *H]
++for a in ARMS:
++  for sub in ('all', 'p2_s17_35', 'grid_p2', 'grid_p4', 'grid_p8'): L.append(row(f'{a} · {sub}', out['replay'][a][sub]))
++L += ['', '臂：old＝5692474f；fix＝bea35380；opt＝2118bc66（主）；optlock＝2118bc66＋harness 鎖 on；optr0＝2118bc66＋maxRecomposeAttempts 0；optr1＝2118bc66＋maxRecomposeAttempts 1、backoff 0、jitter 0。除 optlock 外 harness 鎖皆 off。', '']
++L += ['### 1-p. 逐 run 配對（同 seed／配置／rep；描述性，非顯著性檢定）', '', '| 比較 | 配對數 | 較高 | 相同 | 較低 | 每 run 平均差 | 合計差 |', '|---|---:|---:|---:|---:|---:|---:|']
++for k, v in out['paired_completed'].items(): L.append(f"| {k} | {v['pairs']} | {v['higher']} | {v['equal']} | {v['lower']} | {v['mean_diff_per_run']} | {v['sum_diff']} |")
++L += ['']
++L += ['### 1a. blocked／完成 intents 依最終分類', '', '| 臂 | 分類 → intents |', '|---|---|']
++for a in ARMS:
++  ic = out['replay'][a]['all']['intent_classes'] if out['replay'][a]['all'] else {}
++  L.append(f"| {a} | " + '; '.join(f'{k}: {v}' for k, v in sorted(ic.items())) + ' |')
++L += ['', '### 1b. 每 batch 嘗試次數分布（batches；括號＝intents）', '', '| 臂 | 分布 |', '|---|---|']
++for a in ARMS:
++  g = out['replay'][a]['all']
++  if g: L.append(f"| {a} | " + '; '.join(f"{k} 次: {v}（{g['attempts_intents'].get(k, 0)}）" for k, v in g['attempts_batches'].items()) + ' |')
++L += ['', '## 2. E4 完整 cells（r1 同 seeds／flags）', '', *H]
++for a in ('old', 'fix', 'opt', 'optlock'):
++  for t, g in out['matrix'][a].items():
++    if g: L.append(row(f'{a} · {t}', g))
++L += ['', '## 3. 單 process 回歸（E2 子集：3 workloads × 5 arms × seeds 11/17/23 × 2 reps；bea35380→2118bc66）', '',
++      '| arm/workload | 完成 fix→opt | lost fix/opt | failed runs fix/opt | total_ms mean fix→opt (Δ%) | p50 Δ | p95 Δ | apply_ms mean Δ (Δ%) | apply p95 Δ | 雜訊（同 pin rep2−rep1，total mean） |', '|---|---|---|---|---|---|---|---|---|---|']
++for k, v in reg.items():
++  o, f, d = v['fix'], v['opt'], v['delta_opt_minus_fix']; n = v['noise_rep2_minus_rep1']
++  L.append(f"| {k} | {o['correct']}/{o['offered']} → {f['correct']}/{f['offered']} | {o['lost_effects']}/{f['lost_effects']} | {o['failed_runs']}/{f['failed_runs']} | "
++           f"{o['intent_total_ms']['mean']} → {f['intent_total_ms']['mean']} ({d['intent_total_ms']['mean'][1]}%) | {d['intent_total_ms']['p50'][0]} | {d['intent_total_ms']['p95'][0]} | "
++           f"{d['intent_apply_ms']['mean'][0]} ({d['intent_apply_ms']['mean'][1]}%) | {d['intent_apply_ms']['p95'][0]} | fix {n.get('fix', {}).get('intent_total_ms', {}).get('mean')} / opt {n.get('opt', {}).get('intent_total_ms', {}).get('mean')} |")
++L += ['', '## 4. Barrier 2-process 交錯測試（確定性）', '', '| 案例 | window hit | 遺失效果 | follower 結果 | 最終＝leader-only | 最終＝兩者 full bytes | 殘留檔 | follower lock 取得／tx 嘗試 |', '|---|---|---|---|---|---|---|---|']
++for k, b in out['barrier'].items():
++  L.append(f"| {k} | {b['window_hit']}/{b['reps']} | {b['lost_effects_total']} | {b['follower_classes']} | {b['final_equals_leader_only']} | {b.get('final_equals_both_full_bytes')} | {b['leftover_files']} | {b['follower_commit_guard_attempts']}／{b.get('follower_tx_attempts')} |")
++if out['faults']:
++  L += ['', '## 5. 故障情境（harness 層；2118bc66 主、bea35380 對照）', '', '| 情境 | variant | pin | n | 遺失效果（runs） | frame 壞 | 殘留檔 | 結果分布 |', '|---|---|---|---:|---|---:|---:|---|']
++  for k, g in out['faults'].items():
++    sc, var, pin = [x.strip() for x in k.split('|')]
++    L.append(f"| {sc} | {var} | {pin} | {g['n']} | {g['lost_effects']}（{g['runs_with_lost']}） | {g['frame_bad']} | {g['leftovers']} | {g['outcomes']} |")
++open(os.path.join(A.out, 'R4_TABLES.md'), 'w').write('\n'.join(L) + '\n')
++print(json.dumps({a: {k: out['replay'][a]['all'][k] for k in ('runs', 'failed_runs', 'lost_effects', 'corrupted_files', 'correct', 'blocked_intents', 'identity_ok', 're_compose_events', 're_compose_success')} for a in ARMS if out['replay'][a]['all']}, indent=0))
++print('pin_mismatch', out['pin_mismatch'], 'unscored', len(out['unscored']))
+diff -ruN r3/analysis/rescore_oracle_v2.mjs r4/analysis/rescore_oracle_v2.mjs
+--- r3/analysis/rescore_oracle_v2.mjs	2026-10-08 15:08:40.479142845 +0800
++++ r4/analysis/rescore_oracle_v2.mjs	2026-10-08 15:08:40.483142845 +0800
+@@ -24,7 +24,7 @@
+ (function walk(d) { for (const f of readdirSync(d).sort()) { const p = join(d, f); if (statSync(p).isDirectory()) walk(p); else if (relative(FIXTURE, p) !== 'manifest.json') fixtureFiles.push(relative(FIXTURE, p)); } })(FIXTURE);
+ const baseOf = Object.fromEntries(fixtureFiles.map((f) => [f, readFileSync(join(FIXTURE, f), 'utf8')]));
+ 
+-const stageOf = (c) => (c.match(/^(e[1-5])-/)?.[1]) ?? (/^c4-/.test(c) ? 'c4' : /^d[1-5]-/.test(c) ? c.slice(0, 2) : /^steward-/.test(c) ? 'steward' : /^gaps-/.test(c) ? 'gaps' : /^r2f-/.test(c) ? 'r2-e4-forensics' : /^r3v-/.test(c) ? 'r3-replay' : /^r3m-/.test(c) ? 'r3-matrix' : /^r3r-/.test(c) ? 'r3-regression' : /^r3s-/.test(c) ? 'r3-sp-noise' : /^r3-smoke/.test(c) ? 'r3-smoke' : 'support');
++const stageOf = (c) => (c.match(/^(e[1-5])-/)?.[1]) ?? (/^c4-/.test(c) ? 'c4' : /^d[1-5]-/.test(c) ? c.slice(0, 2) : /^steward-/.test(c) ? 'steward' : /^gaps-/.test(c) ? 'gaps' : /^r2f-/.test(c) ? 'r2-e4-forensics' : /^r3v-/.test(c) ? 'r3-replay' : /^r3m-/.test(c) ? 'r3-matrix' : /^r3r-/.test(c) ? 'r3-regression' : /^r3s-/.test(c) ? 'r3-sp-noise' : /^r3-smoke/.test(c) ? 'r3-smoke' : /^r4v-/.test(c) ? 'r4-replay' : /^r4m-/.test(c) ? 'r4-matrix' : /^r4r-/.test(c) ? 'r4-regression' : 'support');
+ 
+ const rows = [], changes = [], skipped = [];
+ for (const cell of readdirSync(RUNS).sort()) {
+diff -ruN r3/runs/r4-validation/pin_record.py r4/runs/r4-validation/pin_record.py
+--- r3/runs/r4-validation/pin_record.py	1970-01-01 08:00:00.000000000 +0800
++++ r4/runs/r4-validation/pin_record.py	2026-10-08 15:08:40.483142845 +0800
+@@ -0,0 +1,44 @@
++#!/usr/bin/env python3
++"""r4: record the three ATM pins (read-only). Output: PINS.json + PINS.md in argv[1] (default runs/r3-validation)."""
++import hashlib, json, os, subprocess, sys, tarfile
++OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.dirname(os.path.abspath(__file__))
++PINS = {
++  '2118bc66': dict(role='r4 pin (PR #214 merge; feature commit b5729456bc14d9bf4c8acfce7be320fec691fee2; steward completion-rate optimizations)', dir='/workspace/atm-main-2118bc66', sha='2118bc66efb3ac3bc0ddaede6a2f7cb18526b030'),
++  '5692474f': dict(role='baseline (r1/r2 pin; PR #198 merge)', dir='/workspace/atm-main-5692474f', sha='5692474f7db70ab52a7a71c8af4867609e7e4b43'),
++  'bea35380': dict(role='r3 pin (PR #213 merge; feature commit 4d7c9ed6287173f6f704e8d0a0d8a99683776bff; base main 53e6fdb0fca462212c7d1a26dcdfa74653cf4436)',
++                   dir='/workspace/atm-main-bea35380', sha='bea35380d7f381f998c9930fa95f01b999c7f208'),
++}
++H = lambda b: hashlib.sha256(b).hexdigest()
++def fh(p): return H(open(p, 'rb').read())
++def tree_hash(root, sub):
++  lines = []
++  for d, ds, fs in os.walk(os.path.join(root, sub)):
++    ds.sort(); ds[:] = [x for x in ds if x != 'node_modules']
++    for f in sorted(fs):
++      p = os.path.join(d, f); lines.append(f"{fh(p)}  {os.path.relpath(p, root)}")
++  return H('\n'.join(sorted(lines, key=lambda l: l[66:])).encode()), len(lines)
++res = {}
++for k, v in PINS.items():
++  root = os.path.join(v['dir'], f"AI-Atomic-Framework-{v['sha']}"); tgz = os.path.join(v['dir'], 'atm-main.tar.gz')
++  with tarfile.open(tgz) as t: tar_commit = t.pax_headers.get('comment')
++  core_hash, core_n = tree_hash(root, 'packages/core/src')
++  broker = os.path.join(root, 'packages/core/src/broker')
++  keyfiles = {f: fh(os.path.join(broker, f)) for f in sorted(os.listdir(broker))
++              if f.startswith('steward') or f in ('compose.ts', 'decision.ts', 'registry.ts', 'registry-store.ts', 'merge-plan.ts', 'unified-patch.ts')}
++  deps = {}
++  for n in sorted(os.listdir(os.path.join(root, 'node_modules'))):
++    p = os.path.join(root, 'node_modules', n); real = os.path.realpath(p)
++    pj = json.load(open(os.path.join(real, 'package.json')))
++    deps[n] = dict(symlink_target=os.readlink(p) if os.path.islink(p) else None, version=pj.get('version'), package_json_sha256=fh(os.path.join(real, 'package.json')))
++  res[k] = dict(role=v['role'], resolved_commit=v['sha'], tarball_url=f"https://codeload.github.com/eaglhuang/AI-Atomic-Framework/tar.gz/{v['sha']}",
++    tarball_path=tgz, tarball_bytes=os.path.getsize(tgz), tarball_sha256=fh(tgz), tarball_embedded_commit=tar_commit,
++    tarball_commit_matches=(tar_commit == v['sha']), tree=root, core_package_version=json.load(open(os.path.join(root, 'packages/core/package.json')))['version'],
++    packages_core_src_tree_sha256=core_hash, packages_core_src_files=core_n, broker_key_files_sha256=keyfiles, node_modules=deps,
++    install_mechanism='GitHub commit tarball (codeload) extracted on the box; node_modules = the same 5 symlinks as the 5692474f pin (ajv runtime deps only); selected per run via ATM_MONOREPO; no npm publish / tag / clone')
++def bdiff(a, b): return {f: ('added' if f not in a['broker_key_files_sha256'] else 'changed') for f in b['broker_key_files_sha256'] if a['broker_key_files_sha256'].get(f) != b['broker_key_files_sha256'][f]}
++res['diff_core_broker_5692474f_to_bea35380'] = bdiff(res['5692474f'], res['bea35380'])
++res['diff_core_broker_bea35380_to_2118bc66'] = bdiff(res['bea35380'], res['2118bc66'])
++res['note'] = ('core/package.json version label is identical (0.1.2) at both pins; identify runs by meta atm_version source path (contains full SHA). '
++               'Other differences between the pins are outside packages/core (cli, tests, docs, scripts) and are not loaded by the harness.')
++json.dump(res, open(os.path.join(OUT, 'PINS.json'), 'w'), indent=1)
++print(json.dumps({k: (v['tarball_sha256'], v['tarball_commit_matches'], v['packages_core_src_tree_sha256']) for k, v in res.items() if k in PINS}, indent=0)); print(res['diff_core_broker_bea35380_to_2118bc66'])
+diff -ruN r3/runs/r4-validation/run_r4.sh r4/runs/r4-validation/run_r4.sh
+--- r3/runs/r4-validation/run_r4.sh	1970-01-01 08:00:00.000000000 +0800
++++ r4/runs/r4-validation/run_r4.sh	2026-10-08 15:08:40.483142845 +0800
+@@ -0,0 +1,76 @@
++#!/usr/bin/env bash
++# r4 validation of ATM PR #214 (merge 2118bc66; steward completion-rate optimizations) — harness-only; all ATM pins read-only.
++# Same E4 config/seeds as r3. Arms (interleaved per run, same session/machine):
++#   old     = ATM 5692474f, harness --steward-apply-lock off   (pre-#213 control)
++#   fix     = ATM bea35380, harness --steward-apply-lock off   (PR #213; r3 main arm)
++#   opt     = ATM 2118bc66, harness --steward-apply-lock off   (MAIN r4 arm: ATM defaults)
++#   optlock = ATM 2118bc66, harness --steward-apply-lock on    (secondary)
++#   optr0   = ATM 2118bc66, lock off, recomposePolicy {maxRecomposeAttempts:0}                         (ablation: no re-compose retries)
++#   optr1   = ATM 2118bc66, lock off, recomposePolicy {maxRecomposeAttempts:1, backoff 0, jitter 0}    (ablation: r3 retry budget, no backoff)
++# DRAFT evidence, not a win claim.
++set -euo pipefail
++ROOT="$(cd "$(dirname "$0")/../.." && pwd)"; cd "$ROOT"
++export PATH=/workspace/.nvm/versions/node/v24.21.0/bin:${PATH:-}
++OLD=/workspace/atm-main-5692474f/AI-Atomic-Framework-5692474f7db70ab52a7a71c8af4867609e7e4b43
++FIX=/workspace/atm-main-bea35380/AI-Atomic-Framework-bea35380d7f381f998c9930fa95f01b999c7f208
++OPT=/workspace/atm-main-2118bc66/AI-Atomic-Framework-2118bc66efb3ac3bc0ddaede6a2f7cb18526b030
++D="$ROOT/runs/r4-validation"; LOG="$D/r4.log"
++PHASES=${PHASES:-"barrier replay matrix regression faults"}
++REPS_CELL=${REPS_CELL:-35}; REPS_GRID=${REPS_GRID:-5}; BARRIER_REPS=${BARRIER_REPS:-20}; FAULT_REPS=${FAULT_REPS:-10}
++ARMS=${ARMS:-"old fix opt optlock optr0 optr1"}
++MP=(--atm-backend real --arm steward --compose-window-ms 100 --agents 8 --trials 5 --hot-ratio 1 --overlap high
++  --hold-ms-min 8 --hold-ms-max 25 --tick-interval-ms 15 --jitter-ms 6 --force)
++pin(){ case "$1" in old) echo "$OLD";; fix) echo "$FIX";; *) echo "$OPT";; esac; }
++slk(){ [ "$1" = optlock ] && echo on || echo off; }
++pol(){ case "$1" in optr0) echo '{"maxRecomposeAttempts":0}';; optr1) echo '{"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}';; *) echo "";; esac; }
++guard(){ [ -e "runs/$1" ] && { echo "REFUSE: runs/$1 exists" | tee -a "$LOG"; exit 3; } || true; }
++mp(){ # rid arm procs seed registry applylock
++  guard "$1"; local P; P=$(pol "$2")
++  env ${P:+ATM_BENCH_RECOMPOSE_POLICY=$P} ATM_MONOREPO=$(pin "$2") node src/cli.mjs run-mp --run-id "$1" --mode atm --seed "$4" --scheduler-seed $(( $4 + 1000 )) --procs "$3" \
++    --registry-sync "$5" --apply-lock "$6" --steward-apply-lock "$(slk "$2")" "${MP[@]}" > "$D/stdout/$1.log" 2>&1 && rc=0 || rc=$?
++  echo "$1 rc=$rc policy=${P:-default}" >> "$LOG"
++}
++sp(){ # rid arm-pin cli-arm seed hot overlap agents
++  guard "$1"
++  ATM_MONOREPO=$(pin "$2") node src/cli.mjs start --run-id "$1" --arm "$3" --seed "$4" --scheduler-seed $(( $4 + 1000 )) \
++    --hot-ratio "$5" --overlap "$6" --atm-backend real --compose-window-ms 100 --agents "$7" --trials 5 \
++    --hold-ms-min 8 --hold-ms-max 25 --tick-interval-ms 15 --jitter-ms 6 --force > "$D/stdout/$1.log" 2>&1 && rc=0 || rc=$?
++  echo "$1 rc=$rc" >> "$LOG"
++}
++mkdir -p "$D/stdout" "$D/barrier" "$D/faults"; echo "start $(date '+%F %T %Z') phases=[$PHASES] arms=[$ARMS]" >> "$LOG"
++for ph in $PHASES; do echo "phase $ph $(date '+%T')" >> "$LOG"; case $ph in
++barrier)  # seam mode (= r3) at all three pins; stale-proposal at bea35380/2118bc66; before-precheck at 2118bc66 only (hook forwarded only there)
++  for p in old:$OLD fix:$FIX opt:$OPT; do for v in "reducers reducers" "selectors reducers"; do set -- $v
++    node test/barrier_interleave.mjs --mode seam --atm "${p#*:}" --out "$D/barrier/seam-${p%%:*}-L$1-F$2" --reps "$BARRIER_REPS" --lregion "$1" --fregion "$2" >> "$LOG" 2>&1
++  done; done
++  for p in fix:$FIX opt:$OPT; do for v in "reducers reducers" "selectors reducers"; do set -- $v
++    node test/barrier_interleave.mjs --mode stale-proposal --atm "${p#*:}" --out "$D/barrier/staleprop-${p%%:*}-L$1-F$2" --reps "$BARRIER_REPS" --lregion "$1" --fregion "$2" >> "$LOG" 2>&1
++  done; done
++  for v in "reducers reducers" "selectors reducers"; do set -- $v
++    node test/barrier_interleave.mjs --mode before-precheck --atm "$OPT" --out "$D/barrier/beforeprecheck-opt-L$1-F$2" --reps "$BARRIER_REPS" --lregion "$1" --fregion "$2" >> "$LOG" 2>&1
++  done;;
++replay)  # = r3 replay config: 35 exact p2/s17 + grid p{2,4,8} x s{11,17,23} x 5 => 75 runs per arm (r3 had 30 p2/s17 + 5 grid p2/s17 = 35)
++  for r in $(seq -w 1 30); do for a in $ARMS; do mp "r4v-e4-p2-s17-$a-r$r" $a 2 17 cas on; done; done
++  for procs in 2 4 8; do for seed in 11 17 23; do for r in $(seq -w 1 $REPS_GRID); do for a in $ARMS; do
++    mp "r4v-e4-p${procs}-s${seed}-g-$a-r$r" $a $procs $seed cas on; done; done; done; done;;
++matrix)  # = r1 E4 18 cells at old/fix/opt; main steward cells also at optlock
++  for a in old fix opt optlock; do
++    for procs in 2 4 8; do for seed in 11 17 23; do mp "r4m-e4-hot_conflict-steward-p${procs}-s${seed}-$a" $a $procs $seed cas on; done; done
++    [ $a = optlock ] && continue
++    for seed in 11 17 23; do
++      guard "r4m-e4-hot_conflict-steward-sp-s${seed}-$a"
++      ATM_MONOREPO=$(pin $a) node src/cli.mjs start --run-id "r4m-e4-hot_conflict-steward-sp-s${seed}-$a" --seed $seed --scheduler-seed $((seed+1000)) "${MP[@]}" \
++        > "$D/stdout/r4m-e4-hot_conflict-steward-sp-s${seed}-$a.log" 2>&1 && rc=0 || rc=$?; echo "r4m-e4-hot_conflict-steward-sp-s${seed}-$a rc=$rc" >> "$LOG"
++      mp "r4m-e4-hot_conflict-fault_naive-p8-s${seed}-$a" $a 8 $seed naive on
++      mp "r4m-e4-hot_conflict-fault_nolock-p8-s${seed}-$a" $a 8 $seed cas off
++    done
++  done;;
++regression)  # single-process E2 subset (= r3): 3 workloads x 5 arms x seeds 11/17/23 x 2 reps; pins bea35380 vs 2118bc66 interleaved
++  for wl in hot_conflict:1:high hot_disjoint:1:low cold:0:low; do IFS=: read -r wid hot ov <<< "$wl"
++    for arm in steward file_lock occ git_three_way bare_composer; do for seed in 11 17 23; do for r in 1 2; do for a in fix opt; do
++      sp "r4r-e2-${wid}-${arm}-s${seed}-r${r}-$a" $a $arm $seed $hot $ov 3; done; done; done; done; done;;
++faults)  # harness-level fault scenarios at 2118bc66 (main) and bea35380 (contrast); 5692474f has no commit lock (N/A)
++  node test/r4_fault_scenarios.mjs --pins "2118bc66=$OPT,bea35380=$FIX" --out "$D/faults" --reps "$FAULT_REPS" > "$D/faults/summary.stdout.json" 2> "$D/faults/progress.log" && rc=0 || rc=$?
++  echo "faults rc=$rc" >> "$LOG";;
++esac; done
++echo "end $(date '+%F %T %Z')" >> "$LOG"
+diff -ruN r3/src/steward-writer.mjs r4/src/steward-writer.mjs
+--- r3/src/steward-writer.mjs	2026-10-08 15:08:40.479142845 +0800
++++ r4/src/steward-writer.mjs	2026-10-08 15:08:40.483142845 +0800
+@@ -25,10 +25,17 @@
+ // (mkdir <lockRoot>/<sha256(realpath)> succeeded = one commit attempt reached the base-hash compare) and EEXIST polls
+ // (lock contention). At pins without the guard (e.g. 5692474f) both stay 0. Installed before ATM modules load.
+ export const commitGuardObs = { acquires: 0, contention_polls: 0, installed: false };
++// r4 observation-only: count transactional apply attempts via ATM's forwarded `commitHooks.beforePrecheck` test seam
++// (2118bc66+ forwards it from applyStewardPlan; older pins ignore the extra input => stays 0). The hook only increments
++// a counter. Unlike lock acquisitions it also counts attempts that end at the unlocked early stale check (r4 item (b)).
++export const txAttemptObs = { attempts: 0 };
++// r4 ablation only: optional ATM `recomposePolicy` (public applyStewardPlan input, not a CLI flag) from env JSON,
++// e.g. ATM_BENCH_RECOMPOSE_POLICY='{"maxRecomposeAttempts":0}'. Unset => ATM defaults (main arms).
++export const RECOMPOSE_POLICY = (() => { const v = process.env.ATM_BENCH_RECOMPOSE_POLICY; if (!v) return null; return JSON.parse(v); })();
+ function installCommitGuardObserver() {
+   if (commitGuardObs.installed || process.env.ATM_BENCH_COMMIT_OBSERVER === '0') return;
+   const orig = fsMod.mkdirSync;
+-  const re = /atm-steward-commit-locks[\\/][0-9a-f]{64}$/;
++  const re = /steward-commit-locks[\\/][0-9a-f]{64}$/; // r4: also matches 2118bc66 <repo>/.atm/runtime/steward-commit-locks/<h>
+   fsMod.mkdirSync = function (p, opts) {
+     const hit = typeof p === 'string' && re.test(p) && !(opts && opts.recursive);
+     try { const r = orig.call(this, p, opts); if (hit) commitGuardObs.acquires += 1; return r; }
+@@ -337,7 +344,7 @@
+     tel.lock_wait_ms = r2(performance.now() - t_req);
+     tel.t_start_epoch_ms = r2(performance.timeOrigin + performance.now());
+     tel.pre_apply_hash = readHash(key);
+-    const obs0 = { a: commitGuardObs.acquires, c: commitGuardObs.contention_polls };
++    const obs0 = { a: commitGuardObs.acquires, c: commitGuardObs.contention_polls, t: txAttemptObs.attempts };
+     try {
+       const composed = api.composeBrokerProposals(proposals);
+       compose_verdict = composed.mergePlan?.verdict ?? null;
+@@ -355,6 +362,8 @@
+         proposals,
+         scopeFiles: [...new Set(proposals.map((p) => p.targetFile))],
+         evidenceOutPath: evidencePath,
++        commitHooks: { beforePrecheck: () => { txAttemptObs.attempts += 1; } },   // r4 observation-only counter
++        ...(RECOMPOSE_POLICY ? { recomposePolicy: RECOMPOSE_POLICY } : {}),      // r4 ablation arms only
+       });
+       steward_verdict = result?.evidence?.verdict ?? (result?.ok ? 'applied' : 'blocked');
+       blocked_reasons = [...(result?.evidence?.blockedReasons ?? [])];
+@@ -382,6 +391,8 @@
+     tel.atm_commit_attempts = commitGuardObs.acquires - obs0.a;            // r3: 0 = never reached guard (or no guard)
+     tel.atm_commit_lock_contention_polls = commitGuardObs.contention_polls - obs0.c;
+     tel.atm_commit_observer = commitGuardObs.installed;
++    tel.atm_tx_attempts = txAttemptObs.attempts - obs0.t;                    // r4: 0 at pins that do not forward commitHooks
++    tel.recompose_policy = RECOMPOSE_POLICY;
+     };
+     if (this.applyLock) this.applyLock(key, doComposeApply); else doComposeApply();
+     tel.steward_verdict = steward_verdict;
+@@ -411,6 +422,8 @@
+       written,
+       atm_commit_attempts: tel.atm_commit_attempts ?? null,
+       atm_commit_lock_contention_polls: tel.atm_commit_lock_contention_polls ?? null,
++      atm_tx_attempts: tel.atm_tx_attempts ?? null,
++      recompose_policy: tel.recompose_policy ?? null,
+     };
+ 
+     // Dedicated compose_batch event (METRIC_DEFINITIONS §3 / checklist C2).
+@@ -449,6 +462,8 @@
+       output_digest,
+       atm_commit_attempts: batch.atm_commit_attempts,                 // r3 observation-only
+       atm_commit_lock_contention_polls: batch.atm_commit_lock_contention_polls,
++      atm_tx_attempts: batch.atm_tx_attempts,                         // r4 observation-only
++      recompose_policy: batch.recompose_policy ?? null,
+       reason: steward_verdict === 'applied' ? 'steward_applied' : (blocked_reason || 'steward_blocked'),
+     };
+     try {
+diff -ruN r3/test/barrier_interleave.mjs r4/test/barrier_interleave.mjs
+--- r3/test/barrier_interleave.mjs	2026-10-08 15:08:40.479142845 +0800
++++ r4/test/barrier_interleave.mjs	2026-10-08 15:08:40.483142845 +0800
+@@ -18,7 +18,10 @@
+ import { fileURLToPath, pathToFileURL } from 'node:url';
+ 
+ const HERE = dirname(fileURLToPath(import.meta.url));
+-let FREGION = 'reducers'; let LREGION = 'reducers';
++let FREGION = 'reducers'; let LREGION = 'reducers'; let MODE = 'seam';
++// r4 --mode: seam (r3 default: both pause at first canonical-mutation syscall) | stale-proposal (follower proposal built on base B;
++//   follower calls applyStewardPlan only after leader.done -> plan-stage path, r4 item (a)) | before-precheck (follower pauses in
++//   ATM's forwarded commitHooks.beforePrecheck until leader.done -> unlocked early stale check, r4 item (b); 2118bc66+ only).
+ const arg = (k, d = null) => { const i = process.argv.indexOf(k); return i > 0 ? process.argv[i + 1] : d; };
+ const sha = (t) => `sha256:${createHash('sha256').update(t, 'utf8').digest('hex')}`;
+ const sleep = (ms) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+@@ -39,13 +42,14 @@
+   const isCanonical = (op, p, flags) => {
+     if (typeof p !== 'string') return false;
+     const abs = resolve(p);
+-    if (op === 'mkdirSync') return abs.includes('atm-steward-commit-locks');
++    if (op === 'mkdirSync') return /steward-commit-locks/.test(abs); // r4: bea35380 <tmp>/atm-steward-commit-locks; 2118bc66 <repo>/.atm/runtime/steward-commit-locks
+     if (op === 'openSync' && !(typeof flags === 'string' && /[wa+]/.test(flags))) return false;
+     try { return dirname(abs) === targetDir; } catch { return false; }
+   };
+-  log.commit_guard_lock_acquires = 0; // bea35380: mkdir of <lockRoot>/<sha256(realpath)> = one canonical commit attempt
++  log.commit_guard_lock_acquires = 0; log.tx_attempts = 0; // bea35380: mkdir of <lockRoot>/<sha256(realpath)> = one canonical commit attempt
++  const MODE_C = arg('--mode', 'seam');
+   const seam = (op, p) => {
+-    if (log.seam_fired) return;
++    if (log.seam_fired || MODE_C !== 'seam') return;
+     log.seam_fired = true; log.seam_op = op; log.seam_path = p.startsWith(wt) ? p.slice(wt.length + 1) : basename(dirname(p)) + '/' + basename(p);
+     // Read BEFORE signalling arrival: no process can mutate the target until both have arrived.
+     log.disk_hash_at_seam = sha(fs.readFileSync(targetAbs, 'utf8'));
+@@ -58,7 +62,7 @@
+       const p = op === 'renameSync' ? a[1] : a[0];
+       if (isCanonical(op, String(p), a[1])) seam(op, String(p));
+       const r = orig[op].apply(this, a);
+-      if (op === 'mkdirSync' && /atm-steward-commit-locks\/[0-9a-f]{64}$/.test(String(p)) && !a[1]?.recursive) log.commit_guard_lock_acquires += 1;
++      if (op === 'mkdirSync' && /steward-commit-locks\/[0-9a-f]{64}$/.test(String(p)) && !a[1]?.recursive) log.commit_guard_lock_acquires += 1;
+       return r;
+     };
+   }
+@@ -74,10 +78,16 @@
+     content, baseCommit: readGitHeadCommit(wt), intentId });
+   touch(`ready.${role}`); log.both_ready = waitFor(['ready.leader', 'ready.follower'], 15000); mark('both_ready');
+   let result, thrown = null;
++  if (MODE_C === 'stale-proposal' && role === 'follower') { log.paused = true; log.leader_done_seen = waitFor(['leader.done'], 15000); log.disk_hash_at_resume = sha(fs.readFileSync(targetAbs, 'utf8')); mark('follower_release'); }
++  const prePause = () => { log.tx_attempts += 1; if (MODE_C === 'before-precheck' && role === 'follower' && !log.paused) { log.paused = true; touch('paused.follower'); log.leader_done_seen = waitFor(['leader.done'], 15000); log.disk_hash_at_resume = sha(fs.readFileSync(targetAbs, 'utf8')); mark('follower_release'); } };
++  // r4 v2: in before-precheck mode the leader starts only after the follower is paused inside ATM (after ATM's own compose,
++  // before the unlocked precheck), so the leader's commit always lands in exactly that window.
++  if (MODE_C === 'before-precheck' && role === 'leader') { log.follower_paused_seen = waitFor(['paused.follower'], 15000); mark('leader_release'); }
+   try {
+     const composed = composeBrokerProposals([proposal]);
+     result = applyStewardPlan({ cwd: wt, stewardId: 'neutral-write-steward', mergePlan: composed.mergePlan, proposals: [proposal],
+-      scopeFiles: [TARGET], evidenceOutPath: join(bar, `evidence.${role}.json`) });
++      scopeFiles: [TARGET], evidenceOutPath: join(bar, `evidence.${role}.json`),
++      commitHooks: { beforePrecheck: prePause } }); // r4: counter (+ follower pause in before-precheck mode); 2118bc66+ forwards it
+   } catch (e) { thrown = String(e?.message || e); }
+   mark('apply_return');
+   if (role === 'leader') touch('leader.done');
+@@ -90,7 +100,7 @@
+ 
+ function runChild(role, wt, bar, atm) {
+   return new Promise((res) => {
+-    const p = spawn(process.execPath, [fileURLToPath(import.meta.url), '--child', role, '--wt', wt, '--bar', bar, '--fregion', FREGION, '--lregion', LREGION],
++    const p = spawn(process.execPath, [fileURLToPath(import.meta.url), '--child', role, '--wt', wt, '--bar', bar, '--fregion', FREGION, '--lregion', LREGION, '--mode', MODE],
+       { env: { ...process.env, ATM_MONOREPO: atm }, stdio: ['ignore', 'pipe', 'pipe'] });
+     let out = '', err = ''; p.stdout.on('data', (d) => { out += d; }); p.stderr.on('data', (d) => { err += d; });
+     p.on('close', (code) => { let j = null; try { j = JSON.parse(out.trim().split('\n').pop()); } catch {} res({ code, j, err: err.slice(-2000) }); });
+@@ -98,7 +108,7 @@
+ }
+ 
+ async function parent() {
+-  const atm = resolve(arg('--atm')); const out = resolve(arg('--out')); const reps = Number(arg('--reps', '10')); FREGION = arg('--fregion', 'reducers'); LREGION = arg('--lregion', 'reducers');
++  const atm = resolve(arg('--atm')); const out = resolve(arg('--out')); const reps = Number(arg('--reps', '10')); FREGION = arg('--fregion', 'reducers'); LREGION = arg('--lregion', 'reducers'); MODE = arg('--mode', 'seam');
+   fs.mkdirSync(out, { recursive: true });
+   const { initWorktreeGit } = await import(pathToFileURL(join(HERE, '../src/steward-writer.mjs')).href);
+   const pinSha = (atm.match(/[0-9a-f]{40}/) || [null])[0];
+@@ -117,8 +127,10 @@
+     const bothDisjoint = FREGION !== LREGION && f.marker ? withLine([f.marker], FREGION, leaderOnly) : null;
+     const rec = {
+       rep: r, leader: l, follower: f, leader_exit: L.code, follower_exit: F.code, stderr: { leader: L.err, follower: F.err },
+-      window_hit: !!(l.seam_fired && f.seam_fired && l.both_arrived && f.both_arrived && f.leader_done_seen
+-        && l.disk_hash_at_seam === sha(BASE) && f.disk_hash_at_seam === sha(BASE) && l.compose_base_hash === sha(BASE) && f.compose_base_hash === sha(BASE)),
++      window_hit: MODE === 'seam' ? !!(l.seam_fired && f.seam_fired && l.both_arrived && f.both_arrived && f.leader_done_seen
++        && l.disk_hash_at_seam === sha(BASE) && f.disk_hash_at_seam === sha(BASE) && l.compose_base_hash === sha(BASE) && f.compose_base_hash === sha(BASE))
++        : !!(f.paused && f.leader_done_seen && f.compose_base_hash === sha(BASE) && f.disk_hash_at_resume && f.disk_hash_at_resume !== sha(BASE)
++          && (MODE !== 'before-precheck' || l.follower_paused_seen)),
+       final_hash: sha(final), final_bytes: Buffer.byteLength(final), leftover_files: leftovers,
+       leader_marker_present: has(l.marker), follower_marker_present: has(f.marker),
+       final_equals_leader_only: final === leaderOnly,
+@@ -127,17 +139,20 @@
+     // Lost effect: a process reported `applied` but its effect is absent from the final bytes.
+     rec.lost_effects = [l, f].filter((x) => x.verdict === 'applied' && !has(x.marker)).map((x) => x.role);
+     rec.follower_class = f.verdict === 'applied' ? (has(f.marker) && has(l.marker)
+-        ? (f.commit_guard_lock_acquires >= 2 ? 'applied_after_re-compose_both_present' : 'applied_both_present') : 'applied_overwrite')
++        ? (Math.max(f.commit_guard_lock_acquires, f.tx_attempts) >= 2 ? 'applied_after_re-compose_both_present' : 'applied_both_present') : 'applied_overwrite')
+       : (String(f.blockedReasons?.[0] || '').startsWith('re-compose:') ? 'blocked_re-compose'
+         : String(f.blockedReasons?.[0] || '').startsWith('recovery-required:') ? 'blocked_recovery-required'
++        : /^re-compose attempts exhausted/.test(String(f.blockedReasons?.[0] || '')) ? 'blocked_re-compose_exhausted'
+         : /stale/.test(String(f.blockedReasons?.[0] || '')) ? 'blocked_stale_precheck'
++        : (f.commit_guard_lock_acquires >= 1 && String(f.blockedReasons?.[0] || '').startsWith('steward-final-patch-required'))
++          ? 'blocked_after_re-compose(steward-final-patch-required)'
+         : (f.commit_guard_lock_acquires >= 1 && String(f.blockedReasons?.[0] || '').startsWith('compose-context-mismatch'))
+           ? 'blocked_after_re-compose(compose-context-mismatch)' : 'blocked_other');
+     runs.push(rec); fs.rmSync(base, { recursive: true, force: true });
+     process.stderr.write(`rep ${r}: window_hit=${rec.window_hit} leader=${l.verdict} follower=${f.verdict}/${rec.follower_class} lost=${JSON.stringify(rec.lost_effects)}\n`);
+   }
+   const summary = {
+-    test: 'r3-barrier-interleave-v1', variant: FREGION === LREGION ? `same-region(${LREGION})` : `leader-${LREGION}/follower-${FREGION}`, atm_monorepo: atm, atm_pin: pinSha, node: process.version, reps,
++    test: 'r3-barrier-interleave-v1', mode: MODE, variant: FREGION === LREGION ? `same-region(${LREGION})` : `leader-${LREGION}/follower-${FREGION}`, atm_monorepo: atm, atm_pin: pinSha, node: process.version, reps,
+     window_hit: runs.filter((x) => x.window_hit).length,
+     runs_with_lost_effect: runs.filter((x) => x.lost_effects.length).length,
+     lost_effects_total: runs.reduce((s, x) => s + x.lost_effects.length, 0),
+@@ -149,6 +164,7 @@
+     seam_ops: [...new Set(runs.flatMap((x) => [x.leader.seam_op, x.follower.seam_op]))],
+     follower_commit_guard_attempts: [...new Set(runs.map((x) => x.follower.commit_guard_lock_acquires))],
+     leader_commit_guard_attempts: [...new Set(runs.map((x) => x.leader.commit_guard_lock_acquires))],
++    follower_tx_attempts: [...new Set(runs.map((x) => x.follower.tx_attempts))],
+     first_follower_reason: runs[0]?.follower?.blockedReasons?.[0] ?? null,
+   };
+   fs.writeFileSync(join(out, 'barrier_result.json'), JSON.stringify({ summary, runs }, null, 1));
+diff -ruN r3/test/r4_fault_scenarios.mjs r4/test/r4_fault_scenarios.mjs
+--- r3/test/r4_fault_scenarios.mjs	1970-01-01 08:00:00.000000000 +0800
++++ r4/test/r4_fault_scenarios.mjs	2026-10-08 15:08:40.483142845 +0800
+@@ -0,0 +1,221 @@
++#!/usr/bin/env node
++// r4: harness-level fault scenarios for the steward canonical-commit lock (ATM sources are NOT modified).
++// Seams: node:fs interception in each child (module.syncBuiltinESMExports) on
++//   writeFileSync(<lockRoot>/<sha256>/owner)  => "lock held" point (after-lock), and
++//   renameSync(<temp>, <target>)              => "before-rename" point (inside lock, after base compare, temp fully written);
++// plus ATM's forwarded `commitHooks.beforePrecheck` test seam (2118bc66+) for retry exhaustion only.
++// Lock owner files are crafted by the parent only for the pid-reuse / live-holder simulations.
++// Usage: node test/r4_fault_scenarios.mjs --pins <name=ATMROOT,...> --out <dir> [--reps N] [--only F1,F2,...]
++// DRAFT evidence. Exit 0 for a completed experiment; outcomes in <out>/fault_results.json.
++import fs from 'node:fs';
++import { syncBuiltinESMExports } from 'node:module';
++import { spawn, spawnSync } from 'node:child_process';
++import { createHash } from 'node:crypto';
++import { tmpdir } from 'node:os';
++import { dirname, join, resolve, basename } from 'node:path';
++import { fileURLToPath, pathToFileURL } from 'node:url';
++
++const HERE = dirname(fileURLToPath(import.meta.url));
++const arg = (k, d = null) => { const i = process.argv.indexOf(k); return i > 0 ? process.argv[i + 1] : d; };
++const sha = (t) => `sha256:${createHash('sha256').update(t, 'utf8').digest('hex')}`;
++const hex = (t) => createHash('sha256').update(t).digest('hex');
++const sleep = (ms) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
++const TARGET = 'src/store.ts';
++const BASE = [
++  '// fixture for r4 fault scenarios', 'export const store = {};', '// <region:reducers>', '// base reducer line',
++  '// </region:reducers>', '// <region:selectors>', '// base selector line', '// </region:selectors>', 'export default store;', '',
++].join('\n');
++
++// ---------------------------------------------------------------- child
++async function child() {
++  const role = arg('--child'), wt = arg('--wt'), bar = arg('--bar'), region = arg('--region', 'reducers');
++  const hold = arg('--hold', 'none'), holdMs = Number(arg('--hold-ms', '0')), holdWait = arg('--hold-wait-file', '');
++  const injectK = Number(arg('--inject-k', '0')); const policy = arg('--policy', '');
++  const targetAbs = join(wt, TARGET); const targetReal = fs.realpathSync(targetAbs);
++  const log = { role, pid: process.pid, ns_pid_self: process.pid, hold, held: false, lock_acquires: 0, tx_attempts: 0, injected: 0, t: {} };
++  const t0 = Date.now(); const mark = (k) => { log.t[k] = Date.now() - t0; };
++  const orig = { writeFileSync: fs.writeFileSync, renameSync: fs.renameSync, mkdirSync: fs.mkdirSync };
++  const touch = (n) => orig.writeFileSync(join(bar, n), String(process.pid));
++  const waitFor = (n, ms) => { const end = Date.now() + ms; while (Date.now() < end) { if (fs.existsSync(join(bar, n))) return true; sleep(2); } return false; };
++  const doHold = (point) => {
++    if (log.held) return; log.held = true; log.hold_point = point; mark('hold_start'); touch(`holding.${role}`);
++    if (holdMs < 0) { while (true) sleep(1000); }               // wait to be SIGKILLed
++    log.hold_wait_satisfied = holdWait ? waitFor(holdWait, holdMs) : (sleep(holdMs), null); mark('hold_end');
++  };
++  fs.mkdirSync = function (...a) { const r = orig.mkdirSync.apply(this, a); if (/steward-commit-locks\/[0-9a-f]{64}$/.test(String(a[0])) && !a[1]?.recursive) log.lock_acquires += 1; return r; };
++  fs.writeFileSync = function (...a) {
++    const r = orig.writeFileSync.apply(this, a);
++    if (hold === 'after-lock' && /steward-commit-locks\/[0-9a-f]{64}\/owner$/.test(String(a[0]))) doHold('after-lock');
++    return r;
++  };
++  fs.renameSync = function (...a) {
++    if (hold === 'before-rename' && resolve(String(a[1])) === targetReal) doHold('before-rename');
++    return orig.renameSync.apply(this, a);
++  };
++  syncBuiltinESMExports();
++  const { makeMarkerProposal } = await import(pathToFileURL(join(HERE, '../src/steward-writer.mjs')).href);
++  const { atmCoreBroker } = await import(pathToFileURL(join(HERE, '../src/atm-resolve.mjs')).href);
++  const [{ composeBrokerProposals }, { applyStewardPlan, readGitHeadCommit }] = await Promise.all([
++    import(pathToFileURL(atmCoreBroker('compose.ts')).href), import(pathToFileURL(atmCoreBroker('steward.ts')).href)]);
++  const content = fs.readFileSync(targetAbs, 'utf8'); log.compose_base_hash = sha(content);
++  const proposal = makeMarkerProposal({ proposalId: `p-${role}`, actorId: `agent-${role}`, targetFile: TARGET, region, content,
++    baseCommit: readGitHeadCommit(wt), intentId: `fault-${role}` });
++  log.marker = proposal.patch.split('\n').find((l) => l.startsWith('+//') && !l.includes('</region:')).slice(1);
++  if (arg('--start-wait-file')) waitFor(arg('--start-wait-file'), 15000);
++  mark('apply_start');
++  let result, thrown = null;
++  const beforePrecheck = () => {   // counter; F5: simulated competing committed writer between compose and precheck
++    log.tx_attempts += 1;
++    if (injectK < 0 || log.injected < injectK) {
++      const cur = fs.readFileSync(targetAbs, 'utf8').split('\n'); const i = cur.indexOf('// </region:selectors>');
++      cur.splice(i, 0, `// injected competing line ${log.injected + 1}`); orig.writeFileSync(targetAbs, cur.join('\n')); log.injected += 1;
++    }
++  };
++  try {
++    const composed = composeBrokerProposals([proposal]);
++    result = applyStewardPlan({ cwd: wt, stewardId: 'neutral-write-steward', mergePlan: composed.mergePlan, proposals: [proposal],
++      scopeFiles: [TARGET], evidenceOutPath: join(bar, `evidence.${role}.json`), commitHooks: { beforePrecheck },
++      ...(policy ? { recomposePolicy: JSON.parse(policy) } : {}) });
++  } catch (e) { thrown = String(e?.stack || e); }
++  mark('apply_return'); touch(`done.${role}`);
++  const ev = result?.evidence ?? {};
++  Object.assign(log, { ok: !!result?.ok, verdict: ev.verdict ?? 'thrown', blockedReasons: ev.blockedReasons ?? (thrown ? [thrown] : []) });
++  process.stdout.write(JSON.stringify(log) + '\n');
++}
++
++// ---------------------------------------------------------------- parent helpers
++function spawnChild(atm, role, wt, bar, o = {}) {
++  const args = [fileURLToPath(import.meta.url), '--child', role, '--wt', wt, '--bar', bar, '--region', o.region || 'reducers', '--hold', o.hold || 'none',
++    '--hold-ms', String(o.holdMs ?? 0)];
++  if (o.holdWait) args.push('--hold-wait-file', o.holdWait);
++  if (o.startWait) args.push('--start-wait-file', o.startWait);
++  if (o.injectK) args.push('--inject-k', String(o.injectK));
++  if (o.policy) args.push('--policy', JSON.stringify(o.policy));
++  const env = { ...process.env, ATM_MONOREPO: atm, ...(o.tmp ? { TMPDIR: o.tmp } : {}) };
++  const cmd = o.pidns ? 'unshare' : process.execPath; const full = o.pidns ? ['-Urpf', '--mount-proc', process.execPath, ...args] : args;
++  const p = spawn(cmd, full, { env, stdio: ['ignore', 'pipe', 'pipe'] });
++  let out = '', err = ''; p.stdout.on('data', (d) => { out += d; }); p.stderr.on('data', (d) => { err += d; });
++  const done = new Promise((res) => p.on('close', (code, sig) => { let j = null; try { j = JSON.parse(out.trim().split('\n').pop()); } catch {} res({ code, sig, j, err: err.slice(-1500) }); }));
++  return { p, done };
++}
++const waitFile = async (f, ms) => { const end = Date.now() + ms; while (Date.now() < end) { if (fs.existsSync(f)) return true; await new Promise((r) => setTimeout(r, 2)); } return false; };
++function freshWorktree(initWorktreeGit, tag) {
++  const base = fs.mkdtempSync(join(tmpdir(), `r4-fault-${tag}-`)); const wt = join(base, 'wt'), bar = join(base, 'bar'), tmp = join(base, 'tmp');
++  fs.mkdirSync(join(wt, 'src'), { recursive: true }); fs.mkdirSync(bar); fs.mkdirSync(tmp);
++  fs.writeFileSync(join(wt, TARGET), BASE); initWorktreeGit(wt);
++  return { base, wt, bar, tmp };
++}
++function lockDirFor(pinName, wt, tmp) {
++  const real = fs.realpathSync(join(wt, TARGET));
++  return pinName === 'bea35380' ? join(tmp, 'atm-steward-commit-locks', hex(real)) : join(wt, '.atm/runtime/steward-commit-locks', hex(real));
++}
++function startToken(pid) { try { const s = fs.readFileSync(`/proc/${pid}/stat`, 'utf8'); return s.slice(s.lastIndexOf(')') + 1).trim().split(/\s+/)[19]; } catch { return null; } }
++function finalState(wt, ...logs) {
++  const final = fs.readFileSync(join(wt, TARGET), 'utf8'); const lines = final.split('\n');
++  const has = (m) => !!m && lines.includes(m);
++  const leftovers = fs.readdirSync(join(wt, 'src')).filter((n) => n !== 'store.ts');
++  const lost = logs.filter((x) => x && x.verdict === 'applied' && !has(x.marker)).map((x) => x.role);
++  return { final_hash: sha(final), leftover_files: leftovers, lost_effects: lost, present: Object.fromEntries(logs.filter(Boolean).map((x) => [x.role, has(x.marker)])),
++    frame_ok: final.startsWith('// fixture for r4 fault scenarios') && final.endsWith('export default store;\n') };
++}
++const brief = (x) => x ? { verdict: x.verdict, reason: (x.blockedReasons?.[0] || '').slice(0, 160), tx_attempts: x.tx_attempts, lock_acquires: x.lock_acquires,
++  injected: x.injected, held: x.held, hold_point: x.hold_point ?? null, hold_wait_satisfied: x.hold_wait_satisfied ?? null, apply_ms: (x.t.apply_return ?? 0) - (x.t.apply_start ?? 0) } : null;
++
++// ---------------------------------------------------------------- scenarios
++async function main() {
++  const pins = Object.fromEntries(arg('--pins').split(',').map((kv) => kv.split('=')));
++  const out = resolve(arg('--out')); const REPS = Number(arg('--reps', '10')); const only = arg('--only') ? arg('--only').split(',') : null;
++  fs.mkdirSync(out, { recursive: true });
++  const { initWorktreeGit } = await import(pathToFileURL(join(HERE, '../src/steward-writer.mjs')).href);
++  const results = [];
++  const record = (scenario, variant, pin, rep, rec) => { results.push({ scenario, variant, pin, rep, ...rec });
++    process.stderr.write(`${scenario} ${variant} ${pin} r${rep}: ${JSON.stringify({ A: rec.A?.verdict, B: rec.B?.verdict, lost: rec.state?.lost_effects, left: rec.state?.leftover_files?.length })}\n`); };
++  const want = (s) => !only || only.includes(s);
++
++  for (const [pin, atm] of Object.entries(pins)) {
++    // F1: holder SIGKILLed while holding the lock (after-lock / before-rename); B then applies.
++    if (want('F1')) for (const point of ['after-lock', 'before-rename']) for (let r = 1; r <= REPS; r++) {
++      const w = freshWorktree(initWorktreeGit, 'F1'); const tmp = w.tmp;
++      const A = spawnChild(atm, 'A', w.wt, w.bar, { hold: point, holdMs: -1, tmp });
++      const holding = await waitFile(join(w.bar, 'holding.A'), 15000);
++      const lockDir = lockDirFor(pin, w.wt, tmp); const lockExistedAtKill = fs.existsSync(lockDir);
++      A.p.kill('SIGKILL'); const a = await A.done;
++      const leftAfterKill = fs.readdirSync(join(w.wt, 'src')).filter((n) => n !== 'store.ts');
++      const t = Date.now(); const B = spawnChild(atm, 'B', w.wt, w.bar, { region: 'selectors', tmp }); const b = await B.done;
++      record('F1-holder-sigkill', point, pin, r, { A_signal: a.sig, A_held: holding, lock_existed_at_kill: lockExistedAtKill, leftover_after_kill: leftAfterKill,
++        B: brief(b.j), B_wall_ms: Date.now() - t, lock_dir_after: fs.existsSync(lockDir), state: finalState(w.wt, b.j), B_err: b.j ? null : b.err });
++      fs.rmSync(w.base, { recursive: true, force: true });
++    }
++    // F2: crafted owner files (pid reuse = live pid with wrong start token; live holder with correct token; dead pid; legacy v1 live pid).
++    if (want('F2')) for (const variant of ['pidreuse-live-pid-wrong-starttoken', 'live-pid-correct-starttoken', 'dead-pid', 'legacy-v1-live-pid']) for (let r = 1; r <= Math.min(REPS, 5); r++) {
++      const w = freshWorktree(initWorktreeGit, 'F2'); const lockDir = lockDirFor(pin, w.wt, w.tmp); fs.mkdirSync(lockDir, { recursive: true });
++      const sleeper = spawn('sleep', ['60'], { stdio: 'ignore' }); let pid = sleeper.pid, tok = startToken(sleeper.pid);
++      if (variant === 'dead-pid') { const d = spawnSync('sh', ['-c', 'echo $$']); pid = Number(String(d.stdout).trim()); tok = '12345'; }
++      if (variant === 'pidreuse-live-pid-wrong-starttoken') tok = String(Number(tok) + 777);
++      const owner = variant === 'legacy-v1-live-pid' ? `${pid}\n` : (pin === 'bea35380' ? `${pid}\n` : `v2\n${pid}\n${tok}\nfeedfacefeedface\n`);
++      fs.writeFileSync(join(lockDir, 'owner'), owner);
++      const t = Date.now(); const B = spawnChild(atm, 'B', w.wt, w.bar, { tmp: w.tmp }); const b = await B.done; sleeper.kill('SIGKILL');
++      record('F2-crafted-owner', variant, pin, r, { owner_format: owner.startsWith('v2') ? 'v2' : 'v1(pid only)', owner_pid_alive: variant !== 'dead-pid',
++        B: brief(b.j), B_wall_ms: Date.now() - t, lock_dir_after: fs.existsSync(lockDir), state: finalState(w.wt, b.j), B_err: b.j ? null : b.err });
++      fs.rmSync(w.base, { recursive: true, force: true });
++    }
++    // F3: live holder past lockWaitMs (2000 ms): A holds 3500 ms after acquiring; B must not write (recovery-required), A then commits.
++    if (want('F3')) for (let r = 1; r <= REPS; r++) {
++      const w = freshWorktree(initWorktreeGit, 'F3');
++      const A = spawnChild(atm, 'A', w.wt, w.bar, { hold: 'after-lock', holdMs: 3500, tmp: w.tmp });
++      await waitFile(join(w.bar, 'holding.A'), 15000);
++      const t = Date.now(); const B = spawnChild(atm, 'B', w.wt, w.bar, { region: 'selectors', tmp: w.tmp });
++      const [a, b] = await Promise.all([A.done, B.done]);
++      record('F3-live-holder-timeout', 'hold3500ms', pin, r, { A: brief(a.j), B: brief(b.j), B_wall_ms: Date.now() - t, state: finalState(w.wt, a.j, b.j), errs: [a.j ? null : a.err, b.j ? null : b.err] });
++      fs.rmSync(w.base, { recursive: true, force: true });
++    }
++    // F4: separate TMPDIR per process, one shared repo. Both pause before rename (inside their lock, after the base compare).
++    // A waits <=800 ms for B to also reach that point; B then waits for A to finish. If the lock is not shared, both pass the compare.
++    if (want('F4')) for (const tmpMode of ['same-tmpdir', 'different-tmpdir']) for (const bRegion of ['reducers', 'selectors']) for (let r = 1; r <= REPS; r++) {
++      const w = freshWorktree(initWorktreeGit, 'F4'); const tA = join(w.base, 'tA'), tB = tmpMode === 'same-tmpdir' ? tA : join(w.base, 'tB');
++      fs.mkdirSync(tA, { recursive: true }); fs.mkdirSync(tB, { recursive: true });
++      const A = spawnChild(atm, 'A', w.wt, w.bar, { hold: 'before-rename', holdMs: 800, holdWait: 'holding.B', tmp: tA });
++      await waitFile(join(w.bar, 'holding.A'), 15000);
++      const B = spawnChild(atm, 'B', w.wt, w.bar, { region: bRegion, hold: 'before-rename', holdMs: 15000, holdWait: 'done.A', tmp: tB });
++      const [a, b] = await Promise.all([A.done, B.done]);
++      record('F4-tmpdir', `${tmpMode}/B-${bRegion === 'reducers' ? 'same-region' : 'other-region'}`, pin, r, { A: brief(a.j), B: brief(b.j), both_inside_lock: !!(a.j?.hold_wait_satisfied),
++        state: finalState(w.wt, a.j, b.j), errs: [a.j ? null : a.err, b.j ? null : b.err] });
++      fs.rmSync(w.base, { recursive: true, force: true });
++    }
++    // F6: separate PID namespace (unshare -Urpf --mount-proc), one shared repo + shared TMPDIR (real, not simulated).
++    // The holder pauses before rename for <=2500 ms waiting for the other process to also get inside; the other then waits for the holder.
++    if (want('F6')) for (const dir of ['holder-host/contender-pidns', 'holder-pidns/contender-host']) for (let r = 1; r <= REPS; r++) {
++      const w = freshWorktree(initWorktreeGit, 'F6'); const tmp = w.tmp;
++      const A = spawnChild(atm, 'A', w.wt, w.bar, { hold: 'before-rename', holdMs: 2500, holdWait: 'holding.B', tmp, pidns: dir.startsWith('holder-pidns') });
++      await waitFile(join(w.bar, 'holding.A'), 15000);
++      const B = spawnChild(atm, 'B', w.wt, w.bar, { region: 'selectors', hold: 'before-rename', holdMs: 15000, holdWait: 'done.A', tmp, pidns: dir.endsWith('contender-pidns') });
++      const [a, b] = await Promise.all([A.done, B.done]);
++      record('F6-pid-namespace', dir, pin, r, { A: brief(a.j), B: brief(b.j), both_inside_lock: !!(a.j?.hold_wait_satisfied), A_ns_pid: a.j?.pid ?? null, B_ns_pid: b.j?.pid ?? null,
++        state: finalState(w.wt, a.j, b.j), errs: [a.j ? null : a.err, b.j ? null : b.err] });
++      fs.rmSync(w.base, { recursive: true, force: true });
++    }
++    // F5: retry exhaustion. A competing write lands between compose and the unlocked precheck on the first K attempts (beforePrecheck seam).
++    // F5 needs the forwarded beforePrecheck seam (2118bc66+); bea35380 ignores it => not exercisable there (skipped, reported N/A).
++    if (want('F5') && pin !== 'bea35380') for (const [variant, injectK, policy] of [['default-policy/K=always', -1, null], ['default-policy/K=2', 2, null], ['default-policy/K=4', 4, null],
++        ['maxRecompose=0/K=always', -1, { maxRecomposeAttempts: 0 }], ['maxRecompose=1,backoff0/K=1', 1, { maxRecomposeAttempts: 1, recomposeBackoffMs: 0, recomposeJitterMs: 0 }]])
++      for (let r = 1; r <= Math.min(REPS, 5); r++) {
++        const w = freshWorktree(initWorktreeGit, 'F5'); const t = Date.now();
++        const A = spawnChild(atm, 'A', w.wt, w.bar, { injectK, policy, tmp: w.tmp }); const a = await A.done;
++        const final = fs.readFileSync(join(w.wt, TARGET), 'utf8'); const injectedPresent = (final.match(/injected competing line/g) || []).length;
++        record('F5-retry-exhaustion', variant, pin, r, { A: brief(a.j), wall_ms: Date.now() - t, injected_lines_present: injectedPresent, state: finalState(w.wt, a.j), err: a.j ? null : a.err });
++        fs.rmSync(w.base, { recursive: true, force: true });
++      }
++  }
++  // summary
++  const groups = {};
++  for (const x of results) {
++    const k = `${x.scenario} | ${x.variant} | ${x.pin}`; const g = groups[k] ||= { n: 0, lost_effects: 0, runs_with_lost: 0, frame_bad: 0, leftovers: 0, outcomes: {} };
++    g.n++; g.lost_effects += x.state.lost_effects.length; g.runs_with_lost += x.state.lost_effects.length ? 1 : 0; g.frame_bad += x.state.frame_ok ? 0 : 1; g.leftovers += x.state.leftover_files.length;
++    const o = ['A', 'B'].filter((k2) => x[k2]).map((k2) => `${k2}:${x[k2].verdict}${x[k2].verdict !== 'applied' ? '(' + (x[k2].reason.match(/^[a-z-]+( attempts exhausted after \d+ of \d+)?/)?.[0] || x[k2].reason.slice(0, 30)) + ')' : ''}`).join(' ');
++    g.outcomes[o] = (g.outcomes[o] || 0) + 1;
++  }
++  fs.writeFileSync(join(out, 'fault_results.json'), JSON.stringify({ test: 'r4-fault-scenarios-v1', node: process.version, pins, reps: REPS, summary: groups, runs: results }, null, 1));
++  console.log(JSON.stringify(groups, null, 1));
++}
++
++if (arg('--child')) await child(); else await main();
+diff -ruN r3/tools/analyze.sh r4/tools/analyze.sh
+--- r3/tools/analyze.sh	2026-10-08 15:08:40.479142845 +0800
++++ r4/tools/analyze.sh	2026-10-08 15:08:40.483142845 +0800
+@@ -19,6 +19,8 @@
+ python3 analysis/logical_id_audit.py "$OUT/logical-id-audit" > "$OUT/logical-id-audit.log"
+ # r3: ATM PR #213 validation comparison (only when r3 cells exist)
+ if ls -d runs/r3[vmr]-* >/dev/null 2>&1; then python3 analysis/r3_compare.py --rescore "$OUT/oracle-rescore/rescore_cells.json" --out "$OUT/r3-compare" > "$OUT/r3-compare.log"; fi
++# r4: ATM PR #214 validation comparison (only when r4 cells exist)
++if ls -d runs/r4[vmr]-* >/dev/null 2>&1; then python3 analysis/r4_compare.py --rescore "$OUT/oracle-rescore/rescore_cells.json" --out "$OUT/r4-compare" > "$OUT/r4-compare.log"; fi
+ # r1 extractors (E3/E4) re-run in a sandbox copy that writes only under $OUT; output diffed against r1 compare_raw
+ mkdir -p "$OUT/r1-extractors"
+ for pair in "e3-sweep/extract_e3.py:e3_compare_raw.json" "e4-multiprocess/extract_e4.py:e4_compare_raw.json"; do

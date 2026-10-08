@@ -1,0 +1,7 @@
+cells=18 missing=[] main_zombie_zero=True main_receipt=True
+fault_naive p8 sync=naive lock=on correct 18.33 lost 0.67 zombie 4.33 receipt True rate 0.5185
+fault_nolock p8 sync=cas lock=off correct 18.67 lost 0.33 zombie 0 receipt True rate 0.5294
+main_steward_mp p2 sync=cas lock=on correct 21 lost 0.33 zombie 0 receipt True rate 0.5942
+main_steward_mp p4 sync=cas lock=on correct 20 lost 0 zombie 0 receipt True rate 0.5659
+main_steward_mp p8 sync=cas lock=on correct 18.67 lost 0 zombie 0 receipt True rate 0.5294
+sp_baseline p1 sync=cas lock=on correct 31.33 lost 0 zombie 0 receipt True rate 0.8889

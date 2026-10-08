@@ -1,0 +1,312 @@
+{
+ "F1-holder-sigkill | after-lock | 2118bc66": {
+  "n": 10,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "B:applied": 10
+  }
+ },
+ "F1-holder-sigkill | before-rename | 2118bc66": {
+  "n": 10,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 10,
+  "outcomes": {
+   "B:applied": 10
+  }
+ },
+ "F2-crafted-owner | pidreuse-live-pid-wrong-starttoken | 2118bc66": {
+  "n": 5,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "B:applied": 5
+  }
+ },
+ "F2-crafted-owner | live-pid-correct-starttoken | 2118bc66": {
+  "n": 5,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "B:blocked(recovery-required)": 5
+  }
+ },
+ "F2-crafted-owner | dead-pid | 2118bc66": {
+  "n": 5,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "B:applied": 5
+  }
+ },
+ "F2-crafted-owner | legacy-v1-live-pid | 2118bc66": {
+  "n": 5,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "B:blocked(recovery-required)": 5
+  }
+ },
+ "F3-live-holder-timeout | hold3500ms | 2118bc66": {
+  "n": 10,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:blocked(recovery-required)": 10
+  }
+ },
+ "F4-tmpdir | same-tmpdir/B-same-region | 2118bc66": {
+  "n": 10,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:blocked(steward-final-patch-required)": 10
+  }
+ },
+ "F4-tmpdir | same-tmpdir/B-other-region | 2118bc66": {
+  "n": 10,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:applied": 10
+  }
+ },
+ "F4-tmpdir | different-tmpdir/B-same-region | 2118bc66": {
+  "n": 10,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:blocked(steward-final-patch-required)": 10
+  }
+ },
+ "F4-tmpdir | different-tmpdir/B-other-region | 2118bc66": {
+  "n": 10,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:applied": 10
+  }
+ },
+ "F6-pid-namespace | holder-host/contender-pidns | 2118bc66": {
+  "n": 10,
+  "lost_effects": 10,
+  "runs_with_lost": 10,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:applied": 10
+  }
+ },
+ "F6-pid-namespace | holder-pidns/contender-host | 2118bc66": {
+  "n": 10,
+  "lost_effects": 10,
+  "runs_with_lost": 10,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:applied": 10
+  }
+ },
+ "F5-retry-exhaustion | default-policy/K=always | 2118bc66": {
+  "n": 5,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:blocked(re-compose attempts exhausted after 5 of 5)": 5
+  }
+ },
+ "F5-retry-exhaustion | default-policy/K=2 | 2118bc66": {
+  "n": 5,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied": 5
+  }
+ },
+ "F5-retry-exhaustion | default-policy/K=4 | 2118bc66": {
+  "n": 5,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied": 5
+  }
+ },
+ "F5-retry-exhaustion | maxRecompose=0/K=always | 2118bc66": {
+  "n": 5,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:blocked(re-compose attempts exhausted after 1 of 1)": 5
+  }
+ },
+ "F5-retry-exhaustion | maxRecompose=1,backoff0/K=1 | 2118bc66": {
+  "n": 5,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied": 5
+  }
+ },
+ "F1-holder-sigkill | after-lock | bea35380": {
+  "n": 10,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "B:applied": 10
+  }
+ },
+ "F1-holder-sigkill | before-rename | bea35380": {
+  "n": 10,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 10,
+  "outcomes": {
+   "B:applied": 10
+  }
+ },
+ "F2-crafted-owner | pidreuse-live-pid-wrong-starttoken | bea35380": {
+  "n": 5,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "B:blocked(recovery-required)": 5
+  }
+ },
+ "F2-crafted-owner | live-pid-correct-starttoken | bea35380": {
+  "n": 5,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "B:blocked(recovery-required)": 5
+  }
+ },
+ "F2-crafted-owner | dead-pid | bea35380": {
+  "n": 5,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "B:applied": 5
+  }
+ },
+ "F2-crafted-owner | legacy-v1-live-pid | bea35380": {
+  "n": 5,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "B:blocked(recovery-required)": 5
+  }
+ },
+ "F3-live-holder-timeout | hold3500ms | bea35380": {
+  "n": 10,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:blocked(recovery-required)": 10
+  }
+ },
+ "F4-tmpdir | same-tmpdir/B-same-region | bea35380": {
+  "n": 10,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:blocked(compose-context-mismatch)": 10
+  }
+ },
+ "F4-tmpdir | same-tmpdir/B-other-region | bea35380": {
+  "n": 10,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:blocked(compose-context-mismatch)": 10
+  }
+ },
+ "F4-tmpdir | different-tmpdir/B-same-region | bea35380": {
+  "n": 10,
+  "lost_effects": 10,
+  "runs_with_lost": 10,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:applied": 10
+  }
+ },
+ "F4-tmpdir | different-tmpdir/B-other-region | bea35380": {
+  "n": 10,
+  "lost_effects": 10,
+  "runs_with_lost": 10,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:applied": 10
+  }
+ },
+ "F6-pid-namespace | holder-host/contender-pidns | bea35380": {
+  "n": 10,
+  "lost_effects": 10,
+  "runs_with_lost": 10,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:applied": 10
+  }
+ },
+ "F6-pid-namespace | holder-pidns/contender-host | bea35380": {
+  "n": 10,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:blocked(recovery-required)": 10
+  }
+ }
+}

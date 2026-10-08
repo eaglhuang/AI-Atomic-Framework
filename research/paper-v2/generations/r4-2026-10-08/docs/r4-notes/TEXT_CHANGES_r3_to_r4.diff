@@ -1,0 +1,435 @@
+diff -ruN t3/EXPERIMENT_CHECKLIST.md t4/EXPERIMENT_CHECKLIST.md
+--- t3/EXPERIMENT_CHECKLIST.md	2026-10-08 15:08:41.455142845 +0800
++++ t4/EXPERIMENT_CHECKLIST.md	2026-10-08 15:08:41.459142845 +0800
+@@ -153,7 +153,16 @@
+ | r2 P0-2 | 2026-10-08 CST | `src/oracle_v2.mjs`；`test/oracle_v2_contract.mjs`；`analysis/rescore_oracle_v2.mjs` | 全 bytes＋frame＋structure；6 類契約全過；r1 raw 重評 0 改判 |
+ | r2 P0-3 | 2026-10-08 CST | `tools/{verify,analyze,rerun,seal}.sh`；`reproduce.sh` 改為分派 | verify 唯讀；analyze 從 raw 重建 E1–E4 333 cells 全欄相符；E3／E4 r1 extractor 重跑 IDENTICAL |
+ | r3 pin | 2026-10-08 CST | `runs/r3-validation/PINS.json`、`ATM_CORE_DIFF_5692474f..bea35380.patch` | ATM PR #213 merge bea35380 另行安裝；5692474f 不動 |
+-| r3 barrier | 2026-10-08 CST | `test/barrier_interleave.mjs`；`runs/r3-validation/barrier/` | 確定性 2-process 交錯：5692474f 40/40 lost；bea35380 0/40 |
+-| r3 E4 | 2026-10-08 CST | `runs/r3v-*`（225）、`runs/r3m-*`（45）、`runs/r3s-*`（30） | 5692474f：75 runs 8 失敗／12 lost；bea35380（harness 鎖 off）：0／0、損壞 0、18 re-compose；r1 18 cells：0 lost |
++| r3 barrier | 2026-10-08 CST | `test/barrier_interleave.mjs`；`runs/r3-validation/barrier/` | 確定性 2-process 交錯：5692474f 40 次中每次遺失 1 個效果（合計 40）；bea35380 0/40 |
++| r3 E4 | 2026-10-08 CST | `runs/r3v-*`（225）、`runs/r3m-*`（45）、`runs/r3s-*`（30） | 作者自行執行、未獨立重現。5692474f：75 次重播中 8 次 run 失敗，合計遺失 12 個效果，完成 1,519/2,610；bea35380（harness 鎖 off）：0/75 失敗、0 個遺失效果、完成 1,524/2,610（兩者約 58%，非全部成功、未證明不劣）；blocked 1,079／1,086（分列見 F2 表 A-r3）；18 re-compose 僅 3 次成功；損壞 0；r1 18 cells：0 個遺失效果 |
+ | r3 回歸 | 2026-10-08 CST | `runs/r3r-*`（180） | 單 process 15 組正確性計數相同；steward 延遲差在雜訊內；bare composer +1.8% mean |
++| r3 措辭修訂 | 2026-10-08 13:51 後 | 論文 §1.5、§4.11、§6 表 R3b／R4、§7.1、§7.3；`tables/F2_CORRECTNESS_TABLES.md` 表 A-r3／A-r4 | 依作者與外部審閱者協議改分列指標；CI 另列；未做項目明列；**未封存** |
++| r4 pin | 2026-10-08 CST | `runs/r4-validation/PINS.json`、`ATM_CORE_DIFF_bea35380..2118bc66.patch` | ATM PR #214 merge 2118bc66 另行安裝於 `/workspace/atm-main-2118bc66/`；5692474f／bea35380 不動；run 後三 pin core 樹 hash 不變 |
++| r4 E4 | 2026-10-08 14:37–14:58 CST | `runs/r4v-*`（450）、`runs/r4m-*`（63） | 作者自行執行、未獨立重現。2118bc66（harness 鎖 off）：0/75 runs 失敗、0 個遺失效果、完成 1,748/2,610（67.0%）、blocked 862（全為 `steward-final-patch-required`）；bea35380 1,553、0／0；5692474f 1,580、5/75 runs 失敗、合計遺失 6 個效果；損壞 0；分列見 F2 表 A-r4；非全部成功、未做顯著性／非劣性檢定 |
++| r4 消融 | 同上 | `runs/r4v-*-optr0-*`、`*-optr1-*` | 只有 (c) 可經 `recomposePolicy` 關閉：重試 0／1／4 完成 1,718／1,752／1,748；第 3–5 次嘗試未觸發。(a)(b)(d) 無法在不改程式碼下關閉 |
++| r4 barrier | 同上 | `test/barrier_interleave.mjs`；`runs/r4-validation/barrier/` | seam／stale-proposal／before-precheck 每案 20 次：5692474f seam 合計遺失 40；bea35380、2118bc66 0。before-precheck v1（leader 未等待）作廢保留為 superseded |
++| r4 故障 | 同上 | `test/r4_fault_scenarios.mjs`；`runs/r4-validation/faults/` | F1–F5：2118bc66 0 遺失（rename 前被殺留孤兒 temp 檔）；**F6 跨 PID namespace：2118bc66 兩方向各 10/10 遺失（反例）**；bea35380 F4 不同 TMPDIR 10/10 遺失 |
++| r4 回歸 | 同上 | `runs/r4r-*`（180） | 單 process 15 組正確性計數相同；steward total_ms mean +2.4%（hot_disjoint +4.1%、cold +3.4%，與雜訊同量級）；執行順序固定 |
++| r4 論文 | 2026-10-08 CST | 論文 §1.5、§4.11、§6 表 R4、§7.1、§7.3、參考文獻 [20][21]；F2 表 A-r4 | 完成與遺失分列；CI 另列；broker 佇列標為未實作；封存為 r4 generation |
++| Phase 3（450 runs） | **未做** | — | r4 之後仍未執行；先處理 F6 反例與 broker 佇列（論文 §7.3） |
+ 
+diff -ruN t3/METRIC_DEFINITIONS.md t4/METRIC_DEFINITIONS.md
+--- t3/METRIC_DEFINITIONS.md	2026-10-08 15:08:41.455142845 +0800
++++ t4/METRIC_DEFINITIONS.md	2026-10-08 15:08:41.459142845 +0800
+@@ -195,8 +195,26 @@
+ |---|---|---|
+ | re-compose 事件 | 一個 batch 的 ATM canonical commit guard 被抵達且 base 不符：觀察為 `atm_commit_attempts ≥ 2`（重合成後成功）或 `≥ 1` 且最終 `blocked`（重合成後仍未提交） | harness 觀察 seam（`src/steward-writer.mjs` `commitGuardObs`：計數 `mkdir <lockRoot>/<sha256>` 成功次數與 EEXIST 輪詢；不改變行為；5692474f 恆為 0） |
+ | 非完成（non-completion） | offered − correct − 失敗 ops；全部以 `blocked` 結束者依最終理由分類（`file-hash-drift`、`steward-final-patch-required`、未上鎖 stale 檢查、`re-compose→<重合成理由>`、`re-compose:`／`recovery-required:` 前綴）。**計入 goodput 分母（offered）、不計入 correct** | `analysis/r3_compare.py` |
++| 完成 intent（completed） | ATM 回 `applied` 且 oracle v2 判定其效果確實存在於最終 bytes 的 intent；報告為「完成／總 intents」，不得改稱「成功率」或「全部成功」 | oracle v2 |
++| 遺失效果（lost effect） | ATM 回 `applied`（已 ack）但 oracle v2 判定其效果不在最終 bytes 的 intent；以「合計 N 個遺失效果」計數，**不是**失敗次數（例：r3 old 臂「75 次重播中 8 次 run 失敗，合計遺失 12 個效果」） | oracle v2 |
++| blocked intent | 以 `blocked` 結束的 intent（含 re-compose 後仍未提交者）；與遺失效果分開報告，並依最終理由分列；恆等式：完成＋遺失效果＋blocked＝總 intents | ATM 公開結果＋harness 觀察 seam |
++| 失敗 runs／總 runs | 依下一列 failed run 定義計數之 run 數比；與遺失效果分開報告（一個失敗 run 可含多個遺失效果） | oracle v2 |
++| 非劣性措辭 | 完成數未下降僅可寫成「本次觀察中未下降」；未做預先設定界限的非劣性檢定前，不得寫「不劣於」或「已證明不劣」 | 2026-10-08 13:51 作者與外部審閱者協議 |
+ | failed run | 任一 op 的 v2 判定為失敗，或任一檔 frame／structure 違規、foreign write、多餘檔（例如殘留 `*.atm-tmp`） | oracle v2 artifact-only rescore |
+ | 損壞檔 | frame 或 structure 違規檔（含撕裂尾端） | oracle v2 |
+ | 延遲分位數 | 線性插值（numpy `linear`）；per-intent `total_ms`（submit→done）、`apply_ms`、per-run `wall_clock_ms`；mean±sd 不是 CI | `analysis/r3_compare.py` |
+ | `interleave_suspect` 語意變更 | 5692474f：收據 `beforeHash` 為寫前重讀值，≠合成前讀值＝有人插入。bea35380：收據 `beforeHash`＝合成 base，故此特徵在新 pin 只是提示（r3 fix 臂 4 次，皆無遺失）；正確性一律以 oracle v2 判定 | `src/steward-writer.mjs` |
+ 
++## 7. r4 新增口徑（2026-10-08 CST；ATM PR #214 驗證）
++
++| 名稱 | 定義 | 來源 |
++|---|---|---|
++| transactional 嘗試次數（`atm_tx_attempts`） | 一個 batch 進入 ATM transactional apply 迴圈的次數；以 ATM 轉送的 `commitHooks.beforePrecheck` 觀察（只計數、不改行為；bea35380／5692474f 不轉送，恆為 0） | `src/steward-writer.mjs` `txAttemptObs` |
++| 嘗試次數（attempts） | max(`atm_tx_attempts`, 提交鎖取得次數)。2118bc66 的早期 stale 不取鎖，只計鎖會低估，故取兩者最大值；「0 次」＝在計畫／合成階段即 blocked | `analysis/r4_compare.py` |
++| re-compose 事件（r4） | attempts ≥ 2，或 attempts ≥ 1 且最終 `blocked` 且理由為 re-compose 系列 | 同上 |
++| re-compose 成功 | re-compose 事件中最終 `applied` 者（attempts ≥ 2）；以 batch 計，另報 intents 數 | 同上 |
++| 重試用盡 | 理由以 `re-compose attempts exhausted after N of M` 開頭的 blocked；與 `recovery-required:` 分開列 | ATM 公開理由 |
++| blocked 細分（2118bc66） | `steward-final-patch-required` 依理由文字再分「同批次行號重疊」「區域錨定列已改」「同批同區域」；re-compose 之後者另列 | `analysis/r4_compare.py` |
++| 逐 run 配對 | 同 seed／配置／rep 的兩臂完成數比較，報「較高／相同／較低」對數與合計差；**描述性，不是顯著性檢定** | 同上 |
++| 反例（§5.7） | E4、barrier 或故障情境中任何遺失效果或損壞檔；不以完成率提升抵銷（r4：F6 跨 PID namespace） | 2026-10-08 協議 |
++
+diff -ruN t3/VERSION_ANCHORS.md t4/VERSION_ANCHORS.md
+--- t3/VERSION_ANCHORS.md	2026-10-08 15:08:41.459142845 +0800
++++ t4/VERSION_ANCHORS.md	2026-10-08 15:08:41.459142845 +0800
+@@ -193,3 +193,17 @@
+ | 樹完整性 | 兩 pin 解壓樹與各自 tarball 逐檔比對：bea35380 0 差異；5692474f 只多一個空目錄 `.atm-temp`（2026-10-07 22:42 由 ATM 執行時建立），無原始碼差異 |
+ | 角色 | bea35380＝r3 驗證 pin（**不是** final frozen artifact）；5692474f 結果與安裝保留不動 |
+ 
++## r4 更新（2026-10-08 CST）
++
++| 對象 | 內容 |
++|---|---|
++| PR #214 | 「fix(steward): rebase disjoint region edits after hash drift」；created 2026-10-08 14:16:59、merged 14:27:12 Asia/Taipei by cursor[bot]；merge `2118bc66efb3ac3bc0ddaede6a2f7cb18526b030`；feature `b5729456bc14d9bf4c8acfce7be320fec691fee2`；base main `8b3622b7`；11 files、+965／−36 |
++| CI（另列） | PR #214 CI：Product CI、ATM Dogfood、neutrality-scan、sandbox-gate green（feature 14:17–14:26、merge 14:27–14:39 Asia/Taipei）；只跑框架測試，不重跑論文實驗 |
++| r4 pin 安裝 | 與前兩 pin 相同機制：GitHub commit tarball（codeload）解壓至 `/workspace/atm-main-2118bc66/`，`node_modules` 為相同 5 個 symlink；以 `ATM_MONOREPO` 逐 run 選擇。無 clone／tag／publish；5692474f／bea35380 保留 |
++| tarball | 2118bc66：108,077,954 bytes，sha256 `aa959607c35c51b7fc3c4e3d81b3d9e979ee62f4d9361ef9e9f5ee72e78abd88`，內嵌 commit 相符（tarball 較大是因 repo 內含 `research/paper-v2/` r1–r3 generations） |
++| packages/core/src tree sha256 | 2118bc66 `a5492cff082327b08fb8736d9877fa084ce5748399430daab9dc6c455260f316`（435 檔）；bea35380、5692474f 同 r3 |
++| core 差異 | `broker/steward.ts`、`steward-transactional-apply.ts`、`steward-commit-guard.ts`、`steward-base-composer.ts`、`steward-input-validation.ts`（改）與 `steward-region-rebase.ts`（新）；完整 diff `runs/r4-validation/ATM_CORE_DIFF_bea35380..2118bc66.patch` |
++| 樹完整性 | r4 run 前後三 pin core 樹 hash 不變；2118bc66 解壓樹與 tarball 逐檔比對 0 差異 |
++| repo 內 paper-v2 | 2118bc66 的 `research/paper-v2/generations/r3-*/SHA256SUMS` 與本機 r3 封存一致（sha256 `7a8c0cb4…`）；其 `EVIDENCE_INDEX.md` 為 r4 提案的基底 |
++| 角色 | 2118bc66＝r4 驗證 pin（**不是** final frozen artifact） |
++
+diff -ruN t3/paper/ATM_PAPER_V2_DRAFT_zh.md t4/paper/ATM_PAPER_V2_DRAFT_zh.md
+--- t3/paper/ATM_PAPER_V2_DRAFT_zh.md	2026-10-08 15:08:41.455142845 +0800
++++ t4/paper/ATM_PAPER_V2_DRAFT_zh.md	2026-10-08 15:08:41.459142845 +0800
+@@ -5,7 +5,7 @@
+ positioning: "ATM v1（arXiv:2607.00041）的續篇；systems-implementation＋實證論文；三項貢獻 C1 受治理合成提交協定／C2 可檢驗保留性契約／C3 安全與進度成本實證。歷史缺口修復定位為『對 v1 承諾的端到端驗證』，不列為新演算法貢獻"
+ version_date: 2026-10-07
+ revision: "吸收可行性審閱（ATM_PAPER_V2_FEASIBILITY_REVIEW，2026-10-07）後之修訂稿；修訂前版本備份於 ATM_PAPER_V2_DRAFT_zh_pre_review.md；吸收對照見 ATM_PAPER_V2_REVIEW_ABSORB_NOTES.md"
+-version_anchors: "v1 framework v0.9.0-alpha.1（tag object 0b31aa86 ≠ peeled source commit a897f144）；歷史問題基準 v0.1.17 commit 8dd6a1c6；本次 main 快照 3b0f7660（審閱核對 2026-10-07 11:49 UTC＝19:49 Asia/Taipei）；PR #198 已於 2026-10-07 合併為 main 5692474f（r2 更新；candidate final pin，待審核，非 final）；最終 frozen commit 尚未定；r3 更新 2026-10-08：steward 跨 process 修正 PR #213 合併為 main bea35380（merge）／4d7c9ed6（feature），作為 r3 驗證 pin，5692474f 結果保留"
++version_anchors: "v1 framework v0.9.0-alpha.1（tag object 0b31aa86 ≠ peeled source commit a897f144）；歷史問題基準 v0.1.17 commit 8dd6a1c6；本次 main 快照 3b0f7660（審閱核對 2026-10-07 11:49 UTC＝19:49 Asia/Taipei）；PR #198 已於 2026-10-07 合併為 main 5692474f（r2 更新；candidate final pin，待審核，非 final）；最終 frozen commit 尚未定；r3 更新 2026-10-08：steward 跨 process 修正 PR #213 合併為 main bea35380（merge）／4d7c9ed6（feature），作為 r3 驗證 pin，5692474f 結果保留；r4 更新 2026-10-08：steward 完成率最佳化 PR #214 合併為 main 2118bc66（merge）／b5729456（feature），作為 r4 驗證 pin，5692474f、bea35380 結果保留"
+ harness: "atm-bench 0.3.0-latency（steward 臂與強基線臂待 M2/M3 接線）"
+ status: "草稿／非正式投稿（DRAFT — NOT FOR SUBMISSION）；主結果〔待 M2/M4〕；舊數字一律為作者報告值"
+ primary_axis: "同基底確定性合成＋受治理提交（Composer＋中立 steward）"
+@@ -87,6 +87,8 @@
+ - **動機（作者報告值）**：故障注入負面對照（stale／raw overwrite）與理想 sync 參考的對比（§2.3）。
+ - **歷史缺口（質性、可重跑）**：綁 v0.1.17 的五情境探針（§2.4）。
+ - **背景（作者報告值）**：冷熱分級准入成本、冷檔排隊成本、跨 process CAS／apply 互斥負面對照——降為附錄 A，除非它們直接回答 RQ1–RQ4。
++- **跨 process steward 修正驗證（r3，作者自行執行 483 runs，未獨立重現）**：PR #213（`bea35380`）後，E4 重播 75 runs 失敗 0／75、遺失效果 0（修正前 5692474f：失敗 8／75、合計遺失 12 個效果）；完成 1,524／2,610 對修正前 1,519／2,610，兩者約 58%，不可解讀為全部成功或已證明不劣；故障情境與 Phase 3 未做（§6 表 R3b）。完成率最佳化見 §4.11 與表 R4（r4）。
++- **steward 完成率最佳化驗證（r4，作者自行執行 693 runs＋barrier／故障情境，未獨立重現）**：PR #214（`2118bc66`）在 r3 同配置 E4 重播中失敗 0／75、遺失效果 0、損壞 0；完成 1,748／2,610（67.0%），同時段 bea35380 1,553／2,610（59.5%）、5692474f 1,580／2,610（60.5%；失敗 5／75、合計遺失 6 個效果）。完成數在此次觀察中較高，但仍約 33% 以 `blocked` 結束：不可寫成全部成功，亦未做顯著性或非劣性檢定。**反例**：持鎖者與競爭者位於不同 PID namespace（同一工作樹，模擬跨容器）時，2118bc66 會回收存活持鎖者的鎖並遺失已 ack 效果（兩個方向各 10／10）；依 §5.7 不得主張 (d) 支援跨容器。broker 序列化 apply 佇列未實作。Phase 3 450-run 未做（§4.11、§6 表 R4）。
+ - **主結果**：全部〔待 M2/M4〕。
+ 
+ ---
+@@ -116,6 +118,7 @@
+ | 本次 main 快照 | commit `3b0f7660`，狀態截至 2026-10-07 11:49 UTC（19:49 Asia/Taipei）〔審閱核對 2026-10-07〕 | 已含 FileHeat（PR #197）與 native hot parking（PR #199）；text steward 路徑與 v0.1.17 為同一 blob，**尚未**含 #198 修正 |
+ | 修正候選 | PR #198，head `65e8aab3`〔審閱核對 2026-10-07〕；**r2 更新：已於 2026-10-07 合併為 main `5692474f7db70ab52a7a71c8af4867609e7e4b43`**（本文 harness 實驗 pin；candidate final，待審核） | 有 immutable-base 合成與新檢查，但四項契約與本稿草案不同（§2.6）；**不是** final frozen artifact；E4 顯示其 steward apply 為單 process 假設（§6 表 R3） |
+ | steward 跨 process 修正（r3） | PR #213 merge `bea35380d7f381f998c9930fa95f01b999c7f208`（feature `4d7c9ed6287173f6f704e8d0a0d8a99683776bff`；base main `53e6fdb0`；merged 2026-10-08 10:38 Asia/Taipei）；未 tag、未 publish | r3 驗證 pin（§6 表 R3b）。harness 載入的 `packages/core` 相對 5692474f 只差 3 檔（`steward.ts`、`steward-transactional-apply.ts`、新增 `steward-commit-guard.ts`）；其餘差異在 cli／tests／docs，harness 不載入。仍**不是** final frozen artifact |
++| steward 完成率最佳化（r4） | PR #214 merge `2118bc66efb3ac3bc0ddaede6a2f7cb18526b030`（feature `b5729456bc14d9bf4c8acfce7be320fec691fee2`；base main `8b3622b7`；merged 2026-10-08 14:27 Asia/Taipei）；未 tag、未 publish | r4 驗證 pin（§4.11、§6 表 R4）。harness 載入的 `packages/core` 相對 bea35380 改 5 檔（`steward.ts`、`steward-transactional-apply.ts`、`steward-commit-guard.ts`、`steward-base-composer.ts`、`steward-input-validation.ts`）並新增 `steward-region-rebase.ts`；其餘差異（`research/`、docs、CHANGELOG、scripts、tests）harness 不載入。仍**不是** final frozen artifact |
+ | 既有與最終實驗 | 舊數字橫跨 Oct 6（core@0.1.2，HEAD `ed317820`）與 v0.1.17；final SHA 尚未定 | 舊數字一律標作者報告值；所有主比較須在同一最終 frozen commit 上重跑全部臂 |
+ 
+ 兩條版本號（v0.9.0-alpha.1 與 v0.1.x）的對應關係來源未提供〔待核對〕。
+@@ -408,6 +411,33 @@
+ 
+ ---
+ 
++### 4.11 Steward 完成率最佳化（ATM PR #214，merge `2118bc66`；r4 驗證；DRAFT，不主張勝出）
++
++**動機**：r3（§6 表 R3b）顯示 PR #213 後在 E4 設定下未再觀察到遺失效果，但完成率只有約 58%，blocked intents 1,086／2,610；其中 `file-hash-drift` 779、未上鎖早期 stale 檢查 70，re-compose 18 次只成功 3 次。作者要求下列四項全部納入論文 2.0，並以 r4 分開報告最佳化前後的完成與遺失（兩者不合併成單一指標，也不以完成率提升抵銷任何遺失）。
++
++**實作與狀態**（依 PR #214 與程式碼閱讀；完整 diff `runs/r4-validation/ATM_CORE_DIFF_bea35380..2118bc66.patch`）：
++
++| 項目 | 實際設計 | 狀態 | r4 能否單獨關閉 |
++|---|---|---|---|
++| (a) 區域重定 re-compose | 行號合成失敗（`compose-context-mismatch`）時，若每份提案帶區域身分（line anchor hint `L<line>:<region>`、symbol content anchor，或 patch 內唯一的 `</region:…>` 結尾標籤），就在目前檔案的該區域內以提案的舊列序列重新定位並套用。找不到區域→`compose-context-mismatch`；同批兩份提案同區域、或錨定列已被改→`steward-final-patch-required`（不寫入）。計畫階段的 `file-hash-drift` 對有區域身分的提案不再直接擋下，交給區域重定；**沒有**區域身分的提案仍以 `file-hash-drift` fail-closed。註：錨點是 region 標記＋列內容，**不是** CID；原規劃「CID／region」只實作了 region 部分 | 已實作 | 否：無設定開關；關閉需改 ATM 程式碼或改 harness 提案格式（後者會改變工作負載） |
++| (b) 未上鎖早期 stale 檢查改走 re-compose | 早期 stale 不再直接 `blocked`，改回 transactional `re-compose`，進入與鎖內 base 不符相同的重試迴圈 | 已實作 | 否：無開關；`maxRecomposeAttempts=0` 會讓它直接結束，但同時關掉 (c)，無法分離 |
++| (c) 有上限的重試＋退避 | `stewardCanonicalCommitPolicy`：`maxRecomposeAttempts` 4（共 5 次）、`recomposeBackoffMs` 4（第 k 次重試前等 4k ms）、`recomposeJitterMs` 3；用盡時公開理由為 `re-compose attempts exhausted after N of M: …` | 已實作 | 可：`applyStewardPlan` 的公開輸入 `recomposePolicy`（非 CLI 旗標） |
++| (d1) repo 範圍鎖位置 | 預設 `<repo>/.atm/runtime/steward-commit-locks/<sha256(realpath)>`；不同 TMPDIR 共用同一把鎖 | 已實作 | 否：`applyStewardPlan` 不轉送 `commitLockRoot`；以 pin 間對照代替（bea35380 為 `os.tmpdir()` 鎖） |
++| (d2) 過期持鎖者處理 | owner 檔 v2（pid、`/proc/<pid>/stat` start token、nonce）；pid 已死，或 pid 存活但 start token 不符，即回收；存活且吻合者超過 `lockWaitMs`（2,000 ms）→`recovery-required:` | 已實作；**跨 PID namespace 有反例**（見下） | 否 |
++| (d3) broker 序列化 apply 佇列 | — | **未實作（延後）**。PR 作者明言 broker 佇列仍只處理邏輯衝突；steward apply 不經 broker 序列化。本文不得暗示其存在 | — |
++
++**測試**：(1) ATM 自帶（PR #214 自述，本文未重跑）：同 region barrier、上下分離、hash drift 與早期 stale 皆重合成、torn write、持鎖者被殺、pid 重用、存活持鎖逾時、不同 TMPDIR 共鎖、重試用盡；本機 `npm test` 13／13。(2) 本文 harness（r4，作者自行執行，未獨立重現）：E4 重播 6 臂 × 75 runs（含消融）、r1 E4 cells、三種確定性 barrier 模式（seam／stale-proposal／before-precheck）、故障情境 F1–F6、單 process 回歸；結果見 §6 表 R4。
++
++**r4 結果摘要**（詳見表 R4；完成與遺失分開列）：
++
++- E4 重播主臂（2118bc66、harness 鎖 off）：完成 1,748／2,610（67.0%），失敗 runs 0／75，遺失效果 0，blocked 862，損壞檔 0。同時段 bea35380：1,553／2,610（59.5%）、0／75、0、1,057；5692474f：1,580／2,610（60.5%）、5／75 runs 失敗、合計遺失 6 個效果、1,024。
++- 完成數在此次觀察中較高（逐 run 配對 75 對：55 對較高、6 對相同、14 對較低；描述性，不是顯著性檢定），但仍約 33% 的 intents 以 `blocked` 結束，剩餘 blocked 全部是 `steward-final-patch-required`（同區域重疊或錨定列已改，fail-closed）。不可寫成全部成功，也未做顯著性或非劣性檢定。
++- 各項貢獻：`file-hash-drift` 785→0、未上鎖 stale 68→0（(a)(b) 生效）；re-compose 事件 91 次中 24 次成功（bea35380 16 次中 2 次）。(c) 的第 3–5 次嘗試與退避在 E4 中**從未觸發**（每 batch 最多 2 次嘗試）：maxRecompose 0／1（無退避）／4（預設）分別完成 1,718／1,752／1,748。
++- 故障情境：(d1) 不同 TMPDIR 共用鎖：2118bc66 0 遺失（bea35380 每次遺失 1 個效果，10／10）。**(d2) 反例**：持鎖者與競爭者位於不同 PID namespace（`unshare -Urpf --mount-proc`，同一工作樹與同一 tmp，模擬跨容器共用工作樹）時，2118bc66 兩個方向都把**存活**的持鎖者判為過期並回收，各 10／10 次遺失 1 個已 ack 效果；bea35380 在「持鎖者在 namespace 內」方向則以 `recovery-required` 安全擋下（0 遺失），新加的 start-token 檢查使這個方向變差。原因：存活判斷用的是呼叫者所在 namespace 的 `kill(pid, 0)` 與 `/proc/<pid>/stat`，另一 namespace 的 pid 在此不存在（ESRCH）或對到無關程序（start token 不同）。依 §5.7 這是反例：**不得**主張 (d) 支援跨容器或跨 PID namespace。
++- 另：持鎖者在「temp 已寫、rename 前」被 SIGKILL 時，目標目錄留下孤兒 `.<name>.<pid>.<rand>.atm-tmp`（兩個 pin 皆 10／10），下一個持有者不清理；canonical 檔未受損、無遺失。
++
++**驗收原則**（先於資料固定，維持）：任何一項最佳化在 r4 出現遺失效果或損壞檔，依 §5.7 記為反例，不以完成率提升抵銷。E4 重播與 barrier 中 0；故障情境 F6 不為 0（上述反例）。
++
+ ## 5. 評估方法（C3；計畫中）
+ 
+ 本節為預先登記的評估設計，**均未執行**。規模數字是建議值，正式 seed 數與 repetitions 由 pilot（M3）調整。
+@@ -574,34 +604,135 @@
+ 
+ 可主張：在 r1 E4 設定下，多 process steward **會**遺失已 ack 的效果（發生率低但非零；精確格 35 次重播中 2 次失敗）。不可主張：多 process 零遺失；緩解已被證明（75 次 0 失敗只是觀察，非證明）。緩解另有成本：平均 wall p2 572→609 ms、p8 687→907 ms〔作者報告值〕。正確修復需二選一並配契約測試：(a) 部署契約限定每個 canonical root 僅一個 steward 寫入者；(b) ATM 提供跨 process 原子 CAS／鎖，且收據 beforeHash≠合成 base 時 fail-closed。receipt completeness、registry 殘留與 cutpoint 矩陣仍〔待 M4〕。
+ 
+-**表 R3b　r3 更新（2026-10-08）：ATM PR #213（merge `bea35380`）修正後的驗證（DRAFT；上方 r1／r2 反例文字保留為歷史，不刪改；不主張勝出）**
++**表 R3b　r3 更新（2026-10-08；措辭依作者與外部審閱者協議修訂 2026-10-08 13:51）：ATM PR #213（merge `bea35380`）修正後的驗證（DRAFT；上方 r1／r2 反例文字保留為歷史，不刪改；不主張勝出）**
++
++**資料來源與獨立性**：r3 共 483 個 run（E4 重播 225、r1 E4 cells 重跑 45、單 process 回歸 180、單 process E4 雜訊補測 30、smoke 3）全部由**作者自行執行**（同一台機器，2026-10-08 10:45–10:55 Asia/Taipei），**尚未經獨立重現**。raw、腳本與 SHA256 見 evidence generation r3。
++
++**CI（另列，不是論文實驗）**：PR #213 head `4d7c9ed6` 的 4 個 GitHub Actions 檢查（ATM Dogfood、Product CI、neutrality-scan、sandbox-gate）與 merge `bea35380` 的 6 個 check runs 全部 success（2026-10-08 10:27–11:49 Asia/Taipei）；PR 自述本機 `npm test` 13 個 validator、0 失敗。CI 只跑框架自身測試，**不**重跑本文任何實驗，不能作為 E4／barrier 結果的佐證。
+ 
+ 修正內容（依 PR 與程式碼閱讀）：`applyTransactionalStewardPlan` 在鎖外合成與驗證；每個目標檔一把跨 process 鎖（`<os.tmpdir>/atm-steward-commit-locks/<sha256(realpath)>`，pid 檔記錄擁有者），鎖內只做「重讀＋與合成 base 比對 hash＋同目錄 temp 寫入＋rename」；base 不符回 `re-compose` 且不寫入；`applyStewardPlan` 內最多重合成一次，仍無法提交則公開結果為 `blocked`（公開 enum 仍為 `applied`｜`blocked`）。驗證全程 harness 側 `--steward-apply-lock` **關閉**（主比較：檢驗 ATM 本身），另以開啟作次要臂；兩個 ATM pin 並存、互不覆寫（`runs/r3-validation/PINS.json`）。
+ 
+-(1) 確定性 barrier 交錯測試（`test/barrier_interleave.mjs`，harness 層 node:fs 攔截，不改 ATM 原始碼）：兩個 process 對同一 base 合成後，都停在「unlocked 檢查之後、第一個 canonical 變更 syscall 之前」；leader 先完成提交，follower 才放行。每案 20 次。
++(1) 確定性 barrier 交錯測試（`test/barrier_interleave.mjs`，harness 層 node:fs 攔截，不改 ATM 原始碼）：兩個 process 對同一 base 合成後，都停在「unlocked 檢查之後、第一個 canonical 變更 syscall 之前」；leader 先完成提交，follower 才放行。每案 20 次，每次最多可能遺失 1 個效果（leader 的效果）。
+ 
+-| 案例 | ATM pin | window 命中 | lost 效果 | follower 結果 | 最終 bytes |
++| 案例 | ATM pin | window 命中 | 遺失效果（合計，20 次） | follower 結果 | 最終 bytes |
+ |---|---|---:|---:|---|---|
+-| 同 region | 5692474f | 20/20 | **20** | `applied`，覆寫 leader | 只剩 follower 的效果 |
++| 同 region | 5692474f | 20/20 | **20**（每次 1 個） | `applied`，覆寫 leader | 只剩 follower 的效果 |
+ | 同 region | bea35380 | 20/20 | 0 | 1 次 commit 嘗試→re-compose→重合成 `compose-context-mismatch`→`blocked` | 逐位元＝只含 leader 效果 |
+-| leader 改下方、follower 改上方 | 5692474f | 20/20 | **20** | `applied`，覆寫 leader | 只剩 follower 的效果 |
++| leader 改下方、follower 改上方 | 5692474f | 20/20 | **20**（每次 1 個） | `applied`，覆寫 leader | 只剩 follower 的效果 |
+ | leader 改下方、follower 改上方 | bea35380 | 20/20 | 0 | 2 次 commit 嘗試（re-compose 後成功）`applied` | 逐位元＝兩個效果皆在 |
+ 
+-(2) E4 重播（與 r2 鑑識同配置、同 seeds 與次數：每臂 75 runs，含 p2／s17 共 35 次；三臂逐 run 交錯執行，同時段同機器），以 oracle v2（全 bytes＋frame／structure）評分：
++(2) E4 重播（與 r2 鑑識同配置、同 seeds 與次數：每臂 75 runs，含 p2／s17 共 35 次；三臂逐 run 交錯執行，同時段同機器），以 oracle v2（全 bytes＋frame／structure）評分。下表各欄分開列，不合併成單一「成功率」：
+ 
+-| 臂 | ATM pin | harness steward 鎖 | failed runs | lost 效果 | 損壞檔 | correct／offered | re-compose 事件（batch） | wall ms mean／p95 |
+-|---|---|---|---:|---:|---:|---|---:|---|
+-| old（同時段對照） | 5692474f | off | 8 | 12 | 0 | 1519／2610 | — | 591.9／713.9 |
+-| **fix（主比較）** | bea35380 | off | **0** | **0** | **0** | 1524／2610 | 18（3 後續 applied；15 後續 blocked） | 594.8／717.8 |
+-| fixlock（次要） | bea35380 | on | 0 | 0 | 0 | 1592／2610 | 0 | 688.3／972.7 |
++| 臂 | ATM pin | harness steward 鎖 | 完成 intents／總 intents | 失敗 runs／總 runs | 遺失效果（合計） | blocked intents | 損壞檔 | re-compose 事件（batch） | wall ms mean／p95 |
++|---|---|---|---|---|---:|---:|---:|---:|---|
++| old（同時段對照） | 5692474f | off | 1,519／2,610（58.2%） | 8／75 | 12 | 1,079 | 0 | — | 591.9／713.9 |
++| **fix（主比較）** | bea35380 | off | **1,524／2,610（58.4%）** | **0／75** | **0** | 1,086 | 0 | 18 | 594.8／717.8 |
++| fixlock（次要） | bea35380 | on | 1,592／2,610（61.0%） | 0／75 | 0 | 1,018 | 0 | 0 | 688.3／972.7 |
++
++讀法：每臂「完成＋遺失＋blocked＝總 intents」（old：1,519＋12＋1,079＝2,610；fix：1,524＋0＋1,086＝2,610）。old 臂 75 次重播中有 8 次 run 失敗，合計遺失 12 個效果（不是 12 次失敗）；fix 臂為 0 次失敗、0 個遺失效果。完成數 old 1,519 對 fix 1,524：**在這次觀察中完成數沒有下降**，但兩者都只有約 58%，其餘約 42% 以 `blocked` 結束；因此**不可**寫成「全部成功」，也**不可**寫成「已在統計上證明不劣於（non-inferior）舊版」——本回合未做非劣性檢定或 CI。
++
++分組：p2／s17 35 次：old 2／35 runs 失敗、合計遺失 3 個效果、完成 752／1,190；fix 0／35、0、758／1,190。p8 格 15 次：old 4／15 runs 失敗、合計遺失 4 個效果、完成 274／530；fix 0／15、0、278／530。r1 E4 18 個完整 cells 於兩個 pin 重跑：old 只有 `fault_naive` p8 s23 一格遺失 1 個效果（1／18 cells 失敗）；fix 0／18、0 個遺失、損壞 0；fixlock（9 個主臂格）0／9。單 process E4 兩 pin 各 18 次：完成皆 592／636、遺失 0（每 seed 分布重疊，差異屬排程雜訊）。
++
++(3) blocked intents 依最終理由（分列；全部計為非完成，goodput 只計完成）：
++
++| 最終理由 | old（5692474f） | fix（bea35380） | fixlock |
++|---|---:|---:|---:|
++| `file-hash-drift`（提案 base 已過期） | 782 | 779 | 805 |
++| `steward-final-patch-required` | 229 | 218 | 213 |
++| 未上鎖的早期 stale 檢查（bea35380 仍直接回 `blocked`，**不**觸發 re-compose） | 66 | 70 | 0 |
++| re-compose 後重合成失敗（`compose-context-mismatch`） | — | 15 | 0 |
++| 其他 `compose-context-mismatch` | 2 | 4 | 0 |
++| **blocked 合計** | **1,079** | **1,086** | **1,018** |
+ 
+-其中 p2／s17 35 次：old 2 失敗／3 lost；fix 0／0；fixlock 0／0。p8 格：old 4／4；fix 0／0。r1 E4 18 個完整 cells 於兩個 pin 重跑：old 只有 `fault_naive` p8 s23 一格 lost=1；fix 18 格全部 lost=0、損壞=0；fixlock（9 個主臂格）0。單 process E4 兩 pin 各 18 次合計 correct 皆為 592／636、lost 0（每 seed 分布重疊，差異屬排程雜訊）。
+-
+-(3) 非完成照實計入：fix 臂 1086 個未完成 intent 全部是 `blocked`（goodput 只計 correct）。依最終原因：`file-hash-drift` 779、`steward-final-patch-required` 218、未上鎖的早期 stale 檢查 70（此路徑在 bea35380 仍回 `blocked`、**不**觸發重合成）、re-compose 後重合成失敗 15、其他 compose-context-mismatch 4；re-compose 後成功 3。公開理由以 `re-compose:`／`recovery-required:` 開頭者 0 次（harness 的 proposal 是行號／context 錨定的 patch，重合成多半以 context 不符結束，而非再次 base 不符）。鎖競爭輪詢合計 9 次，無 lock timeout。
++re-compose 另列：fix 臂 18 次 re-compose 事件中**只有 3 次**後續成功提交（這 3 個已計入上表「完成」），15 次後續仍 `blocked`（計入上表）。公開理由以 `re-compose:`／`recovery-required:` 開頭者 0 次（harness 的 proposal 是行號／context 錨定的 patch，重合成多半以 context 不符結束，而非再次 base 不符）。鎖競爭輪詢合計 9 次，無 lock timeout。
+ 
+ (4) 成本（照實陳述）：多 process 重播 fix 相對 old，wall mean +0.5%（591.9→594.8 ms）、p95 +3.9 ms；每 intent total_ms mean 93.9→95.0 ms、p95 210.7→220.0 ms。harness 鎖再疊加成本明顯：fixlock wall mean 688.3 ms、p8 平均 894.7 ms（fix 645.6 ms）。單 process 回歸（E2 子集：3 workloads × 5 arms × 3 seeds × 2 reps）：15 組正確性計數兩 pin **完全相同**；steward 臂每 intent total_ms mean +0.23 ms（+0.3%）、p50 +0.98 ms、p95 −6.55 ms，在同 pin rep 間雜訊（最大 7.7 ms）之內；bare composer（同用 `applyStewardPlan`）mean +2.95 ms（+1.8%）、p95 +9.5 ms、apply_ms mean +2.44 ms，三個 workload 方向一致（+1.4～2.5%）且超過其同 pin rep 間雜訊（約 0.3 ms），視為可量測成本；未改動程式路徑的 file lock／OCC／Git 三方 |Δmean| ≤ 0.4%，作雜訊下限。執行順序固定 old 先、fix 後，順序偏差未排除。
+ 
+-可主張：在 r2 的 E4 重播設定與確定性 barrier 交錯下，bea35380 未觀察到 lost 或損壞檔，且不依賴 harness 側鎖；barrier 測試把 5692474f 的 lost update 以確定性方式重現（20/20），bea35380 為 0/20。不可主張：多 process 零遺失已被證明（75 次觀察與兩種強制交錯不是證明）；修正提高完成率或吞吐（correct 1524 對 1519 在雜訊內）；re-compose 能可靠挽回 harness 的提案（18 次中 3 次）；任何勝出。依 §5.7，r2 撤回的 MP 正確性結論**不**自動恢復；r3 只補上「修正後在相同設定下未再觀察到」與一個可重跑的確定性反例測試。尚未驗證：pid 回收導致的 `recovery-required` 路徑（本實驗 0 次）、lock root 位於 `os.tmpdir()`（不同 tmp／容器／網路檔案系統下鎖不共享）、未 fsync（斷電耐久性與舊版相同）、非 ATM 外部寫入者不受此鎖約束、process 在鎖內被 kill 的恢復、harness re-propose 仍為 stub。另：新 pin 的收據 `beforeHash` 改為合成 base，harness 的 `interleave_suspect` 特徵在 fix 臂出現 4 次假陽性，oracle v2 確認均無遺失。
++(5) **明確未做**（不得在正文暗示已涵蓋）：
++- Phase 3 的 450-run 主矩陣：**未執行**（r3 的 483 個 run 是 PR #213 的驗證回合，不是主矩陣）。
++- 故障情境：lock timeout（等待超過 `lockWaitMs`）、持鎖 process 被 kill、跨容器／不同 tmp 目錄／網路檔案系統、`recovery-required` 路徑（含 pid 回收）——**全部未測**；r3 期間這些路徑觸發 0 次，不代表其行為正確。
++- 斷電耐久性（未 fsync，與舊版相同）、非 ATM 外部寫入者、harness re-propose（仍為 stub）：未處理。
++
++可主張：在 r2 的 E4 重播設定與確定性 barrier 交錯下，bea35380 未觀察到遺失效果或損壞檔，且不依賴 harness 側鎖；barrier 測試把 5692474f 的 lost update 以確定性方式重現（每案 20 次、每次遺失 1 個效果），bea35380 為 0。不可主張：多 process 零遺失已被證明（75 次觀察與兩種強制交錯不是證明）；修正提高或維持完成率已被統計證明（1,524 對 1,519 只是一次觀察，兩者約 58%）；re-compose 能可靠挽回提案（18 次中 3 次）；任何勝出。依 §5.7，r2 撤回的 MP 正確性結論**不**自動恢復；r3 只補上「修正後在相同設定下未再觀察到」與一個可重跑的確定性反例測試。另：新 pin 的收據 `beforeHash` 改為合成 base，harness 的 `interleave_suspect` 特徵在 fix 臂出現 4 次假陽性，oracle v2 確認均無遺失。完成率偏低的對策與其 r4 驗證見 §4.11 與表 R4。
++
++**表 R4　r4 更新（2026-10-08）：ATM PR #214（merge `2118bc66`）steward 完成率最佳化的驗證（DRAFT；上方 r1–r3 文字保留為歷史；不主張勝出）**
++
++**資料來源與獨立性**：r4 共 693 個 run（E4 重播 450＝6 臂 × 75、r1 E4 cells 63、單 process 回歸 180），另 barrier 240 次（seam 120、stale-proposal 80、before-precheck 40；另有 40 次 before-precheck v1 因 leader 未等待 follower 進入檢查點而作廢，保留於 raw 並標示 superseded）與故障情境 245 次（2118bc66 135、bea35380 110），全部由**作者自行執行**（同一台機器，2026-10-08 14:37–14:58 Asia/Taipei），**尚未經獨立重現**。三個 ATM pin 並存、唯讀，run 後核對 core 樹 hash 不變（`runs/r4-validation/PINS.json`）。PR #214 自述的 14-run 結果（287／488→325／488、0 lost）本文未重跑其確切 grid，只在 75-run 設定下觀察到同方向。
++
++**CI（另列，不是論文實驗）**：PR #214 feature `b5729456` 的 4 個 GitHub Actions 檢查（14:17–14:26）與 merge `2118bc66` 的 4 個檢查（Product CI、ATM Dogfood、neutrality-scan、sandbox-gate；14:27–14:39 Asia/Taipei）全部 success；PR 自述本機 `npm test` 13／13、`validate-broker-steward`／`validate-broker-cowrite` 通過。CI 只跑框架自身測試，**不**重跑本文任何實驗。
++
++(1) E4 重播（r3 同配置與 seeds：每臂 75 runs，含 p2／s17 共 35 次；所有臂逐 run 交錯、同時段同機器；oracle v2 評分）。各欄分開列，不合併成單一成功率：
++
++| 臂 | ATM pin | harness 鎖 | 完成 intents／總 intents | 失敗 runs／總 runs | 遺失效果（合計） | blocked intents | 損壞檔 | re-compose 事件／成功 | wall ms mean／p95 | 每 intent total_ms mean／p95 |
++|---|---|---|---|---|---:|---:|---:|---|---|---|
++| old（修正前對照） | 5692474f | off | 1,580／2,610（60.5%） | 5／75 | 6 | 1,024 | 0 | — | 594.7／718.7 | 93.2／210.2 |
++| fix（PR #213） | bea35380 | off | 1,553／2,610（59.5%） | 0／75 | 0 | 1,057 | 0 | 16／2 | 583.9／722.4 | 93.6／211.6 |
++| **opt（主；PR #214）** | 2118bc66 | off | **1,748／2,610（67.0%）** | **0／75** | **0** | 862 | 0 | 91／24 | 597.1／738.7 | 96.0／221.7 |
++| optlock（次要） | 2118bc66 | on | 1,841／2,610（70.5%） | 0／75 | 0 | 769 | 0 | 0／0 | 712.0／1,002.3 | 115.5／307.5 |
++
++讀法：每臂完成＋遺失＋blocked＝2,610（old：1,580＋6＋1,024）。old 臂 75 次重播中 5 次 run 失敗，合計遺失 6 個效果（r3 同配置為 8 次、12 個；同一反例的另一次觀察）；fix 與 opt 皆 0 次失敗、0 個遺失效果。完成數 opt 1,748 對 fix 1,553：**在這次觀察中較高**；逐 run 配對（同 seed／配置／rep）75 對中 55 對較高、6 對相同、14 對較低，每 run 平均 +2.6（描述性，**不是**顯著性檢定）。同一 fix 臂在 r3 為 1,524、r4 為 1,553，場次間差約 29 個 intents（約 1.1 個百分點），可作為雜訊量級參考。opt 仍約 33% 以 `blocked` 結束，**不可**寫成全部成功，也**不可**寫成已在統計上證明較佳或不劣。
++
++分組：p2／s17 35 次：old 3／35 runs 失敗、合計遺失 3 個效果、完成 771／1,190；fix 0／35、0、766／1,190；opt 0／35、0、794／1,190。p8 格 15 次：old 1／15、遺失 1、296／530；fix 0／15、0、293／530；opt 0／15、0、358／530。r1 E4 18 個 cells（不含 SP 共 15 個 MP cells）：old 2／15 cells 失敗（`fault_naive` p8、`fault_nolock` p8 各遺失 1 個效果），完成 309／530；fix 0／15、0、286／530；opt 0／15、0、372／530；optlock（9 格）0／9、0、223／318。單 process E4 三 pin 各 3 次皆 98／106、遺失 0。
++
++(2) blocked intents 依最終理由（分列；全部計為非完成）：
++
++| 最終理由 | old 5692474f | fix bea35380 | opt 2118bc66 | optlock |
++|---|---:|---:|---:|---:|
++| `file-hash-drift`（提案 base 已過期，計畫階段） | 742 | 785 | 0 | 0 |
++| 未上鎖早期 stale 檢查 | 62 | 68 | 0 | 0 |
++| re-compose 後重合成失敗（`compose-context-mismatch`） | — | 16 | 0 | 0 |
++| 其他 `compose-context-mismatch` | 5 | 7 | 0 | 0 |
++| `steward-final-patch-required`：同批次行號合成重疊 | 215 | 181 | 181 | 219 |
++| `steward-final-patch-required`：區域錨定列已被改（區域重定拒絕） | — | — | 479 | 474 |
++| 同上，發生於 re-compose 之後 | — | — | 81 | 0 |
++| `steward-final-patch-required`：同批兩份提案同區域（區域重定拒絕） | — | — | 121 | 76 |
++| `re-compose attempts exhausted`／`recovery-required:` | 0／0 | 0／0 | 0／0 | 0／0 |
++| **blocked 合計** | **1,024** | **1,057** | **862** | **769** |
++
++re-compose：opt 91 次事件中 24 次後續成功提交（26 個 intents，已計入完成），67 次後續仍 blocked（81 個 intents）；fix 16 次中 2 次成功。每 batch 嘗試次數分布（batches）：fix 0 次 720、1 次 1,457、2 次 2；opt 0 次 512、1 次 1,659、2 次 24（「0 次」＝在計畫／合成階段即 blocked，未進入 transactional apply）。**沒有任何 batch 用到第 3 次以上嘗試**。
++
++(3) 消融（同場次交錯；只有 (c) 可經公開輸入關閉）：
++
++| 臂 | 設定 | 完成／總 intents | 失敗 runs | 遺失效果 | blocked（其中重試用盡） | re-compose 事件／成功 | wall ms mean／p95 |
++|---|---|---|---:|---:|---|---|---|
++| opt | 2118bc66 預設（重試 4、退避 4 ms、jitter 3 ms） | 1,748（67.0%） | 0／75 | 0 | 862（0） | 91／24 | 597.1／738.7 |
++| optr1 | 重試 1、退避 0、jitter 0 | 1,752（67.1%） | 0／75 | 0 | 858（1） | 104／33 | 601.3／718.2 |
++| optr0 | 重試 0（(b) 的 re-compose 直接結束） | 1,718（65.8%） | 0／75 | 0 | 892（99） | 85／0 | 605.3／743.5 |
++| fix | bea35380（無 (a)–(d)） | 1,553（59.5%） | 0／75 | 0 | 1,057（—） | 16／2 | 583.9／722.4 |
++
++逐 run 配對（描述性）：optr0 對 opt 30 高／12 同／33 低（合計 −30）；optr1 對 opt 33／14／28（＋4）；optr0 對 fix 53／8／14（＋165）。解讀（只限此工作負載）：重試相對不重試約多 30 個完成，與場次間雜訊（約 29）同量級；多於 1 次的重試與退避未觀察到作用。fix→opt 的差距大部分在 optr0 已出現，推測主要來自 (a)＋(b)（含計畫階段的區域重定），但 (a)、(b) 無法分離，(d) 推測不影響完成率——均為推論，非量測。
++
++(4) 確定性 barrier（每案 20 次；harness 層 node:fs 攔截與 ATM 轉送的 `commitHooks.beforePrecheck` 測試接縫；不改 ATM 原始碼）：
++
++| 模式／案例 | 5692474f | bea35380 | 2118bc66 |
++|---|---|---|---|
++| seam（兩者停在第一個 canonical 變更 syscall 前；= r3）同 region | window 20／20；每次遺失 1 個效果（合計 20） | 0；follower re-compose 後 `compose-context-mismatch`→blocked；逐位元＝只含 leader | 0；follower re-compose 後 `steward-final-patch-required`（區域已改）→blocked；逐位元＝只含 leader |
++| seam，上下分離 | 合計遺失 20 | 0；re-compose 後 applied，兩效果皆在 | 0；re-compose 後 applied，兩效果皆在 |
++| stale-proposal（follower 提案建於 base B，leader 提交後才 apply；測 (a)）同 region | 未測 | 0；`file-hash-drift` blocked | 0；`steward-final-patch-required` blocked |
++| stale-proposal，上下分離 | 未測 | 0；`file-hash-drift` blocked（follower 效果未落地） | 0；applied，兩效果皆在（full bytes 20／20） |
++| before-precheck（follower 停在 ATM 合成後、未上鎖檢查前，leader 此時提交；測 (b)）同 region | 不可測（無此接縫） | 不可測（不轉送 hook） | 0；早期 stale→re-compose→`steward-final-patch-required` blocked（20／20） |
++| before-precheck，上下分離 | 不可測 | 不可測 | 0；re-compose 後 applied，兩效果皆在（20／20） |
++
++(5) 故障情境（harness 層；2118bc66 主、bea35380 對照；5692474f 無提交鎖，不適用）：
++
++| 情境 | 2118bc66 | bea35380 |
++|---|---|---|
++| F1 持鎖者取得鎖後即被 SIGKILL（10 次） | 下一個 process 回收鎖並 applied 10／10；0 遺失；無殘留 | 同左 |
++| F1 持鎖者在 temp 已寫、rename 前被 SIGKILL（10 次） | applied 10／10、0 遺失；**孤兒 temp 檔殘留 10／10** | 同左（殘留 10／10） |
++| F2 偽造 owner：pid 存活但 start token 不符（模擬 pid 重用；5 次） | 回收並 applied 5／5（約 89 ms） | 無法辨識，2,000 ms 後 `recovery-required` 5／5（安全但 blocked） |
++| F2 pid 存活且 start token 吻合／舊格式 v1 存活 pid（各 5 次） | `recovery-required` 5／5（約 2,090 ms）／同 | 同左 |
++| F2 pid 已死（5 次） | 回收並 applied 5／5 | 同左 |
++| F3 存活持鎖者持有 3,500 ms（> lockWaitMs 2,000；10 次） | 競爭者 `recovery-required`（2,085–2,096 ms）、不寫入；持鎖者 applied；0 遺失 | 同左 |
++| F4 兩 process 不同 TMPDIR、共用工作樹（各 10 次 × 同／異 region） | 共用 repo 鎖，未同時進入；同 region→`steward-final-patch-required`，異 region→兩者 applied；0 遺失 | **兩者皆進入各自的鎖，遺失 1 個效果 10／10（兩種 region 皆然）**；同 TMPDIR 時 0 |
++| F5 重試用盡（`beforePrecheck` 接縫每次在合成後寫入競爭變更；各 5 次） | 一直干擾→`re-compose attempts exhausted after 5 of 5`、不寫入（apply 137–143 ms，含約 40 ms 退避）；干擾 2／4 次→第 3／5 次 applied；maxRecompose 0→`after 1 of 1`；0 遺失 | 不可測（不轉送 hook） |
++| F6 不同 PID namespace（`unshare -Urpf --mount-proc`；同工作樹、同 tmp；各 10 次）：持鎖者在 host、競爭者在 namespace | **回收存活者的鎖，遺失 1 個效果 10／10** | **遺失 10／10** |
++| F6 持鎖者在 namespace、競爭者在 host | **回收存活者的鎖，遺失 1 個效果 10／10** | `recovery-required` 10／10，0 遺失 |
++
++(6) 成本：多 process 重播 opt 相對 fix，wall mean +2.3%（583.9→597.1 ms）、p95 +16.2 ms；每 intent total_ms mean +2.6%（93.6→96.0 ms）、p95 211.6→221.7 ms。harness 鎖再疊加：optlock wall mean 712.0 ms、p8 950.3 ms。單 process 回歸（E2 子集：3 workloads × 5 arms × 3 seeds × 2 reps；bea35380→2118bc66）：15 組正確性計數**完全相同**；steward 臂每 intent total_ms mean 79.1→81.0 ms（+2.4%；hot_conflict +0.6%、hot_disjoint +4.1%、cold +3.4%），同 pin rep 間雜訊最大約 5 ms，hot_disjoint／cold 的差（+3.2／+2.0 ms）與雜訊同量級；apply_ms mean hot_disjoint +2.04 ms（+4.8%）、cold +0.78 ms、hot_conflict −0.2 ms；bare composer 合計 +0.5%；未改動路徑的 file lock／OCC／Git 三方 |Δmean| ≤ 1.8%。執行順序固定 fix 先、opt 後，順序偏差未排除。
++
++(7) **明確未做**：Phase 3 450-run 主矩陣（**未執行**）；真實容器（只以 `unshare` 測 PID namespace；未測獨立 mount namespace、overlay／網路檔案系統、跨主機）；斷電耐久性（仍無 fsync）；非 ATM 外部寫入者；多檔提交中途被殺；broker 序列化 apply 佇列（未實作）；CID 錨定的 re-compose（未實作）；孤兒 temp 檔清理；獨立重現。
++
++可主張：在 r3 的 E4 重播設定（同 seeds）、三種確定性 barrier 模式與故障情境 F1–F5 下，2118bc66 未觀察到遺失效果或損壞檔；同時段完成數高於 bea35380 與 5692474f，剩餘 blocked 全為 fail-closed 的 `steward-final-patch-required`；不同 TMPDIR 共用鎖、存活持鎖逾時→`recovery-required`、重試用盡→`blocked` 已有可重跑的確定性測試。不可主張：完成率提升已被統計證明或可外推到其他工作負載（harness 提案恰好帶 `L<line>:<region>`，(a) 對無區域身分的提案不生效）；全部成功；多 process 零遺失已被證明；(c) 的多次重試與退避帶來可量測收益；(d) 支援跨容器或跨 PID namespace（F6 反例）；broker 序列化 apply 佇列存在；任何勝出。依 §5.7，r2 撤回的 MP 正確性結論**不**自動恢復；F6 另構成跨 PID namespace 部署下的新反例。
+ 
+ **預定圖表**：
+ 
+@@ -622,6 +753,8 @@
+ 
+ - **可主張（作者報告值、帶 caveat）**：在故障注入負面對照中，省略合成與提交協定時遺失率約 55–65%，與無協調 control 同量級；舊版所有「0 lost」綁理想 sync writer。
+ - **可描述但非結果**：v0.1.17 歷史基準的四類缺口（探針，質性、可重跑；artifact 待附）。
++- **r3 驗證的強度上限**（§6 表 R3b）：483 runs 全為作者自行執行、未獨立重現；PR #213 後 E4 重播失敗 0／75、遺失效果 0（修正前 8／75、合計遺失 12 個效果）只是觀察；完成 1,524／2,610 與修正前 1,519／2,610 皆約 58%，不是全部成功，也未做非劣性檢定。CI（框架測試）不重跑本文實驗。Phase 3 450-run 主矩陣與故障情境（lock timeout、持鎖者被 kill、跨容器、`recovery-required`）**未做**。
++- **r4 驗證的強度上限**（§4.11、§6 表 R4）：693 runs 與 barrier／故障情境全為作者自行執行、未獨立重現。2118bc66 在 E4 重播失敗 0／75、遺失效果 0，完成 1,748／2,610（67.0%）對同時段 bea35380 1,553／2,610：只是一次觀察，未做顯著性或非劣性檢定，且 harness 提案格式恰好帶區域身分，(a) 的效果不能外推到無區域身分的提案。故障情境 F6（不同 PID namespace）出現遺失（兩個方向各 10／10）：跨容器部署下 (d) 的過期持鎖者回收**不安全**。broker 序列化 apply 佇列未實作。Phase 3 450-run 主矩陣仍**未做**。
+ - **不可主張（待 M1–M4）**：全域無遺失更新、100% fail-closed、零越權寫入、合成的延遲成本、相對強基線的優劣；排列穩定等同可序列化；抽樣排列構成證明；角色字串構成 OS 隔離；多檔 rollback 等同 crash atomicity。
+ 
+ **設計限制**
+@@ -659,6 +792,7 @@
+ 
+ ### 7.3 未來工作（依影響排序）
+ 
++0. **（paper 2.0 必含，非延後項）** §4.11 steward 完成率最佳化：r4 驗證已完成（2026-10-08，表 R4；DRAFT）。仍待：跨 PID namespace／跨容器的持鎖者存活判斷（F6 反例；例如不以 pid 存活推斷過期、改用 lease 續約或 broker 序列化 apply）、broker 序列化 apply 佇列（(d3) 未實作）、孤兒 temp 檔清理、CID 錨定 re-compose、獨立重現；之後才是 Phase 3 450-run 主矩陣。
+ 1. 完成 M0–M1：選定契約、完成 §4.4 證明與 S1–S5 擴充測試；核定是否採 #198 契約。
+ 2. M2–M4：真接線、強基線臂、配對 pilot 與最小主結果。
+ 3. Batch closure 與重提協定的正式定義與成本量測（P1-2、P1-3），以及與 native hot parking（PR #199）的整合。
+@@ -809,8 +943,6 @@
+ [3] AI-Atomic-Framework 歷史基準 tag `v0.1.17`，commit `8dd6a1c6d169bf0421a55d3954a0a299b0bd582b`；issue #196。https://github.com/eaglhuang/AI-Atomic-Framework
+ [4] AI-Atomic-Framework main 快照 commit `3b0f7660b6673ba6c7570ee31fa776c0fac89bb5`（狀態截至 2026-10-07 11:49 UTC）〔審閱核對〕。
+ [5] AI-Atomic-Framework PR #198，head `65e8aab36f79c335d542151133e931f7dd71e7c0`：候選同基底 composer 與輸入檢查〔審閱核對〕；r2 更新：2026-10-07 合併為 `5692474f7db70ab52a7a71c8af4867609e7e4b43`（本文實驗 pin，唯讀）。
+-
+-[6] AI-Atomic-Framework PR #213「fix(steward): close concurrent lost updates on canonical commit」：merge `bea35380d7f381f998c9930fa95f01b999c7f208`、feature `4d7c9ed6287173f6f704e8d0a0d8a99683776bff`，2026-10-08 合併（r3 驗證 pin，唯讀；未 tag／publish）。
+ [6] AI-Atomic-Framework PR #197：FileHeat（已合併；預設 static，hybrid／learned opt-in）〔審閱核對〕。
+ [7] AI-Atomic-Framework PR #199：native hot parking（已合併；ticket 與 resume 流程）〔審閱核對〕。
+ [8] Git 官方文件：`git merge-file`（共同 base 三方合併、衝突與 exit status）。
+@@ -825,3 +957,5 @@
+ [17] GNU Diffutils manual: Unified Format（old hunk count 含 context 與刪除行）。
+ [18] SQLite: Atomic Commit in SQLite（方法參考，非 ATM 保證）。
+ [19] ATM v1 所引相鄰工作（CodeCRDT arXiv:2510.18893、EvoGit、AgentGit、CodeTeam、SEMAP、MPAC、CoAgent、S-Bus、ATCC、Atomix、Cordon、AgenticFlict 等）：完整書目沿用 v1 參考文獻表〔待補全文對照〕。
++[20] AI-Atomic-Framework PR #213「fix(steward): close concurrent lost updates on canonical commit」：merge `bea35380d7f381f998c9930fa95f01b999c7f208`、feature `4d7c9ed6287173f6f704e8d0a0d8a99683776bff`，2026-10-08 合併（r3 驗證 pin，唯讀；未 tag／publish）。
++[21] AI-Atomic-Framework PR #214「fix(steward): rebase disjoint region edits after hash drift」：merge `2118bc66efb3ac3bc0ddaede6a2f7cb18526b030`、feature `b5729456bc14d9bf4c8acfce7be320fec691fee2`，2026-10-08 14:27 Asia/Taipei 合併（r4 驗證 pin，唯讀；未 tag、未 publish）。https://github.com/eaglhuang/AI-Atomic-Framework/pull/214
+diff -ruN t3/tables/F2_CORRECTNESS_TABLES.md t4/tables/F2_CORRECTNESS_TABLES.md
+--- t3/tables/F2_CORRECTNESS_TABLES.md	2026-10-08 15:08:41.455142845 +0800
++++ t4/tables/F2_CORRECTNESS_TABLES.md	2026-10-08 15:08:41.459142845 +0800
+@@ -8,6 +8,8 @@
+ | 狀態 | **draft tables** — 彙自 E1–E5 DRAFT；非最終論文排版 |
+ | r2 更新 | 2026-10-08 CST：E4 反例成立（P0-1）；oracle v2 全 bytes＋frame 重評（P0-2）；E5 改報 logical ops |
+ | r3 更新 | 2026-10-08 CST：ATM PR #213（merge `bea35380`）steward 跨 process 修正之驗證；r1／r2 列保留為歷史 |
++| r3 措辭修訂 | 2026-10-08 13:51 後：依作者與外部審閱者協議改為分列指標（表 A-r3）；新增 r4 預留表（表 A-r4）；未封存新 generation |
++| r4 更新 | 2026-10-08 CST：ATM PR #214（merge `2118bc66`）steward 完成率最佳化之驗證；表 A-r4 填入；新增表 A 列；r1–r3 列保留為歷史 |
+ 
+ ## 表 A — RQ2 主臂正確性快照（選摘；DRAFT）
+ 
+@@ -21,15 +23,98 @@
+ | E4 | steward SP | hot_conflict | 94/106＝0.887 | 0 | 同 seeds 單 process 對照 |
+ | E4 r2 | 重播 r1 設定（p2/p4/p8） | hot_conflict | — | 6（75 runs 中 4 runs 失敗；另 1 撕裂檔） | 失敗 4/4 帶競態特徵 |
+ | E4 r2 | 候選緩解：steward 跨 process 鎖 | hot_conflict | — | 0（75 runs） | 觀察非證明；wall 成本 p8 687→907 ms |
+-| E4 r3 | 同時段對照：ATM 5692474f、harness 鎖 off | hot_conflict | 1519/2610＝0.582 | 12（75 runs 中 8 runs 失敗；損壞檔 0） | 重現 r1/r2 反例 |
+-| E4 r3 | **ATM bea35380（PR #213）、harness 鎖 off** | hot_conflict | 1524/2610＝0.584 | **0**（75 runs；損壞檔 0） | 觀察非證明；18 次 re-compose（3 後續 applied、15 後續 blocked，計入非完成）；wall mean 591.9→594.8 ms |
+-| E4 r3 | ATM bea35380＋harness 鎖 on（次要） | hot_conflict | 1592/2610＝0.610 | 0（75 runs） | wall mean 688.3 ms；p8 894.7 ms |
+-| E4 r3 | r1 18 cells 重跑：5692474f／bea35380 | 各臂 | — | 1（fault_naive p8 s23）／0 | 單 process 兩 pin correct 皆 592/636（各 18 次） |
+-| barrier r3 | 確定性 2-process 交錯（每案 20 次） | 同 region／上下分離 | — | 5692474f：20＋20；bea35380：0＋0 | bea35380 同 region→blocked（只留 leader）；上下分離→re-compose 後兩者皆在 |
++| E4 r3 | 同時段對照：ATM 5692474f、harness 鎖 off | hot_conflict | 1519/2610＝0.582 | 12 個遺失效果（合計；75 runs 中 8 runs 失敗；損壞檔 0） | 重現 r1/r2 反例；分列指標見表 A-r3 |
++| E4 r3 | **ATM bea35380（PR #213）、harness 鎖 off** | hot_conflict | 1524/2610＝0.584 | **0**（0/75 runs 失敗；損壞檔 0） | 觀察非證明；完成約 58%，非全部成功；見表 A-r3 |
++| E4 r3 | ATM bea35380＋harness 鎖 on（次要） | hot_conflict | 1592/2610＝0.610 | 0（0/75 runs 失敗） | wall mean 688.3 ms；p8 894.7 ms |
++| E4 r3 | r1 18 cells 重跑：5692474f／bea35380 | 各臂 | — | 1 個遺失效果（fault_naive p8 s23；1/18 cells）／0 | 單 process 兩 pin 完成皆 592/636（各 18 次） |
++| barrier r3 | 確定性 2-process 交錯（每案 20 次） | 同 region／上下分離 | — | 5692474f：每案 20 次、每次遺失 1 個效果（合計 20＋20）；bea35380：0＋0 | bea35380 同 region→blocked（只留 leader）；上下分離→re-compose 後兩者皆在 |
++| E4 r4 | 同時段對照：ATM 5692474f、harness 鎖 off | hot_conflict | 1580/2610＝0.605 | 6 個遺失效果（合計；75 runs 中 5 runs 失敗；損壞檔 0） | **反例重現**（同 r3 機制） |
++| E4 r4 | ATM bea35380（PR #213）、harness 鎖 off | hot_conflict | 1553/2610＝0.595 | 0（0/75 runs 失敗；損壞檔 0） | 同時段對照 |
++| E4 r4 | **ATM 2118bc66（PR #214）、harness 鎖 off** | hot_conflict | 1748/2610＝0.670 | **0**（0/75 runs 失敗；損壞檔 0） | 觀察非證明；作者自行執行、未獨立重現；約 33% 仍 blocked |
++| E4 r4 | ATM 2118bc66＋harness 鎖 on（次要） | hot_conflict | 1841/2610＝0.705 | 0（0/75 runs 失敗） | wall mean 712.0 ms；p8 950.3 ms |
++| E4 r4 | r1 18 cells 重跑：5692474f／bea35380／2118bc66 | 各臂 | MP 309／286／372 of 530 | 2 個遺失效果（fault_naive p8、fault_nolock p8；2/15 MP cells）／0／0 | 單 process 三 pin 皆 98/106 |
++| barrier r4 | 確定性 2-process 交錯（每案 20 次；seam／stale-proposal／before-precheck） | 同 region／上下分離 | — | 5692474f seam：合計 20＋20；bea35380：0；2118bc66：0 | 2118bc66 同 region→`steward-final-patch-required` blocked；上下分離→applied，兩者皆在（stale-proposal 時 bea35380 為 `file-hash-drift` blocked） |
++| 故障 r4 | F6 不同 PID namespace（`unshare`；同工作樹） | 跨 namespace 持鎖 | — | **2118bc66：每方向 10/10 runs 各遺失 1 個效果**；bea35380：host→ns 方向 10/10、反向 0 | **反例**（§5.7）：存活持鎖者被誤判過期 |
+ | E5 | clean_steward | hot_conflict | 41/41 | 0 | fault control（3 cells，41 logical ops） |
+ 
+ **E4 停止規則（r2）**：r1 主臂「CAS＋apply-lock on」標籤對 steward 路徑不成立（apply-lock 未包住 steward，spins=0）；r1 `fault_nolock` 消融對 steward 與主臂相同。E4 的 MP 正確性結論撤回，見 `runs/r2-e4-forensics/E4_FORENSICS.md`。**r3 註**：PR #213 後在同配置未再觀察到 lost／損壞（`runs/r3-analysis/r3-2026-10-08/r3-compare/R3_TABLES.md`）；依停止規則，撤回的 MP 結論不因 r3 自動恢復。比率為 ratio-of-sums（correct／offered），由 `analysis/rebuild_tables.py` 從 raw 重建。
+ 
++## 表 A-r3 — E4 r3 重播分列指標（每臂 75 runs、2,610 intents；oracle v2；DRAFT；措辭依 2026-10-08 13:51 協議）
++
++> 資料來源：作者自行執行的 483 個 r3 run（2026-10-08 10:45–10:55 Asia/Taipei），**未經獨立重現**。下表各欄分開列，不合併成單一成功率。
++
++| 臂 | ATM pin | 完成 intents／總 intents | 失敗 runs／總 runs | 遺失效果（合計） | blocked intents | 損壞檔 |
++|----|---------|--------------------------|--------------------|------------------|-----------------|--------|
++| old（同時段對照，harness 鎖 off） | 5692474f | 1,519／2,610（58.2%） | 8／75 | 12 | 1,079 | 0 |
++| **fix（主比較，harness 鎖 off）** | bea35380 | **1,524／2,610（58.4%）** | **0／75** | **0** | 1,086 | 0 |
++| fixlock（次要，harness 鎖 on） | bea35380 | 1,592／2,610（61.0%） | 0／75 | 0 | 1,018 | 0 |
++
++- 恆等式：完成＋遺失＋blocked＝總 intents（old 1,519＋12＋1,079；fix 1,524＋0＋1,086）。
++- 措辭：old 為「75 次重播中 8 次 run 失敗，合計遺失 12 個效果」（**不是**「12 次失敗」）；fix 為 0 次失敗、0 個遺失效果。
++- 完成數 old 1,519 對 fix 1,524：**本次觀察中完成數未下降**，但兩者皆約 58%；**不可**寫成全部成功，也**不可**寫成已在統計上證明不劣（未做非劣性檢定）。
++- 分組：p2／s17（35 runs）old 2/35 runs 失敗、合計遺失 3 個效果；fix 0/35、0。p8 格（15 runs）old 4/15、合計遺失 4 個效果；fix 0/15、0。
++
++**blocked intents 依最終理由（分列）**
++
++| 最終理由 | old 5692474f | fix bea35380 | fixlock |
++|----------|-------------:|-------------:|--------:|
++| `file-hash-drift` | 782 | 779 | 805 |
++| `steward-final-patch-required` | 229 | 218 | 213 |
++| 未上鎖早期 stale 檢查（bea35380 不觸發 re-compose） | 66 | 70 | 0 |
++| re-compose 後重合成失敗（`compose-context-mismatch`） | — | 15 | 0 |
++| 其他 `compose-context-mismatch` | 2 | 4 | 0 |
++| **合計** | **1,079** | **1,086** | **1,018** |
++
++- re-compose：fix 臂 18 次事件中**只有 3 次**後續成功提交（已計入完成），15 次後續 blocked（已計入上表）。
++
++**CI（另列；不是論文實驗）**：PR #213 head `4d7c9ed6` 4 個檢查與 merge `bea35380` 6 個 check runs（ATM Dogfood、Product CI、neutrality-scan、sandbox-gate）全部 success（2026-10-08 10:27–11:49 Asia/Taipei）；PR 自述本機 `npm test` 13 validators、0 失敗。CI 只跑框架測試，**不**重跑本文實驗。
++
++**明確未做**：Phase 3 450-run 主矩陣；故障情境 lock timeout、持鎖者被 kill、跨容器、`recovery-required`（r3 期間觸發 0 次，不代表行為正確）。
++
++## 表 A-r4 — steward 完成率最佳化前後（r4；每臂 75 runs、2,610 intents；oracle v2；DRAFT；不主張勝出）
++
++> 資料來源：作者自行執行的 r4 run（2026-10-08 14:37–14:58 Asia/Taipei），**未經獨立重現**。下表各欄分開列，不合併成單一成功率。最佳化 (a) region 錨定 re-compose（CID 錨定未實作）；(b) 未上鎖早期 stale 改走 re-compose；(c) 有上限重試＋退避（4 次、4 ms、jitter 3 ms）；(d) repo 範圍鎖位置＋過期持鎖者處理。**broker 序列化 apply 佇列未實作**（論文 §4.11）。
++
++| 臂 | ATM pin | 完成／總 intents | 失敗／總 runs | 遺失效果（合計） | 損壞檔 | blocked | re-compose 事件／成功 | wall ms mean／p95 |
++|----|---------|------------------|---------------|------------------|--------|---------|------------------------|-------------------|
++| old（harness 鎖 off） | 5692474f | 1,580／2,610（60.5%） | 5／75 | 6 | 0 | 1,024 | — | 594.7／718.7 |
++| fix（harness 鎖 off） | bea35380 | 1,553／2,610（59.5%） | 0／75 | 0 | 0 | 1,057 | 16／2 | 583.9／722.4 |
++| **opt（主，harness 鎖 off）** | 2118bc66 | **1,748／2,610（67.0%）** | **0／75** | **0** | 0 | 862 | 91／24 | 597.1／738.7 |
++| optlock（次要，harness 鎖 on） | 2118bc66 | 1,841／2,610（70.5%） | 0／75 | 0 | 0 | 769 | 0／0 | 712.0／1,002.3 |
++| optr1（消融：重試 1、無退避） | 2118bc66 | 1,752／2,610（67.1%） | 0／75 | 0 | 0 | 858 | 104／33 | 601.3／718.2 |
++| optr0（消融：重試 0） | 2118bc66 | 1,718／2,610（65.8%） | 0／75 | 0 | 0 | 892 | 85／0 | 605.3／743.5 |
++
++- 恆等式：完成＋遺失＋blocked＝總 intents（old 1,580＋6＋1,024）。
++- 措辭：old 為「75 次重播中 5 次 run 失敗，合計遺失 6 個效果」；opt 為 0 次失敗、0 個遺失效果。完成數 opt 1,748 對 fix 1,553：**本次觀察中較高**（逐 run 配對 55 高／6 同／14 低；描述性）；仍約 33% blocked，**不可**寫成全部成功，也**未**做顯著性或非劣性檢定。同一 fix 臂 r3→r4 為 1,524→1,553（場次間差約 29）。
++- 分組：p2／s17（35 runs）old 3/35 runs 失敗、合計遺失 3、完成 771/1,190；fix 0、0、766；opt 0、0、794。p8 格（15 runs）old 1/15、1、296/530；fix 0、0、293；opt 0、0、358。
++
++**blocked intents 依最終理由（分列）**
++
++| 最終理由 | old 5692474f | fix bea35380 | opt 2118bc66 | optlock |
++|----------|-------------:|-------------:|-------------:|--------:|
++| `file-hash-drift` | 742 | 785 | 0 | 0 |
++| 未上鎖早期 stale 檢查 | 62 | 68 | 0 | 0 |
++| re-compose 後 `compose-context-mismatch` | — | 16 | 0 | 0 |
++| 其他 `compose-context-mismatch` | 5 | 7 | 0 | 0 |
++| `steward-final-patch-required`：同批次行號重疊 | 215 | 181 | 181 | 219 |
++| `steward-final-patch-required`：區域錨定列已改 | — | — | 479 | 474 |
++| 同上，re-compose 之後 | — | — | 81 | 0 |
++| `steward-final-patch-required`：同批同區域 | — | — | 121 | 76 |
++| `re-compose attempts exhausted`／`recovery-required:` | 0／0 | 0／0 | 0／0 | 0／0 |
++| **合計** | **1,024** | **1,057** | **862** | **769** |
++
++- re-compose：opt 91 次事件中 24 次後續成功提交（26 個 intents），67 次後續 blocked（81 個 intents）；fix 16 次中 2 次成功。每 batch 嘗試次數：fix 0:720／1:1,457／2:2；opt 0:512／1:1,659／2:24；optr1 0:503／1:1,658／2:34。**第 3–5 次嘗試與退避在 E4 中未觸發**。optr0 有 99 個 intents 以 `re-compose attempts exhausted` 結束，optr1 1 個。
++
++**消融可行性**：(c) 可經 `applyStewardPlan` 公開輸入 `recomposePolicy` 關閉（optr0／optr1）；(a) 無開關（需改 ATM 程式碼或改提案格式）；(b) 無法與 (c) 分離；(d) `commitLockRoot` 不經 `applyStewardPlan` 轉送，以 pin 對照代替；broker 佇列未實作。
++
++**barrier（每案 20 次）**：seam：5692474f 每次遺失 1 個效果（合計 20＋20）；bea35380／2118bc66 0＋0（同 region blocked、上下分離 re-compose 後兩者皆在）。stale-proposal：bea35380 兩案皆 `file-hash-drift` blocked；2118bc66 同 region `steward-final-patch-required` blocked、上下分離 applied 兩者皆在（20/20）。before-precheck（只能在 2118bc66 測）：同 region blocked 20/20、上下分離 applied 20/20。
++
++**故障情境**：F1 持鎖者被 SIGKILL（取得鎖後／rename 前）：兩 pin 皆回收並 applied 10/10、0 遺失；rename 前被殺留孤兒 temp 檔 10/10。F2 pid 重用（start token 不符）：2118bc66 回收 applied；bea35380 `recovery-required`（安全）。F3 存活持鎖逾時：兩 pin `recovery-required`、0 遺失。F4 不同 TMPDIR：2118bc66 共鎖 0 遺失；**bea35380 每次遺失 1 個效果 10/10**。F5 重試用盡：2118bc66 `exhausted after 5 of 5`、不寫入；bea35380 不可測。**F6 不同 PID namespace：2118bc66 兩方向各 10/10 runs 遺失 1 個效果（反例）**；bea35380 host→ns 10/10 遺失、反向 `recovery-required`。
++
++**CI（另列；不是論文實驗）**：PR #214 CI：Product CI、ATM Dogfood、neutrality-scan、sandbox-gate 皆綠（feature `b5729456` 14:17–14:26、merge `2118bc66` 14:27–14:39 Asia/Taipei）；PR 自述 `npm test` 13/13。CI 只跑框架測試，**不**重跑本文實驗。
++
++**明確未做**：Phase 3 450-run 主矩陣；真實容器／網路檔案系統；fsync／斷電；外部寫入者；broker 序列化 apply 佇列；CID 錨定 re-compose；孤兒 temp 檔清理；獨立重現。
++
+ ## 表 B — Unsafe acceptance／false reject（口徑）
+ 
+ | 指標 | 定義 | 本包可用證據 |
