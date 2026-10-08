@@ -9,7 +9,8 @@ import { composeBrokerProposals } from '../../packages/core/src/broker/compose.t
 import {
   canonicalCommitLockPath,
   commitCanonicalFiles,
-  defaultStewardCommitLockRoot
+  defaultStewardCommitLockRoot,
+  holdCanonicalCommitLock
 } from '../../packages/core/src/broker/steward-commit-guard.ts';
 import { composeTextPatchesAgainstBase } from '../../packages/core/src/broker/steward-base-composer.ts';
 import { applyStewardPlan, planStewardApply } from '../../packages/core/src/broker/steward.ts';
@@ -143,6 +144,7 @@ function applyRegion(input: {
   readonly proposal: PatchProposal;
   readonly commitHooks?: { readonly beforePrecheck?: () => void; readonly afterPrecheck?: () => void };
   readonly maxRecomposeAttempts?: number;
+  readonly applyQueue?: boolean;
 }) {
   const mergePlan = composeBrokerProposals([input.proposal]).mergePlan;
   return applyStewardPlan({
@@ -156,6 +158,7 @@ function applyRegion(input: {
       recomposeBackoffMs: 0,
       recomposeJitterMs: 0
     },
+    applyQueue: input.applyQueue,
     commitHooks: input.commitHooks
   });
 }
@@ -320,6 +323,8 @@ function runRegionWorker(instruction: RegionInstruction): { readonly ok: boolean
     const apply = applyRegion({
       cwd: instruction.cwd,
       proposal,
+      // Both processes meet inside afterPrecheck. The apply queue would keep the follower out of that hook.
+      applyQueue: false,
       commitHooks: {
         afterPrecheck() {
           writeFileSync(path.join(instruction.barrierDir, `${instruction.role}.ready`), '1', 'utf8');
@@ -474,23 +479,27 @@ async function runKilledHolderAndPidReuse(): Promise<void> {
     const live = path.join(root, 'live.txt');
     writeFileSync(live, 'original\n', 'utf8');
     const liveDir = canonicalCommitLockPath(defaultStewardCommitLockRoot(root), live);
-    mkdirSync(liveDir, { recursive: true });
-    writeFileSync(path.join(liveDir, 'owner'), `${process.pid}\n`, 'utf8');
-    const timeout = commitCanonicalFiles({
-      cwd: root,
-      entries: [{
-        filePath: 'live.txt',
-        targetPath: live,
-        expectedBaseHash: hashContent('original\n'),
-        content: 'nope\n',
-        outputHash: hashContent('nope\n')
-      }],
-      lockWaitMs: 40,
-      lockPollMs: 5
-    });
-    assert.equal(timeout.status, 'recovery-required');
-    assert.match(timeout.reason, /recovery-required:/);
-    assert.equal(readFileSync(live, 'utf8'), 'original\n');
+    const releaseLive = holdCanonicalCommitLock(liveDir, 'live.txt');
+    try {
+      writeFileSync(path.join(liveDir, 'owner'), 'v2\n1\n0\nfake-nonce\n', 'utf8');
+      const timeout = commitCanonicalFiles({
+        cwd: root,
+        entries: [{
+          filePath: 'live.txt',
+          targetPath: live,
+          expectedBaseHash: hashContent('original\n'),
+          content: 'nope\n',
+          outputHash: hashContent('nope\n')
+        }],
+        lockWaitMs: 40,
+        lockPollMs: 5
+      });
+      assert.equal(timeout.status, 'recovery-required');
+      assert.match(timeout.reason, /recovery-required:/);
+      assert.equal(readFileSync(live, 'utf8'), 'original\n');
+    } finally {
+      releaseLive();
+    }
   } finally {
     rmSync(root, { recursive: true, force: true });
   }

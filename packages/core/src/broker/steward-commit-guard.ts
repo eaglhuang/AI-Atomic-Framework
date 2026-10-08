@@ -2,12 +2,13 @@
  * 跨行程的 canonical commit 守衛。
  * 合成與驗證留在鎖外；鎖只包住 base hash 比對與同目錄原子改名。
  * base 不符就回 re-compose，不寫入。暫存檔寫到一半不會改到正式檔。
+ * 鎖是核心層建議鎖，不看 pid。持有者留在其他 PID namespace 時也不會被當成已死。
  */
 import { createHash, randomBytes, randomInt } from 'node:crypto';
 import {
   closeSync,
-  mkdirSync,
   openSync,
+  readdirSync,
   readFileSync,
   realpathSync,
   renameSync,
@@ -18,6 +19,11 @@ import {
 } from 'node:fs';
 import path from 'node:path';
 import { hashContent } from './adapters/cas.ts';
+import {
+  acquireKernelAdvisoryLock,
+  releaseKernelAdvisoryLock,
+  StewardLockTimeoutError
+} from './steward-kernel-lock.ts';
 
 /**
  * Cross-process canonical commit policy.
@@ -31,7 +37,10 @@ export const stewardCanonicalCommitPolicy = {
   /** Extra compose attempts after the first. Each attempt ends applied, blocked, rolled-back, re-compose, or recovery-required. */
   maxRecomposeAttempts: 4,
   recomposeBackoffMs: 4,
-  recomposeJitterMs: 3
+  recomposeJitterMs: 3,
+  /** Per-target apply queue in front of the file lock. `off` leaves the file lock as the only serializer. */
+  applyQueue: 'on',
+  applyQueueWaitMs: 10_000
 } as const;
 
 /** attempt 從 1 起算。backoff 隨次數增加，jitter 含 0。 */
@@ -81,10 +90,12 @@ export function defaultStewardCommitLockRoot(cwd: string = process.cwd()): strin
   return path.join(path.resolve(cwd), '.atm', 'runtime', 'steward-commit-locks');
 }
 
+export function stewardCommitTargetKey(targetPath: string): string {
+  return createHash('sha256').update(realpathSync(targetPath)).digest('hex');
+}
+
 export function canonicalCommitLockPath(lockRoot: string, targetPath: string): string {
-  const physical = realpathSync(targetPath);
-  const key = createHash('sha256').update(physical).digest('hex');
-  return path.join(lockRoot, key);
+  return path.join(lockRoot, stewardCommitTargetKey(targetPath));
 }
 
 /**
@@ -100,7 +111,7 @@ export function commitCanonicalFiles(input: {
   readonly lockPollMs?: number;
   readonly failAfterWrites?: number;
   readonly commitFault?: StewardCommitFault;
-  /** 測試用。鎖已取得、改名之前呼叫。被殺掉時鎖目錄會留給下一個持有者回收。 */
+  /** 測試用。鎖已取得、改名之前呼叫。行程被殺掉時，核心層建議鎖會隨檔案描述子放開。 */
   readonly whileLocked?: () => void;
 }): CanonicalCommitResult {
   const lockRoot = input.lockRoot ?? defaultStewardCommitLockRoot(input.cwd);
@@ -114,9 +125,10 @@ export function commitCanonicalFiles(input: {
   try {
     for (const entry of entries) {
       const lockDir = canonicalCommitLockPath(lockRoot, entry.targetPath);
-      acquireLock(lockDir, lockWaitMs, lockPollMs, entry.filePath);
+      acquireKernelAdvisoryLock(lockDir, lockWaitMs, lockPollMs, entry.filePath);
       held.push(lockDir);
     }
+    for (const entry of entries) removeOrphanCanonicalTemps(entry.targetPath);
     for (const entry of entries) {
       const before = readFileSync(entry.targetPath, 'utf8');
       const observed = hashContent(before);
@@ -197,117 +209,56 @@ export function commitCanonicalFiles(input: {
       files
     };
   } finally {
-    for (const lockDir of [...held].reverse()) releaseLock(lockDir);
+    for (const lockDir of [...held].reverse()) releaseKernelAdvisoryLock(lockDir);
   }
 }
 
-class StewardLockTimeoutError extends Error {
-  readonly filePath: string;
-
-  constructor(filePath: string, holderPid: number | null, waitMs: number) {
-    const holder = holderPid === null ? 'an unknown holder' : `pid ${holderPid}`;
-    super(`recovery-required: canonical commit lock for ${filePath} stayed held for ${waitMs}ms by ${holder}. Retry the steward apply after that owner finishes; do not overwrite the file.`);
-    this.name = 'StewardLockTimeoutError';
-    this.filePath = filePath;
-  }
+/** 測試用。握住核心層建議鎖直到呼叫端放開。pid 檔不會讓這把鎖被別人搶走。 */
+export function holdCanonicalCommitLock(lockDir: string, filePath = 'canonical-target'): () => void {
+  acquireKernelAdvisoryLock(lockDir, stewardCanonicalCommitPolicy.lockWaitMs, stewardCanonicalCommitPolicy.lockPollMs, filePath);
+  return () => releaseKernelAdvisoryLock(lockDir);
 }
 
-interface LockOwner {
-  readonly pid: number | null;
-  readonly startToken: string | null;
-  readonly nonce: string | null;
-}
-
-const heldNonces = new Map<string, string>();
-
-function acquireLock(lockDir: string, waitMs: number, pollMs: number, filePath: string): void {
-  mkdirSync(path.dirname(lockDir), { recursive: true });
-  const deadline = Date.now() + waitMs;
-  while (true) {
-    try {
-      mkdirSync(lockDir);
-      const nonce = randomBytes(8).toString('hex');
-      const startToken = readProcessStartToken(process.pid) ?? '';
-      try {
-        writeFileSync(path.join(lockDir, 'owner'), `v2\n${process.pid}\n${startToken}\n${nonce}\n`, { encoding: 'utf8', flag: 'wx' });
-      } catch (error) {
-        rmSync(lockDir, { recursive: true, force: true });
-        throw error;
-      }
-      heldNonces.set(lockDir, nonce);
-      return;
-    } catch (error) {
-      if (!isErrno(error, 'EEXIST')) throw error;
-      if (holderIsDead(lockDir, waitMs)) {
-        rmSync(lockDir, { recursive: true, force: true });
-        continue;
-      }
-      if (Date.now() >= deadline) {
-        throw new StewardLockTimeoutError(filePath, readOwner(lockDir).pid, waitMs);
-      }
-      sleepMs(pollMs);
-    }
-  }
-}
-
-function releaseLock(lockDir: string): void {
-  const nonce = heldNonces.get(lockDir);
-  const owner = readOwner(lockDir);
-  if (!nonce || owner.nonce !== nonce || owner.pid !== process.pid) return;
-  heldNonces.delete(lockDir);
-  rmSync(lockDir, { recursive: true, force: true });
-}
-
-function holderIsDead(lockDir: string, staleIncompleteMs: number): boolean {
-  const owner = readOwner(lockDir);
-  if (owner.pid === null) {
-    try {
-      return Date.now() - statSync(lockDir).mtimeMs > staleIncompleteMs;
-    } catch {
-      return true;
-    }
-  }
-  if (!pidIsAlive(owner.pid)) return true;
-  if (!owner.startToken) return false;
-  const current = readProcessStartToken(owner.pid);
-  return Boolean(current) && current !== owner.startToken;
-}
-
-function pidIsAlive(pid: number): boolean {
+/**
+ * 只在自己拿到排他鎖時刪暫存檔。拿不到鎖代表寫入者還活著（含其他 PID namespace），一個都不刪。
+ */
+export function cleanupOrphanCanonicalTemps(input: {
+  readonly targetPath: string;
+  readonly cwd?: string;
+  readonly lockRoot?: string;
+}): { readonly removed: readonly string[]; readonly skippedLiveHolder: boolean } {
+  const lockRoot = input.lockRoot ?? defaultStewardCommitLockRoot(input.cwd);
+  const lockDir = canonicalCommitLockPath(lockRoot, input.targetPath);
   try {
-    process.kill(pid, 0);
-    return true;
+    acquireKernelAdvisoryLock(lockDir, 0, 1, input.targetPath);
   } catch (error) {
-    return !isErrno(error, 'ESRCH');
+    if (error instanceof StewardLockTimeoutError) return { removed: [], skippedLiveHolder: true };
+    throw error;
   }
-}
-
-function readOwner(lockDir: string): LockOwner {
   try {
-    const lines = readFileSync(path.join(lockDir, 'owner'), 'utf8').split('\n');
-    if (lines[0] === 'v2') {
-      return { pid: parsePid(lines[1] ?? ''), startToken: lines[2] || null, nonce: lines[3] || null };
-    }
-    return { pid: parsePid(lines[0] ?? ''), startToken: null, nonce: null };
-  } catch {
-    return { pid: null, startToken: null, nonce: null };
+    return { removed: removeOrphanCanonicalTemps(input.targetPath), skippedLiveHolder: false };
+  } finally {
+    releaseKernelAdvisoryLock(lockDir);
   }
 }
 
-function parsePid(value: string): number | null {
-  const pid = Number(value.trim());
-  return Number.isInteger(pid) && pid > 0 ? pid : null;
-}
-
-function readProcessStartToken(pid: number): string | null {
+function removeOrphanCanonicalTemps(targetPath: string): string[] {
+  const directory = path.dirname(targetPath);
+  const prefix = `.${path.basename(targetPath)}.`;
+  let names: string[] = [];
   try {
-    const stat = readFileSync(`/proc/${pid}/stat`, 'utf8');
-    const close = stat.lastIndexOf(')');
-    if (close < 0) return null;
-    return stat.slice(close + 1).trim().split(/\s+/)[19] ?? null;
+    names = readdirSync(directory);
   } catch {
-    return null;
+    return [];
   }
+  const removed: string[] = [];
+  for (const name of names) {
+    if (!name.startsWith(prefix) || !name.endsWith('.atm-tmp')) continue;
+    const full = path.join(directory, name);
+    rmSync(full, { force: true });
+    removed.push(full);
+  }
+  return removed;
 }
 
 function replaceFileAtomically(targetPath: string, content: string): void {
@@ -354,14 +305,6 @@ function temporarySibling(targetPath: string): string {
   );
 }
 
-function sleepMs(ms: number): void {
-  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
-}
-
 function errorText(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
-}
-
-function isErrno(error: unknown, code: string): boolean {
-  return Boolean(error && typeof error === 'object' && (error as { code?: unknown }).code === code);
 }

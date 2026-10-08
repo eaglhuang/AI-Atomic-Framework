@@ -371,6 +371,12 @@ try {
   });
   check(regionRecompose.status === 0, `region re-compose regression must pass:\n${regionRecompose.stdout}\n${regionRecompose.stderr}`);
 
+  const kernelLock = spawnSync(process.execPath, ['--strip-types', path.join(root, 'tests/core/steward-kernel-lock.test.ts')], {
+    cwd: root,
+    encoding: 'utf8'
+  });
+  check(kernelLock.status === 0, `kernel lock regression must pass:\n${kernelLock.stdout}\n${kernelLock.stderr}`);
+
   console.log(`[broker-steward:${mode}] ok`);
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });

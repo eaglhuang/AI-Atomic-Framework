@@ -75,17 +75,24 @@ patches, and incompatible anchors remain fail-closed; Broker does not guess a
 merge.
 
 Canonical commit is a compare-and-swap, not a check-then-write. Composition
-stays outside the lock. Under a per-file cross-process lock the steward
+stays outside the file lock. Under a per-file cross-process lock the steward
 re-reads the target and writes only when the bytes still match the compose
 base, by renaming a completed temporary sibling in the same directory. A
 mismatch does not write: the transactional receipt verdict is `re-compose`.
 The unlocked stale check uses that same verdict, so `applyStewardPlan` retries
 it instead of stopping. The lock directory is
 `<repo>/.atm/runtime/steward-commit-locks`, keyed by the real path of the
-target, so processes that do not share `TMPDIR` still share the lock. A dead
-holder, or a live pid whose process start token no longer matches the owner
-file, is replaced. A live holder that outlasts the wait returns
-`recovery-required` and does not write.
+target, so processes that do not share `TMPDIR` still share the lock. The lock
+itself is a kernel advisory lock (`BEGIN IMMEDIATE` on `lock.sqlite` in that
+directory). It is tied to the holder's open file, so it is released when the
+holder exits, including `SIGKILL`, and it is visible to a live holder in
+another PID namespace on the same filesystem. The `owner` file records pid and
+start time for diagnostics only. A waiter never deletes or replaces a lock
+because a pid looks dead. If the lock cannot be acquired before
+`lockWaitMs`, the result is `recovery-required` and the file is not written.
+While the lock is held, sibling `*.atm-tmp` files for that target are removed.
+A cleanup that cannot acquire the lock leaves those files alone, so a live
+writer's temp is not deleted.
 
 Re-compose locates a region-anchored proposal by its stable region id (the
 `L<line>:<region>` anchor, a symbol content anchor, or the patch's region
@@ -98,8 +105,29 @@ overwritten. Proposals without a region id still fail closed on
 (3). The attempt count includes the first try. The last attempt is terminal:
 `applied`, or public `blocked` with `re-compose attempts exhausted`,
 `recovery-required:`, or a composition block such as
-`steward-final-patch-required`. There is no new CLI flag. The broker queue
-remains the logical-conflict path; it is not a second commit mutex.
+`steward-final-patch-required`. There is no new CLI flag.
+
+`applyStewardPlan` also takes a per-target ticket on
+`<repo>/.atm/runtime/broker-steward-apply-queue` before composing, so
+contending applies run one at a time instead of all composing against the
+same base. That queue is not a substitute for the file lock: if the queue
+directory cannot be created, or the waiter cannot prove it is the head before
+`applyQueueWaitMs`, the apply continues with only the file lock. A queue head
+is removed as abandoned only when its kernel lock can be acquired. An
+undeterminable head is left in place until the wait expires, and the waiter
+then falls back to the file lock rather than stealing the turn.
+
+Ablation uses environment variables read by `applyStewardPlan`. An explicit
+argument overrides the variable. There is no switch that disables the file
+lock.
+
+| Variable | Default | Effect |
+| --- | --- | --- |
+| `ATM_STEWARD_APPLY_QUEUE` | `on` | `on` or `off`. `off` skips the apply queue. |
+| `ATM_STEWARD_APPLY_QUEUE_ROOT` | `<cwd>/.atm/runtime/broker-steward-apply-queue` | Directory for queue tickets. |
+| `ATM_STEWARD_APPLY_QUEUE_WAIT_MS` | `10000` | How long a waiter stays in line before falling back to the file lock. |
+| `ATM_STEWARD_COMMIT_LOCK_ROOT` | `<cwd>/.atm/runtime/steward-commit-locks` | Directory for the kernel file locks. Point processes at different directories to stop sharing the lock. |
+| `ATM_STEWARD_RECOMPOSE_POLICY` | policy defaults | JSON object with `maxRecomposeAttempts`, `recomposeBackoffMs`, and `recomposeJitterMs`. |
 
 ## Operator Flow
 
