@@ -276,14 +276,15 @@ export function applyTransactionalStewardPlan(input: {
   readonly baseHead?: string | null;
   readonly failAfterWrites?: number;
   /**
-   * Test observation seam. `afterPrecheck` runs after the unlocked stale check
-   * and temp materialization, and before the canonical commit. It is not a CLI
-   * option and must not be used to skip the commit guard.
+   * Test seam. `beforePrecheck` runs before the unlocked stale check.
+   * `afterPrecheck` runs after that check and temp materialization, before the
+   * commit lock. Neither seam skips the commit guard or is a CLI option.
    */
   readonly commitHooks?: {
+    readonly beforePrecheck?: () => void;
     readonly afterPrecheck?: () => void;
   };
-  /** Directory for the cross-process commit locks. Defaults to the OS temp dir. */
+  /** Directory for the cross-process commit locks. Defaults to `<cwd>/.atm/runtime/steward-commit-locks`. */
   readonly commitLockRoot?: string;
   readonly commitLockWaitMs?: number;
   readonly commitLockPollMs?: number;
@@ -295,6 +296,7 @@ export function applyTransactionalStewardPlan(input: {
   const scopeSet = new Set(input.scopeFiles.map(normalizePath));
   const fileSlices = [...input.plan.fileSlices].sort((left, right) => left.filePath.localeCompare(right.filePath));
   const blockedReasons: string[] = [];
+  const staleReasons: string[] = [];
 
   if (input.writerRole !== 'neutral-steward') {
     blockedReasons.push('canonical writes require the neutral-steward writer role');
@@ -306,6 +308,8 @@ export function applyTransactionalStewardPlan(input: {
   if (input.semanticValidation.ok !== true || input.semanticValidation.candidateDigest !== candidateDigest || input.semanticValidation.outputDigest !== candidateDigest) {
     blockedReasons.push('semantic validation receipt does not authorize the exact composed candidate digest');
   }
+
+  input.commitHooks?.beforePrecheck?.();
 
   for (const slice of fileSlices) {
     if (!scopeSet.has(normalizePath(slice.filePath))) {
@@ -329,8 +333,9 @@ export function applyTransactionalStewardPlan(input: {
       continue;
     }
     const before = readFileSync(targetPath, 'utf8');
-    if (hashContent(before) !== slice.baseHash) {
-      blockedReasons.push(`canonical target base hash is stale: ${slice.filePath}`);
+    const observed = hashContent(before);
+    if (observed !== slice.baseHash) {
+      staleReasons.push(`re-compose: canonical target base hash is stale: ${slice.filePath} (expected ${slice.baseHash}, observed ${observed}). Re-read the file and compose again against the current bytes.`);
     }
   }
 
@@ -343,6 +348,18 @@ export function applyTransactionalStewardPlan(input: {
         files: [],
         verdict: 'blocked',
         blockedReasons
+      })
+    };
+  }
+  if (staleReasons.length > 0) {
+    return {
+      ok: false,
+      receipt: buildReceipt(input, {
+        candidateDigest,
+        canonicalRoot: cwd,
+        files: [],
+        verdict: 're-compose',
+        blockedReasons: staleReasons
       })
     };
   }
@@ -394,7 +411,8 @@ export function applyTransactionalStewardPlan(input: {
       content: outputByPath.get(normalizePath(slice.filePath))!.content,
       outputHash: slice.outputHash
     })),
-    lockRoot: input.commitLockRoot ?? defaultStewardCommitLockRoot(),
+    cwd,
+    lockRoot: input.commitLockRoot ?? defaultStewardCommitLockRoot(cwd),
     lockWaitMs: input.commitLockWaitMs,
     lockPollMs: input.commitLockPollMs,
     failAfterWrites: input.failAfterWrites,

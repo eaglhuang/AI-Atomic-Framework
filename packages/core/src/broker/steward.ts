@@ -12,7 +12,7 @@ import {
   buildStewardSemanticValidationReceipt,
   type TransactionalStewardApplyResult
 } from './steward-transactional-apply.ts';
-import { stewardCanonicalCommitPolicy } from './steward-commit-guard.ts';
+import { stewardCanonicalCommitPolicy, waitStewardRecomposeBackoff } from './steward-commit-guard.ts';
 import type { VirtualAtomInUseRegistryDocument } from './registry.ts';
 import type { TeamBrokerRuntimeActivationHandshakeEvidence } from './team-lane.ts';
 import type {
@@ -164,6 +164,12 @@ export function planStewardApply(input: {
   };
   return { ok: plan.ok, plan };
 }
+export interface StewardRecomposePolicy {
+  readonly maxRecomposeAttempts?: number;
+  readonly recomposeBackoffMs?: number;
+  readonly recomposeJitterMs?: number;
+}
+
 export function applyStewardPlan(input: {
   readonly cwd: string;
   readonly stewardId: string;
@@ -171,17 +177,29 @@ export function applyStewardPlan(input: {
   readonly proposals: readonly PatchProposal[];
   readonly scopeFiles: readonly string[];
   readonly evidenceOutPath?: string | null;
+  /** Defaults to `stewardCanonicalCommitPolicy`. Not a CLI flag. */
+  readonly recomposePolicy?: StewardRecomposePolicy;
+  /** Forwarded to the transactional apply. Not a CLI flag. */
+  readonly commitHooks?: {
+    readonly beforePrecheck?: () => void;
+    readonly afterPrecheck?: () => void;
+  };
 }): StewardApplyResult {
   const planResult = planStewardApply(input);
   let transactional = planResult.ok
     ? buildPatchProposalComposition({ cwd: input.cwd, mergePlan: input.mergePlan, proposals: input.proposals })
     : null;
   let apply: TransactionalStewardApplyResult | null = null;
+  const attemptBudget = (input.recomposePolicy?.maxRecomposeAttempts ?? stewardCanonicalCommitPolicy.maxRecomposeAttempts) + 1;
+  const backoffMs = input.recomposePolicy?.recomposeBackoffMs ?? stewardCanonicalCommitPolicy.recomposeBackoffMs;
+  const jitterMs = input.recomposePolicy?.recomposeJitterMs ?? stewardCanonicalCommitPolicy.recomposeJitterMs;
+  let attemptsUsed = 0;
   if (planResult.ok && transactional && !transactional.blocked) {
     const baseHead = readGitHeadCommit(input.cwd);
-    const attempts = stewardCanonicalCommitPolicy.maxRecomposeAttempts + 1;
-    for (let attempt = 0; attempt < attempts; attempt += 1) {
+    for (let attempt = 0; attempt < attemptBudget; attempt += 1) {
+      attemptsUsed = attempt + 1;
       if (attempt > 0) {
+        waitStewardRecomposeBackoff(attempt, backoffMs, jitterMs);
         transactional = buildPatchProposalComposition({ cwd: input.cwd, mergePlan: input.mergePlan, proposals: input.proposals });
         if (transactional.blocked) break;
       }
@@ -197,7 +215,8 @@ export function applyStewardPlan(input: {
         outputFiles: transactional.outputFiles,
         scopeFiles: input.scopeFiles,
         semanticValidation,
-        baseHead
+        baseHead,
+        commitHooks: input.commitHooks
       });
       if (apply.ok || apply.receipt.verdict !== 're-compose') break;
     }
@@ -246,7 +265,7 @@ export function applyStewardPlan(input: {
     fileBeforeHashes,
     fileAfterHashes,
     verdict: apply.ok ? 'applied' : 'blocked',
-    blockedReasons: apply.ok ? undefined : apply.receipt.blockedReasons,
+    blockedReasons: apply.ok ? undefined : recomposeTerminalReasons(apply, attemptsUsed, attemptBudget),
     brokerOperationRun
   });
   if (input.evidenceOutPath) writeEvidenceFile(input.evidenceOutPath, evidence);
@@ -533,6 +552,14 @@ function hashText(value: string): string {
 }
 function stripShaPrefix(value: string): string {
   return value.replace(/^sha256:/, '');
+}
+function recomposeTerminalReasons(
+  apply: TransactionalStewardApplyResult,
+  attemptsUsed: number,
+  attemptBudget: number
+): readonly string[] {
+  if (apply.receipt.verdict !== 're-compose' || attemptsUsed < attemptBudget) return apply.receipt.blockedReasons;
+  return apply.receipt.blockedReasons.map((reason) => `re-compose attempts exhausted after ${attemptsUsed} of ${attemptBudget}: ${reason}`);
 }
 export function readGitHeadCommit(cwd: string): string | null {
   const result = spawnSync('git', ['-C', cwd, 'rev-parse', '--verify', 'HEAD'], { encoding: 'utf8' });

@@ -365,6 +365,12 @@ try {
   });
   check(concurrent.status === 0, `concurrent steward commit regression must pass:\n${concurrent.stdout}\n${concurrent.stderr}`);
 
+  const regionRecompose = spawnSync(process.execPath, ['--strip-types', path.join(root, 'tests/core/steward-region-recompose.test.ts')], {
+    cwd: root,
+    encoding: 'utf8'
+  });
+  check(regionRecompose.status === 0, `region re-compose regression must pass:\n${regionRecompose.stdout}\n${regionRecompose.stderr}`);
+
   console.log(`[broker-steward:${mode}] ok`);
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });

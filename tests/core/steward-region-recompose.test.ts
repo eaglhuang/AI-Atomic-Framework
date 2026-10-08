@@ -1,0 +1,574 @@
+import assert from 'node:assert/strict';
+import { spawn, spawnSync, type ChildProcess } from 'node:child_process';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { hashContent } from '../../packages/core/src/broker/adapters/cas.ts';
+import { composeBrokerProposals } from '../../packages/core/src/broker/compose.ts';
+import {
+  canonicalCommitLockPath,
+  commitCanonicalFiles,
+  defaultStewardCommitLockRoot
+} from '../../packages/core/src/broker/steward-commit-guard.ts';
+import { composeTextPatchesAgainstBase } from '../../packages/core/src/broker/steward-base-composer.ts';
+import { applyStewardPlan, planStewardApply } from '../../packages/core/src/broker/steward.ts';
+import type { PatchProposal } from '../../packages/core/src/broker/types.ts';
+const workerFlag = 'ATM_STEWARD_REGION_WORKER';
+const instructionEnv = 'ATM_STEWARD_REGION_INSTRUCTION';
+const RELATIVE = 'src/store.ts';
+const BASE = [
+  '// nonce:0',
+  '// <region:actions>',
+  'export const actions = [];',
+  '// </region:actions>',
+  '// <region:reducers>',
+  'export const reducers = [];',
+  '// </region:reducers>',
+  ''
+].join('\n');
+interface RegionInstruction {
+  readonly kind: 'region-apply';
+  readonly cwd: string;
+  readonly barrierDir: string;
+  readonly role: 'leader' | 'follower';
+  readonly region: string;
+  readonly marker: string;
+  readonly baseContent: string;
+  readonly baseCommit: string;
+}
+interface HoldInstruction {
+  readonly kind: 'lock-hold';
+  readonly cwd: string;
+  readonly relativePath: string;
+  readonly content: string;
+  readonly heldFlag: string;
+  readonly releaseFlag: string;
+}
+interface WaiterInstruction {
+  readonly kind: 'lock-wait';
+  readonly cwd: string;
+  readonly relativePath: string;
+  readonly baseContent: string;
+  readonly nextContent: string;
+}
+function sleepMs(ms: number): void {
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+}
+function waitFor(predicate: () => boolean, timeoutMs: number, label: string): void {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    if (predicate()) return;
+    sleepMs(5);
+  }
+  throw new Error(`timed out waiting for ${label}`);
+}
+function git(cwd: string, args: string[]): string {
+  const result = spawnSync('git', ['-C', cwd, ...args], {
+    encoding: 'utf8',
+    env: { ...process.env, GIT_AUTHOR_NAME: 'ATM', GIT_AUTHOR_EMAIL: 'atm@example.com', GIT_COMMITTER_NAME: 'ATM', GIT_COMMITTER_EMAIL: 'atm@example.com' }
+  });
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  return String(result.stdout ?? '').trim();
+}
+function initRepo(root: string, content: string): string {
+  mkdirSync(path.dirname(path.join(root, RELATIVE)), { recursive: true });
+  writeFileSync(path.join(root, RELATIVE), content, 'utf8');
+  git(root, ['init', '-q']);
+  git(root, ['add', '-A']);
+  git(root, ['commit', '-q', '-m', 'base']);
+  return git(root, ['rev-parse', 'HEAD']);
+}
+function logicalLines(content: string): string[] {
+  const lines = content.split('\n');
+  return content.endsWith('\n') && lines.at(-1) === '' ? lines.slice(0, -1) : lines;
+}
+function insertBeforeClose(content: string, region: string, marker: string): string {
+  const lines = logicalLines(content);
+  const close = `// </region:${region}>`;
+  const index = lines.findIndex((line) => line.includes(close));
+  assert.ok(index > 0, `missing region ${region}`);
+  lines.splice(index, 0, marker);
+  return `${lines.join('\n')}\n`;
+}
+function markerPatch(content: string, region: string, marker: string): { readonly patch: string; readonly closeLine: number } {
+  const lines = logicalLines(content);
+  const close = `// </region:${region}>`;
+  const closeIdx = lines.findIndex((line) => line.includes(close));
+  const contextStart = Math.max(0, closeIdx - 1);
+  const contextEnd = Math.min(lines.length, closeIdx + 2);
+  const before = lines.slice(contextStart, closeIdx).map((line) => ` ${line}`);
+  const removed = [`-${lines[closeIdx]}`];
+  const added = [`+${marker}`, `+${lines[closeIdx]}`];
+  const after = lines.slice(closeIdx + 1, contextEnd).map((line) => ` ${line}`);
+  const oldLength = contextEnd - contextStart;
+  const newLength = oldLength + 1;
+  const patch = [
+    `--- a/${RELATIVE}`,
+    `+++ b/${RELATIVE}`,
+    `@@ -${contextStart + 1},${oldLength} +${contextStart + 1},${newLength} @@`,
+    ...before, ...removed, ...added, ...after, ''
+  ].join('\n');
+  return { patch, closeLine: closeIdx + 1 };
+}
+function makeProposal(input: {
+  readonly proposalId: string;
+  readonly region: string;
+  readonly marker: string;
+  readonly content: string;
+  readonly baseCommit: string;
+  readonly hint?: string;
+}): PatchProposal {
+  const built = markerPatch(input.content, input.region, input.marker);
+  return {
+    schemaId: 'atm.patchProposal.v1',
+    specVersion: '0.1.0',
+    migration: { strategy: 'none', fromVersion: null, notes: 'region-rebase fixture' },
+    proposalId: input.proposalId,
+    taskId: 'TASK-REGION-REBASE',
+    actorId: 'region-actor',
+    baseCommit: input.baseCommit,
+    fileBeforeHash: hashContent(input.content),
+    targetFile: RELATIVE,
+    atomRefs: [{ atomId: `atom-${input.region}`, atomCid: `cid-${input.proposalId}` }],
+    anchors: [{ kind: 'line', hint: input.hint ?? `L${built.closeLine}:${input.region}` }],
+    intent: `insert ${input.marker} into ${input.region}`,
+    patch: input.hint ? '--- a/src/store.ts\n+++ b/src/store.ts\n@@ -1,1 +1,1 @@\n-// nonce:0\n+// nonce:1\n' : built.patch,
+    validators: [],
+    rollback: 'discard'
+  };
+}
+function applyRegion(input: {
+  readonly cwd: string;
+  readonly proposal: PatchProposal;
+  readonly commitHooks?: { readonly beforePrecheck?: () => void; readonly afterPrecheck?: () => void };
+  readonly maxRecomposeAttempts?: number;
+}) {
+  const mergePlan = composeBrokerProposals([input.proposal]).mergePlan;
+  return applyStewardPlan({
+    cwd: input.cwd,
+    stewardId: 'neutral-write-steward',
+    mergePlan,
+    proposals: [input.proposal],
+    scopeFiles: [RELATIVE],
+    recomposePolicy: {
+      maxRecomposeAttempts: input.maxRecomposeAttempts ?? 4,
+      recomposeBackoffMs: 0,
+      recomposeJitterMs: 0
+    },
+    commitHooks: input.commitHooks
+  });
+}
+function runUnitRebase(): void {
+  const shifted = insertBeforeClose(BASE, 'actions', '// LEADER_EFFECT');
+  const follower = makeProposal({
+    proposalId: 'follower',
+    region: 'reducers',
+    marker: '// FOLLOWER_EFFECT',
+    content: BASE,
+    baseCommit: 'ignored-by-composer'
+  });
+  const rebased = composeTextPatchesAgainstBase(RELATIVE, shifted, [follower]);
+  assert.equal(rebased.ok, true);
+  if (!rebased.ok) return;
+  const expected = insertBeforeClose(shifted, 'reducers', '// FOLLOWER_EFFECT');
+  assert.equal(rebased.content, expected);
+  assert.equal(rebased.content.includes('// LEADER_EFFECT'), true);
+  assert.equal(rebased.content.includes('// FOLLOWER_EFFECT'), true);
+  const overlapped = insertBeforeClose(BASE, 'reducers', '// LEADER_EFFECT');
+  const blocked = composeTextPatchesAgainstBase(RELATIVE, overlapped, [follower]);
+  assert.equal(blocked.ok, false);
+  if (blocked.ok) return;
+  assert.equal(blocked.block.code, 'steward-final-patch-required');
+}
+function runHashDriftRebase(): void {
+  const root = mkdtempSync(path.join(os.tmpdir(), 'atm-region-drift-'));
+  try {
+    const head = initRepo(root, BASE);
+    const shifted = insertBeforeClose(BASE, 'actions', '// LEADER_EFFECT');
+    writeFileSync(path.join(root, RELATIVE), shifted, 'utf8');
+    const proposal = makeProposal({
+      proposalId: 'drift-follower',
+      region: 'reducers',
+      marker: '// FOLLOWER_EFFECT',
+      content: BASE,
+      baseCommit: head
+    });
+    const plan = planStewardApply({
+      cwd: root,
+      stewardId: 'neutral-write-steward',
+      mergePlan: composeBrokerProposals([proposal]).mergePlan,
+      proposals: [proposal],
+      scopeFiles: [RELATIVE]
+    });
+    assert.equal(plan.plan.issues.some((issue) => issue.code === 'file-hash-drift'), false);
+    const apply = applyRegion({ cwd: root, proposal });
+    assert.equal(apply.ok, true, JSON.stringify(apply.evidence.blockedReasons));
+    assert.equal(readFileSync(path.join(root, RELATIVE), 'utf8'), insertBeforeClose(shifted, 'reducers', '// FOLLOWER_EFFECT'));
+    const plain = makeProposal({
+      proposalId: 'plain',
+      region: 'reducers',
+      marker: '// NO',
+      content: BASE,
+      baseCommit: head,
+      hint: 'line-1'
+    });
+    writeFileSync(path.join(root, RELATIVE), BASE, 'utf8');
+    const driftedPlain = planStewardApply({
+      cwd: root,
+      stewardId: 'neutral-write-steward',
+      mergePlan: composeBrokerProposals([plain]).mergePlan,
+      proposals: [{ ...plain, fileBeforeHash: hashContent('stale') }],
+      scopeFiles: [RELATIVE]
+    });
+    assert.equal(driftedPlain.plan.issues.some((issue) => issue.code === 'file-hash-drift'), true);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+}
+function runEarlyStaleRoutesToRecompose(): void {
+  const root = mkdtempSync(path.join(os.tmpdir(), 'atm-region-early-'));
+  try {
+    const head = initRepo(root, BASE);
+    const proposal = makeProposal({
+      proposalId: 'early',
+      region: 'reducers',
+      marker: '// FOLLOWER_EFFECT',
+      content: BASE,
+      baseCommit: head
+    });
+    let shifted = false;
+    const apply = applyRegion({
+      cwd: root,
+      proposal,
+      commitHooks: {
+        beforePrecheck() {
+          if (shifted) return;
+          shifted = true;
+          writeFileSync(path.join(root, RELATIVE), insertBeforeClose(BASE, 'actions', '// LEADER_EFFECT'), 'utf8');
+        }
+      }
+    });
+    assert.equal(apply.ok, true, JSON.stringify(apply.evidence.blockedReasons));
+    const landed = readFileSync(path.join(root, RELATIVE), 'utf8');
+    assert.equal(landed, insertBeforeClose(insertBeforeClose(BASE, 'actions', '// LEADER_EFFECT'), 'reducers', '// FOLLOWER_EFFECT'));
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+}
+function runRetryExhaustion(): void {
+  const root = mkdtempSync(path.join(os.tmpdir(), 'atm-region-retry-'));
+  try {
+    const head = initRepo(root, BASE);
+    const proposal = makeProposal({
+      proposalId: 'retry',
+      region: 'reducers',
+      marker: '// SHOULD_NOT_LAND',
+      content: BASE,
+      baseCommit: head
+    });
+    let tick = 0;
+    const apply = applyRegion({
+      cwd: root,
+      proposal,
+      maxRecomposeAttempts: 1,
+      commitHooks: {
+        afterPrecheck() {
+          tick += 1;
+          const next = BASE.replace('// nonce:0', `// nonce:${tick}`);
+          writeFileSync(path.join(root, RELATIVE), next, 'utf8');
+        }
+      }
+    });
+    assert.equal(apply.ok, false);
+    assert.equal(apply.evidence.verdict, 'blocked');
+    const reasons = (apply.evidence.blockedReasons ?? []).join('\n');
+    assert.match(reasons, /re-compose attempts exhausted after 2 of 2/);
+    const landed = readFileSync(path.join(root, RELATIVE), 'utf8');
+    assert.equal(landed.includes('SHOULD_NOT_LAND'), false);
+    assert.equal(landed, BASE.replace('// nonce:0', `// nonce:${tick}`));
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+}
+function spawnWorker(instructionPath: string, extraEnv: Record<string, string> = {}): Promise<{ readonly status: number | null; readonly stdout: string; readonly stderr: string }> {
+  const child = spawn(process.execPath, ['--strip-types', fileURLToPath(import.meta.url)], {
+    env: { ...process.env, ...extraEnv, [workerFlag]: '1', [instructionEnv]: instructionPath },
+    stdio: ['ignore', 'pipe', 'pipe']
+  });
+  return collect(child);
+}
+function collect(child: ChildProcess): Promise<{ readonly status: number | null; readonly stdout: string; readonly stderr: string }> {
+  let stdout = '';
+  let stderr = '';
+  child.stdout?.on('data', (chunk: Buffer) => { stdout += chunk.toString('utf8'); });
+  child.stderr?.on('data', (chunk: Buffer) => { stderr += chunk.toString('utf8'); });
+  return new Promise((resolve, reject) => {
+    child.on('error', reject);
+    child.on('close', (status) => resolve({ status, stdout, stderr }));
+  });
+}
+function runRegionWorker(instruction: RegionInstruction): { readonly ok: boolean; readonly reasons: readonly string[] } {
+  const proposal = makeProposal({
+    proposalId: instruction.role,
+    region: instruction.region,
+    marker: instruction.marker,
+    content: instruction.baseContent,
+    baseCommit: instruction.baseCommit
+  });
+  try {
+    const apply = applyRegion({
+      cwd: instruction.cwd,
+      proposal,
+      commitHooks: {
+        afterPrecheck() {
+          writeFileSync(path.join(instruction.barrierDir, `${instruction.role}.ready`), '1', 'utf8');
+          waitFor(
+            () => existsSync(path.join(instruction.barrierDir, 'leader.ready')) && existsSync(path.join(instruction.barrierDir, 'follower.ready')),
+            10_000,
+            'both region stewards'
+          );
+          if (instruction.role === 'follower') {
+            waitFor(() => existsSync(path.join(instruction.barrierDir, 'leader.done')), 10_000, 'leader commit');
+          }
+        }
+      }
+    });
+    return { ok: apply.ok, reasons: apply.evidence.blockedReasons ?? [] };
+  } finally {
+    if (instruction.role === 'leader') writeFileSync(path.join(instruction.barrierDir, 'leader.done'), '1', 'utf8');
+  }
+}
+async function runRegionPair(sameRegion: boolean): Promise<void> {
+  const root = mkdtempSync(path.join(os.tmpdir(), sameRegion ? 'atm-region-same-' : 'atm-region-disjoint-'));
+  try {
+    const head = initRepo(root, BASE);
+    const barrierDir = path.join(root, 'barrier');
+    mkdirSync(barrierDir, { recursive: true });
+    const leader: RegionInstruction = {
+      kind: 'region-apply',
+      cwd: root,
+      barrierDir,
+      role: 'leader',
+      region: sameRegion ? 'reducers' : 'actions',
+      marker: '// LEADER_EFFECT',
+      baseContent: BASE,
+      baseCommit: head
+    };
+    const follower: RegionInstruction = {
+      ...leader,
+      role: 'follower',
+      region: 'reducers',
+      marker: '// FOLLOWER_EFFECT'
+    };
+    const leaderPath = path.join(barrierDir, 'leader.json');
+    const followerPath = path.join(barrierDir, 'follower.json');
+    writeFileSync(leaderPath, JSON.stringify(leader), 'utf8');
+    writeFileSync(followerPath, JSON.stringify(follower), 'utf8');
+    const [leaderSpawn, followerSpawn] = await Promise.all([spawnWorker(leaderPath), spawnWorker(followerPath)]);
+    const leaderResult = JSON.parse(readFileSync(path.join(barrierDir, 'leader.result.json'), 'utf8')) as { ok: boolean; reasons: string[] };
+    const followerResult = JSON.parse(readFileSync(path.join(barrierDir, 'follower.result.json'), 'utf8')) as { ok: boolean; reasons: string[] };
+    assert.equal(leaderSpawn.status, 0, leaderSpawn.stderr);
+    assert.equal(followerSpawn.status, 0, followerSpawn.stderr);
+    const landed = readFileSync(path.join(root, RELATIVE), 'utf8');
+    assert.equal(leaderResult.ok, true, JSON.stringify(leaderResult.reasons));
+    if (sameRegion) {
+      assert.equal(followerResult.ok, false);
+      assert.match(followerResult.reasons.join('\n'), /steward-final-patch-required|re-compose/);
+      assert.equal(landed, insertBeforeClose(BASE, 'reducers', '// LEADER_EFFECT'));
+      assert.equal(landed.includes('// FOLLOWER_EFFECT'), false);
+    } else {
+      assert.equal(followerResult.ok, true, JSON.stringify(followerResult.reasons));
+      const expected = insertBeforeClose(insertBeforeClose(BASE, 'actions', '// LEADER_EFFECT'), 'reducers', '// FOLLOWER_EFFECT');
+      assert.equal(landed, expected);
+      assert.equal(Buffer.byteLength(landed), Buffer.byteLength(expected));
+    }
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+}
+function runLockHolder(instruction: HoldInstruction): void {
+  const targetPath = path.join(instruction.cwd, instruction.relativePath);
+  commitCanonicalFiles({
+    cwd: instruction.cwd,
+    entries: [{
+      filePath: instruction.relativePath,
+      targetPath,
+      expectedBaseHash: hashContent(instruction.content),
+      content: `${instruction.content}// HELD\n`,
+      outputHash: hashContent(`${instruction.content}// HELD\n`)
+    }],
+    whileLocked() {
+      writeFileSync(instruction.heldFlag, '1', 'utf8');
+      waitFor(() => existsSync(instruction.releaseFlag), 10_000, 'release');
+    }
+  });
+}
+function runLockWaiter(instruction: WaiterInstruction): { readonly status: string; readonly reason: string; readonly finishedAt: number } {
+  const targetPath = path.join(instruction.cwd, instruction.relativePath);
+  writeFileSync(path.join(instruction.cwd, 'waiter.started'), '1', 'utf8');
+  const committed = commitCanonicalFiles({
+    cwd: instruction.cwd,
+    entries: [{
+      filePath: instruction.relativePath,
+      targetPath,
+      expectedBaseHash: hashContent(instruction.baseContent),
+      content: instruction.nextContent,
+      outputHash: hashContent(instruction.nextContent)
+    }]
+  });
+  return { status: committed.status, reason: committed.reason, finishedAt: Date.now() };
+}
+async function runKilledHolderAndPidReuse(): Promise<void> {
+  const root = mkdtempSync(path.join(os.tmpdir(), 'atm-region-lock-'));
+  try {
+    const relativePath = 'src/store.ts';
+    const targetPath = path.join(root, relativePath);
+    mkdirSync(path.dirname(targetPath), { recursive: true });
+    writeFileSync(targetPath, BASE, 'utf8');
+    const heldFlag = path.join(root, 'held');
+    const releaseFlag = path.join(root, 'release');
+    const holdPath = path.join(root, 'hold.json');
+    writeFileSync(holdPath, JSON.stringify({
+      kind: 'lock-hold', cwd: root, relativePath, content: BASE, heldFlag, releaseFlag
+    } satisfies HoldInstruction), 'utf8');
+    const holder = spawn(process.execPath, ['--strip-types', fileURLToPath(import.meta.url)], {
+      env: { ...process.env, [workerFlag]: '1', [instructionEnv]: holdPath, TMPDIR: path.join(root, 'tmp-a') },
+      stdio: ['ignore', 'pipe', 'pipe']
+    });
+    mkdirSync(path.join(root, 'tmp-a'), { recursive: true });
+    waitFor(() => existsSync(heldFlag), 10_000, 'lock held');
+    holder.kill('SIGKILL');
+    await collect(holder);
+    const recovered = commitCanonicalFiles({
+      cwd: root,
+      entries: [{
+        filePath: relativePath,
+        targetPath,
+        expectedBaseHash: hashContent(BASE),
+        content: insertBeforeClose(BASE, 'reducers', '// RECOVERED'),
+        outputHash: hashContent(insertBeforeClose(BASE, 'reducers', '// RECOVERED'))
+      }]
+    });
+    assert.equal(recovered.status, 'applied', recovered.reason);
+    assert.equal(readFileSync(targetPath, 'utf8'), insertBeforeClose(BASE, 'reducers', '// RECOVERED'));
+    assert.equal(readFileSync(targetPath, 'utf8').includes('// HELD'), false);
+    const reused = path.join(root, 'reused.txt');
+    writeFileSync(reused, 'original\n', 'utf8');
+    const lockDir = canonicalCommitLockPath(defaultStewardCommitLockRoot(root), reused);
+    mkdirSync(lockDir, { recursive: true });
+    writeFileSync(path.join(lockDir, 'owner'), `v2\n${process.pid}\n0\nfake-nonce\n`, 'utf8');
+    const stolen = commitCanonicalFiles({
+      cwd: root,
+      entries: [{
+        filePath: 'reused.txt',
+        targetPath: reused,
+        expectedBaseHash: hashContent('original\n'),
+        content: 'replaced\n',
+        outputHash: hashContent('replaced\n')
+      }],
+      lockWaitMs: 200
+    });
+    assert.equal(stolen.status, 'applied', stolen.reason);
+    assert.equal(readFileSync(reused, 'utf8'), 'replaced\n');
+    const live = path.join(root, 'live.txt');
+    writeFileSync(live, 'original\n', 'utf8');
+    const liveDir = canonicalCommitLockPath(defaultStewardCommitLockRoot(root), live);
+    mkdirSync(liveDir, { recursive: true });
+    writeFileSync(path.join(liveDir, 'owner'), `${process.pid}\n`, 'utf8');
+    const timeout = commitCanonicalFiles({
+      cwd: root,
+      entries: [{
+        filePath: 'live.txt',
+        targetPath: live,
+        expectedBaseHash: hashContent('original\n'),
+        content: 'nope\n',
+        outputHash: hashContent('nope\n')
+      }],
+      lockWaitMs: 40,
+      lockPollMs: 5
+    });
+    assert.equal(timeout.status, 'recovery-required');
+    assert.match(timeout.reason, /recovery-required:/);
+    assert.equal(readFileSync(live, 'utf8'), 'original\n');
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+}
+async function runDistinctTmpDirsShareRepoLock(): Promise<void> {
+  const root = mkdtempSync(path.join(os.tmpdir(), 'atm-region-tmpdir-'));
+  const tmpA = path.join(root, 'tmp-a');
+  const tmpB = path.join(root, 'tmp-b');
+  try {
+    mkdirSync(tmpA, { recursive: true });
+    mkdirSync(tmpB, { recursive: true });
+    const relativePath = 'src/store.ts';
+    const targetPath = path.join(root, relativePath);
+    mkdirSync(path.dirname(targetPath), { recursive: true });
+    writeFileSync(targetPath, BASE, 'utf8');
+    const heldFlag = path.join(root, 'held');
+    const releaseFlag = path.join(root, 'release');
+    const holdPath = path.join(root, 'hold.json');
+    const waitPath = path.join(root, 'wait.json');
+    writeFileSync(holdPath, JSON.stringify({
+      kind: 'lock-hold', cwd: root, relativePath, content: BASE, heldFlag, releaseFlag
+    } satisfies HoldInstruction), 'utf8');
+    const nextContent = insertBeforeClose(BASE, 'actions', '// WAITER');
+    writeFileSync(waitPath, JSON.stringify({
+      kind: 'lock-wait', cwd: root, relativePath, baseContent: BASE, nextContent
+    } satisfies WaiterInstruction), 'utf8');
+    const holder = spawnWorker(holdPath, { TMPDIR: tmpA });
+    waitFor(() => existsSync(heldFlag), 10_000, 'shared lock held');
+    const waiter = spawnWorker(waitPath, { TMPDIR: tmpB });
+    waitFor(() => existsSync(path.join(root, 'waiter.started')), 10_000, 'waiter entered commit');
+    sleepMs(200);
+    const releaseAt = Date.now();
+    writeFileSync(releaseFlag, '1', 'utf8');
+    const [holderSpawn, waiterSpawn] = await Promise.all([holder, waiter]);
+    assert.equal(holderSpawn.status, 0, holderSpawn.stderr);
+    assert.equal(waiterSpawn.status, 0, waiterSpawn.stderr);
+    const waiterResult = JSON.parse(readFileSync(path.join(root, 'wait.result.json'), 'utf8')) as { status: string; reason: string; finishedAt: number };
+    assert.equal(waiterResult.status, 're-compose', waiterResult.reason);
+    assert.ok(waiterResult.finishedAt >= releaseAt - 30, 'waiter finished before the repo lock was released');
+    const heldContent = `${BASE}// HELD\n`;
+    assert.equal(readFileSync(targetPath, 'utf8'), heldContent);
+    assert.equal(readFileSync(targetPath, 'utf8').includes('// WAITER'), false);
+    const lockRoot = defaultStewardCommitLockRoot(root);
+    assert.equal(lockRoot.startsWith(path.join(root, '.atm', 'runtime', 'steward-commit-locks')), true);
+    assert.equal(existsSync(lockRoot) || existsSync(path.dirname(lockRoot)), true);
+    assert.equal(existsSync(path.join(tmpA, 'atm-steward-commit-locks')), false);
+    assert.equal(existsSync(path.join(tmpB, 'atm-steward-commit-locks')), false);
+    assert.equal(canonicalCommitLockPath(lockRoot, targetPath).startsWith(lockRoot), true);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+}
+async function main(): Promise<void> {
+  if (process.env[workerFlag] === '1') {
+    const instructionPath = process.env[instructionEnv];
+    if (!instructionPath) throw new Error('missing instruction');
+    const instruction = JSON.parse(readFileSync(instructionPath, 'utf8')) as RegionInstruction | HoldInstruction | WaiterInstruction;
+    if (instruction.kind === 'region-apply') {
+      const result = runRegionWorker(instruction);
+      writeFileSync(path.join(instruction.barrierDir, `${instruction.role}.result.json`), JSON.stringify(result), 'utf8');
+      return;
+    }
+    if (instruction.kind === 'lock-hold') {
+      runLockHolder(instruction);
+      return;
+    }
+    const result = runLockWaiter(instruction);
+    writeFileSync(path.join(instruction.cwd, 'wait.result.json'), JSON.stringify(result), 'utf8');
+    return;
+  }
+  runUnitRebase();
+  runHashDriftRebase();
+  runEarlyStaleRoutesToRecompose();
+  runRetryExhaustion();
+  await runRegionPair(true);
+  await runRegionPair(false);
+  await runKilledHolderAndPidReuse();
+  await runDistinctTmpDirsShareRepoLock();
+  console.log('[steward-region-recompose] ok');
+}
+await main();
