@@ -7,7 +7,8 @@
  */
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { DatabaseSync } from 'node:sqlite';
+import type { DatabaseSync } from 'node:sqlite';
+import { loadDatabaseSync } from './sqlite-runtime.ts';
 
 const SQLITE_BUSY = 5;
 
@@ -93,7 +94,7 @@ export function kernelAdvisoryLockIsFree(dbPath: string): boolean | null {
 }
 
 function openLockDatabase(dbPath: string): DatabaseSync {
-  const db = new DatabaseSync(dbPath, { timeout: 0 });
+  const db = new (loadDatabaseSync())(dbPath, { timeout: 0 });
   db.exec('PRAGMA busy_timeout = 0');
   // 這把鎖只靠核心層的檔案鎖。SQLite 檔本身不必耐久，關掉 fsync 以免每次取得都刷盤。
   db.exec('PRAGMA synchronous = OFF');
