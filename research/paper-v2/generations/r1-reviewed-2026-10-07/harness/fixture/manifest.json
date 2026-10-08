@@ -1,0 +1,18 @@
+{
+  "fixture_id": "atm-bench-fixture-v1-ts",
+  "language": "typescript",
+  "comment_prefix": "//",
+  "files": [
+    { "path": "src/config.ts",            "temperature": "hot",  "regions": ["db", "cache", "flags"] },
+    { "path": "src/routes.ts",            "temperature": "hot",  "regions": ["users", "orders", "admin"] },
+    { "path": "src/store.ts",             "temperature": "hot",  "regions": ["reducers", "selectors", "actions"] },
+    { "path": "src/index.ts",             "temperature": "cold", "regions": ["body"] },
+    { "path": "src/utils/strings.ts",     "temperature": "cold", "regions": ["body"] },
+    { "path": "src/utils/math.ts",        "temperature": "cold", "regions": ["body"] },
+    { "path": "src/utils/date.ts",        "temperature": "cold", "regions": ["body"] },
+    { "path": "src/services/mailer.ts",   "temperature": "cold", "regions": ["body"] },
+    { "path": "src/services/billing.ts",  "temperature": "cold", "regions": ["body"] },
+    { "path": "test/strings.test.ts",     "temperature": "cold", "regions": ["body"] },
+    { "path": "scripts/build.ts",         "temperature": "cold", "regions": ["body"] }
+  ]
+}

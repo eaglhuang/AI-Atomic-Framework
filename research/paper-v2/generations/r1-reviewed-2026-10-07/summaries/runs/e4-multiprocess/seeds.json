@@ -1,0 +1,37 @@
+{
+  "checklist": "E4",
+  "registered_at_cst": "2026-10-07 23:25:31 CST",
+  "banner": "DRAFT evidence — not a win claim; seeds registered BEFORE any E4 run",
+  "atm_pin": "5692474f7db70ab52a7a71c8af4867609e7e4b43",
+  "purpose": "Multi-process 2/4/8: receipt reconciliation, CAS/apply-lock ablation, 0 zombie leases, write monitoring",
+  "main_method": "--arm steward --registry-sync cas --apply-lock on (RQ2)",
+  "workload_choice": "hot_conflict only (MP stress; cold/disjoint deferred — E2 covered single-process)",
+  "agents_x_trials": {"agents": 8, "trials": 5, "rationale": "agents>=procs for p8; trials=5 keeps wall finite vs historic mp-B 40"},
+  "shared_knobs": {
+    "atm_backend": "real",
+    "compose_window_ms": 100,
+    "hot_ratio": 1,
+    "overlap": "high",
+    "hold_ms_min": 8,
+    "hold_ms_max": 25,
+    "tick_interval_ms": 15,
+    "jitter_ms": 6
+  },
+  "workload_seeds": [11, 17, 23],
+  "scheduler_seed_formula": "workload_seed + 1000",
+  "scheduler_seeds": [1011, 1017, 1023],
+  "process_counts": [2, 4, 8],
+  "cells": {
+    "main_steward_mp": {"count": 9, "formula": "procs{2,4,8} × seeds{3} × steward cas+lock"},
+    "sp_baseline_steward": {"count": 3, "formula": "single-process steward × seeds{3} (receipt compare)"},
+    "fault_naive_registry": {"count": 3, "formula": "p8 × seeds{3}; arm_role=fault_ablation; expects zombie leases"},
+    "fault_apply_lock_off": {"count": 3, "formula": "p8 × seeds{3}; arm_role=fault_ablation; may lose updates"}
+  },
+  "expected_cells": 18,
+  "invariants": {
+    "main_zombie_leases": 0,
+    "receipt_reconciliation": "decisions==intents; worker exit 0; oracle rows cover effects",
+    "write_monitor": "proposer_direct_writes sum==0 on steward path; ATM_BENCH_ATOMIC_WRITE=1"
+  },
+  "harness_note": "mp-runner initWorktreeGit for steward; compose windows still do not span OS processes (documented caveat)"
+}
