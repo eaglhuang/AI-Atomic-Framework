@@ -46,6 +46,17 @@ try {
   const clean = atm(project, ['git', 'commit', '--actor', 'ai-a', '--message', 'feat: a3', '--auto-stage']);
   assert.ok((clean.messages ?? []).some((entry: { code: string }) => entry.code === 'ATM_GIT_COMMIT_OK'), JSON.stringify(clean.messages));
   assert.equal(leftBehind(clean), undefined);
+
+  // A task card file not yet committed lands with its task's closeout; it is
+  // not "left behind" by a delivery commit.
+  const opened = atm(project, ['taskflow', 'open', '--write', '--actor', 'ai-a', '--title', 'Add g', '--goal', 'Add g', '--scope-path', 'src/g.js', '--validator', 'node --check src/g.js']);
+  const taskId = opened.evidence.generation.taskId as string;
+  const claimed = atm(project, ['next', '--claim', '--actor', 'ai-a', '--task', taskId]);
+  const lane = JSON.stringify(claimed).match(/lane-\d+-ai-a-[0-9a-f]+/)?.[0] ?? '';
+  writeFileSync(path.join(project, 'src', 'g.js'), 'export const g = 1;\n');
+  const delivered = atm(project, ['git', 'commit', '--actor', 'ai-a', '--task', taskId, '--message', 'feat: g', '--auto-stage', '--lane-session', lane]);
+  assert.ok((delivered.messages ?? []).some((entry: { code: string }) => entry.code === 'ATM_GIT_COMMIT_OK'), JSON.stringify(delivered.messages));
+  assert.equal(leftBehind(delivered), undefined, `the uncommitted card is not reported: ${JSON.stringify(leftBehind(delivered)?.data?.files)}`);
 } finally {
   rmSync(root, { recursive: true, force: true });
 }
