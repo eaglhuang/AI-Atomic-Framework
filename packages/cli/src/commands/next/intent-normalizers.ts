@@ -52,7 +52,10 @@ export function isQueueRequestedPrompt(prompt: string): boolean {
 }
 
 export function isJournalingPrompt(prompt: string): boolean {
-  const hasBacklogSurface = /\bATM-BUG-\d{4}-\d{2}-\d{2}-\d+\b|backlog|bug\s+backlog|journal(?:ing)?|\u8a18\u9304|\u56de\u5beb|\u5beb\u5165|\u65b0\u589e/i.test(prompt);
+  // The surface is where the entry goes (a backlog, journal or record), not
+  // the verb: "\u65b0\u589e" (add) alone sent every Chinese "add a function" request
+  // to the journaling contract.
+  const hasBacklogSurface = /\bATM-BUG-\d{4}-\d{2}-\d{2}-\d+\b|backlog|bug\s+backlog|journal(?:ing)?|\u8a18\u9304|\u7d00\u9304/i.test(prompt);
   if (!hasBacklogSurface) return false;
   // The Latin verbs need word boundaries: "log" also occurs inside "backlog",
   // which routed every backlog repair request to the journaling contract.
