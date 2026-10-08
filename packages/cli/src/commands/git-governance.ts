@@ -56,7 +56,8 @@ export async function runAtmGit(argv: string[]) {
   }
   const taskId = readOption(argv, '--task');
   if (!taskId || (action !== 'commit' && action !== 'push')) {
-    return runAtmGitImplementation(argv);
+    const result = await runAtmGitImplementation(argv);
+    return action === 'commit' ? withChangesLeftBehind(result, readOption(argv, '--cwd') ?? process.cwd(), null) : result;
   }
   const cwd = readOption(argv, '--cwd') ?? process.cwd();
   const actorId = readOption(argv, '--actor') ?? '';
@@ -112,14 +113,14 @@ export async function runAtmGit(argv: string[]) {
   const recorded = derivedAtoms && result.ok !== false && derivedAtoms.refs.length > 0
     ? safeRecordDerivedAtoms(cwd, taskId, actorId, derivedAtoms.refs)
     : false;
-  return {
+  return withChangesLeftBehind({
     ...result,
     evidence: {
       ...(result.evidence ?? {}),
       ...(derivedAtoms ? { derivedAtomConfirmation: { ...summarizeDerivedAtoms(derivedAtoms), recordedOnBrokerIntent: recorded } } : {}),
       workAdmission: { decision: gate.decision, receipt: gate.receipt }
     }
-  };
+  }, cwd, action === 'commit' ? taskId : undefined);
 }
 
 function safeConfirmDerivedAtoms(cwd: string, taskId: string, files: readonly string[], autoStage: boolean) {
@@ -414,4 +415,29 @@ function readStagedFiles(cwd: string): readonly string[] {
   } catch {
     return [];
   }
+}
+
+/**
+ * A governed commit only takes the files its claim covers. Say which other
+ * changed files it left behind, so an agent does not assume every edit
+ * landed. ATM's own runtime state under .atm/ is not reported.
+ */
+function withChangesLeftBehind<T extends { ok?: boolean; messages?: readonly unknown[] }>(result: T, cwd: string, taskId: string | null | undefined): T {
+  if (taskId === undefined || result.ok === false) return result;
+  let leftBehind: string[] = [];
+  try {
+    leftBehind = execFileSync('git', ['status', '--porcelain', '--untracked-files=all'], { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] })
+      .split(/\r?\n/)
+      .map((line) => line.slice(3).trim().replace(/^"|"$/g, '').replace(/\\/g, '/'))
+      .map((entry) => entry.includes(' -> ') ? entry.split(' -> ')[1] : entry)
+      .filter((entry) => entry && !entry.startsWith('.atm/'));
+  } catch {
+    return result;
+  }
+  if (leftBehind.length === 0) return result;
+  const scope = taskId ? `task ${taskId}` : 'this quickfix';
+  return {
+    ...result,
+    messages: [...(result.messages ?? []), message('warning', 'ATM_GIT_COMMIT_CHANGES_LEFT_UNCOMMITTED', `The commit landed, but ${leftBehind.length} changed file(s) outside ${scope}'s scope were not included: ${leftBehind.slice(0, 10).join(', ')}${leftBehind.length > 10 ? ', ...' : ''}. Commit them under a task or quickfix that covers them, or revert them.`, { taskId: taskId ?? null, files: leftBehind })]
+  };
 }
