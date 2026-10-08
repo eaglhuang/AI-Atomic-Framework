@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { hashContent } from '../../packages/core/src/broker/adapters/cas.ts';
-import { canonicalCommitLockPath, commitCanonicalFiles } from '../../packages/core/src/broker/steward-commit-guard.ts';
+import { canonicalCommitLockPath, commitCanonicalFiles, holdCanonicalCommitLock } from '../../packages/core/src/broker/steward-commit-guard.ts';
 import { composeTransactionalMutations } from '../../packages/core/src/broker/transactional-composer.ts';
 import {
   applyTransactionalStewardPlan,
@@ -367,23 +367,26 @@ function runTornWrite(): void {
     const locked = path.join(root, 'locked.txt');
     writeFileSync(locked, 'original\n', 'utf8');
     const lockDir = canonicalCommitLockPath(lockRoot, locked);
-    mkdirSync(lockDir, { recursive: true });
-    writeFileSync(path.join(lockDir, 'owner'), `${process.pid}\n`, 'utf8');
-    const recovery = commitCanonicalFiles({
-      entries: [{
-        filePath: 'locked.txt',
-        targetPath: locked,
-        expectedBaseHash: hashContent('original\n'),
-        content: 'replacement\n',
-        outputHash: hashContent('replacement\n')
-      }],
-      lockRoot,
-      lockWaitMs: 40,
-      lockPollMs: 5
-    });
-    assert.equal(recovery.status, 'recovery-required');
-    assert.match(recovery.reason, /recovery-required:/);
-    assert.equal(readFileSync(locked, 'utf8'), 'original\n');
+    const releaseLock = holdCanonicalCommitLock(lockDir, 'locked.txt');
+    try {
+      const recovery = commitCanonicalFiles({
+        entries: [{
+          filePath: 'locked.txt',
+          targetPath: locked,
+          expectedBaseHash: hashContent('original\n'),
+          content: 'replacement\n',
+          outputHash: hashContent('replacement\n')
+        }],
+        lockRoot,
+        lockWaitMs: 40,
+        lockPollMs: 5
+      });
+      assert.equal(recovery.status, 'recovery-required');
+      assert.match(recovery.reason, /recovery-required:/);
+      assert.equal(readFileSync(locked, 'utf8'), 'original\n');
+    } finally {
+      releaseLock();
+    }
   } finally {
     rmSync(root, { recursive: true, force: true });
   }

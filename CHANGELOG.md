@@ -34,6 +34,27 @@ bridge after the paper-aligned public release.
 - **Paper quick-verify instructions** added to the public docs
   (`a823febb4`).
 
+### Fixed - steward lock across PID namespaces
+
+- **A live commit holder in another PID namespace is no longer treated as dead.**
+  The repo lock used to decide liveness from the recorded pid and `/proc`
+  start time. Both are local to the caller's PID namespace, so a waiter
+  sharing the working tree through `unshare` reclaimed the lock and overwrote
+  an acknowledged effect. The lock is now a kernel advisory lock on
+  `lock.sqlite` under `<repo>/.atm/runtime/steward-commit-locks`. It releases
+  when the holder exits and is visible across PID namespaces on the same
+  filesystem. Pid metadata is diagnostic only. If the lock cannot be taken,
+  the waiter returns `recovery-required` and does not write.
+- **Orphan `*.atm-tmp` siblings are removed only while the exclusive lock is held.**
+  A cleanup that cannot acquire the lock leaves a live writer's temp in place.
+- **Contending `applyStewardPlan` calls queue per target before composing.**
+  The queue is additional ordering. Correctness stays with the file lock and
+  the base-hash compare-and-swap. If the queue cannot be used, the apply
+  continues on the file lock. Set `ATM_STEWARD_APPLY_QUEUE=off` to skip it,
+  `ATM_STEWARD_COMMIT_LOCK_ROOT` to move the lock directory, and
+  `ATM_STEWARD_RECOMPOSE_POLICY` to a JSON object to change retry bounds.
+  Public CLI flags and the `applied` / `blocked` evidence enum are unchanged.
+
 ### Fixed - steward region re-compose
 
 - **Concurrent steward apply completes disjoint region edits after hash drift.**
