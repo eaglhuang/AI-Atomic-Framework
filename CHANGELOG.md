@@ -34,6 +34,22 @@ bridge after the paper-aligned public release.
 - **Paper quick-verify instructions** added to the public docs
   (`a823febb4`).
 
+### Fixed - steward region re-compose
+
+- **Concurrent steward apply completes disjoint region edits after hash drift.**
+  A proposal anchored to a stable region id is rebased onto the current file
+  when line numbers have moved. The same region, or a region whose anchored
+  lines already changed, stays blocked and is not overwritten. The unlocked
+  stale check now returns `re-compose` and enters that retry. Retries are
+  bounded by `stewardCanonicalCommitPolicy.maxRecomposeAttempts` (4 extra
+  attempts), with `recomposeBackoffMs` and `recomposeJitterMs`. Exhaustion is
+  public `blocked` and the reason starts with `re-compose attempts exhausted`.
+  The cross-process lock lives at `<repo>/.atm/runtime/steward-commit-locks`
+  so different temp directories share it. A dead holder or a reused pid (start
+  token mismatch) is reclaimed; a live holder that outlasts the wait is
+  `recovery-required`. Public CLI flags and the `applied` / `blocked` evidence
+  enum are unchanged.
+
 ### Fixed - steward canonical commit
 
 - **Concurrent steward apply no longer silently drops or tears a committed
@@ -84,6 +100,10 @@ bridge after the paper-aligned public release.
   per-file compare-and-swap and an atomic rename. Public steward evidence
   remains `applied` or `blocked`; transactional receipts may now report
   `re-compose` or `recovery-required`.
+- Region-anchored steward proposals now rebase onto the current file after
+  hash drift. Disjoint regions can both commit; the same region stays blocked.
+  Commit locks moved under the repo `.atm/runtime` directory, with bounded
+  re-compose retries and stale-holder reclaim.
 
 #### 2026-06-28
 

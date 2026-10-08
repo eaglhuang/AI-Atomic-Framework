@@ -78,12 +78,28 @@ Canonical commit is a compare-and-swap, not a check-then-write. Composition
 stays outside the lock. Under a per-file cross-process lock the steward
 re-reads the target and writes only when the bytes still match the compose
 base, by renaming a completed temporary sibling in the same directory. A
-mismatch does not write: the transactional receipt verdict is `re-compose`,
-and `applyStewardPlan` recomposes once against the current bytes. If that
-retry still cannot commit, or the commit lock stays held by a live owner, the
-public steward evidence verdict stays `blocked` and the reason starts with
-`re-compose:` or `recovery-required:`. Callers retry a `re-compose` result
-against the current file. There is no new CLI flag.
+mismatch does not write: the transactional receipt verdict is `re-compose`.
+The unlocked stale check uses that same verdict, so `applyStewardPlan` retries
+it instead of stopping. The lock directory is
+`<repo>/.atm/runtime/steward-commit-locks`, keyed by the real path of the
+target, so processes that do not share `TMPDIR` still share the lock. A dead
+holder, or a live pid whose process start token no longer matches the owner
+file, is replaced. A live holder that outlasts the wait returns
+`recovery-required` and does not write.
+
+Re-compose locates a region-anchored proposal by its stable region id (the
+`L<line>:<region>` anchor, a symbol content anchor, or the patch's region
+tag), not by the hunk's old line number. A region whose anchored lines are
+unchanged is rebased and may commit. Two proposals for the same region, or a
+region whose anchored lines already changed, stay blocked and are not
+overwritten. Proposals without a region id still fail closed on
+`file-hash-drift`. `stewardCanonicalCommitPolicy` sets
+`maxRecomposeAttempts` (4), `recomposeBackoffMs` (4), and `recomposeJitterMs`
+(3). The attempt count includes the first try. The last attempt is terminal:
+`applied`, or public `blocked` with `re-compose attempts exhausted`,
+`recovery-required:`, or a composition block such as
+`steward-final-patch-required`. There is no new CLI flag. The broker queue
+remains the logical-conflict path; it is not a second commit mutex.
 
 ## Operator Flow
 

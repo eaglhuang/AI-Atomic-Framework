@@ -3,7 +3,7 @@
  * 合成與驗證留在鎖外；鎖只包住 base hash 比對與同目錄原子改名。
  * base 不符就回 re-compose，不寫入。暫存檔寫到一半不會改到正式檔。
  */
-import { createHash, randomBytes } from 'node:crypto';
+import { createHash, randomBytes, randomInt } from 'node:crypto';
 import {
   closeSync,
   mkdirSync,
@@ -16,7 +16,6 @@ import {
   writeFileSync,
   writeSync
 } from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
 import { hashContent } from './adapters/cas.ts';
 
@@ -29,8 +28,23 @@ export const stewardCanonicalCommitPolicy = {
   schemaId: 'atm.stewardCanonicalCommitPolicy.v1',
   lockWaitMs: 2_000,
   lockPollMs: 5,
-  maxRecomposeAttempts: 1
+  /** Extra compose attempts after the first. Each attempt ends applied, blocked, rolled-back, re-compose, or recovery-required. */
+  maxRecomposeAttempts: 4,
+  recomposeBackoffMs: 4,
+  recomposeJitterMs: 3
 } as const;
+
+/** attempt 從 1 起算。backoff 隨次數增加，jitter 含 0。 */
+export function stewardRecomposeDelayMs(attempt: number, backoffMs: number, jitterMs: number): number {
+  if (attempt <= 0 || backoffMs < 0 || jitterMs < 0) return 0;
+  const jitter = jitterMs === 0 ? 0 : randomInt(0, jitterMs + 1);
+  return backoffMs * attempt + jitter;
+}
+
+export function waitStewardRecomposeBackoff(attempt: number, backoffMs: number, jitterMs: number): void {
+  const delay = stewardRecomposeDelayMs(attempt, backoffMs, jitterMs);
+  if (delay > 0) Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, delay);
+}
 
 export type StewardCommitFault =
   | { readonly kind: 'before-rename' }
@@ -59,8 +73,12 @@ export interface CanonicalCommitResult {
   readonly files: readonly CanonicalCommitFileReceipt[];
 }
 
-export function defaultStewardCommitLockRoot(): string {
-  return path.join(os.tmpdir(), 'atm-steward-commit-locks');
+/**
+ * 鎖放在儲存庫的 ATM 狀態目錄，讓不同 TMPDIR 或容器共用同一份工作樹。
+ * 未給 cwd 時用 process.cwd()。
+ */
+export function defaultStewardCommitLockRoot(cwd: string = process.cwd()): string {
+  return path.join(path.resolve(cwd), '.atm', 'runtime', 'steward-commit-locks');
 }
 
 export function canonicalCommitLockPath(lockRoot: string, targetPath: string): string {
@@ -76,13 +94,16 @@ export function canonicalCommitLockPath(lockRoot: string, targetPath: string): s
  */
 export function commitCanonicalFiles(input: {
   readonly entries: readonly CanonicalCommitEntry[];
+  readonly cwd?: string;
   readonly lockRoot?: string;
   readonly lockWaitMs?: number;
   readonly lockPollMs?: number;
   readonly failAfterWrites?: number;
   readonly commitFault?: StewardCommitFault;
+  /** 測試用。鎖已取得、改名之前呼叫。被殺掉時鎖目錄會留給下一個持有者回收。 */
+  readonly whileLocked?: () => void;
 }): CanonicalCommitResult {
-  const lockRoot = input.lockRoot ?? defaultStewardCommitLockRoot();
+  const lockRoot = input.lockRoot ?? defaultStewardCommitLockRoot(input.cwd);
   const lockWaitMs = input.lockWaitMs ?? stewardCanonicalCommitPolicy.lockWaitMs;
   const lockPollMs = input.lockPollMs ?? stewardCanonicalCommitPolicy.lockPollMs;
   const entries = [...input.entries].sort((left, right) => left.filePath.localeCompare(right.filePath));
@@ -110,6 +131,7 @@ export function commitCanonicalFiles(input: {
       }
       backups.set(entry.filePath, before);
     }
+    input.whileLocked?.();
     let writeCount = 0;
     for (const entry of entries) {
       failedFile = entry.filePath;
@@ -190,18 +212,29 @@ class StewardLockTimeoutError extends Error {
   }
 }
 
+interface LockOwner {
+  readonly pid: number | null;
+  readonly startToken: string | null;
+  readonly nonce: string | null;
+}
+
+const heldNonces = new Map<string, string>();
+
 function acquireLock(lockDir: string, waitMs: number, pollMs: number, filePath: string): void {
   mkdirSync(path.dirname(lockDir), { recursive: true });
   const deadline = Date.now() + waitMs;
   while (true) {
     try {
       mkdirSync(lockDir);
+      const nonce = randomBytes(8).toString('hex');
+      const startToken = readProcessStartToken(process.pid) ?? '';
       try {
-        writeFileSync(path.join(lockDir, 'owner'), `${process.pid}\n`, { encoding: 'utf8', flag: 'wx' });
+        writeFileSync(path.join(lockDir, 'owner'), `v2\n${process.pid}\n${startToken}\n${nonce}\n`, { encoding: 'utf8', flag: 'wx' });
       } catch (error) {
         rmSync(lockDir, { recursive: true, force: true });
         throw error;
       }
+      heldNonces.set(lockDir, nonce);
       return;
     } catch (error) {
       if (!isErrno(error, 'EEXIST')) throw error;
@@ -210,7 +243,7 @@ function acquireLock(lockDir: string, waitMs: number, pollMs: number, filePath: 
         continue;
       }
       if (Date.now() >= deadline) {
-        throw new StewardLockTimeoutError(filePath, readHolderPid(lockDir), waitMs);
+        throw new StewardLockTimeoutError(filePath, readOwner(lockDir).pid, waitMs);
       }
       sleepMs(pollMs);
     }
@@ -218,32 +251,60 @@ function acquireLock(lockDir: string, waitMs: number, pollMs: number, filePath: 
 }
 
 function releaseLock(lockDir: string): void {
-  if (readHolderPid(lockDir) !== process.pid) return;
+  const nonce = heldNonces.get(lockDir);
+  const owner = readOwner(lockDir);
+  if (!nonce || owner.nonce !== nonce || owner.pid !== process.pid) return;
+  heldNonces.delete(lockDir);
   rmSync(lockDir, { recursive: true, force: true });
 }
 
 function holderIsDead(lockDir: string, staleIncompleteMs: number): boolean {
-  const pid = readHolderPid(lockDir);
-  if (pid === null) {
+  const owner = readOwner(lockDir);
+  if (owner.pid === null) {
     try {
       return Date.now() - statSync(lockDir).mtimeMs > staleIncompleteMs;
     } catch {
       return true;
     }
   }
-  if (pid === process.pid) return false;
+  if (!pidIsAlive(owner.pid)) return true;
+  if (!owner.startToken) return false;
+  const current = readProcessStartToken(owner.pid);
+  return Boolean(current) && current !== owner.startToken;
+}
+
+function pidIsAlive(pid: number): boolean {
   try {
     process.kill(pid, 0);
-    return false;
+    return true;
   } catch (error) {
-    return isErrno(error, 'ESRCH');
+    return !isErrno(error, 'ESRCH');
   }
 }
 
-function readHolderPid(lockDir: string): number | null {
+function readOwner(lockDir: string): LockOwner {
   try {
-    const pid = Number(readFileSync(path.join(lockDir, 'owner'), 'utf8').trim());
-    return Number.isInteger(pid) && pid > 0 ? pid : null;
+    const lines = readFileSync(path.join(lockDir, 'owner'), 'utf8').split('\n');
+    if (lines[0] === 'v2') {
+      return { pid: parsePid(lines[1] ?? ''), startToken: lines[2] || null, nonce: lines[3] || null };
+    }
+    return { pid: parsePid(lines[0] ?? ''), startToken: null, nonce: null };
+  } catch {
+    return { pid: null, startToken: null, nonce: null };
+  }
+}
+
+function parsePid(value: string): number | null {
+  const pid = Number(value.trim());
+  return Number.isInteger(pid) && pid > 0 ? pid : null;
+}
+
+function readProcessStartToken(pid: number): string | null {
+  try {
+    const stat = readFileSync(`/proc/${pid}/stat`, 'utf8');
+    const close = stat.lastIndexOf(')');
+    if (close < 0) return null;
+    return stat.slice(close + 1).trim().split(/\s+/)[19] ?? null;
   } catch {
     return null;
   }
