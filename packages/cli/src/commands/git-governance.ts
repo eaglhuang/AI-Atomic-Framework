@@ -109,18 +109,18 @@ export async function runAtmGit(argv: string[]) {
   const governedArgv = action === 'commit' && ticket
     ? appendWorkAdmissionTrailer(argv, ticket.ticketId, ticket.ticketDigest)
     : argv;
-  const result = await runAtmGitImplementation(governedArgv);
+  const result = withChangesLeftBehind(await runAtmGitImplementation(governedArgv), cwd, action === 'commit' ? taskId : undefined);
   const recorded = derivedAtoms && result.ok !== false && derivedAtoms.refs.length > 0
     ? safeRecordDerivedAtoms(cwd, taskId, actorId, derivedAtoms.refs)
     : false;
-  return withChangesLeftBehind({
+  return {
     ...result,
     evidence: {
       ...(result.evidence ?? {}),
       ...(derivedAtoms ? { derivedAtomConfirmation: { ...summarizeDerivedAtoms(derivedAtoms), recordedOnBrokerIntent: recorded } } : {}),
       workAdmission: { decision: gate.decision, receipt: gate.receipt }
     }
-  }, cwd, action === 'commit' ? taskId : undefined);
+  };
 }
 
 function safeConfirmDerivedAtoms(cwd: string, taskId: string, files: readonly string[], autoStage: boolean) {
