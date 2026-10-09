@@ -162,7 +162,7 @@ export function runGitPush(options: LegacyValue) {
       },
     });
   }
-  if (options.dryRun || admission.outcome === "no-op") {
+  if (options.dryRun || (admission.outcome === "no-op" && admission.topology.remoteBranchExists !== false)) {
     const updatedAt = new Date().toISOString();
     const status = options.dryRun ? "dry-run" : "no-op";
     writeGitPushAttemptStatus(options.cwd, statusPath, {

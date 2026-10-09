@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "P2",
-  "status": "Open; first-push failure reproduced",
+  "status": "Wrapper repair locally verified; remote integration and frozen publication pending",
   "area": "Git push admission for a new remote branch",
   "finding": "The governed push wrapper fetches the destination branch before its first publication. An absent remote ref produces ATM_GIT_PUSH_ADMISSION_INTERNAL_ERROR and prevents creation of the new branch even though the host Git push succeeds.",
   "expectedBehavior": "Admission distinguishes an absent destination branch from authentication, network and repository errors. A new branch receives the applicable scope and provenance checks and can be published without requiring the remote branch to exist first.",
   "evidenceOrRepro": "At commit db4cda5ed8cc4f7a4b5fd59dc8335d050881813d, node atm.mjs git push --actor codex-adopter-routing --branch codex/adopter-validation-commands --remote origin --json returned internal-error after git fetch origin codex/adopter-validation-commands reported couldn't find remote ref. No conflicting files were reported and hostPush was null. The owner-authorized maintenance fallback git push -u origin codex/adopter-validation-commands successfully created the branch; PR #146 contains the submitted source and tests. The local admission receipt is .atm/runtime/git-push-attempts/codex-adopter-routing__origin__codex_adopter-validation-commands.json.",
-  "followUp": "Use a local bare remote regression fixture: first push creates a branch; retry updates that branch; unavailable remote and denied access remain failures. Repair destination-existence handling without relaxing existing-branch conflict checks. Raw runtime receipts remain outside tracked history."
+  "followUp": "2026-10-09: PR 153 repaired admission for verified absent branches, but its regression used raw Git for publication. The wrapper still treated admission no-op as nothing to publish and returned success without creating the ref. A real runGitPush regression reproduced hostPush=null; the bounded repair skips host push only for a no-op whose remote branch is not verified absent. Dry-run must not create a ref; first push must create the exact HEAD; synchronized retry stays no-op; inaccessible remotes remain fail-closed. Existing native Git ref-creation race rejection remains covered. Authentication denial and the deployed frozen/npm wrapper are not independently verified by this local test. Raw runtime receipts remain outside tracked history."
 }
