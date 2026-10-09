@@ -17,6 +17,9 @@ ATM（AI-Atomic-Framework）論文 2.0（composer＋中立 steward，RQ2 主臂 
 | 工作稿快照 | [`working-docs/2026-10-09/`](./working-docs/2026-10-09/SNAPSHOT.md)（DRAFT 工作稿；**不是 generation**、不主張結論；不可變。內含早期 backup 與中間版，為「所有產出都進 repo」而收錄，不適用 Generation 政策第 5 條） |
 | 校驗 | `generations/<gen>/verify.sh`（唯讀；`sha256sum -c SHA256SUMS`） |
 | benchmark-trials/2026-10-09-hist-smoke, benchmark-trials/2026-10-09-hist-pilot | 試跑（trial runs, not formal results）：歷史真實 PR benchmark 冒煙＋Django pilot，ATM pin b35a6141（2026-10-09） |
+| benchmark-trials/2026-10-09-hist-mining | 只挖掘、沒有 run（不列入正式結果）：六專案合併 commit base 重新挖掘、可行性 dry-run、prereg v1.1 提案草稿（未套用）（2026-10-09） |
+| benchmark-main/2026-10-10-hist-prereg-v1.1 | 預先登記 v1.1（凍結）＋主樣本 300 對＋O0 30 對＋9,750 runs seed 表；沒有 run 結果（2026-10-10） |
+| benchmark-trials/2026-10-10-hist-confirm-v1.1 | 試跑（不列入正式結果）：prereg v1.1 小量確認，5 對 × 5 arm＋植入故障＋舊 pin，36 runs（2026-10-10） |
 
 ## Generation 政策
 1. **Generation 不可變（immutable）。** 一旦放入 `generations/<id>/` 並產生 `SHA256SUMS`，該目錄內任何檔案都不得修改、刪除或重新產生指紋。
@@ -46,5 +49,8 @@ sh research/paper-v2/working-docs/2026-10-09/verify.sh
 # 預期：OK: 79 files verified (read-only) in .
 sh research/paper-v2/benchmark-trials/2026-10-09-hist-smoke/verify.sh research/paper-v2/benchmark-trials/2026-10-09-hist-smoke
 sh research/paper-v2/benchmark-trials/2026-10-09-hist-pilot/verify.sh research/paper-v2/benchmark-trials/2026-10-09-hist-pilot
+sh research/paper-v2/benchmark-trials/2026-10-09-hist-mining/verify.sh research/paper-v2/benchmark-trials/2026-10-09-hist-mining
+sh research/paper-v2/benchmark-main/2026-10-10-hist-prereg-v1.1/verify.sh research/paper-v2/benchmark-main/2026-10-10-hist-prereg-v1.1
+sh research/paper-v2/benchmark-trials/2026-10-10-hist-confirm-v1.1/verify.sh research/paper-v2/benchmark-trials/2026-10-10-hist-confirm-v1.1
 ```
 **注意：** `harness/reproduce.sh`（r1 版）的 verify 模式會重寫 manifest／checksums，**不可**用來驗證 r1（外審 P0-3）。r2–r6 已把 reproduce 拆成 verify／analyze／rerun／seal；驗證只用各代 `verify.sh`。

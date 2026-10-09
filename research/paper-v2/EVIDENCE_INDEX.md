@@ -238,6 +238,46 @@ r6 上傳包拆成多個獨立 tarball，都解到同一個 `generations/r6-2026
 - Pilot：steward 完成 933/964，失敗 0/60 run，遺失效果 0，blocked 31（file-hash-drift 22、re-compose context mismatch 5、新檔 4），損毀檔 0。git_three_way 基準 arm：失敗 2/60 run，合計遺失 5 個效果（預期中的 lost update，照實列出）。
 - 限制：Django 2024–2025 在凍結規則下 O1（同一 hunk）層為 0 對，本試跑未涵蓋同 hunk 情境；偏離紀錄見各 generation 的 DEVIATIONS.md。
 
+## 14. 歷史真實 PR benchmark：六專案重新挖掘（合併 commit base）與可行性評估（2026-10-09，只挖掘，沒有 run，不列入正式結果）
+
+> 作者執行，尚未獨立重現。CI 只驗證檔案與 SHA256SUMS 一致。本 generation **沒有任何 arm run**，也沒有抽主樣本；主跑（約 9,750 runs）尚未開始，需作者確認。450-run 矩陣仍未完成。
+
+| generation | 路徑 | 內容 | SHA256SUMS sha256 | 檔案數 | 驗證 |
+|---|---|---|---|---:|---|
+| 挖掘＋可行性 | `benchmark-trials/2026-10-09-hist-mining/` | 6 個 prereg 專案（Django、SymPy、xarray、pytest、Sphinx、FastAPI）的 PR 快照（含 merge_commit_sha）、PR 資格與排除理由、所有配對與理由碼、可行性 dry-run、prereg v1.1 提案草稿（未套用）、挖掘腳本與凍結規則副本 | `d2d6512a665f0e841aebb8f1e76343cbfa81856f880e687ac89f468489a2bef5` | 85（不含 SHA256SUMS） | `sh benchmark-trials/2026-10-09-hist-mining/verify.sh benchmark-trials/2026-10-09-hist-mining` → 85 OK |
+
+- PR base 改回 prereg §3.1(4) 的合併 commit 公式（修正試跑偏離：沒有 token 時無法取得合併 commit、162 個 fast-forward PR 被排除）。其他凍結選取規則不變。
+- 候選配對（凍結規則）：Django 239、SymPy 99、xarray 568、pytest 108、Sphinx 223、FastAPI 196；六個專案在每 PR 最多 2 對的限制下都抽得到 50 對（dry-run，非正式主樣本），但幾乎全由 O3 補位。
+- O1（同一 hunk）：合計 7 對（SymPy 6、Sphinx 1），其中 6 對是兩邊修改相同，**改法不同的只有 1 對**。1,205 個 drift 排除中 1,164 個是後合併的 PR 在合併前已 rebase 到對方之上。
+- prereg v1.1 提案（草稿，**未套用**，待作者決定）：對已 rebase 的 PR 改用 rebase 前的 head，估計多出 70 個改法不同的 O1（每 PR 上限 2 時約 65）。見 `PREREG_v1.1_PROPOSAL_zh.md`。
+- 未納入：各專案 `pairs_eligible.jsonl`（含上游程式碼，約 510 MB），SHA-256 記在 MANIFEST.json `regenerable_not_included`，可由 `scripts/build_pairs_merge.py` 決定性重建。GitHub token 只經環境變數使用，不在任何檔案中。
+
+## 15. 歷史真實 PR benchmark：預先登記 v1.1（凍結）與主樣本（2026-10-10，沒有任何 run 結果）
+
+> 作者執行，尚未獨立重現。CI 只驗證檔案與 SHA256SUMS 一致。本 generation 在任何主跑結果產生**之前**凍結選取規則、種子、主樣本與逐 run 的 seed 表；**沒有 run 結果**。450-run 矩陣仍未完成。
+
+| generation | 路徑 | 內容 | SHA256SUMS sha256 | 檔案數 | 驗證 |
+|---|---|---|---|---:|---|
+| prereg v1.1＋主樣本 | `benchmark-main/2026-10-10-hist-prereg-v1.1/` | 預先登記 v1.1 正式版（選項 P：已 rebase 的 PR 改用 rebase 前 head）、凍結收據（抽樣前 2026-10-10 00:13:09 台北時間）、選項 P 建構與抽樣腳本、P 候選池、主樣本 300 對＋O0 30 對（含上游程式碼與授權聲明）、9,750 runs 的 seed 表、pins | `3ff382d11044821d642e5a61b8de934817b664b03492a734f660d05b75de9a86` | 36（不含 SHA256SUMS） | `sh benchmark-main/2026-10-10-hist-prereg-v1.1/verify.sh benchmark-main/2026-10-10-hist-prereg-v1.1` → 36 OK |
+
+- 作者決定（2026-10-10 00:05 台北時間）：採用選項 P、先小量確認再主跑。
+- 選項 P 候選池 405 對：O1 改法不同 72、O1 相同修改 5、O2 39、O3 289。
+- 主樣本 300 對（6 專案 × 50）：O1 72／O2 51／O3 177；規則 v1.0 189／v1.1-P 111。O1 中改法不同 63（其中 rebase 前 62）、相同修改 9。
+- 計畫 runs：主矩陣 7,500＋舊 pin（5692474f，只跑 steward）1,500＋O0 750＝9,750。ATM pin 20effd45（`packages/core` 與 b35a6141 相同）。
+- 含 rebase 前 writer 的配對（所有 O1-P）只算寫入安全終點，語意終點標「不可評估」。
+
+## 16. 歷史真實 PR benchmark：prereg v1.1 小量確認試跑（2026-10-10，試跑，不列入正式結果）
+
+> 作者執行，尚未獨立重現。CI 只驗證檔案與 SHA256SUMS 一致。試跑，不算正式結果。450-run 矩陣仍未完成。
+
+| generation | 路徑 | 內容 | SHA256SUMS sha256 | 檔案數 | 驗證 |
+|---|---|---|---|---:|---|
+| 確認試跑 | `benchmark-trials/2026-10-10-hist-confirm-v1.1/` | 5 對（含 2 個 O1 改法不同的 rebase 前配對）× 5 arm × 1 seed＝25 runs；O1 配對上 5 種植入故障；舊 pin steward 5 runs；共 36 runs | `fd1aa23b33a77c1ee3f60aed8492808fc101d6017aa9a318c532b4e1d1181fe9` | 359（不含 SHA256SUMS） | `sh benchmark-trials/2026-10-10-hist-confirm-v1.1/verify.sh benchmark-trials/2026-10-10-hist-confirm-v1.1` → 359 OK |
+
+- 現行 pin（20effd45）steward：完成 130/146、失敗 run 0/5、遺失 0、被擋 16（其中 15 個是 harness 在呼叫 ATM 前的重新定位失敗，1 個是新建檔）、損毀 0；沒有 §5.7 反例。
+- 植入故障 5/5 都被 oracle 抓到（覆寫遺失＋overlap_both_applied、還原 hunk、frame 位元組、尾端撕裂＋ast、外來檔＋殘留暫存檔）。
+- 配對在主樣本抽完之後才從剩餘的 P 配對抽出，不在主樣本中。
+
 ## 6. 不在 repo 的參照
 - ATM pin 原始碼：GitHub `eaglhuang/AI-Atomic-Framework` commit `5692474f7db70ab52a7a71c8af4867609e7e4b43`（r3 另加 `bea35380d7f381f998c9930fa95f01b999c7f208`，box tarball `/workspace/atm-main-bea35380/atm-main.tar.gz` sha256 `9346e5b175b176618f435aeb4b41ab93ef7575f9bf77d77c47a5aeac87ad34b5`；r4 另加 `2118bc66efb3ac3bc0ddaede6a2f7cb18526b030`，box tarball `/workspace/atm-main-2118bc66/atm-main.tar.gz` sha256 `aa959607c35c51b7fc3c4e3d81b3d9e979ee62f4d9361ef9e9f5ee72e78abd88`；r5 另加 `37847584e24afc08ea58cfe380bb5b1220fbe335`，box tarball `/workspace/atm-main-37847584/atm-main.tar.gz` sha256 `e17a90ddceaf3c70d580c96e31f14cf8251d5a664985c1eb494f0d8db8045e3d`；r6 另加 `b35a6141bd5bfbaec654f1cd3079323581b04074`，box tarball `/workspace/atm-main-b35a6141/atm-main.tar.gz` sha256 `93fa7839d8e0fee51e5ad224833df2b57397fead3e77e0528117f21f5d5e59ef`）；box tarball `/workspace/atm-main-5692474f/atm-main.tar.gz` sha256 `1d498a397e6a5db119d40b8f539dc165cb0028fbfe9577f953023f8ec8d45795`。
 - 論文 v1：arXiv:2607.00041（box `refs/` 有副本，未上傳）。

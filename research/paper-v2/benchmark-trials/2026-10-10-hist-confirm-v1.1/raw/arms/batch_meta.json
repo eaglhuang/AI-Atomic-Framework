@@ -1,0 +1,28 @@
+{
+ "started_at": "2026-10-09T16:13:39.981Z",
+ "node": "v24.21.0",
+ "atm_monorepo": "/workspace/atm-main-20effd45/AI-Atomic-Framework-20effd45a0c3a09c293caaea6a34face0df1c5f4",
+ "params": {
+  "start_jitter_ms": 20,
+  "hold_max_ms": 30,
+  "compose_window_ms": 100,
+  "occ_max_retries": 8,
+  "admit": {
+   "queue_timeout_ms": 2000,
+   "poll_ms": 3
+  },
+  "worker_timeout_ms": 180000
+ },
+ "n_jobs": 25,
+ "arms": [
+  "steward",
+  "file_lock",
+  "occ",
+  "git_three_way",
+  "bare_composer"
+ ],
+ "seeds": [
+  0
+ ],
+ "plants": false
+}
