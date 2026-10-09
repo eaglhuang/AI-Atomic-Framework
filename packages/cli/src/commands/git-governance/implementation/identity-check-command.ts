@@ -49,7 +49,7 @@ import { laneSessionIdFromRecord } from './command-router.ts';
 import { inspectCloseCommitWindowStagedArtifacts } from './git-index-transaction.ts';
 
 import { inspectStdinPathspecGitAddProcesses, readGitCommitAttemptStatus } from './git-process-port.ts';
-import { readGitConfig, writeGitConfig } from './git-config-port.ts';
+import { readEffectiveGitConfig, readGitConfig, writeGitConfig } from './git-config-port.ts';
 
 import { readHeadCommitMessage } from './push-command.ts';
 
@@ -473,7 +473,12 @@ export function resolveGitIdentityProfile(cwd: LegacyValue, actorId: LegacyValue
       gitEmail: defaultIdentity.gitEmail ?? null,
     };
   }
-  return { gitName: null, gitEmail: null };
+  // Last resort: the user's own git identity, so the first governed commit
+  // does not demand a separate `identity set` step.
+  return {
+    gitName: readEffectiveGitConfig(cwd, "user.name"),
+    gitEmail: readEffectiveGitConfig(cwd, "user.email"),
+  };
 }
 
 export function writePreparedRuntimeIdentity(

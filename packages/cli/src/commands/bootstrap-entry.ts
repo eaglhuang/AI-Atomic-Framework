@@ -3,7 +3,7 @@ import path from 'node:path';
 import { runInit } from './init.ts';
 import { message } from './shared.ts';
 import { renderATMChart, resolveATMChartPath } from './atm-chart/render-verify.ts';
-import { ensureAdopterGitignore } from './bootstrap-gitignore.ts';
+import { ensureAdopterGitattributes, ensureAdopterGitignore } from './bootstrap-gitignore.ts';
 import { ensureAdopterTaskflowProfile } from './bootstrap-taskflow-profile.ts';
 
 const defaultBootstrapTaskTitle = 'Bootstrap ATM in this repository';
@@ -17,6 +17,7 @@ export async function runBootstrap(argv: string[]) {
   const writes = result.ok && !argv.includes('--dry-run');
   const atmChart = writes ? ensureATMChart(result.cwd) : null;
   const gitignore = writes ? ensureAdopterGitignore(result.cwd) : null;
+  const gitattributes = writes ? ensureAdopterGitattributes(result.cwd) : null;
   const taskflowProfile = writes ? ensureAdopterTaskflowProfile(result.cwd) : null;
 
   return {
@@ -27,6 +28,7 @@ export async function runBootstrap(argv: string[]) {
       pinnedRunner: readPinnedRunnerMetadata(result.cwd),
       ...(atmChart ? { atmChart: atmChart.evidence } : {}),
       ...(gitignore ? { gitignore } : {}),
+      ...(gitattributes ? { gitattributes } : {}),
       ...(taskflowProfile ? { taskflowProfile } : {})
     },
     messages: [

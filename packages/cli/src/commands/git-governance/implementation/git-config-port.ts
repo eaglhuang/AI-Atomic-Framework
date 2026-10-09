@@ -24,3 +24,18 @@ export function writeGitConfig(cwd: string, key: string, value: string): void {
     env: createSanitizedGitEnv(),
   });
 }
+
+/** Effective value (local, then global/system), so a newcomer's existing git identity is reused. */
+export function readEffectiveGitConfig(cwd: string, key: string): string | null {
+  try {
+    const value = execFileSync('git', ['config', '--get', key], {
+      cwd,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+      env: createSanitizedGitEnv(),
+    }).trim();
+    return value || null;
+  } catch {
+    return null;
+  }
+}
