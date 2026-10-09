@@ -1,0 +1,61 @@
+[
+  {
+    "arm": "bare_composer",
+    "arm_role": "baseline_bare_composer",
+    "correct": 12,
+    "lost": 0,
+    "committed": 12,
+    "blocked": 3,
+    "rejects": 0,
+    "timeouts": 0,
+    "wall_clock_ms": 732.54,
+    "mean_wait_ms": 0,
+    "mean_admission_ms": 0.03,
+    "mean_overhead_ms": 118.32,
+    "decisions": {
+      "composer_merge": 15
+    },
+    "capability_backend": "bare_admit",
+    "admission_bypassed": true
+  },
+  {
+    "arm": "steward",
+    "arm_role": "main_method",
+    "correct": 15,
+    "lost": 0,
+    "committed": 15,
+    "blocked": 0,
+    "rejects": 0,
+    "timeouts": 0,
+    "wall_clock_ms": 567.12,
+    "mean_wait_ms": 11.6,
+    "mean_admission_ms": 15.06,
+    "mean_overhead_ms": 59.49,
+    "decisions": {
+      "composer_merge": 6,
+      "hot_provisional": 9
+    },
+    "capability_backend": "real",
+    "admission_bypassed": false
+  },
+  {
+    "arm": "occ",
+    "arm_role": "baseline_occ",
+    "correct": 15,
+    "lost": 0,
+    "committed": 15,
+    "blocked": 0,
+    "rejects": 0,
+    "timeouts": 0,
+    "wall_clock_ms": 178.59,
+    "mean_wait_ms": 4.2,
+    "mean_admission_ms": 7.95,
+    "mean_overhead_ms": 12.95,
+    "decisions": {
+      "composer_merge": 4,
+      "hot_provisional": 11
+    },
+    "capability_backend": "real",
+    "admission_bypassed": false
+  }
+]
