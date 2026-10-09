@@ -36,6 +36,12 @@ try {
     assert.equal(await run(name), true);
     assert.deepEqual(readdirSync(ownedRoot), ['foreign.txt'], `${name} must clean its own workspace`);
   }
+  await import('./team-state-only-runtime-admission.test.ts');
+  assert.deepEqual(readdirSync(ownedRoot), ['foreign.txt'], 'state-only test fixtures must clean themselves');
+  await import('../../packages/cli/src/commands/team/__tests__/team-execute-defaults.spec.ts');
+  assert.deepEqual(readdirSync(ownedRoot), ['foreign.txt'], 'execute-defaults fixture must clean itself');
+  await import('../../packages/cli/src/commands/team/__tests__/team-execute-fail-closed.spec.ts');
+  assert.deepEqual(readdirSync(ownedRoot), ['foreign.txt'], 'fail-closed fixtures must clean themselves');
 } finally {
   if (previous === undefined) delete process.env.ATM_TEMP_ROOT;
   else process.env.ATM_TEMP_ROOT = previous;
