@@ -1,0 +1,85 @@
+{
+ "atm_env": "ATM defaults (no ATM_STEWARD_* env overrides)",
+ "atm_pin": "20effd45a0c3a09c293caaea6a34face0df1c5f4",
+ "atm_pin_note": "ATM main at freeze (merge of PR #242); packages/core byte-identical to b35a6141 (PR #238 SQLITE_BUSY fix); only packages/cli differs (PR #241 --files-from). Source = codeload tarball, no clone.",
+ "atm_tarball_sha256": "2f2805755ecf863f46efaeb662fb62a782f01bebeccf643c1292e7c5994ab71f",
+ "git": "git version 2.47.3",
+ "harness": "same files as research/paper-v2/benchmark-trials/2026-10-09-hist-pilot/harness (hist files verified equal to pilot PINS.json)",
+ "harness_params": {
+  "admit": {
+   "poll_ms": 3,
+   "queue_timeout_ms": 2000
+  },
+  "compose_window_ms": 100,
+  "concurrency": 3,
+  "hold_max_ms": 30,
+  "occ_max_retries": 8,
+  "start_jitter_ms": 20,
+  "worker_timeout_ms": 180000
+ },
+ "harness_src_sha256": {
+  "hist-tools/README.md": "a317db1fa23ba454058a067b807ce5ff940506eba513fe19c583aa23c9c6b7cd",
+  "hist-tools/SELECTION_RULES.md": "3a63dc168dea375b2c9c945ab5993e8468957157e17d2c718d9b45c1d3d9a725",
+  "hist-tools/SELECTION_RULES.sha256": "ae3688fce979dbf95185d6f7ac76befd420879067b50e988792be1a8a30c79ae",
+  "hist-tools/annotate_base_exists.py": "e7bbf6c398c2fc21f1667ed401e457e58c364441dc76d034e8feb369987582be",
+  "hist-tools/build_pairs.py": "830cbe2d90e0ea193515df802bcde3e75584bd4fb8a4a6c04bbc978f7da052fb",
+  "hist-tools/crosscheck_gold.py": "1d504c7ec23a1f2844dff52fded663a23256c74aa3ad8470e8ed485e0e393e57",
+  "hist-tools/mine_search.py": "04d87296e318ef84d80143ac851097364ec6940a1d6c2c9bba021c2eeab5bdf7",
+  "hist-tools/package_trial.py": "f82da0b694f8956f4e7b1aee161598ac694b8a4ce364fed46fd147f9619f3f45",
+  "hist-tools/sample_pairs.py": "98328e544bb591d53bba3c86c4d30c4e65e34aa88785b395ea785b4fb3ea0119",
+  "hist-tools/semantic.py": "7368e40d79bdf38ba09eeaa6defb941441f4470c140d05e58691f75fb6f3234c",
+  "hist-tools/summarize.py": "a97bff37678474c90b822e41167ddf0961960f306a20179fa3d4f523890f69af",
+  "package.json": "4d8eb87add8ebf7705152efc5049bc1689ec1aa8d1c33f70c2e7534da4694c9c",
+  "src/arm-stats.mjs": "dcd3ef137999d06f00965110804666351f46d8f0a4c4600d35e8d0ab591d73b8",
+  "src/arms.mjs": "eccda7196c55ad6f4435ed200bc9deeb3eb8a3582d396be12a4f29a19e2503aa",
+  "src/atm-resolve.mjs": "5c3ad6dd88e30d766ea450899be2d6477f1084c49ba1599838bf477f5bfdc7b7",
+  "src/bare-admit-broker.mjs": "b8278d9629c8d32574348f57056129a1d84c9b5698ead039298ead4ac384cff7",
+  "src/cli.mjs": "83aca225b449f0745beb0985ee78ac44a8a4070eb2a231e08e6cd5f9c71eafa5",
+  "src/control-writer.mjs": "76c5f831bc04072ddb658ecf69a87e77b5161b929b1d9975dafa3c211386cbf1",
+  "src/export.mjs": "be6c343395451d5f12016b89e688ad84b01e913f99127d7ed3c72ef283bc347d",
+  "src/git-three-way.mjs": "fbc7109eeb552f7613aa89b49bc7d260cc59cb8d580479b61f1932b44653f469",
+  "src/hist/admit.mjs": "f9776860142709139ee811b0c6ec90710779b8a7cae4fa779a549e6ee75d0929",
+  "src/hist/batch.mjs": "eb1a851e339ff777afaabb2a40fe728503494528292bf8453712fbb7a71aff5b",
+  "src/hist/oracle_hist.mjs": "fa32da38e04f76872f63bb0e1a534ff2fa3ceac80d36e66f2bbd65f359fd5879",
+  "src/hist/patchkit.mjs": "b3f74edaf87998eb7fab53e732b6388808af161c188e757cf98e090516be0400",
+  "src/hist/run-pair.mjs": "a3a7b30d0bc6efed334a3b2a86f0c0e5aff45521784715757c2351e10d81b562",
+  "src/hist/worker.mjs": "7eee23b551fcd8365b679e3d1e6b40a115d5d380f3139bb902d3ab834a8536b3",
+  "src/mock-broker.mjs": "4a9195c0e6e22c94de0b3b6ba316af7b4a4519655f105061ae82e1c84d9ff1a4",
+  "src/mp-broker.mjs": "156d12da98fdf9e4ff6aee4ec49ddd648855c0c2cc80f77db82acd6ebb3b9832",
+  "src/mp-runner.mjs": "6ca0be10ea3e29389571d5b7828dc91b366c793f7493a42be8456f97a90f9f00",
+  "src/mp-worker.mjs": "b48f5054b0afed23e90c99f9d0d7b662a4a2e482ee66ddbdd4feba72272b2b3e",
+  "src/oracle.mjs": "80f93d8a8e578f56b357a6752efb50ee69b61bca1575f705d1b903e0d41a4108",
+  "src/oracle_v2.mjs": "e403ddb7a45bf5427e08747a070f277789ee88e51fae0a331b0a29ad94342488",
+  "src/real-broker.mjs": "5e7723feaba09544778d3ed50c4f70b4bb93ef258e4dfc213e37e2e874cd7392",
+  "src/runner.mjs": "c6d5c52a400f7f7f5d8ed89b06a6389a1c3fdd1868ea763c450f79d5850fdb90",
+  "src/scenario.mjs": "70aca2ddfd9f8ca3c0db3df23794264527892358cc3f07faddde44f06e550a64",
+  "src/steward-writer.mjs": "ee09a9776ded864feea46789435644264d87c8041e2ad9ad53b9aad7022949ce",
+  "src/util.mjs": "208465d98c64235f22fada89af98ce0b3fc1dc7750b6006aec0da375896f82b7",
+  "test/hist_oracle_contract.mjs": "4f786c6f17a35f90a0a10196346a70f1dd4579b0c9cf0e316ede78bec63058e7"
+ },
+ "node": "v24.21.0",
+ "numpy": "2.5.3",
+ "old_pin": "5692474f7db70ab52a7a71c8af4867609e7e4b43",
+ "old_pin_tarball_sha256": "1d498a397e6a5db119d40b8f539dc165cb0028fbfe9577f953023f8ec8d45795",
+ "python": "Python 3.13.5",
+ "upstream": {
+  "django": {
+   "tip_at_mining": "904349fcbe0ad4eed097b5e7fb7171954591cb28"
+  },
+  "fastapi": {
+   "tip_at_mining": "f5c6e9b4f9cadc1bf0f9a1fd672e621206b63007"
+  },
+  "pytest": {
+   "tip_at_mining": "e4f7f174bc4a1686b31639d29a3e211941390979"
+  },
+  "sphinx": {
+   "tip_at_mining": "b04a2101295ac3fb725b16111eda0284b6da4cca"
+  },
+  "sympy": {
+   "tip_at_mining": "2f22a5f81e2f4124380be3739a092e9ff20128de"
+  },
+  "xarray": {
+   "tip_at_mining": "6f68d368d91352b84141d64eb5a56a4bf8676a93"
+  }
+ }
+}
