@@ -1,0 +1,60 @@
+{
+ "writer": 1,
+ "pr": 28079,
+ "pid": 2091635,
+ "init_ms": 86.73204,
+ "start_offset_ms": 3,
+ "file_order": [
+  "sympy/printing/pytorch.py",
+  "sympy/utilities/lambdify.py"
+ ],
+ "holds": {
+  "sympy/printing/pytorch.py": 25,
+  "sympy/utilities/lambdify.py": 18
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 28079,
+   "path": "sympy/printing/pytorch.py",
+   "intents": [
+    "log:sympy:28032_28079:28079:sympy/printing/pytorch.py:h0"
+   ],
+   "hold_ms": 25,
+   "t_submit_epoch": 1791563969360,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 14,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 42.94,
+   "t_done_epoch": 1791563969403
+  },
+  {
+   "writer": 1,
+   "pr": 28079,
+   "path": "sympy/utilities/lambdify.py",
+   "intents": [
+    "log:sympy:28032_28079:28079:sympy/utilities/lambdify.py:h1"
+   ],
+   "hold_ms": 18,
+   "t_submit_epoch": 1791563969403,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "lock_spins": 0,
+   "outcome": "blocked",
+   "blocked_reason": "harness-relocate-context-not-found",
+   "total_ms": 26.08,
+   "t_done_epoch": 1791563969429
+  }
+ ],
+ "admit_stats": {
+  "txns": 4,
+  "cas_conflicts": 0
+ },
+ "steward_batches": null
+}

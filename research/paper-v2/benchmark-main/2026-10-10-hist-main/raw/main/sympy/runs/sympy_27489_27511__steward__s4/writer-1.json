@@ -1,0 +1,128 @@
+{
+ "writer": 1,
+ "pr": 27511,
+ "pid": 2124446,
+ "init_ms": 99.39331099999998,
+ "start_offset_ms": 19,
+ "file_order": [
+  "sympy/assumptions/handlers/sets.py"
+ ],
+ "holds": {
+  "sympy/assumptions/handlers/sets.py": 17
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 27511,
+   "path": "sympy/assumptions/handlers/sets.py",
+   "intents": [
+    "log:sympy:27489_27511:27511:sympy/assumptions/handlers/sets.py:h0"
+   ],
+   "hold_ms": 17,
+   "t_submit_epoch": 1791564272463,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 13,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sympy_assumptions_handlers_sets.py-w1-0001",
+   "total_ms": 176.63,
+   "t_done_epoch": 1791564272639
+  }
+ ],
+ "admit_stats": {
+  "txns": 2,
+  "cas_conflicts": 0
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sympy_assumptions_handlers_sets.py-w1-0001",
+   "path": "sympy/assumptions/handlers/sets.py",
+   "pid": 2124446,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-sympy_assumptions_handlers_sets_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sympy_assumptions_handlers_sets_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:d898761ba09ed6acfd226cefe5eb7fbfeb0cc58eb68f7ac5767a75519fcf181f"
+   ],
+   "lock_wait_ms": 0.12,
+   "t_start_epoch_ms": 1791564272496.98,
+   "pre_apply_hash": "sha256:d898761ba09ed6acfd226cefe5eb7fbfeb0cc58eb68f7ac5767a75519fcf181f",
+   "receipt_before_hash": "sha256:d898761ba09ed6acfd226cefe5eb7fbfeb0cc58eb68f7ac5767a75519fcf181f",
+   "receipt_after_hash": "sha256:6e9af01d405993513560ecdb33fa304b384f07d57a51f9c0ccdb532aa19779ed",
+   "post_apply_hash": "sha256:6e9af01d405993513560ecdb33fa304b384f07d57a51f9c0ccdb532aa19779ed",
+   "t_end_epoch_ms": 1791564272629.61,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T00:44:32.629+08:00",
+   "batch_id": "cb-sympy_assumptions_handlers_sets.py-w1-0001",
+   "path": "sympy/assumptions/handlers/sets.py",
+   "proposalIds": [
+    "prop-hist-w1-sympy_assumptions_handlers_sets_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sympy_assumptions_handlers_sets_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-sympy_assumptions_handlers_sets_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-sympy_assumptions_handlers_sets_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-sympy_assumptions_handlers_sets_py",
+     "logical_id": "prop-hist-w1-sympy_assumptions_handlers_sets_py",
+     "attempt_id": "att-prop-hist-w1-sympy_assumptions_handlers_sets_py-r0",
+     "proposal_id": "prop-hist-w1-sympy_assumptions_handlers_sets_py",
+     "actorId": "writer-27511"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.26,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:d898761ba09ed6acfd226cefe5eb7fbfeb0cc58eb68f7ac5767a75519fcf181f",
+   "written": true,
+   "output_digest": "sha256:6e9af01d405993513560ecdb33fa304b384f07d57a51f9c0ccdb532aa19779ed",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

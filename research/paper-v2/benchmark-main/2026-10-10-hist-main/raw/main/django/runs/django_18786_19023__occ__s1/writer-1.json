@@ -1,0 +1,79 @@
+{
+ "writer": 1,
+ "pr": 19023,
+ "pid": 2060573,
+ "init_ms": 62.268747999999995,
+ "start_offset_ms": 9,
+ "file_order": [
+  "django/contrib/gis/geos/prototypes/predicates.py",
+  "django/contrib/gis/geos/prototypes/__init__.py",
+  "django/contrib/gis/geos/geometry.py"
+ ],
+ "holds": {
+  "django/contrib/gis/geos/prototypes/predicates.py": 18,
+  "django/contrib/gis/geos/prototypes/__init__.py": 22,
+  "django/contrib/gis/geos/geometry.py": 14
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 19023,
+   "path": "django/contrib/gis/geos/prototypes/predicates.py",
+   "intents": [
+    "log:django:18786_19023:19023:django/contrib/gis/geos/prototypes/predicates.py:h3"
+   ],
+   "hold_ms": 18,
+   "t_submit_epoch": 1791563724526,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 14,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 38.46,
+   "t_done_epoch": 1791563724564
+  },
+  {
+   "writer": 1,
+   "pr": 19023,
+   "path": "django/contrib/gis/geos/prototypes/__init__.py",
+   "intents": [
+    "log:django:18786_19023:19023:django/contrib/gis/geos/prototypes/__init__.py:h2"
+   ],
+   "hold_ms": 22,
+   "t_submit_epoch": 1791563724564,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 5,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 32.73,
+   "t_done_epoch": 1791563724597
+  },
+  {
+   "writer": 1,
+   "pr": 19023,
+   "path": "django/contrib/gis/geos/geometry.py",
+   "intents": [
+    "log:django:18786_19023:19023:django/contrib/gis/geos/geometry.py:h0",
+    "log:django:18786_19023:19023:django/contrib/gis/geos/geometry.py:h1"
+   ],
+   "hold_ms": 14,
+   "t_submit_epoch": 1791563724597,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 5,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 23.64,
+   "t_done_epoch": 1791563724620
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 6
+ },
+ "steward_batches": null
+}

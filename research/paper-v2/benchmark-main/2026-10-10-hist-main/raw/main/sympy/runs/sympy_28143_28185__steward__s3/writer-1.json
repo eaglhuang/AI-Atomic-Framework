@@ -1,0 +1,134 @@
+{
+ "writer": 1,
+ "pr": 28185,
+ "pid": 2110878,
+ "init_ms": 107.44364499999999,
+ "start_offset_ms": 14,
+ "file_order": [
+  "sympy/physics/continuum_mechanics/beam.py"
+ ],
+ "holds": {
+  "sympy/physics/continuum_mechanics/beam.py": 13
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 28185,
+   "path": "sympy/physics/continuum_mechanics/beam.py",
+   "intents": [
+    "log:sympy:28143_28185:28185:sympy/physics/continuum_mechanics/beam.py:h0",
+    "log:sympy:28143_28185:28185:sympy/physics/continuum_mechanics/beam.py:h1",
+    "log:sympy:28143_28185:28185:sympy/physics/continuum_mechanics/beam.py:h2",
+    "log:sympy:28143_28185:28185:sympy/physics/continuum_mechanics/beam.py:h3",
+    "log:sympy:28143_28185:28185:sympy/physics/continuum_mechanics/beam.py:h4",
+    "log:sympy:28143_28185:28185:sympy/physics/continuum_mechanics/beam.py:h5",
+    "log:sympy:28143_28185:28185:sympy/physics/continuum_mechanics/beam.py:h6"
+   ],
+   "hold_ms": 13,
+   "t_submit_epoch": 1791564146291,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 136,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sympy_physics_continuum_mechanics_beam.py-w1-0001",
+   "total_ms": 290.37,
+   "t_done_epoch": 1791564146581
+  }
+ ],
+ "admit_stats": {
+  "txns": 3,
+  "cas_conflicts": 1
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sympy_physics_continuum_mechanics_beam.py-w1-0001",
+   "path": "sympy/physics/continuum_mechanics/beam.py",
+   "pid": 2110878,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-sympy_physics_continuum_mechanics_beam_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sympy_physics_continuum_mechanics_beam_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:b0d6556d2a110ba4d256cbb0ab0380f1ce45817669b102e85066e2de3e6814ef"
+   ],
+   "lock_wait_ms": 0.12,
+   "t_start_epoch_ms": 1791564146447.2,
+   "pre_apply_hash": "sha256:b0d6556d2a110ba4d256cbb0ab0380f1ce45817669b102e85066e2de3e6814ef",
+   "receipt_before_hash": "sha256:b0d6556d2a110ba4d256cbb0ab0380f1ce45817669b102e85066e2de3e6814ef",
+   "receipt_after_hash": "sha256:3b6b9fbc28b6da47b7eec1390fd89496f75ac72a04d4812a6de5f61bd2aed616",
+   "post_apply_hash": "sha256:3b6b9fbc28b6da47b7eec1390fd89496f75ac72a04d4812a6de5f61bd2aed616",
+   "t_end_epoch_ms": 1791564146579.1,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T00:42:26.579+08:00",
+   "batch_id": "cb-sympy_physics_continuum_mechanics_beam.py-w1-0001",
+   "path": "sympy/physics/continuum_mechanics/beam.py",
+   "proposalIds": [
+    "prop-hist-w1-sympy_physics_continuum_mechanics_beam_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sympy_physics_continuum_mechanics_beam_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-sympy_physics_continuum_mechanics_beam_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-sympy_physics_continuum_mechanics_beam_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-sympy_physics_continuum_mechanics_beam_py",
+     "logical_id": "prop-hist-w1-sympy_physics_continuum_mechanics_beam_py",
+     "attempt_id": "att-prop-hist-w1-sympy_physics_continuum_mechanics_beam_py-r0",
+     "proposal_id": "prop-hist-w1-sympy_physics_continuum_mechanics_beam_py",
+     "actorId": "writer-28185"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.27,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:b0d6556d2a110ba4d256cbb0ab0380f1ce45817669b102e85066e2de3e6814ef",
+   "written": true,
+   "output_digest": "sha256:3b6b9fbc28b6da47b7eec1390fd89496f75ac72a04d4812a6de5f61bd2aed616",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

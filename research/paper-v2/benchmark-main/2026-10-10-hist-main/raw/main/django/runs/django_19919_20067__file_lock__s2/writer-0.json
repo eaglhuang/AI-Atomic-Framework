@@ -1,0 +1,90 @@
+{
+ "writer": 0,
+ "pr": 19919,
+ "pid": 2083455,
+ "init_ms": 73.42907699999999,
+ "start_offset_ms": 4,
+ "file_order": [
+  "django/core/serializers/base.py",
+  "django/core/serializers/python.py",
+  "django/core/serializers/xml_serializer.py"
+ ],
+ "holds": {
+  "django/core/serializers/base.py": 25,
+  "django/core/serializers/python.py": 20,
+  "django/core/serializers/xml_serializer.py": 19
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 19919,
+   "path": "django/core/serializers/base.py",
+   "intents": [
+    "log:django:19919_20067:19919:django/core/serializers/base.py:h0"
+   ],
+   "hold_ms": 25,
+   "t_submit_epoch": 1791563906162,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 12,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 41.91,
+   "t_done_epoch": 1791563906204
+  },
+  {
+   "writer": 0,
+   "pr": 19919,
+   "path": "django/core/serializers/python.py",
+   "intents": [
+    "log:django:19919_20067:19919:django/core/serializers/python.py:h1",
+    "log:django:19919_20067:19919:django/core/serializers/python.py:h2",
+    "log:django:19919_20067:19919:django/core/serializers/python.py:h3",
+    "log:django:19919_20067:19919:django/core/serializers/python.py:h4",
+    "log:django:19919_20067:19919:django/core/serializers/python.py:h5"
+   ],
+   "hold_ms": 20,
+   "t_submit_epoch": 1791563906204,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 27.62,
+   "t_done_epoch": 1791563906231
+  },
+  {
+   "writer": 0,
+   "pr": 19919,
+   "path": "django/core/serializers/xml_serializer.py",
+   "intents": [
+    "log:django:19919_20067:19919:django/core/serializers/xml_serializer.py:h6",
+    "log:django:19919_20067:19919:django/core/serializers/xml_serializer.py:h7",
+    "log:django:19919_20067:19919:django/core/serializers/xml_serializer.py:h8",
+    "log:django:19919_20067:19919:django/core/serializers/xml_serializer.py:h9",
+    "log:django:19919_20067:19919:django/core/serializers/xml_serializer.py:h10",
+    "log:django:19919_20067:19919:django/core/serializers/xml_serializer.py:h11"
+   ],
+   "hold_ms": 19,
+   "t_submit_epoch": 1791563906231,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 25.77,
+   "t_done_epoch": 1791563906257
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 0
+ },
+ "steward_batches": null
+}

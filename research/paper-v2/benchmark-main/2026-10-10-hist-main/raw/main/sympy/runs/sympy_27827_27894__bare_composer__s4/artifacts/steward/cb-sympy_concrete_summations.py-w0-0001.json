@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-936f10a6b2944187",
+  "proposalIds": [
+    "prop-hist-w0-sympy_concrete_summations_py"
+  ],
+  "targetFiles": [
+    "sympy/concrete/summations.py"
+  ],
+  "appliedFiles": [
+    "sympy/concrete/summations.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/concrete/summations.py": "01047e810f43af8fe6fd841746a0a22254d8ebe6619a8328bbfbda64a7b15952"
+  },
+  "fileAfterHashes": {
+    "sympy/concrete/summations.py": "3836fc5d7043cd56bdf61097c35e940acc7a76d8afecba6906faa6696c6e1110"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/concrete/summations.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-936f10a6b2944187",
+    "planId": "merge-936f10a6b2944187",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-936f10a6b2944187",
+        "planId": "merge-936f10a6b2944187",
+        "request_identity": [
+          "prop-hist-w0-sympy_concrete_summations_py"
+        ],
+        "actor_ids": [
+          "writer-27827"
+        ],
+        "request_files": [
+          "sympy/concrete/summations.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/concrete/summations.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/sympy/runs/sympy_27827_27894__bare_composer__s4/artifacts/steward/cb-sympy_concrete_summations.py-w0-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SYMPY_CONCRETE_SUMMATIONS_PY"
+        ],
+        "commit_sha": "a2806de98cbbda3400a1e3a84b4e345f73cd30c2"
+      }
+    ]
+  }
+}

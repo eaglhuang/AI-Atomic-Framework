@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-0a9fd6387cbdacbf",
+  "proposalIds": [
+    "prop-hist-w0-sympy_functions_elementary_complexes_py"
+  ],
+  "targetFiles": [
+    "sympy/functions/elementary/complexes.py"
+  ],
+  "appliedFiles": [
+    "sympy/functions/elementary/complexes.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/functions/elementary/complexes.py": "d3ec544b894736e8ae71617f6619a38585913094d5cb4b76bf55a8b6a12f3933"
+  },
+  "fileAfterHashes": {
+    "sympy/functions/elementary/complexes.py": "570f175098ef5ffb2ff4ff99fc8b7f2032ffc4e171aa8c9f2da56085e0078146"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/functions/elementary/complexes.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-0a9fd6387cbdacbf",
+    "planId": "merge-0a9fd6387cbdacbf",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-0a9fd6387cbdacbf",
+        "planId": "merge-0a9fd6387cbdacbf",
+        "request_identity": [
+          "prop-hist-w0-sympy_functions_elementary_complexes_py"
+        ],
+        "actor_ids": [
+          "writer-27369"
+        ],
+        "request_files": [
+          "sympy/functions/elementary/complexes.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/functions/elementary/complexes.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/sympy/runs/sympy_27369_27414__bare_composer__s1/artifacts/steward/cb-sympy_functions_elementary_complexes.py-w0-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SYMPY_FUNCTIONS_ELEMENTARY_COMPLEXES_PY"
+        ],
+        "commit_sha": "4a71ceb3bc8276ae809475da630e1f846c601eab"
+      }
+    ]
+  }
+}

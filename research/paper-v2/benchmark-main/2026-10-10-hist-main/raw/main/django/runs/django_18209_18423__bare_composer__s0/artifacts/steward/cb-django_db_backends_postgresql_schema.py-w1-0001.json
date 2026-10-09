@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-6a4348e85c2ca0b1",
+  "proposalIds": [
+    "prop-hist-w1-django_db_backends_postgresql_schema_py"
+  ],
+  "targetFiles": [
+    "django/db/backends/postgresql/schema.py"
+  ],
+  "appliedFiles": [
+    "django/db/backends/postgresql/schema.py"
+  ],
+  "fileBeforeHashes": {
+    "django/db/backends/postgresql/schema.py": "4d033a7ecc8cb2c484b391e2aa820bd6145a6401c1d5bdc68396cb62e4ca121f"
+  },
+  "fileAfterHashes": {
+    "django/db/backends/postgresql/schema.py": "e14df421d236a2947bd4b147cceb76c1781346ea26bdaa9206e4d01835acfbe3"
+  },
+  "permissions": {
+    "fileWrite": [
+      "django/db/backends/postgresql/schema.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-6a4348e85c2ca0b1",
+    "planId": "merge-6a4348e85c2ca0b1",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-6a4348e85c2ca0b1",
+        "planId": "merge-6a4348e85c2ca0b1",
+        "request_identity": [
+          "prop-hist-w1-django_db_backends_postgresql_schema_py"
+        ],
+        "actor_ids": [
+          "writer-18423"
+        ],
+        "request_files": [
+          "django/db/backends/postgresql/schema.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "django/db/backends/postgresql/schema.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/django/runs/django_18209_18423__bare_composer__s0/artifacts/steward/cb-django_db_backends_postgresql_schema.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-DJANGO_DB_BACKENDS_POSTGRESQL_SCHEMA_PY"
+        ],
+        "commit_sha": "110b76b3f740b4fc0edfbf7adee4bf190c6002f2"
+      }
+    ]
+  }
+}

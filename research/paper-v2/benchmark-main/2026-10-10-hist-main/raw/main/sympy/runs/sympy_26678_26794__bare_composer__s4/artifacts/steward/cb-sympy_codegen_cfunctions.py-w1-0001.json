@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-bfe437fdf8a74644",
+  "proposalIds": [
+    "prop-hist-w1-sympy_codegen_cfunctions_py"
+  ],
+  "targetFiles": [
+    "sympy/codegen/cfunctions.py"
+  ],
+  "appliedFiles": [
+    "sympy/codegen/cfunctions.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/codegen/cfunctions.py": "1fc6eb008d5077ee69f3f2d77bd247369c49594f8d25d72ef3ce5f1a3876c41e"
+  },
+  "fileAfterHashes": {
+    "sympy/codegen/cfunctions.py": "8eb1566918eb427a47ceeebe9b016d77a711b292bc268ec1dd10e8d403a84cba"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/codegen/cfunctions.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-bfe437fdf8a74644",
+    "planId": "merge-bfe437fdf8a74644",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-bfe437fdf8a74644",
+        "planId": "merge-bfe437fdf8a74644",
+        "request_identity": [
+          "prop-hist-w1-sympy_codegen_cfunctions_py"
+        ],
+        "actor_ids": [
+          "writer-26794"
+        ],
+        "request_files": [
+          "sympy/codegen/cfunctions.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/codegen/cfunctions.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/sympy/runs/sympy_26678_26794__bare_composer__s4/artifacts/steward/cb-sympy_codegen_cfunctions.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_CODEGEN_CFUNCTIONS_PY"
+        ],
+        "commit_sha": "07be16a0d1df2d82928279bb5907d4f00945685f"
+      }
+    ]
+  }
+}

@@ -1,0 +1,106 @@
+{
+ "pair_id": "sympy:28653_28662",
+ "stratum": "O1",
+ "arm": "git_three_way",
+ "plant": null,
+ "seed_k": 2,
+ "seed": 715587425,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-20effd45/AI-Atomic-Framework-20effd45a0c3a09c293caaea6a34face0df1c5f4",
+ "wall_ms": 379,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 6,
+  "by_verdict": {
+   "correct": 6
+  },
+  "completed": 6,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 2,
+  "files_full_bytes_exact": 2,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "sympy/combinatorics/coset_table.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/combinatorics/homomorphisms.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "sympy/combinatorics/coset_table.py": true,
+  "sympy/combinatorics/homomorphisms.py": true
+ },
+ "final_exists": {
+  "sympy/combinatorics/coset_table.py": true,
+  "sympy/combinatorics/homomorphisms.py": true
+ },
+ "files": [
+  {
+   "path": "sympy/combinatorics/coset_table.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:b28a6905df22e9457eb29a5d3b3ca47cd13c7af31e7255389754f07cbe549572",
+   "final_digest": "sha256:b992a5e7f2f56c60469153d5dfc17157faeac33126bc1215d15a36154efa2374",
+   "expected_digests": [
+    "sha256:b992a5e7f2f56c60469153d5dfc17157faeac33126bc1215d15a36154efa2374"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/combinatorics/homomorphisms.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:1c50be85f99798b61539b919e162e62ab44ee61f6655080aed77f01cdcb09302",
+   "final_digest": "sha256:2ed31c144e8f4723721e98ef26af0ef252b7ec13f26725841817a15455fd9281",
+   "expected_digests": [
+    "sha256:2ed31c144e8f4723721e98ef26af0ef252b7ec13f26725841817a15455fd9281"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "sympy/combinatorics/coset_table.py": "sha256:b992a5e7f2f56c60469153d5dfc17157faeac33126bc1215d15a36154efa2374",
+  "sympy/combinatorics/homomorphisms.py": "sha256:2ed31c144e8f4723721e98ef26af0ef252b7ec13f26725841817a15455fd9281"
+ }
+}

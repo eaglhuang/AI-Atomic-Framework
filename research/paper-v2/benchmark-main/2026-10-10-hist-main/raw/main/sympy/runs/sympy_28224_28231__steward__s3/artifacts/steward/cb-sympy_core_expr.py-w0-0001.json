@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-cbb2fb23ab4b1d3c",
+  "proposalIds": [
+    "prop-hist-w0-sympy_core_expr_py"
+  ],
+  "targetFiles": [
+    "sympy/core/expr.py"
+  ],
+  "appliedFiles": [],
+  "fileBeforeHashes": {},
+  "fileAfterHashes": {},
+  "permissions": {
+    "fileWrite": [
+      "sympy/core/expr.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "blocked",
+  "blockedReasons": [
+    "file-hash-drift: Target file hash sha256:d63640184d9331ab84b207e52459bc79ffec781f5d37cd2acd39bcf17f35529b does not match proposal fileBeforeHash sha256:baa27245c9416870fb4423129d933336d147e201ce24da074589f820e8a25a13."
+  ],
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-cbb2fb23ab4b1d3c",
+    "planId": "merge-cbb2fb23ab4b1d3c",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-cbb2fb23ab4b1d3c",
+        "planId": "merge-cbb2fb23ab4b1d3c",
+        "request_identity": [
+          "prop-hist-w0-sympy_core_expr_py"
+        ],
+        "actor_ids": [
+          "writer-28224"
+        ],
+        "request_files": [
+          "sympy/core/expr.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/sympy/runs/sympy_28224_28231__steward__s3/artifacts/steward/cb-sympy_core_expr.py-w0-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SYMPY_CORE_EXPR_PY"
+        ],
+        "commit_sha": "0aab060bac4a3d35c573cf4f7adf432d7408ec84"
+      }
+    ]
+  }
+}

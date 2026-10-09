@@ -1,0 +1,106 @@
+{
+ "pair_id": "sympy:25186_26187",
+ "stratum": "O3",
+ "arm": "bare_composer",
+ "plant": null,
+ "seed_k": 4,
+ "seed": 2102118161,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-20effd45/AI-Atomic-Framework-20effd45a0c3a09c293caaea6a34face0df1c5f4",
+ "wall_ms": 813,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 10,
+  "by_verdict": {
+   "correct": 10
+  },
+  "completed": 10,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 2,
+  "files_full_bytes_exact": 2,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "sympy/polys/rootisolation.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/tensor/tensor.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "sympy/polys/rootisolation.py": true,
+  "sympy/tensor/tensor.py": true
+ },
+ "final_exists": {
+  "sympy/polys/rootisolation.py": true,
+  "sympy/tensor/tensor.py": true
+ },
+ "files": [
+  {
+   "path": "sympy/polys/rootisolation.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:bcebca7b5562dae92598c078a8dcbf11ccd24737a5314a8f077a3ba98762591d",
+   "final_digest": "sha256:7fa5450cc05858604b7f1f6145e4a6f68236ee0ba5d88ec33a0a3777c4800aa7",
+   "expected_digests": [
+    "sha256:7fa5450cc05858604b7f1f6145e4a6f68236ee0ba5d88ec33a0a3777c4800aa7"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/tensor/tensor.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:8a35dc3231ffb5e5b67110a4159fbbc61931c24e2d7230dd8b9786f5212dee0d",
+   "final_digest": "sha256:e5258085e99852b531496f8c39f9d2d288dbe2c51e10e07e308041e005b7a22c",
+   "expected_digests": [
+    "sha256:e5258085e99852b531496f8c39f9d2d288dbe2c51e10e07e308041e005b7a22c"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "sympy/polys/rootisolation.py": "sha256:7fa5450cc05858604b7f1f6145e4a6f68236ee0ba5d88ec33a0a3777c4800aa7",
+  "sympy/tensor/tensor.py": "sha256:e5258085e99852b531496f8c39f9d2d288dbe2c51e10e07e308041e005b7a22c"
+ }
+}

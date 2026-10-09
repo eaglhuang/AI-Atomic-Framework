@@ -1,0 +1,128 @@
+{
+ "writer": 1,
+ "pr": 27611,
+ "pid": 2116396,
+ "init_ms": 101.98618200000001,
+ "start_offset_ms": 7,
+ "file_order": [
+  "sympy/polys/polytools.py"
+ ],
+ "holds": {
+  "sympy/polys/polytools.py": 6
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 27611,
+   "path": "sympy/polys/polytools.py",
+   "intents": [
+    "log:sympy:27598_27611:27611:sympy/polys/polytools.py:h0"
+   ],
+   "hold_ms": 6,
+   "t_submit_epoch": 1791564195421,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 29,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sympy_polys_polytools.py-w1-0001",
+   "total_ms": 193.18,
+   "t_done_epoch": 1791564195615
+  }
+ ],
+ "admit_stats": {
+  "txns": 2,
+  "cas_conflicts": 0
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sympy_polys_polytools.py-w1-0001",
+   "path": "sympy/polys/polytools.py",
+   "pid": 2116396,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-sympy_polys_polytools_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sympy_polys_polytools_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:fd207bbae82a575dea9ec1545ca61cace439858658d2e1f10ced3ba5a492d94a"
+   ],
+   "lock_wait_ms": 0.19,
+   "t_start_epoch_ms": 1791564195464.23,
+   "pre_apply_hash": "sha256:fd207bbae82a575dea9ec1545ca61cace439858658d2e1f10ced3ba5a492d94a",
+   "receipt_before_hash": "sha256:7da185cf60fd9ea4b86ccfd41c322ec937e1fc3ff8e8b70650f305d5c3bad22c",
+   "receipt_after_hash": "sha256:b51ee5719a246fdea611c9dd7e28c871d9956a008ccff405948556b0e3b5c21f",
+   "post_apply_hash": "sha256:b51ee5719a246fdea611c9dd7e28c871d9956a008ccff405948556b0e3b5c21f",
+   "t_end_epoch_ms": 1791564195611.97,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": true,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T00:43:15.612+08:00",
+   "batch_id": "cb-sympy_polys_polytools.py-w1-0001",
+   "path": "sympy/polys/polytools.py",
+   "proposalIds": [
+    "prop-hist-w1-sympy_polys_polytools_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sympy_polys_polytools_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-sympy_polys_polytools_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-sympy_polys_polytools_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-sympy_polys_polytools_py",
+     "logical_id": "prop-hist-w1-sympy_polys_polytools_py",
+     "attempt_id": "att-prop-hist-w1-sympy_polys_polytools_py-r0",
+     "proposal_id": "prop-hist-w1-sympy_polys_polytools_py",
+     "actorId": "writer-27611"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.37,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:fd207bbae82a575dea9ec1545ca61cace439858658d2e1f10ced3ba5a492d94a",
+   "written": true,
+   "output_digest": "sha256:b51ee5719a246fdea611c9dd7e28c871d9956a008ccff405948556b0e3b5c21f",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

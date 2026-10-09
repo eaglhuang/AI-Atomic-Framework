@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-e8227e22cdd7816c",
+  "proposalIds": [
+    "prop-hist-w0-django_init_py"
+  ],
+  "targetFiles": [
+    "django/__init__.py"
+  ],
+  "appliedFiles": [
+    "django/__init__.py"
+  ],
+  "fileBeforeHashes": {
+    "django/__init__.py": "9baf3846f9ab114f1ece32356a88e3304a6f9b23737acd52e1d78d06c9d737ae"
+  },
+  "fileAfterHashes": {
+    "django/__init__.py": "3e992678bd0a9f14e82ff777025ead0538cfda169236ba40b53bd9676287a625"
+  },
+  "permissions": {
+    "fileWrite": [
+      "django/__init__.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-e8227e22cdd7816c",
+    "planId": "merge-e8227e22cdd7816c",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-e8227e22cdd7816c",
+        "planId": "merge-e8227e22cdd7816c",
+        "request_identity": [
+          "prop-hist-w0-django_init_py"
+        ],
+        "actor_ids": [
+          "writer-18127"
+        ],
+        "request_files": [
+          "django/__init__.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "django/__init__.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/django/runs/django_18127_18157__bare_composer__s4/artifacts/steward/cb-django___init__.py-w0-0003.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-DJANGO_INIT_PY"
+        ],
+        "commit_sha": "9b58b7bd49d212ba4001f286d673ffb21ec87169"
+      }
+    ]
+  }
+}

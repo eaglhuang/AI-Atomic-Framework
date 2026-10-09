@@ -1,0 +1,109 @@
+{
+ "writer": 1,
+ "pr": 20340,
+ "pid": 2050392,
+ "init_ms": 76.94513699999999,
+ "start_offset_ms": 15,
+ "file_order": [
+  "django/contrib/admin/templatetags/base.py",
+  "django/template/library.py",
+  "django/template/base.py",
+  "django/utils/inspect.py"
+ ],
+ "holds": {
+  "django/contrib/admin/templatetags/base.py": 19,
+  "django/template/library.py": 3,
+  "django/template/base.py": 2,
+  "django/utils/inspect.py": 7
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 20340,
+   "path": "django/contrib/admin/templatetags/base.py",
+   "intents": [
+    "log:django:20086_20340:20340:django/contrib/admin/templatetags/base.py:h0",
+    "log:django:20086_20340:20340:django/contrib/admin/templatetags/base.py:h1"
+   ],
+   "hold_ms": 19,
+   "t_submit_epoch": 1791563642445,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 17,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 40.52,
+   "t_done_epoch": 1791563642485
+  },
+  {
+   "writer": 1,
+   "pr": 20340,
+   "path": "django/template/library.py",
+   "intents": [
+    "log:django:20086_20340:20340:django/template/library.py:h4",
+    "log:django:20086_20340:20340:django/template/library.py:h5",
+    "log:django:20086_20340:20340:django/template/library.py:h6",
+    "log:django:20086_20340:20340:django/template/library.py:h7"
+   ],
+   "hold_ms": 3,
+   "t_submit_epoch": 1791563642485,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "queue",
+   "admit_wait_ms": 9,
+   "lock_spins": 0,
+   "outcome": "blocked",
+   "blocked_reason": "harness-relocate-context-not-found",
+   "total_ms": 14.85,
+   "t_done_epoch": 1791563642500
+  },
+  {
+   "writer": 1,
+   "pr": 20340,
+   "path": "django/template/base.py",
+   "intents": [
+    "log:django:20086_20340:20340:django/template/base.py:h2",
+    "log:django:20086_20340:20340:django/template/base.py:h3"
+   ],
+   "hold_ms": 2,
+   "t_submit_epoch": 1791563642500,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 7.22,
+   "t_done_epoch": 1791563642507
+  },
+  {
+   "writer": 1,
+   "pr": 20340,
+   "path": "django/utils/inspect.py",
+   "intents": [
+    "log:django:20086_20340:20340:django/utils/inspect.py:h8",
+    "log:django:20086_20340:20340:django/utils/inspect.py:h9",
+    "log:django:20086_20340:20340:django/utils/inspect.py:h10"
+   ],
+   "hold_ms": 7,
+   "t_submit_epoch": 1791563642507,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 11.64,
+   "t_done_epoch": 1791563642519
+  }
+ ],
+ "admit_stats": {
+  "txns": 9,
+  "cas_conflicts": 1
+ },
+ "steward_batches": null
+}

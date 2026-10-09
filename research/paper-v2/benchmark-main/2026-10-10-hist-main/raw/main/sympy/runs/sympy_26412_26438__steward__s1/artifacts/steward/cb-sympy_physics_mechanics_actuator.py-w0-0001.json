@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-926af04d691325fe",
+  "proposalIds": [
+    "prop-hist-w0-sympy_physics_mechanics_actuator_py"
+  ],
+  "targetFiles": [
+    "sympy/physics/mechanics/actuator.py"
+  ],
+  "appliedFiles": [
+    "sympy/physics/mechanics/actuator.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/physics/mechanics/actuator.py": "edf2f1f7eb12914c04bebdaa40eec0f4ab0c356b77258c8f5b4383df89134665"
+  },
+  "fileAfterHashes": {
+    "sympy/physics/mechanics/actuator.py": "3a3a592638701191d28de1da5d2539138f19868f25a717c1dca5df7d3862a898"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/physics/mechanics/actuator.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-926af04d691325fe",
+    "planId": "merge-926af04d691325fe",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-926af04d691325fe",
+        "planId": "merge-926af04d691325fe",
+        "request_identity": [
+          "prop-hist-w0-sympy_physics_mechanics_actuator_py"
+        ],
+        "actor_ids": [
+          "writer-26412"
+        ],
+        "request_files": [
+          "sympy/physics/mechanics/actuator.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/physics/mechanics/actuator.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/sympy/runs/sympy_26412_26438__steward__s1/artifacts/steward/cb-sympy_physics_mechanics_actuator.py-w0-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SYMPY_PHYSICS_MECHANICS_ACTUATOR_PY"
+        ],
+        "commit_sha": "20ccf203f26ab69dc4f0fa8cedb95b25abff4eb8"
+      }
+    ]
+  }
+}

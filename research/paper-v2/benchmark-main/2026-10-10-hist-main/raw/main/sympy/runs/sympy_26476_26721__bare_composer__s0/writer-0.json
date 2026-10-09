@@ -1,0 +1,125 @@
+{
+ "writer": 0,
+ "pr": 26476,
+ "pid": 2115036,
+ "init_ms": 80.13282,
+ "start_offset_ms": 1,
+ "file_order": [
+  "sympy/tensor/tensor.py"
+ ],
+ "holds": {
+  "sympy/tensor/tensor.py": 21
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 26476,
+   "path": "sympy/tensor/tensor.py",
+   "intents": [
+    "log:sympy:26476_26721:26476:sympy/tensor/tensor.py:h0"
+   ],
+   "hold_ms": 21,
+   "t_submit_epoch": 1791564181831,
+   "outcome": "blocked",
+   "blocked_reason": "compose-context-mismatch: proposal 'prop-hist-w0-sympy_tensor_tensor_py' context mismatch at base line 3527: expected \"\", found \"        args = [arg for arg in args if isinstance(arg, TensExpr)]\" [proposals: prop-hist-w0-sympy_tensor_tensor_py]",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w0-sympy_tensor_tensor_py' context mismatch at base line 3527: expected \"\", found \"        args = [arg for arg in args if isinstance(arg, TensExpr)]\" [proposals: prop-hist-w0-sympy_tensor_tensor_py]"
+   ],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sympy_tensor_tensor.py-w0-0001",
+   "total_ms": 131.22,
+   "t_done_epoch": 1791564181962
+  }
+ ],
+ "admit_stats": null,
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sympy_tensor_tensor.py-w0-0001",
+   "path": "sympy/tensor/tensor.py",
+   "pid": 2115036,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-sympy_tensor_tensor_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sympy_tensor_tensor_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:e5258085e99852b531496f8c39f9d2d288dbe2c51e10e07e308041e005b7a22c"
+   ],
+   "lock_wait_ms": 0.11,
+   "t_start_epoch_ms": 1791564181857.41,
+   "pre_apply_hash": "sha256:e5258085e99852b531496f8c39f9d2d288dbe2c51e10e07e308041e005b7a22c",
+   "receipt_before_hash": null,
+   "receipt_after_hash": null,
+   "post_apply_hash": "sha256:9666e86ae5bceb4d21b56fcd771a40adb16ea50b9f18700d28e9b611fc3016c0",
+   "t_end_epoch_ms": 1791564181962.07,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "blocked",
+   "written": false,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T00:43:01.962+08:00",
+   "batch_id": "cb-sympy_tensor_tensor.py-w0-0001",
+   "path": "sympy/tensor/tensor.py",
+   "proposalIds": [
+    "prop-hist-w0-sympy_tensor_tensor_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sympy_tensor_tensor_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-sympy_tensor_tensor_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-sympy_tensor_tensor_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-sympy_tensor_tensor_py",
+     "logical_id": "prop-hist-w0-sympy_tensor_tensor_py",
+     "attempt_id": "att-prop-hist-w0-sympy_tensor_tensor_py-r0",
+     "proposal_id": "prop-hist-w0-sympy_tensor_tensor_py",
+     "actorId": "writer-26476"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w0-sympy_tensor_tensor_py' context mismatch at base line 3527: expected \"\", found \"        args = [arg for arg in args if isinstance(arg, TensExpr)]\" [proposals: prop-hist-w0-sympy_tensor_tensor_py]"
+   ],
+   "blocked_reason": "compose-context-mismatch: proposal 'prop-hist-w0-sympy_tensor_tensor_py' context mismatch at base line 3527: expected \"\", found \"        args = [arg for arg in args if isinstance(arg, TensExpr)]\" [proposals: prop-hist-w0-sympy_tensor_tensor_py]",
+   "window_wait_ms": 0.24,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:e5258085e99852b531496f8c39f9d2d288dbe2c51e10e07e308041e005b7a22c",
+   "written": false,
+   "output_digest": null,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "compose-context-mismatch: proposal 'prop-hist-w0-sympy_tensor_tensor_py' context mismatch at base line 3527: expected \"\", found \"        args = [arg for arg in args if isinstance(arg, TensExpr)]\" [proposals: prop-hist-w0-sympy_tensor_tensor_py]"
+  }
+ ]
+}

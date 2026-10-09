@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-802e8804785c741f",
+  "proposalIds": [
+    "prop-hist-w0-django_utils_crypto_py"
+  ],
+  "targetFiles": [
+    "django/utils/crypto.py"
+  ],
+  "appliedFiles": [
+    "django/utils/crypto.py"
+  ],
+  "fileBeforeHashes": {
+    "django/utils/crypto.py": "33f369447ca854de7b27fa43427a0cd77e7ed97f067b511fe0bdb6e71ca4e15e"
+  },
+  "fileAfterHashes": {
+    "django/utils/crypto.py": "9104402b97299d2a91d0e3a898310e1b0d2556dfe8c5e80e4a7f71dee5797db7"
+  },
+  "permissions": {
+    "fileWrite": [
+      "django/utils/crypto.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-802e8804785c741f",
+    "planId": "merge-802e8804785c741f",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-802e8804785c741f",
+        "planId": "merge-802e8804785c741f",
+        "request_identity": [
+          "prop-hist-w0-django_utils_crypto_py"
+        ],
+        "actor_ids": [
+          "writer-19745"
+        ],
+        "request_files": [
+          "django/utils/crypto.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "django/utils/crypto.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/django/runs/django_19745_19756__steward__s3/artifacts/steward/cb-django_utils_crypto.py-w0-0002.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-DJANGO_UTILS_CRYPTO_PY"
+        ],
+        "commit_sha": "3aab750a7196b8469415c733fd8dc861a6beeda9"
+      }
+    ]
+  }
+}

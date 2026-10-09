@@ -1,0 +1,172 @@
+{
+ "pair_id": "sympy:26042_26044",
+ "stratum": "O3",
+ "arm": "steward",
+ "plant": null,
+ "seed_k": 0,
+ "seed": 3820968614,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-20effd45/AI-Atomic-Framework-20effd45a0c3a09c293caaea6a34face0df1c5f4",
+ "wall_ms": 699,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 17,
+  "by_verdict": {
+   "correct": 17
+  },
+  "completed": 17,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 5,
+  "files_full_bytes_exact": 5,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "sympy/__init__.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/functions/__init__.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/functions/combinatorial/numbers.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/ntheory/residue_ntheory.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/printing/latex.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "sympy/__init__.py": true,
+  "sympy/functions/__init__.py": true,
+  "sympy/functions/combinatorial/numbers.py": true,
+  "sympy/ntheory/residue_ntheory.py": true,
+  "sympy/printing/latex.py": true
+ },
+ "final_exists": {
+  "sympy/__init__.py": true,
+  "sympy/functions/__init__.py": true,
+  "sympy/functions/combinatorial/numbers.py": true,
+  "sympy/ntheory/residue_ntheory.py": true,
+  "sympy/printing/latex.py": true
+ },
+ "files": [
+  {
+   "path": "sympy/__init__.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:1fb540a4d302ba5cc91ea821a3555864061940c6404681758393256c5d425433",
+   "final_digest": "sha256:2a3bcd1729608c9e817972fb8c40103ef43f465b65d01e9c6a48e9f3d092f28a",
+   "expected_digests": [
+    "sha256:2a3bcd1729608c9e817972fb8c40103ef43f465b65d01e9c6a48e9f3d092f28a"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/functions/__init__.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:7f19db55b66bb841d74310790da4130ba935422f01ad6690dcbc01b92659af29",
+   "final_digest": "sha256:1d7a4a24d44b79aeeb6f8741ff1cb815091b8588905b2c9fef1b198197ed7c24",
+   "expected_digests": [
+    "sha256:1d7a4a24d44b79aeeb6f8741ff1cb815091b8588905b2c9fef1b198197ed7c24"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/functions/combinatorial/numbers.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:72fc0875fdebec3b7f23d3aba69e6daed2745090acbe43079076b86d0e1fa7a1",
+   "final_digest": "sha256:ccdd7a0a2d0f1e678a80181c55ecbdec387c0481da216d329f61ed99331f537f",
+   "expected_digests": [
+    "sha256:ccdd7a0a2d0f1e678a80181c55ecbdec387c0481da216d329f61ed99331f537f"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/ntheory/residue_ntheory.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:6fac8f5685bc16b85bb815ce6082884a36852624fe326148c1accb68c4604250",
+   "final_digest": "sha256:6ce57b1b0fc7c153ddf31c1d23ec5f4e14076f211fac8385d0c2d5863eb9dda3",
+   "expected_digests": [
+    "sha256:6ce57b1b0fc7c153ddf31c1d23ec5f4e14076f211fac8385d0c2d5863eb9dda3"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/printing/latex.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:d7df83b470e6be3aa7c984c1ecade27719c7bee859db1d3a2b6645129d1b975b",
+   "final_digest": "sha256:5c9a4f187cca79c573fcce1952494033ef07a9805b905a1c04bdab291695c6a9",
+   "expected_digests": [
+    "sha256:5c9a4f187cca79c573fcce1952494033ef07a9805b905a1c04bdab291695c6a9"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "sympy/__init__.py": "sha256:2a3bcd1729608c9e817972fb8c40103ef43f465b65d01e9c6a48e9f3d092f28a",
+  "sympy/functions/__init__.py": "sha256:1d7a4a24d44b79aeeb6f8741ff1cb815091b8588905b2c9fef1b198197ed7c24",
+  "sympy/functions/combinatorial/numbers.py": "sha256:ccdd7a0a2d0f1e678a80181c55ecbdec387c0481da216d329f61ed99331f537f",
+  "sympy/ntheory/residue_ntheory.py": "sha256:6ce57b1b0fc7c153ddf31c1d23ec5f4e14076f211fac8385d0c2d5863eb9dda3",
+  "sympy/printing/latex.py": "sha256:5c9a4f187cca79c573fcce1952494033ef07a9805b905a1c04bdab291695c6a9"
+ }
+}

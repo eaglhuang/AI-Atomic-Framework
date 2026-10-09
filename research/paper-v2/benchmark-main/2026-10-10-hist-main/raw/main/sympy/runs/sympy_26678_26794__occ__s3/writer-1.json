@@ -1,0 +1,100 @@
+{
+ "writer": 1,
+ "pr": 26794,
+ "pid": 2126873,
+ "init_ms": 70.403318,
+ "start_offset_ms": 12,
+ "file_order": [
+  "sympy/codegen/cfunctions.py",
+  "sympy/printing/pycode.py",
+  "sympy/printing/codeprinter.py",
+  "sympy/printing/numpy.py"
+ ],
+ "holds": {
+  "sympy/codegen/cfunctions.py": 0,
+  "sympy/printing/pycode.py": 29,
+  "sympy/printing/codeprinter.py": 2,
+  "sympy/printing/numpy.py": 11
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 26794,
+   "path": "sympy/codegen/cfunctions.py",
+   "intents": [
+    "log:sympy:26678_26794:26794:sympy/codegen/cfunctions.py:h0",
+    "log:sympy:26678_26794:26794:sympy/codegen/cfunctions.py:h1",
+    "log:sympy:26678_26794:26794:sympy/codegen/cfunctions.py:h2"
+   ],
+   "hold_ms": 0,
+   "t_submit_epoch": 1791564293101,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 16,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 23.55,
+   "t_done_epoch": 1791564293124
+  },
+  {
+   "writer": 1,
+   "pr": 26794,
+   "path": "sympy/printing/pycode.py",
+   "intents": [
+    "log:sympy:26678_26794:26794:sympy/printing/pycode.py:h5"
+   ],
+   "hold_ms": 29,
+   "t_submit_epoch": 1791564293124,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 37.76,
+   "t_done_epoch": 1791564293162
+  },
+  {
+   "writer": 1,
+   "pr": 26794,
+   "path": "sympy/printing/codeprinter.py",
+   "intents": [
+    "log:sympy:26678_26794:26794:sympy/printing/codeprinter.py:h3"
+   ],
+   "hold_ms": 2,
+   "t_submit_epoch": 1791564293162,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "queue",
+   "admit_wait_ms": 24,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 30.96,
+   "t_done_epoch": 1791564293193
+  },
+  {
+   "writer": 1,
+   "pr": 26794,
+   "path": "sympy/printing/numpy.py",
+   "intents": [
+    "log:sympy:26678_26794:26794:sympy/printing/numpy.py:h4"
+   ],
+   "hold_ms": 11,
+   "t_submit_epoch": 1791564293193,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 18.13,
+   "t_done_epoch": 1791564293211
+  }
+ ],
+ "admit_stats": {
+  "txns": 9,
+  "cas_conflicts": 1
+ },
+ "steward_batches": null
+}

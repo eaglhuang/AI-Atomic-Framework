@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-8ac0c96e7ab4917c",
+  "proposalIds": [
+    "prop-hist-w0-django_contrib_gis_db_models_lookups_py"
+  ],
+  "targetFiles": [
+    "django/contrib/gis/db/models/lookups.py"
+  ],
+  "appliedFiles": [
+    "django/contrib/gis/db/models/lookups.py"
+  ],
+  "fileBeforeHashes": {
+    "django/contrib/gis/db/models/lookups.py": "40012398bcec4fc208e59d3e2e9faacf6dd04164b9565691ca2252ed29023419"
+  },
+  "fileAfterHashes": {
+    "django/contrib/gis/db/models/lookups.py": "91e10ff6e386ea42c40eb1ebb0f433b42899f1cb51c68b04d1008f6a9487c78e"
+  },
+  "permissions": {
+    "fileWrite": [
+      "django/contrib/gis/db/models/lookups.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-8ac0c96e7ab4917c",
+    "planId": "merge-8ac0c96e7ab4917c",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-8ac0c96e7ab4917c",
+        "planId": "merge-8ac0c96e7ab4917c",
+        "request_identity": [
+          "prop-hist-w0-django_contrib_gis_db_models_lookups_py"
+        ],
+        "actor_ids": [
+          "writer-19057"
+        ],
+        "request_files": [
+          "django/contrib/gis/db/models/lookups.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "django/contrib/gis/db/models/lookups.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/django/runs/django_19057_19495__steward__s1/artifacts/steward/cb-django_contrib_gis_db_models_lookups.py-w0-0003.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-DJANGO_CONTRIB_GIS_DB_MODELS_LOOKUPS_PY"
+        ],
+        "commit_sha": "621a960ec041fda22ec18a21f8a796f805f506a9"
+      }
+    ]
+  }
+}

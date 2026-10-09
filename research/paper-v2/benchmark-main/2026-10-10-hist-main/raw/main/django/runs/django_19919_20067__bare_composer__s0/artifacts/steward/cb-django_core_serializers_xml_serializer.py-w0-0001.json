@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-73f3089940df5bf2",
+  "proposalIds": [
+    "prop-hist-w0-django_core_serializers_xml_serializer_py"
+  ],
+  "targetFiles": [
+    "django/core/serializers/xml_serializer.py"
+  ],
+  "appliedFiles": [
+    "django/core/serializers/xml_serializer.py"
+  ],
+  "fileBeforeHashes": {
+    "django/core/serializers/xml_serializer.py": "0970c870530e9d942ac8f9796e78ec7ab98e327bc31ddd9deaefc78490b9c3c9"
+  },
+  "fileAfterHashes": {
+    "django/core/serializers/xml_serializer.py": "5a7419bb8b6590ce4560df48f0ae722d94830d7d6b9c97d4bff78821f623f261"
+  },
+  "permissions": {
+    "fileWrite": [
+      "django/core/serializers/xml_serializer.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-73f3089940df5bf2",
+    "planId": "merge-73f3089940df5bf2",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-73f3089940df5bf2",
+        "planId": "merge-73f3089940df5bf2",
+        "request_identity": [
+          "prop-hist-w0-django_core_serializers_xml_serializer_py"
+        ],
+        "actor_ids": [
+          "writer-19919"
+        ],
+        "request_files": [
+          "django/core/serializers/xml_serializer.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "django/core/serializers/xml_serializer.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/django/runs/django_19919_20067__bare_composer__s0/artifacts/steward/cb-django_core_serializers_xml_serializer.py-w0-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-DJANGO_CORE_SERIALIZERS_XML_SERIALIZER_PY"
+        ],
+        "commit_sha": "2020d2502c6497f4a705065f8eca1b6aea71586e"
+      }
+    ]
+  }
+}

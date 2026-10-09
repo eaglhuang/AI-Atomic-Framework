@@ -1,0 +1,87 @@
+{
+ "pair_id": "django:18368_19167",
+ "stratum": "O1",
+ "arm": "occ",
+ "plant": null,
+ "seed_k": 0,
+ "seed": 1131158165,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-20effd45/AI-Atomic-Framework-20effd45a0c3a09c293caaea6a34face0df1c5f4",
+ "wall_ms": 382,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 11,
+  "by_verdict": {
+   "blocked_absent": 6,
+   "correct": 5
+  },
+  "completed": 5,
+  "lost_effects": 0,
+  "blocked": 6,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 1,
+  "files_full_bytes_exact": 1,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {
+  "occ-relocate-context-not-found": 6
+ },
+ "structure": {
+  "django/template/defaulttags.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "django/template/defaulttags.py": true
+ },
+ "final_exists": {
+  "django/template/defaulttags.py": true
+ },
+ "files": [
+  {
+   "path": "django/template/defaulttags.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:ae0f0cca72ffdd1d8bccaf70182b9275fd9aff29d53a20bb6c1e6972dcbcae1f",
+   "final_digest": "sha256:115e2326b49c8c3c330493769c98412cc627e5b236b418f95e9594e7cc1dba69",
+   "expected_digests": [
+    "sha256:115e2326b49c8c3c330493769c98412cc627e5b236b418f95e9594e7cc1dba69"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "django/template/defaulttags.py": "sha256:115e2326b49c8c3c330493769c98412cc627e5b236b418f95e9594e7cc1dba69"
+ }
+}

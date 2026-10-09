@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-61b4a87756dc9349",
+  "proposalIds": [
+    "prop-hist-w0-sympy_matrices_expressions_matexpr_py"
+  ],
+  "targetFiles": [
+    "sympy/matrices/expressions/matexpr.py"
+  ],
+  "appliedFiles": [
+    "sympy/matrices/expressions/matexpr.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/matrices/expressions/matexpr.py": "b99299f71a63d5e15ac9bf31b1339bf26d286309bd077f587fe73c5308af5e86"
+  },
+  "fileAfterHashes": {
+    "sympy/matrices/expressions/matexpr.py": "b08af872fd7e51b4d259eb92fdde3acdcab82dfac4069e76bd24d3fb602cd98d"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/matrices/expressions/matexpr.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-61b4a87756dc9349",
+    "planId": "merge-61b4a87756dc9349",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-61b4a87756dc9349",
+        "planId": "merge-61b4a87756dc9349",
+        "request_identity": [
+          "prop-hist-w0-sympy_matrices_expressions_matexpr_py"
+        ],
+        "actor_ids": [
+          "writer-26303"
+        ],
+        "request_files": [
+          "sympy/matrices/expressions/matexpr.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/matrices/expressions/matexpr.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/sympy/runs/sympy_26303_26442__steward__s1/artifacts/steward/cb-sympy_matrices_expressions_matexpr.py-w0-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SYMPY_MATRICES_EXPRESSIONS_MATEXPR_PY"
+        ],
+        "commit_sha": "6e31988a1e64a080025c2768ca48294c7c21dfe1"
+      }
+    ]
+  }
+}

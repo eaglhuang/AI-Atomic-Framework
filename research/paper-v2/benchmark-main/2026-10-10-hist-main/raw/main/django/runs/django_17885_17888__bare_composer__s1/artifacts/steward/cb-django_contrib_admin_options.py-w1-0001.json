@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-2861393c32723e4d",
+  "proposalIds": [
+    "prop-hist-w1-django_contrib_admin_options_py"
+  ],
+  "targetFiles": [
+    "django/contrib/admin/options.py"
+  ],
+  "appliedFiles": [],
+  "fileBeforeHashes": {},
+  "fileAfterHashes": {},
+  "permissions": {
+    "fileWrite": [
+      "django/contrib/admin/options.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "blocked",
+  "blockedReasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w1-django_contrib_admin_options_py' context mismatch at base line 1033: expected \"\", found \"        return checkbox.render(helpers.ACTION_CHECKBOX_NAME, str(obj.pk))\" [proposals: prop-hist-w1-django_contrib_admin_options_py]"
+  ],
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-2861393c32723e4d",
+    "planId": "merge-2861393c32723e4d",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-2861393c32723e4d",
+        "planId": "merge-2861393c32723e4d",
+        "request_identity": [
+          "prop-hist-w1-django_contrib_admin_options_py"
+        ],
+        "actor_ids": [
+          "writer-17888"
+        ],
+        "request_files": [
+          "django/contrib/admin/options.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/django/runs/django_17885_17888__bare_composer__s1/artifacts/steward/cb-django_contrib_admin_options.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-DJANGO_CONTRIB_ADMIN_OPTIONS_PY"
+        ],
+        "commit_sha": "efa3e3c52c19e601232c8670e6ace850a167255e"
+      }
+    ]
+  }
+}

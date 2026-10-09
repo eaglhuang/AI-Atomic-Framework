@@ -1,0 +1,61 @@
+{
+ "writer": 0,
+ "pr": 27686,
+ "pid": 2104110,
+ "init_ms": 65.55396200000001,
+ "start_offset_ms": 20,
+ "file_order": [
+  "sympy/solvers/ode/single.py",
+  "sympy/solvers/ode/ode.py"
+ ],
+ "holds": {
+  "sympy/solvers/ode/single.py": 26,
+  "sympy/solvers/ode/ode.py": 25
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 27686,
+   "path": "sympy/solvers/ode/single.py",
+   "intents": [
+    "log:sympy:27686_27892:27686:sympy/solvers/ode/single.py:h1",
+    "log:sympy:27686_27892:27686:sympy/solvers/ode/single.py:h2",
+    "log:sympy:27686_27892:27686:sympy/solvers/ode/single.py:h3",
+    "log:sympy:27686_27892:27686:sympy/solvers/ode/single.py:h4"
+   ],
+   "hold_ms": 26,
+   "t_submit_epoch": 1791564085624,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 21,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 56.3,
+   "t_done_epoch": 1791564085680
+  },
+  {
+   "writer": 0,
+   "pr": 27686,
+   "path": "sympy/solvers/ode/ode.py",
+   "intents": [
+    "log:sympy:27686_27892:27686:sympy/solvers/ode/ode.py:h0"
+   ],
+   "hold_ms": 25,
+   "t_submit_epoch": 1791564085680,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "queue",
+   "admit_wait_ms": 40,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 71.97,
+   "t_done_epoch": 1791564085752
+  }
+ ],
+ "admit_stats": {
+  "txns": 5,
+  "cas_conflicts": 0
+ },
+ "steward_batches": null
+}

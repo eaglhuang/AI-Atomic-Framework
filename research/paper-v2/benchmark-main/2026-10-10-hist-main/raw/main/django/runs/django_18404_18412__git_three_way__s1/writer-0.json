@@ -1,0 +1,108 @@
+{
+ "writer": 0,
+ "pr": 18404,
+ "pid": 2084169,
+ "init_ms": 104.78982500000001,
+ "start_offset_ms": 12,
+ "file_order": [
+  "django/db/models/sql/query.py",
+  "django/db/models/fields/tuple_lookups.py",
+  "django/db/models/fields/related_lookups.py",
+  "django/db/models/expressions.py"
+ ],
+ "holds": {
+  "django/db/models/sql/query.py": 14,
+  "django/db/models/fields/tuple_lookups.py": 28,
+  "django/db/models/fields/related_lookups.py": 11,
+  "django/db/models/expressions.py": 4
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 18404,
+   "path": "django/db/models/sql/query.py",
+   "intents": [
+    "log:django:18404_18412:18404:django/db/models/sql/query.py:h15",
+    "log:django:18404_18412:18404:django/db/models/sql/query.py:h16",
+    "log:django:18404_18412:18404:django/db/models/sql/query.py:h17"
+   ],
+   "hold_ms": 14,
+   "t_submit_epoch": 1791563911730,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 28,
+   "outcome": "commit",
+   "total_ms": 56.66,
+   "t_done_epoch": 1791563911786
+  },
+  {
+   "writer": 0,
+   "pr": 18404,
+   "path": "django/db/models/fields/tuple_lookups.py",
+   "intents": [
+    "log:django:18404_18412:18404:django/db/models/fields/tuple_lookups.py:h14"
+   ],
+   "hold_ms": 28,
+   "t_submit_epoch": 1791563911786,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 8,
+   "outcome": "commit",
+   "total_ms": 41.61,
+   "t_done_epoch": 1791563911828
+  },
+  {
+   "writer": 0,
+   "pr": 18404,
+   "path": "django/db/models/fields/related_lookups.py",
+   "intents": [
+    "log:django:18404_18412:18404:django/db/models/fields/related_lookups.py:h1",
+    "log:django:18404_18412:18404:django/db/models/fields/related_lookups.py:h2",
+    "log:django:18404_18412:18404:django/db/models/fields/related_lookups.py:h3",
+    "log:django:18404_18412:18404:django/db/models/fields/related_lookups.py:h4",
+    "log:django:18404_18412:18404:django/db/models/fields/related_lookups.py:h5",
+    "log:django:18404_18412:18404:django/db/models/fields/related_lookups.py:h6",
+    "log:django:18404_18412:18404:django/db/models/fields/related_lookups.py:h7",
+    "log:django:18404_18412:18404:django/db/models/fields/related_lookups.py:h8",
+    "log:django:18404_18412:18404:django/db/models/fields/related_lookups.py:h9",
+    "log:django:18404_18412:18404:django/db/models/fields/related_lookups.py:h10",
+    "log:django:18404_18412:18404:django/db/models/fields/related_lookups.py:h11",
+    "log:django:18404_18412:18404:django/db/models/fields/related_lookups.py:h12",
+    "log:django:18404_18412:18404:django/db/models/fields/related_lookups.py:h13"
+   ],
+   "hold_ms": 11,
+   "t_submit_epoch": 1791563911828,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "total_ms": 22.45,
+   "t_done_epoch": 1791563911850
+  },
+  {
+   "writer": 0,
+   "pr": 18404,
+   "path": "django/db/models/expressions.py",
+   "intents": [
+    "log:django:18404_18412:18404:django/db/models/expressions.py:h0"
+   ],
+   "hold_ms": 4,
+   "t_submit_epoch": 1791563911850,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "outcome": "commit",
+   "total_ms": 16.12,
+   "t_done_epoch": 1791563911867
+  }
+ ],
+ "admit_stats": {
+  "txns": 8,
+  "cas_conflicts": 3
+ },
+ "steward_batches": null
+}

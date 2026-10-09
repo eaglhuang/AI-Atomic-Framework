@@ -1,0 +1,61 @@
+{
+ "writer": 1,
+ "pr": 18423,
+ "pid": 2074362,
+ "init_ms": 68.340014,
+ "start_offset_ms": 16,
+ "file_order": [
+  "django/db/backends/postgresql/schema.py",
+  "django/db/backends/base/schema.py"
+ ],
+ "holds": {
+  "django/db/backends/postgresql/schema.py": 25,
+  "django/db/backends/base/schema.py": 11
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 18423,
+   "path": "django/db/backends/postgresql/schema.py",
+   "intents": [
+    "log:django:18209_18423:18423:django/db/backends/postgresql/schema.py:h1",
+    "log:django:18209_18423:18423:django/db/backends/postgresql/schema.py:h2",
+    "log:django:18209_18423:18423:django/db/backends/postgresql/schema.py:h3",
+    "log:django:18209_18423:18423:django/db/backends/postgresql/schema.py:h4"
+   ],
+   "hold_ms": 25,
+   "t_submit_epoch": 1791563833074,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 19,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 50.94,
+   "t_done_epoch": 1791563833125
+  },
+  {
+   "writer": 1,
+   "pr": 18423,
+   "path": "django/db/backends/base/schema.py",
+   "intents": [
+    "log:django:18209_18423:18423:django/db/backends/base/schema.py:h0"
+   ],
+   "hold_ms": 11,
+   "t_submit_epoch": 1791563833125,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 8,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 25.75,
+   "t_done_epoch": 1791563833151
+  }
+ ],
+ "admit_stats": {
+  "txns": 4,
+  "cas_conflicts": 5
+ },
+ "steward_batches": null
+}

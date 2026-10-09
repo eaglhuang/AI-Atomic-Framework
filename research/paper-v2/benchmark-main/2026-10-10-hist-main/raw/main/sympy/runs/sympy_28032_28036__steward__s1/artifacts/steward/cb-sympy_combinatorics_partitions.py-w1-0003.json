@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-c75ad9c815878cb0",
+  "proposalIds": [
+    "prop-hist-w1-sympy_combinatorics_partitions_py"
+  ],
+  "targetFiles": [
+    "sympy/combinatorics/partitions.py"
+  ],
+  "appliedFiles": [
+    "sympy/combinatorics/partitions.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/combinatorics/partitions.py": "657a9599536399aba131e8935ad082a8e3f7f1bf4c260ed49417596beeda2024"
+  },
+  "fileAfterHashes": {
+    "sympy/combinatorics/partitions.py": "ba5d283d9de58f044b3e463263ae4b6bd8a1ef59dcfcba582ad0ed4576e712b8"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/combinatorics/partitions.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-c75ad9c815878cb0",
+    "planId": "merge-c75ad9c815878cb0",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-c75ad9c815878cb0",
+        "planId": "merge-c75ad9c815878cb0",
+        "request_identity": [
+          "prop-hist-w1-sympy_combinatorics_partitions_py"
+        ],
+        "actor_ids": [
+          "writer-28036"
+        ],
+        "request_files": [
+          "sympy/combinatorics/partitions.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/combinatorics/partitions.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/sympy/runs/sympy_28032_28036__steward__s1/artifacts/steward/cb-sympy_combinatorics_partitions.py-w1-0003.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_COMBINATORICS_PARTITIONS_PY"
+        ],
+        "commit_sha": "28fd534704f6857b1a0c0b3c574f33e0c198de90"
+      }
+    ]
+  }
+}
