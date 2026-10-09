@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-7d44d4b10661c8ee",
+  "proposalIds": [
+    "prop-hist-w0-sympy_core_relational_py"
+  ],
+  "targetFiles": [
+    "sympy/core/relational.py"
+  ],
+  "appliedFiles": [
+    "sympy/core/relational.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/core/relational.py": "74bb04fe4c7eb4d9c08eca297a325740ba0026b262ca2dcbb1719f8898338bd3"
+  },
+  "fileAfterHashes": {
+    "sympy/core/relational.py": "e24a00acfee2356b86b4a367db41fb6c09174905a3638e00cb5e077ceec76cf1"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/core/relational.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-7d44d4b10661c8ee",
+    "planId": "merge-7d44d4b10661c8ee",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-7d44d4b10661c8ee",
+        "planId": "merge-7d44d4b10661c8ee",
+        "request_identity": [
+          "prop-hist-w0-sympy_core_relational_py"
+        ],
+        "actor_ids": [
+          "writer-27353"
+        ],
+        "request_files": [
+          "sympy/core/relational.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/core/relational.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/sympy/runs/sympy_27353_27997__steward__s0/artifacts/steward/cb-sympy_core_relational.py-w0-0006.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SYMPY_CORE_RELATIONAL_PY"
+        ],
+        "commit_sha": "67d2f1f4dc1aa41d1a312ca04d4ccd4bcfb8962c"
+      }
+    ]
+  }
+}

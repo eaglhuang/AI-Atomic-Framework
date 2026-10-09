@@ -1,0 +1,128 @@
+{
+ "writer": 1,
+ "pr": 11939,
+ "pid": 2478360,
+ "init_ms": 89.246803,
+ "start_offset_ms": 1,
+ "file_order": [
+  "sphinx/environment/__init__.py"
+ ],
+ "holds": {
+  "sphinx/environment/__init__.py": 0
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 11939,
+   "path": "sphinx/environment/__init__.py",
+   "intents": [
+    "log:sphinx:11781_11939:11939:sphinx/environment/__init__.py:h0"
+   ],
+   "hold_ms": 0,
+   "t_submit_epoch": 1791575378211,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 17,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sphinx_environment___init__.py-w1-0001",
+   "total_ms": 132.01,
+   "t_done_epoch": 1791575378343
+  }
+ ],
+ "admit_stats": {
+  "txns": 2,
+  "cas_conflicts": 0
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sphinx_environment___init__.py-w1-0001",
+   "path": "sphinx/environment/__init__.py",
+   "pid": 2478360,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-sphinx_environment_init_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sphinx_environment_init_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:f986cbe0f8581542d933e91e2ec33bda1c740d5bd200e7493c6f6354d138f7ca"
+   ],
+   "lock_wait_ms": 0.12,
+   "t_start_epoch_ms": 1791575378232.02,
+   "pre_apply_hash": "sha256:f986cbe0f8581542d933e91e2ec33bda1c740d5bd200e7493c6f6354d138f7ca",
+   "receipt_before_hash": "sha256:f986cbe0f8581542d933e91e2ec33bda1c740d5bd200e7493c6f6354d138f7ca",
+   "receipt_after_hash": "sha256:43e23d87cccdd2f6b7f933336c2e7f2212007e4e6b659fad0811a95ef5c23569",
+   "post_apply_hash": "sha256:43e23d87cccdd2f6b7f933336c2e7f2212007e4e6b659fad0811a95ef5c23569",
+   "t_end_epoch_ms": 1791575378335.89,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:49:38.336+08:00",
+   "batch_id": "cb-sphinx_environment___init__.py-w1-0001",
+   "path": "sphinx/environment/__init__.py",
+   "proposalIds": [
+    "prop-hist-w1-sphinx_environment_init_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sphinx_environment_init_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-sphinx_environment_init_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-sphinx_environment_init_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-sphinx_environment_init_py",
+     "logical_id": "prop-hist-w1-sphinx_environment_init_py",
+     "attempt_id": "att-prop-hist-w1-sphinx_environment_init_py-r0",
+     "proposal_id": "prop-hist-w1-sphinx_environment_init_py",
+     "actorId": "writer-11939"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.25,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:f986cbe0f8581542d933e91e2ec33bda1c740d5bd200e7493c6f6354d138f7ca",
+   "written": true,
+   "output_digest": "sha256:43e23d87cccdd2f6b7f933336c2e7f2212007e4e6b659fad0811a95ef5c23569",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

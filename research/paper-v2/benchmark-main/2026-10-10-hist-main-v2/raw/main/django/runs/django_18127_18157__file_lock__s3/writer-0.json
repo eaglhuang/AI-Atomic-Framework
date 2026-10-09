@@ -1,0 +1,83 @@
+{
+ "writer": 0,
+ "pr": 18127,
+ "pid": 2188133,
+ "init_ms": 77.713002,
+ "start_offset_ms": 10,
+ "file_order": [
+  "django/utils/deprecation.py",
+  "django/__init__.py",
+  "django/contrib/auth/hashers.py"
+ ],
+ "holds": {
+  "django/utils/deprecation.py": 13,
+  "django/__init__.py": 26,
+  "django/contrib/auth/hashers.py": 5
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 18127,
+   "path": "django/utils/deprecation.py",
+   "intents": [
+    "log:django:18127_18157:18127:django/utils/deprecation.py:h2",
+    "log:django:18127_18157:18127:django/utils/deprecation.py:h3",
+    "log:django:18127_18157:18127:django/utils/deprecation.py:h4"
+   ],
+   "hold_ms": 13,
+   "t_submit_epoch": 1791572869429,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 22,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 40.72,
+   "t_done_epoch": 1791572869470
+  },
+  {
+   "writer": 0,
+   "pr": 18127,
+   "path": "django/__init__.py",
+   "intents": [
+    "log:django:18127_18157:18127:django/__init__.py:h0"
+   ],
+   "hold_ms": 26,
+   "t_submit_epoch": 1791572869470,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 31.98,
+   "t_done_epoch": 1791572869502
+  },
+  {
+   "writer": 0,
+   "pr": 18127,
+   "path": "django/contrib/auth/hashers.py",
+   "intents": [
+    "log:django:18127_18157:18127:django/contrib/auth/hashers.py:h1"
+   ],
+   "hold_ms": 5,
+   "t_submit_epoch": 1791572869502,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 10.11,
+   "t_done_epoch": 1791572869512
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 5
+ },
+ "steward_batches": null
+}

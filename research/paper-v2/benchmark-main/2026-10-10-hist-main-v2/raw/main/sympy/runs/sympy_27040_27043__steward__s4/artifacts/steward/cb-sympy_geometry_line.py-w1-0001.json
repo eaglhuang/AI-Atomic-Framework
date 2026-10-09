@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-ff3a5ea67372edaf",
+  "proposalIds": [
+    "prop-hist-w1-sympy_geometry_line_py"
+  ],
+  "targetFiles": [
+    "sympy/geometry/line.py"
+  ],
+  "appliedFiles": [
+    "sympy/geometry/line.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/geometry/line.py": "ed0e921b43b3abbb5a3d38ad9ed5d4d1de95db2b8d6e66b43414a6b304d9aec3"
+  },
+  "fileAfterHashes": {
+    "sympy/geometry/line.py": "630f27b3fc3cae7e8511a93a3267ec75c72034d8cc4078687438a4d945fb8c93"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/geometry/line.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-ff3a5ea67372edaf",
+    "planId": "merge-ff3a5ea67372edaf",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-ff3a5ea67372edaf",
+        "planId": "merge-ff3a5ea67372edaf",
+        "request_identity": [
+          "prop-hist-w1-sympy_geometry_line_py"
+        ],
+        "actor_ids": [
+          "writer-27043"
+        ],
+        "request_files": [
+          "sympy/geometry/line.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/geometry/line.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/sympy/runs/sympy_27040_27043__steward__s4/artifacts/steward/cb-sympy_geometry_line.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_GEOMETRY_LINE_PY"
+        ],
+        "commit_sha": "582d0ff9b2117d943eb89355f21f8d2418a77ac7"
+      }
+    ]
+  }
+}

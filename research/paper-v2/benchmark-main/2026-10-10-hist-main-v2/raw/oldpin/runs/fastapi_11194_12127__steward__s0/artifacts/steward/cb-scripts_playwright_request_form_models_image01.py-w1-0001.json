@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-65c5781925ef9a29",
+  "proposalIds": [
+    "prop-hist-w1-scripts_playwright_request_form_models_image01_py"
+  ],
+  "targetFiles": [
+    "scripts/playwright/request_form_models/image01.py"
+  ],
+  "appliedFiles": [],
+  "fileBeforeHashes": {},
+  "fileAfterHashes": {},
+  "permissions": {
+    "fileWrite": [
+      "scripts/playwright/request_form_models/image01.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "blocked",
+  "blockedReasons": [
+    "file-hash-drift: Target file does not exist: scripts/playwright/request_form_models/image01.py"
+  ],
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-65c5781925ef9a29",
+    "planId": "merge-65c5781925ef9a29",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-65c5781925ef9a29",
+        "planId": "merge-65c5781925ef9a29",
+        "request_identity": [
+          "prop-hist-w1-scripts_playwright_request_form_models_image01_py"
+        ],
+        "actor_ids": [
+          "writer-12127"
+        ],
+        "request_files": [
+          "scripts/playwright/request_form_models/image01.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/oldpin/runs/fastapi_11194_12127__steward__s0/artifacts/steward/cb-scripts_playwright_request_form_models_image01.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SCRIPTS_PLAYWRIGHT_REQUEST_FORM_MODELS_IMAGE01_PY"
+        ],
+        "commit_sha": "6335941237500ba09cd41cbe67773e886dec7ea2"
+      }
+    ]
+  }
+}

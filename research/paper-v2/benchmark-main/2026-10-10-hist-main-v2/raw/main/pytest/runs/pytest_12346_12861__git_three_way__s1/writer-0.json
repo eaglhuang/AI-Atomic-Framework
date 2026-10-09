@@ -1,0 +1,84 @@
+{
+ "writer": 0,
+ "pr": 12346,
+ "pid": 2304097,
+ "init_ms": 79.72182899999999,
+ "start_offset_ms": 6,
+ "file_order": [
+  "src/pytest/__init__.py",
+  "src/_pytest/python.py",
+  "src/_pytest/warning_types.py"
+ ],
+ "holds": {
+  "src/pytest/__init__.py": 0,
+  "src/_pytest/python.py": 12,
+  "src/_pytest/warning_types.py": 26
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 12346,
+   "path": "src/pytest/__init__.py",
+   "intents": [
+    "log:pytest:12346_12861:12346:src/pytest/__init__.py:h9",
+    "log:pytest:12346_12861:12346:src/pytest/__init__.py:h10",
+    "log:pytest:12346_12861:12346:src/pytest/__init__.py:h11"
+   ],
+   "hold_ms": 0,
+   "t_submit_epoch": 1791574043206,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 21,
+   "outcome": "commit",
+   "total_ms": 33.1,
+   "t_done_epoch": 1791574043239
+  },
+  {
+   "writer": 0,
+   "pr": 12346,
+   "path": "src/_pytest/python.py",
+   "intents": [
+    "log:pytest:12346_12861:12346:src/_pytest/python.py:h0",
+    "log:pytest:12346_12861:12346:src/_pytest/python.py:h1",
+    "log:pytest:12346_12861:12346:src/_pytest/python.py:h2",
+    "log:pytest:12346_12861:12346:src/_pytest/python.py:h3",
+    "log:pytest:12346_12861:12346:src/_pytest/python.py:h4",
+    "log:pytest:12346_12861:12346:src/_pytest/python.py:h5",
+    "log:pytest:12346_12861:12346:src/_pytest/python.py:h6"
+   ],
+   "hold_ms": 12,
+   "t_submit_epoch": 1791574043239,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "total_ms": 22.89,
+   "t_done_epoch": 1791574043262
+  },
+  {
+   "writer": 0,
+   "pr": 12346,
+   "path": "src/_pytest/warning_types.py",
+   "intents": [
+    "log:pytest:12346_12861:12346:src/_pytest/warning_types.py:h7",
+    "log:pytest:12346_12861:12346:src/_pytest/warning_types.py:h8"
+   ],
+   "hold_ms": 26,
+   "t_submit_epoch": 1791574043262,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "total_ms": 36.32,
+   "t_done_epoch": 1791574043298
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 6
+ },
+ "steward_batches": null
+}

@@ -1,0 +1,99 @@
+{
+ "writer": 0,
+ "pr": 11842,
+ "pid": 2330484,
+ "init_ms": 74.635797,
+ "start_offset_ms": 1,
+ "file_order": [
+  "sphinx/jinja2glue.py",
+  "sphinx/environment/collectors/toctree.py",
+  "sphinx/ext/napoleon/docstring.py",
+  "sphinx/ext/autodoc/importer.py"
+ ],
+ "holds": {
+  "sphinx/jinja2glue.py": 20,
+  "sphinx/environment/collectors/toctree.py": 18,
+  "sphinx/ext/napoleon/docstring.py": 6,
+  "sphinx/ext/autodoc/importer.py": 6
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 11842,
+   "path": "sphinx/jinja2glue.py",
+   "intents": [
+    "log:sphinx:11842_11843:11842:sphinx/jinja2glue.py:h3"
+   ],
+   "hold_ms": 20,
+   "t_submit_epoch": 1791574243082,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 19,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 45.03,
+   "t_done_epoch": 1791574243127
+  },
+  {
+   "writer": 0,
+   "pr": 11842,
+   "path": "sphinx/environment/collectors/toctree.py",
+   "intents": [
+    "log:sphinx:11842_11843:11842:sphinx/environment/collectors/toctree.py:h0"
+   ],
+   "hold_ms": 18,
+   "t_submit_epoch": 1791574243127,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 10,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 31.77,
+   "t_done_epoch": 1791574243159
+  },
+  {
+   "writer": 0,
+   "pr": 11842,
+   "path": "sphinx/ext/napoleon/docstring.py",
+   "intents": [
+    "log:sphinx:11842_11843:11842:sphinx/ext/napoleon/docstring.py:h2"
+   ],
+   "hold_ms": 6,
+   "t_submit_epoch": 1791574243159,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "blocked",
+   "blocked_reason": "occ-relocate-context-not-found",
+   "occ_retries": 0,
+   "total_ms": 14.41,
+   "t_done_epoch": 1791574243174
+  },
+  {
+   "writer": 0,
+   "pr": 11842,
+   "path": "sphinx/ext/autodoc/importer.py",
+   "intents": [
+    "log:sphinx:11842_11843:11842:sphinx/ext/autodoc/importer.py:h1"
+   ],
+   "hold_ms": 6,
+   "t_submit_epoch": 1791574243174,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 5,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 16.42,
+   "t_done_epoch": 1791574243190
+  }
+ ],
+ "admit_stats": {
+  "txns": 8,
+  "cas_conflicts": 2
+ },
+ "steward_batches": null
+}

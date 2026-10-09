@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-e484d7982a7f1e01",
+  "proposalIds": [
+    "prop-hist-w1-xarray_core_resample_cftime_py"
+  ],
+  "targetFiles": [
+    "xarray/core/resample_cftime.py"
+  ],
+  "appliedFiles": [
+    "xarray/core/resample_cftime.py"
+  ],
+  "fileBeforeHashes": {
+    "xarray/core/resample_cftime.py": "5d4e20205aa6403726900ebc11b60de40c2ceeb46703e12710c10b5e14221cf7"
+  },
+  "fileAfterHashes": {
+    "xarray/core/resample_cftime.py": "a0bc2697515d743b20b04b319ef60b8fa397ec8c6d92a0567a6e9efd159fb002"
+  },
+  "permissions": {
+    "fileWrite": [
+      "xarray/core/resample_cftime.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-e484d7982a7f1e01",
+    "planId": "merge-e484d7982a7f1e01",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-e484d7982a7f1e01",
+        "planId": "merge-e484d7982a7f1e01",
+        "request_identity": [
+          "prop-hist-w1-xarray_core_resample_cftime_py"
+        ],
+        "actor_ids": [
+          "writer-9233"
+        ],
+        "request_files": [
+          "xarray/core/resample_cftime.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "xarray/core/resample_cftime.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/xarray/runs/xarray_7427_9233__bare_composer__s1/artifacts/steward/cb-xarray_core_resample_cftime.py-w1-0004.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-XARRAY_CORE_RESAMPLE_CFTIME_PY"
+        ],
+        "commit_sha": "2c0e86100de523933f99fffe58257a1adf87a07c"
+      }
+    ]
+  }
+}

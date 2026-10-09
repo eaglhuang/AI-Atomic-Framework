@@ -1,0 +1,67 @@
+{
+ "writer": 1,
+ "pr": 28807,
+ "pid": 2218437,
+ "init_ms": 96.91771800000001,
+ "start_offset_ms": 3,
+ "file_order": [
+  "sympy/ntheory/digits.py",
+  "sympy/utilities/iterables.py"
+ ],
+ "holds": {
+  "sympy/ntheory/digits.py": 3,
+  "sympy/utilities/iterables.py": 24
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 28807,
+   "path": "sympy/ntheory/digits.py",
+   "intents": [
+    "log:sympy:28805_28807:28807:sympy/ntheory/digits.py:h0",
+    "log:sympy:28805_28807:28807:sympy/ntheory/digits.py:h1",
+    "log:sympy:28805_28807:28807:sympy/ntheory/digits.py:h2",
+    "log:sympy:28805_28807:28807:sympy/ntheory/digits.py:h3",
+    "log:sympy:28805_28807:28807:sympy/ntheory/digits.py:h4",
+    "log:sympy:28805_28807:28807:sympy/ntheory/digits.py:h5"
+   ],
+   "hold_ms": 3,
+   "t_submit_epoch": 1791573135873,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 63,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 70.46,
+   "t_done_epoch": 1791573135943
+  },
+  {
+   "writer": 1,
+   "pr": 28807,
+   "path": "sympy/utilities/iterables.py",
+   "intents": [
+    "log:sympy:28805_28807:28807:sympy/utilities/iterables.py:h6",
+    "log:sympy:28805_28807:28807:sympy/utilities/iterables.py:h7",
+    "log:sympy:28805_28807:28807:sympy/utilities/iterables.py:h8"
+   ],
+   "hold_ms": 24,
+   "t_submit_epoch": 1791573135943,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 33.65,
+   "t_done_epoch": 1791573135977
+  }
+ ],
+ "admit_stats": {
+  "txns": 4,
+  "cas_conflicts": 7
+ },
+ "steward_batches": null
+}

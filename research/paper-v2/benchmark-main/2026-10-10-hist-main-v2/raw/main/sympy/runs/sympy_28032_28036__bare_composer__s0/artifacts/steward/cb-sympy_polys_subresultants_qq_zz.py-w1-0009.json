@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-8c733af4ebc70985",
+  "proposalIds": [
+    "prop-hist-w1-sympy_polys_subresultants_qq_zz_py"
+  ],
+  "targetFiles": [
+    "sympy/polys/subresultants_qq_zz.py"
+  ],
+  "appliedFiles": [
+    "sympy/polys/subresultants_qq_zz.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/polys/subresultants_qq_zz.py": "54529301ede218c0a298b91cf467aec06e68e12074c764f9911c317b8039043a"
+  },
+  "fileAfterHashes": {
+    "sympy/polys/subresultants_qq_zz.py": "56beb824a69c3dc762e9532403e0992d09ff987e679ec619a919ab9a21bf14e9"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/polys/subresultants_qq_zz.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-8c733af4ebc70985",
+    "planId": "merge-8c733af4ebc70985",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-8c733af4ebc70985",
+        "planId": "merge-8c733af4ebc70985",
+        "request_identity": [
+          "prop-hist-w1-sympy_polys_subresultants_qq_zz_py"
+        ],
+        "actor_ids": [
+          "writer-28036"
+        ],
+        "request_files": [
+          "sympy/polys/subresultants_qq_zz.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/polys/subresultants_qq_zz.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/sympy/runs/sympy_28032_28036__bare_composer__s0/artifacts/steward/cb-sympy_polys_subresultants_qq_zz.py-w1-0009.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_POLYS_SUBRESULTANTS_QQ_ZZ_PY"
+        ],
+        "commit_sha": "b2f824bb9f45d8bc85b4694c46229dba998e1db9"
+      }
+    ]
+  }
+}

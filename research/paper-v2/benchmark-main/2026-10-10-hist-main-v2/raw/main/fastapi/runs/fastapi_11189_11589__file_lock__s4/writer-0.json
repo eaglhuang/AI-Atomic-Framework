@@ -1,0 +1,150 @@
+{
+ "writer": 0,
+ "pr": 11189,
+ "pid": 2381749,
+ "init_ms": 91.2132,
+ "start_offset_ms": 17,
+ "file_order": [
+  "docs_src/security/tutorial005_an.py",
+  "docs_src/security/tutorial005.py",
+  "docs_src/security/tutorial005_an_py39.py",
+  "docs_src/security/tutorial005_py310.py",
+  "docs_src/security/tutorial005_py39.py",
+  "docs_src/security/tutorial005_an_py310.py"
+ ],
+ "holds": {
+  "docs_src/security/tutorial005_an.py": 29,
+  "docs_src/security/tutorial005.py": 8,
+  "docs_src/security/tutorial005_an_py39.py": 7,
+  "docs_src/security/tutorial005_py310.py": 12,
+  "docs_src/security/tutorial005_py39.py": 4,
+  "docs_src/security/tutorial005_an_py310.py": 12
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 11189,
+   "path": "docs_src/security/tutorial005_an.py",
+   "intents": [
+    "log:fastapi:11189_11589:11189:docs_src/security/tutorial005_an.py:h2",
+    "log:fastapi:11189_11589:11189:docs_src/security/tutorial005_an.py:h3"
+   ],
+   "hold_ms": 29,
+   "t_submit_epoch": 1791574647800,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 15,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 48.71,
+   "t_done_epoch": 1791574647849
+  },
+  {
+   "writer": 0,
+   "pr": 11189,
+   "path": "docs_src/security/tutorial005.py",
+   "intents": [
+    "log:fastapi:11189_11589:11189:docs_src/security/tutorial005.py:h0",
+    "log:fastapi:11189_11589:11189:docs_src/security/tutorial005.py:h1"
+   ],
+   "hold_ms": 8,
+   "t_submit_epoch": 1791574647849,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 15.25,
+   "t_done_epoch": 1791574647864
+  },
+  {
+   "writer": 0,
+   "pr": 11189,
+   "path": "docs_src/security/tutorial005_an_py39.py",
+   "intents": [
+    "log:fastapi:11189_11589:11189:docs_src/security/tutorial005_an_py39.py:h6",
+    "log:fastapi:11189_11589:11189:docs_src/security/tutorial005_an_py39.py:h7"
+   ],
+   "hold_ms": 7,
+   "t_submit_epoch": 1791574647864,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "queue",
+   "admit_wait_ms": 9,
+   "lock_spins": 0,
+   "outcome": "blocked",
+   "blocked_reason": "harness-relocate-context-not-found",
+   "total_ms": 18.5,
+   "t_done_epoch": 1791574647883
+  },
+  {
+   "writer": 0,
+   "pr": 11189,
+   "path": "docs_src/security/tutorial005_py310.py",
+   "intents": [
+    "log:fastapi:11189_11589:11189:docs_src/security/tutorial005_py310.py:h8",
+    "log:fastapi:11189_11589:11189:docs_src/security/tutorial005_py310.py:h9"
+   ],
+   "hold_ms": 12,
+   "t_submit_epoch": 1791574647883,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 20.82,
+   "t_done_epoch": 1791574647904
+  },
+  {
+   "writer": 0,
+   "pr": 11189,
+   "path": "docs_src/security/tutorial005_py39.py",
+   "intents": [
+    "log:fastapi:11189_11589:11189:docs_src/security/tutorial005_py39.py:h10",
+    "log:fastapi:11189_11589:11189:docs_src/security/tutorial005_py39.py:h11"
+   ],
+   "hold_ms": 4,
+   "t_submit_epoch": 1791574647904,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "lock_spins": 0,
+   "outcome": "blocked",
+   "blocked_reason": "harness-relocate-context-not-found",
+   "total_ms": 12.68,
+   "t_done_epoch": 1791574647922
+  },
+  {
+   "writer": 0,
+   "pr": 11189,
+   "path": "docs_src/security/tutorial005_an_py310.py",
+   "intents": [
+    "log:fastapi:11189_11589:11189:docs_src/security/tutorial005_an_py310.py:h4",
+    "log:fastapi:11189_11589:11189:docs_src/security/tutorial005_an_py310.py:h5"
+   ],
+   "hold_ms": 12,
+   "t_submit_epoch": 1791574647922,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 22,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 37.89,
+   "t_done_epoch": 1791574647960
+  }
+ ],
+ "admit_stats": {
+  "txns": 13,
+  "cas_conflicts": 14
+ },
+ "steward_batches": null
+}

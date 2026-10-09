@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-318ef26ad8d5e1fd",
+  "proposalIds": [
+    "prop-hist-w0-sphinx_ext_mathjax_py"
+  ],
+  "targetFiles": [
+    "sphinx/ext/mathjax.py"
+  ],
+  "appliedFiles": [],
+  "fileBeforeHashes": {},
+  "fileAfterHashes": {},
+  "permissions": {
+    "fileWrite": [
+      "sphinx/ext/mathjax.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "blocked",
+  "blockedReasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w0-sphinx_ext_mathjax_py' context mismatch at base line 104: expected \"                    'for the current MathJax version, use mathjax3_config instead'\", found \"                    'for the current MathJax version, use mathjax4_config instead'\" [proposals: prop-hist-w0-sphinx_ext_mathjax_py]"
+  ],
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-318ef26ad8d5e1fd",
+    "planId": "merge-318ef26ad8d5e1fd",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-318ef26ad8d5e1fd",
+        "planId": "merge-318ef26ad8d5e1fd",
+        "request_identity": [
+          "prop-hist-w0-sphinx_ext_mathjax_py"
+        ],
+        "actor_ids": [
+          "writer-14025"
+        ],
+        "request_files": [
+          "sphinx/ext/mathjax.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/sphinx/runs/sphinx_14025_14080__bare_composer__s4/artifacts/steward/cb-sphinx_ext_mathjax.py-w0-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SPHINX_EXT_MATHJAX_PY"
+        ],
+        "commit_sha": "f2d68a0c18d1f1f4db5c3da8cbd1ee0b0496fe8b"
+      }
+    ]
+  }
+}

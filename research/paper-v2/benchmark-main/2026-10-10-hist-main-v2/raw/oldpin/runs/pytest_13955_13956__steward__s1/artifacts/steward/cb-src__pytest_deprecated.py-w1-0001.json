@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-6ca4e3cc9012373e",
+  "proposalIds": [
+    "prop-hist-w1-src_pytest_deprecated_py"
+  ],
+  "targetFiles": [
+    "src/_pytest/deprecated.py"
+  ],
+  "appliedFiles": [],
+  "fileBeforeHashes": {},
+  "fileAfterHashes": {},
+  "permissions": {
+    "fileWrite": [
+      "src/_pytest/deprecated.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "blocked",
+  "blockedReasons": [
+    "file-hash-drift: Target file hash sha256:9b4f2a24cadc4f7e915ace7cc4d1cb6f6de4e33addd8f0920dded42ce52f40ef does not match proposal fileBeforeHash sha256:109bef171b02e86119e8b148b33006dd40bf35f67de717bdcb0b30be0307eda5."
+  ],
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-6ca4e3cc9012373e",
+    "planId": "merge-6ca4e3cc9012373e",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-6ca4e3cc9012373e",
+        "planId": "merge-6ca4e3cc9012373e",
+        "request_identity": [
+          "prop-hist-w1-src_pytest_deprecated_py"
+        ],
+        "actor_ids": [
+          "writer-13956"
+        ],
+        "request_files": [
+          "src/_pytest/deprecated.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/oldpin/runs/pytest_13955_13956__steward__s1/artifacts/steward/cb-src__pytest_deprecated.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SRC_PYTEST_DEPRECATED_PY"
+        ],
+        "commit_sha": "33547bbdb27dc1da8edb8eef63dd7c676eb86ed2"
+      }
+    ]
+  }
+}

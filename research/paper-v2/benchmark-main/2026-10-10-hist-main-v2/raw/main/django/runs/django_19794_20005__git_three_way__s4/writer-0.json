@@ -1,0 +1,84 @@
+{
+ "writer": 0,
+ "pr": 19794,
+ "pid": 2169851,
+ "init_ms": 80.422499,
+ "start_offset_ms": 1,
+ "file_order": [
+  "django/db/models/fields/json.py",
+  "django/db/models/__init__.py",
+  "django/contrib/postgres/fields/array.py"
+ ],
+ "holds": {
+  "django/db/models/fields/json.py": 21,
+  "django/db/models/__init__.py": 25,
+  "django/contrib/postgres/fields/array.py": 15
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 19794,
+   "path": "django/db/models/fields/json.py",
+   "intents": [
+    "log:django:19794_20005:19794:django/db/models/fields/json.py:h3",
+    "log:django:19794_20005:19794:django/db/models/fields/json.py:h4",
+    "log:django:19794_20005:19794:django/db/models/fields/json.py:h5",
+    "log:django:19794_20005:19794:django/db/models/fields/json.py:h6",
+    "log:django:19794_20005:19794:django/db/models/fields/json.py:h7",
+    "log:django:19794_20005:19794:django/db/models/fields/json.py:h8",
+    "log:django:19794_20005:19794:django/db/models/fields/json.py:h9",
+    "log:django:19794_20005:19794:django/db/models/fields/json.py:h10",
+    "log:django:19794_20005:19794:django/db/models/fields/json.py:h11"
+   ],
+   "hold_ms": 21,
+   "t_submit_epoch": 1791572727593,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 27,
+   "outcome": "commit",
+   "total_ms": 59.22,
+   "t_done_epoch": 1791572727652
+  },
+  {
+   "writer": 0,
+   "pr": 19794,
+   "path": "django/db/models/__init__.py",
+   "intents": [
+    "log:django:19794_20005:19794:django/db/models/__init__.py:h1",
+    "log:django:19794_20005:19794:django/db/models/__init__.py:h2"
+   ],
+   "hold_ms": 25,
+   "t_submit_epoch": 1791572727652,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 5,
+   "outcome": "commit",
+   "total_ms": 38.08,
+   "t_done_epoch": 1791572727690
+  },
+  {
+   "writer": 0,
+   "pr": 19794,
+   "path": "django/contrib/postgres/fields/array.py",
+   "intents": [
+    "log:django:19794_20005:19794:django/contrib/postgres/fields/array.py:h0"
+   ],
+   "hold_ms": 15,
+   "t_submit_epoch": 1791572727690,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 6,
+   "outcome": "commit",
+   "total_ms": 28.06,
+   "t_done_epoch": 1791572727718
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 5
+ },
+ "steward_batches": null
+}

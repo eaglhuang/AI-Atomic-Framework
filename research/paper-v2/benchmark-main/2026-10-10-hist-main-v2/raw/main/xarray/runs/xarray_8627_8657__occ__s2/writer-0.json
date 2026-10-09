@@ -1,0 +1,105 @@
+{
+ "writer": 0,
+ "pr": 8627,
+ "pid": 2264807,
+ "init_ms": 72.10085899999999,
+ "start_offset_ms": 13,
+ "file_order": [
+  "xarray/core/pdcompat.py",
+  "xarray/coding/frequencies.py",
+  "xarray/coding/cftime_offsets.py",
+  "xarray/core/groupby.py"
+ ],
+ "holds": {
+  "xarray/core/pdcompat.py": 5,
+  "xarray/coding/frequencies.py": 2,
+  "xarray/coding/cftime_offsets.py": 7,
+  "xarray/core/groupby.py": 4
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 8627,
+   "path": "xarray/core/pdcompat.py",
+   "intents": [
+    "log:xarray:8627_8657:8627:xarray/core/pdcompat.py:h9"
+   ],
+   "hold_ms": 5,
+   "t_submit_epoch": 1791573624620,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 15,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 26.43,
+   "t_done_epoch": 1791573624646
+  },
+  {
+   "writer": 0,
+   "pr": 8627,
+   "path": "xarray/coding/frequencies.py",
+   "intents": [
+    "log:xarray:8627_8657:8627:xarray/coding/frequencies.py:h5",
+    "log:xarray:8627_8657:8627:xarray/coding/frequencies.py:h6"
+   ],
+   "hold_ms": 2,
+   "t_submit_epoch": 1791573624646,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 6,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 12.54,
+   "t_done_epoch": 1791573624659
+  },
+  {
+   "writer": 0,
+   "pr": 8627,
+   "path": "xarray/coding/cftime_offsets.py",
+   "intents": [
+    "log:xarray:8627_8657:8627:xarray/coding/cftime_offsets.py:h0",
+    "log:xarray:8627_8657:8627:xarray/coding/cftime_offsets.py:h1",
+    "log:xarray:8627_8657:8627:xarray/coding/cftime_offsets.py:h2",
+    "log:xarray:8627_8657:8627:xarray/coding/cftime_offsets.py:h3",
+    "log:xarray:8627_8657:8627:xarray/coding/cftime_offsets.py:h4"
+   ],
+   "hold_ms": 7,
+   "t_submit_epoch": 1791573624659,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 16.26,
+   "t_done_epoch": 1791573624675
+  },
+  {
+   "writer": 0,
+   "pr": 8627,
+   "path": "xarray/core/groupby.py",
+   "intents": [
+    "log:xarray:8627_8657:8627:xarray/core/groupby.py:h7",
+    "log:xarray:8627_8657:8627:xarray/core/groupby.py:h8"
+   ],
+   "hold_ms": 4,
+   "t_submit_epoch": 1791573624675,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "blocked",
+   "blocked_reason": "occ-relocate-context-not-found",
+   "occ_retries": 0,
+   "total_ms": 8.58,
+   "t_done_epoch": 1791573624683
+  }
+ ],
+ "admit_stats": {
+  "txns": 8,
+  "cas_conflicts": 0
+ },
+ "steward_batches": null
+}

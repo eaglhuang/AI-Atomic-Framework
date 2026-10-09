@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-971c6a2efd7aea99",
+  "proposalIds": [
+    "prop-hist-w1-sympy_simplify_fu_py"
+  ],
+  "targetFiles": [
+    "sympy/simplify/fu.py"
+  ],
+  "appliedFiles": [
+    "sympy/simplify/fu.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/simplify/fu.py": "b64b8f588c2b7c6419ebb850d59dd9d5a6851fee8592ef44e3be16d0634fdfe9"
+  },
+  "fileAfterHashes": {
+    "sympy/simplify/fu.py": "7b17af9a4d69e1880400ef8c993821edc1bb73254c305f29eef675ca6c302a22"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/simplify/fu.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-971c6a2efd7aea99",
+    "planId": "merge-971c6a2efd7aea99",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-971c6a2efd7aea99",
+        "planId": "merge-971c6a2efd7aea99",
+        "request_identity": [
+          "prop-hist-w1-sympy_simplify_fu_py"
+        ],
+        "actor_ids": [
+          "writer-27863"
+        ],
+        "request_files": [
+          "sympy/simplify/fu.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/simplify/fu.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/sympy/runs/sympy_27839_27863__steward__s3/artifacts/steward/cb-sympy_simplify_fu.py-w1-0002.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_SIMPLIFY_FU_PY"
+        ],
+        "commit_sha": "e2f7201a8f03d995e619e87451e1d0728c76f354"
+      }
+    ]
+  }
+}

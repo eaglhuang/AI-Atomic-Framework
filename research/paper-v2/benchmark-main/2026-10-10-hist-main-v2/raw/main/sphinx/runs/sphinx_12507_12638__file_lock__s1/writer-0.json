@@ -1,0 +1,106 @@
+{
+ "writer": 0,
+ "pr": 12507,
+ "pid": 2331550,
+ "init_ms": 73.187952,
+ "start_offset_ms": 10,
+ "file_order": [
+  "sphinx/application.py",
+  "sphinx/directives/admonitions.py",
+  "sphinx/directives/other.py",
+  "sphinx/writers/html5.py"
+ ],
+ "holds": {
+  "sphinx/application.py": 14,
+  "sphinx/directives/admonitions.py": 14,
+  "sphinx/directives/other.py": 1,
+  "sphinx/writers/html5.py": 18
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 12507,
+   "path": "sphinx/application.py",
+   "intents": [
+    "log:sphinx:12507_12638:12507:sphinx/application.py:h0"
+   ],
+   "hold_ms": 14,
+   "t_submit_epoch": 1791574250285,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 17,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 36.92,
+   "t_done_epoch": 1791574250322
+  },
+  {
+   "writer": 0,
+   "pr": 12507,
+   "path": "sphinx/directives/admonitions.py",
+   "intents": [
+    "log:sphinx:12507_12638:12507:sphinx/directives/admonitions.py:h1"
+   ],
+   "hold_ms": 14,
+   "t_submit_epoch": 1791574250322,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 20.48,
+   "t_done_epoch": 1791574250343
+  },
+  {
+   "writer": 0,
+   "pr": 12507,
+   "path": "sphinx/directives/other.py",
+   "intents": [
+    "log:sphinx:12507_12638:12507:sphinx/directives/other.py:h2",
+    "log:sphinx:12507_12638:12507:sphinx/directives/other.py:h3",
+    "log:sphinx:12507_12638:12507:sphinx/directives/other.py:h4"
+   ],
+   "hold_ms": 1,
+   "t_submit_epoch": 1791574250343,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 5.94,
+   "t_done_epoch": 1791574250349
+  },
+  {
+   "writer": 0,
+   "pr": 12507,
+   "path": "sphinx/writers/html5.py",
+   "intents": [
+    "log:sphinx:12507_12638:12507:sphinx/writers/html5.py:h5",
+    "log:sphinx:12507_12638:12507:sphinx/writers/html5.py:h6",
+    "log:sphinx:12507_12638:12507:sphinx/writers/html5.py:h7"
+   ],
+   "hold_ms": 18,
+   "t_submit_epoch": 1791574250349,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 24.1,
+   "t_done_epoch": 1791574250373
+  }
+ ],
+ "admit_stats": {
+  "txns": 8,
+  "cas_conflicts": 3
+ },
+ "steward_batches": null
+}

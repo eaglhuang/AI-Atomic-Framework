@@ -1,0 +1,132 @@
+{
+ "writer": 0,
+ "pr": 26476,
+ "pid": 2235124,
+ "init_ms": 98.866477,
+ "start_offset_ms": 6,
+ "file_order": [
+  "sympy/tensor/tensor.py"
+ ],
+ "holds": {
+  "sympy/tensor/tensor.py": 29
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 26476,
+   "path": "sympy/tensor/tensor.py",
+   "intents": [
+    "log:sympy:26476_26721:26476:sympy/tensor/tensor.py:h0"
+   ],
+   "hold_ms": 29,
+   "t_submit_epoch": 1791573290084,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 15,
+   "outcome": "blocked",
+   "blocked_reason": "file-hash-drift: Target file hash sha256:9666e86ae5bceb4d21b56fcd771a40adb16ea50b9f18700d28e9b611fc3016c0 does not match proposal fileBeforeHash sha256:e5258085e99852b531496f8c39f9d2d288dbe2c51e10e07e308041e005b7a22c.",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "file-hash-drift: Target file hash sha256:9666e86ae5bceb4d21b56fcd771a40adb16ea50b9f18700d28e9b611fc3016c0 does not match proposal fileBeforeHash sha256:e5258085e99852b531496f8c39f9d2d288dbe2c51e10e07e308041e005b7a22c."
+   ],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sympy_tensor_tensor.py-w0-0001",
+   "total_ms": 135.42,
+   "t_done_epoch": 1791573290219
+  }
+ ],
+ "admit_stats": {
+  "txns": 2,
+  "cas_conflicts": 0
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sympy_tensor_tensor.py-w0-0001",
+   "path": "sympy/tensor/tensor.py",
+   "pid": 2235124,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-sympy_tensor_tensor_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sympy_tensor_tensor_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:e5258085e99852b531496f8c39f9d2d288dbe2c51e10e07e308041e005b7a22c"
+   ],
+   "lock_wait_ms": 0.11,
+   "t_start_epoch_ms": 1791573290132.72,
+   "pre_apply_hash": "sha256:e5258085e99852b531496f8c39f9d2d288dbe2c51e10e07e308041e005b7a22c",
+   "receipt_before_hash": null,
+   "receipt_after_hash": null,
+   "post_apply_hash": "sha256:9666e86ae5bceb4d21b56fcd771a40adb16ea50b9f18700d28e9b611fc3016c0",
+   "t_end_epoch_ms": 1791573290216.66,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "blocked",
+   "written": false,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:14:50.216+08:00",
+   "batch_id": "cb-sympy_tensor_tensor.py-w0-0001",
+   "path": "sympy/tensor/tensor.py",
+   "proposalIds": [
+    "prop-hist-w0-sympy_tensor_tensor_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sympy_tensor_tensor_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-sympy_tensor_tensor_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-sympy_tensor_tensor_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-sympy_tensor_tensor_py",
+     "logical_id": "prop-hist-w0-sympy_tensor_tensor_py",
+     "attempt_id": "att-prop-hist-w0-sympy_tensor_tensor_py-r0",
+     "proposal_id": "prop-hist-w0-sympy_tensor_tensor_py",
+     "actorId": "writer-26476"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "file-hash-drift: Target file hash sha256:9666e86ae5bceb4d21b56fcd771a40adb16ea50b9f18700d28e9b611fc3016c0 does not match proposal fileBeforeHash sha256:e5258085e99852b531496f8c39f9d2d288dbe2c51e10e07e308041e005b7a22c."
+   ],
+   "blocked_reason": "file-hash-drift: Target file hash sha256:9666e86ae5bceb4d21b56fcd771a40adb16ea50b9f18700d28e9b611fc3016c0 does not match proposal fileBeforeHash sha256:e5258085e99852b531496f8c39f9d2d288dbe2c51e10e07e308041e005b7a22c.",
+   "window_wait_ms": 0.23,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:e5258085e99852b531496f8c39f9d2d288dbe2c51e10e07e308041e005b7a22c",
+   "written": false,
+   "output_digest": null,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "file-hash-drift: Target file hash sha256:9666e86ae5bceb4d21b56fcd771a40adb16ea50b9f18700d28e9b611fc3016c0 does not match proposal fileBeforeHash sha256:e5258085e99852b531496f8c39f9d2d288dbe2c51e10e07e308041e005b7a22c."
+  }
+ ]
+}

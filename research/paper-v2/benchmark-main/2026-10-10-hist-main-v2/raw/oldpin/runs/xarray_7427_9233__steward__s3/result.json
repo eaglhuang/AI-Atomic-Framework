@@ -1,0 +1,194 @@
+{
+ "pair_id": "xarray:7427_9233",
+ "stratum": "O2",
+ "arm": "steward",
+ "plant": null,
+ "seed_k": 3,
+ "seed": 519737594,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-5692474f/AI-Atomic-Framework-5692474f7db70ab52a7a71c8af4867609e7e4b43",
+ "wall_ms": 1264,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 38,
+  "by_verdict": {
+   "correct": 38
+  },
+  "completed": 38,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 6,
+  "files_full_bytes_exact": 6,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "xarray/core/common.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "xarray/core/dataarray.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "xarray/core/dataset.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "xarray/core/groupers.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "xarray/core/pdcompat.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "xarray/core/resample_cftime.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "xarray/core/common.py": true,
+  "xarray/core/dataarray.py": true,
+  "xarray/core/dataset.py": true,
+  "xarray/core/groupers.py": true,
+  "xarray/core/pdcompat.py": true,
+  "xarray/core/resample_cftime.py": true
+ },
+ "final_exists": {
+  "xarray/core/common.py": true,
+  "xarray/core/dataarray.py": true,
+  "xarray/core/dataset.py": true,
+  "xarray/core/groupers.py": true,
+  "xarray/core/pdcompat.py": true,
+  "xarray/core/resample_cftime.py": true
+ },
+ "files": [
+  {
+   "path": "xarray/core/common.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:bba902f641c209c3bb52d18da06694924217495d1dde8058bbdc17e3d2eef1ad",
+   "final_digest": "sha256:9a1dae38f3494745b7606598db1d43d43afc675f1f693c595a622b10c85c40a7",
+   "expected_digests": [
+    "sha256:9a1dae38f3494745b7606598db1d43d43afc675f1f693c595a622b10c85c40a7"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/core/dataarray.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:ad28a48c2c9ba27d4cc08cb73626f70bed1c84a4b27744b32b116158c6265ae7",
+   "final_digest": "sha256:1373e3336742fd394603f62f092c6ec89b05436f87a835e77885d9d3a0996bba",
+   "expected_digests": [
+    "sha256:1373e3336742fd394603f62f092c6ec89b05436f87a835e77885d9d3a0996bba"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/core/dataset.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:0a2f4cbbfec0e25b20f7344a2c9b5237994cd5503e6fdc7a000a1e3471e8bf8d",
+   "final_digest": "sha256:b77fa86afc3aa9f256cfe4d80925d228715b4d571b3c39f18ba393b4940664bb",
+   "expected_digests": [
+    "sha256:b77fa86afc3aa9f256cfe4d80925d228715b4d571b3c39f18ba393b4940664bb"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/core/groupers.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:a33437ebb1ae0f7ac201b5a665b4837e684933c93c8cfa048a180243d24b7e08",
+   "final_digest": "sha256:d2c36c70ab00fdee3b644bc8885f6a1cf694c9ac1699e5424f06060e2d8c7109",
+   "expected_digests": [
+    "sha256:d2c36c70ab00fdee3b644bc8885f6a1cf694c9ac1699e5424f06060e2d8c7109"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/core/pdcompat.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:8936f115f1b2ae2c56fd2c4b792cb10d6c27e8a6d98aa7bacff6ba72a919774c",
+   "final_digest": "sha256:ce2974436e42296fe4f37072ec1dcdf11639d07b34c1392e98ff6446d57ba7d9",
+   "expected_digests": [
+    "sha256:ce2974436e42296fe4f37072ec1dcdf11639d07b34c1392e98ff6446d57ba7d9"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/core/resample_cftime.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:5d4e20205aa6403726900ebc11b60de40c2ceeb46703e12710c10b5e14221cf7",
+   "final_digest": "sha256:a0bc2697515d743b20b04b319ef60b8fa397ec8c6d92a0567a6e9efd159fb002",
+   "expected_digests": [
+    "sha256:a0bc2697515d743b20b04b319ef60b8fa397ec8c6d92a0567a6e9efd159fb002"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "xarray/core/common.py": "sha256:9a1dae38f3494745b7606598db1d43d43afc675f1f693c595a622b10c85c40a7",
+  "xarray/core/dataarray.py": "sha256:1373e3336742fd394603f62f092c6ec89b05436f87a835e77885d9d3a0996bba",
+  "xarray/core/dataset.py": "sha256:b77fa86afc3aa9f256cfe4d80925d228715b4d571b3c39f18ba393b4940664bb",
+  "xarray/core/groupers.py": "sha256:d2c36c70ab00fdee3b644bc8885f6a1cf694c9ac1699e5424f06060e2d8c7109",
+  "xarray/core/pdcompat.py": "sha256:ce2974436e42296fe4f37072ec1dcdf11639d07b34c1392e98ff6446d57ba7d9",
+  "xarray/core/resample_cftime.py": "sha256:a0bc2697515d743b20b04b319ef60b8fa397ec8c6d92a0567a6e9efd159fb002"
+ }
+}

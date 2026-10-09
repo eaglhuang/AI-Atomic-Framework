@@ -1,0 +1,137 @@
+{
+ "writer": 0,
+ "pr": 26303,
+ "pid": 2210521,
+ "init_ms": 83.44116,
+ "start_offset_ms": 13,
+ "file_order": [
+  "sympy/matrices/expressions/matexpr.py",
+  "sympy/matrices/matrixbase.py"
+ ],
+ "holds": {
+  "sympy/matrices/expressions/matexpr.py": 7,
+  "sympy/matrices/matrixbase.py": 5
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 26303,
+   "path": "sympy/matrices/expressions/matexpr.py",
+   "intents": [
+    "log:sympy:26303_26442:26303:sympy/matrices/expressions/matexpr.py:h0"
+   ],
+   "hold_ms": 7,
+   "t_submit_epoch": 1791573061885,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sympy_matrices_expressions_matexpr.py-w0-0001",
+   "total_ms": 127.55,
+   "t_done_epoch": 1791573062012
+  },
+  {
+   "writer": 0,
+   "pr": 26303,
+   "path": "sympy/matrices/matrixbase.py",
+   "intents": [
+    "log:sympy:26303_26442:26303:sympy/matrices/matrixbase.py:h1"
+   ],
+   "hold_ms": 5,
+   "t_submit_epoch": 1791573062012,
+   "outcome": "blocked",
+   "blocked_reason": "harness-relocate-context-not-found",
+   "total_ms": 7.8,
+   "t_done_epoch": 1791573062020
+  }
+ ],
+ "admit_stats": null,
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sympy_matrices_expressions_matexpr.py-w0-0001",
+   "path": "sympy/matrices/expressions/matexpr.py",
+   "pid": 2210521,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-sympy_matrices_expressions_matexpr_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sympy_matrices_expressions_matexpr_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:b99299f71a63d5e15ac9bf31b1339bf26d286309bd077f587fe73c5308af5e86"
+   ],
+   "lock_wait_ms": 0.17,
+   "t_start_epoch_ms": 1791573061895.85,
+   "pre_apply_hash": "sha256:b99299f71a63d5e15ac9bf31b1339bf26d286309bd077f587fe73c5308af5e86",
+   "receipt_before_hash": "sha256:b99299f71a63d5e15ac9bf31b1339bf26d286309bd077f587fe73c5308af5e86",
+   "receipt_after_hash": "sha256:b08af872fd7e51b4d259eb92fdde3acdcab82dfac4069e76bd24d3fb602cd98d",
+   "post_apply_hash": "sha256:b08af872fd7e51b4d259eb92fdde3acdcab82dfac4069e76bd24d3fb602cd98d",
+   "t_end_epoch_ms": 1791573062012.13,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:11:02.012+08:00",
+   "batch_id": "cb-sympy_matrices_expressions_matexpr.py-w0-0001",
+   "path": "sympy/matrices/expressions/matexpr.py",
+   "proposalIds": [
+    "prop-hist-w0-sympy_matrices_expressions_matexpr_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sympy_matrices_expressions_matexpr_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-sympy_matrices_expressions_matexpr_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-sympy_matrices_expressions_matexpr_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-sympy_matrices_expressions_matexpr_py",
+     "logical_id": "prop-hist-w0-sympy_matrices_expressions_matexpr_py",
+     "attempt_id": "att-prop-hist-w0-sympy_matrices_expressions_matexpr_py-r0",
+     "proposal_id": "prop-hist-w0-sympy_matrices_expressions_matexpr_py",
+     "actorId": "writer-26303"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.37,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:b99299f71a63d5e15ac9bf31b1339bf26d286309bd077f587fe73c5308af5e86",
+   "written": true,
+   "output_digest": "sha256:b08af872fd7e51b4d259eb92fdde3acdcab82dfac4069e76bd24d3fb602cd98d",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

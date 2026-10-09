@@ -1,0 +1,87 @@
+{
+ "writer": 1,
+ "pr": 11915,
+ "pid": 2306163,
+ "init_ms": 63.628885000000004,
+ "start_offset_ms": 15,
+ "file_order": [
+  "src/_pytest/python_api.py",
+  "src/_pytest/python.py",
+  "src/_pytest/compat.py"
+ ],
+ "holds": {
+  "src/_pytest/python_api.py": 12,
+  "src/_pytest/python.py": 6,
+  "src/_pytest/compat.py": 25
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 11915,
+   "path": "src/_pytest/python_api.py",
+   "intents": [
+    "log:pytest:11914_11915:11915:src/_pytest/python_api.py:h6",
+    "log:pytest:11914_11915:11915:src/_pytest/python_api.py:h7",
+    "log:pytest:11914_11915:11915:src/_pytest/python_api.py:h8"
+   ],
+   "hold_ms": 12,
+   "t_submit_epoch": 1791574058620,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 20,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 40.6,
+   "t_done_epoch": 1791574058661
+  },
+  {
+   "writer": 1,
+   "pr": 11915,
+   "path": "src/_pytest/python.py",
+   "intents": [
+    "log:pytest:11914_11915:11915:src/_pytest/python.py:h4",
+    "log:pytest:11914_11915:11915:src/_pytest/python.py:h5"
+   ],
+   "hold_ms": 6,
+   "t_submit_epoch": 1791574058661,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 16.39,
+   "t_done_epoch": 1791574058677
+  },
+  {
+   "writer": 1,
+   "pr": 11915,
+   "path": "src/_pytest/compat.py",
+   "intents": [
+    "log:pytest:11914_11915:11915:src/_pytest/compat.py:h0",
+    "log:pytest:11914_11915:11915:src/_pytest/compat.py:h1",
+    "log:pytest:11914_11915:11915:src/_pytest/compat.py:h2",
+    "log:pytest:11914_11915:11915:src/_pytest/compat.py:h3"
+   ],
+   "hold_ms": 25,
+   "t_submit_epoch": 1791574058677,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 32.51,
+   "t_done_epoch": 1791574058710
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 13
+ },
+ "steward_batches": null
+}

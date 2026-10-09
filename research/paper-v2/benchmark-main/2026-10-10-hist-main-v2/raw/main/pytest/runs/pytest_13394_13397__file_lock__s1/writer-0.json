@@ -1,0 +1,88 @@
+{
+ "writer": 0,
+ "pr": 13394,
+ "pid": 2292343,
+ "init_ms": 72.30588,
+ "start_offset_ms": 4,
+ "file_order": [
+  "src/_pytest/junitxml.py",
+  "src/_pytest/pytester.py",
+  "src/_pytest/terminal.py"
+ ],
+ "holds": {
+  "src/_pytest/junitxml.py": 21,
+  "src/_pytest/pytester.py": 7,
+  "src/_pytest/terminal.py": 10
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 13394,
+   "path": "src/_pytest/junitxml.py",
+   "intents": [
+    "log:pytest:13394_13397:13394:src/_pytest/junitxml.py:h0",
+    "log:pytest:13394_13397:13394:src/_pytest/junitxml.py:h1"
+   ],
+   "hold_ms": 21,
+   "t_submit_epoch": 1791573955542,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 15,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 41.37,
+   "t_done_epoch": 1791573955583
+  },
+  {
+   "writer": 0,
+   "pr": 13394,
+   "path": "src/_pytest/pytester.py",
+   "intents": [
+    "log:pytest:13394_13397:13394:src/_pytest/pytester.py:h2",
+    "log:pytest:13394_13397:13394:src/_pytest/pytester.py:h3",
+    "log:pytest:13394_13397:13394:src/_pytest/pytester.py:h4",
+    "log:pytest:13394_13397:13394:src/_pytest/pytester.py:h5"
+   ],
+   "hold_ms": 7,
+   "t_submit_epoch": 1791573955583,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 6,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 18.52,
+   "t_done_epoch": 1791573955602
+  },
+  {
+   "writer": 0,
+   "pr": 13394,
+   "path": "src/_pytest/terminal.py",
+   "intents": [
+    "log:pytest:13394_13397:13394:src/_pytest/terminal.py:h6",
+    "log:pytest:13394_13397:13394:src/_pytest/terminal.py:h7",
+    "log:pytest:13394_13397:13394:src/_pytest/terminal.py:h8",
+    "log:pytest:13394_13397:13394:src/_pytest/terminal.py:h9"
+   ],
+   "hold_ms": 10,
+   "t_submit_epoch": 1791573955602,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "queue",
+   "admit_wait_ms": 9,
+   "lock_spins": 0,
+   "outcome": "blocked",
+   "blocked_reason": "harness-relocate-context-not-found",
+   "total_ms": 25.42,
+   "t_done_epoch": 1791573955627
+  }
+ ],
+ "admit_stats": {
+  "txns": 7,
+  "cas_conflicts": 1
+ },
+ "steward_batches": null
+}

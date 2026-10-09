@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-0bd154e2fb4bc194",
+  "proposalIds": [
+    "prop-hist-w1-sympy_solvers_diophantine_diophantine_py"
+  ],
+  "targetFiles": [
+    "sympy/solvers/diophantine/diophantine.py"
+  ],
+  "appliedFiles": [
+    "sympy/solvers/diophantine/diophantine.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/solvers/diophantine/diophantine.py": "9fbe17acc216e99c2b01f695564b3b9f0074d460a523449876f4dee4af742677"
+  },
+  "fileAfterHashes": {
+    "sympy/solvers/diophantine/diophantine.py": "761a6cde72e96a2d53434c00c71a38de303a259cc1866927d5aa52371e9b2625"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/solvers/diophantine/diophantine.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-0bd154e2fb4bc194",
+    "planId": "merge-0bd154e2fb4bc194",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-0bd154e2fb4bc194",
+        "planId": "merge-0bd154e2fb4bc194",
+        "request_identity": [
+          "prop-hist-w1-sympy_solvers_diophantine_diophantine_py"
+        ],
+        "actor_ids": [
+          "writer-28036"
+        ],
+        "request_files": [
+          "sympy/solvers/diophantine/diophantine.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/solvers/diophantine/diophantine.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/sympy/runs/sympy_28032_28036__steward__s1/artifacts/steward/cb-sympy_solvers_diophantine_diophantine.py-w1-0010.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_SOLVERS_DIOPHANTINE_DIOPHANTINE_PY"
+        ],
+        "commit_sha": "b2f824bb9f45d8bc85b4694c46229dba998e1db9"
+      }
+    ]
+  }
+}

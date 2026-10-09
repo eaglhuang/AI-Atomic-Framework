@@ -1,0 +1,136 @@
+{
+ "writer": 1,
+ "pr": 13397,
+ "pid": 2292540,
+ "init_ms": 70.585857,
+ "start_offset_ms": 4,
+ "file_order": [
+  "src/_pytest/terminal.py",
+  "src/_pytest/junitxml.py",
+  "src/_pytest/timing.py",
+  "src/_pytest/pytester.py",
+  "src/_pytest/runner.py"
+ ],
+ "holds": {
+  "src/_pytest/terminal.py": 14,
+  "src/_pytest/junitxml.py": 4,
+  "src/_pytest/timing.py": 25,
+  "src/_pytest/pytester.py": 26,
+  "src/_pytest/runner.py": 9
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 13397,
+   "path": "src/_pytest/terminal.py",
+   "intents": [
+    "log:pytest:13394_13397:13397:src/_pytest/terminal.py:h11",
+    "log:pytest:13394_13397:13397:src/_pytest/terminal.py:h12",
+    "log:pytest:13394_13397:13397:src/_pytest/terminal.py:h13",
+    "log:pytest:13394_13397:13397:src/_pytest/terminal.py:h14",
+    "log:pytest:13394_13397:13397:src/_pytest/terminal.py:h15",
+    "log:pytest:13394_13397:13397:src/_pytest/terminal.py:h16",
+    "log:pytest:13394_13397:13397:src/_pytest/terminal.py:h17",
+    "log:pytest:13394_13397:13397:src/_pytest/terminal.py:h18"
+   ],
+   "hold_ms": 14,
+   "t_submit_epoch": 1791573957276,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 18,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 41.41,
+   "t_done_epoch": 1791573957317
+  },
+  {
+   "writer": 1,
+   "pr": 13397,
+   "path": "src/_pytest/junitxml.py",
+   "intents": [
+    "log:pytest:13394_13397:13397:src/_pytest/junitxml.py:h0",
+    "log:pytest:13394_13397:13397:src/_pytest/junitxml.py:h1",
+    "log:pytest:13394_13397:13397:src/_pytest/junitxml.py:h2",
+    "log:pytest:13394_13397:13397:src/_pytest/junitxml.py:h3"
+   ],
+   "hold_ms": 4,
+   "t_submit_epoch": 1791573957317,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 14,
+   "outcome": "blocked",
+   "blocked_reason": "occ-relocate-context-not-found",
+   "occ_retries": 0,
+   "total_ms": 19.57,
+   "t_done_epoch": 1791573957337
+  },
+  {
+   "writer": 1,
+   "pr": 13397,
+   "path": "src/_pytest/timing.py",
+   "intents": [
+    "log:pytest:13394_13397:13397:src/_pytest/timing.py:h19",
+    "log:pytest:13394_13397:13397:src/_pytest/timing.py:h20"
+   ],
+   "hold_ms": 25,
+   "t_submit_epoch": 1791573957337,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 31.85,
+   "t_done_epoch": 1791573957369
+  },
+  {
+   "writer": 1,
+   "pr": 13397,
+   "path": "src/_pytest/pytester.py",
+   "intents": [
+    "log:pytest:13394_13397:13397:src/_pytest/pytester.py:h4",
+    "log:pytest:13394_13397:13397:src/_pytest/pytester.py:h5",
+    "log:pytest:13394_13397:13397:src/_pytest/pytester.py:h6",
+    "log:pytest:13394_13397:13397:src/_pytest/pytester.py:h7"
+   ],
+   "hold_ms": 26,
+   "t_submit_epoch": 1791573957369,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "blocked",
+   "blocked_reason": "occ-relocate-context-not-found",
+   "occ_retries": 0,
+   "total_ms": 30.81,
+   "t_done_epoch": 1791573957399
+  },
+  {
+   "writer": 1,
+   "pr": 13397,
+   "path": "src/_pytest/runner.py",
+   "intents": [
+    "log:pytest:13394_13397:13397:src/_pytest/runner.py:h8",
+    "log:pytest:13394_13397:13397:src/_pytest/runner.py:h9",
+    "log:pytest:13394_13397:13397:src/_pytest/runner.py:h10"
+   ],
+   "hold_ms": 9,
+   "t_submit_epoch": 1791573957400,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 1,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 15.36,
+   "t_done_epoch": 1791573957415
+  }
+ ],
+ "admit_stats": {
+  "txns": 11,
+  "cas_conflicts": 4
+ },
+ "steward_batches": null
+}

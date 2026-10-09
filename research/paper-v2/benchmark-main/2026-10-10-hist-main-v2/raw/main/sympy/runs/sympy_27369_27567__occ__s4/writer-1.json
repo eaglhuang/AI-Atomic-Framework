@@ -1,0 +1,59 @@
+{
+ "writer": 1,
+ "pr": 27567,
+ "pid": 2238674,
+ "init_ms": 70.609992,
+ "start_offset_ms": 13,
+ "file_order": [
+  "sympy/series/gruntz.py",
+  "sympy/core/expr.py"
+ ],
+ "holds": {
+  "sympy/series/gruntz.py": 3,
+  "sympy/core/expr.py": 5
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 27567,
+   "path": "sympy/series/gruntz.py",
+   "intents": [
+    "log:sympy:27369_27567:27567:sympy/series/gruntz.py:h1",
+    "log:sympy:27369_27567:27567:sympy/series/gruntz.py:h2"
+   ],
+   "hold_ms": 3,
+   "t_submit_epoch": 1791573323908,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 17,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 25.34,
+   "t_done_epoch": 1791573323934
+  },
+  {
+   "writer": 1,
+   "pr": 27567,
+   "path": "sympy/core/expr.py",
+   "intents": [
+    "log:sympy:27369_27567:27567:sympy/core/expr.py:h0"
+   ],
+   "hold_ms": 5,
+   "t_submit_epoch": 1791573323934,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 14.76,
+   "t_done_epoch": 1791573323948
+  }
+ ],
+ "admit_stats": {
+  "txns": 4,
+  "cas_conflicts": 1
+ },
+ "steward_batches": null
+}

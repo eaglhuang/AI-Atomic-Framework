@@ -1,0 +1,60 @@
+{
+ "writer": 1,
+ "pr": 13713,
+ "pid": 2385627,
+ "init_ms": 85.876103,
+ "start_offset_ms": 18,
+ "file_order": [
+  "fastapi/applications.py",
+  "fastapi/openapi/utils.py"
+ ],
+ "holds": {
+  "fastapi/applications.py": 20,
+  "fastapi/openapi/utils.py": 18
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 13713,
+   "path": "fastapi/applications.py",
+   "intents": [
+    "log:fastapi:11530_13713:13713:fastapi/applications.py:h0",
+    "log:fastapi:11530_13713:13713:fastapi/applications.py:h1",
+    "log:fastapi:11530_13713:13713:fastapi/applications.py:h2"
+   ],
+   "hold_ms": 20,
+   "t_submit_epoch": 1791574674900,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 16,
+   "outcome": "blocked",
+   "blocked_reason": "git-base-drift",
+   "total_ms": 52.56,
+   "t_done_epoch": 1791574674953
+  },
+  {
+   "writer": 1,
+   "pr": 13713,
+   "path": "fastapi/openapi/utils.py",
+   "intents": [
+    "log:fastapi:11530_13713:13713:fastapi/openapi/utils.py:h3",
+    "log:fastapi:11530_13713:13713:fastapi/openapi/utils.py:h4"
+   ],
+   "hold_ms": 18,
+   "t_submit_epoch": 1791574674953,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "commit",
+   "total_ms": 30.68,
+   "t_done_epoch": 1791574674983
+  }
+ ],
+ "admit_stats": {
+  "txns": 4,
+  "cas_conflicts": 4
+ },
+ "steward_batches": null
+}

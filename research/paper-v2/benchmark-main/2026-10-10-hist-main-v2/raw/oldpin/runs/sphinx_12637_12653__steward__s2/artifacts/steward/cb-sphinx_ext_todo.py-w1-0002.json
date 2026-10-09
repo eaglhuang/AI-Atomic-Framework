@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-a8f4198adca33207",
+  "proposalIds": [
+    "prop-hist-w1-sphinx_ext_todo_py"
+  ],
+  "targetFiles": [
+    "sphinx/ext/todo.py"
+  ],
+  "appliedFiles": [
+    "sphinx/ext/todo.py"
+  ],
+  "fileBeforeHashes": {
+    "sphinx/ext/todo.py": "c63a1a82e29a92bd177ba20c6404a50910fb60096a09a1e72bc298b4d2fb67e5"
+  },
+  "fileAfterHashes": {
+    "sphinx/ext/todo.py": "86b67ed30af68f5d705c1492bc6d8209a5b6483925c348fe23eb46e1e0e19f77"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sphinx/ext/todo.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-a8f4198adca33207",
+    "planId": "merge-a8f4198adca33207",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-a8f4198adca33207",
+        "planId": "merge-a8f4198adca33207",
+        "request_identity": [
+          "prop-hist-w1-sphinx_ext_todo_py"
+        ],
+        "actor_ids": [
+          "writer-12653"
+        ],
+        "request_files": [
+          "sphinx/ext/todo.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sphinx/ext/todo.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/oldpin/runs/sphinx_12637_12653__steward__s2/artifacts/steward/cb-sphinx_ext_todo.py-w1-0002.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SPHINX_EXT_TODO_PY"
+        ],
+        "commit_sha": "943b5a524178da840df427b267c67608a643c3e4"
+      }
+    ]
+  }
+}

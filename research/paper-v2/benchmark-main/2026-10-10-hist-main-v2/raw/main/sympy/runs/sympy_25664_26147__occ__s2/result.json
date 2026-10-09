@@ -1,0 +1,87 @@
+{
+ "pair_id": "sympy:25664_26147",
+ "stratum": "O2",
+ "arm": "occ",
+ "plant": null,
+ "seed_k": 2,
+ "seed": 2900622394,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 435,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 13,
+  "by_verdict": {
+   "blocked_absent": 11,
+   "correct": 2
+  },
+  "completed": 2,
+  "lost_effects": 0,
+  "blocked": 11,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 1,
+  "files_full_bytes_exact": 1,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {
+  "occ-relocate-context-not-found": 11
+ },
+ "structure": {
+  "sympy/functions/special/bessel.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "sympy/functions/special/bessel.py": true
+ },
+ "final_exists": {
+  "sympy/functions/special/bessel.py": true
+ },
+ "files": [
+  {
+   "path": "sympy/functions/special/bessel.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:deae538b4bd5a923d067da12668bc9340be2156b8e5cb50c6c9be9464753c56b",
+   "final_digest": "sha256:40ccb020222e185b745dc42f9e72cd62ded7069aa3a94a393c316f1da6f6ad86",
+   "expected_digests": [
+    "sha256:40ccb020222e185b745dc42f9e72cd62ded7069aa3a94a393c316f1da6f6ad86"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "sympy/functions/special/bessel.py": "sha256:40ccb020222e185b745dc42f9e72cd62ded7069aa3a94a393c316f1da6f6ad86"
+ }
+}

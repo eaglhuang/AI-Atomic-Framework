@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-a1ddf729a3d4342e",
+  "proposalIds": [
+    "prop-hist-w1-docs_src_handling_errors_tutorial005_py"
+  ],
+  "targetFiles": [
+    "docs_src/handling_errors/tutorial005.py"
+  ],
+  "appliedFiles": [
+    "docs_src/handling_errors/tutorial005.py"
+  ],
+  "fileBeforeHashes": {
+    "docs_src/handling_errors/tutorial005.py": "61824da4694a1099574a666fe6034cb70d8551c897b362ba2703f3b27fa3e8fc"
+  },
+  "fileAfterHashes": {
+    "docs_src/handling_errors/tutorial005.py": "1bcb5bf2f454c78eb11fea05198da4e0a174c1aebffec21cc321399b9f2d3a41"
+  },
+  "permissions": {
+    "fileWrite": [
+      "docs_src/handling_errors/tutorial005.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-a1ddf729a3d4342e",
+    "planId": "merge-a1ddf729a3d4342e",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-a1ddf729a3d4342e",
+        "planId": "merge-a1ddf729a3d4342e",
+        "request_identity": [
+          "prop-hist-w1-docs_src_handling_errors_tutorial005_py"
+        ],
+        "actor_ids": [
+          "writer-14077"
+        ],
+        "request_files": [
+          "docs_src/handling_errors/tutorial005.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "docs_src/handling_errors/tutorial005.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/oldpin/runs/fastapi_13713_14077__steward__s2/artifacts/steward/cb-docs_src_handling_errors_tutorial005.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-DOCS_SRC_HANDLING_ERRORS_TUTORIAL005_PY"
+        ],
+        "commit_sha": "57bba7bf4f6c9f2d718d35ce2e813f115a89aa84"
+      }
+    ]
+  }
+}

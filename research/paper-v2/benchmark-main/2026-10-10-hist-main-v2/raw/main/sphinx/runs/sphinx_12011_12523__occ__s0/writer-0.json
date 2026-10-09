@@ -1,0 +1,61 @@
+{
+ "writer": 0,
+ "pr": 12011,
+ "pid": 2365600,
+ "init_ms": 83.232646,
+ "start_offset_ms": 12,
+ "file_order": [
+  "sphinx/config.py",
+  "sphinx/builders/__init__.py"
+ ],
+ "holds": {
+  "sphinx/config.py": 11,
+  "sphinx/builders/__init__.py": 21
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 12011,
+   "path": "sphinx/config.py",
+   "intents": [
+    "log:sphinx:12011_12523:12011:sphinx/config.py:h3",
+    "log:sphinx:12011_12523:12011:sphinx/config.py:h4"
+   ],
+   "hold_ms": 11,
+   "t_submit_epoch": 1791574532370,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 15,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 33.05,
+   "t_done_epoch": 1791574532403
+  },
+  {
+   "writer": 0,
+   "pr": 12011,
+   "path": "sphinx/builders/__init__.py",
+   "intents": [
+    "log:sphinx:12011_12523:12011:sphinx/builders/__init__.py:h0",
+    "log:sphinx:12011_12523:12011:sphinx/builders/__init__.py:h1",
+    "log:sphinx:12011_12523:12011:sphinx/builders/__init__.py:h2"
+   ],
+   "hold_ms": 21,
+   "t_submit_epoch": 1791574532403,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 5,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 31.97,
+   "t_done_epoch": 1791574532435
+  }
+ ],
+ "admit_stats": {
+  "txns": 4,
+  "cas_conflicts": 0
+ },
+ "steward_batches": null
+}

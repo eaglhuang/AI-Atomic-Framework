@@ -1,0 +1,216 @@
+{
+ "pair_id": "django:19393_19430",
+ "stratum": "O0",
+ "arm": "occ",
+ "plant": null,
+ "seed_k": 4,
+ "seed": 1223574964,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 492,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 12,
+  "by_verdict": {
+   "correct": 12
+  },
+  "completed": 12,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 7,
+  "files_full_bytes_exact": 7,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "django/conf/global_settings.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "django/contrib/admin/tests.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "django/core/checks/security/base.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "django/core/management/commands/inspectdb.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "django/middleware/csp.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "django/template/context_processors.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "django/utils/csp.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "django/conf/global_settings.py": true,
+  "django/contrib/admin/tests.py": true,
+  "django/core/checks/security/base.py": true,
+  "django/core/management/commands/inspectdb.py": true,
+  "django/middleware/csp.py": false,
+  "django/template/context_processors.py": true,
+  "django/utils/csp.py": false
+ },
+ "final_exists": {
+  "django/conf/global_settings.py": true,
+  "django/contrib/admin/tests.py": true,
+  "django/core/checks/security/base.py": true,
+  "django/core/management/commands/inspectdb.py": true,
+  "django/middleware/csp.py": true,
+  "django/template/context_processors.py": true,
+  "django/utils/csp.py": true
+ },
+ "files": [
+  {
+   "path": "django/conf/global_settings.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:90ba833f1e9c9b88e2dd69a52de4359dfc2a4755dba0f3e7efedddf4d3e0dabc",
+   "final_digest": "sha256:a1926f270d17ec3ba4c698d546de116bcc7d3bd836f2fa5bcdfc1fe45915aa2f",
+   "expected_digests": [
+    "sha256:a1926f270d17ec3ba4c698d546de116bcc7d3bd836f2fa5bcdfc1fe45915aa2f"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "django/contrib/admin/tests.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:f5aa956c76cc27ae8e45ae75cca20e45176bf63d9bd48ea6956bfde7393ec05b",
+   "final_digest": "sha256:d5a31dd13bbc300bb07e019ca003ef003bdc1c4c12ad84f3987d7cab01745ba8",
+   "expected_digests": [
+    "sha256:d5a31dd13bbc300bb07e019ca003ef003bdc1c4c12ad84f3987d7cab01745ba8"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "django/core/checks/security/base.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:2341a6e38eadc112216d1a291262ac76c616fcd748eff9cafd9576f26b113c4a",
+   "final_digest": "sha256:979d751dab251b7bf3f24da1f7cb3eead8a8a2237e2dfa9b16388714f11be403",
+   "expected_digests": [
+    "sha256:979d751dab251b7bf3f24da1f7cb3eead8a8a2237e2dfa9b16388714f11be403"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "django/core/management/commands/inspectdb.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:4e8a308670b2b1d9b30d0c8ac6c3f0bb8351eb4f76f1f18a1fbf36c7ab602f15",
+   "final_digest": "sha256:a5ead6b9dd4aab5493f1531078472c4026823c2e48e896f7d4e7efaf6a48f182",
+   "expected_digests": [
+    "sha256:a5ead6b9dd4aab5493f1531078472c4026823c2e48e896f7d4e7efaf6a48f182"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "django/middleware/csp.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "final_digest": "sha256:1ed64769e7e1971270b5ea2ff61fedcd37a0cf471cbdb0a39c50f2faec4e980a",
+   "expected_digests": [
+    "sha256:1ed64769e7e1971270b5ea2ff61fedcd37a0cf471cbdb0a39c50f2faec4e980a"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "django/template/context_processors.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:3cc22e1941358a58dfe4bf285e080876fbc53a108b269012770777f4131d8c11",
+   "final_digest": "sha256:1cbe48f5587c33632c2a80ab80858a9fe32c1aa0f3f275938e6904eefd7a4541",
+   "expected_digests": [
+    "sha256:1cbe48f5587c33632c2a80ab80858a9fe32c1aa0f3f275938e6904eefd7a4541"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "django/utils/csp.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "final_digest": "sha256:1d58fb763f8ded02d1899a3eac90c8309aaaa627a3d916d23459b3c0bba5899d",
+   "expected_digests": [
+    "sha256:1d58fb763f8ded02d1899a3eac90c8309aaaa627a3d916d23459b3c0bba5899d"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "django/conf/global_settings.py": "sha256:a1926f270d17ec3ba4c698d546de116bcc7d3bd836f2fa5bcdfc1fe45915aa2f",
+  "django/contrib/admin/tests.py": "sha256:d5a31dd13bbc300bb07e019ca003ef003bdc1c4c12ad84f3987d7cab01745ba8",
+  "django/core/checks/security/base.py": "sha256:979d751dab251b7bf3f24da1f7cb3eead8a8a2237e2dfa9b16388714f11be403",
+  "django/core/management/commands/inspectdb.py": "sha256:a5ead6b9dd4aab5493f1531078472c4026823c2e48e896f7d4e7efaf6a48f182",
+  "django/middleware/csp.py": "sha256:1ed64769e7e1971270b5ea2ff61fedcd37a0cf471cbdb0a39c50f2faec4e980a",
+  "django/template/context_processors.py": "sha256:1cbe48f5587c33632c2a80ab80858a9fe32c1aa0f3f275938e6904eefd7a4541",
+  "django/utils/csp.py": "sha256:1d58fb763f8ded02d1899a3eac90c8309aaaa627a3d916d23459b3c0bba5899d"
+ }
+}

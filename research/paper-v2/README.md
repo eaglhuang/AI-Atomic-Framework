@@ -21,6 +21,7 @@ ATM（AI-Atomic-Framework）論文 2.0（composer＋中立 steward，RQ2 主臂 
 | benchmark-main/2026-10-10-hist-prereg-v1.1 | 預先登記 v1.1（凍結）＋主樣本 300 對＋O0 30 對＋9,750 runs seed 表；沒有 run 結果（2026-10-10） |
 | benchmark-trials/2026-10-10-hist-confirm-v1.1 | 試跑（不列入正式結果）：prereg v1.1 小量確認，5 對 × 5 arm＋植入故障＋舊 pin，36 runs（2026-10-10） |
 | benchmark-main/2026-10-10-hist-main | 主跑（§5.7 反例停止）：Django＋SymPy 2,500／9,750 runs；steward EOF 換行反例與鑑識（2026-10-10） |
+| benchmark-main/2026-10-10-hist-main-v2 | Main run v2: all 9,750 runs rerun on ATM b1fd9d22 (EOF fix); 0 steward counterexamples; semantic endpoint; before/after（2026-10-10） |
 
 ## Generation 政策
 1. **Generation 不可變（immutable）。** 一旦放入 `generations/<id>/` 並產生 `SHA256SUMS`，該目錄內任何檔案都不得修改、刪除或重新產生指紋。
@@ -54,5 +55,6 @@ sh research/paper-v2/benchmark-trials/2026-10-09-hist-mining/verify.sh research/
 sh research/paper-v2/benchmark-main/2026-10-10-hist-prereg-v1.1/verify.sh research/paper-v2/benchmark-main/2026-10-10-hist-prereg-v1.1
 sh research/paper-v2/benchmark-trials/2026-10-10-hist-confirm-v1.1/verify.sh research/paper-v2/benchmark-trials/2026-10-10-hist-confirm-v1.1
 sh research/paper-v2/benchmark-main/2026-10-10-hist-main/verify.sh research/paper-v2/benchmark-main/2026-10-10-hist-main
+sh research/paper-v2/benchmark-main/2026-10-10-hist-main-v2/verify.sh research/paper-v2/benchmark-main/2026-10-10-hist-main-v2
 ```
 **注意：** `harness/reproduce.sh`（r1 版）的 verify 模式會重寫 manifest／checksums，**不可**用來驗證 r1（外審 P0-3）。r2–r6 已把 reproduce 拆成 verify／analyze／rerun／seal；驗證只用各代 `verify.sh`。

@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-b9abd583db75a80d",
+  "proposalIds": [
+    "prop-hist-w1-src_pytest_compat_py"
+  ],
+  "targetFiles": [
+    "src/_pytest/compat.py"
+  ],
+  "appliedFiles": [],
+  "fileBeforeHashes": {},
+  "fileAfterHashes": {},
+  "permissions": {
+    "fileWrite": [
+      "src/_pytest/compat.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "blocked",
+  "blockedReasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w1-src_pytest_compat_py' context mismatch at base line 177: expected \")\", found \"\" [proposals: prop-hist-w1-src_pytest_compat_py]"
+  ],
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-b9abd583db75a80d",
+    "planId": "merge-b9abd583db75a80d",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-b9abd583db75a80d",
+        "planId": "merge-b9abd583db75a80d",
+        "request_identity": [
+          "prop-hist-w1-src_pytest_compat_py"
+        ],
+        "actor_ids": [
+          "writer-11915"
+        ],
+        "request_files": [
+          "src/_pytest/compat.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/pytest/runs/pytest_11914_11915__bare_composer__s2/artifacts/steward/cb-src__pytest_compat.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SRC_PYTEST_COMPAT_PY"
+        ],
+        "commit_sha": "2fb2c30e7ca14872117f12b94c0febef9d3f3403"
+      }
+    ]
+  }
+}

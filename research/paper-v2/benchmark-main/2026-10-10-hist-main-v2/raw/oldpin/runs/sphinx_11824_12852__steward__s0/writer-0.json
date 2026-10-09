@@ -1,0 +1,149 @@
+{
+ "writer": 0,
+ "pr": 11824,
+ "pid": 2474076,
+ "init_ms": 91.13608500000001,
+ "start_offset_ms": 15,
+ "file_order": [
+  "sphinx/application.py",
+  "sphinx/ext/linkcode.py"
+ ],
+ "holds": {
+  "sphinx/application.py": 11,
+  "sphinx/ext/linkcode.py": 24
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 11824,
+   "path": "sphinx/application.py",
+   "intents": [
+    "log:sphinx:11824_12852:11824:sphinx/application.py:h0"
+   ],
+   "hold_ms": 11,
+   "t_submit_epoch": 1791575344626,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 18,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sphinx_application.py-w0-0001",
+   "total_ms": 123.35,
+   "t_done_epoch": 1791575344750
+  },
+  {
+   "writer": 0,
+   "pr": 11824,
+   "path": "sphinx/ext/linkcode.py",
+   "intents": [
+    "log:sphinx:11824_12852:11824:sphinx/ext/linkcode.py:h1",
+    "log:sphinx:11824_12852:11824:sphinx/ext/linkcode.py:h2"
+   ],
+   "hold_ms": 24,
+   "t_submit_epoch": 1791575344750,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "blocked",
+   "blocked_reason": "harness-relocate-context-not-found",
+   "total_ms": 27.73,
+   "t_done_epoch": 1791575344777
+  }
+ ],
+ "admit_stats": {
+  "txns": 4,
+  "cas_conflicts": 1
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sphinx_application.py-w0-0001",
+   "path": "sphinx/application.py",
+   "pid": 2474076,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-sphinx_application_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sphinx_application_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:140dd340ffa921fd3213ce32dabfab676c1864439375932da66dcf7e767ed4c2"
+   ],
+   "lock_wait_ms": 0.11,
+   "t_start_epoch_ms": 1791575344658.07,
+   "pre_apply_hash": "sha256:140dd340ffa921fd3213ce32dabfab676c1864439375932da66dcf7e767ed4c2",
+   "receipt_before_hash": "sha256:140dd340ffa921fd3213ce32dabfab676c1864439375932da66dcf7e767ed4c2",
+   "receipt_after_hash": "sha256:3273847129d2046b4894e59cf73f0763db4bbd5e4aa58acabaa4344f53043b07",
+   "post_apply_hash": "sha256:3273847129d2046b4894e59cf73f0763db4bbd5e4aa58acabaa4344f53043b07",
+   "t_end_epoch_ms": 1791575344746.76,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:49:04.746+08:00",
+   "batch_id": "cb-sphinx_application.py-w0-0001",
+   "path": "sphinx/application.py",
+   "proposalIds": [
+    "prop-hist-w0-sphinx_application_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sphinx_application_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-sphinx_application_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-sphinx_application_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-sphinx_application_py",
+     "logical_id": "prop-hist-w0-sphinx_application_py",
+     "attempt_id": "att-prop-hist-w0-sphinx_application_py-r0",
+     "proposal_id": "prop-hist-w0-sphinx_application_py",
+     "actorId": "writer-11824"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.21,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:140dd340ffa921fd3213ce32dabfab676c1864439375932da66dcf7e767ed4c2",
+   "written": true,
+   "output_digest": "sha256:3273847129d2046b4894e59cf73f0763db4bbd5e4aa58acabaa4344f53043b07",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

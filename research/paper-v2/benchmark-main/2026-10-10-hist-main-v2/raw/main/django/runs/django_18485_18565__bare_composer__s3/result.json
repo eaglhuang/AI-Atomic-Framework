@@ -1,0 +1,109 @@
+{
+ "pair_id": "django:18485_18565",
+ "stratum": "O3",
+ "arm": "bare_composer",
+ "plant": null,
+ "seed_k": 3,
+ "seed": 2857732105,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 455,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 17,
+  "by_verdict": {
+   "correct": 16,
+   "blocked_absent": 1
+  },
+  "completed": 16,
+  "lost_effects": 0,
+  "blocked": 1,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 2,
+  "files_full_bytes_exact": 2,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {
+  "compose-context-mismatch: proposal 'prop-hist-w1-django_db_models_expressions_py": 1
+ },
+ "structure": {
+  "django/db/models/expressions.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "django/db/models/fields/tuple_lookups.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "django/db/models/expressions.py": true,
+  "django/db/models/fields/tuple_lookups.py": true
+ },
+ "final_exists": {
+  "django/db/models/expressions.py": true,
+  "django/db/models/fields/tuple_lookups.py": true
+ },
+ "files": [
+  {
+   "path": "django/db/models/expressions.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:8b420e10cd0af7359b77bb96085e239f82274f232645fb35cf655f8dfbe1ca20",
+   "final_digest": "sha256:1d95e4348ff5a0cd11d93711d059bef9240f05a1db506693f76337a3c833a8e6",
+   "expected_digests": [
+    "sha256:1d95e4348ff5a0cd11d93711d059bef9240f05a1db506693f76337a3c833a8e6"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "django/db/models/fields/tuple_lookups.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:6dcb28db6937fde67152e5d4f82a71ff2ad10cf9dae87279a03aa83439d1061b",
+   "final_digest": "sha256:9f630b2e285ea1903166c731d9c1fe01fc70e1cf5b52f7e64cd439f940872029",
+   "expected_digests": [
+    "sha256:9f630b2e285ea1903166c731d9c1fe01fc70e1cf5b52f7e64cd439f940872029"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "django/db/models/expressions.py": "sha256:1d95e4348ff5a0cd11d93711d059bef9240f05a1db506693f76337a3c833a8e6",
+  "django/db/models/fields/tuple_lookups.py": "sha256:9f630b2e285ea1903166c731d9c1fe01fc70e1cf5b52f7e64cd439f940872029"
+ }
+}

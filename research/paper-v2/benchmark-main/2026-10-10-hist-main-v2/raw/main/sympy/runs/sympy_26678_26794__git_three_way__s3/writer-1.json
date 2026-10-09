@@ -1,0 +1,96 @@
+{
+ "writer": 1,
+ "pr": 26794,
+ "pid": 2246055,
+ "init_ms": 64.194163,
+ "start_offset_ms": 12,
+ "file_order": [
+  "sympy/codegen/cfunctions.py",
+  "sympy/printing/pycode.py",
+  "sympy/printing/codeprinter.py",
+  "sympy/printing/numpy.py"
+ ],
+ "holds": {
+  "sympy/codegen/cfunctions.py": 0,
+  "sympy/printing/pycode.py": 29,
+  "sympy/printing/codeprinter.py": 2,
+  "sympy/printing/numpy.py": 11
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 26794,
+   "path": "sympy/codegen/cfunctions.py",
+   "intents": [
+    "log:sympy:26678_26794:26794:sympy/codegen/cfunctions.py:h0",
+    "log:sympy:26678_26794:26794:sympy/codegen/cfunctions.py:h1",
+    "log:sympy:26678_26794:26794:sympy/codegen/cfunctions.py:h2"
+   ],
+   "hold_ms": 0,
+   "t_submit_epoch": 1791573395433,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 17,
+   "outcome": "commit",
+   "total_ms": 26.95,
+   "t_done_epoch": 1791573395460
+  },
+  {
+   "writer": 1,
+   "pr": 26794,
+   "path": "sympy/printing/pycode.py",
+   "intents": [
+    "log:sympy:26678_26794:26794:sympy/printing/pycode.py:h5"
+   ],
+   "hold_ms": 29,
+   "t_submit_epoch": 1791573395460,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "total_ms": 40.23,
+   "t_done_epoch": 1791573395500
+  },
+  {
+   "writer": 1,
+   "pr": 26794,
+   "path": "sympy/printing/codeprinter.py",
+   "intents": [
+    "log:sympy:26678_26794:26794:sympy/printing/codeprinter.py:h3"
+   ],
+   "hold_ms": 2,
+   "t_submit_epoch": 1791573395500,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 46,
+   "outcome": "commit",
+   "total_ms": 56.75,
+   "t_done_epoch": 1791573395557
+  },
+  {
+   "writer": 1,
+   "pr": 26794,
+   "path": "sympy/printing/numpy.py",
+   "intents": [
+    "log:sympy:26678_26794:26794:sympy/printing/numpy.py:h4"
+   ],
+   "hold_ms": 11,
+   "t_submit_epoch": 1791573395557,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "total_ms": 20.43,
+   "t_done_epoch": 1791573395577
+  }
+ ],
+ "admit_stats": {
+  "txns": 9,
+  "cas_conflicts": 8
+ },
+ "steward_batches": null
+}

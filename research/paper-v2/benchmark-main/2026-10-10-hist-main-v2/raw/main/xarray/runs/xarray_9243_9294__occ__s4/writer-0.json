@@ -1,0 +1,129 @@
+{
+ "writer": 0,
+ "pr": 9243,
+ "pid": 2260550,
+ "init_ms": 72.323938,
+ "start_offset_ms": 17,
+ "file_order": [
+  "xarray/backends/netCDF4_.py",
+  "xarray/backends/common.py",
+  "xarray/backends/plugins.py",
+  "xarray/backends/h5netcdf_.py",
+  "xarray/backends/api.py"
+ ],
+ "holds": {
+  "xarray/backends/netCDF4_.py": 2,
+  "xarray/backends/common.py": 12,
+  "xarray/backends/plugins.py": 20,
+  "xarray/backends/h5netcdf_.py": 13,
+  "xarray/backends/api.py": 2
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 9243,
+   "path": "xarray/backends/netCDF4_.py",
+   "intents": [
+    "log:xarray:9243_9294:9243:xarray/backends/netCDF4_.py:h8",
+    "log:xarray:9243_9294:9243:xarray/backends/netCDF4_.py:h9",
+    "log:xarray:9243_9294:9243:xarray/backends/netCDF4_.py:h10",
+    "log:xarray:9243_9294:9243:xarray/backends/netCDF4_.py:h11",
+    "log:xarray:9243_9294:9243:xarray/backends/netCDF4_.py:h12",
+    "log:xarray:9243_9294:9243:xarray/backends/netCDF4_.py:h13"
+   ],
+   "hold_ms": 2,
+   "t_submit_epoch": 1791573561771,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 18,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 28.28,
+   "t_done_epoch": 1791573561799
+  },
+  {
+   "writer": 0,
+   "pr": 9243,
+   "path": "xarray/backends/common.py",
+   "intents": [
+    "log:xarray:9243_9294:9243:xarray/backends/common.py:h1"
+   ],
+   "hold_ms": 12,
+   "t_submit_epoch": 1791573561799,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 19.34,
+   "t_done_epoch": 1791573561818
+  },
+  {
+   "writer": 0,
+   "pr": 9243,
+   "path": "xarray/backends/plugins.py",
+   "intents": [
+    "log:xarray:9243_9294:9243:xarray/backends/plugins.py:h14"
+   ],
+   "hold_ms": 20,
+   "t_submit_epoch": 1791573561818,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "blocked",
+   "blocked_reason": "occ-relocate-context-not-found",
+   "occ_retries": 0,
+   "total_ms": 26.66,
+   "t_done_epoch": 1791573561845
+  },
+  {
+   "writer": 0,
+   "pr": 9243,
+   "path": "xarray/backends/h5netcdf_.py",
+   "intents": [
+    "log:xarray:9243_9294:9243:xarray/backends/h5netcdf_.py:h2",
+    "log:xarray:9243_9294:9243:xarray/backends/h5netcdf_.py:h3",
+    "log:xarray:9243_9294:9243:xarray/backends/h5netcdf_.py:h4",
+    "log:xarray:9243_9294:9243:xarray/backends/h5netcdf_.py:h5",
+    "log:xarray:9243_9294:9243:xarray/backends/h5netcdf_.py:h6",
+    "log:xarray:9243_9294:9243:xarray/backends/h5netcdf_.py:h7"
+   ],
+   "hold_ms": 13,
+   "t_submit_epoch": 1791573561845,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 21.97,
+   "t_done_epoch": 1791573561867
+  },
+  {
+   "writer": 0,
+   "pr": 9243,
+   "path": "xarray/backends/api.py",
+   "intents": [
+    "log:xarray:9243_9294:9243:xarray/backends/api.py:h0"
+   ],
+   "hold_ms": 2,
+   "t_submit_epoch": 1791573561867,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 10,
+   "t_done_epoch": 1791573561877
+  }
+ ],
+ "admit_stats": {
+  "txns": 10,
+  "cas_conflicts": 1
+ },
+ "steward_batches": null
+}

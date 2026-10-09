@@ -1,0 +1,128 @@
+{
+ "writer": 0,
+ "pr": 3142,
+ "pid": 2405472,
+ "init_ms": 87.376701,
+ "start_offset_ms": 18,
+ "file_order": [
+  "fastapi/security/api_key.py"
+ ],
+ "holds": {
+  "fastapi/security/api_key.py": 15
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 3142,
+   "path": "fastapi/security/api_key.py",
+   "intents": [
+    "log:fastapi:3142_11481:3142:fastapi/security/api_key.py:h0",
+    "log:fastapi:3142_11481:3142:fastapi/security/api_key.py:h1",
+    "log:fastapi:3142_11481:3142:fastapi/security/api_key.py:h2",
+    "log:fastapi:3142_11481:3142:fastapi/security/api_key.py:h3"
+   ],
+   "hold_ms": 15,
+   "t_submit_epoch": 1791574804379,
+   "outcome": "blocked",
+   "blocked_reason": "file-hash-drift: Target file hash sha256:fcea945231071b9fcc4f520f0215c81894423e575305d4b0c3f0de805cbf5bc6 does not match proposal fileBeforeHash sha256:d4cc1a4cccaa9918749c8203202b0fea21bd45dc1bce1f811b448558a45cf27a.",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "file-hash-drift: Target file hash sha256:fcea945231071b9fcc4f520f0215c81894423e575305d4b0c3f0de805cbf5bc6 does not match proposal fileBeforeHash sha256:d4cc1a4cccaa9918749c8203202b0fea21bd45dc1bce1f811b448558a45cf27a."
+   ],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-fastapi_security_api_key.py-w0-0001",
+   "total_ms": 110.62,
+   "t_done_epoch": 1791574804489
+  }
+ ],
+ "admit_stats": null,
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-fastapi_security_api_key.py-w0-0001",
+   "path": "fastapi/security/api_key.py",
+   "pid": 2405472,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-fastapi_security_api_key_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-fastapi_security_api_key_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:d4cc1a4cccaa9918749c8203202b0fea21bd45dc1bce1f811b448558a45cf27a"
+   ],
+   "lock_wait_ms": 0.14,
+   "t_start_epoch_ms": 1791574804397.28,
+   "pre_apply_hash": "sha256:d4cc1a4cccaa9918749c8203202b0fea21bd45dc1bce1f811b448558a45cf27a",
+   "receipt_before_hash": null,
+   "receipt_after_hash": null,
+   "post_apply_hash": "sha256:fcea945231071b9fcc4f520f0215c81894423e575305d4b0c3f0de805cbf5bc6",
+   "t_end_epoch_ms": 1791574804489.4,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "blocked",
+   "written": false,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:40:04.489+08:00",
+   "batch_id": "cb-fastapi_security_api_key.py-w0-0001",
+   "path": "fastapi/security/api_key.py",
+   "proposalIds": [
+    "prop-hist-w0-fastapi_security_api_key_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-fastapi_security_api_key_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-fastapi_security_api_key_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-fastapi_security_api_key_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-fastapi_security_api_key_py",
+     "logical_id": "prop-hist-w0-fastapi_security_api_key_py",
+     "attempt_id": "att-prop-hist-w0-fastapi_security_api_key_py-r0",
+     "proposal_id": "prop-hist-w0-fastapi_security_api_key_py",
+     "actorId": "writer-3142"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "file-hash-drift: Target file hash sha256:fcea945231071b9fcc4f520f0215c81894423e575305d4b0c3f0de805cbf5bc6 does not match proposal fileBeforeHash sha256:d4cc1a4cccaa9918749c8203202b0fea21bd45dc1bce1f811b448558a45cf27a."
+   ],
+   "blocked_reason": "file-hash-drift: Target file hash sha256:fcea945231071b9fcc4f520f0215c81894423e575305d4b0c3f0de805cbf5bc6 does not match proposal fileBeforeHash sha256:d4cc1a4cccaa9918749c8203202b0fea21bd45dc1bce1f811b448558a45cf27a.",
+   "window_wait_ms": 0.36,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:d4cc1a4cccaa9918749c8203202b0fea21bd45dc1bce1f811b448558a45cf27a",
+   "written": false,
+   "output_digest": null,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "file-hash-drift: Target file hash sha256:fcea945231071b9fcc4f520f0215c81894423e575305d4b0c3f0de805cbf5bc6 does not match proposal fileBeforeHash sha256:d4cc1a4cccaa9918749c8203202b0fea21bd45dc1bce1f811b448558a45cf27a."
+  }
+ ]
+}

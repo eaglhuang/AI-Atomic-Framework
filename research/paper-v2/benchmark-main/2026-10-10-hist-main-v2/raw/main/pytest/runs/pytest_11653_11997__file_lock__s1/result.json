@@ -1,0 +1,194 @@
+{
+ "pair_id": "pytest:11653_11997",
+ "stratum": "O3",
+ "arm": "file_lock",
+ "plant": null,
+ "seed_k": 1,
+ "seed": 3660577972,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 619,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 40,
+  "by_verdict": {
+   "correct": 40
+  },
+  "completed": 40,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 6,
+  "files_full_bytes_exact": 6,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "src/_pytest/config/__init__.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "src/_pytest/main.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "src/_pytest/pathlib.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "src/_pytest/python.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "src/_pytest/runner.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "src/_pytest/terminal.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "src/_pytest/config/__init__.py": true,
+  "src/_pytest/main.py": true,
+  "src/_pytest/pathlib.py": true,
+  "src/_pytest/python.py": true,
+  "src/_pytest/runner.py": true,
+  "src/_pytest/terminal.py": true
+ },
+ "final_exists": {
+  "src/_pytest/config/__init__.py": true,
+  "src/_pytest/main.py": true,
+  "src/_pytest/pathlib.py": true,
+  "src/_pytest/python.py": true,
+  "src/_pytest/runner.py": true,
+  "src/_pytest/terminal.py": true
+ },
+ "files": [
+  {
+   "path": "src/_pytest/config/__init__.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:b25dd2353fdfdea79bc8788d66a49111a8da6db8519be052d7a8822e77aeca81",
+   "final_digest": "sha256:774478317a9c080c0dcbf4f0e4d65784616a0f06c70cafad1ce1ce71cc888c4d",
+   "expected_digests": [
+    "sha256:774478317a9c080c0dcbf4f0e4d65784616a0f06c70cafad1ce1ce71cc888c4d"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "src/_pytest/main.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:9c4bc60432f1987850fe8c73e308515ae358819979b56ad6e15e3a11812b2075",
+   "final_digest": "sha256:3f37320c859e9b343e7d13797f85fe373f3dd84b8a3eb4d200b61a83a0677eca",
+   "expected_digests": [
+    "sha256:3f37320c859e9b343e7d13797f85fe373f3dd84b8a3eb4d200b61a83a0677eca"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "src/_pytest/pathlib.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:c7b48bef9fad490aa06c3693237dc82c38c9d132dc6948cce3f8787ec8766357",
+   "final_digest": "sha256:b14f3b40c2706d418f99640b9c8179359c33a5016ef307ffd3d05dcea010733c",
+   "expected_digests": [
+    "sha256:b14f3b40c2706d418f99640b9c8179359c33a5016ef307ffd3d05dcea010733c"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "src/_pytest/python.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:be7144e33e99ade08c3d255baa5a3a3824989b0cf0f05e4b4625c276b3fe95b3",
+   "final_digest": "sha256:c1d51545a6b903bd5e3247a12eb55e2a6be0ea04fc1660e89357e592a5f0c499",
+   "expected_digests": [
+    "sha256:c1d51545a6b903bd5e3247a12eb55e2a6be0ea04fc1660e89357e592a5f0c499"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "src/_pytest/runner.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:b10f8596906ac051dcc6bcec345b09218fbed9ed294f718b79377a32adf7afaf",
+   "final_digest": "sha256:3f87c1e123187fdf6f28df27df2cade13f206613eff8a7355a111b41b6ffa76c",
+   "expected_digests": [
+    "sha256:3f87c1e123187fdf6f28df27df2cade13f206613eff8a7355a111b41b6ffa76c"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "src/_pytest/terminal.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:676ba0276299813f1491a232b26c1489d8a579b8d1f7d53a00cbdf242be3c5ee",
+   "final_digest": "sha256:0c6e22241936612d9767b21b35d9deb6672d9290ddb54799c8d2227c2fd6427d",
+   "expected_digests": [
+    "sha256:0c6e22241936612d9767b21b35d9deb6672d9290ddb54799c8d2227c2fd6427d"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "src/_pytest/config/__init__.py": "sha256:774478317a9c080c0dcbf4f0e4d65784616a0f06c70cafad1ce1ce71cc888c4d",
+  "src/_pytest/main.py": "sha256:3f37320c859e9b343e7d13797f85fe373f3dd84b8a3eb4d200b61a83a0677eca",
+  "src/_pytest/pathlib.py": "sha256:b14f3b40c2706d418f99640b9c8179359c33a5016ef307ffd3d05dcea010733c",
+  "src/_pytest/python.py": "sha256:c1d51545a6b903bd5e3247a12eb55e2a6be0ea04fc1660e89357e592a5f0c499",
+  "src/_pytest/runner.py": "sha256:3f87c1e123187fdf6f28df27df2cade13f206613eff8a7355a111b41b6ffa76c",
+  "src/_pytest/terminal.py": "sha256:0c6e22241936612d9767b21b35d9deb6672d9290ddb54799c8d2227c2fd6427d"
+ }
+}

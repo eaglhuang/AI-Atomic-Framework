@@ -1,0 +1,241 @@
+{
+ "pair_id": "xarray:9522_9529",
+ "stratum": "O2",
+ "arm": "occ",
+ "plant": null,
+ "seed_k": 1,
+ "seed": 2356934247,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 837,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 53,
+  "by_verdict": {
+   "correct": 36,
+   "blocked_absent": 17
+  },
+  "completed": 36,
+  "lost_effects": 0,
+  "blocked": 17,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 8,
+  "files_full_bytes_exact": 8,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {
+  "occ-relocate-context-not-found": 17
+ },
+ "structure": {
+  "xarray/core/common.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "xarray/core/datatree.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "xarray/core/groupby.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "xarray/core/indexes.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "xarray/core/indexing.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "xarray/core/utils.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "xarray/groupers.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "xarray/namedarray/_typing.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "xarray/core/common.py": true,
+  "xarray/core/datatree.py": true,
+  "xarray/core/groupby.py": true,
+  "xarray/core/indexes.py": true,
+  "xarray/core/indexing.py": true,
+  "xarray/core/utils.py": true,
+  "xarray/groupers.py": true,
+  "xarray/namedarray/_typing.py": true
+ },
+ "final_exists": {
+  "xarray/core/common.py": true,
+  "xarray/core/datatree.py": true,
+  "xarray/core/groupby.py": true,
+  "xarray/core/indexes.py": true,
+  "xarray/core/indexing.py": true,
+  "xarray/core/utils.py": true,
+  "xarray/groupers.py": true,
+  "xarray/namedarray/_typing.py": true
+ },
+ "files": [
+  {
+   "path": "xarray/core/common.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:d1e5257e35b140624993c0e21338d396958ee9de27d378a73f3e9049baeb50d6",
+   "final_digest": "sha256:badd9be93af15ff26c57778256be805d5a98bf99a83b3834187ff7101e7d50d7",
+   "expected_digests": [
+    "sha256:badd9be93af15ff26c57778256be805d5a98bf99a83b3834187ff7101e7d50d7"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/core/datatree.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:2ede7fbf99974be28abd99d1715142370c2a0953c8111dffdf4447177ca22387",
+   "final_digest": "sha256:33aca84ab53c3d4195f36ca5ec3216ee2b83eb4fa4a436c2be71104826d938e7",
+   "expected_digests": [
+    "sha256:33aca84ab53c3d4195f36ca5ec3216ee2b83eb4fa4a436c2be71104826d938e7"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/core/groupby.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:16b24c7ad8b94024c17d584d42b2f193d1392ec76a19fe8c09f6e784bf88c0a7",
+   "final_digest": "sha256:3dea9a4cc33484773fce05d0429f0f3cc4152bddb8b4c2ba0b80a5dd90d3b456",
+   "expected_digests": [
+    "sha256:3dea9a4cc33484773fce05d0429f0f3cc4152bddb8b4c2ba0b80a5dd90d3b456"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/core/indexes.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:b4ef6ad0da46057914a9082f455c0a78fc937da21dbe87ac5f9f46643856158b",
+   "final_digest": "sha256:7b2a29b6106d19d330bf2cf0d161794f43c80b408e83680245019ea3bda54af3",
+   "expected_digests": [
+    "sha256:7b2a29b6106d19d330bf2cf0d161794f43c80b408e83680245019ea3bda54af3"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/core/indexing.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:13851abefe8d839699b4542d3d9feec824d65789a4e3bb61c66ba150d10f492b",
+   "final_digest": "sha256:922a99e74956d8ab1dbbc95f00997bdad9def771f839fc0e680d6b473cd7ddc8",
+   "expected_digests": [
+    "sha256:922a99e74956d8ab1dbbc95f00997bdad9def771f839fc0e680d6b473cd7ddc8"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/core/utils.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:6b49721b0d4034dc3b7312a844d1008726080821eaf456228c828b4f600007ac",
+   "final_digest": "sha256:b318e060d2983570d9101618966796443381f2cf2a6eff9fadf832b74da2fd05",
+   "expected_digests": [
+    "sha256:b318e060d2983570d9101618966796443381f2cf2a6eff9fadf832b74da2fd05"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/groupers.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:ceb994b0447b30b0bbdd289c30e1a4f87eb59943d78b3605092b3f2996021c84",
+   "final_digest": "sha256:e1d328c9d2db3c96c4bbccfd34ecb65a4dc9e2ad9edef2f9a0f6e567b7435613",
+   "expected_digests": [
+    "sha256:e1d328c9d2db3c96c4bbccfd34ecb65a4dc9e2ad9edef2f9a0f6e567b7435613"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/namedarray/_typing.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:93fce1c0a5aa23c4e8505c9f8c0647091cff4b0bca05b3214e62a50f079a4309",
+   "final_digest": "sha256:e0f1246a23ee2ecc87c320800ba8019274f183d5cbdcd1abde9e9ff12fcf7c59",
+   "expected_digests": [
+    "sha256:e0f1246a23ee2ecc87c320800ba8019274f183d5cbdcd1abde9e9ff12fcf7c59"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "xarray/core/common.py": "sha256:badd9be93af15ff26c57778256be805d5a98bf99a83b3834187ff7101e7d50d7",
+  "xarray/core/datatree.py": "sha256:33aca84ab53c3d4195f36ca5ec3216ee2b83eb4fa4a436c2be71104826d938e7",
+  "xarray/core/groupby.py": "sha256:3dea9a4cc33484773fce05d0429f0f3cc4152bddb8b4c2ba0b80a5dd90d3b456",
+  "xarray/core/indexes.py": "sha256:7b2a29b6106d19d330bf2cf0d161794f43c80b408e83680245019ea3bda54af3",
+  "xarray/core/indexing.py": "sha256:922a99e74956d8ab1dbbc95f00997bdad9def771f839fc0e680d6b473cd7ddc8",
+  "xarray/core/utils.py": "sha256:b318e060d2983570d9101618966796443381f2cf2a6eff9fadf832b74da2fd05",
+  "xarray/groupers.py": "sha256:e1d328c9d2db3c96c4bbccfd34ecb65a4dc9e2ad9edef2f9a0f6e567b7435613",
+  "xarray/namedarray/_typing.py": "sha256:e0f1246a23ee2ecc87c320800ba8019274f183d5cbdcd1abde9e9ff12fcf7c59"
+ }
+}

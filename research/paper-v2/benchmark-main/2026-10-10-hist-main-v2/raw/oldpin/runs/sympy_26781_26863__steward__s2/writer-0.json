@@ -1,0 +1,153 @@
+{
+ "writer": 0,
+ "pr": 26781,
+ "pid": 2444889,
+ "init_ms": 102.46311200000001,
+ "start_offset_ms": 6,
+ "file_order": [
+  "sympy/physics/control/__init__.py",
+  "sympy/physics/control/lti.py"
+ ],
+ "holds": {
+  "sympy/physics/control/__init__.py": 9,
+  "sympy/physics/control/lti.py": 26
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 26781,
+   "path": "sympy/physics/control/__init__.py",
+   "intents": [
+    "log:sympy:26781_26863:26781:sympy/physics/control/__init__.py:h0",
+    "log:sympy:26781_26863:26781:sympy/physics/control/__init__.py:h1"
+   ],
+   "hold_ms": 9,
+   "t_submit_epoch": 1791575088627,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 19,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sympy_physics_control___init__.py-w0-0001",
+   "total_ms": 123.65,
+   "t_done_epoch": 1791575088751
+  },
+  {
+   "writer": 0,
+   "pr": 26781,
+   "path": "sympy/physics/control/lti.py",
+   "intents": [
+    "log:sympy:26781_26863:26781:sympy/physics/control/lti.py:h2",
+    "log:sympy:26781_26863:26781:sympy/physics/control/lti.py:h3",
+    "log:sympy:26781_26863:26781:sympy/physics/control/lti.py:h4",
+    "log:sympy:26781_26863:26781:sympy/physics/control/lti.py:h5",
+    "log:sympy:26781_26863:26781:sympy/physics/control/lti.py:h6"
+   ],
+   "hold_ms": 26,
+   "t_submit_epoch": 1791575088751,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "queue",
+   "admit_wait_ms": 10,
+   "outcome": "blocked",
+   "blocked_reason": "harness-relocate-context-not-found",
+   "total_ms": 41.42,
+   "t_done_epoch": 1791575088792
+  }
+ ],
+ "admit_stats": {
+  "txns": 5,
+  "cas_conflicts": 1
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sympy_physics_control___init__.py-w0-0001",
+   "path": "sympy/physics/control/__init__.py",
+   "pid": 2444889,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-sympy_physics_control_init_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sympy_physics_control_init_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:609bcedbf5f48e8e597009932e46ce7f644597e413129c694a67b5c16c89c6b9"
+   ],
+   "lock_wait_ms": 0.12,
+   "t_start_epoch_ms": 1791575088659.54,
+   "pre_apply_hash": "sha256:609bcedbf5f48e8e597009932e46ce7f644597e413129c694a67b5c16c89c6b9",
+   "receipt_before_hash": "sha256:609bcedbf5f48e8e597009932e46ce7f644597e413129c694a67b5c16c89c6b9",
+   "receipt_after_hash": "sha256:ce369821083ef603800b65ea1eef2a6afb6b74e2b6de25a41f5b0bb68777355e",
+   "post_apply_hash": "sha256:ce369821083ef603800b65ea1eef2a6afb6b74e2b6de25a41f5b0bb68777355e",
+   "t_end_epoch_ms": 1791575088748.37,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:44:48.748+08:00",
+   "batch_id": "cb-sympy_physics_control___init__.py-w0-0001",
+   "path": "sympy/physics/control/__init__.py",
+   "proposalIds": [
+    "prop-hist-w0-sympy_physics_control_init_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sympy_physics_control_init_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-sympy_physics_control_init_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-sympy_physics_control_init_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-sympy_physics_control_init_py",
+     "logical_id": "prop-hist-w0-sympy_physics_control_init_py",
+     "attempt_id": "att-prop-hist-w0-sympy_physics_control_init_py-r0",
+     "proposal_id": "prop-hist-w0-sympy_physics_control_init_py",
+     "actorId": "writer-26781"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.24,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:609bcedbf5f48e8e597009932e46ce7f644597e413129c694a67b5c16c89c6b9",
+   "written": true,
+   "output_digest": "sha256:ce369821083ef603800b65ea1eef2a6afb6b74e2b6de25a41f5b0bb68777355e",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

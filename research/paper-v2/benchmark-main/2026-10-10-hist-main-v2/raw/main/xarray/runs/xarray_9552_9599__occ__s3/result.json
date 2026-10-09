@@ -1,0 +1,304 @@
+{
+ "pair_id": "xarray:9552_9599",
+ "stratum": "O3",
+ "arm": "occ",
+ "plant": null,
+ "seed_k": 3,
+ "seed": 3510115128,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 1362,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 109,
+  "by_verdict": {
+   "correct": 109
+  },
+  "completed": 109,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 11,
+  "files_full_bytes_exact": 11,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "xarray/backends/api.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "xarray/backends/zarr.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "xarray/coding/variables.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "xarray/conventions.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "xarray/core/dataarray.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "xarray/core/dataset.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "xarray/core/datatree_io.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "xarray/core/dtypes.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "xarray/core/missing.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "xarray/core/npcompat.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "xarray/core/types.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "xarray/backends/api.py": true,
+  "xarray/backends/zarr.py": true,
+  "xarray/coding/variables.py": true,
+  "xarray/conventions.py": true,
+  "xarray/core/dataarray.py": true,
+  "xarray/core/dataset.py": true,
+  "xarray/core/datatree_io.py": true,
+  "xarray/core/dtypes.py": true,
+  "xarray/core/missing.py": true,
+  "xarray/core/npcompat.py": true,
+  "xarray/core/types.py": true
+ },
+ "final_exists": {
+  "xarray/backends/api.py": true,
+  "xarray/backends/zarr.py": true,
+  "xarray/coding/variables.py": true,
+  "xarray/conventions.py": true,
+  "xarray/core/dataarray.py": true,
+  "xarray/core/dataset.py": true,
+  "xarray/core/datatree_io.py": true,
+  "xarray/core/dtypes.py": true,
+  "xarray/core/missing.py": true,
+  "xarray/core/npcompat.py": true,
+  "xarray/core/types.py": true
+ },
+ "files": [
+  {
+   "path": "xarray/backends/api.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:346e305af192203831e8ac28f3d7ee8c40fbba1f129d29b02d3b804ff1a86ac0",
+   "final_digest": "sha256:9871c92bc349dda99db7db8c4a0d64d747c2d662fdb5b3677d31fb9f19d2aab1",
+   "expected_digests": [
+    "sha256:9871c92bc349dda99db7db8c4a0d64d747c2d662fdb5b3677d31fb9f19d2aab1"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/backends/zarr.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:7364268891cf871031d24ae81bf7d77d2b2cc8a28e76b78f67843fc78e1541a5",
+   "final_digest": "sha256:c586c6cd738d068002ce0fc13df236f576bd583b551cf909e6dd61401c30c515",
+   "expected_digests": [
+    "sha256:c586c6cd738d068002ce0fc13df236f576bd583b551cf909e6dd61401c30c515"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/coding/variables.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:89e9a25585743328d128b08adb849ce5d684571a00b5ac65e03fac8678adbe76",
+   "final_digest": "sha256:ec4d13f83c68f589632cd8dc58ebfc16ddebe607ef72e48f1bb493e2e7cac201",
+   "expected_digests": [
+    "sha256:ec4d13f83c68f589632cd8dc58ebfc16ddebe607ef72e48f1bb493e2e7cac201"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/conventions.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:60434719fe84157a24b3e7ccbb64ab41c3c51504b04a7ac0008549aa46b76038",
+   "final_digest": "sha256:2bdfcc5fe4fd44dbc7cb9bade1690ab437c799242eb66beca10d794564e33e64",
+   "expected_digests": [
+    "sha256:2bdfcc5fe4fd44dbc7cb9bade1690ab437c799242eb66beca10d794564e33e64"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/core/dataarray.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:96038f34811214bbd9a0c57f47769ffffe2c6b6cf58fbab57b07f59c97819d5e",
+   "final_digest": "sha256:2dfb8e1c4e4f9149aefd5bac0f7ec1c16d81714029b9a8adfd8ee680cd947d09",
+   "expected_digests": [
+    "sha256:2dfb8e1c4e4f9149aefd5bac0f7ec1c16d81714029b9a8adfd8ee680cd947d09"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/core/dataset.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:21741585418e2c48bce576223317508e64e8dfcabce7b54bbe693220433e0891",
+   "final_digest": "sha256:82998583cc8ff4f12e1a9b092c0c5669824f1c8cf3583908397bbb8cff01516e",
+   "expected_digests": [
+    "sha256:82998583cc8ff4f12e1a9b092c0c5669824f1c8cf3583908397bbb8cff01516e"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/core/datatree_io.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:22de1ce701695c05b614149671deda948b523da076a970c4d58ee432792e7c70",
+   "final_digest": "sha256:6924294cd9ff3563025173e9989d910f1f4038e3bd8a77ce48ec08da59c6427d",
+   "expected_digests": [
+    "sha256:6924294cd9ff3563025173e9989d910f1f4038e3bd8a77ce48ec08da59c6427d"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/core/dtypes.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:258ca54ad453a035bc1411f654448d1f63feececad69f462d56b4e257e3b2f69",
+   "final_digest": "sha256:7ed005ba995ba696f3ce5925d63dfbc95abe670049087fd7e4e411ca232e7fb9",
+   "expected_digests": [
+    "sha256:7ed005ba995ba696f3ce5925d63dfbc95abe670049087fd7e4e411ca232e7fb9"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/core/missing.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:1690c2fe320ec02693f111098e05eaa44c4514f92b6eb5f7976e22c11482746e",
+   "final_digest": "sha256:2eb74c18270742cd4d735a91de9acb206a260faedc23603b693941f34f414f1a",
+   "expected_digests": [
+    "sha256:2eb74c18270742cd4d735a91de9acb206a260faedc23603b693941f34f414f1a"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/core/npcompat.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:31dbb82e2a2f8b7d579da4f61b2663f9bdfd07545c6d0514f7294ef14ee1e513",
+   "final_digest": "sha256:771a6e26cc679f6574e1c3961d9d7702e5929af701326d522da0a7c23b705647",
+   "expected_digests": [
+    "sha256:771a6e26cc679f6574e1c3961d9d7702e5929af701326d522da0a7c23b705647"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/core/types.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:73306b98c421c9781488eba5f44a986ce4bdc56e8e0373c6e9ea3ebe44cdcaef",
+   "final_digest": "sha256:6fedfc30598f42e2e02689bb7f356548a7e03592327dac4d78a2aba80eda310e",
+   "expected_digests": [
+    "sha256:6fedfc30598f42e2e02689bb7f356548a7e03592327dac4d78a2aba80eda310e"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "xarray/backends/api.py": "sha256:9871c92bc349dda99db7db8c4a0d64d747c2d662fdb5b3677d31fb9f19d2aab1",
+  "xarray/backends/zarr.py": "sha256:c586c6cd738d068002ce0fc13df236f576bd583b551cf909e6dd61401c30c515",
+  "xarray/coding/variables.py": "sha256:ec4d13f83c68f589632cd8dc58ebfc16ddebe607ef72e48f1bb493e2e7cac201",
+  "xarray/conventions.py": "sha256:2bdfcc5fe4fd44dbc7cb9bade1690ab437c799242eb66beca10d794564e33e64",
+  "xarray/core/dataarray.py": "sha256:2dfb8e1c4e4f9149aefd5bac0f7ec1c16d81714029b9a8adfd8ee680cd947d09",
+  "xarray/core/dataset.py": "sha256:82998583cc8ff4f12e1a9b092c0c5669824f1c8cf3583908397bbb8cff01516e",
+  "xarray/core/datatree_io.py": "sha256:6924294cd9ff3563025173e9989d910f1f4038e3bd8a77ce48ec08da59c6427d",
+  "xarray/core/dtypes.py": "sha256:7ed005ba995ba696f3ce5925d63dfbc95abe670049087fd7e4e411ca232e7fb9",
+  "xarray/core/missing.py": "sha256:2eb74c18270742cd4d735a91de9acb206a260faedc23603b693941f34f414f1a",
+  "xarray/core/npcompat.py": "sha256:771a6e26cc679f6574e1c3961d9d7702e5929af701326d522da0a7c23b705647",
+  "xarray/core/types.py": "sha256:6fedfc30598f42e2e02689bb7f356548a7e03592327dac4d78a2aba80eda310e"
+ }
+}

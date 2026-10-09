@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-1881dc0e37f80029",
+  "proposalIds": [
+    "prop-hist-w1-xarray_core_dask_array_compat_py"
+  ],
+  "targetFiles": [
+    "xarray/core/dask_array_compat.py"
+  ],
+  "appliedFiles": [],
+  "fileBeforeHashes": {},
+  "fileAfterHashes": {},
+  "permissions": {
+    "fileWrite": [
+      "xarray/core/dask_array_compat.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "blocked",
+  "blockedReasons": [
+    "file-hash-drift: Target file does not exist: xarray/core/dask_array_compat.py"
+  ],
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-1881dc0e37f80029",
+    "planId": "merge-1881dc0e37f80029",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-1881dc0e37f80029",
+        "planId": "merge-1881dc0e37f80029",
+        "request_identity": [
+          "prop-hist-w1-xarray_core_dask_array_compat_py"
+        ],
+        "actor_ids": [
+          "writer-9720"
+        ],
+        "request_files": [
+          "xarray/core/dask_array_compat.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/xarray/runs/xarray_9719_9720__steward__s4/artifacts/steward/cb-xarray_core_dask_array_compat.py-w1-0002.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-XARRAY_CORE_DASK_ARRAY_COMPAT_PY"
+        ],
+        "commit_sha": "22bd503c03e9631eb3237ff9a46a0ebc9df261b1"
+      }
+    ]
+  }
+}

@@ -1,0 +1,57 @@
+{
+ "writer": 1,
+ "pr": 18462,
+ "pid": 2203079,
+ "init_ms": 67.332582,
+ "start_offset_ms": 4,
+ "file_order": [
+  "django/db/models/expressions.py",
+  "django/db/backends/oracle/features.py"
+ ],
+ "holds": {
+  "django/db/models/expressions.py": 21,
+  "django/db/backends/oracle/features.py": 17
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 18462,
+   "path": "django/db/models/expressions.py",
+   "intents": [
+    "log:django:18412_18462:18462:django/db/models/expressions.py:h1",
+    "log:django:18412_18462:18462:django/db/models/expressions.py:h2"
+   ],
+   "hold_ms": 21,
+   "t_submit_epoch": 1791573002479,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 19,
+   "outcome": "commit",
+   "total_ms": 55.45,
+   "t_done_epoch": 1791573002534
+  },
+  {
+   "writer": 1,
+   "pr": 18462,
+   "path": "django/db/backends/oracle/features.py",
+   "intents": [
+    "log:django:18412_18462:18462:django/db/backends/oracle/features.py:h0"
+   ],
+   "hold_ms": 17,
+   "t_submit_epoch": 1791573002534,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 5,
+   "outcome": "commit",
+   "total_ms": 28.21,
+   "t_done_epoch": 1791573002562
+  }
+ ],
+ "admit_stats": {
+  "txns": 4,
+  "cas_conflicts": 0
+ },
+ "steward_batches": null
+}

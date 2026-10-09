@@ -1,0 +1,230 @@
+{
+ "writer": 0,
+ "pr": 26303,
+ "pid": 2210963,
+ "init_ms": 75.036396,
+ "start_offset_ms": 8,
+ "file_order": [
+  "sympy/matrices/matrixbase.py",
+  "sympy/matrices/expressions/matexpr.py"
+ ],
+ "holds": {
+  "sympy/matrices/matrixbase.py": 10,
+  "sympy/matrices/expressions/matexpr.py": 12
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 26303,
+   "path": "sympy/matrices/matrixbase.py",
+   "intents": [
+    "log:sympy:26303_26442:26303:sympy/matrices/matrixbase.py:h1"
+   ],
+   "hold_ms": 10,
+   "t_submit_epoch": 1791573066163,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sympy_matrices_matrixbase.py-w0-0001",
+   "total_ms": 119.08,
+   "t_done_epoch": 1791573066282
+  },
+  {
+   "writer": 0,
+   "pr": 26303,
+   "path": "sympy/matrices/expressions/matexpr.py",
+   "intents": [
+    "log:sympy:26303_26442:26303:sympy/matrices/expressions/matexpr.py:h0"
+   ],
+   "hold_ms": 12,
+   "t_submit_epoch": 1791573066282,
+   "outcome": "blocked",
+   "blocked_reason": "compose-context-mismatch: proposal 'prop-hist-w0-sympy_matrices_expressions_matexpr_py' context mismatch at base line 391: expected \"    def __array__(self):\", found \"    def __array__(self, dtype=object, copy=None):\" [proposals: prop-hist-w0-sympy_matrices_expressions_matexpr_py]",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w0-sympy_matrices_expressions_matexpr_py' context mismatch at base line 391: expected \"    def __array__(self):\", found \"    def __array__(self, dtype=object, copy=None):\" [proposals: prop-hist-w0-sympy_matrices_expressions_matexpr_py]"
+   ],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sympy_matrices_expressions_matexpr.py-w0-0002",
+   "total_ms": 28.24,
+   "t_done_epoch": 1791573066310
+  }
+ ],
+ "admit_stats": null,
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sympy_matrices_matrixbase.py-w0-0001",
+   "path": "sympy/matrices/matrixbase.py",
+   "pid": 2210963,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-sympy_matrices_matrixbase_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sympy_matrices_matrixbase_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:e49d4c1b5744ebe0c51f9e1864ab88029c4c8a134f04f8b4b88baf82a4d98ba1"
+   ],
+   "lock_wait_ms": 0.11,
+   "t_start_epoch_ms": 1791573066178.26,
+   "pre_apply_hash": "sha256:e49d4c1b5744ebe0c51f9e1864ab88029c4c8a134f04f8b4b88baf82a4d98ba1",
+   "receipt_before_hash": "sha256:e49d4c1b5744ebe0c51f9e1864ab88029c4c8a134f04f8b4b88baf82a4d98ba1",
+   "receipt_after_hash": "sha256:43954a96fabe9fda4e0a4cff15e467a2e4fd380aeb27a73980d3cff8bdffee24",
+   "post_apply_hash": "sha256:43954a96fabe9fda4e0a4cff15e467a2e4fd380aeb27a73980d3cff8bdffee24",
+   "t_end_epoch_ms": 1791573066281.66,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:11:06.281+08:00",
+   "batch_id": "cb-sympy_matrices_matrixbase.py-w0-0001",
+   "path": "sympy/matrices/matrixbase.py",
+   "proposalIds": [
+    "prop-hist-w0-sympy_matrices_matrixbase_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sympy_matrices_matrixbase_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-sympy_matrices_matrixbase_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-sympy_matrices_matrixbase_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-sympy_matrices_matrixbase_py",
+     "logical_id": "prop-hist-w0-sympy_matrices_matrixbase_py",
+     "attempt_id": "att-prop-hist-w0-sympy_matrices_matrixbase_py-r0",
+     "proposal_id": "prop-hist-w0-sympy_matrices_matrixbase_py",
+     "actorId": "writer-26303"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.25,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:e49d4c1b5744ebe0c51f9e1864ab88029c4c8a134f04f8b4b88baf82a4d98ba1",
+   "written": true,
+   "output_digest": "sha256:43954a96fabe9fda4e0a4cff15e467a2e4fd380aeb27a73980d3cff8bdffee24",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  },
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sympy_matrices_expressions_matexpr.py-w0-0002",
+   "path": "sympy/matrices/expressions/matexpr.py",
+   "pid": 2210963,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-sympy_matrices_expressions_matexpr_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sympy_matrices_expressions_matexpr_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:b99299f71a63d5e15ac9bf31b1339bf26d286309bd077f587fe73c5308af5e86"
+   ],
+   "lock_wait_ms": 0,
+   "t_start_epoch_ms": 1791573066294.51,
+   "pre_apply_hash": "sha256:b99299f71a63d5e15ac9bf31b1339bf26d286309bd077f587fe73c5308af5e86",
+   "receipt_before_hash": null,
+   "receipt_after_hash": null,
+   "post_apply_hash": "sha256:b08af872fd7e51b4d259eb92fdde3acdcab82dfac4069e76bd24d3fb602cd98d",
+   "t_end_epoch_ms": 1791573066310.31,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "blocked",
+   "written": false,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:11:06.310+08:00",
+   "batch_id": "cb-sympy_matrices_expressions_matexpr.py-w0-0002",
+   "path": "sympy/matrices/expressions/matexpr.py",
+   "proposalIds": [
+    "prop-hist-w0-sympy_matrices_expressions_matexpr_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sympy_matrices_expressions_matexpr_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-sympy_matrices_expressions_matexpr_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-sympy_matrices_expressions_matexpr_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-sympy_matrices_expressions_matexpr_py",
+     "logical_id": "prop-hist-w0-sympy_matrices_expressions_matexpr_py",
+     "attempt_id": "att-prop-hist-w0-sympy_matrices_expressions_matexpr_py-r0",
+     "proposal_id": "prop-hist-w0-sympy_matrices_expressions_matexpr_py",
+     "actorId": "writer-26303"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w0-sympy_matrices_expressions_matexpr_py' context mismatch at base line 391: expected \"    def __array__(self):\", found \"    def __array__(self, dtype=object, copy=None):\" [proposals: prop-hist-w0-sympy_matrices_expressions_matexpr_py]"
+   ],
+   "blocked_reason": "compose-context-mismatch: proposal 'prop-hist-w0-sympy_matrices_expressions_matexpr_py' context mismatch at base line 391: expected \"    def __array__(self):\", found \"    def __array__(self, dtype=object, copy=None):\" [proposals: prop-hist-w0-sympy_matrices_expressions_matexpr_py]",
+   "window_wait_ms": 0.01,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:b99299f71a63d5e15ac9bf31b1339bf26d286309bd077f587fe73c5308af5e86",
+   "written": false,
+   "output_digest": null,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "compose-context-mismatch: proposal 'prop-hist-w0-sympy_matrices_expressions_matexpr_py' context mismatch at base line 391: expected \"    def __array__(self):\", found \"    def __array__(self, dtype=object, copy=None):\" [proposals: prop-hist-w0-sympy_matrices_expressions_matexpr_py]"
+  }
+ ]
+}

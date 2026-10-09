@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-a2f3a06934e578e3",
+  "proposalIds": [
+    "prop-hist-w1-django_db_models_fields_related_descriptors_py"
+  ],
+  "targetFiles": [
+    "django/db/models/fields/related_descriptors.py"
+  ],
+  "appliedFiles": [
+    "django/db/models/fields/related_descriptors.py"
+  ],
+  "fileBeforeHashes": {
+    "django/db/models/fields/related_descriptors.py": "d26e1ced7d3c98ea540c268250c3891d2e0ac4e6d4709a6a0d185b86ae5646d5"
+  },
+  "fileAfterHashes": {
+    "django/db/models/fields/related_descriptors.py": "9580d505aa6ca994f786d409c8e7cafdcc357e5571a18c5f0e0ef60e8fed4e50"
+  },
+  "permissions": {
+    "fileWrite": [
+      "django/db/models/fields/related_descriptors.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-a2f3a06934e578e3",
+    "planId": "merge-a2f3a06934e578e3",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-a2f3a06934e578e3",
+        "planId": "merge-a2f3a06934e578e3",
+        "request_identity": [
+          "prop-hist-w1-django_db_models_fields_related_descriptors_py"
+        ],
+        "actor_ids": [
+          "writer-19072"
+        ],
+        "request_files": [
+          "django/db/models/fields/related_descriptors.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "django/db/models/fields/related_descriptors.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/django/runs/django_19042_19072__steward__s3/artifacts/steward/cb-django_db_models_fields_related_descriptors.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-DJANGO_DB_MODELS_FIELDS_RELATED_DESCRIPTORS_PY"
+        ],
+        "commit_sha": "bee2fc22e18529e628a4527c5720c84d84456f39"
+      }
+    ]
+  }
+}

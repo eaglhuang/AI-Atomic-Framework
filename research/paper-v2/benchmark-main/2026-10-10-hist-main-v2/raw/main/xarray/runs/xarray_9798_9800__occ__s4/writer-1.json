@@ -1,0 +1,63 @@
+{
+ "writer": 1,
+ "pr": 9800,
+ "pid": 2252948,
+ "init_ms": 77.66832399999998,
+ "start_offset_ms": 3,
+ "file_order": [
+  "xarray/core/indexing.py",
+  "xarray/core/computation.py"
+ ],
+ "holds": {
+  "xarray/core/indexing.py": 1,
+  "xarray/core/computation.py": 28
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 9800,
+   "path": "xarray/core/indexing.py",
+   "intents": [
+    "log:xarray:9798_9800:9800:xarray/core/indexing.py:h3",
+    "log:xarray:9798_9800:9800:xarray/core/indexing.py:h4",
+    "log:xarray:9798_9800:9800:xarray/core/indexing.py:h5",
+    "log:xarray:9798_9800:9800:xarray/core/indexing.py:h6"
+   ],
+   "hold_ms": 1,
+   "t_submit_epoch": 1791573475171,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 26,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 40.07,
+   "t_done_epoch": 1791573475211
+  },
+  {
+   "writer": 1,
+   "pr": 9800,
+   "path": "xarray/core/computation.py",
+   "intents": [
+    "log:xarray:9798_9800:9800:xarray/core/computation.py:h0",
+    "log:xarray:9798_9800:9800:xarray/core/computation.py:h1",
+    "log:xarray:9798_9800:9800:xarray/core/computation.py:h2"
+   ],
+   "hold_ms": 28,
+   "t_submit_epoch": 1791573475211,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 41.94,
+   "t_done_epoch": 1791573475253
+  }
+ ],
+ "admit_stats": {
+  "txns": 4,
+  "cas_conflicts": 4
+ },
+ "steward_batches": null
+}

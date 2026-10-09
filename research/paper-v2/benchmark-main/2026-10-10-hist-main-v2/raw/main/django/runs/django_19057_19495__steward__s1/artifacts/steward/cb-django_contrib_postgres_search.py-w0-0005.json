@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-24b8b3f2bb806fee",
+  "proposalIds": [
+    "prop-hist-w0-django_contrib_postgres_search_py"
+  ],
+  "targetFiles": [
+    "django/contrib/postgres/search.py"
+  ],
+  "appliedFiles": [
+    "django/contrib/postgres/search.py"
+  ],
+  "fileBeforeHashes": {
+    "django/contrib/postgres/search.py": "51df2fb0378934d7123f7dd8ab2606c4d141e7e80f80c333a20c08bd3d94f73b"
+  },
+  "fileAfterHashes": {
+    "django/contrib/postgres/search.py": "0467bd52785887183d671ed17e3618a68a9480a93dfdb2dc598545e4c5f1f0c7"
+  },
+  "permissions": {
+    "fileWrite": [
+      "django/contrib/postgres/search.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-24b8b3f2bb806fee",
+    "planId": "merge-24b8b3f2bb806fee",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-24b8b3f2bb806fee",
+        "planId": "merge-24b8b3f2bb806fee",
+        "request_identity": [
+          "prop-hist-w0-django_contrib_postgres_search_py"
+        ],
+        "actor_ids": [
+          "writer-19057"
+        ],
+        "request_files": [
+          "django/contrib/postgres/search.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "django/contrib/postgres/search.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/django/runs/django_19057_19495__steward__s1/artifacts/steward/cb-django_contrib_postgres_search.py-w0-0005.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-DJANGO_CONTRIB_POSTGRES_SEARCH_PY"
+        ],
+        "commit_sha": "fca20812cd895500aae5d1184a4d031e7b18f15b"
+      }
+    ]
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-6f0ee410b0572c44",
+  "proposalIds": [
+    "prop-hist-w1-sympy_algebras_quaternion_py"
+  ],
+  "targetFiles": [
+    "sympy/algebras/quaternion.py"
+  ],
+  "appliedFiles": [
+    "sympy/algebras/quaternion.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/algebras/quaternion.py": "b336f89dff071224b98a2c12ad7a79991bac7e20cc4ee73cf90ea530ab81ae47"
+  },
+  "fileAfterHashes": {
+    "sympy/algebras/quaternion.py": "8b6164be38f5e2f03a1ad5e07129290f056621873b4f9cd3d61c38f6c6fffed3"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/algebras/quaternion.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-6f0ee410b0572c44",
+    "planId": "merge-6f0ee410b0572c44",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-6f0ee410b0572c44",
+        "planId": "merge-6f0ee410b0572c44",
+        "request_identity": [
+          "prop-hist-w1-sympy_algebras_quaternion_py"
+        ],
+        "actor_ids": [
+          "writer-27414"
+        ],
+        "request_files": [
+          "sympy/algebras/quaternion.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/algebras/quaternion.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/oldpin/runs/sympy_27369_27414__steward__s3/artifacts/steward/cb-sympy_algebras_quaternion.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_ALGEBRAS_QUATERNION_PY"
+        ],
+        "commit_sha": "3d624fce31f61cfc0be2933b4d497546e4b8607c"
+      }
+    ]
+  }
+}

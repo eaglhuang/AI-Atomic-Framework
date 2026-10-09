@@ -1,0 +1,130 @@
+{
+ "writer": 1,
+ "pr": 14081,
+ "pid": 2374122,
+ "init_ms": 117.020545,
+ "start_offset_ms": 11,
+ "file_order": [
+  "fastapi/security/api_key.py"
+ ],
+ "holds": {
+  "fastapi/security/api_key.py": 12
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 14081,
+   "path": "fastapi/security/api_key.py",
+   "intents": [
+    "log:fastapi:13786_14081:14081:fastapi/security/api_key.py:h0",
+    "log:fastapi:13786_14081:14081:fastapi/security/api_key.py:h1",
+    "log:fastapi:13786_14081:14081:fastapi/security/api_key.py:h2"
+   ],
+   "hold_ms": 12,
+   "t_submit_epoch": 1791574594978,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 17,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-fastapi_security_api_key.py-w1-0001",
+   "total_ms": 123.44,
+   "t_done_epoch": 1791574595102
+  }
+ ],
+ "admit_stats": {
+  "txns": 2,
+  "cas_conflicts": 1
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-fastapi_security_api_key.py-w1-0001",
+   "path": "fastapi/security/api_key.py",
+   "pid": 2374122,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-fastapi_security_api_key_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-fastapi_security_api_key_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:701239678cd65632f5b89aec8d378bcbb31a7c73c03b61d03f34eba72a086160"
+   ],
+   "lock_wait_ms": 0.16,
+   "t_start_epoch_ms": 1791574595010.77,
+   "pre_apply_hash": "sha256:701239678cd65632f5b89aec8d378bcbb31a7c73c03b61d03f34eba72a086160",
+   "receipt_before_hash": "sha256:701239678cd65632f5b89aec8d378bcbb31a7c73c03b61d03f34eba72a086160",
+   "receipt_after_hash": "sha256:762fb4810f0c2ae822d987e694ca031e4f90305fef9cb189445380ead719edf0",
+   "post_apply_hash": "sha256:762fb4810f0c2ae822d987e694ca031e4f90305fef9cb189445380ead719edf0",
+   "t_end_epoch_ms": 1791574595099.54,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:36:35.099+08:00",
+   "batch_id": "cb-fastapi_security_api_key.py-w1-0001",
+   "path": "fastapi/security/api_key.py",
+   "proposalIds": [
+    "prop-hist-w1-fastapi_security_api_key_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-fastapi_security_api_key_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-fastapi_security_api_key_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-fastapi_security_api_key_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-fastapi_security_api_key_py",
+     "logical_id": "prop-hist-w1-fastapi_security_api_key_py",
+     "attempt_id": "att-prop-hist-w1-fastapi_security_api_key_py-r0",
+     "proposal_id": "prop-hist-w1-fastapi_security_api_key_py",
+     "actorId": "writer-14081"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.23,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:701239678cd65632f5b89aec8d378bcbb31a7c73c03b61d03f34eba72a086160",
+   "written": true,
+   "output_digest": "sha256:762fb4810f0c2ae822d987e694ca031e4f90305fef9cb189445380ead719edf0",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

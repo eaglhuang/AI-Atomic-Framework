@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-824b201e834f80a5",
+  "proposalIds": [
+    "prop-hist-w0-sympy_liealgebras_type_e_py"
+  ],
+  "targetFiles": [
+    "sympy/liealgebras/type_e.py"
+  ],
+  "appliedFiles": [
+    "sympy/liealgebras/type_e.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/liealgebras/type_e.py": "51ff90cc8fba6d125e23dd6cb461ec89eb249f004455822365a88d3fed9b2226"
+  },
+  "fileAfterHashes": {
+    "sympy/liealgebras/type_e.py": "bcded8b82f50c26c734142f39bff31849534ab029bcba91ab6aedd1f9b5f47b2"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/liealgebras/type_e.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-824b201e834f80a5",
+    "planId": "merge-824b201e834f80a5",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-824b201e834f80a5",
+        "planId": "merge-824b201e834f80a5",
+        "request_identity": [
+          "prop-hist-w0-sympy_liealgebras_type_e_py"
+        ],
+        "actor_ids": [
+          "writer-23681"
+        ],
+        "request_files": [
+          "sympy/liealgebras/type_e.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/liealgebras/type_e.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/sympy/runs/sympy_23681_26920__steward__s2/artifacts/steward/cb-sympy_liealgebras_type_e.py-w0-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SYMPY_LIEALGEBRAS_TYPE_E_PY"
+        ],
+        "commit_sha": "d7ff94758aec53b4469dbb7fbc7c90dee1f2f1ed"
+      }
+    ]
+  }
+}

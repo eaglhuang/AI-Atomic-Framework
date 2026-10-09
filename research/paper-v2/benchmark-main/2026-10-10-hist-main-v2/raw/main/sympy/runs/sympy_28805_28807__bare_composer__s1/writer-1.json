@@ -1,0 +1,233 @@
+{
+ "writer": 1,
+ "pr": 28807,
+ "pid": 2218336,
+ "init_ms": 79.48897500000001,
+ "start_offset_ms": 10,
+ "file_order": [
+  "sympy/ntheory/digits.py",
+  "sympy/utilities/iterables.py"
+ ],
+ "holds": {
+  "sympy/ntheory/digits.py": 12,
+  "sympy/utilities/iterables.py": 30
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 28807,
+   "path": "sympy/ntheory/digits.py",
+   "intents": [
+    "log:sympy:28805_28807:28807:sympy/ntheory/digits.py:h0",
+    "log:sympy:28805_28807:28807:sympy/ntheory/digits.py:h1",
+    "log:sympy:28805_28807:28807:sympy/ntheory/digits.py:h2",
+    "log:sympy:28805_28807:28807:sympy/ntheory/digits.py:h3",
+    "log:sympy:28805_28807:28807:sympy/ntheory/digits.py:h4",
+    "log:sympy:28805_28807:28807:sympy/ntheory/digits.py:h5"
+   ],
+   "hold_ms": 12,
+   "t_submit_epoch": 1791573134386,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sympy_ntheory_digits.py-w1-0001",
+   "total_ms": 120.32,
+   "t_done_epoch": 1791573134507
+  },
+  {
+   "writer": 1,
+   "pr": 28807,
+   "path": "sympy/utilities/iterables.py",
+   "intents": [
+    "log:sympy:28805_28807:28807:sympy/utilities/iterables.py:h6",
+    "log:sympy:28805_28807:28807:sympy/utilities/iterables.py:h7",
+    "log:sympy:28805_28807:28807:sympy/utilities/iterables.py:h8"
+   ],
+   "hold_ms": 30,
+   "t_submit_epoch": 1791573134507,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sympy_utilities_iterables.py-w1-0002",
+   "total_ms": 43.95,
+   "t_done_epoch": 1791573134551
+  }
+ ],
+ "admit_stats": null,
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sympy_ntheory_digits.py-w1-0001",
+   "path": "sympy/ntheory/digits.py",
+   "pid": 2218336,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-sympy_ntheory_digits_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sympy_ntheory_digits_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:994752ecf7effba182cd8f47a5c418e2ccf0f1b702ab60a3afa1973df2a02ac4"
+   ],
+   "lock_wait_ms": 0.19,
+   "t_start_epoch_ms": 1791573134402.38,
+   "pre_apply_hash": "sha256:994752ecf7effba182cd8f47a5c418e2ccf0f1b702ab60a3afa1973df2a02ac4",
+   "receipt_before_hash": "sha256:994752ecf7effba182cd8f47a5c418e2ccf0f1b702ab60a3afa1973df2a02ac4",
+   "receipt_after_hash": "sha256:2211c8863937d9739bb5804429b32bad9183d757ab417fe1dc0fac97d39318b7",
+   "post_apply_hash": "sha256:2211c8863937d9739bb5804429b32bad9183d757ab417fe1dc0fac97d39318b7",
+   "t_end_epoch_ms": 1791573134506.75,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:12:14.506+08:00",
+   "batch_id": "cb-sympy_ntheory_digits.py-w1-0001",
+   "path": "sympy/ntheory/digits.py",
+   "proposalIds": [
+    "prop-hist-w1-sympy_ntheory_digits_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sympy_ntheory_digits_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-sympy_ntheory_digits_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-sympy_ntheory_digits_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-sympy_ntheory_digits_py",
+     "logical_id": "prop-hist-w1-sympy_ntheory_digits_py",
+     "attempt_id": "att-prop-hist-w1-sympy_ntheory_digits_py-r0",
+     "proposal_id": "prop-hist-w1-sympy_ntheory_digits_py",
+     "actorId": "writer-28807"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.41,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:994752ecf7effba182cd8f47a5c418e2ccf0f1b702ab60a3afa1973df2a02ac4",
+   "written": true,
+   "output_digest": "sha256:2211c8863937d9739bb5804429b32bad9183d757ab417fe1dc0fac97d39318b7",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  },
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sympy_utilities_iterables.py-w1-0002",
+   "path": "sympy/utilities/iterables.py",
+   "pid": 2218336,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-sympy_utilities_iterables_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sympy_utilities_iterables_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:7989073b31a711d93ab5786b86fd1ce4f68c92d6f952feec8d492a2faed4d10a"
+   ],
+   "lock_wait_ms": 0,
+   "t_start_epoch_ms": 1791573134538.91,
+   "pre_apply_hash": "sha256:7989073b31a711d93ab5786b86fd1ce4f68c92d6f952feec8d492a2faed4d10a",
+   "receipt_before_hash": "sha256:7989073b31a711d93ab5786b86fd1ce4f68c92d6f952feec8d492a2faed4d10a",
+   "receipt_after_hash": "sha256:ec5b21c558e5246839bc3fffb5dd7d97c08a3363c1667da6025a24642f63e75a",
+   "post_apply_hash": "sha256:ec5b21c558e5246839bc3fffb5dd7d97c08a3363c1667da6025a24642f63e75a",
+   "t_end_epoch_ms": 1791573134551.1,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:12:14.551+08:00",
+   "batch_id": "cb-sympy_utilities_iterables.py-w1-0002",
+   "path": "sympy/utilities/iterables.py",
+   "proposalIds": [
+    "prop-hist-w1-sympy_utilities_iterables_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sympy_utilities_iterables_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-sympy_utilities_iterables_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-sympy_utilities_iterables_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-sympy_utilities_iterables_py",
+     "logical_id": "prop-hist-w1-sympy_utilities_iterables_py",
+     "attempt_id": "att-prop-hist-w1-sympy_utilities_iterables_py-r0",
+     "proposal_id": "prop-hist-w1-sympy_utilities_iterables_py",
+     "actorId": "writer-28807"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.01,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:7989073b31a711d93ab5786b86fd1ce4f68c92d6f952feec8d492a2faed4d10a",
+   "written": true,
+   "output_digest": "sha256:ec5b21c558e5246839bc3fffb5dd7d97c08a3363c1667da6025a24642f63e75a",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

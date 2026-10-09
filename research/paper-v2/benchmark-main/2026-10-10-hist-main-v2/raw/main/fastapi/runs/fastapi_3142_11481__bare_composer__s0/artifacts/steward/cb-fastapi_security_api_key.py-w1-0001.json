@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-098dd3ac9b419e0d",
+  "proposalIds": [
+    "prop-hist-w1-fastapi_security_api_key_py"
+  ],
+  "targetFiles": [
+    "fastapi/security/api_key.py"
+  ],
+  "appliedFiles": [],
+  "fileBeforeHashes": {},
+  "fileAfterHashes": {},
+  "permissions": {
+    "fileWrite": [
+      "fastapi/security/api_key.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "blocked",
+  "blockedReasons": [
+    "file-hash-drift: Target file hash sha256:fb769321f1ec819e1c2bdfbfda9dba3c68a063d825b994f6f3982e4b898f0b54 does not match proposal fileBeforeHash sha256:d4cc1a4cccaa9918749c8203202b0fea21bd45dc1bce1f811b448558a45cf27a."
+  ],
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-098dd3ac9b419e0d",
+    "planId": "merge-098dd3ac9b419e0d",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-098dd3ac9b419e0d",
+        "planId": "merge-098dd3ac9b419e0d",
+        "request_identity": [
+          "prop-hist-w1-fastapi_security_api_key_py"
+        ],
+        "actor_ids": [
+          "writer-11481"
+        ],
+        "request_files": [
+          "fastapi/security/api_key.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/fastapi/runs/fastapi_3142_11481__bare_composer__s0/artifacts/steward/cb-fastapi_security_api_key.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-FASTAPI_SECURITY_API_KEY_PY"
+        ],
+        "commit_sha": "db2ffc686f54d5808bfc9ccbb7c053b6629b8579"
+      }
+    ]
+  }
+}

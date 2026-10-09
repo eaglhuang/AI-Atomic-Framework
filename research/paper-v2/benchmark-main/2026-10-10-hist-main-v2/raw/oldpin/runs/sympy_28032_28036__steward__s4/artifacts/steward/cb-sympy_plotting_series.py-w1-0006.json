@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-d012bd68ab4452a0",
+  "proposalIds": [
+    "prop-hist-w1-sympy_plotting_series_py"
+  ],
+  "targetFiles": [
+    "sympy/plotting/series.py"
+  ],
+  "appliedFiles": [
+    "sympy/plotting/series.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/plotting/series.py": "84f90c89c022dbd463a09905a4c0add42467d31741558535c0b9e28a01e009a3"
+  },
+  "fileAfterHashes": {
+    "sympy/plotting/series.py": "f8e29adc8184c387d8ece0062b3c0bdb1f0314f5c617b2b2c215f11927488e63"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/plotting/series.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-d012bd68ab4452a0",
+    "planId": "merge-d012bd68ab4452a0",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-d012bd68ab4452a0",
+        "planId": "merge-d012bd68ab4452a0",
+        "request_identity": [
+          "prop-hist-w1-sympy_plotting_series_py"
+        ],
+        "actor_ids": [
+          "writer-28036"
+        ],
+        "request_files": [
+          "sympy/plotting/series.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/plotting/series.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/oldpin/runs/sympy_28032_28036__steward__s4/artifacts/steward/cb-sympy_plotting_series.py-w1-0006.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_PLOTTING_SERIES_PY"
+        ],
+        "commit_sha": "f833383704d9bffb2539ab39d2ebb0305a6e4232"
+      }
+    ]
+  }
+}

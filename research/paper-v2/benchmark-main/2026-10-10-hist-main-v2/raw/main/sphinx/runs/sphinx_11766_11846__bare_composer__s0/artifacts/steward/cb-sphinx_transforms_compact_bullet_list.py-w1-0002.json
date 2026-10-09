@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-d16d22526958245e",
+  "proposalIds": [
+    "prop-hist-w1-sphinx_transforms_compact_bullet_list_py"
+  ],
+  "targetFiles": [
+    "sphinx/transforms/compact_bullet_list.py"
+  ],
+  "appliedFiles": [
+    "sphinx/transforms/compact_bullet_list.py"
+  ],
+  "fileBeforeHashes": {
+    "sphinx/transforms/compact_bullet_list.py": "f50a1993a62981e1e10b42eccaa75e5d091c09a59a475c9644072e1c0a68594d"
+  },
+  "fileAfterHashes": {
+    "sphinx/transforms/compact_bullet_list.py": "7c07c51d9075743ba4318d8ad3659484453316af9ff56c133dcb43a758160afb"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sphinx/transforms/compact_bullet_list.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-d16d22526958245e",
+    "planId": "merge-d16d22526958245e",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-d16d22526958245e",
+        "planId": "merge-d16d22526958245e",
+        "request_identity": [
+          "prop-hist-w1-sphinx_transforms_compact_bullet_list_py"
+        ],
+        "actor_ids": [
+          "writer-11846"
+        ],
+        "request_files": [
+          "sphinx/transforms/compact_bullet_list.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sphinx/transforms/compact_bullet_list.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/sphinx/runs/sphinx_11766_11846__bare_composer__s0/artifacts/steward/cb-sphinx_transforms_compact_bullet_list.py-w1-0002.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SPHINX_TRANSFORMS_COMPACT_BULLET_LIST_PY"
+        ],
+        "commit_sha": "acb5937849e3c72ed866c8ccecda896c41914921"
+      }
+    ]
+  }
+}

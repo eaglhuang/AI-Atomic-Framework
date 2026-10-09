@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-df1804f7f93203af",
+  "proposalIds": [
+    "prop-hist-w0-sympy_physics_vector_dyadic_py"
+  ],
+  "targetFiles": [
+    "sympy/physics/vector/dyadic.py"
+  ],
+  "appliedFiles": [],
+  "fileBeforeHashes": {},
+  "fileAfterHashes": {},
+  "permissions": {
+    "fileWrite": [
+      "sympy/physics/vector/dyadic.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "blocked",
+  "blockedReasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w0-sympy_physics_vector_dyadic_py' context mismatch at base line 176: expected \"            if ar[i][0] == 1:\", found \"            if v[0] == 1:\" [proposals: prop-hist-w0-sympy_physics_vector_dyadic_py]"
+  ],
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-df1804f7f93203af",
+    "planId": "merge-df1804f7f93203af",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-df1804f7f93203af",
+        "planId": "merge-df1804f7f93203af",
+        "request_identity": [
+          "prop-hist-w0-sympy_physics_vector_dyadic_py"
+        ],
+        "actor_ids": [
+          "writer-27040"
+        ],
+        "request_files": [
+          "sympy/physics/vector/dyadic.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/sympy/runs/sympy_27040_27043__bare_composer__s4/artifacts/steward/cb-sympy_physics_vector_dyadic.py-w0-0003.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SYMPY_PHYSICS_VECTOR_DYADIC_PY"
+        ],
+        "commit_sha": "bcf75aa0b10d085580c62682bbfb8afca864f503"
+      }
+    ]
+  }
+}

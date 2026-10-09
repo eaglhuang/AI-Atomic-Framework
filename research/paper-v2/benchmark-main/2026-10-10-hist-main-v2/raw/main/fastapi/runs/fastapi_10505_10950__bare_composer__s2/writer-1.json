@@ -1,0 +1,126 @@
+{
+ "writer": 1,
+ "pr": 10950,
+ "pid": 2396741,
+ "init_ms": 77.385649,
+ "start_offset_ms": 13,
+ "file_order": [
+  "scripts/docs.py"
+ ],
+ "holds": {
+  "scripts/docs.py": 12
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 10950,
+   "path": "scripts/docs.py",
+   "intents": [
+    "log:fastapi:10505_10950:10950:scripts/docs.py:h0",
+    "log:fastapi:10505_10950:10950:scripts/docs.py:h1"
+   ],
+   "hold_ms": 12,
+   "t_submit_epoch": 1791574748262,
+   "outcome": "blocked",
+   "blocked_reason": "file-hash-drift: Target file hash sha256:01a7e8cedc91a0784e9f1dfe31f1a8df7a527cc240ad544655a785eb0e4a268f does not match proposal fileBeforeHash sha256:5f61d6b6443b553f23fac0ddc5546139219168646dd0df16d51d8a718c94df01.",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "file-hash-drift: Target file hash sha256:01a7e8cedc91a0784e9f1dfe31f1a8df7a527cc240ad544655a785eb0e4a268f does not match proposal fileBeforeHash sha256:5f61d6b6443b553f23fac0ddc5546139219168646dd0df16d51d8a718c94df01."
+   ],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-scripts_docs.py-w1-0001",
+   "total_ms": 99.27,
+   "t_done_epoch": 1791574748362
+  }
+ ],
+ "admit_stats": null,
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-scripts_docs.py-w1-0001",
+   "path": "scripts/docs.py",
+   "pid": 2396741,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-scripts_docs_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-scripts_docs_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:5f61d6b6443b553f23fac0ddc5546139219168646dd0df16d51d8a718c94df01"
+   ],
+   "lock_wait_ms": 0.12,
+   "t_start_epoch_ms": 1791574748277.37,
+   "pre_apply_hash": "sha256:5f61d6b6443b553f23fac0ddc5546139219168646dd0df16d51d8a718c94df01",
+   "receipt_before_hash": null,
+   "receipt_after_hash": null,
+   "post_apply_hash": "sha256:01a7e8cedc91a0784e9f1dfe31f1a8df7a527cc240ad544655a785eb0e4a268f",
+   "t_end_epoch_ms": 1791574748361.73,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "blocked",
+   "written": false,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:39:08.361+08:00",
+   "batch_id": "cb-scripts_docs.py-w1-0001",
+   "path": "scripts/docs.py",
+   "proposalIds": [
+    "prop-hist-w1-scripts_docs_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-scripts_docs_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-scripts_docs_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-scripts_docs_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-scripts_docs_py",
+     "logical_id": "prop-hist-w1-scripts_docs_py",
+     "attempt_id": "att-prop-hist-w1-scripts_docs_py-r0",
+     "proposal_id": "prop-hist-w1-scripts_docs_py",
+     "actorId": "writer-10950"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "file-hash-drift: Target file hash sha256:01a7e8cedc91a0784e9f1dfe31f1a8df7a527cc240ad544655a785eb0e4a268f does not match proposal fileBeforeHash sha256:5f61d6b6443b553f23fac0ddc5546139219168646dd0df16d51d8a718c94df01."
+   ],
+   "blocked_reason": "file-hash-drift: Target file hash sha256:01a7e8cedc91a0784e9f1dfe31f1a8df7a527cc240ad544655a785eb0e4a268f does not match proposal fileBeforeHash sha256:5f61d6b6443b553f23fac0ddc5546139219168646dd0df16d51d8a718c94df01.",
+   "window_wait_ms": 0.24,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:5f61d6b6443b553f23fac0ddc5546139219168646dd0df16d51d8a718c94df01",
+   "written": false,
+   "output_digest": null,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "file-hash-drift: Target file hash sha256:01a7e8cedc91a0784e9f1dfe31f1a8df7a527cc240ad544655a785eb0e4a268f does not match proposal fileBeforeHash sha256:5f61d6b6443b553f23fac0ddc5546139219168646dd0df16d51d8a718c94df01."
+  }
+ ]
+}

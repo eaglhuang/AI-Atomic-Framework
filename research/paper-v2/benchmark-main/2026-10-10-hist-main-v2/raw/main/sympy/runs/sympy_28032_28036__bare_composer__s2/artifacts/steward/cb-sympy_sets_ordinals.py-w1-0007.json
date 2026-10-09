@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-9256d870ce617d0e",
+  "proposalIds": [
+    "prop-hist-w1-sympy_sets_ordinals_py"
+  ],
+  "targetFiles": [
+    "sympy/sets/ordinals.py"
+  ],
+  "appliedFiles": [
+    "sympy/sets/ordinals.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/sets/ordinals.py": "192c9a06aec11c90b7a6f828083a14299434204d955f21edc7afe0e4e4bae16e"
+  },
+  "fileAfterHashes": {
+    "sympy/sets/ordinals.py": "01d2cfc4f7aa7f1927c51a0f47ee8973c3f0e6153a37801b04ccdbdcab0a7305"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/sets/ordinals.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-9256d870ce617d0e",
+    "planId": "merge-9256d870ce617d0e",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-9256d870ce617d0e",
+        "planId": "merge-9256d870ce617d0e",
+        "request_identity": [
+          "prop-hist-w1-sympy_sets_ordinals_py"
+        ],
+        "actor_ids": [
+          "writer-28036"
+        ],
+        "request_files": [
+          "sympy/sets/ordinals.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/sets/ordinals.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/sympy/runs/sympy_28032_28036__bare_composer__s2/artifacts/steward/cb-sympy_sets_ordinals.py-w1-0007.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_SETS_ORDINALS_PY"
+        ],
+        "commit_sha": "602aa2aaa4f182f355d903a10fe292dca3f96876"
+      }
+    ]
+  }
+}

@@ -1,0 +1,135 @@
+{
+ "writer": 1,
+ "pr": 26300,
+ "pid": 2229285,
+ "init_ms": 101.17285799999999,
+ "start_offset_ms": 7,
+ "file_order": [
+  "sympy/solvers/diophantine/diophantine.py"
+ ],
+ "holds": {
+  "sympy/solvers/diophantine/diophantine.py": 15
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 26300,
+   "path": "sympy/solvers/diophantine/diophantine.py",
+   "intents": [
+    "log:sympy:26297_26300:26300:sympy/solvers/diophantine/diophantine.py:h0",
+    "log:sympy:26297_26300:26300:sympy/solvers/diophantine/diophantine.py:h1",
+    "log:sympy:26297_26300:26300:sympy/solvers/diophantine/diophantine.py:h2",
+    "log:sympy:26297_26300:26300:sympy/solvers/diophantine/diophantine.py:h3"
+   ],
+   "hold_ms": 15,
+   "t_submit_epoch": 1791573237100,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 19,
+   "outcome": "blocked",
+   "blocked_reason": "file-hash-drift: Target file hash sha256:8cc6f7f66d5dbdf5933a186d5ee6f40ebfbb99e48aa8f26dcd6fc09961dfa343 does not match proposal fileBeforeHash sha256:cbb94216630ee7341214c1e0a34ecee08e4d8625e0b1b7d4ab93bf40744fa66a.",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "file-hash-drift: Target file hash sha256:8cc6f7f66d5dbdf5933a186d5ee6f40ebfbb99e48aa8f26dcd6fc09961dfa343 does not match proposal fileBeforeHash sha256:cbb94216630ee7341214c1e0a34ecee08e4d8625e0b1b7d4ab93bf40744fa66a."
+   ],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sympy_solvers_diophantine_diophantine.py-w1-0001",
+   "total_ms": 122.19,
+   "t_done_epoch": 1791573237222
+  }
+ ],
+ "admit_stats": {
+  "txns": 2,
+  "cas_conflicts": 5
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sympy_solvers_diophantine_diophantine.py-w1-0001",
+   "path": "sympy/solvers/diophantine/diophantine.py",
+   "pid": 2229285,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-sympy_solvers_diophantine_diophantine_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sympy_solvers_diophantine_diophantine_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:cbb94216630ee7341214c1e0a34ecee08e4d8625e0b1b7d4ab93bf40744fa66a"
+   ],
+   "lock_wait_ms": 0.12,
+   "t_start_epoch_ms": 1791573237139.08,
+   "pre_apply_hash": "sha256:cbb94216630ee7341214c1e0a34ecee08e4d8625e0b1b7d4ab93bf40744fa66a",
+   "receipt_before_hash": null,
+   "receipt_after_hash": null,
+   "post_apply_hash": "sha256:8cc6f7f66d5dbdf5933a186d5ee6f40ebfbb99e48aa8f26dcd6fc09961dfa343",
+   "t_end_epoch_ms": 1791573237219.08,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "blocked",
+   "written": false,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:13:57.219+08:00",
+   "batch_id": "cb-sympy_solvers_diophantine_diophantine.py-w1-0001",
+   "path": "sympy/solvers/diophantine/diophantine.py",
+   "proposalIds": [
+    "prop-hist-w1-sympy_solvers_diophantine_diophantine_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sympy_solvers_diophantine_diophantine_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-sympy_solvers_diophantine_diophantine_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-sympy_solvers_diophantine_diophantine_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-sympy_solvers_diophantine_diophantine_py",
+     "logical_id": "prop-hist-w1-sympy_solvers_diophantine_diophantine_py",
+     "attempt_id": "att-prop-hist-w1-sympy_solvers_diophantine_diophantine_py-r0",
+     "proposal_id": "prop-hist-w1-sympy_solvers_diophantine_diophantine_py",
+     "actorId": "writer-26300"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "file-hash-drift: Target file hash sha256:8cc6f7f66d5dbdf5933a186d5ee6f40ebfbb99e48aa8f26dcd6fc09961dfa343 does not match proposal fileBeforeHash sha256:cbb94216630ee7341214c1e0a34ecee08e4d8625e0b1b7d4ab93bf40744fa66a."
+   ],
+   "blocked_reason": "file-hash-drift: Target file hash sha256:8cc6f7f66d5dbdf5933a186d5ee6f40ebfbb99e48aa8f26dcd6fc09961dfa343 does not match proposal fileBeforeHash sha256:cbb94216630ee7341214c1e0a34ecee08e4d8625e0b1b7d4ab93bf40744fa66a.",
+   "window_wait_ms": 0.27,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:cbb94216630ee7341214c1e0a34ecee08e4d8625e0b1b7d4ab93bf40744fa66a",
+   "written": false,
+   "output_digest": null,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "file-hash-drift: Target file hash sha256:8cc6f7f66d5dbdf5933a186d5ee6f40ebfbb99e48aa8f26dcd6fc09961dfa343 does not match proposal fileBeforeHash sha256:cbb94216630ee7341214c1e0a34ecee08e4d8625e0b1b7d4ab93bf40744fa66a."
+  }
+ ]
+}

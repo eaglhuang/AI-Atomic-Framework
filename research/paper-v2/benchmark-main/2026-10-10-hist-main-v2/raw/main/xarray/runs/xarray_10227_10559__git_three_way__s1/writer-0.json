@@ -1,0 +1,96 @@
+{
+ "writer": 0,
+ "pr": 10227,
+ "pid": 2271584,
+ "init_ms": 68.81514999999999,
+ "start_offset_ms": 6,
+ "file_order": [
+  "xarray/core/dataset.py",
+  "xarray/util/generate_aggregations.py",
+  "xarray/core/common.py",
+  "xarray/core/groupby.py"
+ ],
+ "holds": {
+  "xarray/core/dataset.py": 4,
+  "xarray/util/generate_aggregations.py": 8,
+  "xarray/core/common.py": 27,
+  "xarray/core/groupby.py": 15
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 10227,
+   "path": "xarray/core/dataset.py",
+   "intents": [
+    "log:xarray:10227_10559:10227:xarray/core/dataset.py:h1",
+    "log:xarray:10227_10559:10227:xarray/core/dataset.py:h2"
+   ],
+   "hold_ms": 4,
+   "t_submit_epoch": 1791573705150,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 17,
+   "outcome": "commit",
+   "total_ms": 51.61,
+   "t_done_epoch": 1791573705202
+  },
+  {
+   "writer": 0,
+   "pr": 10227,
+   "path": "xarray/util/generate_aggregations.py",
+   "intents": [
+    "log:xarray:10227_10559:10227:xarray/util/generate_aggregations.py:h5"
+   ],
+   "hold_ms": 8,
+   "t_submit_epoch": 1791573705202,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 6,
+   "outcome": "commit",
+   "total_ms": 21.43,
+   "t_done_epoch": 1791573705223
+  },
+  {
+   "writer": 0,
+   "pr": 10227,
+   "path": "xarray/core/common.py",
+   "intents": [
+    "log:xarray:10227_10559:10227:xarray/core/common.py:h0"
+   ],
+   "hold_ms": 27,
+   "t_submit_epoch": 1791573705224,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "total_ms": 39.72,
+   "t_done_epoch": 1791573705263
+  },
+  {
+   "writer": 0,
+   "pr": 10227,
+   "path": "xarray/core/groupby.py",
+   "intents": [
+    "log:xarray:10227_10559:10227:xarray/core/groupby.py:h3",
+    "log:xarray:10227_10559:10227:xarray/core/groupby.py:h4"
+   ],
+   "hold_ms": 15,
+   "t_submit_epoch": 1791573705263,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "total_ms": 31.58,
+   "t_done_epoch": 1791573705295
+  }
+ ],
+ "admit_stats": {
+  "txns": 8,
+  "cas_conflicts": 9
+ },
+ "steward_batches": null
+}

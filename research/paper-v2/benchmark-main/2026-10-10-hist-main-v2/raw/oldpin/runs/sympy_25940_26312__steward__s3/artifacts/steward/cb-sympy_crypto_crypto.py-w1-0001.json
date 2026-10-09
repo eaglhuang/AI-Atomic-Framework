@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-a12060b5ea13fa6b",
+  "proposalIds": [
+    "prop-hist-w1-sympy_crypto_crypto_py"
+  ],
+  "targetFiles": [
+    "sympy/crypto/crypto.py"
+  ],
+  "appliedFiles": [
+    "sympy/crypto/crypto.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/crypto/crypto.py": "edeed099f1d8668f8e6c945623a93030a55b2876215e31eabc863551ccf3609c"
+  },
+  "fileAfterHashes": {
+    "sympy/crypto/crypto.py": "a2a318ef65fd595a2e4216f926cd4d601f5c1bf526813f3380a335cbd16e98dd"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/crypto/crypto.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-a12060b5ea13fa6b",
+    "planId": "merge-a12060b5ea13fa6b",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-a12060b5ea13fa6b",
+        "planId": "merge-a12060b5ea13fa6b",
+        "request_identity": [
+          "prop-hist-w1-sympy_crypto_crypto_py"
+        ],
+        "actor_ids": [
+          "writer-26312"
+        ],
+        "request_files": [
+          "sympy/crypto/crypto.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/crypto/crypto.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/oldpin/runs/sympy_25940_26312__steward__s3/artifacts/steward/cb-sympy_crypto_crypto.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_CRYPTO_CRYPTO_PY"
+        ],
+        "commit_sha": "03c97414b8c14bb89acd5c446f231d4233c0b431"
+      }
+    ]
+  }
+}

@@ -1,0 +1,122 @@
+{
+ "writer": 1,
+ "pr": 18735,
+ "pid": 2411216,
+ "init_ms": 89.62696799999998,
+ "start_offset_ms": 20,
+ "file_order": [
+  "django/contrib/staticfiles/management/commands/collectstatic.py"
+ ],
+ "holds": {
+  "django/contrib/staticfiles/management/commands/collectstatic.py": 5
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 18735,
+   "path": "django/contrib/staticfiles/management/commands/collectstatic.py",
+   "intents": [
+    "log:django:18645_18735:18735:django/contrib/staticfiles/management/commands/collectstatic.py:h0",
+    "log:django:18645_18735:18735:django/contrib/staticfiles/management/commands/collectstatic.py:h1"
+   ],
+   "hold_ms": 5,
+   "t_submit_epoch": 1791574838911,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-django_contrib_staticfiles_management_commands_collectstatic.py-w1-0001",
+   "total_ms": 113.4,
+   "t_done_epoch": 1791574839025
+  }
+ ],
+ "admit_stats": null,
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-django_contrib_staticfiles_management_commands_collectstatic.py-w1-0001",
+   "path": "django/contrib/staticfiles/management/commands/collectstatic.py",
+   "pid": 2411216,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-django_contrib_staticfiles_management_commands_collectstatic_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-django_contrib_staticfiles_management_commands_collectstatic_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:65deb9760283f099579a80dbde283ab6f6646b880c57fe9e81b2dca112c9d520"
+   ],
+   "lock_wait_ms": 0.13,
+   "t_start_epoch_ms": 1791574838919.43,
+   "pre_apply_hash": "sha256:65deb9760283f099579a80dbde283ab6f6646b880c57fe9e81b2dca112c9d520",
+   "receipt_before_hash": "sha256:65deb9760283f099579a80dbde283ab6f6646b880c57fe9e81b2dca112c9d520",
+   "receipt_after_hash": "sha256:160b0da0a63ca5af40e2c432b6f9f2775f6acc562d3a4610ff006d8031102e2f",
+   "post_apply_hash": "sha256:160b0da0a63ca5af40e2c432b6f9f2775f6acc562d3a4610ff006d8031102e2f",
+   "t_end_epoch_ms": 1791574839024.68,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:40:39.024+08:00",
+   "batch_id": "cb-django_contrib_staticfiles_management_commands_collectstatic.py-w1-0001",
+   "path": "django/contrib/staticfiles/management/commands/collectstatic.py",
+   "proposalIds": [
+    "prop-hist-w1-django_contrib_staticfiles_management_commands_collectstatic_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-django_contrib_staticfiles_management_commands_collectstatic_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-django_contrib_staticfiles_management_commands_collectstatic_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-django_contrib_staticfiles_management_commands_collectstatic_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-django_contrib_staticfiles_management_commands_collectstatic_py",
+     "logical_id": "prop-hist-w1-django_contrib_staticfiles_management_commands_collectstatic_py",
+     "attempt_id": "att-prop-hist-w1-django_contrib_staticfiles_management_commands_collectstatic_py-r0",
+     "proposal_id": "prop-hist-w1-django_contrib_staticfiles_management_commands_collectstatic_py",
+     "actorId": "writer-18735"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.25,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:65deb9760283f099579a80dbde283ab6f6646b880c57fe9e81b2dca112c9d520",
+   "written": true,
+   "output_digest": "sha256:160b0da0a63ca5af40e2c432b6f9f2775f6acc562d3a4610ff006d8031102e2f",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

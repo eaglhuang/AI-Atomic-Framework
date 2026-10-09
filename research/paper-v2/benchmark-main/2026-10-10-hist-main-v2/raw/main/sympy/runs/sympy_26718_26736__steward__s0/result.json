@@ -1,0 +1,87 @@
+{
+ "pair_id": "sympy:26718_26736",
+ "stratum": "O1",
+ "arm": "steward",
+ "plant": null,
+ "seed_k": 0,
+ "seed": 1109553678,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 591,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 28,
+  "by_verdict": {
+   "correct": 18,
+   "blocked_absent": 10
+  },
+  "completed": 18,
+  "lost_effects": 0,
+  "blocked": 10,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 1,
+  "files_full_bytes_exact": 1,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {
+  "harness-relocate-context-not-found": 10
+ },
+ "structure": {
+  "sympy/physics/control/lti.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "sympy/physics/control/lti.py": true
+ },
+ "final_exists": {
+  "sympy/physics/control/lti.py": true
+ },
+ "files": [
+  {
+   "path": "sympy/physics/control/lti.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:a5ffeccc6e6cc463ba3f99384ae5826aef48bf00c8b3d369996f649ccb9a6ff8",
+   "final_digest": "sha256:dbcd7215e91449715b464eb3ca1f820d94a22f231f1702ef1080f004fd82e468",
+   "expected_digests": [
+    "sha256:dbcd7215e91449715b464eb3ca1f820d94a22f231f1702ef1080f004fd82e468"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "sympy/physics/control/lti.py": "sha256:dbcd7215e91449715b464eb3ca1f820d94a22f231f1702ef1080f004fd82e468"
+ }
+}

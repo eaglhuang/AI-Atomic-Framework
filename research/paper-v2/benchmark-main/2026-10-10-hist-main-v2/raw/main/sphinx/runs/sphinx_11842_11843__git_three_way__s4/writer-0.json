@@ -1,0 +1,95 @@
+{
+ "writer": 0,
+ "pr": 11842,
+ "pid": 2330509,
+ "init_ms": 71.203643,
+ "start_offset_ms": 1,
+ "file_order": [
+  "sphinx/jinja2glue.py",
+  "sphinx/environment/collectors/toctree.py",
+  "sphinx/ext/napoleon/docstring.py",
+  "sphinx/ext/autodoc/importer.py"
+ ],
+ "holds": {
+  "sphinx/jinja2glue.py": 20,
+  "sphinx/environment/collectors/toctree.py": 18,
+  "sphinx/ext/napoleon/docstring.py": 6,
+  "sphinx/ext/autodoc/importer.py": 6
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 11842,
+   "path": "sphinx/jinja2glue.py",
+   "intents": [
+    "log:sphinx:11842_11843:11842:sphinx/jinja2glue.py:h3"
+   ],
+   "hold_ms": 20,
+   "t_submit_epoch": 1791574243078,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 24,
+   "outcome": "commit",
+   "total_ms": 58.43,
+   "t_done_epoch": 1791574243137
+  },
+  {
+   "writer": 0,
+   "pr": 11842,
+   "path": "sphinx/environment/collectors/toctree.py",
+   "intents": [
+    "log:sphinx:11842_11843:11842:sphinx/environment/collectors/toctree.py:h0"
+   ],
+   "hold_ms": 18,
+   "t_submit_epoch": 1791574243137,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 10,
+   "outcome": "commit",
+   "total_ms": 35.94,
+   "t_done_epoch": 1791574243173
+  },
+  {
+   "writer": 0,
+   "pr": 11842,
+   "path": "sphinx/ext/napoleon/docstring.py",
+   "intents": [
+    "log:sphinx:11842_11843:11842:sphinx/ext/napoleon/docstring.py:h2"
+   ],
+   "hold_ms": 6,
+   "t_submit_epoch": 1791574243173,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "blocked",
+   "blocked_reason": "git-merge-conflict",
+   "total_ms": 16.87,
+   "t_done_epoch": 1791574243190
+  },
+  {
+   "writer": 0,
+   "pr": 11842,
+   "path": "sphinx/ext/autodoc/importer.py",
+   "intents": [
+    "log:sphinx:11842_11843:11842:sphinx/ext/autodoc/importer.py:h1"
+   ],
+   "hold_ms": 6,
+   "t_submit_epoch": 1791574243190,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "commit",
+   "total_ms": 14.33,
+   "t_done_epoch": 1791574243204
+  }
+ ],
+ "admit_stats": {
+  "txns": 8,
+  "cas_conflicts": 5
+ },
+ "steward_batches": null
+}

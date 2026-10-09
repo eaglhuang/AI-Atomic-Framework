@@ -1,0 +1,134 @@
+{
+ "writer": 1,
+ "pr": 27175,
+ "pid": 2450303,
+ "init_ms": 97.473738,
+ "start_offset_ms": 9,
+ "file_order": [
+  "sympy/core/basic.py"
+ ],
+ "holds": {
+  "sympy/core/basic.py": 7
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 27175,
+   "path": "sympy/core/basic.py",
+   "intents": [
+    "log:sympy:27086_27175:27175:sympy/core/basic.py:h0",
+    "log:sympy:27086_27175:27175:sympy/core/basic.py:h1",
+    "log:sympy:27086_27175:27175:sympy/core/basic.py:h2",
+    "log:sympy:27086_27175:27175:sympy/core/basic.py:h3",
+    "log:sympy:27086_27175:27175:sympy/core/basic.py:h4",
+    "log:sympy:27086_27175:27175:sympy/core/basic.py:h5",
+    "log:sympy:27086_27175:27175:sympy/core/basic.py:h6"
+   ],
+   "hold_ms": 7,
+   "t_submit_epoch": 1791575133812,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 13,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sympy_core_basic.py-w1-0001",
+   "total_ms": 165.52,
+   "t_done_epoch": 1791575133977
+  }
+ ],
+ "admit_stats": {
+  "txns": 2,
+  "cas_conflicts": 0
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sympy_core_basic.py-w1-0001",
+   "path": "sympy/core/basic.py",
+   "pid": 2450303,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-sympy_core_basic_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sympy_core_basic_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:359bb7e7e0c38a12ceb63bb4f4b4e02b2a2087da1af2f10defb73a1ea03abffb"
+   ],
+   "lock_wait_ms": 0.12,
+   "t_start_epoch_ms": 1791575133836.81,
+   "pre_apply_hash": "sha256:359bb7e7e0c38a12ceb63bb4f4b4e02b2a2087da1af2f10defb73a1ea03abffb",
+   "receipt_before_hash": "sha256:359bb7e7e0c38a12ceb63bb4f4b4e02b2a2087da1af2f10defb73a1ea03abffb",
+   "receipt_after_hash": "sha256:58b867378eef0935d492e02bce006045d5e5c6f9e1bbf3afe28267c142d62344",
+   "post_apply_hash": "sha256:58b867378eef0935d492e02bce006045d5e5c6f9e1bbf3afe28267c142d62344",
+   "t_end_epoch_ms": 1791575133961.97,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:45:33.962+08:00",
+   "batch_id": "cb-sympy_core_basic.py-w1-0001",
+   "path": "sympy/core/basic.py",
+   "proposalIds": [
+    "prop-hist-w1-sympy_core_basic_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sympy_core_basic_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-sympy_core_basic_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-sympy_core_basic_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-sympy_core_basic_py",
+     "logical_id": "prop-hist-w1-sympy_core_basic_py",
+     "attempt_id": "att-prop-hist-w1-sympy_core_basic_py-r0",
+     "proposal_id": "prop-hist-w1-sympy_core_basic_py",
+     "actorId": "writer-27175"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.24,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:359bb7e7e0c38a12ceb63bb4f4b4e02b2a2087da1af2f10defb73a1ea03abffb",
+   "written": true,
+   "output_digest": "sha256:58b867378eef0935d492e02bce006045d5e5c6f9e1bbf3afe28267c142d62344",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

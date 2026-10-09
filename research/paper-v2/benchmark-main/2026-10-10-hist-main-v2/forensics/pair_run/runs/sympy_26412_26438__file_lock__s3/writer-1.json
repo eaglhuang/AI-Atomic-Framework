@@ -1,0 +1,62 @@
+{
+ "writer": 1,
+ "pr": 26438,
+ "pid": 2165746,
+ "init_ms": 87.54710200000001,
+ "start_offset_ms": 11,
+ "file_order": [
+  "sympy/physics/mechanics/__init__.py",
+  "sympy/physics/mechanics/actuator.py"
+ ],
+ "holds": {
+  "sympy/physics/mechanics/__init__.py": 9,
+  "sympy/physics/mechanics/actuator.py": 19
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 26438,
+   "path": "sympy/physics/mechanics/__init__.py",
+   "intents": [
+    "log:sympy:26412_26438:26438:sympy/physics/mechanics/__init__.py:h0",
+    "log:sympy:26412_26438:26438:sympy/physics/mechanics/__init__.py:h1"
+   ],
+   "hold_ms": 9,
+   "t_submit_epoch": 1791572686605,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 259,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 275.35,
+   "t_done_epoch": 1791572686880
+  },
+  {
+   "writer": 1,
+   "pr": 26438,
+   "path": "sympy/physics/mechanics/actuator.py",
+   "intents": [
+    "log:sympy:26412_26438:26438:sympy/physics/mechanics/actuator.py:h2",
+    "log:sympy:26412_26438:26438:sympy/physics/mechanics/actuator.py:h3"
+   ],
+   "hold_ms": 19,
+   "t_submit_epoch": 1791572686880,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "queue",
+   "admit_wait_ms": 25,
+   "lock_spins": 0,
+   "outcome": "blocked",
+   "blocked_reason": "harness-relocate-context-not-found",
+   "total_ms": 47.54,
+   "t_done_epoch": 1791572686927
+  }
+ ],
+ "admit_stats": {
+  "txns": 5,
+  "cas_conflicts": 0
+ },
+ "steward_batches": null
+}

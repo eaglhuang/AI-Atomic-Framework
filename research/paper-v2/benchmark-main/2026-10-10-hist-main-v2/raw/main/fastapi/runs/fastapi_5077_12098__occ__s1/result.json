@@ -1,0 +1,106 @@
+{
+ "pair_id": "fastapi:5077_12098",
+ "stratum": "O3",
+ "arm": "occ",
+ "plant": null,
+ "seed_k": 1,
+ "seed": 2702069976,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 372,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 9,
+  "by_verdict": {
+   "correct": 9
+  },
+  "completed": 9,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 2,
+  "files_full_bytes_exact": 2,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "fastapi/dependencies/models.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "fastapi/dependencies/utils.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "fastapi/dependencies/models.py": true,
+  "fastapi/dependencies/utils.py": true
+ },
+ "final_exists": {
+  "fastapi/dependencies/models.py": true,
+  "fastapi/dependencies/utils.py": true
+ },
+ "files": [
+  {
+   "path": "fastapi/dependencies/models.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:fa7f980b1ce054192ead08b8f6a393a284fbd6ffe878084727ea901689f1879a",
+   "final_digest": "sha256:3e397abf1fb89d9e53b5af6425adfe45f40a917b42a52d3df8584c82cf5e58db",
+   "expected_digests": [
+    "sha256:3e397abf1fb89d9e53b5af6425adfe45f40a917b42a52d3df8584c82cf5e58db"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "fastapi/dependencies/utils.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:0c12a3df3da85355375bcf734dcddee9e8fa575432d6dbf1d15e61a3f7185484",
+   "final_digest": "sha256:82deecffe43031419dc1aafa97857a4e4f9c18c2d6cfff7cd230bb0f953398df",
+   "expected_digests": [
+    "sha256:82deecffe43031419dc1aafa97857a4e4f9c18c2d6cfff7cd230bb0f953398df"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "fastapi/dependencies/models.py": "sha256:3e397abf1fb89d9e53b5af6425adfe45f40a917b42a52d3df8584c82cf5e58db",
+  "fastapi/dependencies/utils.py": "sha256:82deecffe43031419dc1aafa97857a4e4f9c18c2d6cfff7cd230bb0f953398df"
+ }
+}

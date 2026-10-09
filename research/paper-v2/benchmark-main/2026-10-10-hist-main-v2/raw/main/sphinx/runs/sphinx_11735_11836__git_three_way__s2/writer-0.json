@@ -1,0 +1,95 @@
+{
+ "writer": 0,
+ "pr": 11735,
+ "pid": 2359962,
+ "init_ms": 66.19569,
+ "start_offset_ms": 5,
+ "file_order": [
+  "sphinx/ext/autosummary/__init__.py",
+  "sphinx/environment/__init__.py",
+  "sphinx/domains/cpp.py",
+  "sphinx/registry.py"
+ ],
+ "holds": {
+  "sphinx/ext/autosummary/__init__.py": 19,
+  "sphinx/environment/__init__.py": 23,
+  "sphinx/domains/cpp.py": 17,
+  "sphinx/registry.py": 19
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 11735,
+   "path": "sphinx/ext/autosummary/__init__.py",
+   "intents": [
+    "log:sphinx:11735_11836:11735:sphinx/ext/autosummary/__init__.py:h3"
+   ],
+   "hold_ms": 19,
+   "t_submit_epoch": 1791574488472,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 15,
+   "outcome": "commit",
+   "total_ms": 53.97,
+   "t_done_epoch": 1791574488526
+  },
+  {
+   "writer": 0,
+   "pr": 11735,
+   "path": "sphinx/environment/__init__.py",
+   "intents": [
+    "log:sphinx:11735_11836:11735:sphinx/environment/__init__.py:h2"
+   ],
+   "hold_ms": 23,
+   "t_submit_epoch": 1791574488526,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "commit",
+   "total_ms": 32.95,
+   "t_done_epoch": 1791574488559
+  },
+  {
+   "writer": 0,
+   "pr": 11735,
+   "path": "sphinx/domains/cpp.py",
+   "intents": [
+    "log:sphinx:11735_11836:11735:sphinx/domains/cpp.py:h0",
+    "log:sphinx:11735_11836:11735:sphinx/domains/cpp.py:h1"
+   ],
+   "hold_ms": 17,
+   "t_submit_epoch": 1791574488559,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "queue",
+   "admit_wait_ms": 9,
+   "outcome": "commit",
+   "total_ms": 42.2,
+   "t_done_epoch": 1791574488601
+  },
+  {
+   "writer": 0,
+   "pr": 11735,
+   "path": "sphinx/registry.py",
+   "intents": [
+    "log:sphinx:11735_11836:11735:sphinx/registry.py:h4"
+   ],
+   "hold_ms": 19,
+   "t_submit_epoch": 1791574488601,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "total_ms": 29.01,
+   "t_done_epoch": 1791574488630
+  }
+ ],
+ "admit_stats": {
+  "txns": 9,
+  "cas_conflicts": 12
+ },
+ "steward_batches": null
+}

@@ -1,0 +1,106 @@
+{
+ "writer": 1,
+ "pr": 20340,
+ "pid": 2173675,
+ "init_ms": 80.946693,
+ "start_offset_ms": 0,
+ "file_order": [
+  "django/template/base.py",
+  "django/contrib/admin/templatetags/base.py",
+  "django/utils/inspect.py",
+  "django/template/library.py"
+ ],
+ "holds": {
+  "django/template/base.py": 0,
+  "django/contrib/admin/templatetags/base.py": 19,
+  "django/utils/inspect.py": 4,
+  "django/template/library.py": 27
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 20340,
+   "path": "django/template/base.py",
+   "intents": [
+    "log:django:20086_20340:20340:django/template/base.py:h2",
+    "log:django:20086_20340:20340:django/template/base.py:h3"
+   ],
+   "hold_ms": 0,
+   "t_submit_epoch": 1791572757301,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 16,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 25.08,
+   "t_done_epoch": 1791572757326
+  },
+  {
+   "writer": 1,
+   "pr": 20340,
+   "path": "django/contrib/admin/templatetags/base.py",
+   "intents": [
+    "log:django:20086_20340:20340:django/contrib/admin/templatetags/base.py:h0",
+    "log:django:20086_20340:20340:django/contrib/admin/templatetags/base.py:h1"
+   ],
+   "hold_ms": 19,
+   "t_submit_epoch": 1791572757326,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 25.91,
+   "t_done_epoch": 1791572757352
+  },
+  {
+   "writer": 1,
+   "pr": 20340,
+   "path": "django/utils/inspect.py",
+   "intents": [
+    "log:django:20086_20340:20340:django/utils/inspect.py:h8",
+    "log:django:20086_20340:20340:django/utils/inspect.py:h9",
+    "log:django:20086_20340:20340:django/utils/inspect.py:h10"
+   ],
+   "hold_ms": 4,
+   "t_submit_epoch": 1791572757352,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 5,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 17.13,
+   "t_done_epoch": 1791572757369
+  },
+  {
+   "writer": 1,
+   "pr": 20340,
+   "path": "django/template/library.py",
+   "intents": [
+    "log:django:20086_20340:20340:django/template/library.py:h4",
+    "log:django:20086_20340:20340:django/template/library.py:h5",
+    "log:django:20086_20340:20340:django/template/library.py:h6",
+    "log:django:20086_20340:20340:django/template/library.py:h7"
+   ],
+   "hold_ms": 27,
+   "t_submit_epoch": 1791572757369,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "blocked",
+   "blocked_reason": "occ-relocate-context-not-found",
+   "occ_retries": 0,
+   "total_ms": 32.37,
+   "t_done_epoch": 1791572757402
+  }
+ ],
+ "admit_stats": {
+  "txns": 8,
+  "cas_conflicts": 5
+ },
+ "steward_batches": null
+}

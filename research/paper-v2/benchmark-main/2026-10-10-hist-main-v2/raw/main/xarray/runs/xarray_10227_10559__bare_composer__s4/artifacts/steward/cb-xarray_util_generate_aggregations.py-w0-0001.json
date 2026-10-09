@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-b064c3ee1c2c88bf",
+  "proposalIds": [
+    "prop-hist-w0-xarray_util_generate_aggregations_py"
+  ],
+  "targetFiles": [
+    "xarray/util/generate_aggregations.py"
+  ],
+  "appliedFiles": [
+    "xarray/util/generate_aggregations.py"
+  ],
+  "fileBeforeHashes": {
+    "xarray/util/generate_aggregations.py": "dc4b6e56ad99b5cba28ca96cd2fe8f49d54888f3dc92fbbe2dd6b4d0bc6f4837"
+  },
+  "fileAfterHashes": {
+    "xarray/util/generate_aggregations.py": "fe8a5622473639379710a482bc3b707a0e00f06b7df3acb9a157f8a5b0a31591"
+  },
+  "permissions": {
+    "fileWrite": [
+      "xarray/util/generate_aggregations.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-b064c3ee1c2c88bf",
+    "planId": "merge-b064c3ee1c2c88bf",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-b064c3ee1c2c88bf",
+        "planId": "merge-b064c3ee1c2c88bf",
+        "request_identity": [
+          "prop-hist-w0-xarray_util_generate_aggregations_py"
+        ],
+        "actor_ids": [
+          "writer-10227"
+        ],
+        "request_files": [
+          "xarray/util/generate_aggregations.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "xarray/util/generate_aggregations.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/xarray/runs/xarray_10227_10559__bare_composer__s4/artifacts/steward/cb-xarray_util_generate_aggregations.py-w0-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-XARRAY_UTIL_GENERATE_AGGREGATIONS_PY"
+        ],
+        "commit_sha": "b3b8d2a9a4b5ca37638f327791e1ae29c3150b6b"
+      }
+    ]
+  }
+}

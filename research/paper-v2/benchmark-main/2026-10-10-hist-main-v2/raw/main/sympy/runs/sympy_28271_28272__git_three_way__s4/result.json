@@ -1,0 +1,197 @@
+{
+ "pair_id": "sympy:28271_28272",
+ "stratum": "O3",
+ "arm": "git_three_way",
+ "plant": null,
+ "seed_k": 4,
+ "seed": 2567550331,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 993,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 51,
+  "by_verdict": {
+   "correct": 47,
+   "blocked_absent": 4
+  },
+  "completed": 47,
+  "lost_effects": 0,
+  "blocked": 4,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 6,
+  "files_full_bytes_exact": 6,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {
+  "git-base-drift": 4
+ },
+ "structure": {
+  "sympy/polys/densebasic.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/polys/polyclasses.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/polys/polytools.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/polys/series/base.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/polys/series/ringflint.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/polys/series/ringpython.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "sympy/polys/densebasic.py": true,
+  "sympy/polys/polyclasses.py": true,
+  "sympy/polys/polytools.py": true,
+  "sympy/polys/series/base.py": true,
+  "sympy/polys/series/ringflint.py": true,
+  "sympy/polys/series/ringpython.py": true
+ },
+ "final_exists": {
+  "sympy/polys/densebasic.py": true,
+  "sympy/polys/polyclasses.py": true,
+  "sympy/polys/polytools.py": true,
+  "sympy/polys/series/base.py": true,
+  "sympy/polys/series/ringflint.py": true,
+  "sympy/polys/series/ringpython.py": true
+ },
+ "files": [
+  {
+   "path": "sympy/polys/densebasic.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:a4912b986fbff99df5300e0010f21a0c058e96a215e99444ec99b789edca9da8",
+   "final_digest": "sha256:6efb269ab22d268efad58e024b792ea9b1f897cf021b1800887ac40f6cf21297",
+   "expected_digests": [
+    "sha256:6efb269ab22d268efad58e024b792ea9b1f897cf021b1800887ac40f6cf21297"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/polys/polyclasses.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:3a5c39bf1fe609ff83a24f42d4c1d8c1ed01ea1b7c4f8ad47707bd37ca11514d",
+   "final_digest": "sha256:12158451fe03d3da7d1b84053cf026277a031779796591645b9647450d03b584",
+   "expected_digests": [
+    "sha256:12158451fe03d3da7d1b84053cf026277a031779796591645b9647450d03b584"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/polys/polytools.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:b89db816e04df20eb2678a0b96b87cfda584c71770f3b3d310cd72a2f4866ec1",
+   "final_digest": "sha256:61c4525bba3f9d3c3519b66ad05f0084a242a5394ea4043d345cd08097779cb8",
+   "expected_digests": [
+    "sha256:61c4525bba3f9d3c3519b66ad05f0084a242a5394ea4043d345cd08097779cb8"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/polys/series/base.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:6c0218d6044c8f8647a5bd46f3a814d8b8ff479b39c3cfdc49c29857829aa396",
+   "final_digest": "sha256:b0dd8c3972c74d3c02c08257704fe7887fe0c4c1cac173520b70ef642a117409",
+   "expected_digests": [
+    "sha256:b0dd8c3972c74d3c02c08257704fe7887fe0c4c1cac173520b70ef642a117409"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/polys/series/ringflint.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:22cdf8bde8f0a16bf4c1574feaf40fd99646bae943ccc9396016278e24756ff1",
+   "final_digest": "sha256:8f9260b881c0a1aad0253421036dd71928a727f18328c56cd7da8b60508579e3",
+   "expected_digests": [
+    "sha256:8f9260b881c0a1aad0253421036dd71928a727f18328c56cd7da8b60508579e3"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/polys/series/ringpython.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:c297282c7c0b9ca5f813b9ad4a1e1886145ccd6f52a07ebb753e110747a69698",
+   "final_digest": "sha256:925abffeac889ecb1c4729a0c9a8fd8ad9c1cb9a2564bbf3431776214ca70151",
+   "expected_digests": [
+    "sha256:925abffeac889ecb1c4729a0c9a8fd8ad9c1cb9a2564bbf3431776214ca70151"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "sympy/polys/densebasic.py": "sha256:6efb269ab22d268efad58e024b792ea9b1f897cf021b1800887ac40f6cf21297",
+  "sympy/polys/polyclasses.py": "sha256:12158451fe03d3da7d1b84053cf026277a031779796591645b9647450d03b584",
+  "sympy/polys/polytools.py": "sha256:61c4525bba3f9d3c3519b66ad05f0084a242a5394ea4043d345cd08097779cb8",
+  "sympy/polys/series/base.py": "sha256:b0dd8c3972c74d3c02c08257704fe7887fe0c4c1cac173520b70ef642a117409",
+  "sympy/polys/series/ringflint.py": "sha256:8f9260b881c0a1aad0253421036dd71928a727f18328c56cd7da8b60508579e3",
+  "sympy/polys/series/ringpython.py": "sha256:925abffeac889ecb1c4729a0c9a8fd8ad9c1cb9a2564bbf3431776214ca70151"
+ }
+}

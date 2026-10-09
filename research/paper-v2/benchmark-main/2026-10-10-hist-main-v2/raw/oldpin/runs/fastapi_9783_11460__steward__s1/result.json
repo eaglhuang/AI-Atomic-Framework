@@ -1,0 +1,87 @@
+{
+ "pair_id": "fastapi:9783_11460",
+ "stratum": "O3",
+ "arm": "steward",
+ "plant": null,
+ "seed_k": 1,
+ "seed": 2970198493,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-5692474f/AI-Atomic-Framework-5692474f7db70ab52a7a71c8af4867609e7e4b43",
+ "wall_ms": 392,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 4,
+  "by_verdict": {
+   "correct": 2,
+   "blocked_absent": 2
+  },
+  "completed": 2,
+  "lost_effects": 0,
+  "blocked": 2,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 1,
+  "files_full_bytes_exact": 1,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {
+  "file-hash-drift: Target file hash sha256": 2
+ },
+ "structure": {
+  "fastapi/security/oauth2.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "fastapi/security/oauth2.py": true
+ },
+ "final_exists": {
+  "fastapi/security/oauth2.py": true
+ },
+ "files": [
+  {
+   "path": "fastapi/security/oauth2.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:05b5dd43f5b63e6e4d21ca471814816b5bb7b741012c282261d38b7e2775b780",
+   "final_digest": "sha256:c42a398f5aa9cdee82bc4b891c89de388d2fd9fa1d1953291c75671e988b7e83",
+   "expected_digests": [
+    "sha256:c42a398f5aa9cdee82bc4b891c89de388d2fd9fa1d1953291c75671e988b7e83"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "fastapi/security/oauth2.py": "sha256:c42a398f5aa9cdee82bc4b891c89de388d2fd9fa1d1953291c75671e988b7e83"
+ }
+}

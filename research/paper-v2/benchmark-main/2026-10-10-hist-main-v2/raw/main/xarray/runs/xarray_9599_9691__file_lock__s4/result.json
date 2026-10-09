@@ -1,0 +1,150 @@
+{
+ "pair_id": "xarray:9599_9691",
+ "stratum": "O3",
+ "arm": "file_lock",
+ "plant": null,
+ "seed_k": 4,
+ "seed": 1676261707,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 673,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 36,
+  "by_verdict": {
+   "correct": 36
+  },
+  "completed": 36,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 4,
+  "files_full_bytes_exact": 4,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "xarray/core/dataarray.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "xarray/core/dataset.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "xarray/core/missing.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "xarray/core/types.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "xarray/core/dataarray.py": true,
+  "xarray/core/dataset.py": true,
+  "xarray/core/missing.py": true,
+  "xarray/core/types.py": true
+ },
+ "final_exists": {
+  "xarray/core/dataarray.py": true,
+  "xarray/core/dataset.py": true,
+  "xarray/core/missing.py": true,
+  "xarray/core/types.py": true
+ },
+ "files": [
+  {
+   "path": "xarray/core/dataarray.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:d89f815e70e3f62094f47b0a0d99ee4f630d087233d8444d58e889ef88610bd0",
+   "final_digest": "sha256:c4e66a4591d8bf6c2e83c1bda7b22c06ec627b230afc03dfab35b771443f2f71",
+   "expected_digests": [
+    "sha256:c4e66a4591d8bf6c2e83c1bda7b22c06ec627b230afc03dfab35b771443f2f71"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/core/dataset.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:327ee0bdd85ed3a839e4e23cce775fe6a0ef84bc7a6641f2e62419cb9762f1e4",
+   "final_digest": "sha256:ab940bc2a7a03a466ac45ce8a816f8c5d245f1f2cc86d347640e0b5b22c196f8",
+   "expected_digests": [
+    "sha256:ab940bc2a7a03a466ac45ce8a816f8c5d245f1f2cc86d347640e0b5b22c196f8"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/core/missing.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:1690c2fe320ec02693f111098e05eaa44c4514f92b6eb5f7976e22c11482746e",
+   "final_digest": "sha256:2eb74c18270742cd4d735a91de9acb206a260faedc23603b693941f34f414f1a",
+   "expected_digests": [
+    "sha256:2eb74c18270742cd4d735a91de9acb206a260faedc23603b693941f34f414f1a"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/core/types.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:d6cfaa5435ab2fa4c77e38b7425dc64ca325cfcfab0b5d624bf5c71148ce8423",
+   "final_digest": "sha256:6fedfc30598f42e2e02689bb7f356548a7e03592327dac4d78a2aba80eda310e",
+   "expected_digests": [
+    "sha256:6fedfc30598f42e2e02689bb7f356548a7e03592327dac4d78a2aba80eda310e"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "xarray/core/dataarray.py": "sha256:c4e66a4591d8bf6c2e83c1bda7b22c06ec627b230afc03dfab35b771443f2f71",
+  "xarray/core/dataset.py": "sha256:ab940bc2a7a03a466ac45ce8a816f8c5d245f1f2cc86d347640e0b5b22c196f8",
+  "xarray/core/missing.py": "sha256:2eb74c18270742cd4d735a91de9acb206a260faedc23603b693941f34f414f1a",
+  "xarray/core/types.py": "sha256:6fedfc30598f42e2e02689bb7f356548a7e03592327dac4d78a2aba80eda310e"
+ }
+}

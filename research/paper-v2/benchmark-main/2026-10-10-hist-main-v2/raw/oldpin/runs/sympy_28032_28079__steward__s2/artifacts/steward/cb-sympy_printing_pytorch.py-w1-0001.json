@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-e97089518ba93f3f",
+  "proposalIds": [
+    "prop-hist-w1-sympy_printing_pytorch_py"
+  ],
+  "targetFiles": [
+    "sympy/printing/pytorch.py"
+  ],
+  "appliedFiles": [
+    "sympy/printing/pytorch.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/printing/pytorch.py": "1d7100a0b6e06ee13e4988f486f0c7789d338333950c190ae6a584acb08984da"
+  },
+  "fileAfterHashes": {
+    "sympy/printing/pytorch.py": "0a7b16579661029a91436daf868491ecac7bec454b390cfdc7c9a49e52af4b25"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/printing/pytorch.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-e97089518ba93f3f",
+    "planId": "merge-e97089518ba93f3f",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-e97089518ba93f3f",
+        "planId": "merge-e97089518ba93f3f",
+        "request_identity": [
+          "prop-hist-w1-sympy_printing_pytorch_py"
+        ],
+        "actor_ids": [
+          "writer-28079"
+        ],
+        "request_files": [
+          "sympy/printing/pytorch.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/printing/pytorch.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/oldpin/runs/sympy_28032_28079__steward__s2/artifacts/steward/cb-sympy_printing_pytorch.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_PRINTING_PYTORCH_PY"
+        ],
+        "commit_sha": "d3362b4f4ad5f32695c375646f2399be1cccfc89"
+      }
+    ]
+  }
+}

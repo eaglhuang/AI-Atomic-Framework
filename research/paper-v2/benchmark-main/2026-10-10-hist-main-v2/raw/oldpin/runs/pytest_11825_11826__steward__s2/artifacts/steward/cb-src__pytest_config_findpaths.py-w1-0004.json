@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-635f528b77ff528f",
+  "proposalIds": [
+    "prop-hist-w1-src_pytest_config_findpaths_py"
+  ],
+  "targetFiles": [
+    "src/_pytest/config/findpaths.py"
+  ],
+  "appliedFiles": [
+    "src/_pytest/config/findpaths.py"
+  ],
+  "fileBeforeHashes": {
+    "src/_pytest/config/findpaths.py": "93562cd9362029c528df08a192fbe10349f8c9ed07d229ab4dc0e5e5835efe8a"
+  },
+  "fileAfterHashes": {
+    "src/_pytest/config/findpaths.py": "a1816662f46a66421436aa95a5d90875daf2e7d14dbe01305c795282bfe631c3"
+  },
+  "permissions": {
+    "fileWrite": [
+      "src/_pytest/config/findpaths.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-635f528b77ff528f",
+    "planId": "merge-635f528b77ff528f",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-635f528b77ff528f",
+        "planId": "merge-635f528b77ff528f",
+        "request_identity": [
+          "prop-hist-w1-src_pytest_config_findpaths_py"
+        ],
+        "actor_ids": [
+          "writer-11826"
+        ],
+        "request_files": [
+          "src/_pytest/config/findpaths.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "src/_pytest/config/findpaths.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/oldpin/runs/pytest_11825_11826__steward__s2/artifacts/steward/cb-src__pytest_config_findpaths.py-w1-0004.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SRC_PYTEST_CONFIG_FINDPATHS_PY"
+        ],
+        "commit_sha": "8c95c77203e6241035ecc98d1eef9decb48c437b"
+      }
+    ]
+  }
+}

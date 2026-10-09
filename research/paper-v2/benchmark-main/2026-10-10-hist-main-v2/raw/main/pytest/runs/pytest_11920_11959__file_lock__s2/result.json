@@ -1,0 +1,84 @@
+{
+ "pair_id": "pytest:11920_11959",
+ "stratum": "O3",
+ "arm": "file_lock",
+ "plant": null,
+ "seed_k": 2,
+ "seed": 2896370321,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 308,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 5,
+  "by_verdict": {
+   "correct": 5
+  },
+  "completed": 5,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 1,
+  "files_full_bytes_exact": 1,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "src/_pytest/recwarn.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "src/_pytest/recwarn.py": true
+ },
+ "final_exists": {
+  "src/_pytest/recwarn.py": true
+ },
+ "files": [
+  {
+   "path": "src/_pytest/recwarn.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:f3f881290034fb889e468ab47c5b0680b883eb2def0dd0ffc23711bc18c0c3f9",
+   "final_digest": "sha256:e767b339210a745483de5f0bbe070e8ca18fdbf03221d86afb7460d2b73257be",
+   "expected_digests": [
+    "sha256:e767b339210a745483de5f0bbe070e8ca18fdbf03221d86afb7460d2b73257be"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "src/_pytest/recwarn.py": "sha256:e767b339210a745483de5f0bbe070e8ca18fdbf03221d86afb7460d2b73257be"
+ }
+}

@@ -1,0 +1,195 @@
+{
+ "writer": 0,
+ "pr": 27040,
+ "pid": 2219425,
+ "init_ms": 108.22388000000001,
+ "start_offset_ms": 19,
+ "file_order": [
+  "sympy/geometry/line.py",
+  "sympy/physics/vector/vector.py",
+  "sympy/physics/vector/dyadic.py"
+ ],
+ "holds": {
+  "sympy/geometry/line.py": 25,
+  "sympy/physics/vector/vector.py": 12,
+  "sympy/physics/vector/dyadic.py": 26
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 27040,
+   "path": "sympy/geometry/line.py",
+   "intents": [
+    "log:sympy:27040_27043:27040:sympy/geometry/line.py:h0"
+   ],
+   "hold_ms": 25,
+   "t_submit_epoch": 1791573146944,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 17,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sympy_geometry_line.py-w0-0001",
+   "total_ms": 147.93,
+   "t_done_epoch": 1791573147091
+  },
+  {
+   "writer": 0,
+   "pr": 27040,
+   "path": "sympy/physics/vector/vector.py",
+   "intents": [
+    "log:sympy:27040_27043:27040:sympy/physics/vector/vector.py:h22",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/vector.py:h23",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/vector.py:h24",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/vector.py:h25",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/vector.py:h26",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/vector.py:h27",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/vector.py:h28",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/vector.py:h29"
+   ],
+   "hold_ms": 12,
+   "t_submit_epoch": 1791573147092,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "queue",
+   "admit_wait_ms": 27,
+   "outcome": "blocked",
+   "blocked_reason": "harness-relocate-context-not-found",
+   "total_ms": 43.06,
+   "t_done_epoch": 1791573147135
+  },
+  {
+   "writer": 0,
+   "pr": 27040,
+   "path": "sympy/physics/vector/dyadic.py",
+   "intents": [
+    "log:sympy:27040_27043:27040:sympy/physics/vector/dyadic.py:h1",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/dyadic.py:h2",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/dyadic.py:h3",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/dyadic.py:h4",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/dyadic.py:h5",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/dyadic.py:h6",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/dyadic.py:h7",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/dyadic.py:h8",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/dyadic.py:h9",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/dyadic.py:h10",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/dyadic.py:h11",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/dyadic.py:h12",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/dyadic.py:h13",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/dyadic.py:h14",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/dyadic.py:h15",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/dyadic.py:h16",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/dyadic.py:h17",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/dyadic.py:h18",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/dyadic.py:h19",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/dyadic.py:h20",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/dyadic.py:h21"
+   ],
+   "hold_ms": 26,
+   "t_submit_epoch": 1791573147135,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "queue",
+   "admit_wait_ms": 29,
+   "outcome": "blocked",
+   "blocked_reason": "harness-relocate-context-not-found",
+   "total_ms": 59.9,
+   "t_done_epoch": 1791573147194
+  }
+ ],
+ "admit_stats": {
+  "txns": 8,
+  "cas_conflicts": 6
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sympy_geometry_line.py-w0-0001",
+   "path": "sympy/geometry/line.py",
+   "pid": 2219425,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-sympy_geometry_line_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sympy_geometry_line_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:ed0e921b43b3abbb5a3d38ad9ed5d4d1de95db2b8d6e66b43414a6b304d9aec3"
+   ],
+   "lock_wait_ms": 0.13,
+   "t_start_epoch_ms": 1791573146991.24,
+   "pre_apply_hash": "sha256:ed0e921b43b3abbb5a3d38ad9ed5d4d1de95db2b8d6e66b43414a6b304d9aec3",
+   "receipt_before_hash": "sha256:ed0e921b43b3abbb5a3d38ad9ed5d4d1de95db2b8d6e66b43414a6b304d9aec3",
+   "receipt_after_hash": "sha256:630f27b3fc3cae7e8511a93a3267ec75c72034d8cc4078687438a4d945fb8c93",
+   "post_apply_hash": "sha256:630f27b3fc3cae7e8511a93a3267ec75c72034d8cc4078687438a4d945fb8c93",
+   "t_end_epoch_ms": 1791573147085.15,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:12:27.085+08:00",
+   "batch_id": "cb-sympy_geometry_line.py-w0-0001",
+   "path": "sympy/geometry/line.py",
+   "proposalIds": [
+    "prop-hist-w0-sympy_geometry_line_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sympy_geometry_line_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-sympy_geometry_line_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-sympy_geometry_line_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-sympy_geometry_line_py",
+     "logical_id": "prop-hist-w0-sympy_geometry_line_py",
+     "attempt_id": "att-prop-hist-w0-sympy_geometry_line_py-r0",
+     "proposal_id": "prop-hist-w0-sympy_geometry_line_py",
+     "actorId": "writer-27040"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.24,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:ed0e921b43b3abbb5a3d38ad9ed5d4d1de95db2b8d6e66b43414a6b304d9aec3",
+   "written": true,
+   "output_digest": "sha256:630f27b3fc3cae7e8511a93a3267ec75c72034d8cc4078687438a4d945fb8c93",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

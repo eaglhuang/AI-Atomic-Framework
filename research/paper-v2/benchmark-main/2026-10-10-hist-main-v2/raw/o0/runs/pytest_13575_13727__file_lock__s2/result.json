@@ -1,0 +1,128 @@
+{
+ "pair_id": "pytest:13575_13727",
+ "stratum": "O0",
+ "arm": "file_lock",
+ "plant": null,
+ "seed_k": 2,
+ "seed": 1043089291,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 595,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 15,
+  "by_verdict": {
+   "correct": 15
+  },
+  "completed": 15,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 3,
+  "files_full_bytes_exact": 3,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "src/_pytest/assertion/rewrite.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "src/_pytest/config/__init__.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "src/_pytest/helpconfig.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "src/_pytest/assertion/rewrite.py": true,
+  "src/_pytest/config/__init__.py": true,
+  "src/_pytest/helpconfig.py": true
+ },
+ "final_exists": {
+  "src/_pytest/assertion/rewrite.py": true,
+  "src/_pytest/config/__init__.py": true,
+  "src/_pytest/helpconfig.py": true
+ },
+ "files": [
+  {
+   "path": "src/_pytest/assertion/rewrite.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:3a6625a73ef33a3c01963656254d13ae464f063617e0681bf57080120ca919de",
+   "final_digest": "sha256:376adab93672026552858ffaca009cbef553f082f2e4dee87ace75e7966d4b10",
+   "expected_digests": [
+    "sha256:376adab93672026552858ffaca009cbef553f082f2e4dee87ace75e7966d4b10"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "src/_pytest/config/__init__.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:10d59dcbec852acc901aff93d85d2fb8ec3c799721ac8f1384e4f89d09b3dee6",
+   "final_digest": "sha256:690a167550df452535fc47f0974ed5a44c957703e42313a2602bcee762ced96f",
+   "expected_digests": [
+    "sha256:690a167550df452535fc47f0974ed5a44c957703e42313a2602bcee762ced96f"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "src/_pytest/helpconfig.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:a6004879102e5e7abee5f0ab707c356aed09a232c2389c7ee445c45e8159919f",
+   "final_digest": "sha256:de12e67e3524c93c239dd14a1c32090809a07cfe6c891941273ec8d268bf759e",
+   "expected_digests": [
+    "sha256:de12e67e3524c93c239dd14a1c32090809a07cfe6c891941273ec8d268bf759e"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "src/_pytest/assertion/rewrite.py": "sha256:376adab93672026552858ffaca009cbef553f082f2e4dee87ace75e7966d4b10",
+  "src/_pytest/config/__init__.py": "sha256:690a167550df452535fc47f0974ed5a44c957703e42313a2602bcee762ced96f",
+  "src/_pytest/helpconfig.py": "sha256:de12e67e3524c93c239dd14a1c32090809a07cfe6c891941273ec8d268bf759e"
+ }
+}

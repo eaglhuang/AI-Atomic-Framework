@@ -1,0 +1,80 @@
+{
+ "writer": 1,
+ "pr": 13961,
+ "pid": 2338259,
+ "init_ms": 72.96182300000001,
+ "start_offset_ms": 6,
+ "file_order": [
+  "sphinx/ext/autosummary/__init__.py",
+  "sphinx/ext/autodoc/_documenters.py"
+ ],
+ "holds": {
+  "sphinx/ext/autosummary/__init__.py": 23,
+  "sphinx/ext/autodoc/_documenters.py": 7
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 13961,
+   "path": "sphinx/ext/autosummary/__init__.py",
+   "intents": [
+    "log:sphinx:13960_13961:13961:sphinx/ext/autosummary/__init__.py:h19",
+    "log:sphinx:13960_13961:13961:sphinx/ext/autosummary/__init__.py:h20",
+    "log:sphinx:13960_13961:13961:sphinx/ext/autosummary/__init__.py:h21"
+   ],
+   "hold_ms": 23,
+   "t_submit_epoch": 1791574310419,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 18,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 48.45,
+   "t_done_epoch": 1791574310468
+  },
+  {
+   "writer": 1,
+   "pr": 13961,
+   "path": "sphinx/ext/autodoc/_documenters.py",
+   "intents": [
+    "log:sphinx:13960_13961:13961:sphinx/ext/autodoc/_documenters.py:h0",
+    "log:sphinx:13960_13961:13961:sphinx/ext/autodoc/_documenters.py:h1",
+    "log:sphinx:13960_13961:13961:sphinx/ext/autodoc/_documenters.py:h2",
+    "log:sphinx:13960_13961:13961:sphinx/ext/autodoc/_documenters.py:h3",
+    "log:sphinx:13960_13961:13961:sphinx/ext/autodoc/_documenters.py:h4",
+    "log:sphinx:13960_13961:13961:sphinx/ext/autodoc/_documenters.py:h5",
+    "log:sphinx:13960_13961:13961:sphinx/ext/autodoc/_documenters.py:h6",
+    "log:sphinx:13960_13961:13961:sphinx/ext/autodoc/_documenters.py:h7",
+    "log:sphinx:13960_13961:13961:sphinx/ext/autodoc/_documenters.py:h8",
+    "log:sphinx:13960_13961:13961:sphinx/ext/autodoc/_documenters.py:h9",
+    "log:sphinx:13960_13961:13961:sphinx/ext/autodoc/_documenters.py:h10",
+    "log:sphinx:13960_13961:13961:sphinx/ext/autodoc/_documenters.py:h11",
+    "log:sphinx:13960_13961:13961:sphinx/ext/autodoc/_documenters.py:h12",
+    "log:sphinx:13960_13961:13961:sphinx/ext/autodoc/_documenters.py:h13",
+    "log:sphinx:13960_13961:13961:sphinx/ext/autodoc/_documenters.py:h14",
+    "log:sphinx:13960_13961:13961:sphinx/ext/autodoc/_documenters.py:h15",
+    "log:sphinx:13960_13961:13961:sphinx/ext/autodoc/_documenters.py:h16",
+    "log:sphinx:13960_13961:13961:sphinx/ext/autodoc/_documenters.py:h17",
+    "log:sphinx:13960_13961:13961:sphinx/ext/autodoc/_documenters.py:h18"
+   ],
+   "hold_ms": 7,
+   "t_submit_epoch": 1791574310468,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "lock_spins": 0,
+   "outcome": "blocked",
+   "blocked_reason": "harness-relocate-context-not-found",
+   "total_ms": 12.26,
+   "t_done_epoch": 1791574310480
+  }
+ ],
+ "admit_stats": {
+  "txns": 4,
+  "cas_conflicts": 3
+ },
+ "steward_batches": null
+}

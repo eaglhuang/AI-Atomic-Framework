@@ -1,0 +1,133 @@
+{
+ "writer": 0,
+ "pr": 13172,
+ "pid": 2335297,
+ "init_ms": 129.04332200000002,
+ "start_offset_ms": 16,
+ "file_order": [
+  "sphinx/ext/autosummary/__init__.py"
+ ],
+ "holds": {
+  "sphinx/ext/autosummary/__init__.py": 1
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 13172,
+   "path": "sphinx/ext/autosummary/__init__.py",
+   "intents": [
+    "log:sphinx:13172_13264:13172:sphinx/ext/autosummary/__init__.py:h0",
+    "log:sphinx:13172_13264:13172:sphinx/ext/autosummary/__init__.py:h1",
+    "log:sphinx:13172_13264:13172:sphinx/ext/autosummary/__init__.py:h2",
+    "log:sphinx:13172_13264:13172:sphinx/ext/autosummary/__init__.py:h3",
+    "log:sphinx:13172_13264:13172:sphinx/ext/autosummary/__init__.py:h4",
+    "log:sphinx:13172_13264:13172:sphinx/ext/autosummary/__init__.py:h5",
+    "log:sphinx:13172_13264:13172:sphinx/ext/autosummary/__init__.py:h6",
+    "log:sphinx:13172_13264:13172:sphinx/ext/autosummary/__init__.py:h7",
+    "log:sphinx:13172_13264:13172:sphinx/ext/autosummary/__init__.py:h8"
+   ],
+   "hold_ms": 1,
+   "t_submit_epoch": 1791574287837,
+   "outcome": "blocked",
+   "blocked_reason": "file-hash-drift: Target file hash sha256:df623202f7a9691d55553a598c751d7854798343399ba798d48c50571f9dd4dd does not match proposal fileBeforeHash sha256:d07137634fb544f125cd83791f055edd3ce7d8b495156ef81619e38f49d94a1e.",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "file-hash-drift: Target file hash sha256:df623202f7a9691d55553a598c751d7854798343399ba798d48c50571f9dd4dd does not match proposal fileBeforeHash sha256:d07137634fb544f125cd83791f055edd3ce7d8b495156ef81619e38f49d94a1e."
+   ],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sphinx_ext_autosummary___init__.py-w0-0001",
+   "total_ms": 117.45,
+   "t_done_epoch": 1791574287955
+  }
+ ],
+ "admit_stats": null,
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sphinx_ext_autosummary___init__.py-w0-0001",
+   "path": "sphinx/ext/autosummary/__init__.py",
+   "pid": 2335297,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-sphinx_ext_autosummary_init_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sphinx_ext_autosummary_init_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:d07137634fb544f125cd83791f055edd3ce7d8b495156ef81619e38f49d94a1e"
+   ],
+   "lock_wait_ms": 0.2,
+   "t_start_epoch_ms": 1791574287842.75,
+   "pre_apply_hash": "sha256:d07137634fb544f125cd83791f055edd3ce7d8b495156ef81619e38f49d94a1e",
+   "receipt_before_hash": null,
+   "receipt_after_hash": null,
+   "post_apply_hash": "sha256:df623202f7a9691d55553a598c751d7854798343399ba798d48c50571f9dd4dd",
+   "t_end_epoch_ms": 1791574287954.6,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "blocked",
+   "written": false,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:31:27.954+08:00",
+   "batch_id": "cb-sphinx_ext_autosummary___init__.py-w0-0001",
+   "path": "sphinx/ext/autosummary/__init__.py",
+   "proposalIds": [
+    "prop-hist-w0-sphinx_ext_autosummary_init_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sphinx_ext_autosummary_init_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-sphinx_ext_autosummary_init_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-sphinx_ext_autosummary_init_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-sphinx_ext_autosummary_init_py",
+     "logical_id": "prop-hist-w0-sphinx_ext_autosummary_init_py",
+     "attempt_id": "att-prop-hist-w0-sphinx_ext_autosummary_init_py-r0",
+     "proposal_id": "prop-hist-w0-sphinx_ext_autosummary_init_py",
+     "actorId": "writer-13172"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "file-hash-drift: Target file hash sha256:df623202f7a9691d55553a598c751d7854798343399ba798d48c50571f9dd4dd does not match proposal fileBeforeHash sha256:d07137634fb544f125cd83791f055edd3ce7d8b495156ef81619e38f49d94a1e."
+   ],
+   "blocked_reason": "file-hash-drift: Target file hash sha256:df623202f7a9691d55553a598c751d7854798343399ba798d48c50571f9dd4dd does not match proposal fileBeforeHash sha256:d07137634fb544f125cd83791f055edd3ce7d8b495156ef81619e38f49d94a1e.",
+   "window_wait_ms": 0.33,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:d07137634fb544f125cd83791f055edd3ce7d8b495156ef81619e38f49d94a1e",
+   "written": false,
+   "output_digest": null,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "file-hash-drift: Target file hash sha256:df623202f7a9691d55553a598c751d7854798343399ba798d48c50571f9dd4dd does not match proposal fileBeforeHash sha256:d07137634fb544f125cd83791f055edd3ce7d8b495156ef81619e38f49d94a1e."
+  }
+ ]
+}

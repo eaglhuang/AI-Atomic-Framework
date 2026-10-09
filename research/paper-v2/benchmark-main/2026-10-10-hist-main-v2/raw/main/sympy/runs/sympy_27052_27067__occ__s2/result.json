@@ -1,0 +1,109 @@
+{
+ "pair_id": "sympy:27052_27067",
+ "stratum": "O1",
+ "arm": "occ",
+ "plant": null,
+ "seed_k": 2,
+ "seed": 1184859889,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 331,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 11,
+  "by_verdict": {
+   "correct": 5,
+   "blocked_absent": 6
+  },
+  "completed": 5,
+  "lost_effects": 0,
+  "blocked": 6,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 2,
+  "files_full_bytes_exact": 2,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {
+  "occ-relocate-context-not-found": 6
+ },
+ "structure": {
+  "sympy/physics/control/__init__.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/physics/control/control_plots.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "sympy/physics/control/__init__.py": true,
+  "sympy/physics/control/control_plots.py": true
+ },
+ "final_exists": {
+  "sympy/physics/control/__init__.py": true,
+  "sympy/physics/control/control_plots.py": true
+ },
+ "files": [
+  {
+   "path": "sympy/physics/control/__init__.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:ce369821083ef603800b65ea1eef2a6afb6b74e2b6de25a41f5b0bb68777355e",
+   "final_digest": "sha256:f744e4ec889973092d08ab28c827a718ebd2bea01e63ef47f79167a7a353e9d9",
+   "expected_digests": [
+    "sha256:f744e4ec889973092d08ab28c827a718ebd2bea01e63ef47f79167a7a353e9d9"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/physics/control/control_plots.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:35f27e403403139921338141ed66418365b3a64675805fbea2bbbaf7987b917f",
+   "final_digest": "sha256:82c960467c734692585c4cfd13bb1bf09f19ce421a3be8375047544ce19fbaa9",
+   "expected_digests": [
+    "sha256:82c960467c734692585c4cfd13bb1bf09f19ce421a3be8375047544ce19fbaa9"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "sympy/physics/control/__init__.py": "sha256:f744e4ec889973092d08ab28c827a718ebd2bea01e63ef47f79167a7a353e9d9",
+  "sympy/physics/control/control_plots.py": "sha256:82c960467c734692585c4cfd13bb1bf09f19ce421a3be8375047544ce19fbaa9"
+ }
+}

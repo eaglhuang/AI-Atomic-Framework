@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-fefc56db3451208e",
+  "proposalIds": [
+    "prop-hist-w1-sympy_assumptions_handlers_sets_py"
+  ],
+  "targetFiles": [
+    "sympy/assumptions/handlers/sets.py"
+  ],
+  "appliedFiles": [
+    "sympy/assumptions/handlers/sets.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/assumptions/handlers/sets.py": "8c94879c8843be6e59a58b652725adc5cad3ff4e15451e4c94548b663068f816"
+  },
+  "fileAfterHashes": {
+    "sympy/assumptions/handlers/sets.py": "d5ed2eb9330bd758785a8c47564eea4b747e6ddb9a4916dad654e607400a4abc"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/assumptions/handlers/sets.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-fefc56db3451208e",
+    "planId": "merge-fefc56db3451208e",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-fefc56db3451208e",
+        "planId": "merge-fefc56db3451208e",
+        "request_identity": [
+          "prop-hist-w1-sympy_assumptions_handlers_sets_py"
+        ],
+        "actor_ids": [
+          "writer-28017"
+        ],
+        "request_files": [
+          "sympy/assumptions/handlers/sets.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/assumptions/handlers/sets.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/o0/runs/sympy_27839_28017__bare_composer__s2/artifacts/steward/cb-sympy_assumptions_handlers_sets.py-w1-0002.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_ASSUMPTIONS_HANDLERS_SETS_PY"
+        ],
+        "commit_sha": "98c02139fe000ef01b5d21b4d5361c02f1d07f34"
+      }
+    ]
+  }
+}

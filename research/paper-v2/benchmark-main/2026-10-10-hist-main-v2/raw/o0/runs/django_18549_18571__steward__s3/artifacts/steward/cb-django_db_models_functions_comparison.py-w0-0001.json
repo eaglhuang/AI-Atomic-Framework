@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-54425e790b3c5c36",
+  "proposalIds": [
+    "prop-hist-w0-django_db_models_functions_comparison_py"
+  ],
+  "targetFiles": [
+    "django/db/models/functions/comparison.py"
+  ],
+  "appliedFiles": [
+    "django/db/models/functions/comparison.py"
+  ],
+  "fileBeforeHashes": {
+    "django/db/models/functions/comparison.py": "ed9c755d5b6991f73344c37ec86b17c0a39902b3a79a4a1ac22a314a255bbc8f"
+  },
+  "fileAfterHashes": {
+    "django/db/models/functions/comparison.py": "d9a67dba3d564565b579a5951f3916d08b10c93158b25dc32df0368c81d72284"
+  },
+  "permissions": {
+    "fileWrite": [
+      "django/db/models/functions/comparison.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-54425e790b3c5c36",
+    "planId": "merge-54425e790b3c5c36",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-54425e790b3c5c36",
+        "planId": "merge-54425e790b3c5c36",
+        "request_identity": [
+          "prop-hist-w0-django_db_models_functions_comparison_py"
+        ],
+        "actor_ids": [
+          "writer-18549"
+        ],
+        "request_files": [
+          "django/db/models/functions/comparison.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "django/db/models/functions/comparison.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/o0/runs/django_18549_18571__steward__s3/artifacts/steward/cb-django_db_models_functions_comparison.py-w0-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-DJANGO_DB_MODELS_FUNCTIONS_COMPARISON_PY"
+        ],
+        "commit_sha": "3fd43e0c5c97dd0bcae2ef2b6bdbf6ca07670983"
+      }
+    ]
+  }
+}

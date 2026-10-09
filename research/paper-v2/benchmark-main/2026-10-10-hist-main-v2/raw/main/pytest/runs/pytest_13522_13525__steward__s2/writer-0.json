@@ -1,0 +1,131 @@
+{
+ "writer": 0,
+ "pr": 13522,
+ "pid": 2308972,
+ "init_ms": 103.253917,
+ "start_offset_ms": 3,
+ "file_order": [
+  "src/_pytest/pytester.py"
+ ],
+ "holds": {
+  "src/_pytest/pytester.py": 9
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 13522,
+   "path": "src/_pytest/pytester.py",
+   "intents": [
+    "log:pytest:13522_13525:13522:src/_pytest/pytester.py:h0",
+    "log:pytest:13522_13525:13522:src/_pytest/pytester.py:h1",
+    "log:pytest:13522_13525:13522:src/_pytest/pytester.py:h2",
+    "log:pytest:13522_13525:13522:src/_pytest/pytester.py:h3"
+   ],
+   "hold_ms": 9,
+   "t_submit_epoch": 1791574082031,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 150,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-src__pytest_pytester.py-w0-0001",
+   "total_ms": 470.62,
+   "t_done_epoch": 1791574082501
+  }
+ ],
+ "admit_stats": {
+  "txns": 3,
+  "cas_conflicts": 3
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-src__pytest_pytester.py-w0-0001",
+   "path": "src/_pytest/pytester.py",
+   "pid": 2308972,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-src_pytest_pytester_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-src_pytest_pytester_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:cd662381ffb9e9a3e6ada74ef54838c2784b6ba4912f9681dcaff43bfbb2a217"
+   ],
+   "lock_wait_ms": 0.12,
+   "t_start_epoch_ms": 1791574082194.43,
+   "pre_apply_hash": "sha256:cd662381ffb9e9a3e6ada74ef54838c2784b6ba4912f9681dcaff43bfbb2a217",
+   "receipt_before_hash": "sha256:cd662381ffb9e9a3e6ada74ef54838c2784b6ba4912f9681dcaff43bfbb2a217",
+   "receipt_after_hash": "sha256:a846e231ae62b1d7278a9119bfd36b923057b5033b238765c9a7a64d41d798fe",
+   "post_apply_hash": "sha256:a846e231ae62b1d7278a9119bfd36b923057b5033b238765c9a7a64d41d798fe",
+   "t_end_epoch_ms": 1791574082297.83,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:28:02.297+08:00",
+   "batch_id": "cb-src__pytest_pytester.py-w0-0001",
+   "path": "src/_pytest/pytester.py",
+   "proposalIds": [
+    "prop-hist-w0-src_pytest_pytester_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-src_pytest_pytester_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-src_pytest_pytester_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-src_pytest_pytester_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-src_pytest_pytester_py",
+     "logical_id": "prop-hist-w0-src_pytest_pytester_py",
+     "attempt_id": "att-prop-hist-w0-src_pytest_pytester_py-r0",
+     "proposal_id": "prop-hist-w0-src_pytest_pytester_py",
+     "actorId": "writer-13522"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.25,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:cd662381ffb9e9a3e6ada74ef54838c2784b6ba4912f9681dcaff43bfbb2a217",
+   "written": true,
+   "output_digest": "sha256:a846e231ae62b1d7278a9119bfd36b923057b5033b238765c9a7a64d41d798fe",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-001a69704496ce23",
+  "proposalIds": [
+    "prop-hist-w1-xarray_coding_cftime_offsets_py"
+  ],
+  "targetFiles": [
+    "xarray/coding/cftime_offsets.py"
+  ],
+  "appliedFiles": [
+    "xarray/coding/cftime_offsets.py"
+  ],
+  "fileBeforeHashes": {
+    "xarray/coding/cftime_offsets.py": "f412464ed070cbe388fc024c2f60f31cd7e32a8c9e54247b0dc517ce289afe1b"
+  },
+  "fileAfterHashes": {
+    "xarray/coding/cftime_offsets.py": "f861cb1ec1aa25633f69807d6178e2595a0f7539351bce15d0b666c759eccba4"
+  },
+  "permissions": {
+    "fileWrite": [
+      "xarray/coding/cftime_offsets.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-001a69704496ce23",
+    "planId": "merge-001a69704496ce23",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-001a69704496ce23",
+        "planId": "merge-001a69704496ce23",
+        "request_identity": [
+          "prop-hist-w1-xarray_coding_cftime_offsets_py"
+        ],
+        "actor_ids": [
+          "writer-9443"
+        ],
+        "request_files": [
+          "xarray/coding/cftime_offsets.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "xarray/coding/cftime_offsets.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/xarray/runs/xarray_9403_9443__bare_composer__s0/artifacts/steward/cb-xarray_coding_cftime_offsets.py-w1-0003.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-XARRAY_CODING_CFTIME_OFFSETS_PY"
+        ],
+        "commit_sha": "739167a23532b61703bb5539ae75420daa31036d"
+      }
+    ]
+  }
+}

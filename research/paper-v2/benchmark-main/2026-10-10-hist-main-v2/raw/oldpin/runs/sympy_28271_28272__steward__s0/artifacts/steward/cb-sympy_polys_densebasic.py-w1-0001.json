@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-a7c79a3ad7c284be",
+  "proposalIds": [
+    "prop-hist-w1-sympy_polys_densebasic_py"
+  ],
+  "targetFiles": [
+    "sympy/polys/densebasic.py"
+  ],
+  "appliedFiles": [
+    "sympy/polys/densebasic.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/polys/densebasic.py": "a4912b986fbff99df5300e0010f21a0c058e96a215e99444ec99b789edca9da8"
+  },
+  "fileAfterHashes": {
+    "sympy/polys/densebasic.py": "06c801f37406b024376c03aaace11be693bdbdb557f890c517222ce49e411a4d"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/polys/densebasic.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-a7c79a3ad7c284be",
+    "planId": "merge-a7c79a3ad7c284be",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-a7c79a3ad7c284be",
+        "planId": "merge-a7c79a3ad7c284be",
+        "request_identity": [
+          "prop-hist-w1-sympy_polys_densebasic_py"
+        ],
+        "actor_ids": [
+          "writer-28272"
+        ],
+        "request_files": [
+          "sympy/polys/densebasic.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/polys/densebasic.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/oldpin/runs/sympy_28271_28272__steward__s0/artifacts/steward/cb-sympy_polys_densebasic.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_POLYS_DENSEBASIC_PY"
+        ],
+        "commit_sha": "3109d1ed37a6d2352503d4d15f8191ed6baa5577"
+      }
+    ]
+  }
+}

@@ -1,0 +1,106 @@
+{
+ "pair_id": "xarray:10844_10884",
+ "stratum": "O0",
+ "arm": "git_three_way",
+ "plant": null,
+ "seed_k": 3,
+ "seed": 2286660196,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 434,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 3,
+  "by_verdict": {
+   "correct": 3
+  },
+  "completed": 3,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 2,
+  "files_full_bytes_exact": 2,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "xarray/core/common.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "xarray/structure/merge.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "xarray/core/common.py": true,
+  "xarray/structure/merge.py": true
+ },
+ "final_exists": {
+  "xarray/core/common.py": true,
+  "xarray/structure/merge.py": true
+ },
+ "files": [
+  {
+   "path": "xarray/core/common.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:06a01346f8d15e07862d9b02e12167ba66f70693ecdb3dfee1f4e0aa5393f2ab",
+   "final_digest": "sha256:d77856d1e3942a1c1b1c26676f9afeb247a19136109d0d489a672c6eb5162446",
+   "expected_digests": [
+    "sha256:d77856d1e3942a1c1b1c26676f9afeb247a19136109d0d489a672c6eb5162446"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/structure/merge.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:7a576d20bcdf9863f1de0b4c8769cee4a4ad2949ab9e73adf18546023cabf8a3",
+   "final_digest": "sha256:beec7f436da4bfdf99ef6a225e160a4ffe09033cadde5c25549d2dfa916f9fc7",
+   "expected_digests": [
+    "sha256:beec7f436da4bfdf99ef6a225e160a4ffe09033cadde5c25549d2dfa916f9fc7"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "xarray/core/common.py": "sha256:d77856d1e3942a1c1b1c26676f9afeb247a19136109d0d489a672c6eb5162446",
+  "xarray/structure/merge.py": "sha256:beec7f436da4bfdf99ef6a225e160a4ffe09033cadde5c25549d2dfa916f9fc7"
+ }
+}

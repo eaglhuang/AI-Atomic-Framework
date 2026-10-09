@@ -1,0 +1,70 @@
+{
+ "writer": 0,
+ "pr": 28032,
+ "pid": 2212031,
+ "init_ms": 85.56649099999998,
+ "start_offset_ms": 17,
+ "file_order": [
+  "sympy/utilities/lambdify.py",
+  "sympy/printing/numpy.py"
+ ],
+ "holds": {
+  "sympy/utilities/lambdify.py": 23,
+  "sympy/printing/numpy.py": 17
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 28032,
+   "path": "sympy/utilities/lambdify.py",
+   "intents": [
+    "log:sympy:28032_28079:28032:sympy/utilities/lambdify.py:h1",
+    "log:sympy:28032_28079:28032:sympy/utilities/lambdify.py:h2",
+    "log:sympy:28032_28079:28032:sympy/utilities/lambdify.py:h3",
+    "log:sympy:28032_28079:28032:sympy/utilities/lambdify.py:h4",
+    "log:sympy:28032_28079:28032:sympy/utilities/lambdify.py:h5",
+    "log:sympy:28032_28079:28032:sympy/utilities/lambdify.py:h6",
+    "log:sympy:28032_28079:28032:sympy/utilities/lambdify.py:h7",
+    "log:sympy:28032_28079:28032:sympy/utilities/lambdify.py:h8",
+    "log:sympy:28032_28079:28032:sympy/utilities/lambdify.py:h9",
+    "log:sympy:28032_28079:28032:sympy/utilities/lambdify.py:h10",
+    "log:sympy:28032_28079:28032:sympy/utilities/lambdify.py:h11"
+   ],
+   "hold_ms": 23,
+   "t_submit_epoch": 1791573074382,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 57,
+   "lock_spins": 0,
+   "outcome": "blocked",
+   "blocked_reason": "harness-relocate-context-not-found",
+   "total_ms": 87.33,
+   "t_done_epoch": 1791573074470
+  },
+  {
+   "writer": 0,
+   "pr": 28032,
+   "path": "sympy/printing/numpy.py",
+   "intents": [
+    "log:sympy:28032_28079:28032:sympy/printing/numpy.py:h0"
+   ],
+   "hold_ms": 17,
+   "t_submit_epoch": 1791573074470,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 23.19,
+   "t_done_epoch": 1791573074493
+  }
+ ],
+ "admit_stats": {
+  "txns": 5,
+  "cas_conflicts": 5
+ },
+ "steward_batches": null
+}

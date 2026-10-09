@@ -1,0 +1,79 @@
+{
+ "writer": 1,
+ "pr": 28757,
+ "pid": 2241760,
+ "init_ms": 77.19581400000001,
+ "start_offset_ms": 2,
+ "file_order": [
+  "sympy/polys/matrices/dense.py",
+  "sympy/solvers/ode/single.py",
+  "sympy/matrices/determinant.py"
+ ],
+ "holds": {
+  "sympy/polys/matrices/dense.py": 21,
+  "sympy/solvers/ode/single.py": 25,
+  "sympy/matrices/determinant.py": 18
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 28757,
+   "path": "sympy/polys/matrices/dense.py",
+   "intents": [
+    "log:sympy:28588_28757:28757:sympy/polys/matrices/dense.py:h1",
+    "log:sympy:28588_28757:28757:sympy/polys/matrices/dense.py:h2"
+   ],
+   "hold_ms": 21,
+   "t_submit_epoch": 1791573355208,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 23,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 51.11,
+   "t_done_epoch": 1791573355259
+  },
+  {
+   "writer": 1,
+   "pr": 28757,
+   "path": "sympy/solvers/ode/single.py",
+   "intents": [
+    "log:sympy:28588_28757:28757:sympy/solvers/ode/single.py:h3"
+   ],
+   "hold_ms": 25,
+   "t_submit_epoch": 1791573355260,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 5,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 39.07,
+   "t_done_epoch": 1791573355299
+  },
+  {
+   "writer": 1,
+   "pr": 28757,
+   "path": "sympy/matrices/determinant.py",
+   "intents": [
+    "log:sympy:28588_28757:28757:sympy/matrices/determinant.py:h0"
+   ],
+   "hold_ms": 18,
+   "t_submit_epoch": 1791573355299,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 30.98,
+   "t_done_epoch": 1791573355330
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 0
+ },
+ "steward_batches": null
+}

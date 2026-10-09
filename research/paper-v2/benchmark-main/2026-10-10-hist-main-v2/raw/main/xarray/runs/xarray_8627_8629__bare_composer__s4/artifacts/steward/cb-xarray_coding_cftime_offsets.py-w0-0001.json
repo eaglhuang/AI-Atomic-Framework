@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-e28f875afab95229",
+  "proposalIds": [
+    "prop-hist-w0-xarray_coding_cftime_offsets_py"
+  ],
+  "targetFiles": [
+    "xarray/coding/cftime_offsets.py"
+  ],
+  "appliedFiles": [],
+  "fileBeforeHashes": {},
+  "fileAfterHashes": {},
+  "permissions": {
+    "fileWrite": [
+      "xarray/coding/cftime_offsets.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "blocked",
+  "blockedReasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w0-xarray_coding_cftime_offsets_py' context mismatch at base line 746: expected \"    emit_user_level_warning(message, FutureWarning)\", found \"    recommended_freq = _DEPRECATED_FREQUENICES[deprecated_freq]\" [proposals: prop-hist-w0-xarray_coding_cftime_offsets_py]"
+  ],
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-e28f875afab95229",
+    "planId": "merge-e28f875afab95229",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-e28f875afab95229",
+        "planId": "merge-e28f875afab95229",
+        "request_identity": [
+          "prop-hist-w0-xarray_coding_cftime_offsets_py"
+        ],
+        "actor_ids": [
+          "writer-8627"
+        ],
+        "request_files": [
+          "xarray/coding/cftime_offsets.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/xarray/runs/xarray_8627_8629__bare_composer__s4/artifacts/steward/cb-xarray_coding_cftime_offsets.py-w0-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-XARRAY_CODING_CFTIME_OFFSETS_PY"
+        ],
+        "commit_sha": "5af5f90ab096f449c4b330dd978de3229bd73877"
+      }
+    ]
+  }
+}

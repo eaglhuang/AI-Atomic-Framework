@@ -1,0 +1,64 @@
+{
+ "writer": 1,
+ "pr": 8960,
+ "pid": 2258691,
+ "init_ms": 68.68701,
+ "start_offset_ms": 17,
+ "file_order": [
+  "xarray/core/dataset.py",
+  "xarray/core/dataarray.py"
+ ],
+ "holds": {
+  "xarray/core/dataset.py": 16,
+  "xarray/core/dataarray.py": 12
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 8960,
+   "path": "xarray/core/dataset.py",
+   "intents": [
+    "log:xarray:8872_8960:8960:xarray/core/dataset.py:h4",
+    "log:xarray:8872_8960:8960:xarray/core/dataset.py:h5",
+    "log:xarray:8872_8960:8960:xarray/core/dataset.py:h6",
+    "log:xarray:8872_8960:8960:xarray/core/dataset.py:h7",
+    "log:xarray:8872_8960:8960:xarray/core/dataset.py:h8"
+   ],
+   "hold_ms": 16,
+   "t_submit_epoch": 1791573544367,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "queue",
+   "admit_wait_ms": 49,
+   "outcome": "blocked",
+   "blocked_reason": "git-merge-conflict",
+   "total_ms": 90.18,
+   "t_done_epoch": 1791573544457
+  },
+  {
+   "writer": 1,
+   "pr": 8960,
+   "path": "xarray/core/dataarray.py",
+   "intents": [
+    "log:xarray:8872_8960:8960:xarray/core/dataarray.py:h0",
+    "log:xarray:8872_8960:8960:xarray/core/dataarray.py:h1",
+    "log:xarray:8872_8960:8960:xarray/core/dataarray.py:h2",
+    "log:xarray:8872_8960:8960:xarray/core/dataarray.py:h3"
+   ],
+   "hold_ms": 12,
+   "t_submit_epoch": 1791573544457,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "queue",
+   "admit_wait_ms": 7,
+   "outcome": "commit",
+   "total_ms": 38.2,
+   "t_done_epoch": 1791573544495
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 1
+ },
+ "steward_batches": null
+}

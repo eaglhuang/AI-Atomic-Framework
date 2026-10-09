@@ -1,0 +1,61 @@
+{
+ "writer": 1,
+ "pr": 26187,
+ "pid": 2236045,
+ "init_ms": 62.683208,
+ "start_offset_ms": 0,
+ "file_order": [
+  "sympy/polys/rootisolation.py",
+  "sympy/tensor/tensor.py"
+ ],
+ "holds": {
+  "sympy/polys/rootisolation.py": 17,
+  "sympy/tensor/tensor.py": 4
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 26187,
+   "path": "sympy/polys/rootisolation.py",
+   "intents": [
+    "log:sympy:25186_26187:26187:sympy/polys/rootisolation.py:h0",
+    "log:sympy:25186_26187:26187:sympy/polys/rootisolation.py:h1"
+   ],
+   "hold_ms": 17,
+   "t_submit_epoch": 1791573298985,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 13,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 35.98,
+   "t_done_epoch": 1791573299021
+  },
+  {
+   "writer": 1,
+   "pr": 26187,
+   "path": "sympy/tensor/tensor.py",
+   "intents": [
+    "log:sympy:25186_26187:26187:sympy/tensor/tensor.py:h2"
+   ],
+   "hold_ms": 4,
+   "t_submit_epoch": 1791573299021,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 14.64,
+   "t_done_epoch": 1791573299036
+  }
+ ],
+ "admit_stats": {
+  "txns": 4,
+  "cas_conflicts": 0
+ },
+ "steward_batches": null
+}

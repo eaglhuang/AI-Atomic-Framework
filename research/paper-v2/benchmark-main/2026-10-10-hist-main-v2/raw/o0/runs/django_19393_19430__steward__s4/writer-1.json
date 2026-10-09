@@ -1,0 +1,128 @@
+{
+ "writer": 1,
+ "pr": 19430,
+ "pid": 2412463,
+ "init_ms": 101.23260099999999,
+ "start_offset_ms": 20,
+ "file_order": [
+  "django/core/management/commands/inspectdb.py"
+ ],
+ "holds": {
+  "django/core/management/commands/inspectdb.py": 9
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 19430,
+   "path": "django/core/management/commands/inspectdb.py",
+   "intents": [
+    "log:django:19393_19430:19430:django/core/management/commands/inspectdb.py:h0"
+   ],
+   "hold_ms": 9,
+   "t_submit_epoch": 1791574847368,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 16,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-django_core_management_commands_inspectdb.py-w1-0001",
+   "total_ms": 121.8,
+   "t_done_epoch": 1791574847489
+  }
+ ],
+ "admit_stats": {
+  "txns": 2,
+  "cas_conflicts": 1
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-django_core_management_commands_inspectdb.py-w1-0001",
+   "path": "django/core/management/commands/inspectdb.py",
+   "pid": 2412463,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-django_core_management_commands_inspectdb_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-django_core_management_commands_inspectdb_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:4e8a308670b2b1d9b30d0c8ac6c3f0bb8351eb4f76f1f18a1fbf36c7ab602f15"
+   ],
+   "lock_wait_ms": 0.12,
+   "t_start_epoch_ms": 1791574847396.3,
+   "pre_apply_hash": "sha256:4e8a308670b2b1d9b30d0c8ac6c3f0bb8351eb4f76f1f18a1fbf36c7ab602f15",
+   "receipt_before_hash": "sha256:4e8a308670b2b1d9b30d0c8ac6c3f0bb8351eb4f76f1f18a1fbf36c7ab602f15",
+   "receipt_after_hash": "sha256:a5ead6b9dd4aab5493f1531078472c4026823c2e48e896f7d4e7efaf6a48f182",
+   "post_apply_hash": "sha256:a5ead6b9dd4aab5493f1531078472c4026823c2e48e896f7d4e7efaf6a48f182",
+   "t_end_epoch_ms": 1791574847487.12,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:40:47.487+08:00",
+   "batch_id": "cb-django_core_management_commands_inspectdb.py-w1-0001",
+   "path": "django/core/management/commands/inspectdb.py",
+   "proposalIds": [
+    "prop-hist-w1-django_core_management_commands_inspectdb_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-django_core_management_commands_inspectdb_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-django_core_management_commands_inspectdb_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-django_core_management_commands_inspectdb_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-django_core_management_commands_inspectdb_py",
+     "logical_id": "prop-hist-w1-django_core_management_commands_inspectdb_py",
+     "attempt_id": "att-prop-hist-w1-django_core_management_commands_inspectdb_py-r0",
+     "proposal_id": "prop-hist-w1-django_core_management_commands_inspectdb_py",
+     "actorId": "writer-19430"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.24,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:4e8a308670b2b1d9b30d0c8ac6c3f0bb8351eb4f76f1f18a1fbf36c7ab602f15",
+   "written": true,
+   "output_digest": "sha256:a5ead6b9dd4aab5493f1531078472c4026823c2e48e896f7d4e7efaf6a48f182",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

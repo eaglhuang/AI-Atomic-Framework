@@ -1,0 +1,84 @@
+{
+ "pair_id": "sphinx:12206_12213",
+ "stratum": "O3",
+ "arm": "steward",
+ "plant": null,
+ "seed_k": 1,
+ "seed": 2796561100,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-5692474f/AI-Atomic-Framework-5692474f7db70ab52a7a71c8af4867609e7e4b43",
+ "wall_ms": 543,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 8,
+  "by_verdict": {
+   "correct": 8
+  },
+  "completed": 8,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 1,
+  "files_full_bytes_exact": 1,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "sphinx/builders/linkcheck.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "sphinx/builders/linkcheck.py": true
+ },
+ "final_exists": {
+  "sphinx/builders/linkcheck.py": true
+ },
+ "files": [
+  {
+   "path": "sphinx/builders/linkcheck.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:b6ebc507e198d956f76bc96c9d764b9b34c8ca6c1e2754bba74d0fc1a61bfc54",
+   "final_digest": "sha256:c63c897774d9a09fa2bb52eb5161a94731855bdd34077e1ee43f155817757a45",
+   "expected_digests": [
+    "sha256:c63c897774d9a09fa2bb52eb5161a94731855bdd34077e1ee43f155817757a45"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "sphinx/builders/linkcheck.py": "sha256:c63c897774d9a09fa2bb52eb5161a94731855bdd34077e1ee43f155817757a45"
+ }
+}

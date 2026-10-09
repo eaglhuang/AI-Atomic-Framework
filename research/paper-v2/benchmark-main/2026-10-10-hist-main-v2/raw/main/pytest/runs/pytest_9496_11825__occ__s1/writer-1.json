@@ -1,0 +1,82 @@
+{
+ "writer": 1,
+ "pr": 11825,
+ "pid": 2301010,
+ "init_ms": 66.885051,
+ "start_offset_ms": 4,
+ "file_order": [
+  "src/_pytest/config/__init__.py",
+  "src/_pytest/fixtures.py",
+  "src/_pytest/hookspec.py"
+ ],
+ "holds": {
+  "src/_pytest/config/__init__.py": 28,
+  "src/_pytest/fixtures.py": 29,
+  "src/_pytest/hookspec.py": 16
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 11825,
+   "path": "src/_pytest/config/__init__.py",
+   "intents": [
+    "log:pytest:9496_11825:11825:src/_pytest/config/__init__.py:h0",
+    "log:pytest:9496_11825:11825:src/_pytest/config/__init__.py:h1",
+    "log:pytest:9496_11825:11825:src/_pytest/config/__init__.py:h2"
+   ],
+   "hold_ms": 28,
+   "t_submit_epoch": 1791574021797,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 13,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 50.78,
+   "t_done_epoch": 1791574021848
+  },
+  {
+   "writer": 1,
+   "pr": 11825,
+   "path": "src/_pytest/fixtures.py",
+   "intents": [
+    "log:pytest:9496_11825:11825:src/_pytest/fixtures.py:h3",
+    "log:pytest:9496_11825:11825:src/_pytest/fixtures.py:h4"
+   ],
+   "hold_ms": 29,
+   "t_submit_epoch": 1791574021848,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 38.92,
+   "t_done_epoch": 1791574021887
+  },
+  {
+   "writer": 1,
+   "pr": 11825,
+   "path": "src/_pytest/hookspec.py",
+   "intents": [
+    "log:pytest:9496_11825:11825:src/_pytest/hookspec.py:h5",
+    "log:pytest:9496_11825:11825:src/_pytest/hookspec.py:h6"
+   ],
+   "hold_ms": 16,
+   "t_submit_epoch": 1791574021887,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 24.77,
+   "t_done_epoch": 1791574021911
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 1
+ },
+ "steward_batches": null
+}

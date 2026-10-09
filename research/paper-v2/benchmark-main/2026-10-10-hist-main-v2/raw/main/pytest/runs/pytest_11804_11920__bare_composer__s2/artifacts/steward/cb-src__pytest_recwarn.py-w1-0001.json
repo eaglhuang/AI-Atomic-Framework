@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-64e8e622f812fd24",
+  "proposalIds": [
+    "prop-hist-w1-src_pytest_recwarn_py"
+  ],
+  "targetFiles": [
+    "src/_pytest/recwarn.py"
+  ],
+  "appliedFiles": [],
+  "fileBeforeHashes": {},
+  "fileAfterHashes": {},
+  "permissions": {
+    "fileWrite": [
+      "src/_pytest/recwarn.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "blocked",
+  "blockedReasons": [
+    "file-hash-drift: Target file hash sha256:f3f881290034fb889e468ab47c5b0680b883eb2def0dd0ffc23711bc18c0c3f9 does not match proposal fileBeforeHash sha256:cfbe4495d6114add62cdc7ee93dbe1387d2b90a097ee48535d084fc23f62bfae."
+  ],
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-64e8e622f812fd24",
+    "planId": "merge-64e8e622f812fd24",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-64e8e622f812fd24",
+        "planId": "merge-64e8e622f812fd24",
+        "request_identity": [
+          "prop-hist-w1-src_pytest_recwarn_py"
+        ],
+        "actor_ids": [
+          "writer-11920"
+        ],
+        "request_files": [
+          "src/_pytest/recwarn.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/pytest/runs/pytest_11804_11920__bare_composer__s2/artifacts/steward/cb-src__pytest_recwarn.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SRC_PYTEST_RECWARN_PY"
+        ],
+        "commit_sha": "d16d93ec0d5dc13709b13d016e5008bff4d76d74"
+      }
+    ]
+  }
+}

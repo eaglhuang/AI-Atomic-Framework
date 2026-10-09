@@ -1,0 +1,85 @@
+{
+ "writer": 1,
+ "pr": 11825,
+ "pid": 2301433,
+ "init_ms": 75.079314,
+ "start_offset_ms": 11,
+ "file_order": [
+  "src/_pytest/fixtures.py",
+  "src/_pytest/hookspec.py",
+  "src/_pytest/config/__init__.py"
+ ],
+ "holds": {
+  "src/_pytest/fixtures.py": 13,
+  "src/_pytest/hookspec.py": 22,
+  "src/_pytest/config/__init__.py": 6
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 11825,
+   "path": "src/_pytest/fixtures.py",
+   "intents": [
+    "log:pytest:9496_11825:11825:src/_pytest/fixtures.py:h3",
+    "log:pytest:9496_11825:11825:src/_pytest/fixtures.py:h4"
+   ],
+   "hold_ms": 13,
+   "t_submit_epoch": 1791574024996,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 21,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 41.42,
+   "t_done_epoch": 1791574025038
+  },
+  {
+   "writer": 1,
+   "pr": 11825,
+   "path": "src/_pytest/hookspec.py",
+   "intents": [
+    "log:pytest:9496_11825:11825:src/_pytest/hookspec.py:h5",
+    "log:pytest:9496_11825:11825:src/_pytest/hookspec.py:h6"
+   ],
+   "hold_ms": 22,
+   "t_submit_epoch": 1791574025038,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "queue",
+   "admit_wait_ms": 10,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 37.97,
+   "t_done_epoch": 1791574025076
+  },
+  {
+   "writer": 1,
+   "pr": 11825,
+   "path": "src/_pytest/config/__init__.py",
+   "intents": [
+    "log:pytest:9496_11825:11825:src/_pytest/config/__init__.py:h0",
+    "log:pytest:9496_11825:11825:src/_pytest/config/__init__.py:h1",
+    "log:pytest:9496_11825:11825:src/_pytest/config/__init__.py:h2"
+   ],
+   "hold_ms": 6,
+   "t_submit_epoch": 1791574025076,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 13.17,
+   "t_done_epoch": 1791574025089
+  }
+ ],
+ "admit_stats": {
+  "txns": 7,
+  "cas_conflicts": 2
+ },
+ "steward_batches": null
+}

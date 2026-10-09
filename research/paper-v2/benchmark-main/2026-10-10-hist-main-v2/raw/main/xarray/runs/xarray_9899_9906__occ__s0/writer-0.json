@@ -1,0 +1,87 @@
+{
+ "writer": 0,
+ "pr": 9899,
+ "pid": 2259132,
+ "init_ms": 74.415736,
+ "start_offset_ms": 15,
+ "file_order": [
+  "xarray/coding/cftime_offsets.py",
+  "xarray/coding/times.py",
+  "xarray/coding/cftimeindex.py"
+ ],
+ "holds": {
+  "xarray/coding/cftime_offsets.py": 29,
+  "xarray/coding/times.py": 28,
+  "xarray/coding/cftimeindex.py": 8
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 9899,
+   "path": "xarray/coding/cftime_offsets.py",
+   "intents": [
+    "log:xarray:9899_9906:9899:xarray/coding/cftime_offsets.py:h0",
+    "log:xarray:9899_9906:9899:xarray/coding/cftime_offsets.py:h1",
+    "log:xarray:9899_9906:9899:xarray/coding/cftime_offsets.py:h2"
+   ],
+   "hold_ms": 29,
+   "t_submit_epoch": 1791573550710,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 14,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 51.19,
+   "t_done_epoch": 1791573550761
+  },
+  {
+   "writer": 0,
+   "pr": 9899,
+   "path": "xarray/coding/times.py",
+   "intents": [
+    "log:xarray:9899_9906:9899:xarray/coding/times.py:h10"
+   ],
+   "hold_ms": 28,
+   "t_submit_epoch": 1791573550761,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "queue",
+   "admit_wait_ms": 27,
+   "outcome": "blocked",
+   "blocked_reason": "occ-relocate-context-not-found",
+   "occ_retries": 0,
+   "total_ms": 58.24,
+   "t_done_epoch": 1791573550819
+  },
+  {
+   "writer": 0,
+   "pr": 9899,
+   "path": "xarray/coding/cftimeindex.py",
+   "intents": [
+    "log:xarray:9899_9906:9899:xarray/coding/cftimeindex.py:h3",
+    "log:xarray:9899_9906:9899:xarray/coding/cftimeindex.py:h4",
+    "log:xarray:9899_9906:9899:xarray/coding/cftimeindex.py:h5",
+    "log:xarray:9899_9906:9899:xarray/coding/cftimeindex.py:h6",
+    "log:xarray:9899_9906:9899:xarray/coding/cftimeindex.py:h7",
+    "log:xarray:9899_9906:9899:xarray/coding/cftimeindex.py:h8",
+    "log:xarray:9899_9906:9899:xarray/coding/cftimeindex.py:h9"
+   ],
+   "hold_ms": 8,
+   "t_submit_epoch": 1791573550819,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 15.92,
+   "t_done_epoch": 1791573550835
+  }
+ ],
+ "admit_stats": {
+  "txns": 7,
+  "cas_conflicts": 1
+ },
+ "steward_batches": null
+}

@@ -1,0 +1,87 @@
+{
+ "pair_id": "sympy:27986_28011",
+ "stratum": "O3",
+ "arm": "steward",
+ "plant": null,
+ "seed_k": 1,
+ "seed": 3081748827,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-5692474f/AI-Atomic-Framework-5692474f7db70ab52a7a71c8af4867609e7e4b43",
+ "wall_ms": 783,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 16,
+  "by_verdict": {
+   "blocked_absent": 15,
+   "correct": 1
+  },
+  "completed": 1,
+  "lost_effects": 0,
+  "blocked": 15,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 1,
+  "files_full_bytes_exact": 1,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {
+  "canonical target base hash is stale: sympy/physics/control/lti.py": 15
+ },
+ "structure": {
+  "sympy/physics/control/lti.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "sympy/physics/control/lti.py": true
+ },
+ "final_exists": {
+  "sympy/physics/control/lti.py": true
+ },
+ "files": [
+  {
+   "path": "sympy/physics/control/lti.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:859312f91e14854165b9c2228849c2b0aceae2f4518cef0ac7f667ef71f32ec4",
+   "final_digest": "sha256:12a207eca412be301a19214bac6f6146afd030da906effb1d8118aa44ff58b11",
+   "expected_digests": [
+    "sha256:12a207eca412be301a19214bac6f6146afd030da906effb1d8118aa44ff58b11"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "sympy/physics/control/lti.py": "sha256:12a207eca412be301a19214bac6f6146afd030da906effb1d8118aa44ff58b11"
+ }
+}

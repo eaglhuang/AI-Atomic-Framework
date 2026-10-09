@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-004c0504561cd7dd",
+  "proposalIds": [
+    "prop-hist-w1-xarray_plot_facetgrid_py"
+  ],
+  "targetFiles": [
+    "xarray/plot/facetgrid.py"
+  ],
+  "appliedFiles": [
+    "xarray/plot/facetgrid.py"
+  ],
+  "fileBeforeHashes": {
+    "xarray/plot/facetgrid.py": "918c36996c0ad693b2bc77e0625e9738cc3efbdd752ad9d0bc186fa75ed8a83f"
+  },
+  "fileAfterHashes": {
+    "xarray/plot/facetgrid.py": "0e7ca549262d17f54ea8c2d1f98235b9b2f797094848efadabcb4458124f27fe"
+  },
+  "permissions": {
+    "fileWrite": [
+      "xarray/plot/facetgrid.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-004c0504561cd7dd",
+    "planId": "merge-004c0504561cd7dd",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-004c0504561cd7dd",
+        "planId": "merge-004c0504561cd7dd",
+        "request_identity": [
+          "prop-hist-w1-xarray_plot_facetgrid_py"
+        ],
+        "actor_ids": [
+          "writer-9687"
+        ],
+        "request_files": [
+          "xarray/plot/facetgrid.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "xarray/plot/facetgrid.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/xarray/runs/xarray_9677_9687__steward__s4/artifacts/steward/cb-xarray_plot_facetgrid.py-w1-0003.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-XARRAY_PLOT_FACETGRID_PY"
+        ],
+        "commit_sha": "b0488f421780c801d6e51ae1ee4785a0681fc1ad"
+      }
+    ]
+  }
+}

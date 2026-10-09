@@ -1,0 +1,67 @@
+{
+ "writer": 0,
+ "pr": 13955,
+ "pid": 2301653,
+ "init_ms": 92.71262899999999,
+ "start_offset_ms": 11,
+ "file_order": [
+  "src/_pytest/deprecated.py",
+  "src/_pytest/config/__init__.py"
+ ],
+ "holds": {
+  "src/_pytest/deprecated.py": 30,
+  "src/_pytest/config/__init__.py": 18
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 13955,
+   "path": "src/_pytest/deprecated.py",
+   "intents": [
+    "log:pytest:13955_13956:13955:src/_pytest/deprecated.py:h11"
+   ],
+   "hold_ms": 30,
+   "t_submit_epoch": 1791574026642,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 21,
+   "outcome": "blocked",
+   "blocked_reason": "git-base-drift",
+   "total_ms": 59.82,
+   "t_done_epoch": 1791574026702
+  },
+  {
+   "writer": 0,
+   "pr": 13955,
+   "path": "src/_pytest/config/__init__.py",
+   "intents": [
+    "log:pytest:13955_13956:13955:src/_pytest/config/__init__.py:h0",
+    "log:pytest:13955_13956:13955:src/_pytest/config/__init__.py:h1",
+    "log:pytest:13955_13956:13955:src/_pytest/config/__init__.py:h2",
+    "log:pytest:13955_13956:13955:src/_pytest/config/__init__.py:h3",
+    "log:pytest:13955_13956:13955:src/_pytest/config/__init__.py:h4",
+    "log:pytest:13955_13956:13955:src/_pytest/config/__init__.py:h5",
+    "log:pytest:13955_13956:13955:src/_pytest/config/__init__.py:h6",
+    "log:pytest:13955_13956:13955:src/_pytest/config/__init__.py:h7",
+    "log:pytest:13955_13956:13955:src/_pytest/config/__init__.py:h8",
+    "log:pytest:13955_13956:13955:src/_pytest/config/__init__.py:h9",
+    "log:pytest:13955_13956:13955:src/_pytest/config/__init__.py:h10"
+   ],
+   "hold_ms": 18,
+   "t_submit_epoch": 1791574026702,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "total_ms": 31.86,
+   "t_done_epoch": 1791574026734
+  }
+ ],
+ "admit_stats": {
+  "txns": 4,
+  "cas_conflicts": 1
+ },
+ "steward_batches": null
+}

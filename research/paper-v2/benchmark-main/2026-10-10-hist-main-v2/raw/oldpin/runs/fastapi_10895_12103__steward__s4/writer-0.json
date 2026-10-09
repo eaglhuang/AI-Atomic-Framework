@@ -1,0 +1,38 @@
+{
+ "writer": 0,
+ "pr": 10895,
+ "pid": 2481749,
+ "init_ms": 95.95157,
+ "start_offset_ms": 16,
+ "file_order": [
+  "fastapi/routing.py"
+ ],
+ "holds": {
+  "fastapi/routing.py": 2
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 10895,
+   "path": "fastapi/routing.py",
+   "intents": [
+    "log:fastapi:10895_12103:10895:fastapi/routing.py:h0"
+   ],
+   "hold_ms": 2,
+   "t_submit_epoch": 1791575403704,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 147,
+   "outcome": "blocked",
+   "blocked_reason": "harness-relocate-context-not-found",
+   "total_ms": 155.54,
+   "t_done_epoch": 1791575403859
+  }
+ ],
+ "admit_stats": {
+  "txns": 3,
+  "cas_conflicts": 21
+ },
+ "steward_batches": []
+}

@@ -1,0 +1,87 @@
+{
+ "pair_id": "sympy:27086_27175",
+ "stratum": "O3",
+ "arm": "steward",
+ "plant": null,
+ "seed_k": 4,
+ "seed": 3114443790,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-5692474f/AI-Atomic-Framework-5692474f7db70ab52a7a71c8af4867609e7e4b43",
+ "wall_ms": 546,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 9,
+  "by_verdict": {
+   "correct": 2,
+   "blocked_absent": 7
+  },
+  "completed": 2,
+  "lost_effects": 0,
+  "blocked": 7,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 1,
+  "files_full_bytes_exact": 1,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {
+  "file-hash-drift: Target file hash sha256": 7
+ },
+ "structure": {
+  "sympy/core/basic.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "sympy/core/basic.py": true
+ },
+ "final_exists": {
+  "sympy/core/basic.py": true
+ },
+ "files": [
+  {
+   "path": "sympy/core/basic.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:359bb7e7e0c38a12ceb63bb4f4b4e02b2a2087da1af2f10defb73a1ea03abffb",
+   "final_digest": "sha256:2d50eb7580b3556aa9e6b62b0fe9fcdd4357021dc7c56c8c018bda1ec708f5cf",
+   "expected_digests": [
+    "sha256:2d50eb7580b3556aa9e6b62b0fe9fcdd4357021dc7c56c8c018bda1ec708f5cf"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "sympy/core/basic.py": "sha256:2d50eb7580b3556aa9e6b62b0fe9fcdd4357021dc7c56c8c018bda1ec708f5cf"
+ }
+}

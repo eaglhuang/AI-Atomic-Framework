@@ -1,0 +1,64 @@
+{
+ "writer": 0,
+ "pr": 11916,
+ "pid": 2365450,
+ "init_ms": 78.092928,
+ "start_offset_ms": 6,
+ "file_order": [
+  "sphinx/util/fileutil.py",
+  "utils/babel_runner.py"
+ ],
+ "holds": {
+  "sphinx/util/fileutil.py": 10,
+  "utils/babel_runner.py": 23
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 11916,
+   "path": "sphinx/util/fileutil.py",
+   "intents": [
+    "log:sphinx:11916_12090:11916:sphinx/util/fileutil.py:h0",
+    "log:sphinx:11916_12090:11916:sphinx/util/fileutil.py:h1",
+    "log:sphinx:11916_12090:11916:sphinx/util/fileutil.py:h2"
+   ],
+   "hold_ms": 10,
+   "t_submit_epoch": 1791574531279,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 39,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 57.12,
+   "t_done_epoch": 1791574531336
+  },
+  {
+   "writer": 0,
+   "pr": 11916,
+   "path": "utils/babel_runner.py",
+   "intents": [
+    "log:sphinx:11916_12090:11916:utils/babel_runner.py:h3",
+    "log:sphinx:11916_12090:11916:utils/babel_runner.py:h4",
+    "log:sphinx:11916_12090:11916:utils/babel_runner.py:h5",
+    "log:sphinx:11916_12090:11916:utils/babel_runner.py:h6",
+    "log:sphinx:11916_12090:11916:utils/babel_runner.py:h7"
+   ],
+   "hold_ms": 23,
+   "t_submit_epoch": 1791574531336,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 5,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 40.08,
+   "t_done_epoch": 1791574531376
+  }
+ ],
+ "admit_stats": {
+  "txns": 4,
+  "cas_conflicts": 17
+ },
+ "steward_batches": null
+}

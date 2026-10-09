@@ -1,0 +1,59 @@
+{
+ "writer": 0,
+ "pr": 19395,
+ "pid": 2180598,
+ "init_ms": 66.729148,
+ "start_offset_ms": 11,
+ "file_order": [
+  "django/db/models/indexes.py",
+  "django/db/models/base.py"
+ ],
+ "holds": {
+  "django/db/models/indexes.py": 10,
+  "django/db/models/base.py": 15
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 19395,
+   "path": "django/db/models/indexes.py",
+   "intents": [
+    "log:django:19395_19445:19395:django/db/models/indexes.py:h3",
+    "log:django:19395_19445:19395:django/db/models/indexes.py:h4"
+   ],
+   "hold_ms": 10,
+   "t_submit_epoch": 1791572813576,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 19,
+   "outcome": "commit",
+   "total_ms": 42.52,
+   "t_done_epoch": 1791572813619
+  },
+  {
+   "writer": 0,
+   "pr": 19395,
+   "path": "django/db/models/base.py",
+   "intents": [
+    "log:django:19395_19445:19395:django/db/models/base.py:h0",
+    "log:django:19395_19445:19395:django/db/models/base.py:h1",
+    "log:django:19395_19445:19395:django/db/models/base.py:h2"
+   ],
+   "hold_ms": 15,
+   "t_submit_epoch": 1791572813619,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 7,
+   "outcome": "commit",
+   "total_ms": 61.24,
+   "t_done_epoch": 1791572813680
+  }
+ ],
+ "admit_stats": {
+  "txns": 4,
+  "cas_conflicts": 0
+ },
+ "steward_batches": null
+}

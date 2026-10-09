@@ -1,0 +1,350 @@
+{
+ "writer": 1,
+ "pr": 12910,
+ "pid": 2314385,
+ "init_ms": 92.39615699999999,
+ "start_offset_ms": 11,
+ "file_order": [
+  "src/_pytest/_io/pprint.py",
+  "src/_pytest/junitxml.py",
+  "src/_pytest/capture.py"
+ ],
+ "holds": {
+  "src/_pytest/_io/pprint.py": 17,
+  "src/_pytest/junitxml.py": 14,
+  "src/_pytest/capture.py": 23
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 12910,
+   "path": "src/_pytest/_io/pprint.py",
+   "intents": [
+    "log:pytest:12854_12910:12910:src/_pytest/_io/pprint.py:h0",
+    "log:pytest:12854_12910:12910:src/_pytest/_io/pprint.py:h1",
+    "log:pytest:12854_12910:12910:src/_pytest/_io/pprint.py:h2"
+   ],
+   "hold_ms": 17,
+   "t_submit_epoch": 1791574122865,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 16,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-src__pytest__io_pprint.py-w1-0001",
+   "total_ms": 141.74,
+   "t_done_epoch": 1791574123006
+  },
+  {
+   "writer": 1,
+   "pr": 12910,
+   "path": "src/_pytest/junitxml.py",
+   "intents": [
+    "log:pytest:12854_12910:12910:src/_pytest/junitxml.py:h6"
+   ],
+   "hold_ms": 14,
+   "t_submit_epoch": 1791574123006,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-src__pytest_junitxml.py-w1-0002",
+   "total_ms": 31.2,
+   "t_done_epoch": 1791574123037
+  },
+  {
+   "writer": 1,
+   "pr": 12910,
+   "path": "src/_pytest/capture.py",
+   "intents": [
+    "log:pytest:12854_12910:12910:src/_pytest/capture.py:h3",
+    "log:pytest:12854_12910:12910:src/_pytest/capture.py:h4",
+    "log:pytest:12854_12910:12910:src/_pytest/capture.py:h5"
+   ],
+   "hold_ms": 23,
+   "t_submit_epoch": 1791574123037,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 5,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-src__pytest_capture.py-w1-0003",
+   "total_ms": 43.58,
+   "t_done_epoch": 1791574123081
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 6
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-src__pytest__io_pprint.py-w1-0001",
+   "path": "src/_pytest/_io/pprint.py",
+   "pid": 2314385,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-src_pytest_io_pprint_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-src_pytest_io_pprint_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:0427bc2bb65cd1dad80b9fc9299041315ae12bce0046598fa64f6f4963d885a1"
+   ],
+   "lock_wait_ms": 0.12,
+   "t_start_epoch_ms": 1791574122900.38,
+   "pre_apply_hash": "sha256:0427bc2bb65cd1dad80b9fc9299041315ae12bce0046598fa64f6f4963d885a1",
+   "receipt_before_hash": "sha256:0427bc2bb65cd1dad80b9fc9299041315ae12bce0046598fa64f6f4963d885a1",
+   "receipt_after_hash": "sha256:918bce55c5e0ad48903721d02f99665eba8729ca0026f94b3760a64c85e47023",
+   "post_apply_hash": "sha256:918bce55c5e0ad48903721d02f99665eba8729ca0026f94b3760a64c85e47023",
+   "t_end_epoch_ms": 1791574123000.69,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:28:43.000+08:00",
+   "batch_id": "cb-src__pytest__io_pprint.py-w1-0001",
+   "path": "src/_pytest/_io/pprint.py",
+   "proposalIds": [
+    "prop-hist-w1-src_pytest_io_pprint_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-src_pytest_io_pprint_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-src_pytest_io_pprint_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-src_pytest_io_pprint_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-src_pytest_io_pprint_py",
+     "logical_id": "prop-hist-w1-src_pytest_io_pprint_py",
+     "attempt_id": "att-prop-hist-w1-src_pytest_io_pprint_py-r0",
+     "proposal_id": "prop-hist-w1-src_pytest_io_pprint_py",
+     "actorId": "writer-12910"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.24,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:0427bc2bb65cd1dad80b9fc9299041315ae12bce0046598fa64f6f4963d885a1",
+   "written": true,
+   "output_digest": "sha256:918bce55c5e0ad48903721d02f99665eba8729ca0026f94b3760a64c85e47023",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  },
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-src__pytest_junitxml.py-w1-0002",
+   "path": "src/_pytest/junitxml.py",
+   "pid": 2314385,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-src_pytest_junitxml_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-src_pytest_junitxml_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:167630ab4c004780a2c738fe6bdaa1cae954484a4cca35fd00b6e3cdafd67bbe"
+   ],
+   "lock_wait_ms": 0,
+   "t_start_epoch_ms": 1791574123024.61,
+   "pre_apply_hash": "sha256:167630ab4c004780a2c738fe6bdaa1cae954484a4cca35fd00b6e3cdafd67bbe",
+   "receipt_before_hash": "sha256:167630ab4c004780a2c738fe6bdaa1cae954484a4cca35fd00b6e3cdafd67bbe",
+   "receipt_after_hash": "sha256:1a6732a3bec5ccbb306938da5b1b0305a1fe6a86ffe353f9017629212cacdc37",
+   "post_apply_hash": "sha256:1a6732a3bec5ccbb306938da5b1b0305a1fe6a86ffe353f9017629212cacdc37",
+   "t_end_epoch_ms": 1791574123034.36,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:28:43.034+08:00",
+   "batch_id": "cb-src__pytest_junitxml.py-w1-0002",
+   "path": "src/_pytest/junitxml.py",
+   "proposalIds": [
+    "prop-hist-w1-src_pytest_junitxml_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-src_pytest_junitxml_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-src_pytest_junitxml_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-src_pytest_junitxml_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-src_pytest_junitxml_py",
+     "logical_id": "prop-hist-w1-src_pytest_junitxml_py",
+     "attempt_id": "att-prop-hist-w1-src_pytest_junitxml_py-r0",
+     "proposal_id": "prop-hist-w1-src_pytest_junitxml_py",
+     "actorId": "writer-12910"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.01,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:167630ab4c004780a2c738fe6bdaa1cae954484a4cca35fd00b6e3cdafd67bbe",
+   "written": true,
+   "output_digest": "sha256:1a6732a3bec5ccbb306938da5b1b0305a1fe6a86ffe353f9017629212cacdc37",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  },
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-src__pytest_capture.py-w1-0003",
+   "path": "src/_pytest/capture.py",
+   "pid": 2314385,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-src_pytest_capture_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-src_pytest_capture_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:a2d5914d25d7752295fa068dc60e7fcebf07b0902f7981be8201ad44730adbcc"
+   ],
+   "lock_wait_ms": 0,
+   "t_start_epoch_ms": 1791574123068.26,
+   "pre_apply_hash": "sha256:a2d5914d25d7752295fa068dc60e7fcebf07b0902f7981be8201ad44730adbcc",
+   "receipt_before_hash": "sha256:a2d5914d25d7752295fa068dc60e7fcebf07b0902f7981be8201ad44730adbcc",
+   "receipt_after_hash": "sha256:edb4f9782489526ee8077760fd56cff038eda8b18ebdd6c01771502b58e3d067",
+   "post_apply_hash": "sha256:edb4f9782489526ee8077760fd56cff038eda8b18ebdd6c01771502b58e3d067",
+   "t_end_epoch_ms": 1791574123078.13,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:28:43.078+08:00",
+   "batch_id": "cb-src__pytest_capture.py-w1-0003",
+   "path": "src/_pytest/capture.py",
+   "proposalIds": [
+    "prop-hist-w1-src_pytest_capture_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-src_pytest_capture_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-src_pytest_capture_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-src_pytest_capture_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-src_pytest_capture_py",
+     "logical_id": "prop-hist-w1-src_pytest_capture_py",
+     "attempt_id": "att-prop-hist-w1-src_pytest_capture_py-r0",
+     "proposal_id": "prop-hist-w1-src_pytest_capture_py",
+     "actorId": "writer-12910"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.01,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:a2d5914d25d7752295fa068dc60e7fcebf07b0902f7981be8201ad44730adbcc",
+   "written": true,
+   "output_digest": "sha256:edb4f9782489526ee8077760fd56cff038eda8b18ebdd6c01771502b58e3d067",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-c5677c3fdcd35dbe",
+  "proposalIds": [
+    "prop-hist-w0-sphinx_roles_py"
+  ],
+  "targetFiles": [
+    "sphinx/roles.py"
+  ],
+  "appliedFiles": [
+    "sphinx/roles.py"
+  ],
+  "fileBeforeHashes": {
+    "sphinx/roles.py": "d12bc665159b5bb5811013c86ac9f152e125c263a207d25adc55e8318616b8d4"
+  },
+  "fileAfterHashes": {
+    "sphinx/roles.py": "c97680057dd7fbc656239a245ebbc84c0bf1500270ac81a7f1195b95f75520e1"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sphinx/roles.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-c5677c3fdcd35dbe",
+    "planId": "merge-c5677c3fdcd35dbe",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-c5677c3fdcd35dbe",
+        "planId": "merge-c5677c3fdcd35dbe",
+        "request_identity": [
+          "prop-hist-w0-sphinx_roles_py"
+        ],
+        "actor_ids": [
+          "writer-11781"
+        ],
+        "request_files": [
+          "sphinx/roles.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sphinx/roles.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/sphinx/runs/sphinx_11781_12132__steward__s4/artifacts/steward/cb-sphinx_roles.py-w0-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SPHINX_ROLES_PY"
+        ],
+        "commit_sha": "60754a562427a9d6da2537d809b0abb3d65dc499"
+      }
+    ]
+  }
+}

@@ -1,0 +1,82 @@
+{
+ "writer": 0,
+ "pr": 19753,
+ "pid": 2176430,
+ "init_ms": 71.929372,
+ "start_offset_ms": 19,
+ "file_order": [
+  "django/db/models/base.py",
+  "django/conf/global_settings.py",
+  "django/db/backends/postgresql/features.py"
+ ],
+ "holds": {
+  "django/db/models/base.py": 17,
+  "django/conf/global_settings.py": 8,
+  "django/db/backends/postgresql/features.py": 17
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 19753,
+   "path": "django/db/models/base.py",
+   "intents": [
+    "log:django:19753_19798:19753:django/db/models/base.py:h2",
+    "log:django:19753_19798:19753:django/db/models/base.py:h3"
+   ],
+   "hold_ms": 17,
+   "t_submit_epoch": 1791572780023,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 16,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 40.59,
+   "t_done_epoch": 1791572780064
+  },
+  {
+   "writer": 0,
+   "pr": 19753,
+   "path": "django/conf/global_settings.py",
+   "intents": [
+    "log:django:19753_19798:19753:django/conf/global_settings.py:h0"
+   ],
+   "hold_ms": 8,
+   "t_submit_epoch": 1791572780064,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 5,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 16.38,
+   "t_done_epoch": 1791572780080
+  },
+  {
+   "writer": 0,
+   "pr": 19753,
+   "path": "django/db/backends/postgresql/features.py",
+   "intents": [
+    "log:django:19753_19798:19753:django/db/backends/postgresql/features.py:h1"
+   ],
+   "hold_ms": 17,
+   "t_submit_epoch": 1791572780080,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 22.3,
+   "t_done_epoch": 1791572780103
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 1
+ },
+ "steward_batches": null
+}

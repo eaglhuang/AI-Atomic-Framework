@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-07cc42c497002d80",
+  "proposalIds": [
+    "prop-hist-w0-sphinx_directives_admonitions_py"
+  ],
+  "targetFiles": [
+    "sphinx/directives/admonitions.py"
+  ],
+  "appliedFiles": [],
+  "fileBeforeHashes": {},
+  "fileAfterHashes": {},
+  "permissions": {
+    "fileWrite": [
+      "sphinx/directives/admonitions.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "blocked",
+  "blockedReasons": [
+    "file-hash-drift: Target file does not exist: sphinx/directives/admonitions.py"
+  ],
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-07cc42c497002d80",
+    "planId": "merge-07cc42c497002d80",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-07cc42c497002d80",
+        "planId": "merge-07cc42c497002d80",
+        "request_identity": [
+          "prop-hist-w0-sphinx_directives_admonitions_py"
+        ],
+        "actor_ids": [
+          "writer-12507"
+        ],
+        "request_files": [
+          "sphinx/directives/admonitions.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/sphinx/runs/sphinx_12507_12720__steward__s1/artifacts/steward/cb-sphinx_directives_admonitions.py-w0-0004.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SPHINX_DIRECTIVES_ADMONITIONS_PY"
+        ],
+        "commit_sha": "617f23e1892820395ccf7fe481e4f23f4e0e9817"
+      }
+    ]
+  }
+}

@@ -1,0 +1,87 @@
+{
+ "pair_id": "fastapi:10240_11099",
+ "stratum": "O3",
+ "arm": "steward",
+ "plant": null,
+ "seed_k": 2,
+ "seed": 4148654971,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-5692474f/AI-Atomic-Framework-5692474f7db70ab52a7a71c8af4867609e7e4b43",
+ "wall_ms": 563,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 2,
+  "by_verdict": {
+   "correct": 1,
+   "blocked_absent": 1
+  },
+  "completed": 1,
+  "lost_effects": 0,
+  "blocked": 1,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 1,
+  "files_full_bytes_exact": 1,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {
+  "canonical target base hash is stale: fastapi/applications.py": 1
+ },
+ "structure": {
+  "fastapi/applications.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "fastapi/applications.py": true
+ },
+ "final_exists": {
+  "fastapi/applications.py": true
+ },
+ "files": [
+  {
+   "path": "fastapi/applications.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:9d4a12cf42e189fdfdbc0c3d2804f3147d978f3ef791fb4e3028b0abaa2c35f8",
+   "final_digest": "sha256:ca1447a8a22f989f13affd7b04316616f1d5e710aa7385d9e1642df0aae5df41",
+   "expected_digests": [
+    "sha256:ca1447a8a22f989f13affd7b04316616f1d5e710aa7385d9e1642df0aae5df41"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "fastapi/applications.py": "sha256:ca1447a8a22f989f13affd7b04316616f1d5e710aa7385d9e1642df0aae5df41"
+ }
+}

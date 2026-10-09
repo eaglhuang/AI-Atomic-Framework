@@ -1,0 +1,102 @@
+{
+ "writer": 0,
+ "pr": 11842,
+ "pid": 2330288,
+ "init_ms": 105.67497300000002,
+ "start_offset_ms": 4,
+ "file_order": [
+  "sphinx/ext/autodoc/importer.py",
+  "sphinx/environment/collectors/toctree.py",
+  "sphinx/jinja2glue.py",
+  "sphinx/ext/napoleon/docstring.py"
+ ],
+ "holds": {
+  "sphinx/ext/autodoc/importer.py": 29,
+  "sphinx/environment/collectors/toctree.py": 26,
+  "sphinx/jinja2glue.py": 28,
+  "sphinx/ext/napoleon/docstring.py": 10
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 11842,
+   "path": "sphinx/ext/autodoc/importer.py",
+   "intents": [
+    "log:sphinx:11842_11843:11842:sphinx/ext/autodoc/importer.py:h1"
+   ],
+   "hold_ms": 29,
+   "t_submit_epoch": 1791574241550,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 20,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 55.14,
+   "t_done_epoch": 1791574241605
+  },
+  {
+   "writer": 0,
+   "pr": 11842,
+   "path": "sphinx/environment/collectors/toctree.py",
+   "intents": [
+    "log:sphinx:11842_11843:11842:sphinx/environment/collectors/toctree.py:h0"
+   ],
+   "hold_ms": 26,
+   "t_submit_epoch": 1791574241605,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 5,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 34.56,
+   "t_done_epoch": 1791574241639
+  },
+  {
+   "writer": 0,
+   "pr": 11842,
+   "path": "sphinx/jinja2glue.py",
+   "intents": [
+    "log:sphinx:11842_11843:11842:sphinx/jinja2glue.py:h3"
+   ],
+   "hold_ms": 28,
+   "t_submit_epoch": 1791574241639,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 38.71,
+   "t_done_epoch": 1791574241678
+  },
+  {
+   "writer": 0,
+   "pr": 11842,
+   "path": "sphinx/ext/napoleon/docstring.py",
+   "intents": [
+    "log:sphinx:11842_11843:11842:sphinx/ext/napoleon/docstring.py:h2"
+   ],
+   "hold_ms": 10,
+   "t_submit_epoch": 1791574241678,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "lock_spins": 0,
+   "outcome": "blocked",
+   "blocked_reason": "harness-relocate-context-not-found",
+   "total_ms": 16.39,
+   "t_done_epoch": 1791574241695
+  }
+ ],
+ "admit_stats": {
+  "txns": 8,
+  "cas_conflicts": 0
+ },
+ "steward_batches": null
+}

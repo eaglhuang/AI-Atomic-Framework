@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-fca0f4b62c133d6e",
+  "proposalIds": [
+    "prop-hist-w0-src_pytest_stepwise_py"
+  ],
+  "targetFiles": [
+    "src/_pytest/stepwise.py"
+  ],
+  "appliedFiles": [
+    "src/_pytest/stepwise.py"
+  ],
+  "fileBeforeHashes": {
+    "src/_pytest/stepwise.py": "59d3eac6b88d19e9eff7bb9ede7080a0f83912d8d137c7429a2d7184c36b343e"
+  },
+  "fileAfterHashes": {
+    "src/_pytest/stepwise.py": "958166ea4834d349ff58418e110021a348fa75108a26f80acf561ad99cfed197"
+  },
+  "permissions": {
+    "fileWrite": [
+      "src/_pytest/stepwise.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-fca0f4b62c133d6e",
+    "planId": "merge-fca0f4b62c133d6e",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-fca0f4b62c133d6e",
+        "planId": "merge-fca0f4b62c133d6e",
+        "request_identity": [
+          "prop-hist-w0-src_pytest_stepwise_py"
+        ],
+        "actor_ids": [
+          "writer-12706"
+        ],
+        "request_files": [
+          "src/_pytest/stepwise.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "src/_pytest/stepwise.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/pytest/runs/pytest_12706_12769__steward__s3/artifacts/steward/cb-src__pytest_stepwise.py-w0-0003.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SRC_PYTEST_STEPWISE_PY"
+        ],
+        "commit_sha": "dfca8654e509c670bf5d948a905eac4f6eb1e6f0"
+      }
+    ]
+  }
+}

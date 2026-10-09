@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-9e96095aa81fb5d6",
+  "proposalIds": [
+    "prop-hist-w1-src_pytest_unraisableexception_py"
+  ],
+  "targetFiles": [
+    "src/_pytest/unraisableexception.py"
+  ],
+  "appliedFiles": [
+    "src/_pytest/unraisableexception.py"
+  ],
+  "fileBeforeHashes": {
+    "src/_pytest/unraisableexception.py": "14cd3fbcb6a54479ca08ec3b2f9f4ab023e9a9727b03795f2b7c4d5e9e90dbcd"
+  },
+  "fileAfterHashes": {
+    "src/_pytest/unraisableexception.py": "74d681a411e4381e293884a868c75abb6a23ac6a1cfe2e2ec7be835572cb4fec"
+  },
+  "permissions": {
+    "fileWrite": [
+      "src/_pytest/unraisableexception.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-9e96095aa81fb5d6",
+    "planId": "merge-9e96095aa81fb5d6",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-9e96095aa81fb5d6",
+        "planId": "merge-9e96095aa81fb5d6",
+        "request_identity": [
+          "prop-hist-w1-src_pytest_unraisableexception_py"
+        ],
+        "actor_ids": [
+          "writer-13525"
+        ],
+        "request_files": [
+          "src/_pytest/unraisableexception.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "src/_pytest/unraisableexception.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/pytest/runs/pytest_13522_13525__steward__s0/artifacts/steward/cb-src__pytest_unraisableexception.py-w1-0002.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SRC_PYTEST_UNRAISABLEEXCEPTION_PY"
+        ],
+        "commit_sha": "a2158b7497c6cc2d3a16a4541e685485467b1dd5"
+      }
+    ]
+  }
+}

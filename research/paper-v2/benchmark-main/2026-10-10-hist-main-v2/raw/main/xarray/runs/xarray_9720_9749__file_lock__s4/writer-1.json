@@ -1,0 +1,82 @@
+{
+ "writer": 1,
+ "pr": 9749,
+ "pid": 2288636,
+ "init_ms": 68.76346000000001,
+ "start_offset_ms": 19,
+ "file_order": [
+  "xarray/core/variable.py",
+  "xarray/core/parallel.py",
+  "xarray/conventions.py"
+ ],
+ "holds": {
+  "xarray/core/variable.py": 16,
+  "xarray/core/parallel.py": 19,
+  "xarray/conventions.py": 23
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 9749,
+   "path": "xarray/core/variable.py",
+   "intents": [
+    "log:xarray:9720_9749:9749:xarray/core/variable.py:h2",
+    "log:xarray:9720_9749:9749:xarray/core/variable.py:h3"
+   ],
+   "hold_ms": 16,
+   "t_submit_epoch": 1791573912840,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 17,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 40.28,
+   "t_done_epoch": 1791573912881
+  },
+  {
+   "writer": 1,
+   "pr": 9749,
+   "path": "xarray/core/parallel.py",
+   "intents": [
+    "log:xarray:9720_9749:9749:xarray/core/parallel.py:h1"
+   ],
+   "hold_ms": 19,
+   "t_submit_epoch": 1791573912881,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 28.14,
+   "t_done_epoch": 1791573912909
+  },
+  {
+   "writer": 1,
+   "pr": 9749,
+   "path": "xarray/conventions.py",
+   "intents": [
+    "log:xarray:9720_9749:9749:xarray/conventions.py:h0"
+   ],
+   "hold_ms": 23,
+   "t_submit_epoch": 1791573912909,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 29.95,
+   "t_done_epoch": 1791573912939
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 9
+ },
+ "steward_batches": null
+}

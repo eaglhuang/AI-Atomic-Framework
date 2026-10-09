@@ -1,0 +1,126 @@
+{
+ "writer": 0,
+ "pr": 27183,
+ "pid": 2227569,
+ "init_ms": 78.94796500000001,
+ "start_offset_ms": 6,
+ "file_order": [
+  "release/compare_tar_against_git.py"
+ ],
+ "holds": {
+  "release/compare_tar_against_git.py": 23
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 27183,
+   "path": "release/compare_tar_against_git.py",
+   "intents": [
+    "log:sympy:27183_27187:27183:release/compare_tar_against_git.py:h0",
+    "log:sympy:27183_27187:27183:release/compare_tar_against_git.py:h1"
+   ],
+   "hold_ms": 23,
+   "t_submit_epoch": 1791573221347,
+   "outcome": "blocked",
+   "blocked_reason": "compose-context-mismatch: proposal 'prop-hist-w0-release_compare_tar_against_git_py' context mismatch at base line 98: expected \"    'bin/mailmap_check.py',\", found \"    'bin/test_sphinx.sh',\" [proposals: prop-hist-w0-release_compare_tar_against_git_py]",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w0-release_compare_tar_against_git_py' context mismatch at base line 98: expected \"    'bin/mailmap_check.py',\", found \"    'bin/test_sphinx.sh',\" [proposals: prop-hist-w0-release_compare_tar_against_git_py]"
+   ],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-release_compare_tar_against_git.py-w0-0001",
+   "total_ms": 123.27,
+   "t_done_epoch": 1791573221470
+  }
+ ],
+ "admit_stats": null,
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-release_compare_tar_against_git.py-w0-0001",
+   "path": "release/compare_tar_against_git.py",
+   "pid": 2227569,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-release_compare_tar_against_git_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-release_compare_tar_against_git_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:912a5cf7766ba5b58d70b22adf599e661afde951a613c340bf0b7bc95a13d400"
+   ],
+   "lock_wait_ms": 0.12,
+   "t_start_epoch_ms": 1791573221372.03,
+   "pre_apply_hash": "sha256:912a5cf7766ba5b58d70b22adf599e661afde951a613c340bf0b7bc95a13d400",
+   "receipt_before_hash": null,
+   "receipt_after_hash": null,
+   "post_apply_hash": "sha256:c46738df50fbb16b75eed0f993d05f5207fbc6b56076d1be855b0d38945dbd96",
+   "t_end_epoch_ms": 1791573221470.36,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "blocked",
+   "written": false,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:13:41.470+08:00",
+   "batch_id": "cb-release_compare_tar_against_git.py-w0-0001",
+   "path": "release/compare_tar_against_git.py",
+   "proposalIds": [
+    "prop-hist-w0-release_compare_tar_against_git_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-release_compare_tar_against_git_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-release_compare_tar_against_git_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-release_compare_tar_against_git_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-release_compare_tar_against_git_py",
+     "logical_id": "prop-hist-w0-release_compare_tar_against_git_py",
+     "attempt_id": "att-prop-hist-w0-release_compare_tar_against_git_py-r0",
+     "proposal_id": "prop-hist-w0-release_compare_tar_against_git_py",
+     "actorId": "writer-27183"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w0-release_compare_tar_against_git_py' context mismatch at base line 98: expected \"    'bin/mailmap_check.py',\", found \"    'bin/test_sphinx.sh',\" [proposals: prop-hist-w0-release_compare_tar_against_git_py]"
+   ],
+   "blocked_reason": "compose-context-mismatch: proposal 'prop-hist-w0-release_compare_tar_against_git_py' context mismatch at base line 98: expected \"    'bin/mailmap_check.py',\", found \"    'bin/test_sphinx.sh',\" [proposals: prop-hist-w0-release_compare_tar_against_git_py]",
+   "window_wait_ms": 0.29,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:912a5cf7766ba5b58d70b22adf599e661afde951a613c340bf0b7bc95a13d400",
+   "written": false,
+   "output_digest": null,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "compose-context-mismatch: proposal 'prop-hist-w0-release_compare_tar_against_git_py' context mismatch at base line 98: expected \"    'bin/mailmap_check.py',\", found \"    'bin/test_sphinx.sh',\" [proposals: prop-hist-w0-release_compare_tar_against_git_py]"
+  }
+ ]
+}

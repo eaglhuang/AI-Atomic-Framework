@@ -1,0 +1,85 @@
+{
+ "writer": 1,
+ "pr": 12910,
+ "pid": 2314109,
+ "init_ms": 62.375189,
+ "start_offset_ms": 8,
+ "file_order": [
+  "src/_pytest/capture.py",
+  "src/_pytest/_io/pprint.py",
+  "src/_pytest/junitxml.py"
+ ],
+ "holds": {
+  "src/_pytest/capture.py": 24,
+  "src/_pytest/_io/pprint.py": 28,
+  "src/_pytest/junitxml.py": 26
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 12910,
+   "path": "src/_pytest/capture.py",
+   "intents": [
+    "log:pytest:12854_12910:12910:src/_pytest/capture.py:h3",
+    "log:pytest:12854_12910:12910:src/_pytest/capture.py:h4",
+    "log:pytest:12854_12910:12910:src/_pytest/capture.py:h5"
+   ],
+   "hold_ms": 24,
+   "t_submit_epoch": 1791574120790,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 15,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 49.42,
+   "t_done_epoch": 1791574120839
+  },
+  {
+   "writer": 1,
+   "pr": 12910,
+   "path": "src/_pytest/_io/pprint.py",
+   "intents": [
+    "log:pytest:12854_12910:12910:src/_pytest/_io/pprint.py:h0",
+    "log:pytest:12854_12910:12910:src/_pytest/_io/pprint.py:h1",
+    "log:pytest:12854_12910:12910:src/_pytest/_io/pprint.py:h2"
+   ],
+   "hold_ms": 28,
+   "t_submit_epoch": 1791574120839,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 8,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 41.38,
+   "t_done_epoch": 1791574120881
+  },
+  {
+   "writer": 1,
+   "pr": 12910,
+   "path": "src/_pytest/junitxml.py",
+   "intents": [
+    "log:pytest:12854_12910:12910:src/_pytest/junitxml.py:h6"
+   ],
+   "hold_ms": 26,
+   "t_submit_epoch": 1791574120881,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 34.09,
+   "t_done_epoch": 1791574120915
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 0
+ },
+ "steward_batches": null
+}

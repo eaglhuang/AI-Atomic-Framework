@@ -1,0 +1,62 @@
+{
+ "writer": 1,
+ "pr": 12098,
+ "pid": 2388281,
+ "init_ms": 89.536311,
+ "start_offset_ms": 17,
+ "file_order": [
+  "fastapi/dependencies/utils.py",
+  "fastapi/dependencies/models.py"
+ ],
+ "holds": {
+  "fastapi/dependencies/utils.py": 29,
+  "fastapi/dependencies/models.py": 1
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 12098,
+   "path": "fastapi/dependencies/utils.py",
+   "intents": [
+    "log:fastapi:5077_12098:12098:fastapi/dependencies/utils.py:h5"
+   ],
+   "hold_ms": 29,
+   "t_submit_epoch": 1791574692261,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 16,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 50.14,
+   "t_done_epoch": 1791574692311
+  },
+  {
+   "writer": 1,
+   "pr": 12098,
+   "path": "fastapi/dependencies/models.py",
+   "intents": [
+    "log:fastapi:5077_12098:12098:fastapi/dependencies/models.py:h0",
+    "log:fastapi:5077_12098:12098:fastapi/dependencies/models.py:h1",
+    "log:fastapi:5077_12098:12098:fastapi/dependencies/models.py:h2",
+    "log:fastapi:5077_12098:12098:fastapi/dependencies/models.py:h3",
+    "log:fastapi:5077_12098:12098:fastapi/dependencies/models.py:h4"
+   ],
+   "hold_ms": 1,
+   "t_submit_epoch": 1791574692311,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 7.36,
+   "t_done_epoch": 1791574692318
+  }
+ ],
+ "admit_stats": {
+  "txns": 4,
+  "cas_conflicts": 0
+ },
+ "steward_batches": null
+}

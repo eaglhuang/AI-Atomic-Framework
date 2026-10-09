@@ -1,0 +1,106 @@
+{
+ "pair_id": "pytest:12716_12752",
+ "stratum": "O2",
+ "arm": "git_three_way",
+ "plant": null,
+ "seed_k": 4,
+ "seed": 2152648267,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 415,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 12,
+  "by_verdict": {
+   "correct": 12
+  },
+  "completed": 12,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 2,
+  "files_full_bytes_exact": 2,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "src/_pytest/assertion/rewrite.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "src/_pytest/pathlib.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "src/_pytest/assertion/rewrite.py": true,
+  "src/_pytest/pathlib.py": true
+ },
+ "final_exists": {
+  "src/_pytest/assertion/rewrite.py": true,
+  "src/_pytest/pathlib.py": true
+ },
+ "files": [
+  {
+   "path": "src/_pytest/assertion/rewrite.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:1bdde7e89f2095659357ad9ba1a273765a8dd4f9ed2fb17a38f7a8cb9eab2d94",
+   "final_digest": "sha256:1d5e80b9f1d5bbb780a752b568760495a25b61601090caffa4c1153b964a4bdc",
+   "expected_digests": [
+    "sha256:1d5e80b9f1d5bbb780a752b568760495a25b61601090caffa4c1153b964a4bdc"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "src/_pytest/pathlib.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:86c7973c034a5e778f6dd153f99d0723f24638a42249199aca547e6e99deaa94",
+   "final_digest": "sha256:a275e830ca3871ba7e0d1d375d0b918a6b889bf0eb1cd83746e8f03f867bb627",
+   "expected_digests": [
+    "sha256:a275e830ca3871ba7e0d1d375d0b918a6b889bf0eb1cd83746e8f03f867bb627"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "src/_pytest/assertion/rewrite.py": "sha256:1d5e80b9f1d5bbb780a752b568760495a25b61601090caffa4c1153b964a4bdc",
+  "src/_pytest/pathlib.py": "sha256:a275e830ca3871ba7e0d1d375d0b918a6b889bf0eb1cd83746e8f03f867bb627"
+ }
+}

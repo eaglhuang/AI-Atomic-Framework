@@ -1,0 +1,128 @@
+{
+ "pair_id": "pytest:12854_12910",
+ "stratum": "O3",
+ "arm": "steward",
+ "plant": null,
+ "seed_k": 2,
+ "seed": 3977793786,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 472,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 11,
+  "by_verdict": {
+   "correct": 11
+  },
+  "completed": 11,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 3,
+  "files_full_bytes_exact": 3,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "src/_pytest/_io/pprint.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "src/_pytest/capture.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "src/_pytest/junitxml.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "src/_pytest/_io/pprint.py": true,
+  "src/_pytest/capture.py": true,
+  "src/_pytest/junitxml.py": true
+ },
+ "final_exists": {
+  "src/_pytest/_io/pprint.py": true,
+  "src/_pytest/capture.py": true,
+  "src/_pytest/junitxml.py": true
+ },
+ "files": [
+  {
+   "path": "src/_pytest/_io/pprint.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:0427bc2bb65cd1dad80b9fc9299041315ae12bce0046598fa64f6f4963d885a1",
+   "final_digest": "sha256:918bce55c5e0ad48903721d02f99665eba8729ca0026f94b3760a64c85e47023",
+   "expected_digests": [
+    "sha256:918bce55c5e0ad48903721d02f99665eba8729ca0026f94b3760a64c85e47023"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "src/_pytest/capture.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:8a2bbf939ff40126c8352e7fa3b671312846696645403fb2ee3b54f8d889b4cb",
+   "final_digest": "sha256:edb4f9782489526ee8077760fd56cff038eda8b18ebdd6c01771502b58e3d067",
+   "expected_digests": [
+    "sha256:edb4f9782489526ee8077760fd56cff038eda8b18ebdd6c01771502b58e3d067"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "src/_pytest/junitxml.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:167630ab4c004780a2c738fe6bdaa1cae954484a4cca35fd00b6e3cdafd67bbe",
+   "final_digest": "sha256:1a6732a3bec5ccbb306938da5b1b0305a1fe6a86ffe353f9017629212cacdc37",
+   "expected_digests": [
+    "sha256:1a6732a3bec5ccbb306938da5b1b0305a1fe6a86ffe353f9017629212cacdc37"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "src/_pytest/_io/pprint.py": "sha256:918bce55c5e0ad48903721d02f99665eba8729ca0026f94b3760a64c85e47023",
+  "src/_pytest/capture.py": "sha256:edb4f9782489526ee8077760fd56cff038eda8b18ebdd6c01771502b58e3d067",
+  "src/_pytest/junitxml.py": "sha256:1a6732a3bec5ccbb306938da5b1b0305a1fe6a86ffe353f9017629212cacdc37"
+ }
+}

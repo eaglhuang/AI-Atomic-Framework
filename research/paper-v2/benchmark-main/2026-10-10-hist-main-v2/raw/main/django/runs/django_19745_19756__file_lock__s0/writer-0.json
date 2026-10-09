@@ -1,0 +1,164 @@
+{
+ "writer": 0,
+ "pr": 19745,
+ "pid": 2166459,
+ "init_ms": 136.973589,
+ "start_offset_ms": 8,
+ "file_order": [
+  "django/middleware/csrf.py",
+  "django/contrib/auth/__init__.py",
+  "django/contrib/auth/tokens.py",
+  "django/utils/crypto.py",
+  "django/contrib/auth/hashers.py",
+  "django/core/signing.py"
+ ],
+ "holds": {
+  "django/middleware/csrf.py": 21,
+  "django/contrib/auth/__init__.py": 29,
+  "django/contrib/auth/tokens.py": 5,
+  "django/utils/crypto.py": 20,
+  "django/contrib/auth/hashers.py": 1,
+  "django/core/signing.py": 25
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 19745,
+   "path": "django/middleware/csrf.py",
+   "intents": [
+    "log:django:19745_19756:19745:django/middleware/csrf.py:h20",
+    "log:django:19745_19756:19745:django/middleware/csrf.py:h21",
+    "log:django:19745_19756:19745:django/middleware/csrf.py:h22"
+   ],
+   "hold_ms": 21,
+   "t_submit_epoch": 1791572704374,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 14,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 41.11,
+   "t_done_epoch": 1791572704415
+  },
+  {
+   "writer": 0,
+   "pr": 19745,
+   "path": "django/contrib/auth/__init__.py",
+   "intents": [
+    "log:django:19745_19756:19745:django/contrib/auth/__init__.py:h0",
+    "log:django:19745_19756:19745:django/contrib/auth/__init__.py:h1",
+    "log:django:19745_19756:19745:django/contrib/auth/__init__.py:h2",
+    "log:django:19745_19756:19745:django/contrib/auth/__init__.py:h3",
+    "log:django:19745_19756:19745:django/contrib/auth/__init__.py:h4",
+    "log:django:19745_19756:19745:django/contrib/auth/__init__.py:h5",
+    "log:django:19745_19756:19745:django/contrib/auth/__init__.py:h6",
+    "log:django:19745_19756:19745:django/contrib/auth/__init__.py:h7"
+   ],
+   "hold_ms": 29,
+   "t_submit_epoch": 1791572704415,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "queue",
+   "admit_wait_ms": 20,
+   "lock_spins": 0,
+   "outcome": "blocked",
+   "blocked_reason": "harness-relocate-context-not-found",
+   "total_ms": 269.43,
+   "t_done_epoch": 1791572704685
+  },
+  {
+   "writer": 0,
+   "pr": 19745,
+   "path": "django/contrib/auth/tokens.py",
+   "intents": [
+    "log:django:19745_19756:19745:django/contrib/auth/tokens.py:h14",
+    "log:django:19745_19756:19745:django/contrib/auth/tokens.py:h15",
+    "log:django:19745_19756:19745:django/contrib/auth/tokens.py:h16"
+   ],
+   "hold_ms": 5,
+   "t_submit_epoch": 1791572704685,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 10.82,
+   "t_done_epoch": 1791572704695
+  },
+  {
+   "writer": 0,
+   "pr": 19745,
+   "path": "django/utils/crypto.py",
+   "intents": [
+    "log:django:19745_19756:19745:django/utils/crypto.py:h23",
+    "log:django:19745_19756:19745:django/utils/crypto.py:h24",
+    "log:django:19745_19756:19745:django/utils/crypto.py:h25"
+   ],
+   "hold_ms": 20,
+   "t_submit_epoch": 1791572704696,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 25.63,
+   "t_done_epoch": 1791572704721
+  },
+  {
+   "writer": 0,
+   "pr": 19745,
+   "path": "django/contrib/auth/hashers.py",
+   "intents": [
+    "log:django:19745_19756:19745:django/contrib/auth/hashers.py:h8",
+    "log:django:19745_19756:19745:django/contrib/auth/hashers.py:h9",
+    "log:django:19745_19756:19745:django/contrib/auth/hashers.py:h10",
+    "log:django:19745_19756:19745:django/contrib/auth/hashers.py:h11",
+    "log:django:19745_19756:19745:django/contrib/auth/hashers.py:h12",
+    "log:django:19745_19756:19745:django/contrib/auth/hashers.py:h13"
+   ],
+   "hold_ms": 1,
+   "t_submit_epoch": 1791572704721,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 5.98,
+   "t_done_epoch": 1791572704727
+  },
+  {
+   "writer": 0,
+   "pr": 19745,
+   "path": "django/core/signing.py",
+   "intents": [
+    "log:django:19745_19756:19745:django/core/signing.py:h17",
+    "log:django:19745_19756:19745:django/core/signing.py:h18",
+    "log:django:19745_19756:19745:django/core/signing.py:h19"
+   ],
+   "hold_ms": 25,
+   "t_submit_epoch": 1791572704727,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 31,
+   "t_done_epoch": 1791572704758
+  }
+ ],
+ "admit_stats": {
+  "txns": 13,
+  "cas_conflicts": 0
+ },
+ "steward_batches": null
+}

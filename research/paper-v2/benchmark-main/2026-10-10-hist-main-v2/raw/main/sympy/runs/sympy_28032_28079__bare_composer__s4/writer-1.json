@@ -1,0 +1,137 @@
+{
+ "writer": 1,
+ "pr": 28079,
+ "pid": 2212555,
+ "init_ms": 78.79109399999999,
+ "start_offset_ms": 3,
+ "file_order": [
+  "sympy/printing/pytorch.py",
+  "sympy/utilities/lambdify.py"
+ ],
+ "holds": {
+  "sympy/printing/pytorch.py": 25,
+  "sympy/utilities/lambdify.py": 18
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 28079,
+   "path": "sympy/printing/pytorch.py",
+   "intents": [
+    "log:sympy:28032_28079:28079:sympy/printing/pytorch.py:h0"
+   ],
+   "hold_ms": 25,
+   "t_submit_epoch": 1791573077588,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sympy_printing_pytorch.py-w1-0001",
+   "total_ms": 132.64,
+   "t_done_epoch": 1791573077721
+  },
+  {
+   "writer": 1,
+   "pr": 28079,
+   "path": "sympy/utilities/lambdify.py",
+   "intents": [
+    "log:sympy:28032_28079:28079:sympy/utilities/lambdify.py:h1"
+   ],
+   "hold_ms": 18,
+   "t_submit_epoch": 1791573077721,
+   "outcome": "blocked",
+   "blocked_reason": "harness-relocate-context-not-found",
+   "total_ms": 19.31,
+   "t_done_epoch": 1791573077740
+  }
+ ],
+ "admit_stats": null,
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sympy_printing_pytorch.py-w1-0001",
+   "path": "sympy/printing/pytorch.py",
+   "pid": 2212555,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-sympy_printing_pytorch_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sympy_printing_pytorch_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:1d7100a0b6e06ee13e4988f486f0c7789d338333950c190ae6a584acb08984da"
+   ],
+   "lock_wait_ms": 0.11,
+   "t_start_epoch_ms": 1791573077618.01,
+   "pre_apply_hash": "sha256:1d7100a0b6e06ee13e4988f486f0c7789d338333950c190ae6a584acb08984da",
+   "receipt_before_hash": "sha256:1d7100a0b6e06ee13e4988f486f0c7789d338333950c190ae6a584acb08984da",
+   "receipt_after_hash": "sha256:0a7b16579661029a91436daf868491ecac7bec454b390cfdc7c9a49e52af4b25",
+   "post_apply_hash": "sha256:0a7b16579661029a91436daf868491ecac7bec454b390cfdc7c9a49e52af4b25",
+   "t_end_epoch_ms": 1791573077720.67,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:11:17.720+08:00",
+   "batch_id": "cb-sympy_printing_pytorch.py-w1-0001",
+   "path": "sympy/printing/pytorch.py",
+   "proposalIds": [
+    "prop-hist-w1-sympy_printing_pytorch_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sympy_printing_pytorch_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-sympy_printing_pytorch_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-sympy_printing_pytorch_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-sympy_printing_pytorch_py",
+     "logical_id": "prop-hist-w1-sympy_printing_pytorch_py",
+     "attempt_id": "att-prop-hist-w1-sympy_printing_pytorch_py-r0",
+     "proposal_id": "prop-hist-w1-sympy_printing_pytorch_py",
+     "actorId": "writer-28079"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.24,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:1d7100a0b6e06ee13e4988f486f0c7789d338333950c190ae6a584acb08984da",
+   "written": true,
+   "output_digest": "sha256:0a7b16579661029a91436daf868491ecac7bec454b390cfdc7c9a49e52af4b25",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

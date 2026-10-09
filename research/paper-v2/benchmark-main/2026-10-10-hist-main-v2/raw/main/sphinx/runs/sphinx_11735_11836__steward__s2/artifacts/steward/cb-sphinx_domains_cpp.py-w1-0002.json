@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-94c66a2ab16f6c28",
+  "proposalIds": [
+    "prop-hist-w1-sphinx_domains_cpp_py"
+  ],
+  "targetFiles": [
+    "sphinx/domains/cpp.py"
+  ],
+  "appliedFiles": [
+    "sphinx/domains/cpp.py"
+  ],
+  "fileBeforeHashes": {
+    "sphinx/domains/cpp.py": "89d61a1397294e903d268b82a9da1d551cd4181ac72dd2cdd8851b2794b642ef"
+  },
+  "fileAfterHashes": {
+    "sphinx/domains/cpp.py": "390aefcecffd65af895cef4c8f3244499d7a4e8ae93411347e5c7cdf0428c952"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sphinx/domains/cpp.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-94c66a2ab16f6c28",
+    "planId": "merge-94c66a2ab16f6c28",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-94c66a2ab16f6c28",
+        "planId": "merge-94c66a2ab16f6c28",
+        "request_identity": [
+          "prop-hist-w1-sphinx_domains_cpp_py"
+        ],
+        "actor_ids": [
+          "writer-11836"
+        ],
+        "request_files": [
+          "sphinx/domains/cpp.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sphinx/domains/cpp.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/sphinx/runs/sphinx_11735_11836__steward__s2/artifacts/steward/cb-sphinx_domains_cpp.py-w1-0002.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SPHINX_DOMAINS_CPP_PY"
+        ],
+        "commit_sha": "1ab8b14306bc5215bfd00839ac44bb7d92869c69"
+      }
+    ]
+  }
+}

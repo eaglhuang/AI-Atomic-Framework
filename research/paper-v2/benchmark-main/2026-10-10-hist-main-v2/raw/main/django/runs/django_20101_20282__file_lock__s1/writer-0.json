@@ -1,0 +1,191 @@
+{
+ "writer": 0,
+ "pr": 20101,
+ "pid": 2168194,
+ "init_ms": 75.62712200000001,
+ "start_offset_ms": 0,
+ "file_order": [
+  "django/db/backends/mysql/features.py",
+  "django/db/backends/base/features.py",
+  "django/db/backends/oracle/features.py",
+  "django/db/backends/sqlite3/_functions.py",
+  "django/db/backends/sqlite3/features.py",
+  "django/db/models/functions/__init__.py",
+  "django/db/backends/postgresql/features.py",
+  "django/db/models/functions/uuid.py"
+ ],
+ "holds": {
+  "django/db/backends/mysql/features.py": 1,
+  "django/db/backends/base/features.py": 11,
+  "django/db/backends/oracle/features.py": 30,
+  "django/db/backends/sqlite3/_functions.py": 5,
+  "django/db/backends/sqlite3/features.py": 13,
+  "django/db/models/functions/__init__.py": 23,
+  "django/db/backends/postgresql/features.py": 16,
+  "django/db/models/functions/uuid.py": 16
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 20101,
+   "path": "django/db/backends/mysql/features.py",
+   "intents": [
+    "log:django:20101_20282:20101:django/db/backends/mysql/features.py:h1"
+   ],
+   "hold_ms": 1,
+   "t_submit_epoch": 1791572715974,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 15,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 20.83,
+   "t_done_epoch": 1791572715995
+  },
+  {
+   "writer": 0,
+   "pr": 20101,
+   "path": "django/db/backends/base/features.py",
+   "intents": [
+    "log:django:20101_20282:20101:django/db/backends/base/features.py:h0"
+   ],
+   "hold_ms": 11,
+   "t_submit_epoch": 1791572715995,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 20.08,
+   "t_done_epoch": 1791572716015
+  },
+  {
+   "writer": 0,
+   "pr": 20101,
+   "path": "django/db/backends/oracle/features.py",
+   "intents": [
+    "log:django:20101_20282:20101:django/db/backends/oracle/features.py:h2"
+   ],
+   "hold_ms": 30,
+   "t_submit_epoch": 1791572716015,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 5,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 38.09,
+   "t_done_epoch": 1791572716053
+  },
+  {
+   "writer": 0,
+   "pr": 20101,
+   "path": "django/db/backends/sqlite3/_functions.py",
+   "intents": [
+    "log:django:20101_20282:20101:django/db/backends/sqlite3/_functions.py:h4",
+    "log:django:20101_20282:20101:django/db/backends/sqlite3/_functions.py:h5",
+    "log:django:20101_20282:20101:django/db/backends/sqlite3/_functions.py:h6",
+    "log:django:20101_20282:20101:django/db/backends/sqlite3/_functions.py:h7"
+   ],
+   "hold_ms": 5,
+   "t_submit_epoch": 1791572716054,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 5,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 13.87,
+   "t_done_epoch": 1791572716067
+  },
+  {
+   "writer": 0,
+   "pr": 20101,
+   "path": "django/db/backends/sqlite3/features.py",
+   "intents": [
+    "log:django:20101_20282:20101:django/db/backends/sqlite3/features.py:h8",
+    "log:django:20101_20282:20101:django/db/backends/sqlite3/features.py:h9"
+   ],
+   "hold_ms": 13,
+   "t_submit_epoch": 1791572716067,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 5,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 20.78,
+   "t_done_epoch": 1791572716088
+  },
+  {
+   "writer": 0,
+   "pr": 20101,
+   "path": "django/db/models/functions/__init__.py",
+   "intents": [
+    "log:django:20101_20282:20101:django/db/models/functions/__init__.py:h10",
+    "log:django:20101_20282:20101:django/db/models/functions/__init__.py:h11"
+   ],
+   "hold_ms": 23,
+   "t_submit_epoch": 1791572716088,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "lock_spins": 0,
+   "outcome": "blocked",
+   "blocked_reason": "harness-relocate-context-not-found",
+   "total_ms": 28.25,
+   "t_done_epoch": 1791572716116
+  },
+  {
+   "writer": 0,
+   "pr": 20101,
+   "path": "django/db/backends/postgresql/features.py",
+   "intents": [
+    "log:django:20101_20282:20101:django/db/backends/postgresql/features.py:h3"
+   ],
+   "hold_ms": 16,
+   "t_submit_epoch": 1791572716116,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 21.63,
+   "t_done_epoch": 1791572716138
+  },
+  {
+   "writer": 0,
+   "pr": 20101,
+   "path": "django/db/models/functions/uuid.py",
+   "intents": [
+    "log:django:20101_20282:20101:django/db/models/functions/uuid.py:h12"
+   ],
+   "hold_ms": 16,
+   "t_submit_epoch": 1791572716138,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 84,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 106.62,
+   "t_done_epoch": 1791572716245
+  }
+ ],
+ "admit_stats": {
+  "txns": 16,
+  "cas_conflicts": 0
+ },
+ "steward_batches": null
+}

@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-3d36855fb786a7be",
+  "proposalIds": [
+    "prop-hist-w0-fastapi_routing_py"
+  ],
+  "targetFiles": [
+    "fastapi/routing.py"
+  ],
+  "appliedFiles": [
+    "fastapi/routing.py"
+  ],
+  "fileBeforeHashes": {
+    "fastapi/routing.py": "75c4018f152c3bd293d299a9d5ec09cccf2a0f7c237198b506b9f2caa6042e81"
+  },
+  "fileAfterHashes": {
+    "fastapi/routing.py": "93a65badf525e8b93f7bf424fad0ac795697bf648a739f05748d768e159caa0c"
+  },
+  "permissions": {
+    "fileWrite": [
+      "fastapi/routing.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-3d36855fb786a7be",
+    "planId": "merge-3d36855fb786a7be",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-3d36855fb786a7be",
+        "planId": "merge-3d36855fb786a7be",
+        "request_identity": [
+          "prop-hist-w0-fastapi_routing_py"
+        ],
+        "actor_ids": [
+          "writer-10895"
+        ],
+        "request_files": [
+          "fastapi/routing.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "fastapi/routing.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/fastapi/runs/fastapi_10895_12103__steward__s1/artifacts/steward/cb-fastapi_routing.py-w0-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-FASTAPI_ROUTING_PY"
+        ],
+        "commit_sha": "b90026fc9e0609f2f7d8f3faee79e43bfd1f177a"
+      }
+    ]
+  }
+}

@@ -1,0 +1,122 @@
+{
+ "writer": 0,
+ "pr": 27183,
+ "pid": 2227424,
+ "init_ms": 82.858002,
+ "start_offset_ms": 3,
+ "file_order": [
+  "release/compare_tar_against_git.py"
+ ],
+ "holds": {
+  "release/compare_tar_against_git.py": 8
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 27183,
+   "path": "release/compare_tar_against_git.py",
+   "intents": [
+    "log:sympy:27183_27187:27183:release/compare_tar_against_git.py:h0",
+    "log:sympy:27183_27187:27183:release/compare_tar_against_git.py:h1"
+   ],
+   "hold_ms": 8,
+   "t_submit_epoch": 1791573220517,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-release_compare_tar_against_git.py-w0-0001",
+   "total_ms": 115.65,
+   "t_done_epoch": 1791573220632
+  }
+ ],
+ "admit_stats": null,
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-release_compare_tar_against_git.py-w0-0001",
+   "path": "release/compare_tar_against_git.py",
+   "pid": 2227424,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-release_compare_tar_against_git_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-release_compare_tar_against_git_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:912a5cf7766ba5b58d70b22adf599e661afde951a613c340bf0b7bc95a13d400"
+   ],
+   "lock_wait_ms": 0.14,
+   "t_start_epoch_ms": 1791573220528.05,
+   "pre_apply_hash": "sha256:912a5cf7766ba5b58d70b22adf599e661afde951a613c340bf0b7bc95a13d400",
+   "receipt_before_hash": "sha256:912a5cf7766ba5b58d70b22adf599e661afde951a613c340bf0b7bc95a13d400",
+   "receipt_after_hash": "sha256:9b1b715ae0d2e345df7a95283433fdd9538fc78dc327c913049fb07e7ae6486f",
+   "post_apply_hash": "sha256:9b1b715ae0d2e345df7a95283433fdd9538fc78dc327c913049fb07e7ae6486f",
+   "t_end_epoch_ms": 1791573220632.22,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:13:40.632+08:00",
+   "batch_id": "cb-release_compare_tar_against_git.py-w0-0001",
+   "path": "release/compare_tar_against_git.py",
+   "proposalIds": [
+    "prop-hist-w0-release_compare_tar_against_git_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-release_compare_tar_against_git_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-release_compare_tar_against_git_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-release_compare_tar_against_git_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-release_compare_tar_against_git_py",
+     "logical_id": "prop-hist-w0-release_compare_tar_against_git_py",
+     "attempt_id": "att-prop-hist-w0-release_compare_tar_against_git_py-r0",
+     "proposal_id": "prop-hist-w0-release_compare_tar_against_git_py",
+     "actorId": "writer-27183"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.31,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:912a5cf7766ba5b58d70b22adf599e661afde951a613c340bf0b7bc95a13d400",
+   "written": true,
+   "output_digest": "sha256:9b1b715ae0d2e345df7a95283433fdd9538fc78dc327c913049fb07e7ae6486f",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

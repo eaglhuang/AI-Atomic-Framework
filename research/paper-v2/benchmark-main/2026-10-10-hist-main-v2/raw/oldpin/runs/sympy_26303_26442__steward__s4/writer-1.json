@@ -1,0 +1,148 @@
+{
+ "writer": 1,
+ "pr": 26442,
+ "pid": 2442189,
+ "init_ms": 87.04631599999999,
+ "start_offset_ms": 9,
+ "file_order": [
+  "sympy/matrices/matrixbase.py",
+  "sympy/matrices/expressions/matexpr.py"
+ ],
+ "holds": {
+  "sympy/matrices/matrixbase.py": 5,
+  "sympy/matrices/expressions/matexpr.py": 19
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 26442,
+   "path": "sympy/matrices/matrixbase.py",
+   "intents": [
+    "log:sympy:26303_26442:26442:sympy/matrices/matrixbase.py:h1"
+   ],
+   "hold_ms": 5,
+   "t_submit_epoch": 1791575063993,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 62,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sympy_matrices_matrixbase.py-w1-0001",
+   "total_ms": 206.64,
+   "t_done_epoch": 1791575064199
+  },
+  {
+   "writer": 1,
+   "pr": 26442,
+   "path": "sympy/matrices/expressions/matexpr.py",
+   "intents": [
+    "log:sympy:26303_26442:26442:sympy/matrices/expressions/matexpr.py:h0"
+   ],
+   "hold_ms": 19,
+   "t_submit_epoch": 1791575064199,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "queue",
+   "admit_wait_ms": 16,
+   "outcome": "blocked",
+   "blocked_reason": "harness-relocate-context-not-found",
+   "total_ms": 37.37,
+   "t_done_epoch": 1791575064237
+  }
+ ],
+ "admit_stats": {
+  "txns": 5,
+  "cas_conflicts": 33
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sympy_matrices_matrixbase.py-w1-0001",
+   "path": "sympy/matrices/matrixbase.py",
+   "pid": 2442189,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-sympy_matrices_matrixbase_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sympy_matrices_matrixbase_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:e49d4c1b5744ebe0c51f9e1864ab88029c4c8a134f04f8b4b88baf82a4d98ba1"
+   ],
+   "lock_wait_ms": 0.12,
+   "t_start_epoch_ms": 1791575064065.22,
+   "pre_apply_hash": "sha256:e49d4c1b5744ebe0c51f9e1864ab88029c4c8a134f04f8b4b88baf82a4d98ba1",
+   "receipt_before_hash": "sha256:e49d4c1b5744ebe0c51f9e1864ab88029c4c8a134f04f8b4b88baf82a4d98ba1",
+   "receipt_after_hash": "sha256:43954a96fabe9fda4e0a4cff15e467a2e4fd380aeb27a73980d3cff8bdffee24",
+   "post_apply_hash": "sha256:43954a96fabe9fda4e0a4cff15e467a2e4fd380aeb27a73980d3cff8bdffee24",
+   "t_end_epoch_ms": 1791575064196.11,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:44:24.196+08:00",
+   "batch_id": "cb-sympy_matrices_matrixbase.py-w1-0001",
+   "path": "sympy/matrices/matrixbase.py",
+   "proposalIds": [
+    "prop-hist-w1-sympy_matrices_matrixbase_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sympy_matrices_matrixbase_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-sympy_matrices_matrixbase_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-sympy_matrices_matrixbase_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-sympy_matrices_matrixbase_py",
+     "logical_id": "prop-hist-w1-sympy_matrices_matrixbase_py",
+     "attempt_id": "att-prop-hist-w1-sympy_matrices_matrixbase_py-r0",
+     "proposal_id": "prop-hist-w1-sympy_matrices_matrixbase_py",
+     "actorId": "writer-26442"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.26,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:e49d4c1b5744ebe0c51f9e1864ab88029c4c8a134f04f8b4b88baf82a4d98ba1",
+   "written": true,
+   "output_digest": "sha256:43954a96fabe9fda4e0a4cff15e467a2e4fd380aeb27a73980d3cff8bdffee24",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

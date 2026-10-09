@@ -1,0 +1,61 @@
+{
+ "writer": 0,
+ "pr": 11781,
+ "pid": 2360781,
+ "init_ms": 76.39257500000001,
+ "start_offset_ms": 15,
+ "file_order": [
+  "sphinx/roles.py",
+  "sphinx/environment/__init__.py"
+ ],
+ "holds": {
+  "sphinx/roles.py": 17,
+  "sphinx/environment/__init__.py": 27
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 11781,
+   "path": "sphinx/roles.py",
+   "intents": [
+    "log:sphinx:11781_11939:11781:sphinx/roles.py:h1",
+    "log:sphinx:11781_11939:11781:sphinx/roles.py:h2"
+   ],
+   "hold_ms": 17,
+   "t_submit_epoch": 1791574500234,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 14,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 36.48,
+   "t_done_epoch": 1791574500271
+  },
+  {
+   "writer": 0,
+   "pr": 11781,
+   "path": "sphinx/environment/__init__.py",
+   "intents": [
+    "log:sphinx:11781_11939:11781:sphinx/environment/__init__.py:h0"
+   ],
+   "hold_ms": 27,
+   "t_submit_epoch": 1791574500271,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 8,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 38.83,
+   "t_done_epoch": 1791574500310
+  }
+ ],
+ "admit_stats": {
+  "txns": 4,
+  "cas_conflicts": 0
+ },
+ "steward_batches": null
+}

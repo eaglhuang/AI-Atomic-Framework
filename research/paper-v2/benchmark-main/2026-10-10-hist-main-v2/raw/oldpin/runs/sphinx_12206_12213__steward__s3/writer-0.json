@@ -1,0 +1,131 @@
+{
+ "writer": 0,
+ "pr": 12206,
+ "pid": 2476091,
+ "init_ms": 101.26777799999999,
+ "start_offset_ms": 14,
+ "file_order": [
+  "sphinx/builders/linkcheck.py"
+ ],
+ "holds": {
+  "sphinx/builders/linkcheck.py": 27
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 12206,
+   "path": "sphinx/builders/linkcheck.py",
+   "intents": [
+    "log:sphinx:12206_12213:12206:sphinx/builders/linkcheck.py:h0",
+    "log:sphinx:12206_12213:12206:sphinx/builders/linkcheck.py:h1",
+    "log:sphinx:12206_12213:12206:sphinx/builders/linkcheck.py:h2",
+    "log:sphinx:12206_12213:12206:sphinx/builders/linkcheck.py:h3"
+   ],
+   "hold_ms": 27,
+   "t_submit_epoch": 1791575360530,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 134,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sphinx_builders_linkcheck.py-w0-0001",
+   "total_ms": 261.16,
+   "t_done_epoch": 1791575360791
+  }
+ ],
+ "admit_stats": {
+  "txns": 3,
+  "cas_conflicts": 11
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sphinx_builders_linkcheck.py-w0-0001",
+   "path": "sphinx/builders/linkcheck.py",
+   "pid": 2476091,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-sphinx_builders_linkcheck_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sphinx_builders_linkcheck_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:4492bf8257825e0abbf5d56a5c1e3352a7c29e5d7771df4f5152f14a53169c6b"
+   ],
+   "lock_wait_ms": 0.13,
+   "t_start_epoch_ms": 1791575360694.69,
+   "pre_apply_hash": "sha256:4492bf8257825e0abbf5d56a5c1e3352a7c29e5d7771df4f5152f14a53169c6b",
+   "receipt_before_hash": "sha256:4492bf8257825e0abbf5d56a5c1e3352a7c29e5d7771df4f5152f14a53169c6b",
+   "receipt_after_hash": "sha256:c63c897774d9a09fa2bb52eb5161a94731855bdd34077e1ee43f155817757a45",
+   "post_apply_hash": "sha256:c63c897774d9a09fa2bb52eb5161a94731855bdd34077e1ee43f155817757a45",
+   "t_end_epoch_ms": 1791575360786.98,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:49:20.787+08:00",
+   "batch_id": "cb-sphinx_builders_linkcheck.py-w0-0001",
+   "path": "sphinx/builders/linkcheck.py",
+   "proposalIds": [
+    "prop-hist-w0-sphinx_builders_linkcheck_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sphinx_builders_linkcheck_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-sphinx_builders_linkcheck_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-sphinx_builders_linkcheck_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-sphinx_builders_linkcheck_py",
+     "logical_id": "prop-hist-w0-sphinx_builders_linkcheck_py",
+     "attempt_id": "att-prop-hist-w0-sphinx_builders_linkcheck_py-r0",
+     "proposal_id": "prop-hist-w0-sphinx_builders_linkcheck_py",
+     "actorId": "writer-12206"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.24,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:4492bf8257825e0abbf5d56a5c1e3352a7c29e5d7771df4f5152f14a53169c6b",
+   "written": true,
+   "output_digest": "sha256:c63c897774d9a09fa2bb52eb5161a94731855bdd34077e1ee43f155817757a45",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

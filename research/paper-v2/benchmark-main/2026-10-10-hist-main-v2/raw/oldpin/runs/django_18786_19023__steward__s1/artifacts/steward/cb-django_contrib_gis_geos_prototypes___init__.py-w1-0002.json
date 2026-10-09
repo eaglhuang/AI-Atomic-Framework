@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-c173c206657d673f",
+  "proposalIds": [
+    "prop-hist-w1-django_contrib_gis_geos_prototypes_init_py"
+  ],
+  "targetFiles": [
+    "django/contrib/gis/geos/prototypes/__init__.py"
+  ],
+  "appliedFiles": [
+    "django/contrib/gis/geos/prototypes/__init__.py"
+  ],
+  "fileBeforeHashes": {
+    "django/contrib/gis/geos/prototypes/__init__.py": "8809ec0f46e0f2eec0be8ec599eb78964028f659eccb27d915aee4dc843a4f5c"
+  },
+  "fileAfterHashes": {
+    "django/contrib/gis/geos/prototypes/__init__.py": "e38192d2ec3883756683a4154671fe7de7770a61274f8b918fb37e5ec7cb6b9b"
+  },
+  "permissions": {
+    "fileWrite": [
+      "django/contrib/gis/geos/prototypes/__init__.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-c173c206657d673f",
+    "planId": "merge-c173c206657d673f",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-c173c206657d673f",
+        "planId": "merge-c173c206657d673f",
+        "request_identity": [
+          "prop-hist-w1-django_contrib_gis_geos_prototypes_init_py"
+        ],
+        "actor_ids": [
+          "writer-19023"
+        ],
+        "request_files": [
+          "django/contrib/gis/geos/prototypes/__init__.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "django/contrib/gis/geos/prototypes/__init__.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/oldpin/runs/django_18786_19023__steward__s1/artifacts/steward/cb-django_contrib_gis_geos_prototypes___init__.py-w1-0002.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-DJANGO_CONTRIB_GIS_GEOS_PROTOTYPES_INIT_PY"
+        ],
+        "commit_sha": "acee820b318067caa12f527a78ed5261fe6ace19"
+      }
+    ]
+  }
+}

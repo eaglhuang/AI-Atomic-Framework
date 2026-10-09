@@ -1,0 +1,85 @@
+{
+ "writer": 1,
+ "pr": 9614,
+ "pid": 2251591,
+ "init_ms": 71.94267400000001,
+ "start_offset_ms": 3,
+ "file_order": [
+  "xarray/backends/zarr.py",
+  "xarray/backends/h5netcdf_.py",
+  "xarray/backends/netCDF4_.py"
+ ],
+ "holds": {
+  "xarray/backends/zarr.py": 17,
+  "xarray/backends/h5netcdf_.py": 23,
+  "xarray/backends/netCDF4_.py": 1
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 9614,
+   "path": "xarray/backends/zarr.py",
+   "intents": [
+    "log:xarray:9552_9614:9614:xarray/backends/zarr.py:h6",
+    "log:xarray:9552_9614:9614:xarray/backends/zarr.py:h7",
+    "log:xarray:9552_9614:9614:xarray/backends/zarr.py:h8"
+   ],
+   "hold_ms": 17,
+   "t_submit_epoch": 1791573453753,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 38,
+   "outcome": "blocked",
+   "blocked_reason": "occ-relocate-context-not-found",
+   "occ_retries": 0,
+   "total_ms": 60.69,
+   "t_done_epoch": 1791573453814
+  },
+  {
+   "writer": 1,
+   "pr": 9614,
+   "path": "xarray/backends/h5netcdf_.py",
+   "intents": [
+    "log:xarray:9552_9614:9614:xarray/backends/h5netcdf_.py:h0",
+    "log:xarray:9552_9614:9614:xarray/backends/h5netcdf_.py:h1",
+    "log:xarray:9552_9614:9614:xarray/backends/h5netcdf_.py:h2"
+   ],
+   "hold_ms": 23,
+   "t_submit_epoch": 1791573453814,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 32.05,
+   "t_done_epoch": 1791573453846
+  },
+  {
+   "writer": 1,
+   "pr": 9614,
+   "path": "xarray/backends/netCDF4_.py",
+   "intents": [
+    "log:xarray:9552_9614:9614:xarray/backends/netCDF4_.py:h3",
+    "log:xarray:9552_9614:9614:xarray/backends/netCDF4_.py:h4",
+    "log:xarray:9552_9614:9614:xarray/backends/netCDF4_.py:h5"
+   ],
+   "hold_ms": 1,
+   "t_submit_epoch": 1791573453846,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 8.83,
+   "t_done_epoch": 1791573453855
+  }
+ ],
+ "admit_stats": {
+  "txns": 7,
+  "cas_conflicts": 3
+ },
+ "steward_batches": null
+}

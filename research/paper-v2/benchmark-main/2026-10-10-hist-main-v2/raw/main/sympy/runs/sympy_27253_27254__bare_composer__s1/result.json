@@ -1,0 +1,87 @@
+{
+ "pair_id": "sympy:27253_27254",
+ "stratum": "O3",
+ "arm": "bare_composer",
+ "plant": null,
+ "seed_k": 1,
+ "seed": 4249184209,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 419,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 8,
+  "by_verdict": {
+   "blocked_absent": 2,
+   "correct": 6
+  },
+  "completed": 6,
+  "lost_effects": 0,
+  "blocked": 2,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 1,
+  "files_full_bytes_exact": 1,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {
+  "compose-context-mismatch: proposal 'prop-hist-w0-sympy_core_basic_py' context mi": 2
+ },
+ "structure": {
+  "sympy/core/basic.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "sympy/core/basic.py": true
+ },
+ "final_exists": {
+  "sympy/core/basic.py": true
+ },
+ "files": [
+  {
+   "path": "sympy/core/basic.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:2d50eb7580b3556aa9e6b62b0fe9fcdd4357021dc7c56c8c018bda1ec708f5cf",
+   "final_digest": "sha256:f3684d0c19c631686e54136c49e7de3217773c632a72a1957773bb2999ee49be",
+   "expected_digests": [
+    "sha256:f3684d0c19c631686e54136c49e7de3217773c632a72a1957773bb2999ee49be"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "sympy/core/basic.py": "sha256:f3684d0c19c631686e54136c49e7de3217773c632a72a1957773bb2999ee49be"
+ }
+}

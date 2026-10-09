@@ -1,0 +1,65 @@
+{
+ "writer": 1,
+ "pr": 9771,
+ "pid": 2267380,
+ "init_ms": 68.11834,
+ "start_offset_ms": 1,
+ "file_order": [
+  "xarray/core/duck_array_ops.py",
+  "xarray/core/dask_array_ops.py"
+ ],
+ "holds": {
+  "xarray/core/duck_array_ops.py": 0,
+  "xarray/core/dask_array_ops.py": 6
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 9771,
+   "path": "xarray/core/duck_array_ops.py",
+   "intents": [
+    "log:xarray:9766_9771:9771:xarray/core/duck_array_ops.py:h7",
+    "log:xarray:9766_9771:9771:xarray/core/duck_array_ops.py:h8",
+    "log:xarray:9766_9771:9771:xarray/core/duck_array_ops.py:h9",
+    "log:xarray:9766_9771:9771:xarray/core/duck_array_ops.py:h10"
+   ],
+   "hold_ms": 0,
+   "t_submit_epoch": 1791573649292,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 15,
+   "outcome": "commit",
+   "total_ms": 30.45,
+   "t_done_epoch": 1791573649322
+  },
+  {
+   "writer": 1,
+   "pr": 9771,
+   "path": "xarray/core/dask_array_ops.py",
+   "intents": [
+    "log:xarray:9766_9771:9771:xarray/core/dask_array_ops.py:h0",
+    "log:xarray:9766_9771:9771:xarray/core/dask_array_ops.py:h1",
+    "log:xarray:9766_9771:9771:xarray/core/dask_array_ops.py:h2",
+    "log:xarray:9766_9771:9771:xarray/core/dask_array_ops.py:h3",
+    "log:xarray:9766_9771:9771:xarray/core/dask_array_ops.py:h4",
+    "log:xarray:9766_9771:9771:xarray/core/dask_array_ops.py:h5",
+    "log:xarray:9766_9771:9771:xarray/core/dask_array_ops.py:h6"
+   ],
+   "hold_ms": 6,
+   "t_submit_epoch": 1791573649322,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "outcome": "commit",
+   "total_ms": 17.55,
+   "t_done_epoch": 1791573649340
+  }
+ ],
+ "admit_stats": {
+  "txns": 4,
+  "cas_conflicts": 1
+ },
+ "steward_batches": null
+}

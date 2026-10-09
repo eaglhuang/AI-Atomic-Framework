@@ -1,0 +1,132 @@
+{
+ "writer": 1,
+ "pr": 11925,
+ "pid": 2430946,
+ "init_ms": 101.802589,
+ "start_offset_ms": 3,
+ "file_order": [
+  "scripts/comment_docs_deploy_url_in_pr.py"
+ ],
+ "holds": {
+  "scripts/comment_docs_deploy_url_in_pr.py": 3
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 11925,
+   "path": "scripts/comment_docs_deploy_url_in_pr.py",
+   "intents": [
+    "log:fastapi:11460_11925:11925:scripts/comment_docs_deploy_url_in_pr.py:h0"
+   ],
+   "hold_ms": 3,
+   "t_submit_epoch": 1791574979779,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 48,
+   "outcome": "blocked",
+   "blocked_reason": "file-hash-drift: Target file does not exist: scripts/comment_docs_deploy_url_in_pr.py",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "file-hash-drift: Target file does not exist: scripts/comment_docs_deploy_url_in_pr.py"
+   ],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-scripts_comment_docs_deploy_url_in_pr.py-w1-0001",
+   "total_ms": 170.27,
+   "t_done_epoch": 1791574979949
+  }
+ ],
+ "admit_stats": {
+  "txns": 2,
+  "cas_conflicts": 2
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-scripts_comment_docs_deploy_url_in_pr.py-w1-0001",
+   "path": "scripts/comment_docs_deploy_url_in_pr.py",
+   "pid": 2430946,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-scripts_comment_docs_deploy_url_in_pr_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-scripts_comment_docs_deploy_url_in_pr_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   ],
+   "lock_wait_ms": 0.16,
+   "t_start_epoch_ms": 1791574979833.94,
+   "pre_apply_hash": null,
+   "receipt_before_hash": null,
+   "receipt_after_hash": null,
+   "post_apply_hash": null,
+   "t_end_epoch_ms": 1791574979945.26,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "blocked",
+   "written": false,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:42:59.945+08:00",
+   "batch_id": "cb-scripts_comment_docs_deploy_url_in_pr.py-w1-0001",
+   "path": "scripts/comment_docs_deploy_url_in_pr.py",
+   "proposalIds": [
+    "prop-hist-w1-scripts_comment_docs_deploy_url_in_pr_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-scripts_comment_docs_deploy_url_in_pr_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-scripts_comment_docs_deploy_url_in_pr_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-scripts_comment_docs_deploy_url_in_pr_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-scripts_comment_docs_deploy_url_in_pr_py",
+     "logical_id": "prop-hist-w1-scripts_comment_docs_deploy_url_in_pr_py",
+     "attempt_id": "att-prop-hist-w1-scripts_comment_docs_deploy_url_in_pr_py-r0",
+     "proposal_id": "prop-hist-w1-scripts_comment_docs_deploy_url_in_pr_py",
+     "actorId": "writer-11925"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "file-hash-drift: Target file does not exist: scripts/comment_docs_deploy_url_in_pr.py"
+   ],
+   "blocked_reason": "file-hash-drift: Target file does not exist: scripts/comment_docs_deploy_url_in_pr.py",
+   "window_wait_ms": 0.34,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "written": false,
+   "output_digest": null,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "file-hash-drift: Target file does not exist: scripts/comment_docs_deploy_url_in_pr.py"
+  }
+ ]
+}

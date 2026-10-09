@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-57a44252971ef951",
+  "proposalIds": [
+    "prop-hist-w0-sphinx_ext_autodoc_event_listeners_py"
+  ],
+  "targetFiles": [
+    "sphinx/ext/autodoc/_event_listeners.py"
+  ],
+  "appliedFiles": [
+    "sphinx/ext/autodoc/_event_listeners.py"
+  ],
+  "fileBeforeHashes": {
+    "sphinx/ext/autodoc/_event_listeners.py": "b2daccde93791456e2112f669c22b55e2a5eb7098f8331ddd8ebb9bab8ab6f5f"
+  },
+  "fileAfterHashes": {
+    "sphinx/ext/autodoc/_event_listeners.py": "8f02d11498edc3b183c8aa547a4f2597c1000767b233a9ab6f5937fc9cdfea18"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sphinx/ext/autodoc/_event_listeners.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-57a44252971ef951",
+    "planId": "merge-57a44252971ef951",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-57a44252971ef951",
+        "planId": "merge-57a44252971ef951",
+        "request_identity": [
+          "prop-hist-w0-sphinx_ext_autodoc_event_listeners_py"
+        ],
+        "actor_ids": [
+          "writer-14126"
+        ],
+        "request_files": [
+          "sphinx/ext/autodoc/_event_listeners.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sphinx/ext/autodoc/_event_listeners.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/sphinx/runs/sphinx_14126_14127__bare_composer__s2/artifacts/steward/cb-sphinx_ext_autodoc__event_listeners.py-w0-0005.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SPHINX_EXT_AUTODOC_EVENT_LISTENERS_PY"
+        ],
+        "commit_sha": "21704f69cb22b1721e210f30e26d7fbe136f532e"
+      }
+    ]
+  }
+}

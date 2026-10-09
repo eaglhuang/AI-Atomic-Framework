@@ -1,0 +1,150 @@
+{
+ "pair_id": "xarray:10318_10650",
+ "stratum": "O0",
+ "arm": "git_three_way",
+ "plant": null,
+ "seed_k": 4,
+ "seed": 1047608456,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 516,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 17,
+  "by_verdict": {
+   "correct": 17
+  },
+  "completed": 17,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 4,
+  "files_full_bytes_exact": 4,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "xarray/coding/cftime_offsets.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "xarray/coding/cftimeindex.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "xarray/core/coordinates.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "xarray/core/resample_cftime.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "xarray/coding/cftime_offsets.py": true,
+  "xarray/coding/cftimeindex.py": true,
+  "xarray/core/coordinates.py": true,
+  "xarray/core/resample_cftime.py": true
+ },
+ "final_exists": {
+  "xarray/coding/cftime_offsets.py": true,
+  "xarray/coding/cftimeindex.py": true,
+  "xarray/core/coordinates.py": true,
+  "xarray/core/resample_cftime.py": true
+ },
+ "files": [
+  {
+   "path": "xarray/coding/cftime_offsets.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:28deab061e7767844bed8d08b8c6d2f09f3ff690a1094bf0dad01112a818f31c",
+   "final_digest": "sha256:adf0c59bfb589371e8cb2709c5b997df1d15b364c7477699111308a6c4cb413f",
+   "expected_digests": [
+    "sha256:adf0c59bfb589371e8cb2709c5b997df1d15b364c7477699111308a6c4cb413f"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/coding/cftimeindex.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:234e40e2d865a0bac626185995fbadb9eb2e9d075bd10279f69c3e0ebfb79018",
+   "final_digest": "sha256:f3e0dc936171ccf5b14990e5e56ba9520229da525baed3c05513b83a984585b8",
+   "expected_digests": [
+    "sha256:f3e0dc936171ccf5b14990e5e56ba9520229da525baed3c05513b83a984585b8"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/core/coordinates.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:5ec07210a7e536e25136a1d031fdf2f3fddf3ee30912ac98b5859762819a8752",
+   "final_digest": "sha256:aedaa4e2c7c1f918639ef51c1dd03eefe6d98352cd414b1703f11d109138cea5",
+   "expected_digests": [
+    "sha256:aedaa4e2c7c1f918639ef51c1dd03eefe6d98352cd414b1703f11d109138cea5"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/core/resample_cftime.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:db7f9a2789e4f391c1c01986e28836e17a77e019eec8faba6796e84c9c472f47",
+   "final_digest": "sha256:c0e06c9338d6305fe105266ccb9329470851a173b07c9a0d587b999f93bae0b6",
+   "expected_digests": [
+    "sha256:c0e06c9338d6305fe105266ccb9329470851a173b07c9a0d587b999f93bae0b6"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "xarray/coding/cftime_offsets.py": "sha256:adf0c59bfb589371e8cb2709c5b997df1d15b364c7477699111308a6c4cb413f",
+  "xarray/coding/cftimeindex.py": "sha256:f3e0dc936171ccf5b14990e5e56ba9520229da525baed3c05513b83a984585b8",
+  "xarray/core/coordinates.py": "sha256:aedaa4e2c7c1f918639ef51c1dd03eefe6d98352cd414b1703f11d109138cea5",
+  "xarray/core/resample_cftime.py": "sha256:c0e06c9338d6305fe105266ccb9329470851a173b07c9a0d587b999f93bae0b6"
+ }
+}

@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-258198a84f50fa2a",
+  "proposalIds": [
+    "prop-hist-w0-sympy_sets_sets_py"
+  ],
+  "targetFiles": [
+    "sympy/sets/sets.py"
+  ],
+  "appliedFiles": [
+    "sympy/sets/sets.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/sets/sets.py": "22ba68c285a1d92ebaef1d5da4df5d7d1509b6b966f27802bbe6767e2c2e0cf6"
+  },
+  "fileAfterHashes": {
+    "sympy/sets/sets.py": "e8561b9b481fff75bd1e730d2e7c3065e26277ed006d0d433f05438494a56817"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/sets/sets.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-258198a84f50fa2a",
+    "planId": "merge-258198a84f50fa2a",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-258198a84f50fa2a",
+        "planId": "merge-258198a84f50fa2a",
+        "request_identity": [
+          "prop-hist-w0-sympy_sets_sets_py"
+        ],
+        "actor_ids": [
+          "writer-26872"
+        ],
+        "request_files": [
+          "sympy/sets/sets.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/sets/sets.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/oldpin/runs/sympy_26872_27173__steward__s4/artifacts/steward/cb-sympy_sets_sets.py-w0-0002.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SYMPY_SETS_SETS_PY"
+        ],
+        "commit_sha": "d09c52b9ac676ad37256f979cccaa9128d44ecaf"
+      }
+    ]
+  }
+}

@@ -1,0 +1,40 @@
+{
+ "writer": 1,
+ "pr": 12172,
+ "pid": 2293161,
+ "init_ms": 70.277807,
+ "start_offset_ms": 13,
+ "file_order": [
+  "src/_pytest/python.py"
+ ],
+ "holds": {
+  "src/_pytest/python.py": 18
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 12172,
+   "path": "src/_pytest/python.py",
+   "intents": [
+    "log:pytest:11910_12172:12172:src/_pytest/python.py:h0",
+    "log:pytest:11910_12172:12172:src/_pytest/python.py:h1"
+   ],
+   "hold_ms": 18,
+   "t_submit_epoch": 1791573962190,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 50,
+   "outcome": "blocked",
+   "blocked_reason": "occ-relocate-context-not-found",
+   "occ_retries": 0,
+   "total_ms": 73.22,
+   "t_done_epoch": 1791573962264
+  }
+ ],
+ "admit_stats": {
+  "txns": 3,
+  "cas_conflicts": 7
+ },
+ "steward_batches": null
+}

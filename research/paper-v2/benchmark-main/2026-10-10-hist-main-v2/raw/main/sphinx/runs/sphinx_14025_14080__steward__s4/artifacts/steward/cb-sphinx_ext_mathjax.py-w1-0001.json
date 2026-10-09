@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-4972e88b661a3080",
+  "proposalIds": [
+    "prop-hist-w1-sphinx_ext_mathjax_py"
+  ],
+  "targetFiles": [
+    "sphinx/ext/mathjax.py"
+  ],
+  "appliedFiles": [
+    "sphinx/ext/mathjax.py"
+  ],
+  "fileBeforeHashes": {
+    "sphinx/ext/mathjax.py": "123a025818b0e2f68a1b0d2e6671d92e36d2c8342b04be4226eae217e39a2021"
+  },
+  "fileAfterHashes": {
+    "sphinx/ext/mathjax.py": "e22595cbf2e4e3649f52a08ae2f5da477caa2c83e4f582b51fe9f6e25d8e2c2e"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sphinx/ext/mathjax.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-4972e88b661a3080",
+    "planId": "merge-4972e88b661a3080",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-4972e88b661a3080",
+        "planId": "merge-4972e88b661a3080",
+        "request_identity": [
+          "prop-hist-w1-sphinx_ext_mathjax_py"
+        ],
+        "actor_ids": [
+          "writer-14080"
+        ],
+        "request_files": [
+          "sphinx/ext/mathjax.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sphinx/ext/mathjax.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/sphinx/runs/sphinx_14025_14080__steward__s4/artifacts/steward/cb-sphinx_ext_mathjax.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SPHINX_EXT_MATHJAX_PY"
+        ],
+        "commit_sha": "f2d68a0c18d1f1f4db5c3da8cbd1ee0b0496fe8b"
+      }
+    ]
+  }
+}

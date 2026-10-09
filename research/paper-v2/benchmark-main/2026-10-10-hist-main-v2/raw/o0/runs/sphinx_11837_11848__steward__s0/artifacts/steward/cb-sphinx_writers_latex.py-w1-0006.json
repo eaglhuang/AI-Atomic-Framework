@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-93710e1a651a2094",
+  "proposalIds": [
+    "prop-hist-w1-sphinx_writers_latex_py"
+  ],
+  "targetFiles": [
+    "sphinx/writers/latex.py"
+  ],
+  "appliedFiles": [
+    "sphinx/writers/latex.py"
+  ],
+  "fileBeforeHashes": {
+    "sphinx/writers/latex.py": "78d6ed48b5b7e963bb31fc1daab26736b1270c72177179ff46cb0a24b75ecac4"
+  },
+  "fileAfterHashes": {
+    "sphinx/writers/latex.py": "6125307b9107dd8a7cb5acdb9f74bc3996b990c7a7600a03688aadbea4664f63"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sphinx/writers/latex.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-93710e1a651a2094",
+    "planId": "merge-93710e1a651a2094",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-93710e1a651a2094",
+        "planId": "merge-93710e1a651a2094",
+        "request_identity": [
+          "prop-hist-w1-sphinx_writers_latex_py"
+        ],
+        "actor_ids": [
+          "writer-11848"
+        ],
+        "request_files": [
+          "sphinx/writers/latex.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sphinx/writers/latex.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/o0/runs/sphinx_11837_11848__steward__s0/artifacts/steward/cb-sphinx_writers_latex.py-w1-0006.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SPHINX_WRITERS_LATEX_PY"
+        ],
+        "commit_sha": "de2945fca438548ba866d9f771f3d41112156705"
+      }
+    ]
+  }
+}

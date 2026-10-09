@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-a35df770619873b9",
+  "proposalIds": [
+    "prop-hist-w1-django_db_models_query_utils_py"
+  ],
+  "targetFiles": [
+    "django/db/models/query_utils.py"
+  ],
+  "appliedFiles": [
+    "django/db/models/query_utils.py"
+  ],
+  "fileBeforeHashes": {
+    "django/db/models/query_utils.py": "42f2cb3d2d7c7fa649131e771407efbabe09017e721251650f54ebe87a5e9029"
+  },
+  "fileAfterHashes": {
+    "django/db/models/query_utils.py": "4593434092cbbf69772ca779ef7cd6a12f12757fcd52b9bc9fb843eb9b92f814"
+  },
+  "permissions": {
+    "fileWrite": [
+      "django/db/models/query_utils.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-a35df770619873b9",
+    "planId": "merge-a35df770619873b9",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-a35df770619873b9",
+        "planId": "merge-a35df770619873b9",
+        "request_identity": [
+          "prop-hist-w1-django_db_models_query_utils_py"
+        ],
+        "actor_ids": [
+          "writer-19445"
+        ],
+        "request_files": [
+          "django/db/models/query_utils.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "django/db/models/query_utils.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/django/runs/django_19395_19445__bare_composer__s1/artifacts/steward/cb-django_db_models_query_utils.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-DJANGO_DB_MODELS_QUERY_UTILS_PY"
+        ],
+        "commit_sha": "93cef61635b114364b823840c2a4912a4b33e242"
+      }
+    ]
+  }
+}

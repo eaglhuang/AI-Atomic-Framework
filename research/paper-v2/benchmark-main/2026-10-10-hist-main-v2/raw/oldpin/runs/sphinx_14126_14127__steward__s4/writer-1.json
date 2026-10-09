@@ -1,0 +1,130 @@
+{
+ "writer": 1,
+ "pr": 14127,
+ "pid": 2475599,
+ "init_ms": 87.262124,
+ "start_offset_ms": 3,
+ "file_order": [
+  "sphinx/ext/napoleon/docstring.py"
+ ],
+ "holds": {
+  "sphinx/ext/napoleon/docstring.py": 15
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 14127,
+   "path": "sphinx/ext/napoleon/docstring.py",
+   "intents": [
+    "log:sphinx:14126_14127:14127:sphinx/ext/napoleon/docstring.py:h0",
+    "log:sphinx:14126_14127:14127:sphinx/ext/napoleon/docstring.py:h1",
+    "log:sphinx:14126_14127:14127:sphinx/ext/napoleon/docstring.py:h2"
+   ],
+   "hold_ms": 15,
+   "t_submit_epoch": 1791575356700,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 18,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sphinx_ext_napoleon_docstring.py-w1-0001",
+   "total_ms": 121.06,
+   "t_done_epoch": 1791575356821
+  }
+ ],
+ "admit_stats": {
+  "txns": 2,
+  "cas_conflicts": 0
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sphinx_ext_napoleon_docstring.py-w1-0001",
+   "path": "sphinx/ext/napoleon/docstring.py",
+   "pid": 2475599,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-sphinx_ext_napoleon_docstring_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sphinx_ext_napoleon_docstring_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:4ce59cd6b1552c597e54f4750dd0c1bcb2d74bf7e3b3a0fcc41499ac8a0cec17"
+   ],
+   "lock_wait_ms": 0.11,
+   "t_start_epoch_ms": 1791575356735.63,
+   "pre_apply_hash": "sha256:4ce59cd6b1552c597e54f4750dd0c1bcb2d74bf7e3b3a0fcc41499ac8a0cec17",
+   "receipt_before_hash": "sha256:4ce59cd6b1552c597e54f4750dd0c1bcb2d74bf7e3b3a0fcc41499ac8a0cec17",
+   "receipt_after_hash": "sha256:577b4cc3170f7ba302c0609d069847f58516321deb3fb01169750ed1cbb935de",
+   "post_apply_hash": "sha256:577b4cc3170f7ba302c0609d069847f58516321deb3fb01169750ed1cbb935de",
+   "t_end_epoch_ms": 1791575356817.11,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:49:16.817+08:00",
+   "batch_id": "cb-sphinx_ext_napoleon_docstring.py-w1-0001",
+   "path": "sphinx/ext/napoleon/docstring.py",
+   "proposalIds": [
+    "prop-hist-w1-sphinx_ext_napoleon_docstring_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sphinx_ext_napoleon_docstring_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-sphinx_ext_napoleon_docstring_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-sphinx_ext_napoleon_docstring_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-sphinx_ext_napoleon_docstring_py",
+     "logical_id": "prop-hist-w1-sphinx_ext_napoleon_docstring_py",
+     "attempt_id": "att-prop-hist-w1-sphinx_ext_napoleon_docstring_py-r0",
+     "proposal_id": "prop-hist-w1-sphinx_ext_napoleon_docstring_py",
+     "actorId": "writer-14127"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.22,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:4ce59cd6b1552c597e54f4750dd0c1bcb2d74bf7e3b3a0fcc41499ac8a0cec17",
+   "written": true,
+   "output_digest": "sha256:577b4cc3170f7ba302c0609d069847f58516321deb3fb01169750ed1cbb935de",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

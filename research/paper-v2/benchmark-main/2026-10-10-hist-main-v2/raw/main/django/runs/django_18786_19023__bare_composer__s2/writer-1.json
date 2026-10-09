@@ -1,0 +1,332 @@
+{
+ "writer": 1,
+ "pr": 19023,
+ "pid": 2183240,
+ "init_ms": 83.25599399999999,
+ "start_offset_ms": 19,
+ "file_order": [
+  "django/contrib/gis/geos/prototypes/predicates.py",
+  "django/contrib/gis/geos/geometry.py",
+  "django/contrib/gis/geos/prototypes/__init__.py"
+ ],
+ "holds": {
+  "django/contrib/gis/geos/prototypes/predicates.py": 12,
+  "django/contrib/gis/geos/geometry.py": 11,
+  "django/contrib/gis/geos/prototypes/__init__.py": 14
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 19023,
+   "path": "django/contrib/gis/geos/prototypes/predicates.py",
+   "intents": [
+    "log:django:18786_19023:19023:django/contrib/gis/geos/prototypes/predicates.py:h3"
+   ],
+   "hold_ms": 12,
+   "t_submit_epoch": 1791572835223,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-django_contrib_gis_geos_prototypes_predicates.py-w1-0001",
+   "total_ms": 153.44,
+   "t_done_epoch": 1791572835376
+  },
+  {
+   "writer": 1,
+   "pr": 19023,
+   "path": "django/contrib/gis/geos/geometry.py",
+   "intents": [
+    "log:django:18786_19023:19023:django/contrib/gis/geos/geometry.py:h0",
+    "log:django:18786_19023:19023:django/contrib/gis/geos/geometry.py:h1"
+   ],
+   "hold_ms": 11,
+   "t_submit_epoch": 1791572835376,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-django_contrib_gis_geos_geometry.py-w1-0002",
+   "total_ms": 22.75,
+   "t_done_epoch": 1791572835399
+  },
+  {
+   "writer": 1,
+   "pr": 19023,
+   "path": "django/contrib/gis/geos/prototypes/__init__.py",
+   "intents": [
+    "log:django:18786_19023:19023:django/contrib/gis/geos/prototypes/__init__.py:h2"
+   ],
+   "hold_ms": 14,
+   "t_submit_epoch": 1791572835399,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-django_contrib_gis_geos_prototypes___init__.py-w1-0003",
+   "total_ms": 23.97,
+   "t_done_epoch": 1791572835423
+  }
+ ],
+ "admit_stats": null,
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-django_contrib_gis_geos_prototypes_predicates.py-w1-0001",
+   "path": "django/contrib/gis/geos/prototypes/predicates.py",
+   "pid": 2183240,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-django_contrib_gis_geos_prototypes_predicates_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-django_contrib_gis_geos_prototypes_predicates_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:f8d78d7a669893396f1f3712d6f5e204a3c7b978fe581e3013fc51092b563e83"
+   ],
+   "lock_wait_ms": 0.12,
+   "t_start_epoch_ms": 1791572835237.23,
+   "pre_apply_hash": "sha256:f8d78d7a669893396f1f3712d6f5e204a3c7b978fe581e3013fc51092b563e83",
+   "receipt_before_hash": "sha256:f8d78d7a669893396f1f3712d6f5e204a3c7b978fe581e3013fc51092b563e83",
+   "receipt_after_hash": "sha256:07ac2a00217ef30f76e334592792dd1bc1c8b78add0e3082c3cfad4ae30b9b91",
+   "post_apply_hash": "sha256:07ac2a00217ef30f76e334592792dd1bc1c8b78add0e3082c3cfad4ae30b9b91",
+   "t_end_epoch_ms": 1791572835376.01,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:07:15.376+08:00",
+   "batch_id": "cb-django_contrib_gis_geos_prototypes_predicates.py-w1-0001",
+   "path": "django/contrib/gis/geos/prototypes/predicates.py",
+   "proposalIds": [
+    "prop-hist-w1-django_contrib_gis_geos_prototypes_predicates_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-django_contrib_gis_geos_prototypes_predicates_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-django_contrib_gis_geos_prototypes_predicates_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-django_contrib_gis_geos_prototypes_predicates_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-django_contrib_gis_geos_prototypes_predicates_py",
+     "logical_id": "prop-hist-w1-django_contrib_gis_geos_prototypes_predicates_py",
+     "attempt_id": "att-prop-hist-w1-django_contrib_gis_geos_prototypes_predicates_py-r0",
+     "proposal_id": "prop-hist-w1-django_contrib_gis_geos_prototypes_predicates_py",
+     "actorId": "writer-19023"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.25,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:f8d78d7a669893396f1f3712d6f5e204a3c7b978fe581e3013fc51092b563e83",
+   "written": true,
+   "output_digest": "sha256:07ac2a00217ef30f76e334592792dd1bc1c8b78add0e3082c3cfad4ae30b9b91",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  },
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-django_contrib_gis_geos_geometry.py-w1-0002",
+   "path": "django/contrib/gis/geos/geometry.py",
+   "pid": 2183240,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-django_contrib_gis_geos_geometry_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-django_contrib_gis_geos_geometry_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:b267f5225f29f998ed50828d9ceeb4faedbe1b6f055fb6a6c668cbab053c510d"
+   ],
+   "lock_wait_ms": 0,
+   "t_start_epoch_ms": 1791572835388.71,
+   "pre_apply_hash": "sha256:b267f5225f29f998ed50828d9ceeb4faedbe1b6f055fb6a6c668cbab053c510d",
+   "receipt_before_hash": "sha256:b267f5225f29f998ed50828d9ceeb4faedbe1b6f055fb6a6c668cbab053c510d",
+   "receipt_after_hash": "sha256:4c435ef28dee1d08fbdfbf540cf6315ee0060f803539d26a961ec4b3d615c287",
+   "post_apply_hash": "sha256:4c435ef28dee1d08fbdfbf540cf6315ee0060f803539d26a961ec4b3d615c287",
+   "t_end_epoch_ms": 1791572835399.15,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:07:15.399+08:00",
+   "batch_id": "cb-django_contrib_gis_geos_geometry.py-w1-0002",
+   "path": "django/contrib/gis/geos/geometry.py",
+   "proposalIds": [
+    "prop-hist-w1-django_contrib_gis_geos_geometry_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-django_contrib_gis_geos_geometry_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-django_contrib_gis_geos_geometry_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-django_contrib_gis_geos_geometry_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-django_contrib_gis_geos_geometry_py",
+     "logical_id": "prop-hist-w1-django_contrib_gis_geos_geometry_py",
+     "attempt_id": "att-prop-hist-w1-django_contrib_gis_geos_geometry_py-r0",
+     "proposal_id": "prop-hist-w1-django_contrib_gis_geos_geometry_py",
+     "actorId": "writer-19023"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.01,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:b267f5225f29f998ed50828d9ceeb4faedbe1b6f055fb6a6c668cbab053c510d",
+   "written": true,
+   "output_digest": "sha256:4c435ef28dee1d08fbdfbf540cf6315ee0060f803539d26a961ec4b3d615c287",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  },
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-django_contrib_gis_geos_prototypes___init__.py-w1-0003",
+   "path": "django/contrib/gis/geos/prototypes/__init__.py",
+   "pid": 2183240,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-django_contrib_gis_geos_prototypes_init_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-django_contrib_gis_geos_prototypes_init_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:8809ec0f46e0f2eec0be8ec599eb78964028f659eccb27d915aee4dc843a4f5c"
+   ],
+   "lock_wait_ms": 0,
+   "t_start_epoch_ms": 1791572835413.69,
+   "pre_apply_hash": "sha256:8809ec0f46e0f2eec0be8ec599eb78964028f659eccb27d915aee4dc843a4f5c",
+   "receipt_before_hash": "sha256:8809ec0f46e0f2eec0be8ec599eb78964028f659eccb27d915aee4dc843a4f5c",
+   "receipt_after_hash": "sha256:e38192d2ec3883756683a4154671fe7de7770a61274f8b918fb37e5ec7cb6b9b",
+   "post_apply_hash": "sha256:e38192d2ec3883756683a4154671fe7de7770a61274f8b918fb37e5ec7cb6b9b",
+   "t_end_epoch_ms": 1791572835423.11,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:07:15.423+08:00",
+   "batch_id": "cb-django_contrib_gis_geos_prototypes___init__.py-w1-0003",
+   "path": "django/contrib/gis/geos/prototypes/__init__.py",
+   "proposalIds": [
+    "prop-hist-w1-django_contrib_gis_geos_prototypes_init_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-django_contrib_gis_geos_prototypes_init_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-django_contrib_gis_geos_prototypes_init_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-django_contrib_gis_geos_prototypes_init_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-django_contrib_gis_geos_prototypes_init_py",
+     "logical_id": "prop-hist-w1-django_contrib_gis_geos_prototypes_init_py",
+     "attempt_id": "att-prop-hist-w1-django_contrib_gis_geos_prototypes_init_py-r0",
+     "proposal_id": "prop-hist-w1-django_contrib_gis_geos_prototypes_init_py",
+     "actorId": "writer-19023"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.01,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:8809ec0f46e0f2eec0be8ec599eb78964028f659eccb27d915aee4dc843a4f5c",
+   "written": true,
+   "output_digest": "sha256:e38192d2ec3883756683a4154671fe7de7770a61274f8b918fb37e5ec7cb6b9b",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

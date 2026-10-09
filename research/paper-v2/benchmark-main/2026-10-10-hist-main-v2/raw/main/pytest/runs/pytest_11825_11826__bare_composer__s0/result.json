@@ -1,0 +1,197 @@
+{
+ "pair_id": "pytest:11825_11826",
+ "stratum": "O3",
+ "arm": "bare_composer",
+ "plant": null,
+ "seed_k": 0,
+ "seed": 1730743329,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 810,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 34,
+  "by_verdict": {
+   "correct": 27,
+   "blocked_absent": 7
+  },
+  "completed": 27,
+  "lost_effects": 0,
+  "blocked": 7,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 6,
+  "files_full_bytes_exact": 6,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {
+  "compose-context-mismatch: proposal 'prop-hist-w1-src_pytest_config_init_py' cont": 7
+ },
+ "structure": {
+  "src/_pytest/config/__init__.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "src/_pytest/config/findpaths.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "src/_pytest/fixtures.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "src/_pytest/helpconfig.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "src/_pytest/hookspec.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "src/_pytest/python.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "src/_pytest/config/__init__.py": true,
+  "src/_pytest/config/findpaths.py": true,
+  "src/_pytest/fixtures.py": true,
+  "src/_pytest/helpconfig.py": true,
+  "src/_pytest/hookspec.py": true,
+  "src/_pytest/python.py": true
+ },
+ "final_exists": {
+  "src/_pytest/config/__init__.py": true,
+  "src/_pytest/config/findpaths.py": true,
+  "src/_pytest/fixtures.py": true,
+  "src/_pytest/helpconfig.py": true,
+  "src/_pytest/hookspec.py": true,
+  "src/_pytest/python.py": true
+ },
+ "files": [
+  {
+   "path": "src/_pytest/config/__init__.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:d3216524a136e4b2210eda1a56a9215034be807bb7588f9854206d338445f6a3",
+   "final_digest": "sha256:1e8b16d4d35a09c562876d0827c537a023c9af2f2dc8ba0cb935a56f94932990",
+   "expected_digests": [
+    "sha256:1e8b16d4d35a09c562876d0827c537a023c9af2f2dc8ba0cb935a56f94932990"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "src/_pytest/config/findpaths.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:93562cd9362029c528df08a192fbe10349f8c9ed07d229ab4dc0e5e5835efe8a",
+   "final_digest": "sha256:a1816662f46a66421436aa95a5d90875daf2e7d14dbe01305c795282bfe631c3",
+   "expected_digests": [
+    "sha256:a1816662f46a66421436aa95a5d90875daf2e7d14dbe01305c795282bfe631c3"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "src/_pytest/fixtures.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:2935cba2745ed98d6cf5c307132a5317d27591c31184c8130e28afdaae14b539",
+   "final_digest": "sha256:592b2540e80ff1b1e5c7aaecd66aaf88cdec75b99a8e223d3a447f61558df76f",
+   "expected_digests": [
+    "sha256:592b2540e80ff1b1e5c7aaecd66aaf88cdec75b99a8e223d3a447f61558df76f"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "src/_pytest/helpconfig.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:bdf291a21b6a80f90820f8f4c10fae7f3f3fb7bb25c1c556bd94b450b2fcd20b",
+   "final_digest": "sha256:1d98f1d003bd48a509d955eaaf590d04ab49eb1b137a1996f8fb90433d1aad94",
+   "expected_digests": [
+    "sha256:1d98f1d003bd48a509d955eaaf590d04ab49eb1b137a1996f8fb90433d1aad94"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "src/_pytest/hookspec.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:efe7a893170929f06ef99e28a34249a43d1aa2e606701c215acf1b7f0493da33",
+   "final_digest": "sha256:d77b5fdad4461ca1c6c94d6eed8875c4fef82ab951482c4ed894c5177a979f4f",
+   "expected_digests": [
+    "sha256:d77b5fdad4461ca1c6c94d6eed8875c4fef82ab951482c4ed894c5177a979f4f"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "src/_pytest/python.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:16272871faed73c9e04d3906bc2210ed1a3005195fd059cb009c87af48938880",
+   "final_digest": "sha256:6da2f36d0d8b5e30d7c0788011bd94342605062516bcc830bec9caa0583147ef",
+   "expected_digests": [
+    "sha256:6da2f36d0d8b5e30d7c0788011bd94342605062516bcc830bec9caa0583147ef"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "src/_pytest/config/__init__.py": "sha256:1e8b16d4d35a09c562876d0827c537a023c9af2f2dc8ba0cb935a56f94932990",
+  "src/_pytest/config/findpaths.py": "sha256:a1816662f46a66421436aa95a5d90875daf2e7d14dbe01305c795282bfe631c3",
+  "src/_pytest/fixtures.py": "sha256:592b2540e80ff1b1e5c7aaecd66aaf88cdec75b99a8e223d3a447f61558df76f",
+  "src/_pytest/helpconfig.py": "sha256:1d98f1d003bd48a509d955eaaf590d04ab49eb1b137a1996f8fb90433d1aad94",
+  "src/_pytest/hookspec.py": "sha256:d77b5fdad4461ca1c6c94d6eed8875c4fef82ab951482c4ed894c5177a979f4f",
+  "src/_pytest/python.py": "sha256:6da2f36d0d8b5e30d7c0788011bd94342605062516bcc830bec9caa0583147ef"
+ }
+}

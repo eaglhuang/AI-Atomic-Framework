@@ -1,0 +1,40 @@
+{
+ "writer": 1,
+ "pr": 14055,
+ "pid": 2373070,
+ "init_ms": 63.287029000000004,
+ "start_offset_ms": 9,
+ "file_order": [
+  "scripts/docs.py"
+ ],
+ "holds": {
+  "scripts/docs.py": 29
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 14055,
+   "path": "scripts/docs.py",
+   "intents": [
+    "log:fastapi:14033_14055:14055:scripts/docs.py:h0",
+    "log:fastapi:14033_14055:14055:scripts/docs.py:h1",
+    "log:fastapi:14033_14055:14055:scripts/docs.py:h2"
+   ],
+   "hold_ms": 29,
+   "t_submit_epoch": 1791574588845,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 40,
+   "outcome": "blocked",
+   "blocked_reason": "git-merge-conflict",
+   "total_ms": 78.25,
+   "t_done_epoch": 1791574588924
+  }
+ ],
+ "admit_stats": {
+  "txns": 3,
+  "cas_conflicts": 1
+ },
+ "steward_batches": null
+}

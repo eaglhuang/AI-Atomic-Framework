@@ -1,0 +1,39 @@
+{
+ "writer": 1,
+ "pr": 17702,
+ "pid": 2193056,
+ "init_ms": 77.910753,
+ "start_offset_ms": 13,
+ "file_order": [
+  "django/contrib/admin/utils.py"
+ ],
+ "holds": {
+  "django/contrib/admin/utils.py": 11
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 17702,
+   "path": "django/contrib/admin/utils.py",
+   "intents": [
+    "log:django:17357_17702:17702:django/contrib/admin/utils.py:h0"
+   ],
+   "hold_ms": 11,
+   "t_submit_epoch": 1791572911826,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 14,
+   "lock_spins": 2,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 33.35,
+   "t_done_epoch": 1791572911859
+  }
+ ],
+ "admit_stats": {
+  "txns": 2,
+  "cas_conflicts": 3
+ },
+ "steward_batches": null
+}

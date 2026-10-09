@@ -1,0 +1,79 @@
+{
+ "writer": 1,
+ "pr": 11825,
+ "pid": 2300880,
+ "init_ms": 64.21941000000001,
+ "start_offset_ms": 9,
+ "file_order": [
+  "src/_pytest/fixtures.py",
+  "src/_pytest/config/__init__.py",
+  "src/_pytest/hookspec.py"
+ ],
+ "holds": {
+  "src/_pytest/fixtures.py": 0,
+  "src/_pytest/config/__init__.py": 12,
+  "src/_pytest/hookspec.py": 0
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 11825,
+   "path": "src/_pytest/fixtures.py",
+   "intents": [
+    "log:pytest:9496_11825:11825:src/_pytest/fixtures.py:h3",
+    "log:pytest:9496_11825:11825:src/_pytest/fixtures.py:h4"
+   ],
+   "hold_ms": 0,
+   "t_submit_epoch": 1791574021107,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 19,
+   "outcome": "commit",
+   "total_ms": 32.39,
+   "t_done_epoch": 1791574021139
+  },
+  {
+   "writer": 1,
+   "pr": 11825,
+   "path": "src/_pytest/config/__init__.py",
+   "intents": [
+    "log:pytest:9496_11825:11825:src/_pytest/config/__init__.py:h0",
+    "log:pytest:9496_11825:11825:src/_pytest/config/__init__.py:h1",
+    "log:pytest:9496_11825:11825:src/_pytest/config/__init__.py:h2"
+   ],
+   "hold_ms": 12,
+   "t_submit_epoch": 1791574021139,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 6,
+   "outcome": "commit",
+   "total_ms": 26.26,
+   "t_done_epoch": 1791574021165
+  },
+  {
+   "writer": 1,
+   "pr": 11825,
+   "path": "src/_pytest/hookspec.py",
+   "intents": [
+    "log:pytest:9496_11825:11825:src/_pytest/hookspec.py:h5",
+    "log:pytest:9496_11825:11825:src/_pytest/hookspec.py:h6"
+   ],
+   "hold_ms": 0,
+   "t_submit_epoch": 1791574021165,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "total_ms": 11.61,
+   "t_done_epoch": 1791574021177
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 0
+ },
+ "steward_batches": null
+}

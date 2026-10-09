@@ -1,0 +1,239 @@
+{
+ "writer": 0,
+ "pr": 13830,
+ "pid": 2293796,
+ "init_ms": 87.54479500000001,
+ "start_offset_ms": 15,
+ "file_order": [
+  "src/_pytest/config/findpaths.py",
+  "src/_pytest/config/__init__.py"
+ ],
+ "holds": {
+  "src/_pytest/config/findpaths.py": 10,
+  "src/_pytest/config/__init__.py": 16
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 13830,
+   "path": "src/_pytest/config/findpaths.py",
+   "intents": [
+    "log:pytest:13830_13831:13830:src/_pytest/config/findpaths.py:h5",
+    "log:pytest:13830_13831:13830:src/_pytest/config/findpaths.py:h6",
+    "log:pytest:13830_13831:13830:src/_pytest/config/findpaths.py:h7",
+    "log:pytest:13830_13831:13830:src/_pytest/config/findpaths.py:h8",
+    "log:pytest:13830_13831:13830:src/_pytest/config/findpaths.py:h9",
+    "log:pytest:13830_13831:13830:src/_pytest/config/findpaths.py:h10"
+   ],
+   "hold_ms": 10,
+   "t_submit_epoch": 1791573966787,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-src__pytest_config_findpaths.py-w0-0001",
+   "total_ms": 116.56,
+   "t_done_epoch": 1791573966903
+  },
+  {
+   "writer": 0,
+   "pr": 13830,
+   "path": "src/_pytest/config/__init__.py",
+   "intents": [
+    "log:pytest:13830_13831:13830:src/_pytest/config/__init__.py:h0",
+    "log:pytest:13830_13831:13830:src/_pytest/config/__init__.py:h1",
+    "log:pytest:13830_13831:13830:src/_pytest/config/__init__.py:h2",
+    "log:pytest:13830_13831:13830:src/_pytest/config/__init__.py:h3",
+    "log:pytest:13830_13831:13830:src/_pytest/config/__init__.py:h4"
+   ],
+   "hold_ms": 16,
+   "t_submit_epoch": 1791573966903,
+   "outcome": "blocked",
+   "blocked_reason": "compose-context-mismatch: proposal 'prop-hist-w0-src_pytest_config_init_py' context mismatch at base line 1086: expected \"        self._override_ini: Sequence[str] = ()\", found \"        self._opt2dest: dict[str, str] = {}\" [proposals: prop-hist-w0-src_pytest_config_init_py]",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w0-src_pytest_config_init_py' context mismatch at base line 1086: expected \"        self._override_ini: Sequence[str] = ()\", found \"        self._opt2dest: dict[str, str] = {}\" [proposals: prop-hist-w0-src_pytest_config_init_py]"
+   ],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-src__pytest_config___init__.py-w0-0002",
+   "total_ms": 30.16,
+   "t_done_epoch": 1791573966934
+  }
+ ],
+ "admit_stats": null,
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-src__pytest_config_findpaths.py-w0-0001",
+   "path": "src/_pytest/config/findpaths.py",
+   "pid": 2293796,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-src_pytest_config_findpaths_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-src_pytest_config_findpaths_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:511e8b4b3e6d39ab5b24aba4aba62e7b6d11d55fc76fdf24a2e57a07682dd825"
+   ],
+   "lock_wait_ms": 0.18,
+   "t_start_epoch_ms": 1791573966803.34,
+   "pre_apply_hash": "sha256:511e8b4b3e6d39ab5b24aba4aba62e7b6d11d55fc76fdf24a2e57a07682dd825",
+   "receipt_before_hash": "sha256:511e8b4b3e6d39ab5b24aba4aba62e7b6d11d55fc76fdf24a2e57a07682dd825",
+   "receipt_after_hash": "sha256:64f3c7b946f3adb258a7d6fdbf0d6fe9423b38f6f08b8b61ba12982effca06dc",
+   "post_apply_hash": "sha256:64f3c7b946f3adb258a7d6fdbf0d6fe9423b38f6f08b8b61ba12982effca06dc",
+   "t_end_epoch_ms": 1791573966903.5,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:26:06.903+08:00",
+   "batch_id": "cb-src__pytest_config_findpaths.py-w0-0001",
+   "path": "src/_pytest/config/findpaths.py",
+   "proposalIds": [
+    "prop-hist-w0-src_pytest_config_findpaths_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-src_pytest_config_findpaths_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-src_pytest_config_findpaths_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-src_pytest_config_findpaths_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-src_pytest_config_findpaths_py",
+     "logical_id": "prop-hist-w0-src_pytest_config_findpaths_py",
+     "attempt_id": "att-prop-hist-w0-src_pytest_config_findpaths_py-r0",
+     "proposal_id": "prop-hist-w0-src_pytest_config_findpaths_py",
+     "actorId": "writer-13830"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.55,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:511e8b4b3e6d39ab5b24aba4aba62e7b6d11d55fc76fdf24a2e57a07682dd825",
+   "written": true,
+   "output_digest": "sha256:64f3c7b946f3adb258a7d6fdbf0d6fe9423b38f6f08b8b61ba12982effca06dc",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  },
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-src__pytest_config___init__.py-w0-0002",
+   "path": "src/_pytest/config/__init__.py",
+   "pid": 2293796,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-src_pytest_config_init_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-src_pytest_config_init_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:09060b80d3c8433487382858ff305ac910dd30ba03fdb27bba17874de79b9598"
+   ],
+   "lock_wait_ms": 0,
+   "t_start_epoch_ms": 1791573966922.25,
+   "pre_apply_hash": "sha256:09060b80d3c8433487382858ff305ac910dd30ba03fdb27bba17874de79b9598",
+   "receipt_before_hash": null,
+   "receipt_after_hash": null,
+   "post_apply_hash": "sha256:8c6823134fa2e52ae299f98eeeb0bfb9b15a12e7cd7dcfdab85cd72d63e3940f",
+   "t_end_epoch_ms": 1791573966934,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "blocked",
+   "written": false,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:26:06.934+08:00",
+   "batch_id": "cb-src__pytest_config___init__.py-w0-0002",
+   "path": "src/_pytest/config/__init__.py",
+   "proposalIds": [
+    "prop-hist-w0-src_pytest_config_init_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-src_pytest_config_init_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-src_pytest_config_init_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-src_pytest_config_init_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-src_pytest_config_init_py",
+     "logical_id": "prop-hist-w0-src_pytest_config_init_py",
+     "attempt_id": "att-prop-hist-w0-src_pytest_config_init_py-r0",
+     "proposal_id": "prop-hist-w0-src_pytest_config_init_py",
+     "actorId": "writer-13830"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w0-src_pytest_config_init_py' context mismatch at base line 1086: expected \"        self._override_ini: Sequence[str] = ()\", found \"        self._opt2dest: dict[str, str] = {}\" [proposals: prop-hist-w0-src_pytest_config_init_py]"
+   ],
+   "blocked_reason": "compose-context-mismatch: proposal 'prop-hist-w0-src_pytest_config_init_py' context mismatch at base line 1086: expected \"        self._override_ini: Sequence[str] = ()\", found \"        self._opt2dest: dict[str, str] = {}\" [proposals: prop-hist-w0-src_pytest_config_init_py]",
+   "window_wait_ms": 0.03,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:09060b80d3c8433487382858ff305ac910dd30ba03fdb27bba17874de79b9598",
+   "written": false,
+   "output_digest": null,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "compose-context-mismatch: proposal 'prop-hist-w0-src_pytest_config_init_py' context mismatch at base line 1086: expected \"        self._override_ini: Sequence[str] = ()\", found \"        self._opt2dest: dict[str, str] = {}\" [proposals: prop-hist-w0-src_pytest_config_init_py]"
+  }
+ ]
+}

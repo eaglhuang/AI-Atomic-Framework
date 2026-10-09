@@ -1,0 +1,38 @@
+{
+ "writer": 1,
+ "pr": 11888,
+ "pid": 2350462,
+ "init_ms": 74.75146899999999,
+ "start_offset_ms": 14,
+ "file_order": [
+  "sphinx/search/__init__.py"
+ ],
+ "holds": {
+  "sphinx/search/__init__.py": 13
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 11888,
+   "path": "sphinx/search/__init__.py",
+   "intents": [
+    "log:sphinx:11696_11888:11888:sphinx/search/__init__.py:h0"
+   ],
+   "hold_ms": 13,
+   "t_submit_epoch": 1791574407611,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 17,
+   "outcome": "blocked",
+   "blocked_reason": "git-base-drift",
+   "total_ms": 42.73,
+   "t_done_epoch": 1791574407653
+  }
+ ],
+ "admit_stats": {
+  "txns": 2,
+  "cas_conflicts": 7
+ },
+ "steward_batches": null
+}

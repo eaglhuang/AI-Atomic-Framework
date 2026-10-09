@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-413d10b4f2f9372d",
+  "proposalIds": [
+    "prop-hist-w1-sphinx_deprecation_py"
+  ],
+  "targetFiles": [
+    "sphinx/deprecation.py"
+  ],
+  "appliedFiles": [
+    "sphinx/deprecation.py"
+  ],
+  "fileBeforeHashes": {
+    "sphinx/deprecation.py": "001228d6de264b00934f6bb1a5428d7304076f75faaaeaffb738825b3221aad1"
+  },
+  "fileAfterHashes": {
+    "sphinx/deprecation.py": "13c94d0829470b532dd88897358a79a142eaba45237ef4a71ea5260d77efa1bc"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sphinx/deprecation.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-413d10b4f2f9372d",
+    "planId": "merge-413d10b4f2f9372d",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-413d10b4f2f9372d",
+        "planId": "merge-413d10b4f2f9372d",
+        "request_identity": [
+          "prop-hist-w1-sphinx_deprecation_py"
+        ],
+        "actor_ids": [
+          "writer-12651"
+        ],
+        "request_files": [
+          "sphinx/deprecation.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sphinx/deprecation.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/o0/runs/sphinx_12646_12651__steward__s4/artifacts/steward/cb-sphinx_deprecation.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SPHINX_DEPRECATION_PY"
+        ],
+        "commit_sha": "b2c7dcce52bc88502e9a5fe19710f6206d7f2a06"
+      }
+    ]
+  }
+}

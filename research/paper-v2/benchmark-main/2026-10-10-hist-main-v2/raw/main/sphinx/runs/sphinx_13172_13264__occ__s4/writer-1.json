@@ -1,0 +1,126 @@
+{
+ "writer": 1,
+ "pr": 13264,
+ "pid": 2335725,
+ "init_ms": 67.17052,
+ "start_offset_ms": 0,
+ "file_order": [
+  "sphinx/directives/patches.py",
+  "sphinx/ext/autosummary/__init__.py",
+  "sphinx/ext/imgmath.py",
+  "sphinx/writers/latex.py",
+  "sphinx/ext/mathjax.py"
+ ],
+ "holds": {
+  "sphinx/directives/patches.py": 9,
+  "sphinx/ext/autosummary/__init__.py": 18,
+  "sphinx/ext/imgmath.py": 27,
+  "sphinx/writers/latex.py": 3,
+  "sphinx/ext/mathjax.py": 3
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 13264,
+   "path": "sphinx/directives/patches.py",
+   "intents": [
+    "log:sphinx:13172_13264:13264:sphinx/directives/patches.py:h0",
+    "log:sphinx:13172_13264:13264:sphinx/directives/patches.py:h1",
+    "log:sphinx:13172_13264:13264:sphinx/directives/patches.py:h2",
+    "log:sphinx:13172_13264:13264:sphinx/directives/patches.py:h3"
+   ],
+   "hold_ms": 9,
+   "t_submit_epoch": 1791574291420,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 16,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 35.09,
+   "t_done_epoch": 1791574291455
+  },
+  {
+   "writer": 1,
+   "pr": 13264,
+   "path": "sphinx/ext/autosummary/__init__.py",
+   "intents": [
+    "log:sphinx:13172_13264:13264:sphinx/ext/autosummary/__init__.py:h4",
+    "log:sphinx:13172_13264:13264:sphinx/ext/autosummary/__init__.py:h5",
+    "log:sphinx:13172_13264:13264:sphinx/ext/autosummary/__init__.py:h6",
+    "log:sphinx:13172_13264:13264:sphinx/ext/autosummary/__init__.py:h7",
+    "log:sphinx:13172_13264:13264:sphinx/ext/autosummary/__init__.py:h8"
+   ],
+   "hold_ms": 18,
+   "t_submit_epoch": 1791574291455,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "queue",
+   "admit_wait_ms": 21,
+   "outcome": "blocked",
+   "blocked_reason": "occ-relocate-context-not-found",
+   "occ_retries": 0,
+   "total_ms": 45.55,
+   "t_done_epoch": 1791574291500
+  },
+  {
+   "writer": 1,
+   "pr": 13264,
+   "path": "sphinx/ext/imgmath.py",
+   "intents": [
+    "log:sphinx:13172_13264:13264:sphinx/ext/imgmath.py:h9"
+   ],
+   "hold_ms": 27,
+   "t_submit_epoch": 1791574291500,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 34,
+   "t_done_epoch": 1791574291534
+  },
+  {
+   "writer": 1,
+   "pr": 13264,
+   "path": "sphinx/writers/latex.py",
+   "intents": [
+    "log:sphinx:13172_13264:13264:sphinx/writers/latex.py:h11"
+   ],
+   "hold_ms": 3,
+   "t_submit_epoch": 1791574291534,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 12.4,
+   "t_done_epoch": 1791574291547
+  },
+  {
+   "writer": 1,
+   "pr": 13264,
+   "path": "sphinx/ext/mathjax.py",
+   "intents": [
+    "log:sphinx:13172_13264:13264:sphinx/ext/mathjax.py:h10"
+   ],
+   "hold_ms": 3,
+   "t_submit_epoch": 1791574291547,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 10.74,
+   "t_done_epoch": 1791574291557
+  }
+ ],
+ "admit_stats": {
+  "txns": 11,
+  "cas_conflicts": 5
+ },
+ "steward_batches": null
+}

@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-a66304731abc62da",
+  "proposalIds": [
+    "prop-hist-w1-fastapi_encoders_py"
+  ],
+  "targetFiles": [
+    "fastapi/encoders.py"
+  ],
+  "appliedFiles": [
+    "fastapi/encoders.py"
+  ],
+  "fileBeforeHashes": {
+    "fastapi/encoders.py": "a86968d01e16e1c2aca94f7dc300d986792d7de02a264177ea93ff89762bfa7c"
+  },
+  "fileAfterHashes": {
+    "fastapi/encoders.py": "b466aa36dfd0cdb706998fa90e79eef2461d378839e177fb9e17d89f997cb4b3"
+  },
+  "permissions": {
+    "fileWrite": [
+      "fastapi/encoders.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-a66304731abc62da",
+    "planId": "merge-a66304731abc62da",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-a66304731abc62da",
+        "planId": "merge-a66304731abc62da",
+        "request_identity": [
+          "prop-hist-w1-fastapi_encoders_py"
+        ],
+        "actor_ids": [
+          "writer-9929"
+        ],
+        "request_files": [
+          "fastapi/encoders.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "fastapi/encoders.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/fastapi/runs/fastapi_4972_9929__steward__s1/artifacts/steward/cb-fastapi_encoders.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-FASTAPI_ENCODERS_PY"
+        ],
+        "commit_sha": "b300726365e31a856fe8aaa69e86fdb7e6c4292e"
+      }
+    ]
+  }
+}

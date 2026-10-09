@@ -1,0 +1,128 @@
+{
+ "writer": 1,
+ "pr": 19065,
+ "pid": 2409657,
+ "init_ms": 101.579907,
+ "start_offset_ms": 5,
+ "file_order": [
+  "django/db/backends/postgresql/compiler.py"
+ ],
+ "holds": {
+  "django/db/backends/postgresql/compiler.py": 0
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 19065,
+   "path": "django/db/backends/postgresql/compiler.py",
+   "intents": [
+    "log:django:18466_19065:19065:django/db/backends/postgresql/compiler.py:h0"
+   ],
+   "hold_ms": 0,
+   "t_submit_epoch": 1791574829793,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 16,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-django_db_backends_postgresql_compiler.py-w1-0001",
+   "total_ms": 133.03,
+   "t_done_epoch": 1791574829926
+  }
+ ],
+ "admit_stats": {
+  "txns": 2,
+  "cas_conflicts": 0
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-django_db_backends_postgresql_compiler.py-w1-0001",
+   "path": "django/db/backends/postgresql/compiler.py",
+   "pid": 2409657,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-django_db_backends_postgresql_compiler_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-django_db_backends_postgresql_compiler_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:ec3a2a5dcab656696cae917bc4045a183f615c75b935a6d9693a7985c5f38a30"
+   ],
+   "lock_wait_ms": 0.11,
+   "t_start_epoch_ms": 1791574829813.28,
+   "pre_apply_hash": "sha256:ec3a2a5dcab656696cae917bc4045a183f615c75b935a6d9693a7985c5f38a30",
+   "receipt_before_hash": "sha256:ec3a2a5dcab656696cae917bc4045a183f615c75b935a6d9693a7985c5f38a30",
+   "receipt_after_hash": "sha256:f05c8ed152ed2cdb6e1c1f9d7e1fef5048f9b8a20f1cc6d77ca43c4715a6bdcd",
+   "post_apply_hash": "sha256:f05c8ed152ed2cdb6e1c1f9d7e1fef5048f9b8a20f1cc6d77ca43c4715a6bdcd",
+   "t_end_epoch_ms": 1791574829920.92,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:40:29.921+08:00",
+   "batch_id": "cb-django_db_backends_postgresql_compiler.py-w1-0001",
+   "path": "django/db/backends/postgresql/compiler.py",
+   "proposalIds": [
+    "prop-hist-w1-django_db_backends_postgresql_compiler_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-django_db_backends_postgresql_compiler_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-django_db_backends_postgresql_compiler_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-django_db_backends_postgresql_compiler_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-django_db_backends_postgresql_compiler_py",
+     "logical_id": "prop-hist-w1-django_db_backends_postgresql_compiler_py",
+     "attempt_id": "att-prop-hist-w1-django_db_backends_postgresql_compiler_py-r0",
+     "proposal_id": "prop-hist-w1-django_db_backends_postgresql_compiler_py",
+     "actorId": "writer-19065"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.23,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:ec3a2a5dcab656696cae917bc4045a183f615c75b935a6d9693a7985c5f38a30",
+   "written": true,
+   "output_digest": "sha256:f05c8ed152ed2cdb6e1c1f9d7e1fef5048f9b8a20f1cc6d77ca43c4715a6bdcd",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

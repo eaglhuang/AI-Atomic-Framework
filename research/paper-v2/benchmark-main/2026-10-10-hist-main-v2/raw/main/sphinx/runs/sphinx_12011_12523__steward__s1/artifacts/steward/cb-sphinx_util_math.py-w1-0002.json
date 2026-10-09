@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-12f3e5190741af6f",
+  "proposalIds": [
+    "prop-hist-w1-sphinx_util_math_py"
+  ],
+  "targetFiles": [
+    "sphinx/util/math.py"
+  ],
+  "appliedFiles": [
+    "sphinx/util/math.py"
+  ],
+  "fileBeforeHashes": {
+    "sphinx/util/math.py": "ce67f74cc443f401c8c443da384d776542a373fbf0bf90aade28f68508644512"
+  },
+  "fileAfterHashes": {
+    "sphinx/util/math.py": "1ae06a6efba741f384d89a718c5b14a16c2e8c385669810b733248c8d1b32e11"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sphinx/util/math.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-12f3e5190741af6f",
+    "planId": "merge-12f3e5190741af6f",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-12f3e5190741af6f",
+        "planId": "merge-12f3e5190741af6f",
+        "request_identity": [
+          "prop-hist-w1-sphinx_util_math_py"
+        ],
+        "actor_ids": [
+          "writer-12523"
+        ],
+        "request_files": [
+          "sphinx/util/math.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sphinx/util/math.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/sphinx/runs/sphinx_12011_12523__steward__s1/artifacts/steward/cb-sphinx_util_math.py-w1-0002.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SPHINX_UTIL_MATH_PY"
+        ],
+        "commit_sha": "3a0c53240897cf1c7c5aea69e8377487627836f7"
+      }
+    ]
+  }
+}

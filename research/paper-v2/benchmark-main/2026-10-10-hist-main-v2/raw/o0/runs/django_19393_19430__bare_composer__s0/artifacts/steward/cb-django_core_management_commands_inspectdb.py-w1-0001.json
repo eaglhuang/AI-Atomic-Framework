@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-fce7b30998c5a054",
+  "proposalIds": [
+    "prop-hist-w1-django_core_management_commands_inspectdb_py"
+  ],
+  "targetFiles": [
+    "django/core/management/commands/inspectdb.py"
+  ],
+  "appliedFiles": [
+    "django/core/management/commands/inspectdb.py"
+  ],
+  "fileBeforeHashes": {
+    "django/core/management/commands/inspectdb.py": "4e8a308670b2b1d9b30d0c8ac6c3f0bb8351eb4f76f1f18a1fbf36c7ab602f15"
+  },
+  "fileAfterHashes": {
+    "django/core/management/commands/inspectdb.py": "a5ead6b9dd4aab5493f1531078472c4026823c2e48e896f7d4e7efaf6a48f182"
+  },
+  "permissions": {
+    "fileWrite": [
+      "django/core/management/commands/inspectdb.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-fce7b30998c5a054",
+    "planId": "merge-fce7b30998c5a054",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-fce7b30998c5a054",
+        "planId": "merge-fce7b30998c5a054",
+        "request_identity": [
+          "prop-hist-w1-django_core_management_commands_inspectdb_py"
+        ],
+        "actor_ids": [
+          "writer-19430"
+        ],
+        "request_files": [
+          "django/core/management/commands/inspectdb.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "django/core/management/commands/inspectdb.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/o0/runs/django_19393_19430__bare_composer__s0/artifacts/steward/cb-django_core_management_commands_inspectdb.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-DJANGO_CORE_MANAGEMENT_COMMANDS_INSPECTDB_PY"
+        ],
+        "commit_sha": "e8b88d2bf67c1f052a4b807c4bdcf576fe3f2f3f"
+      }
+    ]
+  }
+}

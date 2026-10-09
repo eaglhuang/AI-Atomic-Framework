@@ -1,0 +1,108 @@
+{
+ "writer": 0,
+ "pr": 8627,
+ "pid": 2264776,
+ "init_ms": 68.024937,
+ "start_offset_ms": 13,
+ "file_order": [
+  "xarray/core/pdcompat.py",
+  "xarray/coding/frequencies.py",
+  "xarray/coding/cftime_offsets.py",
+  "xarray/core/groupby.py"
+ ],
+ "holds": {
+  "xarray/core/pdcompat.py": 5,
+  "xarray/coding/frequencies.py": 2,
+  "xarray/coding/cftime_offsets.py": 7,
+  "xarray/core/groupby.py": 4
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 8627,
+   "path": "xarray/core/pdcompat.py",
+   "intents": [
+    "log:xarray:8627_8657:8627:xarray/core/pdcompat.py:h9"
+   ],
+   "hold_ms": 5,
+   "t_submit_epoch": 1791573624619,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 16,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 27.26,
+   "t_done_epoch": 1791573624647
+  },
+  {
+   "writer": 0,
+   "pr": 8627,
+   "path": "xarray/coding/frequencies.py",
+   "intents": [
+    "log:xarray:8627_8657:8627:xarray/coding/frequencies.py:h5",
+    "log:xarray:8627_8657:8627:xarray/coding/frequencies.py:h6"
+   ],
+   "hold_ms": 2,
+   "t_submit_epoch": 1791573624647,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 11.3,
+   "t_done_epoch": 1791573624658
+  },
+  {
+   "writer": 0,
+   "pr": 8627,
+   "path": "xarray/coding/cftime_offsets.py",
+   "intents": [
+    "log:xarray:8627_8657:8627:xarray/coding/cftime_offsets.py:h0",
+    "log:xarray:8627_8657:8627:xarray/coding/cftime_offsets.py:h1",
+    "log:xarray:8627_8657:8627:xarray/coding/cftime_offsets.py:h2",
+    "log:xarray:8627_8657:8627:xarray/coding/cftime_offsets.py:h3",
+    "log:xarray:8627_8657:8627:xarray/coding/cftime_offsets.py:h4"
+   ],
+   "hold_ms": 7,
+   "t_submit_epoch": 1791573624658,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 13.61,
+   "t_done_epoch": 1791573624672
+  },
+  {
+   "writer": 0,
+   "pr": 8627,
+   "path": "xarray/core/groupby.py",
+   "intents": [
+    "log:xarray:8627_8657:8627:xarray/core/groupby.py:h7",
+    "log:xarray:8627_8657:8627:xarray/core/groupby.py:h8"
+   ],
+   "hold_ms": 4,
+   "t_submit_epoch": 1791573624672,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "lock_spins": 0,
+   "outcome": "blocked",
+   "blocked_reason": "harness-relocate-context-not-found",
+   "total_ms": 9.45,
+   "t_done_epoch": 1791573624681
+  }
+ ],
+ "admit_stats": {
+  "txns": 8,
+  "cas_conflicts": 0
+ },
+ "steward_batches": null
+}

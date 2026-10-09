@@ -1,0 +1,83 @@
+{
+ "writer": 0,
+ "pr": 8459,
+ "pid": 2282226,
+ "init_ms": 69.95654,
+ "start_offset_ms": 4,
+ "file_order": [
+  "xarray/backends/zarr.py",
+  "xarray/core/dataarray.py",
+  "xarray/core/dataset.py"
+ ],
+ "holds": {
+  "xarray/backends/zarr.py": 25,
+  "xarray/core/dataarray.py": 3,
+  "xarray/core/dataset.py": 27
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 8459,
+   "path": "xarray/backends/zarr.py",
+   "intents": [
+    "log:xarray:8459_8598:8459:xarray/backends/zarr.py:h0",
+    "log:xarray:8459_8598:8459:xarray/backends/zarr.py:h1",
+    "log:xarray:8459_8598:8459:xarray/backends/zarr.py:h2"
+   ],
+   "hold_ms": 25,
+   "t_submit_epoch": 1791573838941,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 13,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 47.39,
+   "t_done_epoch": 1791573838988
+  },
+  {
+   "writer": 0,
+   "pr": 8459,
+   "path": "xarray/core/dataarray.py",
+   "intents": [
+    "log:xarray:8459_8598:8459:xarray/core/dataarray.py:h3",
+    "log:xarray:8459_8598:8459:xarray/core/dataarray.py:h4",
+    "log:xarray:8459_8598:8459:xarray/core/dataarray.py:h5",
+    "log:xarray:8459_8598:8459:xarray/core/dataarray.py:h6"
+   ],
+   "hold_ms": 3,
+   "t_submit_epoch": 1791573838988,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 13,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 30.53,
+   "t_done_epoch": 1791573839018
+  },
+  {
+   "writer": 0,
+   "pr": 8459,
+   "path": "xarray/core/dataset.py",
+   "intents": [
+    "log:xarray:8459_8598:8459:xarray/core/dataset.py:h7"
+   ],
+   "hold_ms": 27,
+   "t_submit_epoch": 1791573839018,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 9,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 51.29,
+   "t_done_epoch": 1791573839070
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 11
+ },
+ "steward_batches": null
+}

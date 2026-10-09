@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-eddaccdedbe8423d",
+  "proposalIds": [
+    "prop-hist-w1-sympy_functions_elementary_hyperbolic_py"
+  ],
+  "targetFiles": [
+    "sympy/functions/elementary/hyperbolic.py"
+  ],
+  "appliedFiles": [
+    "sympy/functions/elementary/hyperbolic.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/functions/elementary/hyperbolic.py": "144b1da5461ca4f30716d47ef37f6b8e63664ca2a19829c4001456981921d392"
+  },
+  "fileAfterHashes": {
+    "sympy/functions/elementary/hyperbolic.py": "7625541d98932abf0cc451b2ba9298e84cee49e44c809f875cf3e1f034d6c629"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/functions/elementary/hyperbolic.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-eddaccdedbe8423d",
+    "planId": "merge-eddaccdedbe8423d",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-eddaccdedbe8423d",
+        "planId": "merge-eddaccdedbe8423d",
+        "request_identity": [
+          "prop-hist-w1-sympy_functions_elementary_hyperbolic_py"
+        ],
+        "actor_ids": [
+          "writer-28382"
+        ],
+        "request_files": [
+          "sympy/functions/elementary/hyperbolic.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/functions/elementary/hyperbolic.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/o0/runs/sympy_28294_28382__bare_composer__s3/artifacts/steward/cb-sympy_functions_elementary_hyperbolic.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_FUNCTIONS_ELEMENTARY_HYPERBOLIC_PY"
+        ],
+        "commit_sha": "83dda8c2f705c7de60b81bfa18b86e03669fb5c7"
+      }
+    ]
+  }
+}

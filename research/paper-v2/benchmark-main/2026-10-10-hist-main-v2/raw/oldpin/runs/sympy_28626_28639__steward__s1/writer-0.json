@@ -1,0 +1,132 @@
+{
+ "writer": 0,
+ "pr": 28626,
+ "pid": 2449384,
+ "init_ms": 105.50662500000001,
+ "start_offset_ms": 13,
+ "file_order": [
+  "sympy/combinatorics/perm_groups.py"
+ ],
+ "holds": {
+  "sympy/combinatorics/perm_groups.py": 21
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 28626,
+   "path": "sympy/combinatorics/perm_groups.py",
+   "intents": [
+    "log:sympy:28626_28639:28626:sympy/combinatorics/perm_groups.py:h0"
+   ],
+   "hold_ms": 21,
+   "t_submit_epoch": 1791575126076,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 49,
+   "outcome": "blocked",
+   "blocked_reason": "file-hash-drift: Target file hash sha256:8d36f70ef58971a837cad493087a7b98fc6a60e119912303d3ae39dd61a23e23 does not match proposal fileBeforeHash sha256:04558626ad927d9a852cde05ad10b1c452af0424828fa55e726d5f9ba4a7d20c.",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "file-hash-drift: Target file hash sha256:8d36f70ef58971a837cad493087a7b98fc6a60e119912303d3ae39dd61a23e23 does not match proposal fileBeforeHash sha256:04558626ad927d9a852cde05ad10b1c452af0424828fa55e726d5f9ba4a7d20c."
+   ],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sympy_combinatorics_perm_groups.py-w0-0001",
+   "total_ms": 175.88,
+   "t_done_epoch": 1791575126252
+  }
+ ],
+ "admit_stats": {
+  "txns": 2,
+  "cas_conflicts": 8
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sympy_combinatorics_perm_groups.py-w0-0001",
+   "path": "sympy/combinatorics/perm_groups.py",
+   "pid": 2449384,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-sympy_combinatorics_perm_groups_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sympy_combinatorics_perm_groups_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:04558626ad927d9a852cde05ad10b1c452af0424828fa55e726d5f9ba4a7d20c"
+   ],
+   "lock_wait_ms": 0.12,
+   "t_start_epoch_ms": 1791575126153.01,
+   "pre_apply_hash": "sha256:04558626ad927d9a852cde05ad10b1c452af0424828fa55e726d5f9ba4a7d20c",
+   "receipt_before_hash": null,
+   "receipt_after_hash": null,
+   "post_apply_hash": "sha256:8d36f70ef58971a837cad493087a7b98fc6a60e119912303d3ae39dd61a23e23",
+   "t_end_epoch_ms": 1791575126245.5,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "blocked",
+   "written": false,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:45:26.245+08:00",
+   "batch_id": "cb-sympy_combinatorics_perm_groups.py-w0-0001",
+   "path": "sympy/combinatorics/perm_groups.py",
+   "proposalIds": [
+    "prop-hist-w0-sympy_combinatorics_perm_groups_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sympy_combinatorics_perm_groups_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-sympy_combinatorics_perm_groups_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-sympy_combinatorics_perm_groups_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-sympy_combinatorics_perm_groups_py",
+     "logical_id": "prop-hist-w0-sympy_combinatorics_perm_groups_py",
+     "attempt_id": "att-prop-hist-w0-sympy_combinatorics_perm_groups_py-r0",
+     "proposal_id": "prop-hist-w0-sympy_combinatorics_perm_groups_py",
+     "actorId": "writer-28626"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "file-hash-drift: Target file hash sha256:8d36f70ef58971a837cad493087a7b98fc6a60e119912303d3ae39dd61a23e23 does not match proposal fileBeforeHash sha256:04558626ad927d9a852cde05ad10b1c452af0424828fa55e726d5f9ba4a7d20c."
+   ],
+   "blocked_reason": "file-hash-drift: Target file hash sha256:8d36f70ef58971a837cad493087a7b98fc6a60e119912303d3ae39dd61a23e23 does not match proposal fileBeforeHash sha256:04558626ad927d9a852cde05ad10b1c452af0424828fa55e726d5f9ba4a7d20c.",
+   "window_wait_ms": 0.27,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:04558626ad927d9a852cde05ad10b1c452af0424828fa55e726d5f9ba4a7d20c",
+   "written": false,
+   "output_digest": null,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "file-hash-drift: Target file hash sha256:8d36f70ef58971a837cad493087a7b98fc6a60e119912303d3ae39dd61a23e23 does not match proposal fileBeforeHash sha256:04558626ad927d9a852cde05ad10b1c452af0424828fa55e726d5f9ba4a7d20c."
+  }
+ ]
+}

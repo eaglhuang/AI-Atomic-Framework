@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-96541ba2891d403c",
+  "proposalIds": [
+    "prop-hist-w0-docs_src_query_params_str_validations_tutorial006d_py"
+  ],
+  "targetFiles": [
+    "docs_src/query_params_str_validations/tutorial006d.py"
+  ],
+  "appliedFiles": [
+    "docs_src/query_params_str_validations/tutorial006d.py"
+  ],
+  "fileBeforeHashes": {
+    "docs_src/query_params_str_validations/tutorial006d.py": "352fa14e407eac9e037979d1b19dc58dac7c4d50ffdcae40650d1efd14d77c62"
+  },
+  "fileAfterHashes": {
+    "docs_src/query_params_str_validations/tutorial006d.py": "850750f09ead1413b17178883d2ecf3ba724647c2ac4f059f0f25f41a9e62e93"
+  },
+  "permissions": {
+    "fileWrite": [
+      "docs_src/query_params_str_validations/tutorial006d.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-96541ba2891d403c",
+    "planId": "merge-96541ba2891d403c",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-96541ba2891d403c",
+        "planId": "merge-96541ba2891d403c",
+        "request_identity": [
+          "prop-hist-w0-docs_src_query_params_str_validations_tutorial006d_py"
+        ],
+        "actor_ids": [
+          "writer-12197"
+        ],
+        "request_files": [
+          "docs_src/query_params_str_validations/tutorial006d.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "docs_src/query_params_str_validations/tutorial006d.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/oldpin/runs/fastapi_12197_12407__steward__s2/artifacts/steward/cb-docs_src_query_params_str_validations_tutorial006d.py-w0-0004.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-DOCS_SRC_QUERY_PARAMS_STR_VALIDATIONS_TUTORIAL006D_PY"
+        ],
+        "commit_sha": "c8a169729e80deed35a128b488a089a8f7c61fdb"
+      }
+    ]
+  }
+}

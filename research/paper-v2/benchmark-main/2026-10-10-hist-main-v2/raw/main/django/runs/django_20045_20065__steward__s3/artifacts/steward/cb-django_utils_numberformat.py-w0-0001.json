@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-c75173e7efbf7486",
+  "proposalIds": [
+    "prop-hist-w0-django_utils_numberformat_py"
+  ],
+  "targetFiles": [
+    "django/utils/numberformat.py"
+  ],
+  "appliedFiles": [
+    "django/utils/numberformat.py"
+  ],
+  "fileBeforeHashes": {
+    "django/utils/numberformat.py": "f0ba923267f168dd0f6124d3112e944ff0137ab7c36109fb61ae0d23bd2031a5"
+  },
+  "fileAfterHashes": {
+    "django/utils/numberformat.py": "fe751d2f2077191d10f32367471e0b7f64fac3ce878d1923fd5988feb851e090"
+  },
+  "permissions": {
+    "fileWrite": [
+      "django/utils/numberformat.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-c75173e7efbf7486",
+    "planId": "merge-c75173e7efbf7486",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-c75173e7efbf7486",
+        "planId": "merge-c75173e7efbf7486",
+        "request_identity": [
+          "prop-hist-w0-django_utils_numberformat_py"
+        ],
+        "actor_ids": [
+          "writer-20045"
+        ],
+        "request_files": [
+          "django/utils/numberformat.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "django/utils/numberformat.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/django/runs/django_20045_20065__steward__s3/artifacts/steward/cb-django_utils_numberformat.py-w0-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-DJANGO_UTILS_NUMBERFORMAT_PY"
+        ],
+        "commit_sha": "a5b2ac3d069b212d63577f610415fcb8a68ea973"
+      }
+    ]
+  }
+}

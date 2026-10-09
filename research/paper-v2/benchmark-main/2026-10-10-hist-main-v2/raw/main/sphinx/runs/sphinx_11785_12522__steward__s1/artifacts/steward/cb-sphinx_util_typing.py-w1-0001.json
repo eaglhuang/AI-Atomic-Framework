@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-e915b9d9e4b504ed",
+  "proposalIds": [
+    "prop-hist-w1-sphinx_util_typing_py"
+  ],
+  "targetFiles": [
+    "sphinx/util/typing.py"
+  ],
+  "appliedFiles": [
+    "sphinx/util/typing.py"
+  ],
+  "fileBeforeHashes": {
+    "sphinx/util/typing.py": "cd1c26e0717bfe9c2253354a23a517c5e975bef6afd82ecb1a334b074d2ecf83"
+  },
+  "fileAfterHashes": {
+    "sphinx/util/typing.py": "260b9c0eb37fdd07e818543670a959748924b115cb1cc1e99cf4dc53d0cdce7b"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sphinx/util/typing.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-e915b9d9e4b504ed",
+    "planId": "merge-e915b9d9e4b504ed",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-e915b9d9e4b504ed",
+        "planId": "merge-e915b9d9e4b504ed",
+        "request_identity": [
+          "prop-hist-w1-sphinx_util_typing_py"
+        ],
+        "actor_ids": [
+          "writer-12522"
+        ],
+        "request_files": [
+          "sphinx/util/typing.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sphinx/util/typing.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/sphinx/runs/sphinx_11785_12522__steward__s1/artifacts/steward/cb-sphinx_util_typing.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SPHINX_UTIL_TYPING_PY"
+        ],
+        "commit_sha": "36eb6cbf7ad7f08e25aa372729d1aca4da962120"
+      }
+    ]
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-0157d20a32213223",
+  "proposalIds": [
+    "prop-hist-w0-django_core_signing_py"
+  ],
+  "targetFiles": [
+    "django/core/signing.py"
+  ],
+  "appliedFiles": [
+    "django/core/signing.py"
+  ],
+  "fileBeforeHashes": {
+    "django/core/signing.py": "e76b4fa0a141bba9f1f001ce0cf1500564d9fa3762945c8ee43e6bd55aae5cb3"
+  },
+  "fileAfterHashes": {
+    "django/core/signing.py": "2d81cce6ba36dda878add11bb0e7602589bc800adfc94d45234ed94aca4450fb"
+  },
+  "permissions": {
+    "fileWrite": [
+      "django/core/signing.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-0157d20a32213223",
+    "planId": "merge-0157d20a32213223",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-0157d20a32213223",
+        "planId": "merge-0157d20a32213223",
+        "request_identity": [
+          "prop-hist-w0-django_core_signing_py"
+        ],
+        "actor_ids": [
+          "writer-19745"
+        ],
+        "request_files": [
+          "django/core/signing.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "django/core/signing.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/django/runs/django_19745_19756__steward__s0/artifacts/steward/cb-django_core_signing.py-w0-0005.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-DJANGO_CORE_SIGNING_PY"
+        ],
+        "commit_sha": "1cba0f29d63fd59c505c27b9e83ed59a76748e69"
+      }
+    ]
+  }
+}

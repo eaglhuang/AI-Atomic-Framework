@@ -1,0 +1,128 @@
+{
+ "writer": 0,
+ "pr": 14025,
+ "pid": 2363483,
+ "init_ms": 100.63631999999998,
+ "start_offset_ms": 5,
+ "file_order": [
+  "sphinx/ext/mathjax.py"
+ ],
+ "holds": {
+  "sphinx/ext/mathjax.py": 23
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 14025,
+   "path": "sphinx/ext/mathjax.py",
+   "intents": [
+    "log:sphinx:14025_14080:14025:sphinx/ext/mathjax.py:h0",
+    "log:sphinx:14025_14080:14025:sphinx/ext/mathjax.py:h1",
+    "log:sphinx:14025_14080:14025:sphinx/ext/mathjax.py:h2",
+    "log:sphinx:14025_14080:14025:sphinx/ext/mathjax.py:h3",
+    "log:sphinx:14025_14080:14025:sphinx/ext/mathjax.py:h4",
+    "log:sphinx:14025_14080:14025:sphinx/ext/mathjax.py:h5",
+    "log:sphinx:14025_14080:14025:sphinx/ext/mathjax.py:h6",
+    "log:sphinx:14025_14080:14025:sphinx/ext/mathjax.py:h7"
+   ],
+   "hold_ms": 23,
+   "t_submit_epoch": 1791574518892,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sphinx_ext_mathjax.py-w0-0001",
+   "total_ms": 123.93,
+   "t_done_epoch": 1791574519015
+  }
+ ],
+ "admit_stats": null,
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sphinx_ext_mathjax.py-w0-0001",
+   "path": "sphinx/ext/mathjax.py",
+   "pid": 2363483,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-sphinx_ext_mathjax_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sphinx_ext_mathjax_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:123a025818b0e2f68a1b0d2e6671d92e36d2c8342b04be4226eae217e39a2021"
+   ],
+   "lock_wait_ms": 0.17,
+   "t_start_epoch_ms": 1791574518918.22,
+   "pre_apply_hash": "sha256:123a025818b0e2f68a1b0d2e6671d92e36d2c8342b04be4226eae217e39a2021",
+   "receipt_before_hash": "sha256:123a025818b0e2f68a1b0d2e6671d92e36d2c8342b04be4226eae217e39a2021",
+   "receipt_after_hash": "sha256:f42139197a070fab162acaff49e07a20d5cbb41c2ece6660cc980c857805e533",
+   "post_apply_hash": "sha256:f42139197a070fab162acaff49e07a20d5cbb41c2ece6660cc980c857805e533",
+   "t_end_epoch_ms": 1791574519015.5,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:35:19.015+08:00",
+   "batch_id": "cb-sphinx_ext_mathjax.py-w0-0001",
+   "path": "sphinx/ext/mathjax.py",
+   "proposalIds": [
+    "prop-hist-w0-sphinx_ext_mathjax_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sphinx_ext_mathjax_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-sphinx_ext_mathjax_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-sphinx_ext_mathjax_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-sphinx_ext_mathjax_py",
+     "logical_id": "prop-hist-w0-sphinx_ext_mathjax_py",
+     "attempt_id": "att-prop-hist-w0-sphinx_ext_mathjax_py-r0",
+     "proposal_id": "prop-hist-w0-sphinx_ext_mathjax_py",
+     "actorId": "writer-14025"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.37,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:123a025818b0e2f68a1b0d2e6671d92e36d2c8342b04be4226eae217e39a2021",
+   "written": true,
+   "output_digest": "sha256:f42139197a070fab162acaff49e07a20d5cbb41c2ece6660cc980c857805e533",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

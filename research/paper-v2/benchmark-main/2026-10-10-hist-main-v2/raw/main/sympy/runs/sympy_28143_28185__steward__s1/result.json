@@ -1,0 +1,84 @@
+{
+ "pair_id": "sympy:28143_28185",
+ "stratum": "O3",
+ "arm": "steward",
+ "plant": null,
+ "seed_k": 1,
+ "seed": 1636502442,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 799,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 14,
+  "by_verdict": {
+   "correct": 14
+  },
+  "completed": 14,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 1,
+  "files_full_bytes_exact": 1,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "sympy/physics/continuum_mechanics/beam.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "sympy/physics/continuum_mechanics/beam.py": true
+ },
+ "final_exists": {
+  "sympy/physics/continuum_mechanics/beam.py": true
+ },
+ "files": [
+  {
+   "path": "sympy/physics/continuum_mechanics/beam.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:2dadc2d75cb1a978ac19483d76588258eed7b40511e6f3f5c4e40da9fdfecb85",
+   "final_digest": "sha256:3b6b9fbc28b6da47b7eec1390fd89496f75ac72a04d4812a6de5f61bd2aed616",
+   "expected_digests": [
+    "sha256:3b6b9fbc28b6da47b7eec1390fd89496f75ac72a04d4812a6de5f61bd2aed616"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "sympy/physics/continuum_mechanics/beam.py": "sha256:3b6b9fbc28b6da47b7eec1390fd89496f75ac72a04d4812a6de5f61bd2aed616"
+ }
+}

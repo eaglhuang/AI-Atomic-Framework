@@ -1,0 +1,125 @@
+{
+ "writer": 0,
+ "pr": 17831,
+ "pid": 2184176,
+ "init_ms": 83.9164,
+ "start_offset_ms": 0,
+ "file_order": [
+  "django/db/models/base.py"
+ ],
+ "holds": {
+  "django/db/models/base.py": 0
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 17831,
+   "path": "django/db/models/base.py",
+   "intents": [
+    "log:django:17831_17920:17831:django/db/models/base.py:h0",
+    "log:django:17831_17920:17831:django/db/models/base.py:h1",
+    "log:django:17831_17920:17831:django/db/models/base.py:h2",
+    "log:django:17831_17920:17831:django/db/models/base.py:h3",
+    "log:django:17831_17920:17831:django/db/models/base.py:h4"
+   ],
+   "hold_ms": 0,
+   "t_submit_epoch": 1791572841349,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-django_db_models_base.py-w0-0001",
+   "total_ms": 150.3,
+   "t_done_epoch": 1791572841499
+  }
+ ],
+ "admit_stats": null,
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-django_db_models_base.py-w0-0001",
+   "path": "django/db/models/base.py",
+   "pid": 2184176,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-django_db_models_base_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-django_db_models_base_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:a07af07ca2fa5c9c43983c147e92fdfe08e88cc3929496f77291553e89120823"
+   ],
+   "lock_wait_ms": 0.13,
+   "t_start_epoch_ms": 1791572841357.04,
+   "pre_apply_hash": "sha256:a07af07ca2fa5c9c43983c147e92fdfe08e88cc3929496f77291553e89120823",
+   "receipt_before_hash": "sha256:a07af07ca2fa5c9c43983c147e92fdfe08e88cc3929496f77291553e89120823",
+   "receipt_after_hash": "sha256:49e0e9b14f6e12e26e9cf5b8ecd1edd050ee299d9d4fc86884de7a1515355869",
+   "post_apply_hash": "sha256:49e0e9b14f6e12e26e9cf5b8ecd1edd050ee299d9d4fc86884de7a1515355869",
+   "t_end_epoch_ms": 1791572841499.24,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:07:21.499+08:00",
+   "batch_id": "cb-django_db_models_base.py-w0-0001",
+   "path": "django/db/models/base.py",
+   "proposalIds": [
+    "prop-hist-w0-django_db_models_base_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-django_db_models_base_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-django_db_models_base_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-django_db_models_base_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-django_db_models_base_py",
+     "logical_id": "prop-hist-w0-django_db_models_base_py",
+     "attempt_id": "att-prop-hist-w0-django_db_models_base_py-r0",
+     "proposal_id": "prop-hist-w0-django_db_models_base_py",
+     "actorId": "writer-17831"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.24,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:a07af07ca2fa5c9c43983c147e92fdfe08e88cc3929496f77291553e89120823",
+   "written": true,
+   "output_digest": "sha256:49e0e9b14f6e12e26e9cf5b8ecd1edd050ee299d9d4fc86884de7a1515355869",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

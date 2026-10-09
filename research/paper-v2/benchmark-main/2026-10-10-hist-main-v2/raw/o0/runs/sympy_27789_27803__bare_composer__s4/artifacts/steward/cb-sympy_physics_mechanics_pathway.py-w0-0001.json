@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-1792679a92671d3c",
+  "proposalIds": [
+    "prop-hist-w0-sympy_physics_mechanics_pathway_py"
+  ],
+  "targetFiles": [
+    "sympy/physics/mechanics/pathway.py"
+  ],
+  "appliedFiles": [
+    "sympy/physics/mechanics/pathway.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/physics/mechanics/pathway.py": "8017e3a12ca3ca6eeacfcb43d630f921457c2a2bd301249423cd9dd709874f9d"
+  },
+  "fileAfterHashes": {
+    "sympy/physics/mechanics/pathway.py": "924c4ffcccfc6dc0d9d58b21482eca272f0b7ea88c267d811ad1c7c540a3501a"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/physics/mechanics/pathway.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-1792679a92671d3c",
+    "planId": "merge-1792679a92671d3c",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-1792679a92671d3c",
+        "planId": "merge-1792679a92671d3c",
+        "request_identity": [
+          "prop-hist-w0-sympy_physics_mechanics_pathway_py"
+        ],
+        "actor_ids": [
+          "writer-27789"
+        ],
+        "request_files": [
+          "sympy/physics/mechanics/pathway.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/physics/mechanics/pathway.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/o0/runs/sympy_27789_27803__bare_composer__s4/artifacts/steward/cb-sympy_physics_mechanics_pathway.py-w0-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SYMPY_PHYSICS_MECHANICS_PATHWAY_PY"
+        ],
+        "commit_sha": "4d1d91795b18ef8fd1857ea9bc21f9c4d862fedc"
+      }
+    ]
+  }
+}

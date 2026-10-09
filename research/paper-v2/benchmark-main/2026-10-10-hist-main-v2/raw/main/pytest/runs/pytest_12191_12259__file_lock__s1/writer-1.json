@@ -1,0 +1,40 @@
+{
+ "writer": 1,
+ "pr": 12259,
+ "pid": 2315886,
+ "init_ms": 62.29558,
+ "start_offset_ms": 19,
+ "file_order": [
+  "src/_pytest/runner.py"
+ ],
+ "holds": {
+  "src/_pytest/runner.py": 19
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 12259,
+   "path": "src/_pytest/runner.py",
+   "intents": [
+    "log:pytest:12191_12259:12259:src/_pytest/runner.py:h0",
+    "log:pytest:12191_12259:12259:src/_pytest/runner.py:h1"
+   ],
+   "hold_ms": 19,
+   "t_submit_epoch": 1791574134054,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "queue",
+   "admit_wait_ms": 21,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 46,
+   "t_done_epoch": 1791574134100
+  }
+ ],
+ "admit_stats": {
+  "txns": 3,
+  "cas_conflicts": 0
+ },
+ "steward_batches": null
+}

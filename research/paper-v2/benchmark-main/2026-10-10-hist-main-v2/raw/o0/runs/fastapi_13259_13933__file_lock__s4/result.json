@@ -1,0 +1,106 @@
+{
+ "pair_id": "fastapi:13259_13933",
+ "stratum": "O0",
+ "arm": "file_lock",
+ "plant": null,
+ "seed_k": 4,
+ "seed": 1312186374,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 317,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 3,
+  "by_verdict": {
+   "correct": 3
+  },
+  "completed": 3,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 2,
+  "files_full_bytes_exact": 2,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "docs_src/app_testing/tutorial004.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "scripts/translate.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "docs_src/app_testing/tutorial004.py": false,
+  "scripts/translate.py": true
+ },
+ "final_exists": {
+  "docs_src/app_testing/tutorial004.py": true,
+  "scripts/translate.py": true
+ },
+ "files": [
+  {
+   "path": "docs_src/app_testing/tutorial004.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "final_digest": "sha256:8b9936fc81135a831d39ab9190d8be9dd77a218959afd7578de04ba0947ad61e",
+   "expected_digests": [
+    "sha256:8b9936fc81135a831d39ab9190d8be9dd77a218959afd7578de04ba0947ad61e"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "scripts/translate.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:ee5dac1f8e552dde861792d7286194d49f1eb0c8b8bc3e7431eefee333b1563f",
+   "final_digest": "sha256:963c2277c66612674d227bb9ad23dfe55fa03d75ca1b03c48fa02b04fc5f2788",
+   "expected_digests": [
+    "sha256:963c2277c66612674d227bb9ad23dfe55fa03d75ca1b03c48fa02b04fc5f2788"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "docs_src/app_testing/tutorial004.py": "sha256:8b9936fc81135a831d39ab9190d8be9dd77a218959afd7578de04ba0947ad61e",
+  "scripts/translate.py": "sha256:963c2277c66612674d227bb9ad23dfe55fa03d75ca1b03c48fa02b04fc5f2788"
+ }
+}

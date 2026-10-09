@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-0931a17c3b75cb7c",
+  "proposalIds": [
+    "prop-hist-w1-sphinx_environment_adapters_indexentries_py"
+  ],
+  "targetFiles": [
+    "sphinx/environment/adapters/indexentries.py"
+  ],
+  "appliedFiles": [
+    "sphinx/environment/adapters/indexentries.py"
+  ],
+  "fileBeforeHashes": {
+    "sphinx/environment/adapters/indexentries.py": "f723fd61b56ea4e5895283d50b50ad2f117836c4d5c4e6a187dc7d1c86e3d9ee"
+  },
+  "fileAfterHashes": {
+    "sphinx/environment/adapters/indexentries.py": "3ffc117822725ce655b3ed35e76a1300626ebf7e7b98a8f1f3f6f43b98ed6f32"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sphinx/environment/adapters/indexentries.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-0931a17c3b75cb7c",
+    "planId": "merge-0931a17c3b75cb7c",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-0931a17c3b75cb7c",
+        "planId": "merge-0931a17c3b75cb7c",
+        "request_identity": [
+          "prop-hist-w1-sphinx_environment_adapters_indexentries_py"
+        ],
+        "actor_ids": [
+          "writer-12658"
+        ],
+        "request_files": [
+          "sphinx/environment/adapters/indexentries.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sphinx/environment/adapters/indexentries.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/sphinx/runs/sphinx_12657_12658__bare_composer__s4/artifacts/steward/cb-sphinx_environment_adapters_indexentries.py-w1-0006.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SPHINX_ENVIRONMENT_ADAPTERS_INDEXENTRIES_PY"
+        ],
+        "commit_sha": "e324f75dc99febd235eebea0bbb1798c64d32fee"
+      }
+    ]
+  }
+}

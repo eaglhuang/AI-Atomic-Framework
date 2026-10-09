@@ -1,0 +1,194 @@
+{
+ "pair_id": "sympy:27040_27043",
+ "stratum": "O1",
+ "arm": "git_three_way",
+ "plant": null,
+ "seed_k": 1,
+ "seed": 2949391705,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 750,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 67,
+  "by_verdict": {
+   "correct": 67
+  },
+  "completed": 67,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 6,
+  "files_full_bytes_exact": 6,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "sympy/geometry/line.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/integrals/integrals.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/physics/vector/dyadic.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/physics/vector/vector.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/printing/str.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/simplify/simplify.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "sympy/geometry/line.py": true,
+  "sympy/integrals/integrals.py": true,
+  "sympy/physics/vector/dyadic.py": true,
+  "sympy/physics/vector/vector.py": true,
+  "sympy/printing/str.py": true,
+  "sympy/simplify/simplify.py": true
+ },
+ "final_exists": {
+  "sympy/geometry/line.py": true,
+  "sympy/integrals/integrals.py": true,
+  "sympy/physics/vector/dyadic.py": true,
+  "sympy/physics/vector/vector.py": true,
+  "sympy/printing/str.py": true,
+  "sympy/simplify/simplify.py": true
+ },
+ "files": [
+  {
+   "path": "sympy/geometry/line.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:ed0e921b43b3abbb5a3d38ad9ed5d4d1de95db2b8d6e66b43414a6b304d9aec3",
+   "final_digest": "sha256:630f27b3fc3cae7e8511a93a3267ec75c72034d8cc4078687438a4d945fb8c93",
+   "expected_digests": [
+    "sha256:630f27b3fc3cae7e8511a93a3267ec75c72034d8cc4078687438a4d945fb8c93"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/integrals/integrals.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:b35be5492f1a323b6cd2df274b60fb25380ab4be0e8f4292de39d1eb83948d5d",
+   "final_digest": "sha256:b3507a881434ec45f9d8019f6ef63e45a361d2115a789c188d246d6aa56493cd",
+   "expected_digests": [
+    "sha256:b3507a881434ec45f9d8019f6ef63e45a361d2115a789c188d246d6aa56493cd"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/physics/vector/dyadic.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:2b903726d45061217985e638b705deb0e3a9e40213941dd7a9f60a2d07002cb0",
+   "final_digest": "sha256:d078656f8e6043f9db2fa78c914d3d1e60bb0e3d16884a76f3908f21a954221b",
+   "expected_digests": [
+    "sha256:d078656f8e6043f9db2fa78c914d3d1e60bb0e3d16884a76f3908f21a954221b"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/physics/vector/vector.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:01d957b560ea4c7e80b975a7a031ffbf56fb7b1a2801fa7b76b5a2262863bb51",
+   "final_digest": "sha256:b47c62f8731d20e0f5c7e7c347a5d7b6f52eb766c4e8ce4966ebff4bd3f6ec6a",
+   "expected_digests": [
+    "sha256:b47c62f8731d20e0f5c7e7c347a5d7b6f52eb766c4e8ce4966ebff4bd3f6ec6a"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/printing/str.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:376d9af94e196ebbb942d0181a211844bfe00bd2379174e73d41365df17bbd72",
+   "final_digest": "sha256:2720bdda8c3a9ee8dccb70760b2d89cc559cc21e5443a9a93bc80b0fce758087",
+   "expected_digests": [
+    "sha256:2720bdda8c3a9ee8dccb70760b2d89cc559cc21e5443a9a93bc80b0fce758087"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/simplify/simplify.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:7ba239d0f8f2fc8dc434e0a9024c16abb72db724a95526333f9fe08240e8c001",
+   "final_digest": "sha256:c36f80f3d6185655cfe94b4969a169b1195d5ce32cb080ebc0276290946f271f",
+   "expected_digests": [
+    "sha256:c36f80f3d6185655cfe94b4969a169b1195d5ce32cb080ebc0276290946f271f"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "sympy/geometry/line.py": "sha256:630f27b3fc3cae7e8511a93a3267ec75c72034d8cc4078687438a4d945fb8c93",
+  "sympy/integrals/integrals.py": "sha256:b3507a881434ec45f9d8019f6ef63e45a361d2115a789c188d246d6aa56493cd",
+  "sympy/physics/vector/dyadic.py": "sha256:d078656f8e6043f9db2fa78c914d3d1e60bb0e3d16884a76f3908f21a954221b",
+  "sympy/physics/vector/vector.py": "sha256:b47c62f8731d20e0f5c7e7c347a5d7b6f52eb766c4e8ce4966ebff4bd3f6ec6a",
+  "sympy/printing/str.py": "sha256:2720bdda8c3a9ee8dccb70760b2d89cc559cc21e5443a9a93bc80b0fce758087",
+  "sympy/simplify/simplify.py": "sha256:c36f80f3d6185655cfe94b4969a169b1195d5ce32cb080ebc0276290946f271f"
+ }
+}

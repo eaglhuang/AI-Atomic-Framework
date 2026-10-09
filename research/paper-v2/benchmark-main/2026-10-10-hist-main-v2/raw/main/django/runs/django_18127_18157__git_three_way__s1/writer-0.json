@@ -1,0 +1,77 @@
+{
+ "writer": 0,
+ "pr": 18127,
+ "pid": 2187901,
+ "init_ms": 89.92000999999999,
+ "start_offset_ms": 3,
+ "file_order": [
+  "django/contrib/auth/hashers.py",
+  "django/__init__.py",
+  "django/utils/deprecation.py"
+ ],
+ "holds": {
+  "django/contrib/auth/hashers.py": 18,
+  "django/__init__.py": 0,
+  "django/utils/deprecation.py": 14
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 18127,
+   "path": "django/contrib/auth/hashers.py",
+   "intents": [
+    "log:django:18127_18157:18127:django/contrib/auth/hashers.py:h1"
+   ],
+   "hold_ms": 18,
+   "t_submit_epoch": 1791572868060,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 34,
+   "outcome": "commit",
+   "total_ms": 62.52,
+   "t_done_epoch": 1791572868123
+  },
+  {
+   "writer": 0,
+   "pr": 18127,
+   "path": "django/__init__.py",
+   "intents": [
+    "log:django:18127_18157:18127:django/__init__.py:h0"
+   ],
+   "hold_ms": 0,
+   "t_submit_epoch": 1791572868123,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "commit",
+   "total_ms": 9.51,
+   "t_done_epoch": 1791572868132
+  },
+  {
+   "writer": 0,
+   "pr": 18127,
+   "path": "django/utils/deprecation.py",
+   "intents": [
+    "log:django:18127_18157:18127:django/utils/deprecation.py:h2",
+    "log:django:18127_18157:18127:django/utils/deprecation.py:h3",
+    "log:django:18127_18157:18127:django/utils/deprecation.py:h4"
+   ],
+   "hold_ms": 14,
+   "t_submit_epoch": 1791572868132,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "total_ms": 23.97,
+   "t_done_epoch": 1791572868156
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 1
+ },
+ "steward_batches": null
+}

@@ -1,0 +1,140 @@
+{
+ "writer": 1,
+ "pr": 9795,
+ "pid": 2273154,
+ "init_ms": 70.375621,
+ "start_offset_ms": 19,
+ "file_order": [
+  "xarray/backends/zarr.py"
+ ],
+ "holds": {
+  "xarray/backends/zarr.py": 12
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 9795,
+   "path": "xarray/backends/zarr.py",
+   "intents": [
+    "log:xarray:9561_9795:9795:xarray/backends/zarr.py:h0",
+    "log:xarray:9561_9795:9795:xarray/backends/zarr.py:h1",
+    "log:xarray:9561_9795:9795:xarray/backends/zarr.py:h2",
+    "log:xarray:9561_9795:9795:xarray/backends/zarr.py:h3",
+    "log:xarray:9561_9795:9795:xarray/backends/zarr.py:h4",
+    "log:xarray:9561_9795:9795:xarray/backends/zarr.py:h5",
+    "log:xarray:9561_9795:9795:xarray/backends/zarr.py:h6",
+    "log:xarray:9561_9795:9795:xarray/backends/zarr.py:h7",
+    "log:xarray:9561_9795:9795:xarray/backends/zarr.py:h8",
+    "log:xarray:9561_9795:9795:xarray/backends/zarr.py:h9",
+    "log:xarray:9561_9795:9795:xarray/backends/zarr.py:h10",
+    "log:xarray:9561_9795:9795:xarray/backends/zarr.py:h11",
+    "log:xarray:9561_9795:9795:xarray/backends/zarr.py:h12",
+    "log:xarray:9561_9795:9795:xarray/backends/zarr.py:h13",
+    "log:xarray:9561_9795:9795:xarray/backends/zarr.py:h14",
+    "log:xarray:9561_9795:9795:xarray/backends/zarr.py:h15"
+   ],
+   "hold_ms": 12,
+   "t_submit_epoch": 1791573727165,
+   "outcome": "blocked",
+   "blocked_reason": "compose-context-mismatch: proposal 'prop-hist-w1-xarray_backends_zarr_py' context mismatch at base line 36: expected \"from xarray.namedarray.utils import module_available\", found \"from xarray.namedarray.pycompat import integer_types\" [proposals: prop-hist-w1-xarray_backends_zarr_py]",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w1-xarray_backends_zarr_py' context mismatch at base line 36: expected \"from xarray.namedarray.utils import module_available\", found \"from xarray.namedarray.pycompat import integer_types\" [proposals: prop-hist-w1-xarray_backends_zarr_py]"
+   ],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-xarray_backends_zarr.py-w1-0001",
+   "total_ms": 101.55,
+   "t_done_epoch": 1791573727266
+  }
+ ],
+ "admit_stats": null,
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-xarray_backends_zarr.py-w1-0001",
+   "path": "xarray/backends/zarr.py",
+   "pid": 2273154,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-xarray_backends_zarr_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-xarray_backends_zarr_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:5aa1f7fa0074c5a78da4223b540912ebd7f150d33e38e2ec97eb464bfe3adb2d"
+   ],
+   "lock_wait_ms": 0.12,
+   "t_start_epoch_ms": 1791573727181.96,
+   "pre_apply_hash": "sha256:5aa1f7fa0074c5a78da4223b540912ebd7f150d33e38e2ec97eb464bfe3adb2d",
+   "receipt_before_hash": null,
+   "receipt_after_hash": null,
+   "post_apply_hash": "sha256:091519ae16fd3b5b229e623f5245b5fc12a3d87c31a272316d4ae91032f8bd21",
+   "t_end_epoch_ms": 1791573727266.47,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "blocked",
+   "written": false,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:22:07.266+08:00",
+   "batch_id": "cb-xarray_backends_zarr.py-w1-0001",
+   "path": "xarray/backends/zarr.py",
+   "proposalIds": [
+    "prop-hist-w1-xarray_backends_zarr_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-xarray_backends_zarr_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-xarray_backends_zarr_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-xarray_backends_zarr_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-xarray_backends_zarr_py",
+     "logical_id": "prop-hist-w1-xarray_backends_zarr_py",
+     "attempt_id": "att-prop-hist-w1-xarray_backends_zarr_py-r0",
+     "proposal_id": "prop-hist-w1-xarray_backends_zarr_py",
+     "actorId": "writer-9795"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w1-xarray_backends_zarr_py' context mismatch at base line 36: expected \"from xarray.namedarray.utils import module_available\", found \"from xarray.namedarray.pycompat import integer_types\" [proposals: prop-hist-w1-xarray_backends_zarr_py]"
+   ],
+   "blocked_reason": "compose-context-mismatch: proposal 'prop-hist-w1-xarray_backends_zarr_py' context mismatch at base line 36: expected \"from xarray.namedarray.utils import module_available\", found \"from xarray.namedarray.pycompat import integer_types\" [proposals: prop-hist-w1-xarray_backends_zarr_py]",
+   "window_wait_ms": 0.25,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:5aa1f7fa0074c5a78da4223b540912ebd7f150d33e38e2ec97eb464bfe3adb2d",
+   "written": false,
+   "output_digest": null,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "compose-context-mismatch: proposal 'prop-hist-w1-xarray_backends_zarr_py' context mismatch at base line 36: expected \"from xarray.namedarray.utils import module_available\", found \"from xarray.namedarray.pycompat import integer_types\" [proposals: prop-hist-w1-xarray_backends_zarr_py]"
+  }
+ ]
+}

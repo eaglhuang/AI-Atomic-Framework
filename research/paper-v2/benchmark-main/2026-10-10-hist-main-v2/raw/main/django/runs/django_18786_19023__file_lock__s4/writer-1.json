@@ -1,0 +1,82 @@
+{
+ "writer": 1,
+ "pr": 19023,
+ "pid": 2183476,
+ "init_ms": 84.39488499999999,
+ "start_offset_ms": 20,
+ "file_order": [
+  "django/contrib/gis/geos/prototypes/__init__.py",
+  "django/contrib/gis/geos/geometry.py",
+  "django/contrib/gis/geos/prototypes/predicates.py"
+ ],
+ "holds": {
+  "django/contrib/gis/geos/prototypes/__init__.py": 23,
+  "django/contrib/gis/geos/geometry.py": 21,
+  "django/contrib/gis/geos/prototypes/predicates.py": 12
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 19023,
+   "path": "django/contrib/gis/geos/prototypes/__init__.py",
+   "intents": [
+    "log:django:18786_19023:19023:django/contrib/gis/geos/prototypes/__init__.py:h2"
+   ],
+   "hold_ms": 23,
+   "t_submit_epoch": 1791572836581,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 17,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 44.53,
+   "t_done_epoch": 1791572836626
+  },
+  {
+   "writer": 1,
+   "pr": 19023,
+   "path": "django/contrib/gis/geos/geometry.py",
+   "intents": [
+    "log:django:18786_19023:19023:django/contrib/gis/geos/geometry.py:h0",
+    "log:django:18786_19023:19023:django/contrib/gis/geos/geometry.py:h1"
+   ],
+   "hold_ms": 21,
+   "t_submit_epoch": 1791572836626,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 10,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 33.76,
+   "t_done_epoch": 1791572836660
+  },
+  {
+   "writer": 1,
+   "pr": 19023,
+   "path": "django/contrib/gis/geos/prototypes/predicates.py",
+   "intents": [
+    "log:django:18786_19023:19023:django/contrib/gis/geos/prototypes/predicates.py:h3"
+   ],
+   "hold_ms": 12,
+   "t_submit_epoch": 1791572836660,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 7,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 23.53,
+   "t_done_epoch": 1791572836683
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 13
+ },
+ "steward_batches": null
+}

@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-8818e13ac76f1313",
+  "proposalIds": [
+    "prop-hist-w1-src_pytest_terminal_py"
+  ],
+  "targetFiles": [
+    "src/_pytest/terminal.py"
+  ],
+  "appliedFiles": [],
+  "fileBeforeHashes": {},
+  "fileAfterHashes": {},
+  "permissions": {
+    "fileWrite": [
+      "src/_pytest/terminal.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "blocked",
+  "blockedReasons": [
+    "file-hash-drift: Target file hash sha256:62e10d3c117a52da697bac92dcc37bc761918cf8cd80699f278e0255e8040042 does not match proposal fileBeforeHash sha256:c8a7f05052d8109162323119e066b3b71f40d28595d5e17dae8d4a0be4260a71."
+  ],
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-8818e13ac76f1313",
+    "planId": "merge-8818e13ac76f1313",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-8818e13ac76f1313",
+        "planId": "merge-8818e13ac76f1313",
+        "request_identity": [
+          "prop-hist-w1-src_pytest_terminal_py"
+        ],
+        "actor_ids": [
+          "writer-11653"
+        ],
+        "request_files": [
+          "src/_pytest/terminal.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/oldpin/runs/pytest_11574_11653__steward__s0/artifacts/steward/cb-src__pytest_terminal.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SRC_PYTEST_TERMINAL_PY"
+        ],
+        "commit_sha": "b55dd64e5df59d272d022f45b80bfb3af71e2159"
+      }
+    ]
+  }
+}

@@ -1,0 +1,129 @@
+{
+ "writer": 0,
+ "pr": 9783,
+ "pid": 2485729,
+ "init_ms": 90.93685099999999,
+ "start_offset_ms": 7,
+ "file_order": [
+  "fastapi/security/oauth2.py"
+ ],
+ "holds": {
+  "fastapi/security/oauth2.py": 0
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 9783,
+   "path": "fastapi/security/oauth2.py",
+   "intents": [
+    "log:fastapi:9783_11460:9783:fastapi/security/oauth2.py:h0",
+    "log:fastapi:9783_11460:9783:fastapi/security/oauth2.py:h1"
+   ],
+   "hold_ms": 0,
+   "t_submit_epoch": 1791575431027,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 20,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-fastapi_security_oauth2.py-w0-0001",
+   "total_ms": 117.67,
+   "t_done_epoch": 1791575431144
+  }
+ ],
+ "admit_stats": {
+  "txns": 2,
+  "cas_conflicts": 0
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-fastapi_security_oauth2.py-w0-0001",
+   "path": "fastapi/security/oauth2.py",
+   "pid": 2485729,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-fastapi_security_oauth2_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-fastapi_security_oauth2_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:05b5dd43f5b63e6e4d21ca471814816b5bb7b741012c282261d38b7e2775b780"
+   ],
+   "lock_wait_ms": 0.13,
+   "t_start_epoch_ms": 1791575431053.05,
+   "pre_apply_hash": "sha256:05b5dd43f5b63e6e4d21ca471814816b5bb7b741012c282261d38b7e2775b780",
+   "receipt_before_hash": "sha256:05b5dd43f5b63e6e4d21ca471814816b5bb7b741012c282261d38b7e2775b780",
+   "receipt_after_hash": "sha256:c42a398f5aa9cdee82bc4b891c89de388d2fd9fa1d1953291c75671e988b7e83",
+   "post_apply_hash": "sha256:c42a398f5aa9cdee82bc4b891c89de388d2fd9fa1d1953291c75671e988b7e83",
+   "t_end_epoch_ms": 1791575431141.25,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:50:31.141+08:00",
+   "batch_id": "cb-fastapi_security_oauth2.py-w0-0001",
+   "path": "fastapi/security/oauth2.py",
+   "proposalIds": [
+    "prop-hist-w0-fastapi_security_oauth2_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-fastapi_security_oauth2_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-fastapi_security_oauth2_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-fastapi_security_oauth2_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-fastapi_security_oauth2_py",
+     "logical_id": "prop-hist-w0-fastapi_security_oauth2_py",
+     "attempt_id": "att-prop-hist-w0-fastapi_security_oauth2_py-r0",
+     "proposal_id": "prop-hist-w0-fastapi_security_oauth2_py",
+     "actorId": "writer-9783"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.26,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:05b5dd43f5b63e6e4d21ca471814816b5bb7b741012c282261d38b7e2775b780",
+   "written": true,
+   "output_digest": "sha256:c42a398f5aa9cdee82bc4b891c89de388d2fd9fa1d1953291c75671e988b7e83",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

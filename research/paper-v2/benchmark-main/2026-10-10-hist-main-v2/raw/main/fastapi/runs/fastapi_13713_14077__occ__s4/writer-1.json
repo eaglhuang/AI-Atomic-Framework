@@ -1,0 +1,81 @@
+{
+ "writer": 1,
+ "pr": 14077,
+ "pid": 2396250,
+ "init_ms": 80.835337,
+ "start_offset_ms": 8,
+ "file_order": [
+  "docs_src/handling_errors/tutorial005.py",
+  "fastapi/exception_handlers.py",
+  "fastapi/openapi/utils.py"
+ ],
+ "holds": {
+  "docs_src/handling_errors/tutorial005.py": 27,
+  "fastapi/exception_handlers.py": 9,
+  "fastapi/openapi/utils.py": 19
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 14077,
+   "path": "docs_src/handling_errors/tutorial005.py",
+   "intents": [
+    "log:fastapi:13713_14077:14077:docs_src/handling_errors/tutorial005.py:h0",
+    "log:fastapi:13713_14077:14077:docs_src/handling_errors/tutorial005.py:h1"
+   ],
+   "hold_ms": 27,
+   "t_submit_epoch": 1791574745137,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 14,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 48.28,
+   "t_done_epoch": 1791574745185
+  },
+  {
+   "writer": 1,
+   "pr": 14077,
+   "path": "fastapi/exception_handlers.py",
+   "intents": [
+    "log:fastapi:13713_14077:14077:fastapi/exception_handlers.py:h2",
+    "log:fastapi:13713_14077:14077:fastapi/exception_handlers.py:h3"
+   ],
+   "hold_ms": 9,
+   "t_submit_epoch": 1791574745185,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 7,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 20.4,
+   "t_done_epoch": 1791574745206
+  },
+  {
+   "writer": 1,
+   "pr": 14077,
+   "path": "fastapi/openapi/utils.py",
+   "intents": [
+    "log:fastapi:13713_14077:14077:fastapi/openapi/utils.py:h4",
+    "log:fastapi:13713_14077:14077:fastapi/openapi/utils.py:h5"
+   ],
+   "hold_ms": 19,
+   "t_submit_epoch": 1791574745206,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 26.46,
+   "t_done_epoch": 1791574745232
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 4
+ },
+ "steward_batches": null
+}

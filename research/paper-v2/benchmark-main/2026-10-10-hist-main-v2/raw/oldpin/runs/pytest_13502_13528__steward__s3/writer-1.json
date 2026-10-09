@@ -1,0 +1,38 @@
+{
+ "writer": 1,
+ "pr": 13528,
+ "pid": 2464474,
+ "init_ms": 94.544013,
+ "start_offset_ms": 17,
+ "file_order": [
+  "src/_pytest/unittest.py"
+ ],
+ "holds": {
+  "src/_pytest/unittest.py": 20
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 13528,
+   "path": "src/_pytest/unittest.py",
+   "intents": [
+    "log:pytest:13502_13528:13528:src/_pytest/unittest.py:h0"
+   ],
+   "hold_ms": 20,
+   "t_submit_epoch": 1791575274569,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 149,
+   "outcome": "blocked",
+   "blocked_reason": "harness-relocate-context-not-found",
+   "total_ms": 181.45,
+   "t_done_epoch": 1791575274750
+  }
+ ],
+ "admit_stats": {
+  "txns": 3,
+  "cas_conflicts": 2
+ },
+ "steward_batches": []
+}

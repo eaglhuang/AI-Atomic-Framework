@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-7a82c4f68e8389f7",
+  "proposalIds": [
+    "prop-hist-w1-sphinx_events_py"
+  ],
+  "targetFiles": [
+    "sphinx/events.py"
+  ],
+  "appliedFiles": [
+    "sphinx/events.py"
+  ],
+  "fileBeforeHashes": {
+    "sphinx/events.py": "dab12be07a667b86d381abda6c09ade7ccf16ac2f1bda0ce11aa210e303997b0"
+  },
+  "fileAfterHashes": {
+    "sphinx/events.py": "1bc647131df20ea5b8f85474ee1d42037da38b492bfe8daa1dde7ffc64a49336"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sphinx/events.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-7a82c4f68e8389f7",
+    "planId": "merge-7a82c4f68e8389f7",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-7a82c4f68e8389f7",
+        "planId": "merge-7a82c4f68e8389f7",
+        "request_identity": [
+          "prop-hist-w1-sphinx_events_py"
+        ],
+        "actor_ids": [
+          "writer-11848"
+        ],
+        "request_files": [
+          "sphinx/events.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sphinx/events.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/o0/runs/sphinx_11837_11848__bare_composer__s0/artifacts/steward/cb-sphinx_events.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SPHINX_EVENTS_PY"
+        ],
+        "commit_sha": "c446c3ed39fe879acc5c3c3b5425a6eed12462e1"
+      }
+    ]
+  }
+}

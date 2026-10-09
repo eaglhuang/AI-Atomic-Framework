@@ -1,0 +1,237 @@
+{
+ "writer": 0,
+ "pr": 13802,
+ "pid": 2336081,
+ "init_ms": 84.43739,
+ "start_offset_ms": 6,
+ "file_order": [
+  "sphinx/ext/autodoc/_documenters.py",
+  "sphinx/ext/autodoc/importer.py"
+ ],
+ "holds": {
+  "sphinx/ext/autodoc/_documenters.py": 2,
+  "sphinx/ext/autodoc/importer.py": 16
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 13802,
+   "path": "sphinx/ext/autodoc/_documenters.py",
+   "intents": [
+    "log:sphinx:13802_13803:13802:sphinx/ext/autodoc/_documenters.py:h0",
+    "log:sphinx:13802_13803:13802:sphinx/ext/autodoc/_documenters.py:h1",
+    "log:sphinx:13802_13803:13802:sphinx/ext/autodoc/_documenters.py:h2"
+   ],
+   "hold_ms": 2,
+   "t_submit_epoch": 1791574294453,
+   "outcome": "blocked",
+   "blocked_reason": "file-hash-drift: Target file hash sha256:66b2792807433a4ad09d7d117e5e28576f40f42b9435318dc16c33f9be9de396 does not match proposal fileBeforeHash sha256:22efbc96d0d8c9c5b31eb4d8a7545c4903cd303d6d0fb4396c679cbd95ac0bb4.",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "file-hash-drift: Target file hash sha256:66b2792807433a4ad09d7d117e5e28576f40f42b9435318dc16c33f9be9de396 does not match proposal fileBeforeHash sha256:22efbc96d0d8c9c5b31eb4d8a7545c4903cd303d6d0fb4396c679cbd95ac0bb4."
+   ],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sphinx_ext_autodoc__documenters.py-w0-0001",
+   "total_ms": 129.99,
+   "t_done_epoch": 1791574294583
+  },
+  {
+   "writer": 0,
+   "pr": 13802,
+   "path": "sphinx/ext/autodoc/importer.py",
+   "intents": [
+    "log:sphinx:13802_13803:13802:sphinx/ext/autodoc/importer.py:h3",
+    "log:sphinx:13802_13803:13802:sphinx/ext/autodoc/importer.py:h4"
+   ],
+   "hold_ms": 16,
+   "t_submit_epoch": 1791574294583,
+   "outcome": "blocked",
+   "blocked_reason": "compose-context-mismatch: proposal 'prop-hist-w0-sphinx_ext_autodoc_importer_py' context mismatch at base line 815: expected \"        try:\", found \"        mod_all = safe_getattr(obj, '__all__', None)\" [proposals: prop-hist-w0-sphinx_ext_autodoc_importer_py]",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w0-sphinx_ext_autodoc_importer_py' context mismatch at base line 815: expected \"        try:\", found \"        mod_all = safe_getattr(obj, '__all__', None)\" [proposals: prop-hist-w0-sphinx_ext_autodoc_importer_py]"
+   ],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sphinx_ext_autodoc_importer.py-w0-0002",
+   "total_ms": 30.97,
+   "t_done_epoch": 1791574294614
+  }
+ ],
+ "admit_stats": null,
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sphinx_ext_autodoc__documenters.py-w0-0001",
+   "path": "sphinx/ext/autodoc/_documenters.py",
+   "pid": 2336081,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-sphinx_ext_autodoc_documenters_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sphinx_ext_autodoc_documenters_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:22efbc96d0d8c9c5b31eb4d8a7545c4903cd303d6d0fb4396c679cbd95ac0bb4"
+   ],
+   "lock_wait_ms": 0.13,
+   "t_start_epoch_ms": 1791574294459.67,
+   "pre_apply_hash": "sha256:22efbc96d0d8c9c5b31eb4d8a7545c4903cd303d6d0fb4396c679cbd95ac0bb4",
+   "receipt_before_hash": null,
+   "receipt_after_hash": null,
+   "post_apply_hash": "sha256:66b2792807433a4ad09d7d117e5e28576f40f42b9435318dc16c33f9be9de396",
+   "t_end_epoch_ms": 1791574294583.03,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "blocked",
+   "written": false,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:31:34.583+08:00",
+   "batch_id": "cb-sphinx_ext_autodoc__documenters.py-w0-0001",
+   "path": "sphinx/ext/autodoc/_documenters.py",
+   "proposalIds": [
+    "prop-hist-w0-sphinx_ext_autodoc_documenters_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sphinx_ext_autodoc_documenters_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-sphinx_ext_autodoc_documenters_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-sphinx_ext_autodoc_documenters_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-sphinx_ext_autodoc_documenters_py",
+     "logical_id": "prop-hist-w0-sphinx_ext_autodoc_documenters_py",
+     "attempt_id": "att-prop-hist-w0-sphinx_ext_autodoc_documenters_py-r0",
+     "proposal_id": "prop-hist-w0-sphinx_ext_autodoc_documenters_py",
+     "actorId": "writer-13802"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "file-hash-drift: Target file hash sha256:66b2792807433a4ad09d7d117e5e28576f40f42b9435318dc16c33f9be9de396 does not match proposal fileBeforeHash sha256:22efbc96d0d8c9c5b31eb4d8a7545c4903cd303d6d0fb4396c679cbd95ac0bb4."
+   ],
+   "blocked_reason": "file-hash-drift: Target file hash sha256:66b2792807433a4ad09d7d117e5e28576f40f42b9435318dc16c33f9be9de396 does not match proposal fileBeforeHash sha256:22efbc96d0d8c9c5b31eb4d8a7545c4903cd303d6d0fb4396c679cbd95ac0bb4.",
+   "window_wait_ms": 0.29,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:22efbc96d0d8c9c5b31eb4d8a7545c4903cd303d6d0fb4396c679cbd95ac0bb4",
+   "written": false,
+   "output_digest": null,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "file-hash-drift: Target file hash sha256:66b2792807433a4ad09d7d117e5e28576f40f42b9435318dc16c33f9be9de396 does not match proposal fileBeforeHash sha256:22efbc96d0d8c9c5b31eb4d8a7545c4903cd303d6d0fb4396c679cbd95ac0bb4."
+  },
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sphinx_ext_autodoc_importer.py-w0-0002",
+   "path": "sphinx/ext/autodoc/importer.py",
+   "pid": 2336081,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-sphinx_ext_autodoc_importer_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sphinx_ext_autodoc_importer_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:25f7189339ca433e1d43503aa1f4288c618d32481208799582102a7c0b1811ea"
+   ],
+   "lock_wait_ms": 0,
+   "t_start_epoch_ms": 1791574294600.86,
+   "pre_apply_hash": "sha256:25f7189339ca433e1d43503aa1f4288c618d32481208799582102a7c0b1811ea",
+   "receipt_before_hash": null,
+   "receipt_after_hash": null,
+   "post_apply_hash": "sha256:d4ec5d194e20fa7c83012fa1db10d347ae71f706405ee0ea3ad933a88b935899",
+   "t_end_epoch_ms": 1791574294614.56,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "blocked",
+   "written": false,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:31:34.614+08:00",
+   "batch_id": "cb-sphinx_ext_autodoc_importer.py-w0-0002",
+   "path": "sphinx/ext/autodoc/importer.py",
+   "proposalIds": [
+    "prop-hist-w0-sphinx_ext_autodoc_importer_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sphinx_ext_autodoc_importer_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-sphinx_ext_autodoc_importer_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-sphinx_ext_autodoc_importer_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-sphinx_ext_autodoc_importer_py",
+     "logical_id": "prop-hist-w0-sphinx_ext_autodoc_importer_py",
+     "attempt_id": "att-prop-hist-w0-sphinx_ext_autodoc_importer_py-r0",
+     "proposal_id": "prop-hist-w0-sphinx_ext_autodoc_importer_py",
+     "actorId": "writer-13802"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w0-sphinx_ext_autodoc_importer_py' context mismatch at base line 815: expected \"        try:\", found \"        mod_all = safe_getattr(obj, '__all__', None)\" [proposals: prop-hist-w0-sphinx_ext_autodoc_importer_py]"
+   ],
+   "blocked_reason": "compose-context-mismatch: proposal 'prop-hist-w0-sphinx_ext_autodoc_importer_py' context mismatch at base line 815: expected \"        try:\", found \"        mod_all = safe_getattr(obj, '__all__', None)\" [proposals: prop-hist-w0-sphinx_ext_autodoc_importer_py]",
+   "window_wait_ms": 0.01,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:25f7189339ca433e1d43503aa1f4288c618d32481208799582102a7c0b1811ea",
+   "written": false,
+   "output_digest": null,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "compose-context-mismatch: proposal 'prop-hist-w0-sphinx_ext_autodoc_importer_py' context mismatch at base line 815: expected \"        try:\", found \"        mod_all = safe_getattr(obj, '__all__', None)\" [proposals: prop-hist-w0-sphinx_ext_autodoc_importer_py]"
+  }
+ ]
+}
