@@ -122,8 +122,9 @@ jobs:
             changed_files="$(git diff --name-only HEAD 2>/dev/null || true)"
           fi
           if [ -n "$changed_files" ]; then
-            changed_csv="$(printf '%s\n' "$changed_files" | paste -sd, -)"
-            node atm.mjs framework-mode claim --actor "ci-${GITHUB_RUN_ID}" --files "$changed_csv" --reason "CI preflight framework-development claim" --json
+            changed_list="${RUNNER_TEMP:-${TMPDIR:-/tmp}}/atm-framework-claim-files.txt"
+            printf '%s\n' "$changed_files" > "$changed_list"
+            node atm.mjs framework-mode claim --actor "ci-${GITHUB_RUN_ID}" --files-from "$changed_list" --reason "CI preflight framework-development claim" --json
           else
             echo "No changed files to claim."
           fi
@@ -139,8 +140,9 @@ jobs:
             changed_files="$(git diff --name-only HEAD 2>/dev/null || true)"
           fi
           if [ -n "$changed_files" ]; then
-            changed_csv="$(printf '%s\n' "$changed_files" | paste -sd, -)"
-            node atm.mjs guard framework-development --files "$changed_csv" --json
+            changed_list="${RUNNER_TEMP:-${TMPDIR:-/tmp}}/atm-framework-guard-files.txt"
+            printf '%s\n' "$changed_files" > "$changed_list"
+            node atm.mjs guard framework-development --files-from "$changed_list" --json
           else
             node atm.mjs guard framework-development --json
           fi
