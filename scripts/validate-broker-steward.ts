@@ -377,6 +377,12 @@ try {
   });
   check(kernelLock.status === 0, `kernel lock regression must pass:\n${kernelLock.stdout}\n${kernelLock.stderr}`);
 
+  const queueBusy = spawnSync(process.execPath, ['--strip-types', path.join(root, 'tests/core/steward-apply-queue-busy.test.ts')], {
+    cwd: root,
+    encoding: 'utf8'
+  });
+  check(queueBusy.status === 0, `apply queue SQLITE_BUSY regression must pass:\n${queueBusy.stdout}\n${queueBusy.stderr}`);
+
   console.log(`[broker-steward:${mode}] ok`);
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
