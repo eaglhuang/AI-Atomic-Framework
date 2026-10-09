@@ -1,4 +1,4 @@
-import { chmodSync, copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
+import { chmodSync, constants, copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -160,7 +160,14 @@ export function installPinnedRunner(cwd: string, force: boolean, created: string
     unchanged.push('atm.mjs');
   } else {
     mkdirSync(path.dirname(runnerPath), { recursive: true });
-    copyFileSync(source.path, runnerPath);
+    try {
+      copyFileSync(source.path, runnerPath, force ? 0 : constants.COPYFILE_EXCL);
+    } catch (error) {
+      if (!force && (error as NodeJS.ErrnoException).code === 'EEXIST') {
+        throw new Error('ATM_SETUP_RUNNER_CONFLICT: preserved a project runner created concurrently; inspect it before retrying setup.');
+      }
+      throw error;
+    }
     syncExecutableMode(source.path, runnerPath);
     status = existingSha256 ? 'replaced' : 'installed';
     created.push('atm.mjs');
@@ -187,7 +194,7 @@ export function installPinnedRunner(cwd: string, force: boolean, created: string
   return metadata;
 }
 
-function resolvePinnedRunnerSource(): { readonly path: string; readonly kind: LocalGovernancePinnedRunnerResult['sourceKind'] } | null {
+export function resolvePinnedRunnerSource(): { readonly path: string; readonly kind: LocalGovernancePinnedRunnerResult['sourceKind'] } | null {
   const explicit = resolveExistingFile(process.env.ATM_PINNED_RUNNER_SOURCE);
   if (explicit) {
     return { path: explicit, kind: 'explicit-env' };

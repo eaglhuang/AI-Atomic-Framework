@@ -79,17 +79,22 @@ export function compileSkillTemplatesForAdapter(adapterTarget, templates = undef
         ]);
     }
     if (adapterTarget === 'gemini') {
-        return resolvedTemplates.map((template) => ({
-            relativePath: `${template.frontmatter.id}.toml`,
-            content: compileSkillTemplate(template, 'gemini', options),
-            fileFormat: 'toml',
-            source: 'template',
-            skillId: template.frontmatter.id,
-            sourceDigest: digestSkillTemplate(template),
-            sourceCatalogDigest,
-            installProfileId: profileId,
-            managed: true
-        }));
+        return resolvedTemplates.flatMap((template) => [{
+                relativePath: `${template.frontmatter.id}.toml`,
+                content: compileSkillTemplate(template, 'gemini', options),
+                fileFormat: 'toml',
+                source: 'template',
+                skillId: template.frontmatter.id,
+                sourceDigest: digestSkillTemplate(template),
+                sourceCatalogDigest,
+                installProfileId: profileId,
+                managed: true
+            }, ...loadSkillTemplateCompanionFiles(template.frontmatter.id, {
+                skillId: template.frontmatter.id,
+                sourceDigest: digestSkillTemplate(template),
+                sourceCatalogDigest,
+                installProfileId: profileId
+            })]);
     }
     return resolvedTemplates.flatMap((template) => [
         {
@@ -113,7 +118,13 @@ export function compileSkillTemplatesForAdapter(adapterTarget, templates = undef
             sourceCatalogDigest,
             installProfileId: profileId,
             managed: true
-        }
+        },
+        ...loadSkillTemplateCompanionFiles(template.frontmatter.id, {
+            skillId: template.frontmatter.id,
+            sourceDigest: digestSkillTemplate(template),
+            sourceCatalogDigest,
+            installProfileId: profileId
+        })
     ]);
 }
 /**
@@ -132,7 +143,9 @@ export function resolveDefaultSkillSourceCoverage(repositoryRoot = integrationsC
 }
 export function compileSkillTemplate(template, adapterTarget, options = {}) {
     const frontmatter = template.frontmatter;
-    const body = renderSkillTemplateBody(template, options);
+    const referenceRoot = adapterTarget === 'gemini' ? `${frontmatter.id}/references`
+        : adapterTarget === 'copilot-instructions' || adapterTarget === 'copilot-prompt' ? `../${frontmatter.id}/references` : 'references';
+    const body = renderSkillTemplateBody(template, options).replaceAll('{{REFERENCE_ROOT}}', referenceRoot);
     if (adapterTarget === 'claude-code' || adapterTarget === 'codex') {
         return `---
 name: ${frontmatter.id}

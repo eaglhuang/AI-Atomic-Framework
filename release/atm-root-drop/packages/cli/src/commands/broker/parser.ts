@@ -39,7 +39,7 @@ const defaultFallbackBrokerRunEvidenceRelativeDir = path.join(
 
 export interface ParsedBrokerOptions {
   readonly cwd: string;
-  readonly action: 'register' | 'heartbeat' | 'decision' | 'status' | 'release' | 'acknowledge' | 'cleanup' | 'proposal' | 'compose' | 'steward' | 'runtime' | 'runner-sync' | 'projection' | 'plan-batch' | 'schedule' | 'batch' | 'parallel-admission' | 'replay' | 'post-compose-semantic-validation' | null;
+  readonly action: 'register' | 'heartbeat' | 'decision' | 'status' | 'release' | 'acknowledge' | 'cleanup' | 'proposal' | 'compose' | 'steward' | 'runtime' | 'runner-sync' | 'projection' | 'plan-batch' | 'schedule' | 'batch' | 'parallel-admission' | 'replay' | 'heat-status' | 'heat-reset' | 'post-compose-semantic-validation' | null;
   readonly candidateFile: string | null;
   readonly proposalAction: 'create' | 'list' | 'show' | 'validate' | null;
   readonly stewardAction: 'plan' | 'apply' | null;
@@ -71,6 +71,7 @@ export interface ParsedBrokerOptions {
   readonly expectedTasks: readonly string[];
   readonly collectionTimeoutMs: number;
   readonly intentFile: string | null;
+  readonly queueTicketId: string | null;
   readonly freezeId: string | null;
   readonly ttlSeconds: number;
   readonly surfaces: readonly string[];
@@ -130,6 +131,7 @@ export function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
     expectedTasks: [] as string[],
     collectionTimeoutMs: 120000,
     intentFile: null as string | null,
+    queueTicketId: null as string | null,
     freezeId: null as string | null,
     ttlSeconds: 1800,
     surfaces: [] as string[],
@@ -259,6 +261,11 @@ export function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
     }
     if (arg === '--intent-file') {
       state.intentFile = requireValue(argv, index, '--intent-file');
+      index += 1;
+      continue;
+    }
+    if (arg === '--queue-ticket') {
+      state.queueTicketId = requireValue(argv, index, arg);
       index += 1;
       continue;
     }
@@ -471,6 +478,7 @@ export function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
     expectedTasks: state.expectedTasks,
     collectionTimeoutMs: state.collectionTimeoutMs,
     intentFile: state.intentFile,
+    queueTicketId: state.queueTicketId,
     freezeId: state.freezeId,
     ttlSeconds: state.ttlSeconds,
     surfaces: state.surfaces,

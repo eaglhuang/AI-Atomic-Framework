@@ -61,21 +61,16 @@ export function readStagedJsonFile(cwd, relativeFile) {
     }
 }
 export function readStagedFiles(cwd) {
-    try {
-        return runGitCommand(cwd, [
-            "diff",
-            "--cached",
-            "--name-only",
-            "--diff-filter=ACMRTD",
-        ])
-            .split(/\r?\n/)
-            .map(normalizeRelativePath)
-            .filter(Boolean)
-            .sort((left, right) => left.localeCompare(right));
-    }
-    catch {
-        return [];
-    }
+    return runGitCommand(cwd, [
+        "diff",
+        "--cached",
+        "--name-only",
+        "--diff-filter=ACMRTD",
+        "-z",
+    ])
+        .split("\0")
+        .filter(Boolean)
+        .sort((left, right) => left.localeCompare(right));
 }
 /**
  * Read tracked worktree changes independently of staged state. A path may be
@@ -84,16 +79,10 @@ export function readStagedFiles(cwd) {
  * authoritative.
  */
 export function readUnstagedFiles(cwd) {
-    try {
-        return runGitCommand(cwd, ["diff", "--name-only", "--diff-filter=ACMRTD"])
-            .split(/\r?\n/)
-            .map(normalizeRelativePath)
-            .filter(Boolean)
-            .sort((left, right) => left.localeCompare(right));
-    }
-    catch {
-        return [];
-    }
+    return runGitCommand(cwd, ["diff", "--name-only", "--diff-filter=ACMRTD", "-z"])
+        .split("\0")
+        .filter(Boolean)
+        .sort((left, right) => left.localeCompare(right));
 }
 export function rollbackNewlyStagedLiveIndexResidue(cwd, stagedBeforeAttempt) {
     const beforeSet = new Set(stagedBeforeAttempt);
@@ -109,20 +98,15 @@ export function rollbackNewlyStagedLiveIndexResidue(cwd, stagedBeforeAttempt) {
     return newlyStaged;
 }
 export function readStagedDiffNames(cwd, diffFilter) {
-    try {
-        return runGitCommand(cwd, [
-            "diff",
-            "--cached",
-            "--name-only",
-            `--diff-filter=${diffFilter}`,
-        ])
-            .split(/\r?\n/)
-            .map(normalizeRelativePath)
-            .filter(Boolean);
-    }
-    catch {
-        return [];
-    }
+    return runGitCommand(cwd, [
+        "diff",
+        "--cached",
+        "--name-only",
+        `--diff-filter=${diffFilter}`,
+        "-z",
+    ])
+        .split("\0")
+        .filter(Boolean);
 }
 export function isAllowedGovernanceArtifactPath(cwd, filePath, taskId) {
     const normalized = normalizeRelativePath(filePath);
@@ -325,26 +309,50 @@ export function deferForeignStagedFiles(cwd, taskId, unexpectedStagedTasks) {
     return deferStagedFilePaths(cwd, taskId, files);
 }
 export function deferStagedFilePaths(cwd, taskId, filesInput) {
-    const files = uniqueSorted(filesInput.map(normalizeRelativePath).filter(Boolean));
+    const files = [...new Set(filesInput)].filter(Boolean).sort();
     if (files.length === 0)
         return null;
+    // A rename is one index change: parking only its destination leaks the
+    // source deletion into the intervening commit.
+    const renames = runGitCommand(cwd, ["diff", "--cached", "--name-status", "-z", "--diff-filter=R"]).split("\0");
+    for (let index = 0; index + 2 < renames.length; index += 3) {
+        const pair = renames.slice(index + 1, index + 3);
+        if (pair.some((filePath) => files.includes(filePath))) {
+            for (const filePath of pair)
+                if (!files.includes(filePath))
+                    files.push(filePath);
+        }
+    }
+    files.sort();
     const entries = [];
-    forEachPathspecBatch({ paths: files, fixedArgs: ["ls-files", "-s", "--"] }, (batch) => {
-        for (const match of runGitCommand(cwd, ["ls-files", "-s", "--", ...batch])
-            .split(/\r?\n/)
-            .map((line) => line.match(/^(\d+) ([0-9a-f]+) \d+\t(.+)$/i))
+    forEachPathspecBatch({ paths: files, fixedArgs: ["--literal-pathspecs", "ls-files", "-s", "-z", "--"] }, (batch) => {
+        for (const match of runGitCommand(cwd, ["--literal-pathspecs", "ls-files", "-s", "-z", "--", ...batch])
+            .split("\0")
+            .map((line) => line.match(/^(\d+) ([0-9a-f]+) (\d+)\t([\s\S]+)$/i))
             .filter((candidate) => candidate !== null)) {
-            const [, mode, blobId, filePath] = match;
-            entries.push({ path: normalizeRelativePath(filePath), mode, blobId });
+            const [, mode, blobId, stage, filePath] = match;
+            if (stage !== "0")
+                throw new Error(`Cannot defer an unresolved index entry: ${filePath}.`);
+            entries.push({ path: filePath, mode, blobId });
         }
     });
-    if (entries.length !== files.length) {
+    const deletions = new Set(entries.length < files.length
+        ? runGitCommand(cwd, ["diff", "--cached", "--name-only", "-z", "--no-renames", "--diff-filter=D"]).split("\0").filter(Boolean)
+        : []);
+    const capturedPaths = new Set(entries.map((entry) => entry.path));
+    for (const filePath of files) {
+        if (!capturedPaths.has(filePath) && deletions.has(filePath)) {
+            entries.push({ path: filePath, deleted: true });
+            capturedPaths.add(filePath);
+        }
+    }
+    if (entries.length !== files.length || files.some((filePath) => !capturedPaths.has(filePath))) {
         throw new Error(`Cannot defer foreign staged files without a complete index snapshot: expected ${files.length} entries, captured ${entries.length}.`);
     }
     const snapshotPath = `.atm/runtime/snapshots/foreign-staged-${taskId}-${Date.now()}.json`;
     mkdirSync(path.dirname(path.join(cwd, snapshotPath)), { recursive: true });
     writeFileSync(path.join(cwd, snapshotPath), `${JSON.stringify({ schemaId: "atm.foreignStagedSnapshot.v1", taskId, createdAt: new Date().toISOString(), files, entries }, null, 2)}\n`, "utf8");
-    forEachPathspecBatch({ paths: files, fixedArgs: ["restore", "--staged", "--"] }, (batch) => runGitCommand(cwd, ["restore", "--staged", "--", ...batch], ["ignore", "pipe", "pipe"]));
+    forEachPathspecBatch({ paths: files, fixedArgs: ["--literal-pathspecs", "restore", "--staged", "--"] }, (batch) => runGitCommand(cwd, ["--literal-pathspecs", "restore", "--staged", "--", ...batch], ["ignore", "pipe", "pipe"]));
     return snapshotPath;
 }
 export function cleanupDeferredForeignStagedSnapshot(cwd, snapshotPath) {
@@ -356,20 +364,22 @@ export function cleanupDeferredForeignStagedSnapshot(cwd, snapshotPath) {
     const snapshot = JSON.parse(readFileSync(absolutePath, "utf8"));
     const entries = Array.isArray(snapshot?.entries) ? snapshot.entries : [];
     for (const entry of entries) {
-        const filePath = normalizeRelativePath(entry?.path);
+        const filePath = typeof entry?.path === "string" ? entry.path : "";
         const mode = String(entry?.mode ?? "");
         const blobId = String(entry?.blobId ?? "");
-        if (!filePath || !/^\d+$/.test(mode) || !/^[0-9a-f]+$/i.test(blobId)) {
+        if (!filePath || (entry.deleted !== true && (!/^\d+$/.test(mode) || !/^[0-9a-f]+$/i.test(blobId)))) {
             throw new Error(`Invalid deferred foreign staged snapshot entry in ${snapshotPath}.`);
         }
-        runGitCommand(cwd, ["update-index", "--add", "--cacheinfo", `${mode},${blobId},${filePath}`], ["ignore", "pipe", "pipe"]);
-        const restoredEntry = runGitCommand(cwd, ["ls-files", "-s", "--", filePath]);
-        if (!restoredEntry.includes(`${mode} ${blobId} 0\t${filePath}`)) {
+        runGitCommand(cwd, entry.deleted === true
+            ? ["--literal-pathspecs", "update-index", "--force-remove", "--", filePath]
+            : ["update-index", "--add", "--cacheinfo", `${mode},${blobId},${filePath}`], ["ignore", "pipe", "pipe"]);
+        const restoredEntry = runGitCommand(cwd, ["--literal-pathspecs", "ls-files", "-s", "-z", "--", filePath]);
+        if (restoredEntry !== (entry.deleted === true ? "" : `${mode} ${blobId} 0\t${filePath}\0`)) {
             throw new Error(`Deferred foreign staged entry was not restored: ${filePath}.`);
         }
     }
     rmSync(absolutePath, { force: true });
-    return entries.map((entry) => normalizeRelativePath(entry.path));
+    return entries.map((entry) => entry.path).sort();
 }
 export function recordGitIndexRestoreFailure(cwd, input) {
     const relativePath = `.atm/history/evidence/${input.taskId}.index-restore-failure.json`;

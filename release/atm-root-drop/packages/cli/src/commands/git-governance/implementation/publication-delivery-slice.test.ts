@@ -9,6 +9,7 @@ import {
 import { resolvePublicationDeliverySlice } from '../../../../../core/src/git/publication-delivery-slice.ts';
 import { pathMatchesTaskScope } from '../commit-scope-policy.ts';
 import { resolveTaskScopedCommitBundle } from './commit-bundle-resolution.ts';
+import { issueWorkAdmissionTicket } from '../../../../../core/src/broker/work-admission-ticket.ts';
 
 const SHA = '194c7670d0f046de5ee707be9be14afb2eabda7a';
 const TASK_ID = 'TASK-SLICE-0001';
@@ -189,7 +190,8 @@ writeFileSync(path.join(cwd, 'packages/cli/dist/atm.d.ts'), 'export {}\n');
 writeFileSync(path.join(cwd, 'packages/cli/dist/gone.d.ts'), 'export {}\n');
 writeFileSync(path.join(cwd, 'release/atm-onefile/atm.mjs'), 'export {}\n');
 writeFileSync(path.join(cwd, 'docs/reports/plan-closeback.json'), '{"closeback":true}\n');
-writeFileSync(path.join(cwd, '.atm/catalog/registry/actors.json'), '{"actors":[]}\n');
+const sliceActor = { actorId: 'test-actor', actorKind: 'ai-agent', displayName: 'Slice Test', gitName: 'Slice Test', gitEmail: 'slice@example.invalid' };
+writeFileSync(path.join(cwd, '.atm/catalog/registry/actors.json'), JSON.stringify({ actors: [sliceActor] }));
 writeFileSync(path.join(cwd, `.atm/history/evidence/${TASK_ID}.runner-sync-receipt.json`), `${JSON.stringify(published)}\n`);
 writeFileSync(
   path.join(cwd, `.atm/history/tasks/${TASK_ID}.json`),
@@ -224,7 +226,7 @@ writeFileSync(path.join(cwd, 'packages/cli/dist/atm.d.ts'), 'export { atm: true 
 rmSync(path.join(cwd, 'packages/cli/dist/gone.d.ts'));
 writeFileSync(path.join(cwd, 'release/atm-onefile/atm.mjs'), 'export { built: true }\n');
 writeFileSync(path.join(cwd, 'docs/reports/plan-closeback.json'), '{"closeback":"dirty"}\n');
-writeFileSync(path.join(cwd, '.atm/catalog/registry/actors.json'), '{"actors":["other-task"]}\n');
+writeFileSync(path.join(cwd, '.atm/catalog/registry/actors.json'), JSON.stringify({ actors: [sliceActor, { ...sliceActor, actorId: 'other-task' }] }));
 writeFileSync(path.join(cwd, `.atm/history/evidence/${TASK_ID}.runner-sync-receipt.json`), `${JSON.stringify(published)}\n`);
 const manifestPath = path.join(cwd, '.atm', 'history', 'evidence', `${TASK_ID}.delivery-slice.json`);
 writeFileSync(manifestPath, `${JSON.stringify(manifest)}\n`);
@@ -284,5 +286,21 @@ const foreignReceiptBundle = resolveTaskScopedCommitBundle({
 });
 assert.equal(foreignReceiptBundle.ok, false);
 assert.equal(foreignReceiptBundle.blockedCode, 'ATM_GIT_COMMIT_DELIVERY_SLICE_INVALID');
+
+const registryPath = '.atm/catalog/registry/actors.json';
+const scopedTask = JSON.parse(readFileSync(path.join(cwd, `.atm/history/tasks/${TASK_ID}.json`), 'utf8'));
+scopedTask.scopePaths.push(registryPath); scopedTask.claim.files.push(registryPath);
+scopedTask.workAdmissionTicket = issueWorkAdmissionTicket({ taskId: TASK_ID, actorId: 'test-actor', claimGeneration: 'lease-slice', allowedFiles: scopedTask.claim.files, runnerSelection: { runnerKind: 'frozen', runnerRef: 'fixture', selectedAt: new Date().toISOString() } });
+writeFileSync(path.join(cwd, `.atm/history/tasks/${TASK_ID}.json`), JSON.stringify(scopedTask));
+execFileSync('git', ['add', '--', registryPath], { cwd });
+const registryIndex = execFileSync('git', ['ls-files', '--stage', '--', registryPath], { cwd, encoding: 'utf8' });
+const sliceInput = { cwd, taskId: TASK_ID, actorId: 'test-actor', taskDocument: scopedTask, message: 'fixture', trailers: [], apply: false, autoStage: true, deferForeignStaged: true, deliverySliceManifestPath: `.atm/history/evidence/${TASK_ID}.delivery-slice.json` };
+const explicitlyScopedSlice = resolveTaskScopedCommitBundle(sliceInput);
+assert.equal(explicitlyScopedSlice.ok, true);
+assert(!explicitlyScopedSlice.commitFiles.includes(registryPath), 'pre-staged explicit authority must not expand a closed publication slice');
+assert(!explicitlyScopedSlice.sealedBundle.entries.some((entry: { path: string }) => entry.path === registryPath));
+writeFileSync(path.join(cwd, registryPath), JSON.stringify({ actors: [{ ...sliceActor, gitName: 'Changed identity' }] }));
+assert.throws(() => resolveTaskScopedCommitBundle({ ...sliceInput, apply: true }), (error: unknown) => (error as { code: string }).code === 'ATM_COMMIT_ACTOR_REGISTRY_UNSTAGED', 'slice attribution dependency must fail before apply or parking');
+assert.equal(execFileSync('git', ['ls-files', '--stage', '--', registryPath], { cwd, encoding: 'utf8' }), registryIndex);
 
 rmSync(cwd, { recursive: true, force: true });

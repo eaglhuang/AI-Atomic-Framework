@@ -66,6 +66,8 @@ export function applyLiveIndexRollbackAfterCommitError(input: {
   readonly headAdvancedDuringAttempt: boolean;
   readonly indexRestorationSnapshot: IndexRestorationSnapshot | null;
   readonly liveIndexSnapshotBeforeAttempt: LegacyValue;
+  readonly operationOwnedPaths?: readonly string[];
+  readonly expectedOperationIndex?: IndexRestorationSnapshot;
 }): {
   readonly indexRestoration: IndexRestorationOutcome | null;
   readonly liveIndexResidueRollback: readonly string[];
@@ -74,17 +76,13 @@ export function applyLiveIndexRollbackAfterCommitError(input: {
     return { indexRestoration: null, liveIndexResidueRollback: [] };
   }
   const indexRestoration = input.indexRestorationSnapshot
-    ? restoreIndexToSnapshot(input.cwd, input.indexRestorationSnapshot)
+    ? restoreIndexToSnapshot(input.cwd, input.indexRestorationSnapshot, { paths: input.operationOwnedPaths ?? [], expected: input.expectedOperationIndex ?? input.indexRestorationSnapshot })
     : null;
   return {
     indexRestoration,
     liveIndexResidueRollback: Array.from(
       new Set([
         ...(indexRestoration?.restoredPaths ?? []),
-        ...rollbackNewlyStagedLiveIndexResidue(
-          input.cwd,
-          input.liveIndexSnapshotBeforeAttempt,
-        ),
       ]),
     ).sort(),
   };
@@ -95,7 +93,9 @@ let { actorId, args, autoStagedFrameworkPaths, branchName, branchRef, bypassesAc
 // ATM-GOV-0369 amendment 1: the boundary that can fail owns its own
 // pre-operation snapshot, so restoration never depends on a caller
 // remembering to take one.
-const indexRestorationSnapshotBeforeCommitAttempt = captureIndexRestorationSnapshot(options.cwd);
+const indexRestorationSnapshotBeforeCommitAttempt = context.liveIndexRestorationSnapshotBeforeCommitAttempt ?? captureIndexRestorationSnapshot(options.cwd);
+let expectedOperationIndex = captureIndexRestorationSnapshot(options.cwd);
+const operationOwnedPaths = new Set<string>(autoStagedFrameworkPaths ?? []);
 try {
     withBranchCommitQueueLock(
       {
@@ -155,6 +155,8 @@ try {
           hookTaskId,
           autoStagedFrameworkPaths,
         });
+        if (candidate.preStagedEvidence?.evidencePath) operationOwnedPaths.add(candidate.preStagedEvidence.evidencePath);
+        expectedOperationIndex = captureIndexRestorationSnapshot(options.cwd);
         // executeHookBypassCommitBoundary( is reached inside executeCommitAttempt
         // only after withBranchCommitQueueLock admits this branch commit window.
         protectedOverrideAudit = executeCommitAttempt({
@@ -195,11 +197,13 @@ try {
       headShaBeforeCommit &&
       headShaAfterFailure !== headShaBeforeCommit,
     );
-    const { liveIndexResidueRollback } = applyLiveIndexRollbackAfterCommitError({
+    const { liveIndexResidueRollback, indexRestoration } = applyLiveIndexRollbackAfterCommitError({
       cwd: options.cwd,
       headAdvancedDuringAttempt,
       indexRestorationSnapshot: indexRestorationSnapshotBeforeCommitAttempt,
       liveIndexSnapshotBeforeAttempt: liveIndexSnapshotBeforeCommitAttempt,
+      operationOwnedPaths: [...operationOwnedPaths],
+      expectedOperationIndex,
     });
     const gitHeadEvidenceRollback = headAdvancedDuringAttempt
       ? false
@@ -256,13 +260,14 @@ try {
           ? error.code
           : isCommitTimeoutFailure
             ? "ATM_GIT_COMMIT_TIMEOUT"
-            : "UNKNOWN",
+            : readAtmErrorCode(error) ?? "UNKNOWN",
       errorSummary: hookFailureSummary
         ?? (error instanceof Error ? error.message.slice(0, 500) : String(error)),
       statusCommand,
       retryCommand,
       copyableCommitCommand: rawCopyableCommitCommand,
       liveIndexResidueRollback,
+      indexRestoration,
     });
     if (
       error instanceof CliError &&
@@ -356,6 +361,15 @@ try {
               nestedAttemptStatus.liveIndexResidueRollback ?? null,
           }
         : null;
+    // Retrying cannot help when there is nothing to commit, so say so instead
+    // of pointing at an opaque nested failure and the same retry command.
+    if (!headAdvancedDuringAttempt && readAtmErrorCode(error) === "ATM_COMMIT_ATTRIBUTION_EMPTY_BUNDLE") {
+      throw new CliError(
+        "ATM_GIT_COMMIT_NOTHING_TO_COMMIT",
+        "Nothing to commit: none of the files this commit may include has a change. Edit the claimed files first; if the change already landed in an earlier commit, there is nothing left to commit.",
+        { exitCode: 1, details: { actorId, taskId: options.taskId, headShaBeforeCommit, commitAttemptStatusPath, statusCommand, gitHeadEvidenceRollback } },
+      );
+    }
     throw new CliError(
       "ATM_GIT_COMMIT_FAILED",
       hookFailureSummary ?? "ATM git commit wrapper failed.",
@@ -515,4 +529,10 @@ return makeResult({
       protectedOverrideOutcome,
     },
   });
+}
+
+/** Coded errors from the commit path keep their ATM code in the attempt record. */
+function readAtmErrorCode(error: unknown): string | null {
+  const code = (error as { code?: unknown } | null)?.code;
+  return typeof code === "string" && code.startsWith("ATM_") ? code : null;
 }

@@ -15,8 +15,8 @@
  * platform byte budget. That keeps it testable for a Windows budget from a
  * POSIX host, and it means no caller has to know a limit exists.
  *
- * Normalization is part of the contract, not a convenience. Callers compare
- * index entries by path, so the planner returns one canonical, deduplicated,
+ * Path bytes are part of the contract. Callers compare
+ * index entries by path, so the planner returns one lossless, deduplicated,
  * sorted list and guarantees that concatenating the batches reproduces it
  * exactly. Splitting a list must not change what the list means.
  */
@@ -64,9 +64,6 @@ export function estimateArgvBytes(args) {
     }
     return total;
 }
-function normalizePath(value) {
-    return String(value ?? '').replace(/\\/g, '/').replace(/^\.\//, '').trim();
-}
 /**
  * Split `paths` into invocations that each stay within `budgetBytes` once
  * `fixedArgs` is charged to every batch.
@@ -77,7 +74,7 @@ function normalizePath(value) {
  */
 export function planPathspecBatches(input) {
     const budgetBytes = input.budgetBytes ?? resolvePathspecArgvBudget().budgetBytes;
-    const paths = [...new Set(input.paths.map(normalizePath).filter(Boolean))].sort();
+    const paths = [...new Set(input.paths.filter(Boolean))].sort();
     const fixedBytes = estimateArgvBytes(input.fixedArgs);
     const batches = [];
     let current = [];

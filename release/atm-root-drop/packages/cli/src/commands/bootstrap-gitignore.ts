@@ -5,9 +5,10 @@ const startMarker = '# ATM runtime state (managed by ATM bootstrap):start';
 const endMarker = '# ATM runtime state (managed by ATM bootstrap):end';
 
 // The per-machine runtime and session outputs the ATM framework repository
-// ignores. .atm/history/** stays tracked: it is the durable governance record
-// (task-import reports, evidence) that governed commits stage. Without them an adopter's first `git status` lists locks,
-// telemetry and session files as untracked work.
+// ignores. .atm/history/** stays tracked (tasks, events, evidence are the
+// durable governance record governed commits stage) except the transient
+// task-import reports. Without them an adopter's first `git status` lists
+// locks, telemetry and session files as untracked work.
 export const adopterRuntimeIgnorePatterns = [
   '.atm/runtime/telemetry/',
   '.atm/runtime/guidance/',
@@ -27,7 +28,20 @@ export const adopterRuntimeIgnorePatterns = [
   '.atm/runtime/evidence-ledger/',
   '.atm/runtime/incidents/',
   '.atm/runtime/write-broker.registry.json',
+  '.atm/runtime/file-heat.json',
   '.atm/runtime/git-commit-attempts/',
+  // Per-claim lanes, close transactions and broker queues appear during a
+  // normal task claim and close.
+  '.atm/runtime/lane-sessions/',
+  '.atm/runtime/close-transactions/',
+  '.atm/runtime/broker-intents/',
+  '.atm/runtime/broker-shared-surface-freezes.json',
+  '.atm/runtime/broker-shared-surface-queues.json',
+  // Rewritten on every command; a tracked copy leaves the worktree dirty.
+  '.atm/runtime/version-cache.json',
+  // ATM classifies task-import reports as transient (auto-clean-safe);
+  // the framework repository ignores .atm/history/reports/ as well.
+  '.atm/history/reports/task-import/',
   '.atm-temp/',
   // create-atm installs the ATM CLI into the project; an unignored
   // node_modules turns the first `git add -A` into a dependency commit
@@ -53,4 +67,34 @@ function isFrameworkRepository(cwd: string) {
   } catch {
     return false;
   }
+}
+
+const attributesStartMarker = '# ATM generated files (managed by ATM bootstrap):start';
+const attributesEndMarker = '# ATM generated files (managed by ATM bootstrap):end';
+
+// ATM writes LF files. On Windows with core.autocrlf the first `git add -A`
+// otherwise prints one "LF will be replaced by CRLF" warning per generated file.
+export const adopterEolAttributePatterns = [
+  '.atm/** text eol=lf',
+  '.claude/** text eol=lf',
+  '.agents/** text eol=lf',
+  '.cursor/** text eol=lf',
+  '.github/instructions/** text eol=lf',
+  '.gemini/** text eol=lf',
+  'AGENTS.md text eol=lf',
+  'GEMINI.md text eol=lf',
+  'atm.mjs text eol=lf',
+  'taskflow.profile.json text eol=lf'
+] as const;
+
+export function ensureAdopterGitattributes(cwd: string) {
+  if (isFrameworkRepository(cwd)) return { status: 'framework-repository' as const };
+  const attributesPath = path.join(cwd, '.gitattributes');
+  const current = existsSync(attributesPath) ? readFileSync(attributesPath, 'utf8') : '';
+  if (current.includes(attributesStartMarker)) return { status: 'existing' as const, path: '.gitattributes' };
+  const eol = current.includes('\r\n') ? '\r\n' : '\n';
+  const block = [attributesStartMarker, ...adopterEolAttributePatterns, attributesEndMarker].join(eol);
+  const separator = current.length === 0 ? '' : current.endsWith('\n') ? eol : eol + eol;
+  writeFileSync(attributesPath, `${current}${separator}${block}${eol}`, 'utf8');
+  return { status: current.length === 0 ? 'created' as const : 'appended' as const, path: '.gitattributes' };
 }

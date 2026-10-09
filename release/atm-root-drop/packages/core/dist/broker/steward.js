@@ -4,8 +4,11 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { buildStewardApplyEvidence } from './apply-evidence.js';
 import { sortProposalsForCompose } from './merge-plan.js';
-import { validateBrokerProposal } from './proposal.js';
+import { validateStewardInputs } from './steward-input-validation.js';
+import { formatStewardCompositionBlock } from './steward-base-composer.js';
 import { applyTransactionalStewardPlan, buildPatchProposalComposition, buildStewardSemanticValidationReceipt } from './steward-transactional-apply.js';
+import { waitStewardRecomposeBackoff } from './steward-commit-guard.js';
+import { resolveStewardCommitControls, withStewardApplyQueue } from './steward-apply-queue.js';
 /**
  * Validates that a steward identity is well-formed and authorised.
  * Derived-artifact writers must declare a route or task authorisation.
@@ -49,7 +52,57 @@ export function planStewardApply(input) {
 }
 export function applyStewardPlan(input) {
     const planResult = planStewardApply(input);
-    if (!planResult.ok) {
+    const controls = resolveStewardCommitControls(input);
+    const attemptBudget = controls.maxRecomposeAttempts + 1;
+    const outcome = planResult.ok
+        ? withStewardApplyQueue({
+            cwd: input.cwd,
+            targetPaths: planResult.plan.targetFiles.map((file) => path.resolve(input.cwd, file)),
+            enabled: controls.applyQueue,
+            queueRoot: controls.applyQueueRoot,
+            waitMs: controls.applyQueueWaitMs,
+            pollMs: controls.lockPollMs
+        }, () => {
+            let transactional = buildPatchProposalComposition({ cwd: input.cwd, mergePlan: input.mergePlan, proposals: input.proposals });
+            let apply = null;
+            let attemptsUsed = 0;
+            if (!transactional.blocked) {
+                const baseHead = readGitHeadCommit(input.cwd);
+                for (let attempt = 0; attempt < attemptBudget; attempt += 1) {
+                    attemptsUsed = attempt + 1;
+                    if (attempt > 0) {
+                        waitStewardRecomposeBackoff(attempt, controls.recomposeBackoffMs, controls.recomposeJitterMs);
+                        transactional = buildPatchProposalComposition({ cwd: input.cwd, mergePlan: input.mergePlan, proposals: input.proposals });
+                        if (transactional.blocked)
+                            break;
+                    }
+                    const semanticValidation = buildStewardSemanticValidationReceipt({
+                        plan: transactional.plan,
+                        outputFiles: transactional.outputFiles
+                    });
+                    apply = applyTransactionalStewardPlan({
+                        cwd: input.cwd,
+                        stewardId: input.stewardId,
+                        writerRole: 'neutral-steward',
+                        plan: transactional.plan,
+                        outputFiles: transactional.outputFiles,
+                        scopeFiles: input.scopeFiles,
+                        semanticValidation,
+                        baseHead,
+                        commitLockRoot: controls.lockRoot,
+                        commitHooks: input.commitHooks
+                    });
+                    if (apply.ok || apply.receipt.verdict !== 're-compose')
+                        break;
+                }
+            }
+            return { transactional, apply, attemptsUsed };
+        })
+        : null;
+    const transactional = outcome?.transactional ?? null;
+    const apply = outcome?.apply ?? null;
+    const attemptsUsed = outcome?.attemptsUsed ?? 0;
+    if (!planResult.ok || transactional?.blocked) {
         const brokerOperationRun = buildStewardBrokerOperationRun({
             mergePlan: input.mergePlan,
             proposals: input.proposals,
@@ -65,32 +118,17 @@ export function applyStewardPlan(input) {
             fileBeforeHashes: {},
             fileAfterHashes: {},
             verdict: 'blocked',
-            blockedReasons: planResult.plan.issues.map((issue) => `${issue.code}: ${issue.detail}`),
+            blockedReasons: transactional?.blocked
+                ? [formatStewardCompositionBlock(transactional.blocked), ...input.mergePlan.conflicts.map((conflict) => `conflict: ${conflict.detail}`)]
+                : planResult.plan.issues.map((issue) => `${issue.code}: ${issue.detail}`),
             brokerOperationRun
         });
         if (input.evidenceOutPath)
             writeEvidenceFile(input.evidenceOutPath, evidence);
         return { ok: false, evidence };
     }
-    const transactional = buildPatchProposalComposition({
-        cwd: input.cwd,
-        mergePlan: input.mergePlan,
-        proposals: input.proposals
-    });
-    const semanticValidation = buildStewardSemanticValidationReceipt({
-        plan: transactional.plan,
-        outputFiles: transactional.outputFiles
-    });
-    const apply = applyTransactionalStewardPlan({
-        cwd: input.cwd,
-        stewardId: input.stewardId,
-        writerRole: 'neutral-steward',
-        plan: transactional.plan,
-        outputFiles: transactional.outputFiles,
-        scopeFiles: input.scopeFiles,
-        semanticValidation,
-        baseHead: readGitHeadCommit(input.cwd)
-    });
+    if (!transactional || !apply)
+        throw new Error('steward composition missing after a successful plan');
     const fileBeforeHashes = Object.fromEntries(apply.receipt.files.map((file) => [file.filePath, stripShaPrefix(file.beforeHash)]));
     const fileAfterHashes = Object.fromEntries(apply.receipt.files.map((file) => [file.filePath, stripShaPrefix(file.afterHash)]));
     const appliedFiles = apply.ok ? apply.receipt.files.map((file) => file.filePath).sort((left, right) => left.localeCompare(right)) : [];
@@ -110,7 +148,7 @@ export function applyStewardPlan(input) {
         fileBeforeHashes,
         fileAfterHashes,
         verdict: apply.ok ? 'applied' : 'blocked',
-        blockedReasons: apply.ok ? undefined : apply.receipt.blockedReasons,
+        blockedReasons: apply.ok ? undefined : recomposeTerminalReasons(apply, attemptsUsed, attemptBudget),
         brokerOperationRun
     });
     if (input.evidenceOutPath)
@@ -231,7 +269,7 @@ export function arbitrateStewardRequest(input) {
     });
     if (!planResult.ok) {
         // Determine if this is a merge-required or hard-blocked situation
-        const hasBlockingConflict = planResult.plan.issues.some((issue) => issue.code === 'blocked-merge-plan' || issue.code === 'out-of-scope-target');
+        const hasBlockingConflict = planResult.plan.issues.some((issue) => issue.code === 'blocked-merge-plan' || issue.code === 'out-of-scope-target' || issue.code === 'invalid-steward-identity');
         const verdict = hasBlockingConflict ? 'blocked' : 'merge-required';
         return {
             schemaId: 'atm.stewardArbitrationResult.v1',
@@ -265,55 +303,6 @@ export function arbitrateStewardRequest(input) {
         applyEvidence: applyResult.evidence,
         issues: applyResult.ok ? [] : (applyResult.evidence.blockedReasons ?? []).map((reason) => ({ code: 'blocked-merge-plan', detail: reason }))
     };
-}
-function validateStewardInputs(input) {
-    const issues = [];
-    const cwd = path.resolve(input.cwd);
-    const scopeSet = new Set(input.scopeFiles.map((entry) => normalizeRepoPath(cwd, entry)).filter(Boolean));
-    if (input.mergePlan.schemaId !== 'atm.mergePlan.v1') {
-        issues.push({ code: 'invalid-merge-plan', detail: `Unexpected merge plan schemaId '${input.mergePlan.schemaId}'.` });
-    }
-    // Steward takeover is only allowed if the conflict verdict says it is safe ('needs-steward' or 'parallel-safe')
-    if (input.mergePlan.verdict === 'blocked-cid-conflict' || input.mergePlan.verdict === 'blocked-shared-surface') {
-        issues.push({ code: 'blocked-merge-plan', detail: `Merge plan verdict '${input.mergePlan.verdict}' cannot be applied by steward.` });
-    }
-    // Human-required verdicts are fail-closed at the arbitration layer,
-    // but if someone calls planStewardApply directly with one, block it too.
-    if (input.mergePlan.verdict === 'human-required') {
-        issues.push({ code: 'human-review-required', detail: 'Merge plan verdict is human-required; steward cannot auto-resolve.' });
-    }
-    const proposalIds = new Set(input.proposals.map((proposal) => proposal.proposalId));
-    for (const expectedId of input.mergePlan.inputProposals) {
-        if (!proposalIds.has(expectedId)) {
-            issues.push({ code: 'missing-proposal', detail: `Merge plan references missing proposal '${expectedId}'.` });
-        }
-    }
-    if (input.mergePlan.inputProposals.length !== input.proposals.length) {
-        issues.push({ code: 'invalid-merge-plan', detail: 'Proposal count does not match merge plan inputProposals.' });
-    }
-    for (const proposal of input.proposals) {
-        const normalizedTarget = normalizeRepoPath(cwd, proposal.targetFile);
-        if (!normalizedTarget || isPathOutsideRoot(cwd, path.resolve(cwd, proposal.targetFile))) {
-            issues.push({ code: 'out-of-scope-target', detail: `Target file is outside repository root: ${proposal.targetFile}` });
-            continue;
-        }
-        if (scopeSet.size > 0 && !scopeSet.has(normalizedTarget)) {
-            issues.push({ code: 'scope-lock-mismatch', detail: `Target file '${proposal.targetFile}' is outside steward scope lock.` });
-        }
-        const validation = validateBrokerProposal(proposal, { cwd });
-        for (const issue of validation.issues) {
-            if (issue.kind === 'stale-base-commit') {
-                issues.push({ code: 'stale-base-commit', detail: issue.detail });
-            }
-            if (issue.kind === 'file-hash-mismatch') {
-                issues.push({ code: 'file-hash-drift', detail: issue.detail });
-            }
-            if (issue.kind === 'out-of-scope-target-file') {
-                issues.push({ code: 'out-of-scope-target', detail: issue.detail });
-            }
-        }
-    }
-    return dedupeIssues(issues);
 }
 export function applyUnifiedPatch(content, patch) {
     const lines = content.split(/\r?\n/);
@@ -429,31 +418,10 @@ function hashText(value) {
 function stripShaPrefix(value) {
     return value.replace(/^sha256:/, '');
 }
-function normalizeRepoPath(cwd, candidate) {
-    const normalized = path.normalize(candidate).replace(/\\/g, '/');
-    if (!normalized)
-        return '';
-    const absolute = path.isAbsolute(normalized) ? path.resolve(normalized) : path.resolve(cwd, normalized);
-    const relative = path.relative(cwd, absolute).replace(/\\/g, '/');
-    if (relative.startsWith('..') || path.isAbsolute(relative))
-        return '';
-    return relative;
-}
-function isPathOutsideRoot(root, candidatePath) {
-    const relative = path.relative(path.resolve(root), path.resolve(candidatePath));
-    return relative.startsWith('..') || path.isAbsolute(relative);
-}
-function dedupeIssues(issues) {
-    const seen = new Set();
-    const unique = [];
-    for (const issue of issues) {
-        const key = `${issue.code}::${issue.detail}`;
-        if (seen.has(key))
-            continue;
-        seen.add(key);
-        unique.push(issue);
-    }
-    return unique.sort((left, right) => `${left.code}::${left.detail}`.localeCompare(`${right.code}::${right.detail}`));
+function recomposeTerminalReasons(apply, attemptsUsed, attemptBudget) {
+    if (apply.receipt.verdict !== 're-compose' || attemptsUsed < attemptBudget)
+        return apply.receipt.blockedReasons;
+    return apply.receipt.blockedReasons.map((reason) => `re-compose attempts exhausted after ${attemptsUsed} of ${attemptBudget}: ${reason}`);
 }
 export function readGitHeadCommit(cwd) {
     const result = spawnSync('git', ['-C', cwd, 'rev-parse', '--verify', 'HEAD'], { encoding: 'utf8' });

@@ -24,6 +24,13 @@ const createResult = spawnSync(process.execPath, [
   '--json'
 ], {
   cwd: root,
+  env: {
+    ...process.env,
+    GIT_AUTHOR_NAME: 'ATM dist-tag fixture',
+    GIT_AUTHOR_EMAIL: 'dist-tag-fixture@example.invalid',
+    GIT_COMMITTER_NAME: 'ATM dist-tag fixture',
+    GIT_COMMITTER_EMAIL: 'dist-tag-fixture@example.invalid'
+  },
   encoding: 'utf8'
 });
 

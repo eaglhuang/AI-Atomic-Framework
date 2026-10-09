@@ -98,6 +98,20 @@ try {
   assert.deepEqual(mixedManifest?.freshValidationPasses, ['typecheck']);
   assert.deepEqual(mixedManifest?.staleValidationPasses, ['validate:cli']);
 
+  const commaCommand = 'npm run check:encoding:touched -- --files alpha.ts,beta.ts';
+  const commaAdd = await runEvidence([
+    'add', '--cwd', tempDir, '--task', taskId, '--actor', 'fixture-agent',
+    '--kind', 'test', '--command', commaCommand, '--exit-code', '0',
+    '--stdout-sha256', `sha256:${'3'.repeat(64)}`,
+    '--stderr-sha256', `sha256:${'0'.repeat(64)}`,
+    '--validators', commaCommand, '--json'
+  ]) as any;
+  assert.equal(commaAdd.ok, true);
+  const commaPasses = readEvidenceBundleManifest(tempDir, taskId)?.freshValidationPasses;
+  assert.ok(commaPasses?.includes('check:encoding:touched -- --files alpha.ts,beta.ts'));
+  assert.ok(!commaPasses?.includes('beta.ts'));
+  assert.ok(!commaPasses?.includes('check:encoding:touched -- --files alpha.ts'));
+
   const fixtureDir = path.join(tempDir, 'tests/cli-fixtures/evidence-bundle-dir');
   mkdirSync(fixtureDir, { recursive: true });
   writeFileSync(path.join(fixtureDir, 'alpha.json'), '{}\n', 'utf8');

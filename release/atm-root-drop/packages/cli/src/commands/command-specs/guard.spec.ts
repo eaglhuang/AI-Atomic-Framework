@@ -18,6 +18,7 @@ export default defineCommandSpec({
     { flag: '--task', value: 'id', summary: 'Task id for mutation or git guard checks.' },
     { flag: '--actor', value: 'id', summary: 'Actor id for mutation or git guard checks.' },
     { flag: '--files', value: 'csv', summary: 'Comma-separated file paths for the guard or declared framework scope.' },
+    { flag: '--files-from', value: 'path', summary: 'Newline-separated file paths for the guard or declared framework scope. Same per-path normalization as --files.' },
     { flag: '--base', value: 'ref', summary: 'Base ref for commit-range guard.' },
     { flag: '--head', value: 'ref', summary: 'Head ref for commit-range guard.' },
     { flag: '--fail-open', summary: 'Return ok=true with warnings when violations are detected.' },

@@ -4,9 +4,9 @@ import { calculateBrokerDecision } from './decision.js';
 import { buildVirtualAtomInUseRegistry, cleanupStale, loadRegistry } from './registry.js';
 import { readGitHeadCommit } from './steward.js';
 import { buildFileHashesBefore, deriveTeamAtomRefs, deriveTeamProposalAdmission, normalizePathList, normalizeStringList, readGitBranchRef, readSessionId, toSyntheticAtomSlug, toProposalAdmissionRequest } from './team-lane/support.js';
+import { evaluateTeamFileHeat, normalizeTeamTargetFiles, selectTeamHotFiles } from './team-lane/file-heat-admission.js';
 export const DEFAULT_TEAM_STEWARD_ID = 'neutral-write-steward';
 export const DEFAULT_BROKER_REGISTRY_RELATIVE_PATH = '.atm/runtime/write-broker.registry.json';
-const HOT_FILE_BASENAMES = new Set(['tasks.ts', 'next.ts', 'evidence.ts', 'hook.ts', 'team.ts', 'broker.ts']);
 export function buildTeamBrokerRunRecord(input) {
     const taskId = input.request.taskId?.trim();
     const transactionIds = normalizeStringList(input.transactionIds ?? []);
@@ -50,9 +50,8 @@ export function buildTeamBrokerRunRecordEnvelope(input) {
 export function buildTeamWriteIntent(input) {
     const task = input.task;
     const baseCommit = readGitHeadCommit(path.resolve(input.cwd)) ?? 'unknown-base-commit';
-    const targetFiles = [...new Set(input.writePaths.map((entry) => entry.replace(/\\/g, '/')).filter(Boolean))]
-        .sort((left, right) => left.localeCompare(right));
-    const hotFiles = targetFiles.filter((entry) => HOT_FILE_BASENAMES.has(path.posix.basename(entry)));
+    const targetFiles = normalizeTeamTargetFiles(input.writePaths);
+    const hotFiles = selectTeamHotFiles(targetFiles, input.fileHeat);
     const proposalAdmission = deriveTeamProposalAdmission(task, hotFiles);
     return {
         schemaId: 'atm.writeIntent.v1',
@@ -121,13 +120,14 @@ export function resolveTeamBrokerLane(decision) {
         chosenLane: decision.lane === 'serial' ? 'serial' : 'direct-brokered',
         stewardId: null,
         composerPath: null,
-        safeToStart: true,
-        blockedReasons: []
+        safeToStart: decision.lane !== 'serial',
+        blockedReasons: decision.lane === 'serial' ? [decision.reason] : []
     };
 }
 export function evaluateTeamBrokerLane(input) {
     const registryPath = input.registryPath ?? path.join(path.resolve(input.cwd), DEFAULT_BROKER_REGISTRY_RELATIVE_PATH);
-    const writeIntent = buildTeamWriteIntent(input);
+    const fileHeat = evaluateTeamFileHeat(input);
+    const writeIntent = buildTeamWriteIntent({ ...input, fileHeat });
     const registry = cleanupStale(loadRegistry(registryPath, { persistCleanup: input.readOnly !== true }));
     const virtualAtomInUseRegistry = buildVirtualAtomInUseRegistry(registry);
     const decision = calculateBrokerDecision(writeIntent, registry);
@@ -165,7 +165,8 @@ export function evaluateTeamBrokerLane(input) {
         stewardId: resolution.stewardId,
         composerPath: resolution.composerPath,
         safeToStart: resolution.safeToStart,
-        blockedReasons: resolution.blockedReasons
+        blockedReasons: resolution.blockedReasons,
+        fileHeat
     };
     return {
         ok: resolution.safeToStart,

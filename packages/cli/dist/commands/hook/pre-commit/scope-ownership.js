@@ -2,7 +2,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { readBrokerLifecycleState } from '../../../_vendor/core/dist/broker/lifecycle.js';
 import { SHARED_WRITE_PROVENANCE_RECEIPT_SCHEMA_ID, evaluateSharedWriteAdmission } from '../../../_vendor/core/dist/broker/shared-write-provenance-policy.js';
-import { inspectTrackedActorRegistryState } from '../../actor-registry.js';
+import { resolveCandidateAttributionAuthority } from '../../git-governance/implementation/candidate-attribution.js';
 import { readActiveCloseCommitWindows } from '../../framework-development.js';
 import { readFrameworkTempLockProjection } from '../../framework-development/framework-temp-lock-projection.js';
 import { listTaskOwnedProtectedOverrideAuditFiles } from '../../git-governance.js';
@@ -314,9 +314,9 @@ export function collectTaskGovernedCommitAllowedFiles(cwd, taskId) {
             files.push(planPath);
         collectStringArrayField(task.planningMirrorPaths, files);
     }
-    const actorRegistryState = inspectTrackedActorRegistryState(cwd);
-    if (actorRegistryState.tracked && (actorRegistryState.staged || actorRegistryState.unstaged)) {
-        files.push(actorRegistryState.path);
+    const registryAuthority = resolveCandidateAttributionAuthority({ cwd, taskId, actorId: process.env.ATM_COMMIT_ACTOR_ID ?? null, laneSessionId: process.env.ATM_COMMIT_LANE_SESSION_ID ?? null }, ['.atm/catalog/registry/actors.json']);
+    if (registryAuthority.ok) {
+        files.push('.atm/catalog/registry/actors.json');
     }
     files.push(...listTaskOwnedProtectedOverrideAuditFiles(cwd, taskId));
     return uniqueSorted(files.map(normalizeRelativePath).filter(isTaskDirectionPathCandidate));
