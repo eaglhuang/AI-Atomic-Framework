@@ -1,0 +1,43 @@
+{
+  "checklist": "E3",
+  "registered_at_cst": "2026-10-07 23:15:36 CST",
+  "banner": "DRAFT evidence — not a win claim; seeds registered BEFORE any E3 run",
+  "atm_pin": "5692474f7db70ab52a7a71c8af4867609e7e4b43",
+  "main_method": "--arm steward",
+  "contrast_arm": "bare_composer (hot_conflict only — ablation)",
+  "purpose": "compose-window-ms sweep (incl. 0): latency vs coverage tradeoff",
+  "agents_x_trials": {"agents": 3, "trials": 5, "rationale": "E1/E2 parity for comparable offered/correct"},
+  "shared_knobs": {
+    "atm_backend": "real",
+    "hold_ms_min": 8,
+    "hold_ms_max": 25,
+    "tick_interval_ms": 15,
+    "jitter_ms": 6
+  },
+  "compose_window_ms_grid": [0, 25, 50, 100, 200, 400],
+  "workloads": [
+    {"id": "cold", "hot_ratio": 0, "overlap": "low"},
+    {"id": "hot_disjoint", "hot_ratio": 1, "overlap": "low"},
+    {"id": "hot_conflict", "hot_ratio": 1, "overlap": "high"}
+  ],
+  "workload_choice_rationale": "Reuse E1/E2 trio so window tradeoff is comparable to fixed-window=100 E2 DRAFT tables; all three retained (no subset drop).",
+  "primary": {
+    "arm": "steward",
+    "workloads": ["cold", "hot_disjoint", "hot_conflict"],
+    "cells": 90
+  },
+  "contrast": {
+    "arm": "bare_composer",
+    "workloads": ["hot_conflict"],
+    "cells": 30,
+    "note": "Same window grid; isolates composer without broker admission under conflict pressure"
+  },
+  "workload_seeds": [11, 17, 23, 29, 31],
+  "scheduler_seed_formula": "workload_seed + 1000",
+  "scheduler_seeds": [1011, 1017, 1023, 1029, 1031],
+  "pairing": "same (workload_seed, scheduler_seed, workload_id, compose_window_ms) across steward; bare_composer only on hot_conflict",
+  "proof_rule": "meta.scenario_seed != meta.scheduler_seed; meta.params.compose_window_ms matches run-id wN",
+  "expected_cells": 120,
+  "run_id_pattern": "e3-<wl>-<arm>-w<ms>-s<seed>",
+  "never_drop": "steward cells; window=0 cells"
+}
