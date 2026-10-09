@@ -92,6 +92,17 @@ try {
   assert(hostB?.skipped === true && hostB.skipReason?.includes('--skip'), 'host-b must be skipped by basename');
   assert(!existsSync(path.join(targetB, 'atm.mjs')), 'skipped host-b must not be mutated');
 
+  const repeatedSync = runInternalReleaseSync({
+    cwd: fixtureFrameworkRoot, repos: [targetA], skips: [], build: false,
+    dryRun: false, verify: false, allowVerifyFailure: false,
+    source: sourceRunner, keepTemp: false
+  });
+  assert(repeatedSync.ok === true, 'identical-runner sync must remain successful');
+  assert(repeatedSync.targets[0]?.backupPath === null, 'identical-runner sync must not create another full-byte backup');
+  assert(readFileSync(path.join(targetA, hostA.backupPath!), 'utf8') === 'old runner\n', 'repeat must preserve the changed-runner recovery backup');
+  const repeatedMetadata = JSON.parse(readFileSync(path.join(targetA, '.atm', 'runtime', 'pinned-runner.json'), 'utf8'));
+  assert(repeatedMetadata.sha256 === sourceHash && repeatedMetadata.existingSha256 === sourceHash, 'identical-runner sync must still refresh pinned provenance');
+
   const dryRun = runInternalReleaseSync({
     cwd: fixtureFrameworkRoot,
     repos: [targetC],
