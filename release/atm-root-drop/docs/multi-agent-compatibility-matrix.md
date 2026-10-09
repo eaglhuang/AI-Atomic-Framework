@@ -4,19 +4,19 @@
 
 This matrix is generated from built-in agent-pack metadata and advisory confidence profiles. It exists to prevent drift between the installed pack registry, the public compatibility table, and the multi-agent confidence workflow.
 
-Source metadata SHA-256: `6227f9825a185d44f7e366f8fe95b3891b3f0af387cf57ea8e12de044df64394`
+Source metadata SHA-256: `8feb6487f8f2be0b08c78f2735bd75d371b3a1eea6741ac7fce8a3f6f9e8f850`
 
 ## Agent Pack Registry Matrix
 
-| Agent | Pack ID | Agent Target | Managed Target Roots | File Formats | Managed Files | First Command | Source Hash |
+| Agent | Pack ID | Agent Target | Managed Target Roots | File Formats | Managed Files | Operational Command | Source Hash |
 | --- | --- | --- | --- | --- | ---: | --- | --- |
 | Claude Code | `claude-code` | `claude-code` | `.claude/commands` | Markdown | 6 | `node atm.mjs next --json` | `f9c6396a995afefc` |
-| Cursor | `cursor` | `cursor` | `.cursor/rules/skills` | Markdown | 34 | `node atm.mjs next --json` | `6f6fc1d1c6641d90` |
-| GitHub Copilot Agent | `copilot` | `copilot` | `.github/instructions`, `.github/prompts` | Markdown | 50 | `node atm.mjs next --json` | `10707779430a60a0` |
-| Gemini | `gemini` | `gemini` | `.gemini/commands` | TOML | 25 | `node atm.mjs next --json` | `9e07501d51227a89` |
-| Windsurf | `windsurf` | `windsurf` | `.windsurf/workflows` | Markdown | 18 | `node atm.mjs next --json` | `92d9a56ce7ba0c35` |
+| Cursor | `cursor` | `cursor` | `.cursor/rules/skills` | Markdown | 35 | `node atm.mjs next --json` | `f99a9142e4c593f5` |
+| GitHub Copilot Agent | `copilot` | `copilot` | `.github/atm-deep-module-refactor`, `.github/atm-governance-router`, `.github/instructions`, `.github/prompts` | Markdown | 60 | `node atm.mjs next --json` | `ff591ef69925f795` |
+| Gemini | `gemini` | `gemini` | `.gemini/commands` | Markdown, TOML | 35 | `node atm.mjs next --json` | `f2b209e79e852c7e` |
+| Windsurf | `windsurf` | `windsurf` | `.windsurf/workflows` | Markdown | 18 | `node atm.mjs next --json` | `ba8061c1b29d5639` |
 
-Every generated agent entry routes the first operational action back to `node atm.mjs next --json`; agent packs are onboarding wrappers, not a second governance protocol.
+Agent packs are onboarding wrappers, not a second governance protocol. This table retains their existing operational command metadata. When a pack includes the governance router Skill, follow its first-run inspection before executing the selected operational command.
 
 ## Integration Adapter Registry Matrix
 
@@ -24,11 +24,14 @@ Official integration adapters are installable through `atm integration list/add/
 
 | Adapter ID | Managed Target Roots | File Formats | First Command | CLI Lifecycle |
 | --- | --- | --- | --- | --- |
-| `claude-code` | `.claude/skills` | SKILL.md | `node atm.mjs next --json` | list/add/verify/remove |
-| `codex` | `integrations/codex-skills` | SKILL.md | `node atm.mjs next --json` | list/add/verify/remove |
-| `copilot` | `.github`, `.github/instructions`, `.github/prompts` | Markdown | `node atm.mjs next --json` | list/add/verify/remove |
-| `cursor` | `.cursor/rules/skills` | Markdown | `node atm.mjs next --json` | list/add/verify/remove |
-| `gemini` | `.gemini/commands` | TOML | `node atm.mjs next --json` | list/add/verify/remove |
+| `claude-code` | `.claude/skills` | skill | `node atm.mjs --help --cwd . --prompt "$ARGUMENTS" --json` | list/add/verify/remove |
+| `codex` | `integrations/codex-skills` | skill | `node atm.mjs --help --cwd . --prompt "$ARGUMENTS" --json` | list/add/verify/remove |
+| `copilot` | `.github` | instructions-md | `node atm.mjs --help --cwd . --prompt "$ARGUMENTS" --json` | list/add/verify/remove |
+| `cursor` | `.cursor/rules` | markdown | `node atm.mjs --help --cwd . --prompt "$ARGUMENTS" --json` | list/add/verify/remove |
+| `gemini` | `.gemini/commands` | toml | `node atm.mjs --help --cwd . --prompt "$ARGUMENTS" --json` | list/add/verify/remove |
+| `antigravity` | `.` | markdown | `node atm.mjs --help --cwd . --prompt "$ARGUMENTS" --json` | list/add/verify/remove |
+
+These rows come from the installed adapter registry. They describe programmatic entry contracts, not proof that an AI model automatically selects a Skill.
 
 ## Advisory Confidence Profiles
 

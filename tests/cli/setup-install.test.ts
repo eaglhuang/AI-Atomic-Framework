@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { syncBuiltinESMExports } from 'node:module';
 import { installPinnedRunner } from '../../packages/plugin-governance-local/src/bootstrap/bootstrap/bootstrap-support.ts';
-import fs, { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import fs, { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, renameSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { runSetup } from '../../packages/cli/src/commands/setup.ts';
@@ -38,7 +38,7 @@ function snapshotTree(root: string): Record<string, string> {
   walk(root); return result;
 }
 
-test('noninteractive and JSON modes never prompt or silently choose cwd', async t => {
+test('noninteractive and JSON modes never prompt or choose a non-project cwd', async t => {
   const f = fixture(t); let asked = false;
   await assert.rejects(runSetup(['--json'], { ...f.input, interactive: true, ask: async () => { asked = true; return f.project; } }), /Pass explicit/);
   assert.equal(asked, false);
@@ -372,4 +372,16 @@ test('pinned runner exclusive creation preserves a file arriving at the write bo
     assert.throws(() => installPinnedRunner(f.project, false, [], []), /RUNNER_CONFLICT/);
     assert.equal(readFileSync(file, 'utf8'), 'concurrent foreign launcher');
   } finally { t.mock.restoreAll(); syncBuiltinESMExports(); }
+});
+
+test('noninteractive setup defaults to the current directory only when it is a project root', async t => {
+  const f = fixture(t); const previous = process.cwd();
+  try {
+    process.chdir(f.project);
+    await assert.rejects(runSetup(['--agents', 'none', '--dry-run', '--json'], f.input), /Pass explicit/);
+    writeFileSync(path.join(f.project, 'package.json'), '{"name":"demo"}\n', 'utf8');
+    const result = await runSetup(['--agents', 'none', '--dry-run', '--json'], f.input);
+    assert.equal(result.ok, true);
+    assert.equal(realpathSync(result.cwd), realpathSync(f.project));
+  } finally { process.chdir(previous); }
 });

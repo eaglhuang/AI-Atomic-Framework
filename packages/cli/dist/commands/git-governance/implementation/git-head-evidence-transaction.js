@@ -1,8 +1,7 @@
 import { appendFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync, } from "node:fs";
-import { createHash } from "node:crypto";
 import os from "node:os";
 import path from "node:path";
-import { gitHeadEvidencePath, gitHeadEvidencePaths, } from "../../git-head-evidence.js";
+import { gitHeadEvidencePaths, } from "../../git-head-evidence.js";
 import { clearIncidentFlags, detectCrossTaskMutation, readIncidentFlag, } from "../../../_vendor/core/dist/broker/cross-task-mutation-guard.js";
 import { normalizeRelativePath, } from "../commit-scope-policy.js";
 import { readStagedFiles } from './git-index-transaction.js';
@@ -23,8 +22,7 @@ export function ensureGovernedGitHeadEvidenceStagedForCommit(cwd, actorId) {
         return null;
     const parentCommitShas = readCurrentHeadParentCommitShas(cwd);
     const generatedAt = new Date().toISOString();
-    const evidenceAbsolute = path.join(cwd, gitHeadEvidencePath);
-    mkdirSync(path.dirname(evidenceAbsolute), { recursive: true });
+    const evidenceAbsolute = path.join(cwd, gitHeadEvidencePaths.runtimeJsonl);
     if (!hasMatchingWorktreeGitHeadEvidence(cwd, treeSha, parentCommitShas)) {
         const payload = {
             schemaVersion: "atm.gitHeadEvidence.v0.1",
@@ -46,7 +44,7 @@ export function ensureGovernedGitHeadEvidenceStagedForCommit(cwd, actorId) {
                             treeSha,
                             parentCommitShas,
                             stagedPathCount: readStagedFiles(cwd).length,
-                            evidencePath: gitHeadEvidencePath,
+                            evidencePath: gitHeadEvidencePaths.runtimeJsonl,
                             generatedAt,
                         },
                         preparedBy: { mode: "governed-git-commit-wrapper" },
@@ -56,8 +54,7 @@ export function ensureGovernedGitHeadEvidenceStagedForCommit(cwd, actorId) {
         };
         appendGitHeadEvidenceJsonl(evidenceAbsolute, payload);
     }
-    runGitCommand(cwd, ["add", "--", gitHeadEvidencePath], ["ignore", "pipe", "pipe"]);
-    return { evidencePath: gitHeadEvidencePath, treeSha, parentCommitShas };
+    return { evidencePath: null, runtimeEvidencePath: gitHeadEvidencePaths.runtimeJsonl, treeSha, parentCommitShas };
 }
 export function ensureGovernedGitHeadEvidenceStagedForTaskScopedCommit(cwd, actorId, taskId, commitFiles, env) {
     if (!shouldStageGovernedGitHeadEvidenceBeforeCommit(commitFiles)) {
@@ -68,8 +65,7 @@ export function ensureGovernedGitHeadEvidenceStagedForTaskScopedCommit(cwd, acto
         return null;
     const parentCommitShas = readCurrentHeadParentCommitShas(cwd);
     const generatedAt = new Date().toISOString();
-    const evidenceAbsolute = path.join(cwd, gitHeadEvidencePath);
-    mkdirSync(path.dirname(evidenceAbsolute), { recursive: true });
+    const evidenceAbsolute = path.join(cwd, gitHeadEvidencePaths.runtimeJsonl);
     if (!hasMatchingWorktreeGitHeadEvidence(cwd, treeSha, parentCommitShas)) {
         const payload = {
             schemaVersion: "atm.gitHeadEvidence.v0.1",
@@ -92,7 +88,7 @@ export function ensureGovernedGitHeadEvidenceStagedForTaskScopedCommit(cwd, acto
                             treeSha,
                             parentCommitShas,
                             stagedPathCount: commitFiles.length,
-                            evidencePath: gitHeadEvidencePath,
+                            evidencePath: gitHeadEvidencePaths.runtimeJsonl,
                             generatedAt,
                         },
                         preparedBy: {
@@ -105,39 +101,19 @@ export function ensureGovernedGitHeadEvidenceStagedForTaskScopedCommit(cwd, acto
         };
         appendGitHeadEvidenceJsonl(evidenceAbsolute, payload);
     }
-    // The caller owns a sealed candidate index. Staging evidence into the live
-    // index as well would create an unrelated shared-index write and can race
-    // with a foreign lane without contributing to the committed tree.
-    runGitCommandWithEnv(cwd, ["add", "-f", "--", gitHeadEvidencePath], env, [
-        "ignore",
-        "pipe",
-        "pipe",
-    ]);
-    return { evidencePath: gitHeadEvidencePath, treeSha, parentCommitShas };
+    // Runtime receipts are local diagnostics, not part of the sealed candidate
+    // index or the resulting commit tree.
+    return { evidencePath: null, runtimeEvidencePath: gitHeadEvidencePaths.runtimeJsonl, treeSha, parentCommitShas };
 }
 export function appendGitHeadEvidenceJsonl(evidenceAbsolute, payload) {
     const nextLine = `${JSON.stringify(payload)}\n`;
-    mkdirSync(path.dirname(evidenceAbsolute), { recursive: true });
     const repoRoot = path.resolve(path.dirname(evidenceAbsolute), "..", "..", "..");
     const runtimeAbsolute = path.join(repoRoot, gitHeadEvidencePaths.runtimeJsonl);
     mkdirSync(path.dirname(runtimeAbsolute), { recursive: true });
     appendFileSync(runtimeAbsolute, nextLine, "utf8");
-    const rawEventDigest = `sha256:${createHash("sha256").update(nextLine, "utf8").digest("hex")}`;
-    const compact = {
-        schemaVersion: "atm.gitHeadAcceptance.v1",
-        storagePolicy: "runtime-raw-tracked-digest",
-        source: {
-            availability: "runtime-local",
-            rawJournalPath: gitHeadEvidencePaths.runtimeJsonl,
-            rawEventDigest,
-        },
-        evidence: payload.evidence ?? [],
-    };
-    const compactDigest = `sha256:${createHash("sha256").update(JSON.stringify(compact), "utf8").digest("hex")}`;
-    writeFileSync(evidenceAbsolute, `${JSON.stringify({ ...compact, digest: compactDigest })}\n`, "utf8");
 }
 export function captureGitHeadEvidencePreparation(cwd) {
-    const evidenceAbsolute = path.join(cwd, gitHeadEvidencePath);
+    const evidenceAbsolute = path.join(cwd, gitHeadEvidencePaths.runtimeJsonl);
     const existed = existsSync(evidenceAbsolute);
     return {
         evidenceAbsolute,
@@ -169,7 +145,7 @@ export function reconcileResolvedCrossTaskMutationIncident(cwd, taskId) {
     return true;
 }
 export function hasMatchingWorktreeGitHeadEvidence(cwd, treeSha, parentCommitShas) {
-    const evidenceAbsolute = path.join(cwd, gitHeadEvidencePath);
+    const evidenceAbsolute = path.join(cwd, gitHeadEvidencePaths.runtimeJsonl);
     if (!existsSync(evidenceAbsolute))
         return false;
     const lines = readFileSync(evidenceAbsolute, "utf8")

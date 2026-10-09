@@ -103,7 +103,9 @@ export function evaluateGitAdmission(input: GitAdmissionOptions): GitAdmissionRe
         brokerDecision: null,
         brokerRegistryPath: resolveRegistryPath(input.cwd, input.registryPath),
         conflictingFiles: [],
-        recommendedNextStep: 'No local commits diverge from the merge base; nothing to admit before push.',
+        recommendedNextStep: envelope.topology.remoteBranchExists === false
+          ? 'The remote branch does not exist; no same-ref competition to admit. Create it with a normal non-force push; native Git still rejects creation races.'
+          : 'No local commits diverge from the merge base; nothing to admit before push.',
         local,
         remote,
         diagnostics

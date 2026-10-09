@@ -359,6 +359,30 @@ try {
   check(transactional.plan.rollback.returnedQueueRequestIds.length === 1, 'transactional composer must return skipped members to queue');
   check(readFileSync(targetFile, 'utf8') === liveBeforeTransactional, 'transactional composer must not mutate live target file');
 
+  const concurrent = spawnSync(process.execPath, ['--strip-types', path.join(root, 'tests/core/steward-concurrent-commit.test.ts')], {
+    cwd: root,
+    encoding: 'utf8'
+  });
+  check(concurrent.status === 0, `concurrent steward commit regression must pass:\n${concurrent.stdout}\n${concurrent.stderr}`);
+
+  const regionRecompose = spawnSync(process.execPath, ['--strip-types', path.join(root, 'tests/core/steward-region-recompose.test.ts')], {
+    cwd: root,
+    encoding: 'utf8'
+  });
+  check(regionRecompose.status === 0, `region re-compose regression must pass:\n${regionRecompose.stdout}\n${regionRecompose.stderr}`);
+
+  const kernelLock = spawnSync(process.execPath, ['--strip-types', path.join(root, 'tests/core/steward-kernel-lock.test.ts')], {
+    cwd: root,
+    encoding: 'utf8'
+  });
+  check(kernelLock.status === 0, `kernel lock regression must pass:\n${kernelLock.stdout}\n${kernelLock.stderr}`);
+
+  const queueBusy = spawnSync(process.execPath, ['--strip-types', path.join(root, 'tests/core/steward-apply-queue-busy.test.ts')], {
+    cwd: root,
+    encoding: 'utf8'
+  });
+  check(queueBusy.status === 0, `apply queue SQLITE_BUSY regression must pass:\n${queueBusy.stdout}\n${queueBusy.stderr}`);
+
   console.log(`[broker-steward:${mode}] ok`);
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });

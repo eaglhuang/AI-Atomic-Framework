@@ -1,5 +1,6 @@
-import { runFirstUseChain } from './lib/npm-first-use.ts';
-import { execFileSync, spawnSync } from 'node:child_process';
+import { readReleaseManifest, verifyArtifact } from './release-artifact-manifest.ts';
+import { runCleanNpmConsumerCommand, runFirstUseChain } from './lib/npm-first-use.ts';
+import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -12,6 +13,8 @@ type Args = {
   output?: string;
   recordBlocked: boolean;
   requireDefaultTag: boolean;
+  artifactManifest?: string;
+  expectedTag?: string;
   measure: boolean;
   candidateDir: string;
   baselineVersion?: string;
@@ -40,6 +43,8 @@ function parseArgs(): Args {
     output: value('--output'),
     recordBlocked: argv.includes('--record-blocked'),
     requireDefaultTag: argv.includes('--require-default-tag'),
+    artifactManifest: value('--artifact-manifest'),
+    expectedTag: value('--expected-tag'),
     measure: argv.includes('--measure'),
     candidateDir: resolve(value('--candidate-dir', join('packages', 'cli')) as string),
     baselineVersion: value('--baseline-version'),
@@ -56,7 +61,9 @@ function resolvePublishedLatest(packageName: string): string {
 
 function npmCommand() { return process.platform === 'win32' ? 'npm.cmd' : 'npm'; }
 function runNpm(args: string[], cwd?: string) {
-  return execFileSync(npmCommand(), args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true, shell: process.platform === 'win32' });
+  const cache = mkdtempSync(join(tmpdir(), 'atm-public-registry-cache-'));
+  try { return execFileSync(npmCommand(), [...args, '--registry', 'https://registry.npmjs.org', '--cache', cache, '--prefer-online'], { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true, shell: process.platform === 'win32' }); }
+  finally { rmSync(cache, { recursive: true, force: true }); }
 }
 function sha256(path: string) { return createHash('sha256').update(readFileSync(path)).digest('hex'); }
 function loadArtifactBudget(packageName: string): ArtifactBudget | null {
@@ -209,7 +216,7 @@ function runSmoke(tarball: string, root: string, label: string, runs: number) {
     let commandExecuted = true;
     for (let i = 0; i < (name === 'version' ? runs : 1); i += 1) {
       const started = performance.now();
-      const result = spawnSync(bin, argv, { cwd: consumer, encoding: 'utf8', windowsHide: true, shell: process.platform === 'win32' });
+      const result = runCleanNpmConsumerCommand(bin, argv, consumer);
       commandRuns.push(performance.now() - started);
       exitCode = result.status ?? 1;
       combined = `${result.stdout ?? ''}${result.stderr ?? ''}`;
@@ -301,6 +308,8 @@ try {
   }
   const registryTarball = metadata?.dist?.tarball ?? metadata?.['dist.tarball'];
   const latestVersion = distTags?.latest ?? null;
+  if (metadata?.version !== args.version) throw new Error('Requested registry version mismatch');
+  if (args.expectedTag && distTags?.[args.expectedTag] !== args.version) throw new Error('Expected candidate tag mismatch');
   if (args.requireDefaultTag && latestVersion !== args.version) throw new Error(`default latest dist-tag resolves to ${latestVersion ?? 'unknown'}, not ${args.version}`);
   const registryIntegrity = metadata?.dist?.integrity ?? metadata?.['dist.integrity'] ?? null;
   const registryUnpackedSize = Number(metadata?.dist?.unpackedSize ?? metadata?.['dist.unpackedSize']);
@@ -317,10 +326,16 @@ try {
     throw new Error(`public tarball exceeds artifact entry budget: ${registryFileCount}/${budget.maxPackedEntries} files`);
   }
   root = mkdtempSync(join(tmpdir(), 'atm-public-npm-'));
-  const packed = JSON.parse(runNpm(['pack', `${args.packageName}@${args.version}`, '--pack-destination', root, '--json', '--loglevel', 'silent'], root).trim());
+  const packed = JSON.parse(runNpm(['pack', `${args.packageName}@${args.version}`, '--ignore-scripts', '--pack-destination', root, '--json', '--loglevel', 'silent'], root).trim());
   const filename = Array.isArray(packed) ? packed[0]?.filename : packed?.filename;
   if (!filename) throw new Error('npm pack returned no tarball');
   const tarball = join(root, filename);
+  const candidateManifest = args.artifactManifest ? readReleaseManifest(resolve(args.artifactManifest)) : null;
+  const expectedArtifact = candidateManifest?.artifacts.find(artifact => artifact.name === args.packageName);
+  if (candidateManifest) {
+    if (!expectedArtifact || candidateManifest.version !== args.version || expectedArtifact.filename !== filename || expectedArtifact.integrity !== registryIntegrity) throw new Error('Candidate metadata mismatch');
+    verifyArtifact(candidateManifest, expectedArtifact, root);
+  }
   const pathLength = measureInstalledPathLength(args.packageName, (Array.isArray(packed) ? packed[0]?.files : packed?.files) ?? []);
   // Recorded for every version and reported as a validation failure rather than
   // thrown. The cap ratchets the version under development, but this validator
@@ -332,6 +347,11 @@ try {
     && pathLength.longestInstalledPathChars > budget.maxInstalledPathChars;
   const windowsLongPathsEnabled = detectWindowsLongPathSupport();
   const smokeRun = runSmoke(tarball, root, 'public', args.measurementRuns);
+  if (candidateManifest && expectedArtifact) {
+    const runtime = JSON.parse(smokeRun.versionOutput ?? '{}').evidence?.runtimeBuildIdentity;
+    if (runtime?.status !== 'verified' || runtime.executionMode !== 'npm-package' || runtime.version !== args.version
+      || runtime.sourceCommit !== candidateManifest.sourceCommit || runtime.sourceDigest !== candidateManifest.sourceDigest || runtime.buildId !== expectedArtifact.buildId) throw new Error('Installed candidate runtime identity mismatch');
+  }
   const commandMatrix = Object.keys(smokeRun.smoke);
   const expectedCommands = publicSmokeCommandNames;
   const smokeEntries = Object.values(smokeRun.smoke) as Array<{ commandExecuted: boolean; moduleResolutionFailure: boolean }>;

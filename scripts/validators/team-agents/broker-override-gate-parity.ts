@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
 import { buildBrokerConflictSharedVocabulary } from '../../../packages/cli/src/commands/team.ts';
@@ -22,6 +22,7 @@ export async function runBrokerOverrideGateParityValidatorCase(taskCase: string)
   assert.ok(claimAdmission.blockReason?.includes('broker-conflict-blocked'));
 
   const cwd = createTempWorkspace('team-broker-gate-parity-');
+  try {
   const now = Date.now();
   const heartbeatAt = new Date(now).toISOString();
   const expiresAt = new Date(now + 60 * 60 * 1000).toISOString();
@@ -109,4 +110,7 @@ export async function runBrokerOverrideGateParityValidatorCase(taskCase: string)
 
   console.log('[validate-team-agents] ok (broker-override-gate-parity)');
   return true;
+  } finally {
+    rmSync(cwd, { recursive: true, force: true });
+  }
 }

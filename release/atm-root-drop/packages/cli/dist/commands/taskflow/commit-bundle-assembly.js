@@ -1,3 +1,4 @@
+import { resolveCandidateAttributionAuthority } from '../git-governance/implementation/candidate-attribution.js';
 import { execFileSync } from 'node:child_process';
 import { createHash, randomUUID } from 'node:crypto';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
@@ -188,7 +189,7 @@ function getDirtyFiles(cwd) {
 function isTrackedGitFile(cwd, file) { return tryGitScalar(cwd, ['ls-files', '--error-unmatch', '--', file]) === file; }
 function listExplicitTaskFiles(taskDocument, key) { const container = taskDocument[key]; if (!container || typeof container !== 'object' || Array.isArray(container))
     return []; const files = container.files ?? container.allowedFiles; return Array.isArray(files) ? files.filter((file) => typeof file === 'string').map(normalizeTaskflowRelativePath) : []; }
-function listAuthorizedDirtyActorRegistryFiles(input) { const actorRegistry = '.atm/catalog/registry/actors.json'; const runtimeAllowed = resolveTaskflowDeclaredFiles(input.repoRoot, input.taskId, input.taskDocument); const explicitAllowed = [...listExplicitTaskFiles(input.taskDocument, 'claim'), ...listExplicitTaskFiles(input.taskDocument, 'taskDirectionLock')]; const authorized = [...runtimeAllowed, ...explicitAllowed].some((allowed) => taskflowPathMatches(actorRegistry, allowed)); return input.dirtyFiles.includes(actorRegistry) && isTrackedGitFile(input.repoRoot, actorRegistry) && authorized ? [actorRegistry] : []; }
+function listAuthorizedDirtyActorRegistryFiles(input) { const actorRegistry = '.atm/catalog/registry/actors.json'; const authority = resolveCandidateAttributionAuthority({ cwd: input.repoRoot, taskId: input.taskId, actorId: input.actorId }, [actorRegistry]); return input.dirtyFiles.includes(actorRegistry) && isTrackedGitFile(input.repoRoot, actorRegistry) && authority.ok ? [actorRegistry] : []; }
 function getHistoricalCommittedFiles(cwd, refs) {
     const files = [];
     for (const ref of refs) {
@@ -378,7 +379,7 @@ export function buildTaskflowCommitBundle(input) {
     const historicalBatchStageFile = resolveExistingHistoricalBatchStageFile(targetRepoRoot, input.historicalBatchRef);
     const backendGovernanceFiles = [...listCurrentTaskGovernanceFiles(targetRepoRoot, input.taskId), ...listCurrentTaskCloseEvidenceFiles(targetRepoRoot, input.taskId), ...(input.backendResult ? extractBackendStageFiles(input.backendResult) : []),
         ...listTaskOwnedProtectedOverrideAuditFiles(targetRepoRoot, input.taskId)];
-    const targetGovernanceFiles = uniqueSorted([...(historicalBatchStageFile ? [historicalBatchStageFile] : []), ...backendGovernanceFiles, ...listAuthorizedDirtyActorRegistryFiles({ repoRoot: targetRepoRoot, taskId: input.taskId, taskDocument, dirtyFiles }), taskflowSealManifestPath(input.taskId)]);
+    const targetGovernanceFiles = uniqueSorted([...(historicalBatchStageFile ? [historicalBatchStageFile] : []), ...backendGovernanceFiles, ...listAuthorizedDirtyActorRegistryFiles({ repoRoot: targetRepoRoot, taskId: input.taskId, actorId: input.actorId, dirtyFiles }), taskflowSealManifestPath(input.taskId)]);
     const excludedDirtyFiles = [];
     const excludedReasons = {};
     const scopeAmendmentCandidateFiles = [];
@@ -537,7 +538,7 @@ async function commitTaskflowBundle(input) {
     }
     return { ...input.bundle, targetRepo, planningRepo, failClosed: false, recoveryCommand: null };
 }
-function commitRepoWithTemporaryIndex(input) {
+export function commitRepoWithTemporaryIndex(input) {
     const tempDir = mkdtempSync(path.join(os.tmpdir(), 'atm-taskflow-commit-index-'));
     const tempIndexFile = path.join(tempDir, 'index');
     const identity = input.actorId ? resolveActorGitIdentityForCommit(input.repoRoot, input.actorId) : null;

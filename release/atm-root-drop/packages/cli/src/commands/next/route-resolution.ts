@@ -1,5 +1,7 @@
 export type { NextClaimIntent, PromptScopedTaskContext } from './route-resolution/intent.ts';
 export {
+  buildPromptSuggestedRoutes,
+  buildTaskScopeNotFoundRoute,
   createDeterministicTaskIntent,
   detectRequestedTaskAction,
   extractPromptPathHints,

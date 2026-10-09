@@ -10,7 +10,7 @@ CID terminology used by this guide:
 
 ## Write Intents and Decisions
 
-`packages/core/src/broker/types.ts` defines `WriteIntent` (task, actor, base commit, target files, atom refs, shared surfaces, requested lane) and `BrokerDecision`. `calculateBrokerDecision(newIntent, registry)` in `decision.ts` checks the new intent against all active intents and returns one of four primary verdicts:
+`packages/core/src/broker/types.ts` defines `WriteIntent` (task, actor, base commit, target files, atom refs, shared surfaces, requested lane) and `BrokerDecision`. `calculateBrokerDecision(newIntent, registry)` checks active intents and pending native serial tickets:
 
 | Verdict | Lane | Meaning |
 |---|---|---|
@@ -18,6 +18,62 @@ CID terminology used by this guide:
 | `needs-physical-split` | `deterministic-composer` | Same physical file but CID-disjoint; routed to the composer |
 | `blocked-cid-conflict` | `blocked` | Atom ID or semantic CID collision with an active intent |
 | `blocked-shared-surface` | `blocked` | Generator / projection / registry / validator / artifact collision |
+| `serial` | `serial` | A ready cold/hot logical write collision or earlier conflicting native ticket must wait before mutation |
+
+## Native Cold Serial Queue
+
+Cold means neither writer declares a proposal-first trigger, submitted proposal summary, or hot-file metadata. With `requestedLane: "auto"`, a cold same-atom/CID collision on a shared write surface, or a proven overlapping source range, selects `lane: "serial"` and canonical admission `disposition: "queue"`. Explicit `requestedLane: "serial"` also permits a conservative same-file fallback when bounds are unavailable. A requested lane never overrides a lease, read dependency, shared-surface guard, or hot/proposal-first route.
+
+The compose boundary remains explicit:
+
+- Disjoint files and disjoint bounded cold regions remain parallel eligible
+- Unbounded same-file work with distinct atoms and automatic lane selection remains composer-routed
+- Compatible bounded proposal regions retain deterministic composition
+- Ready hot/proposal-first overlapping regions use native parking, with no write authority while waiting
+- Reads and independent private preparation do not acquire native serial tickets
+
+`calculateBrokerDecision` and `evaluateBrokerAdmission` are pure previews. Durable admission occurs through `createBrokerTransactionAuthority(...).register(...)`, also used by `broker register`. Queue tickets live in the existing write-broker registry's `serialQueue`, under the same original-snapshot CAS transaction as registration and release. A waiter is not an `activeIntents` writer lease.
+
+Tickets retain an owner, exact scope digest, committed monotonic sequence, original intent, blockers, enqueue/eligibility/grant times and expiry. FIFO is conflict-local: an unrelated resource can proceed, while a multi-resource request cannot jump earlier overlapping tickets. Enqueue, eligibility, grant, cancellation, release and expiry events are distinct. Repeated submissions retain ticket identity and order. A live writer must finish/release before queuing a changed scope, avoiding hold-and-wait cycles.
+
+### Release and resume
+
+Release only makes the next conflicting ticket **eligible for revalidation**. It never grants an old intent automatically. The eligible window is at most 30 seconds, bounded by the original queue lifetime. Expired/cancelled tickets release their place. A granted ticket becomes terminal when its matching writer lease expires or is released; retained terminal history and events are bounded.
+
+1. Submit the prepared write intent with `broker register --task <task> --actor <owner> --intent-file <intent.json> --json`
+2. If `evidence.admission.disposition` is `queue`, retain its ticket ID and inspect `broker status --json`. The result has `writeAuthorized: false`; CLI `ok: false` prevents legacy consumers from treating accepted queue placement as permission to write
+3. The active owner runs `broker release --task <task> --actor <owner> --json`. Queue-related release/cancellation requires the explicit owner
+4. Re-read current source and refresh the intent's base commit, preserving its exact write/read/region/proposal scope. Run `broker register --task <task> --actor <owner> --intent-file <refreshed-intent.json> --queue-ticket <ticket-id> --json`
+5. Proceed only through the returned canonical lane and its existing downstream checks. Direct/proposal admission retains its normal write requirements. A `compose` result consumes the eligible ticket into a composer-owned lease, keeps CLI `writeAuthorized: false`, and requires the normal proposal/composer/steward path before applying content. Release completes either lane. The CLI checks the actual repository HEAD again during each CAS retry. The core API requires `currentBaseCommit` or a `resolveCurrentBaseCommit` reader on resume
+
+Scope changes require cancelling the old ticket and submitting a new intent; changing the base alone never authorizes broader paths or atoms. Resume repeats the current lease, read/write, shared-surface and FIFO checks. A replay of a successful resume can confirm its still-live, exact-scope grant without renewing the lease or emitting another grant. Queue admission does not apply a patch or replace file-preimage/content-hash CAS, validators, or steward controls. A new base commit is not proof that an old patch remains valid.
+
+`broker status` exposes `serialQueueTickets[].position`, `waitMs`, `blockerIntentIds`, expiry and an authority digest. `evidence.admission.metrics.queueWaitMs` and `queuePosition` are available to a native consumer. Registry events establish eligibility and grant order. Status and decision commands do not persist cleanup; explicit cleanup and lifecycle writes use original-snapshot CAS. A crashed process that leaves the registry's compare/write lock remains fail-closed and needs governed recovery; automatic lock theft is not part of this queue.
+
+The bounded equivalent benchmark is `node --strip-types scripts/validate-broker-native-serial-queue.ts`. It includes six simultaneous real CLI enqueue processes, restart/resume/release through separate processes, native wait telemetry, preserved FIFO grants and no lost counter updates. It never retries `true-conflict` in a harness overlay. Its reported wall/wait times include CLI process startup and are diagnostic measurements, not throughput claims or a performance comparison.
+
+## Native Hot-Conflict Parking
+
+A submitted proposal with a proven overlapping write region or material atom/CID write conflict receives canonical `disposition: "queue"`, rather than a terminal `true-conflict` solely because another hot writer still holds the resource. The incoming writer waits; the incumbent's provisional lease is not revoked or silently paused. The same registry, conflict-local FIFO, CAS transaction, release/expiry wakeup and explicit current-base resume API serve cold and hot tickets.
+
+This path preserves the existing hard boundaries:
+
+- Missing proposal summaries cannot enter FIFO through an earlier ticket or acquire a writer through legacy shared-queue state
+- Read dependencies, shared-surface conflicts, malformed lease/fencing state and owner/scope/base mismatch still fail closed
+- Compatible bounded proposals stay composer-routed, including when a queued writer becomes eligible beside disjoint composer work
+- Unknown bounds remain conservative. Every active writer and shared target file is compared before an apparent disjoint region can justify composition
+- Parked and eligible tickets are not writer leases. A granted composer ticket is still not direct-write permission
+- A lost-response replay observes an exact live registration. Cleanup may persist expiry and eligibility, but replay never renews or resurrects a writer
+
+An initial conflict-free hot intent can still register proposal-only metadata with `ok: true` and admission state `proposal-submitted`. It has `writeAuthorized: false` and no authorized write files; team start remains blocked. The same owner may submit its summary for the identical live scope and base without waiting behind later tickets. This monotonic readiness upgrade does not widen scope or relax the strict grant/replay comparison.
+
+`BrokerDecision.queueReason` identifies `cold-write-conflict`, `hot-write-conflict`, `provisional-overlap` or `fifo-predecessor`. Persisted tickets, observations and transition events expose the original reason and `blockerTaskIds`, alongside `blockerIntentIds`, position and wait time. Older cold-only queue documents remain readable. A pure preview's reason does not mean a ticket was persisted; use the transaction receipt from `broker register`.
+
+PR197's heat receipt remains the classification source for team intents. Static remains the default. Frozen hybrid/learned modes and the selected proposal scope use the same admission rules. Resume reuses the ticket's selected intent instead of recomputing heat and silently changing its scope. Team planning stays a preview; native admission is performed by the transactional registration/claim route. Waiting never authorizes a provider start, runtime write or task close.
+
+Run `node --strip-types scripts/validate-broker-native-hot-queue.ts` for the bounded hot acceptance fixture. It covers seven simultaneous contenders behind one incumbent, explicit native ticket resume, FIFO grants, duplicate-resume CAS, expiry, cancellation, proposal readiness, mixed cold/hot work and current-base checks. Its target is all eight valid fixture writers completing with no terminal-conflict retry overlay, duplicate grants or lost counter updates. Reported wait/wall time includes CLI startup and is an observation, not a throughput promise.
+
+This fixture is not the separate atm-bench seed-42, 50-trial, eight-agent workload. That workload must still be run with `--hot-retry` disabled before claiming its acceptance threshold. Native ticket resume is the API, not an overlay that catches and retries terminal conflicts. Queue safety does not make a stale writer that skips composition/preimage checks safe.
 
 ## Proposal-Gated Admission v1
 
@@ -42,7 +98,7 @@ Admission states:
 | `write-admitted` | Direct broker path is fully admitted |
 | `composer-routed` | Same-file work is routed to the deterministic composer before live write |
 | `blocked-before-write` | Broker blocked the lane before apply-time mutation |
-| `parked-for-rearbitration` | Existing writer must pause so broker can rearbitrate |
+| `parked-for-rearbitration` | Incoming proposal needs composer rearbitration; this legacy state alone is not a durable queue ticket or an incumbent pause |
 | `applied` | Governed write reached the final applied state |
 
 Current v1 rule boundary:
@@ -50,8 +106,8 @@ Current v1 rule boundary:
 - Proposal gating is conditional escalation, not the default for every file.
 - Existing direct broker flows stay valid when `trigger = not-required`.
 - Hot-file and overlap-risk lanes can carry proposal-first evidence without changing the envelope shape used by downstream evidence capture.
-- When two writers still share the same coarse owner map, bounded-region proposal evidence may refine that owner-level conflict: disjoint regions can route to composer, overlapping regions remain blocked.
-- Blocked same-owner overlaps may also emit a structured split suggestion (`decompositionRequest.suggestedAtoms`) so the map curator can promote the coarse owner map into finer child atoms without guessing the first cut by hand.
+- When two writers still share the same coarse owner map, bounded-region proposal evidence may refine that owner-level conflict: disjoint regions can route to composer, ready overlapping writers queue before mutation.
+- Queued or blocked same-owner overlaps may also emit a structured split suggestion (`decompositionRequest.suggestedAtoms`) so the map curator can promote the coarse owner map into finer child atoms without guessing the first cut by hand.
 - The curator bridge now treats that broker split suggestion as a review-only atom-map patch draft, pointing at the owner shard plus projection rebuild path, so reviewers can approve a concrete split patch before the next collision reuses the same coarse owner map.
 
 ## Candidate Bridge (TASK-ASP-0004)
@@ -71,12 +127,23 @@ const decision = calculateBrokerDecision(intent, registry);
 
 Behavior:
 
-- **Deterministic `atomCid`** - SHA-256 of the canonical candidate contract `(kind || symbol || sourcePaths || detectionMethod)`, where `sourcePaths` is the deduplicated, sorted union of the candidate's `filePath` and `suggestedSourcePaths`. The same candidate yields the same CID across runs, which is what lets the broker detect two agents claiming the same semantic unit.
+- **Deterministic `atomCid` (`cid.v2`)** - SHA-256 of `(cid.v2 || languageId || sourcePaths || kind || symbol || ordinal)`, where `sourcePaths` is the deduplicated, sorted union of the candidate's `filePath` and `suggestedSourcePaths`, and `languageId` is inferred from the file extension when absent. Line numbers and `detectionMethod` are not part of the identity, so inserting lines above an atom or upgrading the detector keeps its CID. `normalizeDerivedCandidates` merges consecutive same-name candidates (TypeScript overloads) and assigns a source-order `ordinal` only to remaining same-kind, same-symbol duplicates in one file; `computeAtomContentVersion` tracks body changes separately with LF-normalized hashing. The same code always yields the same CID, which is what lets the broker detect two agents claiming the same semantic unit.
 - **`atomId`** - uses the candidate's `suggestedAtomId` when present, otherwise falls back to `ATM-AUTO-<cid-prefix>`.
 - **`targetFiles`** - deduplicated, sorted union of each candidate's `filePath` and `suggestedSourcePaths`.
 - **`sharedSurfaces`** - empty by default; pass `ctx.sharedSurfaces` to declare generators, projections, registries, validators, or artifacts.
 - **`requestedLane`** - `'auto'` by default (the broker decides); override with `ctx.requestedLane`.
 - **Read-only and pure** - the bridge never mutates candidate input, never calls an LLM, and needs no language-specific semantics.
+
+## Derived Atoms: Two-Phase Symbol-Level Occupancy (TASK-ASP-0006..0011)
+
+Derived atoms let tasks that change different functions of one file run in parallel without rewriting source or storing a second registry. They are computed from code on demand with the cid.v2 identity above.
+
+- **Claim: reserve.** `node atm.mjs next --claim --task <id> --actor <id> --atoms alpha,beta --json` resolves each symbol in the task scope files at the base commit and registers the matching atoms (`operation: 'modify'`, with source ranges) on the task's broker intent. A reservation is an intent ceiling, not an exclusive guarantee. Two tasks that reserve disjoint atoms of one file are admitted as `parallel-safe` by the existing physical-overlap check. Symbols that do not exist yet are reported as `unresolved` and confirmed at commit time. Without `--atoms`, the claim stays file-level and shareable; the decision is deferred to commit.
+- **Commit: confirm.** The governed `node atm.mjs git commit --task <id>` derives the atoms the staged diff actually touched (the index post-image, or the worktree for `--auto-stage`, which stages exactly that content). Old-side atoms catch deletions and new-side atoms catch new code. If another active task reserved or confirmed one of those atoms, the commit is refused with `ATM_GIT_DERIVED_ATOM_CONFLICT` before anything is written. Otherwise the confirmed atoms are merged into the task's broker intent, which the existing VirtualAtomInUse projection already exposes; reservations are released with the intent at close.
+- **Preamble.** Imports and top-level statements before the first atom form one `#preamble` pseudo-atom per file. A preamble change commutes only when it purely adds import lines; removing or editing an import, or adding another top-level statement, keeps the preamble exclusive.
+- **Fallbacks.** Unsupported languages (today only JavaScript and TypeScript are derivable), binary content, low-confidence candidates, changed non-blank lines outside every atom, and files of stale formal atoms stay file-level, which is the behaviour before this plan. Derivation failures never block a commit. `ATM_DERIVED_ATOMS=off` disables the feature.
+- **Formal atoms.** Registry atoms are file-level today (`location.codePaths`), so they are ownership annotations and never swallow the derived atoms of their files. A formal atom whose code path no longer exists is stale: `atm doctor` reports `ATM_ATOM_FORMAL_STALE`, its files fall back to file-level, and ATM never rewrites formal atoms automatically. Promotion of a derived atom to a formal atom always goes through `atm create` / `behavior.atomize` and review.
+- **Semantic revalidation.** Disjoint atoms can still break each other (for example a changed signature). Parallel commits land sequentially, so the later task's close-time validator evidence runs on a HEAD that contains both changes; steward-composed writes keep using the existing post-compose semantic validation (`post-compose-semantic-validation.ts`). No new validation entry point is added.
 
 ## Adapter Symbol Canonicalization Manifest
 
@@ -126,7 +193,7 @@ Fail-closed rules:
 
 - Do not promote an adapter to `parallel-safe` just because `enclose()` is missing or returned `null`.
 - Use enclosure evidence only to refine a Layer 1 boundary; never widen symbol identity or CID scope from an absent capability.
-- If the broker already has a stronger verdict, keep that verdict: atom/CID overlap remains `blocked-cid-conflict`, shared-surface overlap remains `blocked-shared-surface`, and ambiguous same-file overlap stays on the deterministic-composer path (`needs-physical-split`) instead of being upgraded to optimistic parallel admission.
+- If the broker already has a stronger verdict, keep that verdict: cold logical overlap queues before write, protected atom/read conflicts remain blocked, shared-surface overlap remains `blocked-shared-surface`, and automatic ambiguous same-file overlap stays composer-routed instead of becoming optimistic parallel admission.
 - Record missing or null enclosure as evidence of the fallback path so the lane remains auditable.
 
 Because `@ai-atomic-framework/plugin-sdk` depends on core, the bridge declares a structural `BridgeAtomCandidate` mirror instead of importing the SDK type; plugin-sdk `AtomCandidate` values are directly assignable (covered by `__tests__/candidate-bridge.test.ts`).
