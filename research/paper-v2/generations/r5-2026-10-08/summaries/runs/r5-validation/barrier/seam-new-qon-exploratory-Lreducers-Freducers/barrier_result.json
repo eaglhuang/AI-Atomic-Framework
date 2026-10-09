@@ -1,0 +1,417 @@
+{
+ "summary": {
+  "test": "r3-barrier-interleave-v1",
+  "mode": "seam",
+  "atm_env": {
+   "ATM_STEWARD_APPLY_QUEUE": "on"
+  },
+  "variant": "same-region(reducers)",
+  "atm_monorepo": "/workspace/atm-main-37847584/AI-Atomic-Framework-37847584e24afc08ea58cfe380bb5b1220fbe335",
+  "atm_pin": "37847584e24afc08ea58cfe380bb5b1220fbe335",
+  "node": "v24.21.0",
+  "reps": 5,
+  "window_hit": 5,
+  "runs_with_lost_effect": 0,
+  "lost_effects_total": 0,
+  "leader_applied": 5,
+  "follower_classes": {
+   "blocked_after_re-compose(steward-final-patch-required)": 5
+  },
+  "final_equals_leader_only": 5,
+  "final_equals_both_full_bytes": 0,
+  "leftover_files": 0,
+  "seam_ops": [
+   "mkdirSync"
+  ],
+  "follower_commit_guard_attempts": [
+   0
+  ],
+  "leader_commit_guard_attempts": [
+   0
+  ],
+  "follower_tx_attempts": [
+   1
+  ],
+  "follower_lock_owner_writes": [
+   1
+  ],
+  "first_follower_reason": "steward-final-patch-required: proposal 'p-follower' overlaps region 'reducers', which changed after the proposal was anchored; refusing to overwrite [proposals: p-follower]"
+ },
+ "runs": [
+  {
+   "rep": 1,
+   "leader": {
+    "role": "leader",
+    "pid": 1108831,
+    "seam_fired": true,
+    "seam_op": "mkdirSync",
+    "seam_path": ".atm/runtime/steward-commit-locks/f543f0b50628c7f62e422e96fff41837fa6597340a295f5a7c51ba50055e065b",
+    "t": {
+     "both_ready": 95,
+     "seam_arrive": 188,
+     "both_arrived": 10212,
+     "apply_return": 10215
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 1,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "disk_hash_at_seam": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_arrived": true,
+    "lock_owner_writes": 1,
+    "ok": true,
+    "verdict": "applied",
+    "blockedReasons": [],
+    "receipt_before": "8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "receipt_after": "f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+    "marker": "// atm-edit barrier-leader by agent-leader"
+   },
+   "follower": {
+    "role": "follower",
+    "pid": 1108832,
+    "seam_fired": true,
+    "seam_op": "mkdirSync",
+    "seam_path": ".atm/runtime/steward-commit-locks/f543f0b50628c7f62e422e96fff41837fa6597340a295f5a7c51ba50055e065b",
+    "t": {
+     "both_ready": 91,
+     "seam_arrive": 10208,
+     "both_arrived": 10208,
+     "follower_release": 10213,
+     "apply_return": 10220
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 1,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "disk_hash_at_seam": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_arrived": true,
+    "leader_done_seen": true,
+    "lock_owner_writes": 1,
+    "ok": false,
+    "verdict": "blocked",
+    "blockedReasons": [
+     "steward-final-patch-required: proposal 'p-follower' overlaps region 'reducers', which changed after the proposal was anchored; refusing to overwrite [proposals: p-follower]"
+    ],
+    "receipt_before": null,
+    "receipt_after": null,
+    "marker": "// atm-edit barrier-follower by agent-follower"
+   },
+   "leader_exit": 0,
+   "follower_exit": 0,
+   "stderr": {
+    "leader": "",
+    "follower": ""
+   },
+   "window_hit": true,
+   "final_hash": "sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+   "final_bytes": 230,
+   "leftover_files": [],
+   "leader_marker_present": true,
+   "follower_marker_present": false,
+   "final_equals_leader_only": true,
+   "final_equals_both_full_bytes": false,
+   "lost_effects": [],
+   "follower_class": "blocked_after_re-compose(steward-final-patch-required)"
+  },
+  {
+   "rep": 2,
+   "leader": {
+    "role": "leader",
+    "pid": 1108907,
+    "seam_fired": true,
+    "seam_op": "mkdirSync",
+    "seam_path": ".atm/runtime/steward-commit-locks/5339180154f87079d0e34bc3f9ca3bf3b463f0567fdc516bf6f2d72066bfbfc8",
+    "t": {
+     "both_ready": 86,
+     "seam_arrive": 10196,
+     "both_arrived": 10196,
+     "apply_return": 10199
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 1,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "disk_hash_at_seam": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_arrived": true,
+    "lock_owner_writes": 1,
+    "ok": true,
+    "verdict": "applied",
+    "blockedReasons": [],
+    "receipt_before": "8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "receipt_after": "f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+    "marker": "// atm-edit barrier-leader by agent-leader"
+   },
+   "follower": {
+    "role": "follower",
+    "pid": 1108908,
+    "seam_fired": true,
+    "seam_op": "mkdirSync",
+    "seam_path": ".atm/runtime/steward-commit-locks/5339180154f87079d0e34bc3f9ca3bf3b463f0567fdc516bf6f2d72066bfbfc8",
+    "t": {
+     "both_ready": 87,
+     "seam_arrive": 181,
+     "both_arrived": 10196,
+     "follower_release": 10198,
+     "apply_return": 10208
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 1,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "disk_hash_at_seam": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_arrived": true,
+    "leader_done_seen": true,
+    "lock_owner_writes": 1,
+    "ok": false,
+    "verdict": "blocked",
+    "blockedReasons": [
+     "steward-final-patch-required: proposal 'p-follower' overlaps region 'reducers', which changed after the proposal was anchored; refusing to overwrite [proposals: p-follower]"
+    ],
+    "receipt_before": null,
+    "receipt_after": null,
+    "marker": "// atm-edit barrier-follower by agent-follower"
+   },
+   "leader_exit": 0,
+   "follower_exit": 0,
+   "stderr": {
+    "leader": "",
+    "follower": ""
+   },
+   "window_hit": true,
+   "final_hash": "sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+   "final_bytes": 230,
+   "leftover_files": [],
+   "leader_marker_present": true,
+   "follower_marker_present": false,
+   "final_equals_leader_only": true,
+   "final_equals_both_full_bytes": false,
+   "lost_effects": [],
+   "follower_class": "blocked_after_re-compose(steward-final-patch-required)"
+  },
+  {
+   "rep": 3,
+   "leader": {
+    "role": "leader",
+    "pid": 1108977,
+    "seam_fired": true,
+    "seam_op": "mkdirSync",
+    "seam_path": ".atm/runtime/steward-commit-locks/d6a85539ed1c83de41f3c9c3ba3e24508043023df004464277d7ed1296cdd664",
+    "t": {
+     "both_ready": 89,
+     "seam_arrive": 190,
+     "both_arrived": 10199,
+     "apply_return": 10201
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 1,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "disk_hash_at_seam": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_arrived": true,
+    "lock_owner_writes": 1,
+    "ok": true,
+    "verdict": "applied",
+    "blockedReasons": [],
+    "receipt_before": "8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "receipt_after": "f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+    "marker": "// atm-edit barrier-leader by agent-leader"
+   },
+   "follower": {
+    "role": "follower",
+    "pid": 1108978,
+    "seam_fired": true,
+    "seam_op": "mkdirSync",
+    "seam_path": ".atm/runtime/steward-commit-locks/d6a85539ed1c83de41f3c9c3ba3e24508043023df004464277d7ed1296cdd664",
+    "t": {
+     "both_ready": 86,
+     "seam_arrive": 10195,
+     "both_arrived": 10195,
+     "follower_release": 10200,
+     "apply_return": 10207
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 1,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "disk_hash_at_seam": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_arrived": true,
+    "leader_done_seen": true,
+    "lock_owner_writes": 1,
+    "ok": false,
+    "verdict": "blocked",
+    "blockedReasons": [
+     "steward-final-patch-required: proposal 'p-follower' overlaps region 'reducers', which changed after the proposal was anchored; refusing to overwrite [proposals: p-follower]"
+    ],
+    "receipt_before": null,
+    "receipt_after": null,
+    "marker": "// atm-edit barrier-follower by agent-follower"
+   },
+   "leader_exit": 0,
+   "follower_exit": 0,
+   "stderr": {
+    "leader": "",
+    "follower": ""
+   },
+   "window_hit": true,
+   "final_hash": "sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+   "final_bytes": 230,
+   "leftover_files": [],
+   "leader_marker_present": true,
+   "follower_marker_present": false,
+   "final_equals_leader_only": true,
+   "final_equals_both_full_bytes": false,
+   "lost_effects": [],
+   "follower_class": "blocked_after_re-compose(steward-final-patch-required)"
+  },
+  {
+   "rep": 4,
+   "leader": {
+    "role": "leader",
+    "pid": 1109260,
+    "seam_fired": true,
+    "seam_op": "mkdirSync",
+    "seam_path": ".atm/runtime/steward-commit-locks/5a065fd38186bb606f7cbe5648cf20601e5691707666549eef60b6e069218b36",
+    "t": {
+     "both_ready": 110,
+     "seam_arrive": 10211,
+     "both_arrived": 10211,
+     "apply_return": 10213
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 1,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "disk_hash_at_seam": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_arrived": true,
+    "lock_owner_writes": 1,
+    "ok": true,
+    "verdict": "applied",
+    "blockedReasons": [],
+    "receipt_before": "8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "receipt_after": "f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+    "marker": "// atm-edit barrier-leader by agent-leader"
+   },
+   "follower": {
+    "role": "follower",
+    "pid": 1109261,
+    "seam_fired": true,
+    "seam_op": "mkdirSync",
+    "seam_path": ".atm/runtime/steward-commit-locks/5a065fd38186bb606f7cbe5648cf20601e5691707666549eef60b6e069218b36",
+    "t": {
+     "both_ready": 100,
+     "seam_arrive": 192,
+     "both_arrived": 10203,
+     "follower_release": 10205,
+     "apply_return": 10213
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 1,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "disk_hash_at_seam": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_arrived": true,
+    "leader_done_seen": true,
+    "lock_owner_writes": 1,
+    "ok": false,
+    "verdict": "blocked",
+    "blockedReasons": [
+     "steward-final-patch-required: proposal 'p-follower' overlaps region 'reducers', which changed after the proposal was anchored; refusing to overwrite [proposals: p-follower]"
+    ],
+    "receipt_before": null,
+    "receipt_after": null,
+    "marker": "// atm-edit barrier-follower by agent-follower"
+   },
+   "leader_exit": 0,
+   "follower_exit": 0,
+   "stderr": {
+    "leader": "",
+    "follower": ""
+   },
+   "window_hit": true,
+   "final_hash": "sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+   "final_bytes": 230,
+   "leftover_files": [],
+   "leader_marker_present": true,
+   "follower_marker_present": false,
+   "final_equals_leader_only": true,
+   "final_equals_both_full_bytes": false,
+   "lost_effects": [],
+   "follower_class": "blocked_after_re-compose(steward-final-patch-required)"
+  },
+  {
+   "rep": 5,
+   "leader": {
+    "role": "leader",
+    "pid": 1109330,
+    "seam_fired": true,
+    "seam_op": "mkdirSync",
+    "seam_path": ".atm/runtime/steward-commit-locks/78d9ee9452ece96bff7f2a26929e255f544ff3ec373f68a5e14504ded8e82046",
+    "t": {
+     "both_ready": 84,
+     "seam_arrive": 178,
+     "both_arrived": 10193,
+     "apply_return": 10197
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 1,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "disk_hash_at_seam": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_arrived": true,
+    "lock_owner_writes": 1,
+    "ok": true,
+    "verdict": "applied",
+    "blockedReasons": [],
+    "receipt_before": "8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "receipt_after": "f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+    "marker": "// atm-edit barrier-leader by agent-leader"
+   },
+   "follower": {
+    "role": "follower",
+    "pid": 1109331,
+    "seam_fired": true,
+    "seam_op": "mkdirSync",
+    "seam_path": ".atm/runtime/steward-commit-locks/78d9ee9452ece96bff7f2a26929e255f544ff3ec373f68a5e14504ded8e82046",
+    "t": {
+     "both_ready": 85,
+     "seam_arrive": 10191,
+     "both_arrived": 10192,
+     "follower_release": 10196,
+     "apply_return": 10206
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 1,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "disk_hash_at_seam": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_arrived": true,
+    "leader_done_seen": true,
+    "lock_owner_writes": 1,
+    "ok": false,
+    "verdict": "blocked",
+    "blockedReasons": [
+     "steward-final-patch-required: proposal 'p-follower' overlaps region 'reducers', which changed after the proposal was anchored; refusing to overwrite [proposals: p-follower]"
+    ],
+    "receipt_before": null,
+    "receipt_after": null,
+    "marker": "// atm-edit barrier-follower by agent-follower"
+   },
+   "leader_exit": 0,
+   "follower_exit": 0,
+   "stderr": {
+    "leader": "",
+    "follower": ""
+   },
+   "window_hit": true,
+   "final_hash": "sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+   "final_bytes": 230,
+   "leftover_files": [],
+   "leader_marker_present": true,
+   "follower_marker_present": false,
+   "final_equals_leader_only": true,
+   "final_equals_both_full_bytes": false,
+   "lost_effects": [],
+   "follower_class": "blocked_after_re-compose(steward-final-patch-required)"
+  }
+ ]
+}
