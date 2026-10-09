@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/test-report/metrics.schema.json",
+  "title": "ATM Test Report Metrics v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "latency": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "errorRate": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "coverage": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 1
+    },
+    "edgeCaseCount": {
+      "type": "integer",
+      "minimum": 0
+    }
+  }
+}

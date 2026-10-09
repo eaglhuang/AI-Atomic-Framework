@@ -1,0 +1,169 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/governance/propagation-report.schema.json",
+  "title": "ATM Propagation Report v0.1",
+  "description": "Deterministic downstream map propagation report emitted for an upgraded atom.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "migration",
+    "reportId",
+    "generatedAt",
+    "atomId",
+    "discoveredMaps",
+    "perMapStatus",
+    "failedDownstream",
+    "propagationDuration",
+    "metrics",
+    "summary",
+    "passed"
+  ],
+  "properties": {
+    "schemaId": {
+      "const": "atm.propagationReport"
+    },
+    "specVersion": {
+      "const": "0.1.0"
+    },
+    "migration": {
+      "$ref": "#/$defs/migration"
+    },
+    "reportId": {
+      "type": "string",
+      "pattern": "^propagation\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "atomId": {
+      "type": "string",
+      "pattern": "^ATM-[A-Z][A-Z0-9]*-\\d{4}$"
+    },
+    "behaviorId": {
+      "type": "string",
+      "pattern": "^behavior\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+    },
+    "discoveredMaps": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^ATM-MAP-[A-Z0-9-]+$"
+      }
+    },
+    "perMapStatus": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/perMapStatus"
+      }
+    },
+    "failedDownstream": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^ATM-MAP-[A-Z0-9-]+$"
+      }
+    },
+    "propagationDuration": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "metrics": {
+      "$ref": "https://schemas.ai-atomic-framework.dev/test-report/metrics.schema.json"
+    },
+    "summary": {
+      "$ref": "#/$defs/summary"
+    },
+    "passed": {
+      "type": "boolean"
+    }
+  },
+  "$defs": {
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy", "fromVersion", "notes"],
+      "properties": {
+        "strategy": {
+          "enum": ["none", "additive", "breaking"]
+        },
+        "fromVersion": {
+          "type": ["string", "null"],
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "perMapStatus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mapId", "ok", "exitCode", "durationMs", "resolutionMode", "reportPath", "warnings"],
+      "properties": {
+        "mapId": {
+          "type": "string",
+          "pattern": "^ATM-MAP-[A-Z0-9-]+$"
+        },
+        "ok": {
+          "type": "boolean"
+        },
+        "exitCode": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "durationMs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "resolutionMode": {
+          "enum": ["canonical", "legacy"]
+        },
+        "reportPath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "stdout": {
+          "type": "string"
+        },
+        "stderr": {
+          "type": "string"
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["total", "passed", "failed", "durationMs"],
+      "properties": {
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "passed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "failed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "durationMs": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}
