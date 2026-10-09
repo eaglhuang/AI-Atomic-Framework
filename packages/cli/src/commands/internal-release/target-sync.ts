@@ -55,7 +55,8 @@ export function syncTarget(input: {
   }
 
   const previousSha256 = existsSync(runnerPath) ? sha256File(runnerPath) : null;
-  const backupPath = previousSha256
+  const runnerChanged = previousSha256 !== input.sourceSha256;
+  const backupPath = previousSha256 && runnerChanged
     ? path.join(repoPath, '.atm', 'history', 'reports', 'internal-release-sync', input.runId, 'atm.mjs.previous')
     : null;
   if (!existsSync(path.join(repoPath, '.atm', 'config.json'))) {
@@ -67,7 +68,7 @@ export function syncTarget(input: {
       mkdirSync(path.dirname(backupPath), { recursive: true });
       copyFileSync(runnerPath, backupPath);
     }
-    copyFileSync(input.sourceRunnerPath, runnerPath);
+    if (runnerChanged) copyFileSync(input.sourceRunnerPath, runnerPath);
     mkdirSync(path.dirname(metadataPath), { recursive: true });
     writeFileSync(metadataPath, `${JSON.stringify({
       schemaVersion: 'atm.pinnedRunner.v0.1',
