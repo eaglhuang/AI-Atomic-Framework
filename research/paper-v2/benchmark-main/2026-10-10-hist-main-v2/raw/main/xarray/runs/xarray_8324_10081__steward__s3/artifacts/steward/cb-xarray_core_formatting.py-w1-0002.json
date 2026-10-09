@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-88190da803e6d2db",
+  "proposalIds": [
+    "prop-hist-w1-xarray_core_formatting_py"
+  ],
+  "targetFiles": [
+    "xarray/core/formatting.py"
+  ],
+  "appliedFiles": [
+    "xarray/core/formatting.py"
+  ],
+  "fileBeforeHashes": {
+    "xarray/core/formatting.py": "de5b2aa8f609f166a8b1f74374c519eda32cab52f5f1e35e5fb634b8543f0326"
+  },
+  "fileAfterHashes": {
+    "xarray/core/formatting.py": "0e1a64bf3d0b59b58ecea92895b4e800513193c93097dbd19ce95508b44637eb"
+  },
+  "permissions": {
+    "fileWrite": [
+      "xarray/core/formatting.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-88190da803e6d2db",
+    "planId": "merge-88190da803e6d2db",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-88190da803e6d2db",
+        "planId": "merge-88190da803e6d2db",
+        "request_identity": [
+          "prop-hist-w1-xarray_core_formatting_py"
+        ],
+        "actor_ids": [
+          "writer-10081"
+        ],
+        "request_files": [
+          "xarray/core/formatting.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "xarray/core/formatting.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/xarray/runs/xarray_8324_10081__steward__s3/artifacts/steward/cb-xarray_core_formatting.py-w1-0002.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-XARRAY_CORE_FORMATTING_PY"
+        ],
+        "commit_sha": "950031a08ee1d25dda654fc1701c2bc0b8c26c88"
+      }
+    ]
+  }
+}

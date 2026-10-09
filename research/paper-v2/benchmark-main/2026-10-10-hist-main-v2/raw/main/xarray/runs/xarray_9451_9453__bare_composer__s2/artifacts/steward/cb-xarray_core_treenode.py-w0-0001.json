@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-1ebadde082f1211d",
+  "proposalIds": [
+    "prop-hist-w0-xarray_core_treenode_py"
+  ],
+  "targetFiles": [
+    "xarray/core/treenode.py"
+  ],
+  "appliedFiles": [],
+  "fileBeforeHashes": {},
+  "fileAfterHashes": {},
+  "permissions": {
+    "fileWrite": [
+      "xarray/core/treenode.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "blocked",
+  "blockedReasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w0-xarray_core_treenode_py' context mismatch at base line 562: expected \"    def __delitem__(self: Tree, key: str):\", found \"    def __delitem__(self: Tree, key: str) -> None:\" [proposals: prop-hist-w0-xarray_core_treenode_py]"
+  ],
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-1ebadde082f1211d",
+    "planId": "merge-1ebadde082f1211d",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-1ebadde082f1211d",
+        "planId": "merge-1ebadde082f1211d",
+        "request_identity": [
+          "prop-hist-w0-xarray_core_treenode_py"
+        ],
+        "actor_ids": [
+          "writer-9451"
+        ],
+        "request_files": [
+          "xarray/core/treenode.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/xarray/runs/xarray_9451_9453__bare_composer__s2/artifacts/steward/cb-xarray_core_treenode.py-w0-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-XARRAY_CORE_TREENODE_PY"
+        ],
+        "commit_sha": "995e15f11eef388f896087dbb0774aaeb20e06e0"
+      }
+    ]
+  }
+}

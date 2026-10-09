@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-38683cdb950530c1",
+  "proposalIds": [
+    "prop-hist-w0-src_pytest_assertion_rewrite_py"
+  ],
+  "targetFiles": [
+    "src/_pytest/assertion/rewrite.py"
+  ],
+  "appliedFiles": [
+    "src/_pytest/assertion/rewrite.py"
+  ],
+  "fileBeforeHashes": {
+    "src/_pytest/assertion/rewrite.py": "1bdde7e89f2095659357ad9ba1a273765a8dd4f9ed2fb17a38f7a8cb9eab2d94"
+  },
+  "fileAfterHashes": {
+    "src/_pytest/assertion/rewrite.py": "1d5e80b9f1d5bbb780a752b568760495a25b61601090caffa4c1153b964a4bdc"
+  },
+  "permissions": {
+    "fileWrite": [
+      "src/_pytest/assertion/rewrite.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-38683cdb950530c1",
+    "planId": "merge-38683cdb950530c1",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-38683cdb950530c1",
+        "planId": "merge-38683cdb950530c1",
+        "request_identity": [
+          "prop-hist-w0-src_pytest_assertion_rewrite_py"
+        ],
+        "actor_ids": [
+          "writer-12716"
+        ],
+        "request_files": [
+          "src/_pytest/assertion/rewrite.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "src/_pytest/assertion/rewrite.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/pytest/runs/pytest_12716_12752__steward__s0/artifacts/steward/cb-src__pytest_assertion_rewrite.py-w0-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SRC_PYTEST_ASSERTION_REWRITE_PY"
+        ],
+        "commit_sha": "9abd801ff3cb9c53bdcf6c424ddc7953a8ef40f5"
+      }
+    ]
+  }
+}

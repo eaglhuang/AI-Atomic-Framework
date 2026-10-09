@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-eadfc6846a5dcc7d",
+  "proposalIds": [
+    "prop-hist-w1-sympy_physics_vector_vector_py"
+  ],
+  "targetFiles": [
+    "sympy/physics/vector/vector.py"
+  ],
+  "appliedFiles": [
+    "sympy/physics/vector/vector.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/physics/vector/vector.py": "01d957b560ea4c7e80b975a7a031ffbf56fb7b1a2801fa7b76b5a2262863bb51"
+  },
+  "fileAfterHashes": {
+    "sympy/physics/vector/vector.py": "b47c62f8731d20e0f5c7e7c347a5d7b6f52eb766c4e8ce4966ebff4bd3f6ec6a"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/physics/vector/vector.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-eadfc6846a5dcc7d",
+    "planId": "merge-eadfc6846a5dcc7d",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-eadfc6846a5dcc7d",
+        "planId": "merge-eadfc6846a5dcc7d",
+        "request_identity": [
+          "prop-hist-w1-sympy_physics_vector_vector_py"
+        ],
+        "actor_ids": [
+          "writer-27043"
+        ],
+        "request_files": [
+          "sympy/physics/vector/vector.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/physics/vector/vector.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/oldpin/runs/sympy_27040_27043__steward__s2/artifacts/steward/cb-sympy_physics_vector_vector.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_PHYSICS_VECTOR_VECTOR_PY"
+        ],
+        "commit_sha": "bf4be62935c66390ef0f9c8e58b9cb6329a1ff5d"
+      }
+    ]
+  }
+}

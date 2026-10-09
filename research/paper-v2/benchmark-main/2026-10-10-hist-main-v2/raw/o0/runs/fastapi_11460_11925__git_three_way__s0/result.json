@@ -1,0 +1,106 @@
+{
+ "pair_id": "fastapi:11460_11925",
+ "stratum": "O0",
+ "arm": "git_three_way",
+ "plant": null,
+ "seed_k": 0,
+ "seed": 2850075918,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 319,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 3,
+  "by_verdict": {
+   "correct": 3
+  },
+  "completed": 3,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 2,
+  "files_full_bytes_exact": 2,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "fastapi/security/oauth2.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "scripts/comment_docs_deploy_url_in_pr.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "fastapi/security/oauth2.py": true,
+  "scripts/comment_docs_deploy_url_in_pr.py": false
+ },
+ "final_exists": {
+  "fastapi/security/oauth2.py": true,
+  "scripts/comment_docs_deploy_url_in_pr.py": true
+ },
+ "files": [
+  {
+   "path": "fastapi/security/oauth2.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:9567a65f808b02f6a747afa3890c45b4ec878c76f312735ba72b40fd65e065cc",
+   "final_digest": "sha256:a3e6b5715b4300d4489a93f6a4b13c1ab714372d702b2c53c195c9033b8d5a95",
+   "expected_digests": [
+    "sha256:a3e6b5715b4300d4489a93f6a4b13c1ab714372d702b2c53c195c9033b8d5a95"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "scripts/comment_docs_deploy_url_in_pr.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "final_digest": "sha256:ae0d43ac0c9b8ac908c9b0456ab82fc3b8042c878787977ccc1ee073dbb56076",
+   "expected_digests": [
+    "sha256:ae0d43ac0c9b8ac908c9b0456ab82fc3b8042c878787977ccc1ee073dbb56076"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "fastapi/security/oauth2.py": "sha256:a3e6b5715b4300d4489a93f6a4b13c1ab714372d702b2c53c195c9033b8d5a95",
+  "scripts/comment_docs_deploy_url_in_pr.py": "sha256:ae0d43ac0c9b8ac908c9b0456ab82fc3b8042c878787977ccc1ee073dbb56076"
+ }
+}

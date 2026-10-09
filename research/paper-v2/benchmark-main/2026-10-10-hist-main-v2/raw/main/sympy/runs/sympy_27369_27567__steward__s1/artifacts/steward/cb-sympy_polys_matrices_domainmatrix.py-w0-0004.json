@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-3906b23df14af6a5",
+  "proposalIds": [
+    "prop-hist-w0-sympy_polys_matrices_domainmatrix_py"
+  ],
+  "targetFiles": [
+    "sympy/polys/matrices/domainmatrix.py"
+  ],
+  "appliedFiles": [
+    "sympy/polys/matrices/domainmatrix.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/polys/matrices/domainmatrix.py": "ad5384227eef87f446781ba53752714b780cc948195c6f1cd0e9e8ee2b447186"
+  },
+  "fileAfterHashes": {
+    "sympy/polys/matrices/domainmatrix.py": "6c8e84103b9e574d459b537ff7576143bdcb05c26e8c0bcfb9f4206ed8d0e21a"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/polys/matrices/domainmatrix.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-3906b23df14af6a5",
+    "planId": "merge-3906b23df14af6a5",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-3906b23df14af6a5",
+        "planId": "merge-3906b23df14af6a5",
+        "request_identity": [
+          "prop-hist-w0-sympy_polys_matrices_domainmatrix_py"
+        ],
+        "actor_ids": [
+          "writer-27369"
+        ],
+        "request_files": [
+          "sympy/polys/matrices/domainmatrix.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/polys/matrices/domainmatrix.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/sympy/runs/sympy_27369_27567__steward__s1/artifacts/steward/cb-sympy_polys_matrices_domainmatrix.py-w0-0004.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SYMPY_POLYS_MATRICES_DOMAINMATRIX_PY"
+        ],
+        "commit_sha": "4d0b15f082d78470599b0707cbd6958279b7f309"
+      }
+    ]
+  }
+}

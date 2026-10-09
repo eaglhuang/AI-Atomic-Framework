@@ -1,0 +1,133 @@
+{
+ "writer": 1,
+ "pr": 26920,
+ "pid": 2220341,
+ "init_ms": 105.557786,
+ "start_offset_ms": 11,
+ "file_order": [
+  "sympy/liealgebras/type_e.py"
+ ],
+ "holds": {
+  "sympy/liealgebras/type_e.py": 2
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 26920,
+   "path": "sympy/liealgebras/type_e.py",
+   "intents": [
+    "log:sympy:23681_26920:26920:sympy/liealgebras/type_e.py:h0",
+    "log:sympy:23681_26920:26920:sympy/liealgebras/type_e.py:h1",
+    "log:sympy:23681_26920:26920:sympy/liealgebras/type_e.py:h2",
+    "log:sympy:23681_26920:26920:sympy/liealgebras/type_e.py:h3",
+    "log:sympy:23681_26920:26920:sympy/liealgebras/type_e.py:h4",
+    "log:sympy:23681_26920:26920:sympy/liealgebras/type_e.py:h5"
+   ],
+   "hold_ms": 2,
+   "t_submit_epoch": 1791573153531,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 15,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sympy_liealgebras_type_e.py-w1-0001",
+   "total_ms": 116.7,
+   "t_done_epoch": 1791573153648
+  }
+ ],
+ "admit_stats": {
+  "txns": 2,
+  "cas_conflicts": 0
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sympy_liealgebras_type_e.py-w1-0001",
+   "path": "sympy/liealgebras/type_e.py",
+   "pid": 2220341,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-sympy_liealgebras_type_e_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sympy_liealgebras_type_e_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:51ff90cc8fba6d125e23dd6cb461ec89eb249f004455822365a88d3fed9b2226"
+   ],
+   "lock_wait_ms": 0.11,
+   "t_start_epoch_ms": 1791573153551.82,
+   "pre_apply_hash": "sha256:51ff90cc8fba6d125e23dd6cb461ec89eb249f004455822365a88d3fed9b2226",
+   "receipt_before_hash": "sha256:51ff90cc8fba6d125e23dd6cb461ec89eb249f004455822365a88d3fed9b2226",
+   "receipt_after_hash": "sha256:884d8a32e119ca664107786b66b7799f45eacace413fcd5e6bcbfb6b784a5cd6",
+   "post_apply_hash": "sha256:884d8a32e119ca664107786b66b7799f45eacace413fcd5e6bcbfb6b784a5cd6",
+   "t_end_epoch_ms": 1791573153644.67,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:12:33.644+08:00",
+   "batch_id": "cb-sympy_liealgebras_type_e.py-w1-0001",
+   "path": "sympy/liealgebras/type_e.py",
+   "proposalIds": [
+    "prop-hist-w1-sympy_liealgebras_type_e_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sympy_liealgebras_type_e_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-sympy_liealgebras_type_e_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-sympy_liealgebras_type_e_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-sympy_liealgebras_type_e_py",
+     "logical_id": "prop-hist-w1-sympy_liealgebras_type_e_py",
+     "attempt_id": "att-prop-hist-w1-sympy_liealgebras_type_e_py-r0",
+     "proposal_id": "prop-hist-w1-sympy_liealgebras_type_e_py",
+     "actorId": "writer-26920"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.22,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:51ff90cc8fba6d125e23dd6cb461ec89eb249f004455822365a88d3fed9b2226",
+   "written": true,
+   "output_digest": "sha256:884d8a32e119ca664107786b66b7799f45eacace413fcd5e6bcbfb6b784a5cd6",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

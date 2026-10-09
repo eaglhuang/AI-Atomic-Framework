@@ -1,0 +1,175 @@
+{
+ "pair_id": "sphinx:11842_11843",
+ "stratum": "O1",
+ "arm": "file_lock",
+ "plant": null,
+ "seed_k": 1,
+ "seed": 3887869286,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 382,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 6,
+  "by_verdict": {
+   "correct": 5,
+   "blocked_absent": 1
+  },
+  "completed": 5,
+  "lost_effects": 0,
+  "blocked": 1,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 5,
+  "files_full_bytes_exact": 5,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {
+  "harness-relocate-context-not-found": 1
+ },
+ "structure": {
+  "sphinx/environment/collectors/toctree.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sphinx/ext/apidoc.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sphinx/ext/autodoc/importer.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sphinx/ext/napoleon/docstring.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sphinx/jinja2glue.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "sphinx/environment/collectors/toctree.py": true,
+  "sphinx/ext/apidoc.py": true,
+  "sphinx/ext/autodoc/importer.py": true,
+  "sphinx/ext/napoleon/docstring.py": true,
+  "sphinx/jinja2glue.py": true
+ },
+ "final_exists": {
+  "sphinx/environment/collectors/toctree.py": true,
+  "sphinx/ext/apidoc.py": true,
+  "sphinx/ext/autodoc/importer.py": true,
+  "sphinx/ext/napoleon/docstring.py": true,
+  "sphinx/jinja2glue.py": true
+ },
+ "files": [
+  {
+   "path": "sphinx/environment/collectors/toctree.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:fc05747bd045c1cfed04308de14b761d7ae58677bdcd5337439e62f34064d429",
+   "final_digest": "sha256:5af0f6c7f349c10d8c3a77362788e626f25919bf12c97cbe1dbb1f221d979fd1",
+   "expected_digests": [
+    "sha256:5af0f6c7f349c10d8c3a77362788e626f25919bf12c97cbe1dbb1f221d979fd1"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sphinx/ext/apidoc.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:f73c00ee56bda01a4e75a6790fb46d40b18c4970c1480547e2eb533c6a8b824a",
+   "final_digest": "sha256:36cbc85d6ae80cf0cec6d0e93cca446a9d96de869e1677fe5ed164a85f6894fe",
+   "expected_digests": [
+    "sha256:36cbc85d6ae80cf0cec6d0e93cca446a9d96de869e1677fe5ed164a85f6894fe"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sphinx/ext/autodoc/importer.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:07e2cf79b4a00bb884893698931fc4d93a1951691b1faf188071c756e168061e",
+   "final_digest": "sha256:32e95dc32009b2e5fe387f9b7cac990e314258dd3bb3e1bf2444830f76fac992",
+   "expected_digests": [
+    "sha256:32e95dc32009b2e5fe387f9b7cac990e314258dd3bb3e1bf2444830f76fac992"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sphinx/ext/napoleon/docstring.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:50b845fb23f9523f50271c4077afb4fbd87a9573c0e6681813b0ac0d9e868970",
+   "final_digest": "sha256:835ca837f15b96fb63dbf7c60e8fdb09630beb3e03309c363e82e0026096aa2e",
+   "expected_digests": [
+    "sha256:835ca837f15b96fb63dbf7c60e8fdb09630beb3e03309c363e82e0026096aa2e"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sphinx/jinja2glue.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:1d3301f8bdc100c777c7b641adfc65a8d10d41f1fcf1b463d8fddf43c57ae34b",
+   "final_digest": "sha256:9ecad7d4bd0e338a4c787ad3b9a37fc762e0a37ffc4cb53608c42313a208bac8",
+   "expected_digests": [
+    "sha256:9ecad7d4bd0e338a4c787ad3b9a37fc762e0a37ffc4cb53608c42313a208bac8"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "sphinx/environment/collectors/toctree.py": "sha256:5af0f6c7f349c10d8c3a77362788e626f25919bf12c97cbe1dbb1f221d979fd1",
+  "sphinx/ext/apidoc.py": "sha256:36cbc85d6ae80cf0cec6d0e93cca446a9d96de869e1677fe5ed164a85f6894fe",
+  "sphinx/ext/autodoc/importer.py": "sha256:32e95dc32009b2e5fe387f9b7cac990e314258dd3bb3e1bf2444830f76fac992",
+  "sphinx/ext/napoleon/docstring.py": "sha256:835ca837f15b96fb63dbf7c60e8fdb09630beb3e03309c363e82e0026096aa2e",
+  "sphinx/jinja2glue.py": "sha256:9ecad7d4bd0e338a4c787ad3b9a37fc762e0a37ffc4cb53608c42313a208bac8"
+ }
+}

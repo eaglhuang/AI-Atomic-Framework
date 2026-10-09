@@ -1,0 +1,272 @@
+{
+ "writer": 0,
+ "pr": 11891,
+ "pid": 2478438,
+ "init_ms": 88.08659,
+ "start_offset_ms": 4,
+ "file_order": [
+  "sphinx/builders/html/__init__.py",
+  "sphinx/theming.py"
+ ],
+ "holds": {
+  "sphinx/builders/html/__init__.py": 15,
+  "sphinx/theming.py": 9
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 11891,
+   "path": "sphinx/builders/html/__init__.py",
+   "intents": [
+    "log:sphinx:11891_11894:11891:sphinx/builders/html/__init__.py:h0"
+   ],
+   "hold_ms": 15,
+   "t_submit_epoch": 1791575378972,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 27,
+   "outcome": "blocked",
+   "blocked_reason": "file-hash-drift: Target file hash sha256:a28f56c83c6af0c51f5c97b8c194f285850fbae8e3756b036db5d39567d1befc does not match proposal fileBeforeHash sha256:8f5653cd858ac8f9b975bf5e9ca9c63fa34013b3b4f34aff2ab267fbd55aaf71.",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "file-hash-drift: Target file hash sha256:a28f56c83c6af0c51f5c97b8c194f285850fbae8e3756b036db5d39567d1befc does not match proposal fileBeforeHash sha256:8f5653cd858ac8f9b975bf5e9ca9c63fa34013b3b4f34aff2ab267fbd55aaf71."
+   ],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sphinx_builders_html___init__.py-w0-0001",
+   "total_ms": 136.27,
+   "t_done_epoch": 1791575379108
+  },
+  {
+   "writer": 0,
+   "pr": 11891,
+   "path": "sphinx/theming.py",
+   "intents": [
+    "log:sphinx:11891_11894:11891:sphinx/theming.py:h1",
+    "log:sphinx:11891_11894:11891:sphinx/theming.py:h2",
+    "log:sphinx:11891_11894:11891:sphinx/theming.py:h3",
+    "log:sphinx:11891_11894:11891:sphinx/theming.py:h4",
+    "log:sphinx:11891_11894:11891:sphinx/theming.py:h5",
+    "log:sphinx:11891_11894:11891:sphinx/theming.py:h6",
+    "log:sphinx:11891_11894:11891:sphinx/theming.py:h7",
+    "log:sphinx:11891_11894:11891:sphinx/theming.py:h8",
+    "log:sphinx:11891_11894:11891:sphinx/theming.py:h9",
+    "log:sphinx:11891_11894:11891:sphinx/theming.py:h10",
+    "log:sphinx:11891_11894:11891:sphinx/theming.py:h11",
+    "log:sphinx:11891_11894:11891:sphinx/theming.py:h12",
+    "log:sphinx:11891_11894:11891:sphinx/theming.py:h13",
+    "log:sphinx:11891_11894:11891:sphinx/theming.py:h14",
+    "log:sphinx:11891_11894:11891:sphinx/theming.py:h15",
+    "log:sphinx:11891_11894:11891:sphinx/theming.py:h16",
+    "log:sphinx:11891_11894:11891:sphinx/theming.py:h17",
+    "log:sphinx:11891_11894:11891:sphinx/theming.py:h18",
+    "log:sphinx:11891_11894:11891:sphinx/theming.py:h19",
+    "log:sphinx:11891_11894:11891:sphinx/theming.py:h20",
+    "log:sphinx:11891_11894:11891:sphinx/theming.py:h21",
+    "log:sphinx:11891_11894:11891:sphinx/theming.py:h22",
+    "log:sphinx:11891_11894:11891:sphinx/theming.py:h23",
+    "log:sphinx:11891_11894:11891:sphinx/theming.py:h24",
+    "log:sphinx:11891_11894:11891:sphinx/theming.py:h25",
+    "log:sphinx:11891_11894:11891:sphinx/theming.py:h26",
+    "log:sphinx:11891_11894:11891:sphinx/theming.py:h27",
+    "log:sphinx:11891_11894:11891:sphinx/theming.py:h28",
+    "log:sphinx:11891_11894:11891:sphinx/theming.py:h29",
+    "log:sphinx:11891_11894:11891:sphinx/theming.py:h30",
+    "log:sphinx:11891_11894:11891:sphinx/theming.py:h31",
+    "log:sphinx:11891_11894:11891:sphinx/theming.py:h32"
+   ],
+   "hold_ms": 9,
+   "t_submit_epoch": 1791575379108,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sphinx_theming.py-w0-0002",
+   "total_ms": 23.26,
+   "t_done_epoch": 1791575379131
+  }
+ ],
+ "admit_stats": {
+  "txns": 4,
+  "cas_conflicts": 5
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sphinx_builders_html___init__.py-w0-0001",
+   "path": "sphinx/builders/html/__init__.py",
+   "pid": 2478438,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-sphinx_builders_html_init_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sphinx_builders_html_init_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:8f5653cd858ac8f9b975bf5e9ca9c63fa34013b3b4f34aff2ab267fbd55aaf71"
+   ],
+   "lock_wait_ms": 0.12,
+   "t_start_epoch_ms": 1791575379017.82,
+   "pre_apply_hash": "sha256:8f5653cd858ac8f9b975bf5e9ca9c63fa34013b3b4f34aff2ab267fbd55aaf71",
+   "receipt_before_hash": null,
+   "receipt_after_hash": null,
+   "post_apply_hash": "sha256:a28f56c83c6af0c51f5c97b8c194f285850fbae8e3756b036db5d39567d1befc",
+   "t_end_epoch_ms": 1791575379105.41,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "blocked",
+   "written": false,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:49:39.105+08:00",
+   "batch_id": "cb-sphinx_builders_html___init__.py-w0-0001",
+   "path": "sphinx/builders/html/__init__.py",
+   "proposalIds": [
+    "prop-hist-w0-sphinx_builders_html_init_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sphinx_builders_html_init_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-sphinx_builders_html_init_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-sphinx_builders_html_init_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-sphinx_builders_html_init_py",
+     "logical_id": "prop-hist-w0-sphinx_builders_html_init_py",
+     "attempt_id": "att-prop-hist-w0-sphinx_builders_html_init_py-r0",
+     "proposal_id": "prop-hist-w0-sphinx_builders_html_init_py",
+     "actorId": "writer-11891"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "file-hash-drift: Target file hash sha256:a28f56c83c6af0c51f5c97b8c194f285850fbae8e3756b036db5d39567d1befc does not match proposal fileBeforeHash sha256:8f5653cd858ac8f9b975bf5e9ca9c63fa34013b3b4f34aff2ab267fbd55aaf71."
+   ],
+   "blocked_reason": "file-hash-drift: Target file hash sha256:a28f56c83c6af0c51f5c97b8c194f285850fbae8e3756b036db5d39567d1befc does not match proposal fileBeforeHash sha256:8f5653cd858ac8f9b975bf5e9ca9c63fa34013b3b4f34aff2ab267fbd55aaf71.",
+   "window_wait_ms": 0.28,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:8f5653cd858ac8f9b975bf5e9ca9c63fa34013b3b4f34aff2ab267fbd55aaf71",
+   "written": false,
+   "output_digest": null,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "file-hash-drift: Target file hash sha256:a28f56c83c6af0c51f5c97b8c194f285850fbae8e3756b036db5d39567d1befc does not match proposal fileBeforeHash sha256:8f5653cd858ac8f9b975bf5e9ca9c63fa34013b3b4f34aff2ab267fbd55aaf71."
+  },
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sphinx_theming.py-w0-0002",
+   "path": "sphinx/theming.py",
+   "pid": 2478438,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-sphinx_theming_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sphinx_theming_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:fc59b5116f2537a686ca80fdf0c456151aef42e83a77a7379e62ef76d519b9da"
+   ],
+   "lock_wait_ms": 0,
+   "t_start_epoch_ms": 1791575379120.83,
+   "pre_apply_hash": "sha256:fc59b5116f2537a686ca80fdf0c456151aef42e83a77a7379e62ef76d519b9da",
+   "receipt_before_hash": "sha256:fc59b5116f2537a686ca80fdf0c456151aef42e83a77a7379e62ef76d519b9da",
+   "receipt_after_hash": "sha256:d5ff92af4fecc5290c58d479d32ce1dc1f1cd7b94f4b51b30997a9ca46f83f7b",
+   "post_apply_hash": "sha256:d5ff92af4fecc5290c58d479d32ce1dc1f1cd7b94f4b51b30997a9ca46f83f7b",
+   "t_end_epoch_ms": 1791575379129.9,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:49:39.129+08:00",
+   "batch_id": "cb-sphinx_theming.py-w0-0002",
+   "path": "sphinx/theming.py",
+   "proposalIds": [
+    "prop-hist-w0-sphinx_theming_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sphinx_theming_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-sphinx_theming_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-sphinx_theming_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-sphinx_theming_py",
+     "logical_id": "prop-hist-w0-sphinx_theming_py",
+     "attempt_id": "att-prop-hist-w0-sphinx_theming_py-r0",
+     "proposal_id": "prop-hist-w0-sphinx_theming_py",
+     "actorId": "writer-11891"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.01,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:fc59b5116f2537a686ca80fdf0c456151aef42e83a77a7379e62ef76d519b9da",
+   "written": true,
+   "output_digest": "sha256:d5ff92af4fecc5290c58d479d32ce1dc1f1cd7b94f4b51b30997a9ca46f83f7b",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

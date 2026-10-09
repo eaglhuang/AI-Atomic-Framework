@@ -1,0 +1,168 @@
+{
+ "writer": 1,
+ "pr": 13961,
+ "pid": 2472856,
+ "init_ms": 88.56985999999999,
+ "start_offset_ms": 2,
+ "file_order": [
+  "sphinx/ext/autodoc/_documenters.py",
+  "sphinx/ext/autosummary/__init__.py"
+ ],
+ "holds": {
+  "sphinx/ext/autodoc/_documenters.py": 24,
+  "sphinx/ext/autosummary/__init__.py": 27
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 13961,
+   "path": "sphinx/ext/autodoc/_documenters.py",
+   "intents": [
+    "log:sphinx:13960_13961:13961:sphinx/ext/autodoc/_documenters.py:h0",
+    "log:sphinx:13960_13961:13961:sphinx/ext/autodoc/_documenters.py:h1",
+    "log:sphinx:13960_13961:13961:sphinx/ext/autodoc/_documenters.py:h2",
+    "log:sphinx:13960_13961:13961:sphinx/ext/autodoc/_documenters.py:h3",
+    "log:sphinx:13960_13961:13961:sphinx/ext/autodoc/_documenters.py:h4",
+    "log:sphinx:13960_13961:13961:sphinx/ext/autodoc/_documenters.py:h5",
+    "log:sphinx:13960_13961:13961:sphinx/ext/autodoc/_documenters.py:h6",
+    "log:sphinx:13960_13961:13961:sphinx/ext/autodoc/_documenters.py:h7",
+    "log:sphinx:13960_13961:13961:sphinx/ext/autodoc/_documenters.py:h8",
+    "log:sphinx:13960_13961:13961:sphinx/ext/autodoc/_documenters.py:h9",
+    "log:sphinx:13960_13961:13961:sphinx/ext/autodoc/_documenters.py:h10",
+    "log:sphinx:13960_13961:13961:sphinx/ext/autodoc/_documenters.py:h11",
+    "log:sphinx:13960_13961:13961:sphinx/ext/autodoc/_documenters.py:h12",
+    "log:sphinx:13960_13961:13961:sphinx/ext/autodoc/_documenters.py:h13",
+    "log:sphinx:13960_13961:13961:sphinx/ext/autodoc/_documenters.py:h14",
+    "log:sphinx:13960_13961:13961:sphinx/ext/autodoc/_documenters.py:h15",
+    "log:sphinx:13960_13961:13961:sphinx/ext/autodoc/_documenters.py:h16",
+    "log:sphinx:13960_13961:13961:sphinx/ext/autodoc/_documenters.py:h17",
+    "log:sphinx:13960_13961:13961:sphinx/ext/autodoc/_documenters.py:h18"
+   ],
+   "hold_ms": 24,
+   "t_submit_epoch": 1791575335477,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 179,
+   "outcome": "blocked",
+   "blocked_reason": "harness-relocate-context-not-found",
+   "total_ms": 208.94,
+   "t_done_epoch": 1791575335685
+  },
+  {
+   "writer": 1,
+   "pr": 13961,
+   "path": "sphinx/ext/autosummary/__init__.py",
+   "intents": [
+    "log:sphinx:13960_13961:13961:sphinx/ext/autosummary/__init__.py:h19",
+    "log:sphinx:13960_13961:13961:sphinx/ext/autosummary/__init__.py:h20",
+    "log:sphinx:13960_13961:13961:sphinx/ext/autosummary/__init__.py:h21"
+   ],
+   "hold_ms": 27,
+   "t_submit_epoch": 1791575335685,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sphinx_ext_autosummary___init__.py-w1-0001",
+   "total_ms": 120.4,
+   "t_done_epoch": 1791575335806
+  }
+ ],
+ "admit_stats": {
+  "txns": 5,
+  "cas_conflicts": 15
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sphinx_ext_autosummary___init__.py-w1-0001",
+   "path": "sphinx/ext/autosummary/__init__.py",
+   "pid": 2472856,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-sphinx_ext_autosummary_init_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sphinx_ext_autosummary_init_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:ff3fe8056696bc0612d070ff354e4e9bcaf0cd5a49457652fcffc97613bc6cb3"
+   ],
+   "lock_wait_ms": 0.12,
+   "t_start_epoch_ms": 1791575335716.9,
+   "pre_apply_hash": "sha256:ff3fe8056696bc0612d070ff354e4e9bcaf0cd5a49457652fcffc97613bc6cb3",
+   "receipt_before_hash": "sha256:ff3fe8056696bc0612d070ff354e4e9bcaf0cd5a49457652fcffc97613bc6cb3",
+   "receipt_after_hash": "sha256:f604be6bcabadd1f58482dc17f20b99b9985580da197f206f83ccb9e0cdc4e12",
+   "post_apply_hash": "sha256:f604be6bcabadd1f58482dc17f20b99b9985580da197f206f83ccb9e0cdc4e12",
+   "t_end_epoch_ms": 1791575335801.78,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:48:55.801+08:00",
+   "batch_id": "cb-sphinx_ext_autosummary___init__.py-w1-0001",
+   "path": "sphinx/ext/autosummary/__init__.py",
+   "proposalIds": [
+    "prop-hist-w1-sphinx_ext_autosummary_init_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sphinx_ext_autosummary_init_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-sphinx_ext_autosummary_init_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-sphinx_ext_autosummary_init_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-sphinx_ext_autosummary_init_py",
+     "logical_id": "prop-hist-w1-sphinx_ext_autosummary_init_py",
+     "attempt_id": "att-prop-hist-w1-sphinx_ext_autosummary_init_py-r0",
+     "proposal_id": "prop-hist-w1-sphinx_ext_autosummary_init_py",
+     "actorId": "writer-13961"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.24,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:ff3fe8056696bc0612d070ff354e4e9bcaf0cd5a49457652fcffc97613bc6cb3",
+   "written": true,
+   "output_digest": "sha256:f604be6bcabadd1f58482dc17f20b99b9985580da197f206f83ccb9e0cdc4e12",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

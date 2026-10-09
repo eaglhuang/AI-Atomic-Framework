@@ -1,0 +1,106 @@
+{
+ "pair_id": "sphinx:11781_12132",
+ "stratum": "O3",
+ "arm": "occ",
+ "plant": null,
+ "seed_k": 1,
+ "seed": 3883601859,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 358,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 6,
+  "by_verdict": {
+   "correct": 6
+  },
+  "completed": 6,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 2,
+  "files_full_bytes_exact": 2,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "sphinx/environment/__init__.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sphinx/roles.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "sphinx/environment/__init__.py": true,
+  "sphinx/roles.py": true
+ },
+ "final_exists": {
+  "sphinx/environment/__init__.py": true,
+  "sphinx/roles.py": true
+ },
+ "files": [
+  {
+   "path": "sphinx/environment/__init__.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:f986cbe0f8581542d933e91e2ec33bda1c740d5bd200e7493c6f6354d138f7ca",
+   "final_digest": "sha256:9776e00213fd010a9f06c3644f76d4bad0a8d17c9aef4b103bbac2cd5d90d2e1",
+   "expected_digests": [
+    "sha256:9776e00213fd010a9f06c3644f76d4bad0a8d17c9aef4b103bbac2cd5d90d2e1"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sphinx/roles.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:d12bc665159b5bb5811013c86ac9f152e125c263a207d25adc55e8318616b8d4",
+   "final_digest": "sha256:e97df277cb07eeabc4bf73eae631962b70b2c8c5ccf0102568d51696bbfab7e7",
+   "expected_digests": [
+    "sha256:e97df277cb07eeabc4bf73eae631962b70b2c8c5ccf0102568d51696bbfab7e7"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "sphinx/environment/__init__.py": "sha256:9776e00213fd010a9f06c3644f76d4bad0a8d17c9aef4b103bbac2cd5d90d2e1",
+  "sphinx/roles.py": "sha256:e97df277cb07eeabc4bf73eae631962b70b2c8c5ccf0102568d51696bbfab7e7"
+ }
+}

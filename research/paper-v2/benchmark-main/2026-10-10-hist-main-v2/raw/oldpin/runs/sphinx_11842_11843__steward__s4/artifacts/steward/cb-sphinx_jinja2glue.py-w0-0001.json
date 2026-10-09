@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-8ff3a594ee38c666",
+  "proposalIds": [
+    "prop-hist-w0-sphinx_jinja2glue_py"
+  ],
+  "targetFiles": [
+    "sphinx/jinja2glue.py"
+  ],
+  "appliedFiles": [
+    "sphinx/jinja2glue.py"
+  ],
+  "fileBeforeHashes": {
+    "sphinx/jinja2glue.py": "1d3301f8bdc100c777c7b641adfc65a8d10d41f1fcf1b463d8fddf43c57ae34b"
+  },
+  "fileAfterHashes": {
+    "sphinx/jinja2glue.py": "9ecad7d4bd0e338a4c787ad3b9a37fc762e0a37ffc4cb53608c42313a208bac8"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sphinx/jinja2glue.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-8ff3a594ee38c666",
+    "planId": "merge-8ff3a594ee38c666",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-8ff3a594ee38c666",
+        "planId": "merge-8ff3a594ee38c666",
+        "request_identity": [
+          "prop-hist-w0-sphinx_jinja2glue_py"
+        ],
+        "actor_ids": [
+          "writer-11842"
+        ],
+        "request_files": [
+          "sphinx/jinja2glue.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sphinx/jinja2glue.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/oldpin/runs/sphinx_11842_11843__steward__s4/artifacts/steward/cb-sphinx_jinja2glue.py-w0-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SPHINX_JINJA2GLUE_PY"
+        ],
+        "commit_sha": "674ca087e70521721844c6160275f4612276053f"
+      }
+    ]
+  }
+}

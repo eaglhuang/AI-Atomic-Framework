@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-4040288f0f85cafc",
+  "proposalIds": [
+    "prop-hist-w0-sympy_functions_special_bessel_py"
+  ],
+  "targetFiles": [
+    "sympy/functions/special/bessel.py"
+  ],
+  "appliedFiles": [
+    "sympy/functions/special/bessel.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/functions/special/bessel.py": "0f1591122738ca168fe0d2cd23b587b3b90e8a90c326809bb9dd0bed9a3fec0d"
+  },
+  "fileAfterHashes": {
+    "sympy/functions/special/bessel.py": "cd0254bc3c4496002d2b23762368b2f81d35e81b33bbab3966ec0fbbb654ee55"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/functions/special/bessel.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-4040288f0f85cafc",
+    "planId": "merge-4040288f0f85cafc",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-4040288f0f85cafc",
+        "planId": "merge-4040288f0f85cafc",
+        "request_identity": [
+          "prop-hist-w0-sympy_functions_special_bessel_py"
+        ],
+        "actor_ids": [
+          "writer-25664"
+        ],
+        "request_files": [
+          "sympy/functions/special/bessel.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/functions/special/bessel.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/oldpin/runs/sympy_25664_26298__steward__s3/artifacts/steward/cb-sympy_functions_special_bessel.py-w0-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SYMPY_FUNCTIONS_SPECIAL_BESSEL_PY"
+        ],
+        "commit_sha": "98dc271cce3f99e985395da7cf1a0fe0242d01b9"
+      }
+    ]
+  }
+}

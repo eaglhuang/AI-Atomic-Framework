@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-e3b036bdda75fd94",
+  "proposalIds": [
+    "prop-hist-w1-scripts_translate_py"
+  ],
+  "targetFiles": [
+    "scripts/translate.py"
+  ],
+  "appliedFiles": [
+    "scripts/translate.py"
+  ],
+  "fileBeforeHashes": {
+    "scripts/translate.py": "ee5dac1f8e552dde861792d7286194d49f1eb0c8b8bc3e7431eefee333b1563f"
+  },
+  "fileAfterHashes": {
+    "scripts/translate.py": "963c2277c66612674d227bb9ad23dfe55fa03d75ca1b03c48fa02b04fc5f2788"
+  },
+  "permissions": {
+    "fileWrite": [
+      "scripts/translate.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-e3b036bdda75fd94",
+    "planId": "merge-e3b036bdda75fd94",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-e3b036bdda75fd94",
+        "planId": "merge-e3b036bdda75fd94",
+        "request_identity": [
+          "prop-hist-w1-scripts_translate_py"
+        ],
+        "actor_ids": [
+          "writer-13933"
+        ],
+        "request_files": [
+          "scripts/translate.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "scripts/translate.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/o0/runs/fastapi_13259_13933__bare_composer__s3/artifacts/steward/cb-scripts_translate.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SCRIPTS_TRANSLATE_PY"
+        ],
+        "commit_sha": "e30f7d324f39658e73100c966f64c7f0f56c7242"
+      }
+    ]
+  }
+}

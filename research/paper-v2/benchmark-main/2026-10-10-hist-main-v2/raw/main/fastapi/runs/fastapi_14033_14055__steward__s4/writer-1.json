@@ -1,0 +1,40 @@
+{
+ "writer": 1,
+ "pr": 14055,
+ "pid": 2372978,
+ "init_ms": 97.95900500000002,
+ "start_offset_ms": 9,
+ "file_order": [
+  "scripts/docs.py"
+ ],
+ "holds": {
+  "scripts/docs.py": 29
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 14055,
+   "path": "scripts/docs.py",
+   "intents": [
+    "log:fastapi:14033_14055:14055:scripts/docs.py:h0",
+    "log:fastapi:14033_14055:14055:scripts/docs.py:h1",
+    "log:fastapi:14033_14055:14055:scripts/docs.py:h2"
+   ],
+   "hold_ms": 29,
+   "t_submit_epoch": 1791574588346,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 139,
+   "outcome": "blocked",
+   "blocked_reason": "harness-relocate-context-not-found",
+   "total_ms": 173.62,
+   "t_done_epoch": 1791574588519
+  }
+ ],
+ "admit_stats": {
+  "txns": 3,
+  "cas_conflicts": 1
+ },
+ "steward_batches": []
+}

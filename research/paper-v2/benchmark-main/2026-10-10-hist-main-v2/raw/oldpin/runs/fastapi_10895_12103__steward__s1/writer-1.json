@@ -1,0 +1,264 @@
+{
+ "writer": 1,
+ "pr": 12103,
+ "pid": 2481644,
+ "init_ms": 87.971002,
+ "start_offset_ms": 10,
+ "file_order": [
+  "fastapi/dependencies/utils.py",
+  "fastapi/utils.py",
+  "fastapi/routing.py"
+ ],
+ "holds": {
+  "fastapi/dependencies/utils.py": 25,
+  "fastapi/utils.py": 30,
+  "fastapi/routing.py": 24
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 12103,
+   "path": "fastapi/dependencies/utils.py",
+   "intents": [
+    "log:fastapi:10895_12103:12103:fastapi/dependencies/utils.py:h0",
+    "log:fastapi:10895_12103:12103:fastapi/dependencies/utils.py:h1",
+    "log:fastapi:10895_12103:12103:fastapi/dependencies/utils.py:h2"
+   ],
+   "hold_ms": 25,
+   "t_submit_epoch": 1791575402953,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 18,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-fastapi_dependencies_utils.py-w1-0001",
+   "total_ms": 135.22,
+   "t_done_epoch": 1791575403088
+  },
+  {
+   "writer": 1,
+   "pr": 12103,
+   "path": "fastapi/utils.py",
+   "intents": [
+    "log:fastapi:10895_12103:12103:fastapi/utils.py:h6",
+    "log:fastapi:10895_12103:12103:fastapi/utils.py:h7",
+    "log:fastapi:10895_12103:12103:fastapi/utils.py:h8",
+    "log:fastapi:10895_12103:12103:fastapi/utils.py:h9"
+   ],
+   "hold_ms": 30,
+   "t_submit_epoch": 1791575403088,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-fastapi_utils.py-w1-0002",
+   "total_ms": 42.57,
+   "t_done_epoch": 1791575403130
+  },
+  {
+   "writer": 1,
+   "pr": 12103,
+   "path": "fastapi/routing.py",
+   "intents": [
+    "log:fastapi:10895_12103:12103:fastapi/routing.py:h3",
+    "log:fastapi:10895_12103:12103:fastapi/routing.py:h4",
+    "log:fastapi:10895_12103:12103:fastapi/routing.py:h5"
+   ],
+   "hold_ms": 24,
+   "t_submit_epoch": 1791575403130,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 9,
+   "outcome": "blocked",
+   "blocked_reason": "harness-relocate-context-not-found",
+   "total_ms": 46.9,
+   "t_done_epoch": 1791575403177
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 1
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-fastapi_dependencies_utils.py-w1-0001",
+   "path": "fastapi/dependencies/utils.py",
+   "pid": 2481644,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-fastapi_dependencies_utils_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-fastapi_dependencies_utils_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:af29ceaf05ba04a4afd1b4d50c26356a0e2446c3b32709a6ccedf5b112ac4f30"
+   ],
+   "lock_wait_ms": 0.15,
+   "t_start_epoch_ms": 1791575402999.88,
+   "pre_apply_hash": "sha256:af29ceaf05ba04a4afd1b4d50c26356a0e2446c3b32709a6ccedf5b112ac4f30",
+   "receipt_before_hash": "sha256:af29ceaf05ba04a4afd1b4d50c26356a0e2446c3b32709a6ccedf5b112ac4f30",
+   "receipt_after_hash": "sha256:bb48eeba125dcf65762c62d222cb2a91d1d91450bc1be9173ea22e6e064214ed",
+   "post_apply_hash": "sha256:bb48eeba125dcf65762c62d222cb2a91d1d91450bc1be9173ea22e6e064214ed",
+   "t_end_epoch_ms": 1791575403084.43,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:50:03.084+08:00",
+   "batch_id": "cb-fastapi_dependencies_utils.py-w1-0001",
+   "path": "fastapi/dependencies/utils.py",
+   "proposalIds": [
+    "prop-hist-w1-fastapi_dependencies_utils_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-fastapi_dependencies_utils_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-fastapi_dependencies_utils_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-fastapi_dependencies_utils_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-fastapi_dependencies_utils_py",
+     "logical_id": "prop-hist-w1-fastapi_dependencies_utils_py",
+     "attempt_id": "att-prop-hist-w1-fastapi_dependencies_utils_py-r0",
+     "proposal_id": "prop-hist-w1-fastapi_dependencies_utils_py",
+     "actorId": "writer-12103"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.25,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:af29ceaf05ba04a4afd1b4d50c26356a0e2446c3b32709a6ccedf5b112ac4f30",
+   "written": true,
+   "output_digest": "sha256:bb48eeba125dcf65762c62d222cb2a91d1d91450bc1be9173ea22e6e064214ed",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "steward_applied"
+  },
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-fastapi_utils.py-w1-0002",
+   "path": "fastapi/utils.py",
+   "pid": 2481644,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-fastapi_utils_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-fastapi_utils_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:9472a782bf9398ec7d4334b203a3d7612bc48313d8508939b77bbe919b6c9043"
+   ],
+   "lock_wait_ms": 0,
+   "t_start_epoch_ms": 1791575403120.26,
+   "pre_apply_hash": "sha256:9472a782bf9398ec7d4334b203a3d7612bc48313d8508939b77bbe919b6c9043",
+   "receipt_before_hash": "sha256:9472a782bf9398ec7d4334b203a3d7612bc48313d8508939b77bbe919b6c9043",
+   "receipt_after_hash": "sha256:e6253537a97864d5bf9cbe047f90fab3fe6f398975329c09e2b47aca98c34b7a",
+   "post_apply_hash": "sha256:e6253537a97864d5bf9cbe047f90fab3fe6f398975329c09e2b47aca98c34b7a",
+   "t_end_epoch_ms": 1791575403128.22,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:50:03.128+08:00",
+   "batch_id": "cb-fastapi_utils.py-w1-0002",
+   "path": "fastapi/utils.py",
+   "proposalIds": [
+    "prop-hist-w1-fastapi_utils_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-fastapi_utils_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-fastapi_utils_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-fastapi_utils_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-fastapi_utils_py",
+     "logical_id": "prop-hist-w1-fastapi_utils_py",
+     "attempt_id": "att-prop-hist-w1-fastapi_utils_py-r0",
+     "proposal_id": "prop-hist-w1-fastapi_utils_py",
+     "actorId": "writer-12103"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.01,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:9472a782bf9398ec7d4334b203a3d7612bc48313d8508939b77bbe919b6c9043",
+   "written": true,
+   "output_digest": "sha256:e6253537a97864d5bf9cbe047f90fab3fe6f398975329c09e2b47aca98c34b7a",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

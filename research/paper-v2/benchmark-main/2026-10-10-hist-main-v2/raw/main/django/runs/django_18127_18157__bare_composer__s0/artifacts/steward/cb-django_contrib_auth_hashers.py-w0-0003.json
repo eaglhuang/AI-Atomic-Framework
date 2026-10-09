@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-e3dd79d20bd5b10e",
+  "proposalIds": [
+    "prop-hist-w0-django_contrib_auth_hashers_py"
+  ],
+  "targetFiles": [
+    "django/contrib/auth/hashers.py"
+  ],
+  "appliedFiles": [
+    "django/contrib/auth/hashers.py"
+  ],
+  "fileBeforeHashes": {
+    "django/contrib/auth/hashers.py": "3c09fe5ad324e6207eaba2a231eaefc67af30783f47a11ec4021c7cf11fcefc7"
+  },
+  "fileAfterHashes": {
+    "django/contrib/auth/hashers.py": "90cbdae3b6cc78ad7ab73ea88c4e582ee1127f9cc6f7421d75eb4e6f75db68c1"
+  },
+  "permissions": {
+    "fileWrite": [
+      "django/contrib/auth/hashers.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-e3dd79d20bd5b10e",
+    "planId": "merge-e3dd79d20bd5b10e",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-e3dd79d20bd5b10e",
+        "planId": "merge-e3dd79d20bd5b10e",
+        "request_identity": [
+          "prop-hist-w0-django_contrib_auth_hashers_py"
+        ],
+        "actor_ids": [
+          "writer-18127"
+        ],
+        "request_files": [
+          "django/contrib/auth/hashers.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "django/contrib/auth/hashers.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/django/runs/django_18127_18157__bare_composer__s0/artifacts/steward/cb-django_contrib_auth_hashers.py-w0-0003.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-DJANGO_CONTRIB_AUTH_HASHERS_PY"
+        ],
+        "commit_sha": "5f1e797aaabffdb5c3ef89cb287eaebbaddd9ea4"
+      }
+    ]
+  }
+}

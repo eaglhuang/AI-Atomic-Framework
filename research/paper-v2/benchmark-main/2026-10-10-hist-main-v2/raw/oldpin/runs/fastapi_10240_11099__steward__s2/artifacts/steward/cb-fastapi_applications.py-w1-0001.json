@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-b9458e58c224e0ba",
+  "proposalIds": [
+    "prop-hist-w1-fastapi_applications_py"
+  ],
+  "targetFiles": [
+    "fastapi/applications.py"
+  ],
+  "appliedFiles": [],
+  "fileBeforeHashes": {},
+  "fileAfterHashes": {},
+  "permissions": {
+    "fileWrite": [
+      "fastapi/applications.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "blocked",
+  "blockedReasons": [
+    "canonical target base hash is stale: fastapi/applications.py"
+  ],
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-b9458e58c224e0ba",
+    "planId": "merge-b9458e58c224e0ba",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-b9458e58c224e0ba",
+        "planId": "merge-b9458e58c224e0ba",
+        "request_identity": [
+          "prop-hist-w1-fastapi_applications_py"
+        ],
+        "actor_ids": [
+          "writer-11099"
+        ],
+        "request_files": [
+          "fastapi/applications.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/oldpin/runs/fastapi_10240_11099__steward__s2/artifacts/steward/cb-fastapi_applications.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-FASTAPI_APPLICATIONS_PY"
+        ],
+        "commit_sha": "5c24b69f6bd23a71db43cfce1f76fd50cab3b22c"
+      }
+    ]
+  }
+}

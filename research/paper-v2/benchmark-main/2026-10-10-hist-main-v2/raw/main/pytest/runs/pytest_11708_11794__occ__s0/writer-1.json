@@ -1,0 +1,109 @@
+{
+ "writer": 1,
+ "pr": 11794,
+ "pid": 2296771,
+ "init_ms": 71.101313,
+ "start_offset_ms": 8,
+ "file_order": [
+  "src/_pytest/python.py",
+  "src/_pytest/fixtures.py",
+  "src/_pytest/setuponly.py",
+  "src/_pytest/config/__init__.py"
+ ],
+ "holds": {
+  "src/_pytest/python.py": 23,
+  "src/_pytest/fixtures.py": 27,
+  "src/_pytest/setuponly.py": 4,
+  "src/_pytest/config/__init__.py": 29
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 11794,
+   "path": "src/_pytest/python.py",
+   "intents": [
+    "log:pytest:11708_11794:11794:src/_pytest/python.py:h9"
+   ],
+   "hold_ms": 23,
+   "t_submit_epoch": 1791573987397,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 18,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 51.66,
+   "t_done_epoch": 1791573987448
+  },
+  {
+   "writer": 1,
+   "pr": 11794,
+   "path": "src/_pytest/fixtures.py",
+   "intents": [
+    "log:pytest:11708_11794:11794:src/_pytest/fixtures.py:h3",
+    "log:pytest:11708_11794:11794:src/_pytest/fixtures.py:h4",
+    "log:pytest:11708_11794:11794:src/_pytest/fixtures.py:h5",
+    "log:pytest:11708_11794:11794:src/_pytest/fixtures.py:h6",
+    "log:pytest:11708_11794:11794:src/_pytest/fixtures.py:h7",
+    "log:pytest:11708_11794:11794:src/_pytest/fixtures.py:h8"
+   ],
+   "hold_ms": 27,
+   "t_submit_epoch": 1791573987448,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 37.17,
+   "t_done_epoch": 1791573987485
+  },
+  {
+   "writer": 1,
+   "pr": 11794,
+   "path": "src/_pytest/setuponly.py",
+   "intents": [
+    "log:pytest:11708_11794:11794:src/_pytest/setuponly.py:h10",
+    "log:pytest:11708_11794:11794:src/_pytest/setuponly.py:h11",
+    "log:pytest:11708_11794:11794:src/_pytest/setuponly.py:h12",
+    "log:pytest:11708_11794:11794:src/_pytest/setuponly.py:h13",
+    "log:pytest:11708_11794:11794:src/_pytest/setuponly.py:h14"
+   ],
+   "hold_ms": 4,
+   "t_submit_epoch": 1791573987485,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 12.19,
+   "t_done_epoch": 1791573987498
+  },
+  {
+   "writer": 1,
+   "pr": 11794,
+   "path": "src/_pytest/config/__init__.py",
+   "intents": [
+    "log:pytest:11708_11794:11794:src/_pytest/config/__init__.py:h0",
+    "log:pytest:11708_11794:11794:src/_pytest/config/__init__.py:h1",
+    "log:pytest:11708_11794:11794:src/_pytest/config/__init__.py:h2"
+   ],
+   "hold_ms": 29,
+   "t_submit_epoch": 1791573987498,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 39.53,
+   "t_done_epoch": 1791573987537
+  }
+ ],
+ "admit_stats": {
+  "txns": 8,
+  "cas_conflicts": 5
+ },
+ "steward_batches": null
+}

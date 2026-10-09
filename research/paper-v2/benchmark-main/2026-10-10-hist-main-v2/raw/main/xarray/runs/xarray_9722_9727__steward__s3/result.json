@@ -1,0 +1,304 @@
+{
+ "pair_id": "xarray:9722_9727",
+ "stratum": "O3",
+ "arm": "steward",
+ "plant": null,
+ "seed_k": 3,
+ "seed": 980791616,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 1716,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 22,
+  "by_verdict": {
+   "correct": 22
+  },
+  "completed": 22,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 11,
+  "files_full_bytes_exact": 11,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "xarray/backends/common.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "xarray/backends/plugins.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "xarray/core/coordinates.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "xarray/core/dataset.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "xarray/core/indexing.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "xarray/core/missing.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "xarray/core/nputils.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "xarray/core/utils.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "xarray/plot/dataarray_plot.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "xarray/plot/facetgrid.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "xarray/plot/utils.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "xarray/backends/common.py": true,
+  "xarray/backends/plugins.py": true,
+  "xarray/core/coordinates.py": true,
+  "xarray/core/dataset.py": true,
+  "xarray/core/indexing.py": true,
+  "xarray/core/missing.py": true,
+  "xarray/core/nputils.py": true,
+  "xarray/core/utils.py": true,
+  "xarray/plot/dataarray_plot.py": true,
+  "xarray/plot/facetgrid.py": true,
+  "xarray/plot/utils.py": true
+ },
+ "final_exists": {
+  "xarray/backends/common.py": true,
+  "xarray/backends/plugins.py": true,
+  "xarray/core/coordinates.py": true,
+  "xarray/core/dataset.py": true,
+  "xarray/core/indexing.py": true,
+  "xarray/core/missing.py": true,
+  "xarray/core/nputils.py": true,
+  "xarray/core/utils.py": true,
+  "xarray/plot/dataarray_plot.py": true,
+  "xarray/plot/facetgrid.py": true,
+  "xarray/plot/utils.py": true
+ },
+ "files": [
+  {
+   "path": "xarray/backends/common.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:90c3e5c1850c0c1542a66c8c41a51b8301f1bd48037492763f3e2b5438130a73",
+   "final_digest": "sha256:7fde1ec3beb3334f5fc8ce59b0d21a3e98b8a4b688bf54f09103b7e3047dc077",
+   "expected_digests": [
+    "sha256:7fde1ec3beb3334f5fc8ce59b0d21a3e98b8a4b688bf54f09103b7e3047dc077"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/backends/plugins.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:3a77753deefe55618fa1320efd181778cda37763e8eed0c8b4d39204179df393",
+   "final_digest": "sha256:9d116fd991087abe16fedd4a143c337db54ac36be40788ddff798fca5b559586",
+   "expected_digests": [
+    "sha256:9d116fd991087abe16fedd4a143c337db54ac36be40788ddff798fca5b559586"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/core/coordinates.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:de2535fc195ad2d628d4f830e97dbe552b9bf37e49a1785c45d804bbe9e42c5d",
+   "final_digest": "sha256:c2b27fa411a43c09d045ff62afd8684746897eadf9e30f58521b0222d3ad7bc2",
+   "expected_digests": [
+    "sha256:c2b27fa411a43c09d045ff62afd8684746897eadf9e30f58521b0222d3ad7bc2"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/core/dataset.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:ef3bf135649894211943266c1d09a223d05f1a659f1d3a7dd7b0687f931f4413",
+   "final_digest": "sha256:5dd493609d5337696bf77570cc1350ea1cfde7fdd9e8ec587cd99d6194cfbc1c",
+   "expected_digests": [
+    "sha256:5dd493609d5337696bf77570cc1350ea1cfde7fdd9e8ec587cd99d6194cfbc1c"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/core/indexing.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:2e4c9021ded2593ba2ffe28cdd61fc4ae20163110fb512410512e74c380f0b32",
+   "final_digest": "sha256:6211f2cc7c980bab92be476e87ff42fed668c820551384d88b99d01bd6fd7a68",
+   "expected_digests": [
+    "sha256:6211f2cc7c980bab92be476e87ff42fed668c820551384d88b99d01bd6fd7a68"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/core/missing.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:1690c2fe320ec02693f111098e05eaa44c4514f92b6eb5f7976e22c11482746e",
+   "final_digest": "sha256:c73aadca04c365a2328f8f1a6e750da518c2f733e44c3513eefa7636be17b6bd",
+   "expected_digests": [
+    "sha256:c73aadca04c365a2328f8f1a6e750da518c2f733e44c3513eefa7636be17b6bd"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/core/nputils.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:21145bacfdcbac37063336d7e90d89cd6cb2e80ad5293dbe1eee8ab26917ae17",
+   "final_digest": "sha256:036d93b1ea62f88f0af1d797904c20ac0ea7f241d22b9f0dfb938939e8ad893c",
+   "expected_digests": [
+    "sha256:036d93b1ea62f88f0af1d797904c20ac0ea7f241d22b9f0dfb938939e8ad893c"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/core/utils.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:01a402824f3c3e1ace8e6deebc2a43ab230d7afc8045df93c83ad345b7fe2e43",
+   "final_digest": "sha256:51a8eb07ef2bf626a597d20c742b85f8b20abb811b9065a06c783ef38d95efeb",
+   "expected_digests": [
+    "sha256:51a8eb07ef2bf626a597d20c742b85f8b20abb811b9065a06c783ef38d95efeb"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/plot/dataarray_plot.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:45dfe13c22c5e7d8ffccd66eaf33e0ea664277f4605c6b06f18c38fb1cfde468",
+   "final_digest": "sha256:99c56bef85a64e8d7e94a0a9eb135cc017eafab91ed86c1bbd780f036ded4e7b",
+   "expected_digests": [
+    "sha256:99c56bef85a64e8d7e94a0a9eb135cc017eafab91ed86c1bbd780f036ded4e7b"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/plot/facetgrid.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:0e7ca549262d17f54ea8c2d1f98235b9b2f797094848efadabcb4458124f27fe",
+   "final_digest": "sha256:833a72093bc71d778fd65440ac25daee450eee25d63aebd99e9ee1a1c1c91243",
+   "expected_digests": [
+    "sha256:833a72093bc71d778fd65440ac25daee450eee25d63aebd99e9ee1a1c1c91243"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/plot/utils.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:4cdc48e07e12e2deb202ac03ff7e803edc4e83ce154f6238e054073f62f08266",
+   "final_digest": "sha256:f54c18e820a1da7235899ae45cce0a13c8b39b252af70380299ab7a758acd468",
+   "expected_digests": [
+    "sha256:f54c18e820a1da7235899ae45cce0a13c8b39b252af70380299ab7a758acd468"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "xarray/backends/common.py": "sha256:7fde1ec3beb3334f5fc8ce59b0d21a3e98b8a4b688bf54f09103b7e3047dc077",
+  "xarray/backends/plugins.py": "sha256:9d116fd991087abe16fedd4a143c337db54ac36be40788ddff798fca5b559586",
+  "xarray/core/coordinates.py": "sha256:c2b27fa411a43c09d045ff62afd8684746897eadf9e30f58521b0222d3ad7bc2",
+  "xarray/core/dataset.py": "sha256:5dd493609d5337696bf77570cc1350ea1cfde7fdd9e8ec587cd99d6194cfbc1c",
+  "xarray/core/indexing.py": "sha256:6211f2cc7c980bab92be476e87ff42fed668c820551384d88b99d01bd6fd7a68",
+  "xarray/core/missing.py": "sha256:c73aadca04c365a2328f8f1a6e750da518c2f733e44c3513eefa7636be17b6bd",
+  "xarray/core/nputils.py": "sha256:036d93b1ea62f88f0af1d797904c20ac0ea7f241d22b9f0dfb938939e8ad893c",
+  "xarray/core/utils.py": "sha256:51a8eb07ef2bf626a597d20c742b85f8b20abb811b9065a06c783ef38d95efeb",
+  "xarray/plot/dataarray_plot.py": "sha256:99c56bef85a64e8d7e94a0a9eb135cc017eafab91ed86c1bbd780f036ded4e7b",
+  "xarray/plot/facetgrid.py": "sha256:833a72093bc71d778fd65440ac25daee450eee25d63aebd99e9ee1a1c1c91243",
+  "xarray/plot/utils.py": "sha256:f54c18e820a1da7235899ae45cce0a13c8b39b252af70380299ab7a758acd468"
+ }
+}

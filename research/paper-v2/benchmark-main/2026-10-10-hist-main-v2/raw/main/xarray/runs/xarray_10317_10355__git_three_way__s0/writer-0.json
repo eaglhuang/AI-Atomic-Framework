@@ -1,0 +1,61 @@
+{
+ "writer": 0,
+ "pr": 10317,
+ "pid": 2254934,
+ "init_ms": 78.78136799999999,
+ "start_offset_ms": 13,
+ "file_order": [
+  "xarray/core/extension_array.py",
+  "xarray/core/formatting.py"
+ ],
+ "holds": {
+  "xarray/core/extension_array.py": 30,
+  "xarray/core/formatting.py": 2
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 10317,
+   "path": "xarray/core/extension_array.py",
+   "intents": [
+    "log:xarray:10317_10355:10317:xarray/core/extension_array.py:h0",
+    "log:xarray:10317_10355:10317:xarray/core/extension_array.py:h1",
+    "log:xarray:10317_10355:10317:xarray/core/extension_array.py:h2"
+   ],
+   "hold_ms": 30,
+   "t_submit_epoch": 1791573494260,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 18,
+   "outcome": "commit",
+   "total_ms": 60.81,
+   "t_done_epoch": 1791573494321
+  },
+  {
+   "writer": 0,
+   "pr": 10317,
+   "path": "xarray/core/formatting.py",
+   "intents": [
+    "log:xarray:10317_10355:10317:xarray/core/formatting.py:h3",
+    "log:xarray:10317_10355:10317:xarray/core/formatting.py:h4",
+    "log:xarray:10317_10355:10317:xarray/core/formatting.py:h5"
+   ],
+   "hold_ms": 2,
+   "t_submit_epoch": 1791573494321,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 6,
+   "outcome": "blocked",
+   "blocked_reason": "git-merge-conflict",
+   "total_ms": 14.34,
+   "t_done_epoch": 1791573494335
+  }
+ ],
+ "admit_stats": {
+  "txns": 4,
+  "cas_conflicts": 5
+ },
+ "steward_batches": null
+}

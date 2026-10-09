@@ -1,0 +1,150 @@
+{
+ "pair_id": "django:20045_20065",
+ "stratum": "O3",
+ "arm": "file_lock",
+ "plant": null,
+ "seed_k": 1,
+ "seed": 363210975,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 363,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 24,
+  "by_verdict": {
+   "correct": 24
+  },
+  "completed": 24,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 4,
+  "files_full_bytes_exact": 4,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "django/utils/html.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "django/utils/http.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "django/utils/numberformat.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "django/utils/text.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "django/utils/html.py": true,
+  "django/utils/http.py": true,
+  "django/utils/numberformat.py": true,
+  "django/utils/text.py": true
+ },
+ "final_exists": {
+  "django/utils/html.py": true,
+  "django/utils/http.py": true,
+  "django/utils/numberformat.py": true,
+  "django/utils/text.py": true
+ },
+ "files": [
+  {
+   "path": "django/utils/html.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:64a5446da22defc6ef81fc8b8f577e27b6a3816820f0ee54240fc69891c555c6",
+   "final_digest": "sha256:b6bf46e651ef006b15f2463ce212bf28ae89a36e65b7db7b5aeb3ccbfdc90d64",
+   "expected_digests": [
+    "sha256:b6bf46e651ef006b15f2463ce212bf28ae89a36e65b7db7b5aeb3ccbfdc90d64"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "django/utils/http.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:b87405ed949c7e3b89ef07cdd82d1d6dbba37497a9ce022ce7a50d18a4d15de2",
+   "final_digest": "sha256:69738e38ca75e2d722bcc46d8158c6a304a351a232ae7c61f60efe504097540f",
+   "expected_digests": [
+    "sha256:69738e38ca75e2d722bcc46d8158c6a304a351a232ae7c61f60efe504097540f"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "django/utils/numberformat.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:f0ba923267f168dd0f6124d3112e944ff0137ab7c36109fb61ae0d23bd2031a5",
+   "final_digest": "sha256:eb2f4e352ae5728c45cd73578a03e801fabe0e07666febd3b21c04add3d580be",
+   "expected_digests": [
+    "sha256:eb2f4e352ae5728c45cd73578a03e801fabe0e07666febd3b21c04add3d580be"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "django/utils/text.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:0b7ac9aef06742953d1feaabdabac2c1206e25cdb08f24b4402b519bf189ee7f",
+   "final_digest": "sha256:e94066e53c1a02e390c0de8382512ee40b4d98449f413375b810ec0c05009ff5",
+   "expected_digests": [
+    "sha256:e94066e53c1a02e390c0de8382512ee40b4d98449f413375b810ec0c05009ff5"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "django/utils/html.py": "sha256:b6bf46e651ef006b15f2463ce212bf28ae89a36e65b7db7b5aeb3ccbfdc90d64",
+  "django/utils/http.py": "sha256:69738e38ca75e2d722bcc46d8158c6a304a351a232ae7c61f60efe504097540f",
+  "django/utils/numberformat.py": "sha256:eb2f4e352ae5728c45cd73578a03e801fabe0e07666febd3b21c04add3d580be",
+  "django/utils/text.py": "sha256:e94066e53c1a02e390c0de8382512ee40b4d98449f413375b810ec0c05009ff5"
+ }
+}

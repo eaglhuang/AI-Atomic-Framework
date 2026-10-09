@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-b777726bcd35c3cb",
+  "proposalIds": [
+    "prop-hist-w0-src_pytest_warning_types_py"
+  ],
+  "targetFiles": [
+    "src/_pytest/warning_types.py"
+  ],
+  "appliedFiles": [
+    "src/_pytest/warning_types.py"
+  ],
+  "fileBeforeHashes": {
+    "src/_pytest/warning_types.py": "9b6fd8df3c9d5193733e9bbcf27f303cd5aa6b17da01330a128ff30205ccab26"
+  },
+  "fileAfterHashes": {
+    "src/_pytest/warning_types.py": "f828a3918b756d57a5408c1be2657d0aab4de45b29e1adaf001bfb72c61cf583"
+  },
+  "permissions": {
+    "fileWrite": [
+      "src/_pytest/warning_types.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-b777726bcd35c3cb",
+    "planId": "merge-b777726bcd35c3cb",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-b777726bcd35c3cb",
+        "planId": "merge-b777726bcd35c3cb",
+        "request_identity": [
+          "prop-hist-w0-src_pytest_warning_types_py"
+        ],
+        "actor_ids": [
+          "writer-12346"
+        ],
+        "request_files": [
+          "src/_pytest/warning_types.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "src/_pytest/warning_types.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/pytest/runs/pytest_12346_12861__bare_composer__s4/artifacts/steward/cb-src__pytest_warning_types.py-w0-0003.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SRC_PYTEST_WARNING_TYPES_PY"
+        ],
+        "commit_sha": "165621348cc7ec235a8d74f544e7fce5195258d9"
+      }
+    ]
+  }
+}

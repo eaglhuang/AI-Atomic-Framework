@@ -1,0 +1,150 @@
+{
+ "pair_id": "sympy:27414_27492",
+ "stratum": "O0",
+ "arm": "bare_composer",
+ "plant": null,
+ "seed_k": 2,
+ "seed": 1258037445,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 426,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 38,
+  "by_verdict": {
+   "correct": 38
+  },
+  "completed": 38,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 4,
+  "files_full_bytes_exact": 4,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "sympy/algebras/quaternion.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/assumptions/ask_generated.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/assumptions/cnf.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/assumptions/facts.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "sympy/algebras/quaternion.py": true,
+  "sympy/assumptions/ask_generated.py": true,
+  "sympy/assumptions/cnf.py": true,
+  "sympy/assumptions/facts.py": true
+ },
+ "final_exists": {
+  "sympy/algebras/quaternion.py": true,
+  "sympy/assumptions/ask_generated.py": true,
+  "sympy/assumptions/cnf.py": true,
+  "sympy/assumptions/facts.py": true
+ },
+ "files": [
+  {
+   "path": "sympy/algebras/quaternion.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:b336f89dff071224b98a2c12ad7a79991bac7e20cc4ee73cf90ea530ab81ae47",
+   "final_digest": "sha256:8b6164be38f5e2f03a1ad5e07129290f056621873b4f9cd3d61c38f6c6fffed3",
+   "expected_digests": [
+    "sha256:8b6164be38f5e2f03a1ad5e07129290f056621873b4f9cd3d61c38f6c6fffed3"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/assumptions/ask_generated.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:c21348539b63d949041873c07e4fbff3d6a1bd5111b389e9381d096156c84097",
+   "final_digest": "sha256:b93d122f6103ab402d42c2e104385e20184c79f48c6904d9dc96de3bae667f07",
+   "expected_digests": [
+    "sha256:b93d122f6103ab402d42c2e104385e20184c79f48c6904d9dc96de3bae667f07"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/assumptions/cnf.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:99fb611572fc261a67ed5823d487c6e5a705cdf060695d36c73b50ecaa682e68",
+   "final_digest": "sha256:786723aa4c8c2cfc4867cbd68eef95c3a638df4ba081c981c7971f5379e24468",
+   "expected_digests": [
+    "sha256:786723aa4c8c2cfc4867cbd68eef95c3a638df4ba081c981c7971f5379e24468"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/assumptions/facts.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:7e298fa07132bac494af4b88e248836f89b3c478c406096f2d05b40c674d140b",
+   "final_digest": "sha256:7269f96a2eb8433f649a887e1946e735dfe0e981a70092425232865c102c8989",
+   "expected_digests": [
+    "sha256:7269f96a2eb8433f649a887e1946e735dfe0e981a70092425232865c102c8989"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "sympy/algebras/quaternion.py": "sha256:8b6164be38f5e2f03a1ad5e07129290f056621873b4f9cd3d61c38f6c6fffed3",
+  "sympy/assumptions/ask_generated.py": "sha256:b93d122f6103ab402d42c2e104385e20184c79f48c6904d9dc96de3bae667f07",
+  "sympy/assumptions/cnf.py": "sha256:786723aa4c8c2cfc4867cbd68eef95c3a638df4ba081c981c7971f5379e24468",
+  "sympy/assumptions/facts.py": "sha256:7269f96a2eb8433f649a887e1946e735dfe0e981a70092425232865c102c8989"
+ }
+}

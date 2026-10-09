@@ -1,0 +1,85 @@
+{
+ "writer": 1,
+ "pr": 19018,
+ "pid": 2202553,
+ "init_ms": 77.321384,
+ "start_offset_ms": 13,
+ "file_order": [
+  "django/db/models/base.py",
+  "django/db/models/query.py",
+  "django/db/models/options.py"
+ ],
+ "holds": {
+  "django/db/models/base.py": 5,
+  "django/db/models/query.py": 9,
+  "django/db/models/options.py": 13
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 19018,
+   "path": "django/db/models/base.py",
+   "intents": [
+    "log:django:18909_19018:19018:django/db/models/base.py:h0",
+    "log:django:18909_19018:19018:django/db/models/base.py:h1",
+    "log:django:18909_19018:19018:django/db/models/base.py:h2"
+   ],
+   "hold_ms": 5,
+   "t_submit_epoch": 1791572997423,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 19,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 33.92,
+   "t_done_epoch": 1791572997457
+  },
+  {
+   "writer": 1,
+   "pr": 19018,
+   "path": "django/db/models/query.py",
+   "intents": [
+    "log:django:18909_19018:19018:django/db/models/query.py:h4",
+    "log:django:18909_19018:19018:django/db/models/query.py:h5",
+    "log:django:18909_19018:19018:django/db/models/query.py:h6"
+   ],
+   "hold_ms": 9,
+   "t_submit_epoch": 1791572997457,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 5,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 18.33,
+   "t_done_epoch": 1791572997475
+  },
+  {
+   "writer": 1,
+   "pr": 19018,
+   "path": "django/db/models/options.py",
+   "intents": [
+    "log:django:18909_19018:19018:django/db/models/options.py:h3"
+   ],
+   "hold_ms": 13,
+   "t_submit_epoch": 1791572997475,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 21.96,
+   "t_done_epoch": 1791572997497
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 11
+ },
+ "steward_batches": null
+}

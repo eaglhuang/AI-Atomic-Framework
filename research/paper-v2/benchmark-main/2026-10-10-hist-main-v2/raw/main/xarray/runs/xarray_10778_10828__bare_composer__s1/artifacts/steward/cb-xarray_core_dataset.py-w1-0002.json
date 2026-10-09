@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-f713fa3e0519db59",
+  "proposalIds": [
+    "prop-hist-w1-xarray_core_dataset_py"
+  ],
+  "targetFiles": [
+    "xarray/core/dataset.py"
+  ],
+  "appliedFiles": [],
+  "fileBeforeHashes": {},
+  "fileAfterHashes": {},
+  "permissions": {
+    "fileWrite": [
+      "xarray/core/dataset.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "blocked",
+  "blockedReasons": [
+    "file-hash-drift: Target file hash sha256:d55f53555ce9b8fe70e7854d9b6209fac54bb109dca8ce2c27538f6064a289b0 does not match proposal fileBeforeHash sha256:d2fdbd22c76b0da78d6ed94127f938bcd2a879b57e8e027e445af8d907f60e9b."
+  ],
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-f713fa3e0519db59",
+    "planId": "merge-f713fa3e0519db59",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-f713fa3e0519db59",
+        "planId": "merge-f713fa3e0519db59",
+        "request_identity": [
+          "prop-hist-w1-xarray_core_dataset_py"
+        ],
+        "actor_ids": [
+          "writer-10828"
+        ],
+        "request_files": [
+          "xarray/core/dataset.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/xarray/runs/xarray_10778_10828__bare_composer__s1/artifacts/steward/cb-xarray_core_dataset.py-w1-0002.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-XARRAY_CORE_DATASET_PY"
+        ],
+        "commit_sha": "173059db501fdc40a3f4d746d449b305e96a419a"
+      }
+    ]
+  }
+}

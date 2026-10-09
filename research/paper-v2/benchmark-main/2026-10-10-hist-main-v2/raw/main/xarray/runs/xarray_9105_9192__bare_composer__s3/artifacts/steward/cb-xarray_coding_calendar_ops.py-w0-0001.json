@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-b15691a9d074bfca",
+  "proposalIds": [
+    "prop-hist-w0-xarray_coding_calendar_ops_py"
+  ],
+  "targetFiles": [
+    "xarray/coding/calendar_ops.py"
+  ],
+  "appliedFiles": [],
+  "fileBeforeHashes": {},
+  "fileAfterHashes": {},
+  "permissions": {
+    "fileWrite": [
+      "xarray/coding/calendar_ops.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "blocked",
+  "blockedReasons": [
+    "file-hash-drift: Target file hash sha256:e6eb34aaff125f88316038457e677f56fc97f79edd67ff96b92fa5c3094eceb6 does not match proposal fileBeforeHash sha256:f20f74fcbda0530f56bd9847c4e1209872ce0d4561e704c7eeed23a26f77d905."
+  ],
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-b15691a9d074bfca",
+    "planId": "merge-b15691a9d074bfca",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-b15691a9d074bfca",
+        "planId": "merge-b15691a9d074bfca",
+        "request_identity": [
+          "prop-hist-w0-xarray_coding_calendar_ops_py"
+        ],
+        "actor_ids": [
+          "writer-9105"
+        ],
+        "request_files": [
+          "xarray/coding/calendar_ops.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/xarray/runs/xarray_9105_9192__bare_composer__s3/artifacts/steward/cb-xarray_coding_calendar_ops.py-w0-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-XARRAY_CODING_CALENDAR_OPS_PY"
+        ],
+        "commit_sha": "6a01c8acaf93594929cd0327ac0659c2cd5a4d76"
+      }
+    ]
+  }
+}

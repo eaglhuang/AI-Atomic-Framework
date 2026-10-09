@@ -1,0 +1,141 @@
+{
+ "writer": 0,
+ "pr": 9199,
+ "pid": 2276335,
+ "init_ms": 74.669657,
+ "start_offset_ms": 15,
+ "file_order": [
+  "xarray/backends/netCDF4_.py",
+  "xarray/backends/h5netcdf_.py"
+ ],
+ "holds": {
+  "xarray/backends/netCDF4_.py": 11,
+  "xarray/backends/h5netcdf_.py": 28
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 9199,
+   "path": "xarray/backends/netCDF4_.py",
+   "intents": [
+    "log:xarray:9199_9243:9199:xarray/backends/netCDF4_.py:h4",
+    "log:xarray:9199_9243:9199:xarray/backends/netCDF4_.py:h5"
+   ],
+   "hold_ms": 11,
+   "t_submit_epoch": 1791573752740,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-xarray_backends_netCDF4_.py-w0-0001",
+   "total_ms": 107.89,
+   "t_done_epoch": 1791573752848
+  },
+  {
+   "writer": 0,
+   "pr": 9199,
+   "path": "xarray/backends/h5netcdf_.py",
+   "intents": [
+    "log:xarray:9199_9243:9199:xarray/backends/h5netcdf_.py:h0",
+    "log:xarray:9199_9243:9199:xarray/backends/h5netcdf_.py:h1",
+    "log:xarray:9199_9243:9199:xarray/backends/h5netcdf_.py:h2",
+    "log:xarray:9199_9243:9199:xarray/backends/h5netcdf_.py:h3"
+   ],
+   "hold_ms": 28,
+   "t_submit_epoch": 1791573752848,
+   "outcome": "blocked",
+   "blocked_reason": "harness-relocate-context-not-found",
+   "total_ms": 28.41,
+   "t_done_epoch": 1791573752876
+  }
+ ],
+ "admit_stats": null,
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-xarray_backends_netCDF4_.py-w0-0001",
+   "path": "xarray/backends/netCDF4_.py",
+   "pid": 2276335,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-xarray_backends_netCDF4_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-xarray_backends_netCDF4_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:44377830e3f935adcc9ee0f6bced02e27796a4eeea128324e378a0d2c6f204e9"
+   ],
+   "lock_wait_ms": 0.12,
+   "t_start_epoch_ms": 1791573752753.89,
+   "pre_apply_hash": "sha256:44377830e3f935adcc9ee0f6bced02e27796a4eeea128324e378a0d2c6f204e9",
+   "receipt_before_hash": "sha256:44377830e3f935adcc9ee0f6bced02e27796a4eeea128324e378a0d2c6f204e9",
+   "receipt_after_hash": "sha256:11dbc3eb587c09aa6a2bd593f6a6981b42347bc2b1fcf62b02b45baa0a5ecec9",
+   "post_apply_hash": "sha256:11dbc3eb587c09aa6a2bd593f6a6981b42347bc2b1fcf62b02b45baa0a5ecec9",
+   "t_end_epoch_ms": 1791573752847.53,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:22:32.847+08:00",
+   "batch_id": "cb-xarray_backends_netCDF4_.py-w0-0001",
+   "path": "xarray/backends/netCDF4_.py",
+   "proposalIds": [
+    "prop-hist-w0-xarray_backends_netCDF4_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-xarray_backends_netCDF4_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-xarray_backends_netCDF4_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-xarray_backends_netCDF4_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-xarray_backends_netCDF4_py",
+     "logical_id": "prop-hist-w0-xarray_backends_netCDF4_py",
+     "attempt_id": "att-prop-hist-w0-xarray_backends_netCDF4_py-r0",
+     "proposal_id": "prop-hist-w0-xarray_backends_netCDF4_py",
+     "actorId": "writer-9199"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.25,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:44377830e3f935adcc9ee0f6bced02e27796a4eeea128324e378a0d2c6f204e9",
+   "written": true,
+   "output_digest": "sha256:11dbc3eb587c09aa6a2bd593f6a6981b42347bc2b1fcf62b02b45baa0a5ecec9",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

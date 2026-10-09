@@ -1,0 +1,87 @@
+{
+ "pair_id": "sphinx:12160_12213",
+ "stratum": "O3",
+ "arm": "steward",
+ "plant": null,
+ "seed_k": 4,
+ "seed": 1469057418,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-5692474f/AI-Atomic-Framework-5692474f7db70ab52a7a71c8af4867609e7e4b43",
+ "wall_ms": 492,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 5,
+  "by_verdict": {
+   "correct": 1,
+   "blocked_absent": 4
+  },
+  "completed": 1,
+  "lost_effects": 0,
+  "blocked": 4,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 1,
+  "files_full_bytes_exact": 1,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {
+  "file-hash-drift: Target file hash sha256": 4
+ },
+ "structure": {
+  "sphinx/builders/linkcheck.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "sphinx/builders/linkcheck.py": true
+ },
+ "final_exists": {
+  "sphinx/builders/linkcheck.py": true
+ },
+ "files": [
+  {
+   "path": "sphinx/builders/linkcheck.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:86fee84c524da5e807ddec3084acbb272b0298c5906f7e40d414bb4a5a65bd8e",
+   "final_digest": "sha256:f3be50fe34dbe9e657b15cc2be57b1556b6274a2a0508778a3a831dcd3cb292b",
+   "expected_digests": [
+    "sha256:f3be50fe34dbe9e657b15cc2be57b1556b6274a2a0508778a3a831dcd3cb292b"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "sphinx/builders/linkcheck.py": "sha256:f3be50fe34dbe9e657b15cc2be57b1556b6274a2a0508778a3a831dcd3cb292b"
+ }
+}

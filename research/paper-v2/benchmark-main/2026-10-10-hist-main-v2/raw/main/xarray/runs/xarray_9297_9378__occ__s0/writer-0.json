@@ -1,0 +1,112 @@
+{
+ "writer": 0,
+ "pr": 9297,
+ "pid": 2269527,
+ "init_ms": 82.37692,
+ "start_offset_ms": 14,
+ "file_order": [
+  "xarray/core/iterators.py",
+  "xarray/core/datatree.py",
+  "xarray/core/treenode.py",
+  "xarray/core/datatree_render.py"
+ ],
+ "holds": {
+  "xarray/core/iterators.py": 10,
+  "xarray/core/datatree.py": 16,
+  "xarray/core/treenode.py": 8,
+  "xarray/core/datatree_render.py": 9
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 9297,
+   "path": "xarray/core/iterators.py",
+   "intents": [
+    "log:xarray:9297_9378:9297:xarray/core/iterators.py:h10",
+    "log:xarray:9297_9378:9297:xarray/core/iterators.py:h11",
+    "log:xarray:9297_9378:9297:xarray/core/iterators.py:h12",
+    "log:xarray:9297_9378:9297:xarray/core/iterators.py:h13",
+    "log:xarray:9297_9378:9297:xarray/core/iterators.py:h14",
+    "log:xarray:9297_9378:9297:xarray/core/iterators.py:h15"
+   ],
+   "hold_ms": 10,
+   "t_submit_epoch": 1791573676002,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 16,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 33.94,
+   "t_done_epoch": 1791573676036
+  },
+  {
+   "writer": 0,
+   "pr": 9297,
+   "path": "xarray/core/datatree.py",
+   "intents": [
+    "log:xarray:9297_9378:9297:xarray/core/datatree.py:h0",
+    "log:xarray:9297_9378:9297:xarray/core/datatree.py:h1",
+    "log:xarray:9297_9378:9297:xarray/core/datatree.py:h2",
+    "log:xarray:9297_9378:9297:xarray/core/datatree.py:h3",
+    "log:xarray:9297_9378:9297:xarray/core/datatree.py:h4",
+    "log:xarray:9297_9378:9297:xarray/core/datatree.py:h5"
+   ],
+   "hold_ms": 16,
+   "t_submit_epoch": 1791573676036,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "blocked",
+   "blocked_reason": "occ-relocate-context-not-found",
+   "occ_retries": 0,
+   "total_ms": 20.61,
+   "t_done_epoch": 1791573676057
+  },
+  {
+   "writer": 0,
+   "pr": 9297,
+   "path": "xarray/core/treenode.py",
+   "intents": [
+    "log:xarray:9297_9378:9297:xarray/core/treenode.py:h16"
+   ],
+   "hold_ms": 8,
+   "t_submit_epoch": 1791573676057,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 13.57,
+   "t_done_epoch": 1791573676070
+  },
+  {
+   "writer": 0,
+   "pr": 9297,
+   "path": "xarray/core/datatree_render.py",
+   "intents": [
+    "log:xarray:9297_9378:9297:xarray/core/datatree_render.py:h6",
+    "log:xarray:9297_9378:9297:xarray/core/datatree_render.py:h7",
+    "log:xarray:9297_9378:9297:xarray/core/datatree_render.py:h8",
+    "log:xarray:9297_9378:9297:xarray/core/datatree_render.py:h9"
+   ],
+   "hold_ms": 9,
+   "t_submit_epoch": 1791573676070,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 15.24,
+   "t_done_epoch": 1791573676085
+  }
+ ],
+ "admit_stats": {
+  "txns": 8,
+  "cas_conflicts": 4
+ },
+ "steward_batches": null
+}

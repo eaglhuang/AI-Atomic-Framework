@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-b32b4b87cc3c1640",
+  "proposalIds": [
+    "prop-hist-w1-src_pytest_mark_structures_py"
+  ],
+  "targetFiles": [
+    "src/_pytest/mark/structures.py"
+  ],
+  "appliedFiles": [
+    "src/_pytest/mark/structures.py"
+  ],
+  "fileBeforeHashes": {
+    "src/_pytest/mark/structures.py": "ea1888477778cf1cb7e588b0f7ad6bf6c62b365f93e564bcff46ae4a6a5d881d"
+  },
+  "fileAfterHashes": {
+    "src/_pytest/mark/structures.py": "2033bf25617b84f4567d0edaa77da4dee142db1ca7b1e9a7e61a68ff0bf7cb04"
+  },
+  "permissions": {
+    "fileWrite": [
+      "src/_pytest/mark/structures.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-b32b4b87cc3c1640",
+    "planId": "merge-b32b4b87cc3c1640",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-b32b4b87cc3c1640",
+        "planId": "merge-b32b4b87cc3c1640",
+        "request_identity": [
+          "prop-hist-w1-src_pytest_mark_structures_py"
+        ],
+        "actor_ids": [
+          "writer-12861"
+        ],
+        "request_files": [
+          "src/_pytest/mark/structures.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "src/_pytest/mark/structures.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/pytest/runs/pytest_12346_12861__steward__s2/artifacts/steward/cb-src__pytest_mark_structures.py-w1-0002.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SRC_PYTEST_MARK_STRUCTURES_PY"
+        ],
+        "commit_sha": "aba6e18b15971e8eead44e24c85f2689f275bd4e"
+      }
+    ]
+  }
+}

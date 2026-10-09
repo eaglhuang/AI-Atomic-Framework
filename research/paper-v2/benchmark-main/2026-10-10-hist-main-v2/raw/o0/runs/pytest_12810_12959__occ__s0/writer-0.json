@@ -1,0 +1,59 @@
+{
+ "writer": 0,
+ "pr": 12810,
+ "pid": 2422313,
+ "init_ms": 69.166783,
+ "start_offset_ms": 8,
+ "file_order": [
+  "src/_pytest/python.py",
+  "src/_pytest/main.py"
+ ],
+ "holds": {
+  "src/_pytest/python.py": 11,
+  "src/_pytest/main.py": 18
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 12810,
+   "path": "src/_pytest/python.py",
+   "intents": [
+    "log:pytest:12810_12959:12810:src/_pytest/python.py:h1",
+    "log:pytest:12810_12959:12810:src/_pytest/python.py:h2"
+   ],
+   "hold_ms": 11,
+   "t_submit_epoch": 1791574917975,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 14,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 34.33,
+   "t_done_epoch": 1791574918010
+  },
+  {
+   "writer": 0,
+   "pr": 12810,
+   "path": "src/_pytest/main.py",
+   "intents": [
+    "log:pytest:12810_12959:12810:src/_pytest/main.py:h0"
+   ],
+   "hold_ms": 18,
+   "t_submit_epoch": 1791574918010,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 6,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 31.31,
+   "t_done_epoch": 1791574918041
+  }
+ ],
+ "admit_stats": {
+  "txns": 4,
+  "cas_conflicts": 2
+ },
+ "steward_batches": null
+}

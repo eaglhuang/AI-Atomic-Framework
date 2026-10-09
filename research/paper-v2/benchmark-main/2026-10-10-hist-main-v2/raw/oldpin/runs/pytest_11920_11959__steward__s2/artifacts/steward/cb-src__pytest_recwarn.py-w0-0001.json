@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-c85053eacdf1a608",
+  "proposalIds": [
+    "prop-hist-w0-src_pytest_recwarn_py"
+  ],
+  "targetFiles": [
+    "src/_pytest/recwarn.py"
+  ],
+  "appliedFiles": [],
+  "fileBeforeHashes": {},
+  "fileAfterHashes": {},
+  "permissions": {
+    "fileWrite": [
+      "src/_pytest/recwarn.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "blocked",
+  "blockedReasons": [
+    "canonical target base hash is stale: src/_pytest/recwarn.py"
+  ],
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-c85053eacdf1a608",
+    "planId": "merge-c85053eacdf1a608",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-c85053eacdf1a608",
+        "planId": "merge-c85053eacdf1a608",
+        "request_identity": [
+          "prop-hist-w0-src_pytest_recwarn_py"
+        ],
+        "actor_ids": [
+          "writer-11920"
+        ],
+        "request_files": [
+          "src/_pytest/recwarn.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/oldpin/runs/pytest_11920_11959__steward__s2/artifacts/steward/cb-src__pytest_recwarn.py-w0-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SRC_PYTEST_RECWARN_PY"
+        ],
+        "commit_sha": "b581918704c02c5a36121530c49fde08b017b84d"
+      }
+    ]
+  }
+}

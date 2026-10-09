@@ -1,0 +1,88 @@
+{
+ "writer": 0,
+ "pr": 9451,
+ "pid": 2254148,
+ "init_ms": 71.353387,
+ "start_offset_ms": 17,
+ "file_order": [
+  "xarray/core/coordinates.py",
+  "xarray/core/treenode.py",
+  "xarray/core/datatree.py"
+ ],
+ "holds": {
+  "xarray/core/coordinates.py": 22,
+  "xarray/core/treenode.py": 20,
+  "xarray/core/datatree.py": 15
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 9451,
+   "path": "xarray/core/coordinates.py",
+   "intents": [
+    "log:xarray:9451_9453:9451:xarray/core/coordinates.py:h0",
+    "log:xarray:9451_9453:9451:xarray/core/coordinates.py:h1",
+    "log:xarray:9451_9453:9451:xarray/core/coordinates.py:h2",
+    "log:xarray:9451_9453:9451:xarray/core/coordinates.py:h3",
+    "log:xarray:9451_9453:9451:xarray/core/coordinates.py:h4"
+   ],
+   "hold_ms": 22,
+   "t_submit_epoch": 1791573487810,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 18,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 50,
+   "t_done_epoch": 1791573487859
+  },
+  {
+   "writer": 0,
+   "pr": 9451,
+   "path": "xarray/core/treenode.py",
+   "intents": [
+    "log:xarray:9451_9453:9451:xarray/core/treenode.py:h9",
+    "log:xarray:9451_9453:9451:xarray/core/treenode.py:h10"
+   ],
+   "hold_ms": 20,
+   "t_submit_epoch": 1791573487860,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "blocked",
+   "blocked_reason": "occ-relocate-context-not-found",
+   "occ_retries": 0,
+   "total_ms": 27.66,
+   "t_done_epoch": 1791573487887
+  },
+  {
+   "writer": 0,
+   "pr": 9451,
+   "path": "xarray/core/datatree.py",
+   "intents": [
+    "log:xarray:9451_9453:9451:xarray/core/datatree.py:h5",
+    "log:xarray:9451_9453:9451:xarray/core/datatree.py:h6",
+    "log:xarray:9451_9453:9451:xarray/core/datatree.py:h7",
+    "log:xarray:9451_9453:9451:xarray/core/datatree.py:h8"
+   ],
+   "hold_ms": 15,
+   "t_submit_epoch": 1791573487887,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "blocked",
+   "blocked_reason": "occ-relocate-context-not-found",
+   "occ_retries": 0,
+   "total_ms": 22.22,
+   "t_done_epoch": 1791573487909
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 3
+ },
+ "steward_batches": null
+}

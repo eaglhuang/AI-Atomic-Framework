@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-006f9e70ebe5133f",
+  "proposalIds": [
+    "prop-hist-w0-src_pytest_io_terminalwriter_py"
+  ],
+  "targetFiles": [
+    "src/_pytest/_io/terminalwriter.py"
+  ],
+  "appliedFiles": [
+    "src/_pytest/_io/terminalwriter.py"
+  ],
+  "fileBeforeHashes": {
+    "src/_pytest/_io/terminalwriter.py": "ee90a9b4bb8b7bd84b457426d786f4a9208e5fd1de3fec1cb8db8f7d459a4c98"
+  },
+  "fileAfterHashes": {
+    "src/_pytest/_io/terminalwriter.py": "b7ca4c0d806cb24587cf20c9bb78607445aff2babbf07167ff6bcaf17393c031"
+  },
+  "permissions": {
+    "fileWrite": [
+      "src/_pytest/_io/terminalwriter.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-006f9e70ebe5133f",
+    "planId": "merge-006f9e70ebe5133f",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-006f9e70ebe5133f",
+        "planId": "merge-006f9e70ebe5133f",
+        "request_identity": [
+          "prop-hist-w0-src_pytest_io_terminalwriter_py"
+        ],
+        "actor_ids": [
+          "writer-11914"
+        ],
+        "request_files": [
+          "src/_pytest/_io/terminalwriter.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "src/_pytest/_io/terminalwriter.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/oldpin/runs/pytest_11914_11916__steward__s1/artifacts/steward/cb-src__pytest__io_terminalwriter.py-w0-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SRC_PYTEST_IO_TERMINALWRITER_PY"
+        ],
+        "commit_sha": "e8ab7d9393321820a514fc2052da6f1754d42d7b"
+      }
+    ]
+  }
+}

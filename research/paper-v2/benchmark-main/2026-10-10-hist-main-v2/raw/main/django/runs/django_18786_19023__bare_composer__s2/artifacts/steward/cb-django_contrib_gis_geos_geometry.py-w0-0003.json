@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-44b64c82a9d190a5",
+  "proposalIds": [
+    "prop-hist-w0-django_contrib_gis_geos_geometry_py"
+  ],
+  "targetFiles": [
+    "django/contrib/gis/geos/geometry.py"
+  ],
+  "appliedFiles": [
+    "django/contrib/gis/geos/geometry.py"
+  ],
+  "fileBeforeHashes": {
+    "django/contrib/gis/geos/geometry.py": "4c435ef28dee1d08fbdfbf540cf6315ee0060f803539d26a961ec4b3d615c287"
+  },
+  "fileAfterHashes": {
+    "django/contrib/gis/geos/geometry.py": "6ce34b1048a3c46ffc1631cdb98aa6e45f02bea7acae138ae3ad8873dbc8bbc6"
+  },
+  "permissions": {
+    "fileWrite": [
+      "django/contrib/gis/geos/geometry.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-44b64c82a9d190a5",
+    "planId": "merge-44b64c82a9d190a5",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-44b64c82a9d190a5",
+        "planId": "merge-44b64c82a9d190a5",
+        "request_identity": [
+          "prop-hist-w0-django_contrib_gis_geos_geometry_py"
+        ],
+        "actor_ids": [
+          "writer-18786"
+        ],
+        "request_files": [
+          "django/contrib/gis/geos/geometry.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "django/contrib/gis/geos/geometry.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/django/runs/django_18786_19023__bare_composer__s2/artifacts/steward/cb-django_contrib_gis_geos_geometry.py-w0-0003.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-DJANGO_CONTRIB_GIS_GEOS_GEOMETRY_PY"
+        ],
+        "commit_sha": "f0f36739051aadb5b1c22b3d7fa1564d7b54ecfb"
+      }
+    ]
+  }
+}

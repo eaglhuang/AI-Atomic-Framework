@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-67a422817fc94551",
+  "proposalIds": [
+    "prop-hist-w0-sphinx_ext_napoleon_docstring_py"
+  ],
+  "targetFiles": [
+    "sphinx/ext/napoleon/docstring.py"
+  ],
+  "appliedFiles": [
+    "sphinx/ext/napoleon/docstring.py"
+  ],
+  "fileBeforeHashes": {
+    "sphinx/ext/napoleon/docstring.py": "408e9710f9428776547b09d18ebc7f86b722044501f2a63f7b86b9b786199196"
+  },
+  "fileAfterHashes": {
+    "sphinx/ext/napoleon/docstring.py": "f3259d7a0de45726d43cbb4b695b06f7b329e2dc4dd95f1b21c62d5b692bce76"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sphinx/ext/napoleon/docstring.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-67a422817fc94551",
+    "planId": "merge-67a422817fc94551",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-67a422817fc94551",
+        "planId": "merge-67a422817fc94551",
+        "request_identity": [
+          "prop-hist-w0-sphinx_ext_napoleon_docstring_py"
+        ],
+        "actor_ids": [
+          "writer-12003"
+        ],
+        "request_files": [
+          "sphinx/ext/napoleon/docstring.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sphinx/ext/napoleon/docstring.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/sphinx/runs/sphinx_12003_12417__bare_composer__s3/artifacts/steward/cb-sphinx_ext_napoleon_docstring.py-w0-0003.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SPHINX_EXT_NAPOLEON_DOCSTRING_PY"
+        ],
+        "commit_sha": "a4a278bef6eeb6c3f1039010b5b4e3bef7ec6f74"
+      }
+    ]
+  }
+}

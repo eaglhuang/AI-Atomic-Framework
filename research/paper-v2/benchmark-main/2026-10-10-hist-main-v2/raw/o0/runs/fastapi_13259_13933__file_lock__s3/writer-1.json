@@ -1,0 +1,40 @@
+{
+ "writer": 1,
+ "pr": 13933,
+ "pid": 2428120,
+ "init_ms": 79.276144,
+ "start_offset_ms": 12,
+ "file_order": [
+  "scripts/translate.py"
+ ],
+ "holds": {
+  "scripts/translate.py": 18
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 13933,
+   "path": "scripts/translate.py",
+   "intents": [
+    "log:fastapi:13259_13933:13933:scripts/translate.py:h0",
+    "log:fastapi:13259_13933:13933:scripts/translate.py:h1"
+   ],
+   "hold_ms": 18,
+   "t_submit_epoch": 1791574962752,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 16,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 42.02,
+   "t_done_epoch": 1791574962794
+  }
+ ],
+ "admit_stats": {
+  "txns": 2,
+  "cas_conflicts": 4
+ },
+ "steward_batches": null
+}

@@ -1,0 +1,134 @@
+{
+ "writer": 0,
+ "pr": 26297,
+ "pid": 2446503,
+ "init_ms": 91.40754199999999,
+ "start_offset_ms": 15,
+ "file_order": [
+  "sympy/solvers/diophantine/diophantine.py"
+ ],
+ "holds": {
+  "sympy/solvers/diophantine/diophantine.py": 16
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 26297,
+   "path": "sympy/solvers/diophantine/diophantine.py",
+   "intents": [
+    "log:sympy:26297_26300:26297:sympy/solvers/diophantine/diophantine.py:h0",
+    "log:sympy:26297_26300:26297:sympy/solvers/diophantine/diophantine.py:h1",
+    "log:sympy:26297_26300:26297:sympy/solvers/diophantine/diophantine.py:h2",
+    "log:sympy:26297_26300:26297:sympy/solvers/diophantine/diophantine.py:h3",
+    "log:sympy:26297_26300:26297:sympy/solvers/diophantine/diophantine.py:h4",
+    "log:sympy:26297_26300:26297:sympy/solvers/diophantine/diophantine.py:h5",
+    "log:sympy:26297_26300:26297:sympy/solvers/diophantine/diophantine.py:h6"
+   ],
+   "hold_ms": 16,
+   "t_submit_epoch": 1791575102312,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 18,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sympy_solvers_diophantine_diophantine.py-w0-0001",
+   "total_ms": 166.72,
+   "t_done_epoch": 1791575102479
+  }
+ ],
+ "admit_stats": {
+  "txns": 2,
+  "cas_conflicts": 1
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sympy_solvers_diophantine_diophantine.py-w0-0001",
+   "path": "sympy/solvers/diophantine/diophantine.py",
+   "pid": 2446503,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-sympy_solvers_diophantine_diophantine_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sympy_solvers_diophantine_diophantine_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:cbb94216630ee7341214c1e0a34ecee08e4d8625e0b1b7d4ab93bf40744fa66a"
+   ],
+   "lock_wait_ms": 0.12,
+   "t_start_epoch_ms": 1791575102354.04,
+   "pre_apply_hash": "sha256:cbb94216630ee7341214c1e0a34ecee08e4d8625e0b1b7d4ab93bf40744fa66a",
+   "receipt_before_hash": "sha256:cbb94216630ee7341214c1e0a34ecee08e4d8625e0b1b7d4ab93bf40744fa66a",
+   "receipt_after_hash": "sha256:8cc6f7f66d5dbdf5933a186d5ee6f40ebfbb99e48aa8f26dcd6fc09961dfa343",
+   "post_apply_hash": "sha256:8cc6f7f66d5dbdf5933a186d5ee6f40ebfbb99e48aa8f26dcd6fc09961dfa343",
+   "t_end_epoch_ms": 1791575102475.82,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:45:02.475+08:00",
+   "batch_id": "cb-sympy_solvers_diophantine_diophantine.py-w0-0001",
+   "path": "sympy/solvers/diophantine/diophantine.py",
+   "proposalIds": [
+    "prop-hist-w0-sympy_solvers_diophantine_diophantine_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sympy_solvers_diophantine_diophantine_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-sympy_solvers_diophantine_diophantine_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-sympy_solvers_diophantine_diophantine_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-sympy_solvers_diophantine_diophantine_py",
+     "logical_id": "prop-hist-w0-sympy_solvers_diophantine_diophantine_py",
+     "attempt_id": "att-prop-hist-w0-sympy_solvers_diophantine_diophantine_py-r0",
+     "proposal_id": "prop-hist-w0-sympy_solvers_diophantine_diophantine_py",
+     "actorId": "writer-26297"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.27,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:cbb94216630ee7341214c1e0a34ecee08e4d8625e0b1b7d4ab93bf40744fa66a",
+   "written": true,
+   "output_digest": "sha256:8cc6f7f66d5dbdf5933a186d5ee6f40ebfbb99e48aa8f26dcd6fc09961dfa343",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

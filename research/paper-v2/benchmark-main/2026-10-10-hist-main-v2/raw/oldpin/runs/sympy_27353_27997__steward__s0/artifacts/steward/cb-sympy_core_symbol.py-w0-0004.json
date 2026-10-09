@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-e16745999ee0a0fd",
+  "proposalIds": [
+    "prop-hist-w0-sympy_core_symbol_py"
+  ],
+  "targetFiles": [
+    "sympy/core/symbol.py"
+  ],
+  "appliedFiles": [
+    "sympy/core/symbol.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/core/symbol.py": "0c5bebffa79c0fa2ba748dde3e6abaa50965452edeccbb19d8436f0b9427effe"
+  },
+  "fileAfterHashes": {
+    "sympy/core/symbol.py": "6e72b29cc468b011d4cf61480989ae139a968e7258e141ad27e7a19d970fb6a2"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/core/symbol.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-e16745999ee0a0fd",
+    "planId": "merge-e16745999ee0a0fd",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-e16745999ee0a0fd",
+        "planId": "merge-e16745999ee0a0fd",
+        "request_identity": [
+          "prop-hist-w0-sympy_core_symbol_py"
+        ],
+        "actor_ids": [
+          "writer-27353"
+        ],
+        "request_files": [
+          "sympy/core/symbol.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/core/symbol.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/oldpin/runs/sympy_27353_27997__steward__s0/artifacts/steward/cb-sympy_core_symbol.py-w0-0004.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SYMPY_CORE_SYMBOL_PY"
+        ],
+        "commit_sha": "b9695254a2aa5c564e6f95bf696b119cc47476c8"
+      }
+    ]
+  }
+}

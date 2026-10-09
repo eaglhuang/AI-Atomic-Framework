@@ -1,0 +1,128 @@
+{
+ "pair_id": "sphinx:11916_12090",
+ "stratum": "O3",
+ "arm": "steward",
+ "plant": null,
+ "seed_k": 0,
+ "seed": 283782532,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-5692474f/AI-Atomic-Framework-5692474f7db70ab52a7a71c8af4867609e7e4b43",
+ "wall_ms": 442,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 26,
+  "by_verdict": {
+   "correct": 26
+  },
+  "completed": 26,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 3,
+  "files_full_bytes_exact": 3,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "sphinx/util/fileutil.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "utils/babel_runner.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "utils/bump_version.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "sphinx/util/fileutil.py": true,
+  "utils/babel_runner.py": true,
+  "utils/bump_version.py": true
+ },
+ "final_exists": {
+  "sphinx/util/fileutil.py": true,
+  "utils/babel_runner.py": true,
+  "utils/bump_version.py": true
+ },
+ "files": [
+  {
+   "path": "sphinx/util/fileutil.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:1d65be035a614c8a86202d383764c51ed155a1bf81e9f47297e30e14d7ebadf5",
+   "final_digest": "sha256:5e1a46598e6cafb749c407317e3ae93821d69df41f576666158a90a26932cdf1",
+   "expected_digests": [
+    "sha256:5e1a46598e6cafb749c407317e3ae93821d69df41f576666158a90a26932cdf1"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "utils/babel_runner.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:b69ea41dc5ab346b7fdf1e2074cf48db312e42fe06edea216b8cd8ac79807c75",
+   "final_digest": "sha256:6a696be7940a62f138e89cc8a53911da7c99b5b7e433a64d22c57220d3b315ee",
+   "expected_digests": [
+    "sha256:6a696be7940a62f138e89cc8a53911da7c99b5b7e433a64d22c57220d3b315ee"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "utils/bump_version.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:115c8f0d0cc9485964e1c31ab43461c6608934aeef00047561dad46966506751",
+   "final_digest": "sha256:8c6f5373b7340e15b195b52a148d95b8b4e5ce7049cf5cb710b7e820f4527132",
+   "expected_digests": [
+    "sha256:8c6f5373b7340e15b195b52a148d95b8b4e5ce7049cf5cb710b7e820f4527132"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "sphinx/util/fileutil.py": "sha256:5e1a46598e6cafb749c407317e3ae93821d69df41f576666158a90a26932cdf1",
+  "utils/babel_runner.py": "sha256:6a696be7940a62f138e89cc8a53911da7c99b5b7e433a64d22c57220d3b315ee",
+  "utils/bump_version.py": "sha256:8c6f5373b7340e15b195b52a148d95b8b4e5ce7049cf5cb710b7e820f4527132"
+ }
+}

@@ -1,0 +1,56 @@
+{
+ "writer": 1,
+ "pr": 11843,
+ "pid": 2330352,
+ "init_ms": 90.332955,
+ "start_offset_ms": 10,
+ "file_order": [
+  "sphinx/ext/apidoc.py",
+  "sphinx/ext/napoleon/docstring.py"
+ ],
+ "holds": {
+  "sphinx/ext/apidoc.py": 12,
+  "sphinx/ext/napoleon/docstring.py": 23
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 11843,
+   "path": "sphinx/ext/apidoc.py",
+   "intents": [
+    "log:sphinx:11842_11843:11843:sphinx/ext/apidoc.py:h0"
+   ],
+   "hold_ms": 12,
+   "t_submit_epoch": 1791574241699,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 16,
+   "outcome": "commit",
+   "total_ms": 39.94,
+   "t_done_epoch": 1791574241739
+  },
+  {
+   "writer": 1,
+   "pr": 11843,
+   "path": "sphinx/ext/napoleon/docstring.py",
+   "intents": [
+    "log:sphinx:11842_11843:11843:sphinx/ext/napoleon/docstring.py:h1"
+   ],
+   "hold_ms": 23,
+   "t_submit_epoch": 1791574241739,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "total_ms": 34.63,
+   "t_done_epoch": 1791574241773
+  }
+ ],
+ "admit_stats": {
+  "txns": 4,
+  "cas_conflicts": 1
+ },
+ "steward_batches": null
+}

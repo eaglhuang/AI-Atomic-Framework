@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-f1e5a6da5ca61127",
+  "proposalIds": [
+    "prop-hist-w0-sphinx_ext_imgmath_py"
+  ],
+  "targetFiles": [
+    "sphinx/ext/imgmath.py"
+  ],
+  "appliedFiles": [
+    "sphinx/ext/imgmath.py"
+  ],
+  "fileBeforeHashes": {
+    "sphinx/ext/imgmath.py": "9484d2f41f3c3aec95d1d9063031205053d750bfd942be5fc06b19b22f3cecbf"
+  },
+  "fileAfterHashes": {
+    "sphinx/ext/imgmath.py": "d359b339d9880f2e4fa52f0f4fda44aeb55f2be11ff567be733a4f0b239b89c7"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sphinx/ext/imgmath.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-f1e5a6da5ca61127",
+    "planId": "merge-f1e5a6da5ca61127",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-f1e5a6da5ca61127",
+        "planId": "merge-f1e5a6da5ca61127",
+        "request_identity": [
+          "prop-hist-w0-sphinx_ext_imgmath_py"
+        ],
+        "actor_ids": [
+          "writer-12364"
+        ],
+        "request_files": [
+          "sphinx/ext/imgmath.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sphinx/ext/imgmath.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/sphinx/runs/sphinx_12364_12456__bare_composer__s1/artifacts/steward/cb-sphinx_ext_imgmath.py-w0-0003.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SPHINX_EXT_IMGMATH_PY"
+        ],
+        "commit_sha": "8a70839d1abe953e891f96ce3cfbaa6f89f3cd6f"
+      }
+    ]
+  }
+}

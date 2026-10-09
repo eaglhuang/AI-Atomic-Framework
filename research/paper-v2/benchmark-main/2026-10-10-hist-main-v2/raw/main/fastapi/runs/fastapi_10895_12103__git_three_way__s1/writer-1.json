@@ -1,0 +1,83 @@
+{
+ "writer": 1,
+ "pr": 12103,
+ "pid": 2375548,
+ "init_ms": 78.522716,
+ "start_offset_ms": 10,
+ "file_order": [
+  "fastapi/dependencies/utils.py",
+  "fastapi/utils.py",
+  "fastapi/routing.py"
+ ],
+ "holds": {
+  "fastapi/dependencies/utils.py": 25,
+  "fastapi/utils.py": 30,
+  "fastapi/routing.py": 24
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 12103,
+   "path": "fastapi/dependencies/utils.py",
+   "intents": [
+    "log:fastapi:10895_12103:12103:fastapi/dependencies/utils.py:h0",
+    "log:fastapi:10895_12103:12103:fastapi/dependencies/utils.py:h1",
+    "log:fastapi:10895_12103:12103:fastapi/dependencies/utils.py:h2"
+   ],
+   "hold_ms": 25,
+   "t_submit_epoch": 1791574603654,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 15,
+   "outcome": "commit",
+   "total_ms": 50.81,
+   "t_done_epoch": 1791574603704
+  },
+  {
+   "writer": 1,
+   "pr": 12103,
+   "path": "fastapi/utils.py",
+   "intents": [
+    "log:fastapi:10895_12103:12103:fastapi/utils.py:h6",
+    "log:fastapi:10895_12103:12103:fastapi/utils.py:h7",
+    "log:fastapi:10895_12103:12103:fastapi/utils.py:h8",
+    "log:fastapi:10895_12103:12103:fastapi/utils.py:h9"
+   ],
+   "hold_ms": 30,
+   "t_submit_epoch": 1791574603704,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "commit",
+   "total_ms": 42.32,
+   "t_done_epoch": 1791574603747
+  },
+  {
+   "writer": 1,
+   "pr": 12103,
+   "path": "fastapi/routing.py",
+   "intents": [
+    "log:fastapi:10895_12103:12103:fastapi/routing.py:h3",
+    "log:fastapi:10895_12103:12103:fastapi/routing.py:h4",
+    "log:fastapi:10895_12103:12103:fastapi/routing.py:h5"
+   ],
+   "hold_ms": 24,
+   "t_submit_epoch": 1791574603747,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "outcome": "blocked",
+   "blocked_reason": "git-merge-conflict",
+   "total_ms": 39.04,
+   "t_done_epoch": 1791574603786
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 1
+ },
+ "steward_batches": null
+}

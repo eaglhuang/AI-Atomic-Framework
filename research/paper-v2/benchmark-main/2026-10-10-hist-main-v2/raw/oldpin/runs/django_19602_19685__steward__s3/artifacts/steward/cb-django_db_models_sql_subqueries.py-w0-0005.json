@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-912bac46b4c3ffb3",
+  "proposalIds": [
+    "prop-hist-w0-django_db_models_sql_subqueries_py"
+  ],
+  "targetFiles": [
+    "django/db/models/sql/subqueries.py"
+  ],
+  "appliedFiles": [
+    "django/db/models/sql/subqueries.py"
+  ],
+  "fileBeforeHashes": {
+    "django/db/models/sql/subqueries.py": "953995820ab325608c3405fab3e906fd0bc1e7f9cc4e522d4c2110fc5ce8e433"
+  },
+  "fileAfterHashes": {
+    "django/db/models/sql/subqueries.py": "bf3416518f396f6745dc0476cb1720695bd0f9ade7e30a24ab425ff3dcad09f5"
+  },
+  "permissions": {
+    "fileWrite": [
+      "django/db/models/sql/subqueries.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-912bac46b4c3ffb3",
+    "planId": "merge-912bac46b4c3ffb3",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-912bac46b4c3ffb3",
+        "planId": "merge-912bac46b4c3ffb3",
+        "request_identity": [
+          "prop-hist-w0-django_db_models_sql_subqueries_py"
+        ],
+        "actor_ids": [
+          "writer-19602"
+        ],
+        "request_files": [
+          "django/db/models/sql/subqueries.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "django/db/models/sql/subqueries.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/oldpin/runs/django_19602_19685__steward__s3/artifacts/steward/cb-django_db_models_sql_subqueries.py-w0-0005.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-DJANGO_DB_MODELS_SQL_SUBQUERIES_PY"
+        ],
+        "commit_sha": "7302736ff9c9ba8b124af79f69b5f6ef8c416a3e"
+      }
+    ]
+  }
+}

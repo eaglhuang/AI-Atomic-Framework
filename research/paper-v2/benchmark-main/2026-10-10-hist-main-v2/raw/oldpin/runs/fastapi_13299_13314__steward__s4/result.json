@@ -1,0 +1,150 @@
+{
+ "pair_id": "fastapi:13299_13314",
+ "stratum": "O3",
+ "arm": "steward",
+ "plant": null,
+ "seed_k": 4,
+ "seed": 510378413,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-5692474f/AI-Atomic-Framework-5692474f7db70ab52a7a71c8af4867609e7e4b43",
+ "wall_ms": 600,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 19,
+  "by_verdict": {
+   "correct": 19
+  },
+  "completed": 19,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 4,
+  "files_full_bytes_exact": 4,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "fastapi/dependencies/utils.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "fastapi/openapi/utils.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "fastapi/routing.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "scripts/translate.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "fastapi/dependencies/utils.py": true,
+  "fastapi/openapi/utils.py": true,
+  "fastapi/routing.py": true,
+  "scripts/translate.py": true
+ },
+ "final_exists": {
+  "fastapi/dependencies/utils.py": true,
+  "fastapi/openapi/utils.py": true,
+  "fastapi/routing.py": true,
+  "scripts/translate.py": true
+ },
+ "files": [
+  {
+   "path": "fastapi/dependencies/utils.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:52a3751f493fe0f0a73fe9d160da6ea757dd22ecc4c751796553ba5ae551c781",
+   "final_digest": "sha256:b2838d8a9851de21ed534b4581c79df25e3355567f74a6cc8acf495d44963f11",
+   "expected_digests": [
+    "sha256:b2838d8a9851de21ed534b4581c79df25e3355567f74a6cc8acf495d44963f11"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "fastapi/openapi/utils.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:be96c0cd6a6e35a24bfe8701c6de23a74194530ac328d0756a7ca8031ebd7e10",
+   "final_digest": "sha256:9fab2431e52d6faa8603f8de3850320d92b2d818218081c814561c0d9848b65b",
+   "expected_digests": [
+    "sha256:9fab2431e52d6faa8603f8de3850320d92b2d818218081c814561c0d9848b65b"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "fastapi/routing.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:58ad3a23065ec91c3191d078b8767b2578a7c6d54ec4cf0a7b4b6a1da0cebd80",
+   "final_digest": "sha256:ab093f566d64e2f0c675e12c90d0956132b4d5f0e062292a7ce4bf95fd03a807",
+   "expected_digests": [
+    "sha256:ab093f566d64e2f0c675e12c90d0956132b4d5f0e062292a7ce4bf95fd03a807"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "scripts/translate.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:55cf66c5944ac58a25efcd9f206fa9a3bb842b93d37f2bd541c9b8d7ea5af2ec",
+   "final_digest": "sha256:54830630f0155121d73c4a512f63595259aa8a36b1631e5f871402b354bdd1a0",
+   "expected_digests": [
+    "sha256:54830630f0155121d73c4a512f63595259aa8a36b1631e5f871402b354bdd1a0"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "fastapi/dependencies/utils.py": "sha256:b2838d8a9851de21ed534b4581c79df25e3355567f74a6cc8acf495d44963f11",
+  "fastapi/openapi/utils.py": "sha256:9fab2431e52d6faa8603f8de3850320d92b2d818218081c814561c0d9848b65b",
+  "fastapi/routing.py": "sha256:ab093f566d64e2f0c675e12c90d0956132b4d5f0e062292a7ce4bf95fd03a807",
+  "scripts/translate.py": "sha256:54830630f0155121d73c4a512f63595259aa8a36b1631e5f871402b354bdd1a0"
+ }
+}

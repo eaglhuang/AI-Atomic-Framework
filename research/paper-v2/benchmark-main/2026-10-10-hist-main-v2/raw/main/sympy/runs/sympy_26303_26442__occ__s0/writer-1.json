@@ -1,0 +1,59 @@
+{
+ "writer": 1,
+ "pr": 26442,
+ "pid": 2210472,
+ "init_ms": 69.29611700000001,
+ "start_offset_ms": 20,
+ "file_order": [
+  "sympy/matrices/matrixbase.py",
+  "sympy/matrices/expressions/matexpr.py"
+ ],
+ "holds": {
+  "sympy/matrices/matrixbase.py": 3,
+  "sympy/matrices/expressions/matexpr.py": 26
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 26442,
+   "path": "sympy/matrices/matrixbase.py",
+   "intents": [
+    "log:sympy:26303_26442:26442:sympy/matrices/matrixbase.py:h1"
+   ],
+   "hold_ms": 3,
+   "t_submit_epoch": 1791573061770,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 15,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 26.88,
+   "t_done_epoch": 1791573061796
+  },
+  {
+   "writer": 1,
+   "pr": 26442,
+   "path": "sympy/matrices/expressions/matexpr.py",
+   "intents": [
+    "log:sympy:26303_26442:26442:sympy/matrices/expressions/matexpr.py:h0"
+   ],
+   "hold_ms": 26,
+   "t_submit_epoch": 1791573061796,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 1,
+   "outcome": "blocked",
+   "blocked_reason": "occ-relocate-context-not-found",
+   "occ_retries": 0,
+   "total_ms": 30.03,
+   "t_done_epoch": 1791573061826
+  }
+ ],
+ "admit_stats": {
+  "txns": 4,
+  "cas_conflicts": 1
+ },
+ "steward_batches": null
+}

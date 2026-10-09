@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-06ebc7a92f6cf51e",
+  "proposalIds": [
+    "prop-hist-w1-xarray_core_groupers_py"
+  ],
+  "targetFiles": [
+    "xarray/core/groupers.py"
+  ],
+  "appliedFiles": [
+    "xarray/core/groupers.py"
+  ],
+  "fileBeforeHashes": {
+    "xarray/core/groupers.py": "b6aac98349613754dc48185f29c7fc63974d63e4e8191437ff74966857ee43fe"
+  },
+  "fileAfterHashes": {
+    "xarray/core/groupers.py": "d2c36c70ab00fdee3b644bc8885f6a1cf694c9ac1699e5424f06060e2d8c7109"
+  },
+  "permissions": {
+    "fileWrite": [
+      "xarray/core/groupers.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-06ebc7a92f6cf51e",
+    "planId": "merge-06ebc7a92f6cf51e",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-06ebc7a92f6cf51e",
+        "planId": "merge-06ebc7a92f6cf51e",
+        "request_identity": [
+          "prop-hist-w1-xarray_core_groupers_py"
+        ],
+        "actor_ids": [
+          "writer-9233"
+        ],
+        "request_files": [
+          "xarray/core/groupers.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "xarray/core/groupers.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/xarray/runs/xarray_7427_9233__steward__s3/artifacts/steward/cb-xarray_core_groupers.py-w1-0005.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-XARRAY_CORE_GROUPERS_PY"
+        ],
+        "commit_sha": "3b50e57a84cd23376cfff73205e35c5e24b87d4c"
+      }
+    ]
+  }
+}

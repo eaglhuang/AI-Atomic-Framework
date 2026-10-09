@@ -1,0 +1,64 @@
+{
+ "writer": 1,
+ "pr": 13525,
+ "pid": 2309299,
+ "init_ms": 77.142484,
+ "start_offset_ms": 14,
+ "file_order": [
+  "src/_pytest/pytester.py",
+  "src/_pytest/unraisableexception.py"
+ ],
+ "holds": {
+  "src/_pytest/pytester.py": 0,
+  "src/_pytest/unraisableexception.py": 22
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 13525,
+   "path": "src/_pytest/pytester.py",
+   "intents": [
+    "log:pytest:13522_13525:13525:src/_pytest/pytester.py:h0",
+    "log:pytest:13522_13525:13525:src/_pytest/pytester.py:h1",
+    "log:pytest:13522_13525:13525:src/_pytest/pytester.py:h2"
+   ],
+   "hold_ms": 0,
+   "t_submit_epoch": 1791574084316,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 36,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 43.54,
+   "t_done_epoch": 1791574084360
+  },
+  {
+   "writer": 1,
+   "pr": 13525,
+   "path": "src/_pytest/unraisableexception.py",
+   "intents": [
+    "log:pytest:13522_13525:13525:src/_pytest/unraisableexception.py:h3",
+    "log:pytest:13522_13525:13525:src/_pytest/unraisableexception.py:h4",
+    "log:pytest:13522_13525:13525:src/_pytest/unraisableexception.py:h5"
+   ],
+   "hold_ms": 22,
+   "t_submit_epoch": 1791574084360,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 27.72,
+   "t_done_epoch": 1791574084387
+  }
+ ],
+ "admit_stats": {
+  "txns": 5,
+  "cas_conflicts": 7
+ },
+ "steward_batches": null
+}

@@ -1,0 +1,121 @@
+{
+ "writer": 1,
+ "pr": 26809,
+ "pid": 2228194,
+ "init_ms": 78.81760499999999,
+ "start_offset_ms": 3,
+ "file_order": [
+  "sympy/tensor/array/expressions/array_expressions.py"
+ ],
+ "holds": {
+  "sympy/tensor/array/expressions/array_expressions.py": 7
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 26809,
+   "path": "sympy/tensor/array/expressions/array_expressions.py",
+   "intents": [
+    "log:sympy:26752_26809:26809:sympy/tensor/array/expressions/array_expressions.py:h0"
+   ],
+   "hold_ms": 7,
+   "t_submit_epoch": 1791573226850,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sympy_tensor_array_expressions_array_expressions.py-w1-0001",
+   "total_ms": 115.84,
+   "t_done_epoch": 1791573226966
+  }
+ ],
+ "admit_stats": null,
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sympy_tensor_array_expressions_array_expressions.py-w1-0001",
+   "path": "sympy/tensor/array/expressions/array_expressions.py",
+   "pid": 2228194,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-sympy_tensor_array_expressions_array_expressions_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sympy_tensor_array_expressions_array_expressions_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:1736959e0f0f29997274200f099c233809d1ecd7afc73062bfba90fdd460daeb"
+   ],
+   "lock_wait_ms": 0.12,
+   "t_start_epoch_ms": 1791573226861.05,
+   "pre_apply_hash": "sha256:1736959e0f0f29997274200f099c233809d1ecd7afc73062bfba90fdd460daeb",
+   "receipt_before_hash": "sha256:1736959e0f0f29997274200f099c233809d1ecd7afc73062bfba90fdd460daeb",
+   "receipt_after_hash": "sha256:9efc96244c04a300399cda926cac3c9a49173dfea81d281d884c0eea621eb446",
+   "post_apply_hash": "sha256:9efc96244c04a300399cda926cac3c9a49173dfea81d281d884c0eea621eb446",
+   "t_end_epoch_ms": 1791573226965.91,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:13:46.966+08:00",
+   "batch_id": "cb-sympy_tensor_array_expressions_array_expressions.py-w1-0001",
+   "path": "sympy/tensor/array/expressions/array_expressions.py",
+   "proposalIds": [
+    "prop-hist-w1-sympy_tensor_array_expressions_array_expressions_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sympy_tensor_array_expressions_array_expressions_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-sympy_tensor_array_expressions_array_expressions_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-sympy_tensor_array_expressions_array_expressions_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-sympy_tensor_array_expressions_array_expressions_py",
+     "logical_id": "prop-hist-w1-sympy_tensor_array_expressions_array_expressions_py",
+     "attempt_id": "att-prop-hist-w1-sympy_tensor_array_expressions_array_expressions_py-r0",
+     "proposal_id": "prop-hist-w1-sympy_tensor_array_expressions_array_expressions_py",
+     "actorId": "writer-26809"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.26,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:1736959e0f0f29997274200f099c233809d1ecd7afc73062bfba90fdd460daeb",
+   "written": true,
+   "output_digest": "sha256:9efc96244c04a300399cda926cac3c9a49173dfea81d281d884c0eea621eb446",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

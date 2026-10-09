@@ -1,0 +1,57 @@
+{
+ "writer": 0,
+ "pr": 11774,
+ "pid": 2298463,
+ "init_ms": 75.16973899999999,
+ "start_offset_ms": 4,
+ "file_order": [
+  "src/_pytest/fixtures.py",
+  "src/_pytest/nodes.py"
+ ],
+ "holds": {
+  "src/_pytest/fixtures.py": 22,
+  "src/_pytest/nodes.py": 2
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 11774,
+   "path": "src/_pytest/fixtures.py",
+   "intents": [
+    "log:pytest:11774_11780:11774:src/_pytest/fixtures.py:h0"
+   ],
+   "hold_ms": 22,
+   "t_submit_epoch": 1791574002998,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 55,
+   "outcome": "commit",
+   "total_ms": 90.96,
+   "t_done_epoch": 1791574003089
+  },
+  {
+   "writer": 0,
+   "pr": 11774,
+   "path": "src/_pytest/nodes.py",
+   "intents": [
+    "log:pytest:11774_11780:11774:src/_pytest/nodes.py:h1",
+    "log:pytest:11774_11780:11774:src/_pytest/nodes.py:h2"
+   ],
+   "hold_ms": 2,
+   "t_submit_epoch": 1791574003089,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "total_ms": 11.52,
+   "t_done_epoch": 1791574003101
+  }
+ ],
+ "admit_stats": {
+  "txns": 5,
+  "cas_conflicts": 11
+ },
+ "steward_batches": null
+}

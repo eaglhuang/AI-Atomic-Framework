@@ -1,0 +1,236 @@
+{
+ "writer": 0,
+ "pr": 28032,
+ "pid": 2212257,
+ "init_ms": 77.691524,
+ "start_offset_ms": 10,
+ "file_order": [
+  "sympy/printing/numpy.py",
+  "sympy/utilities/lambdify.py"
+ ],
+ "holds": {
+  "sympy/printing/numpy.py": 22,
+  "sympy/utilities/lambdify.py": 7
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 28032,
+   "path": "sympy/printing/numpy.py",
+   "intents": [
+    "log:sympy:28032_28079:28032:sympy/printing/numpy.py:h0"
+   ],
+   "hold_ms": 22,
+   "t_submit_epoch": 1791573075842,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sympy_printing_numpy.py-w0-0001",
+   "total_ms": 121.47,
+   "t_done_epoch": 1791573075964
+  },
+  {
+   "writer": 0,
+   "pr": 28032,
+   "path": "sympy/utilities/lambdify.py",
+   "intents": [
+    "log:sympy:28032_28079:28032:sympy/utilities/lambdify.py:h1",
+    "log:sympy:28032_28079:28032:sympy/utilities/lambdify.py:h2",
+    "log:sympy:28032_28079:28032:sympy/utilities/lambdify.py:h3",
+    "log:sympy:28032_28079:28032:sympy/utilities/lambdify.py:h4",
+    "log:sympy:28032_28079:28032:sympy/utilities/lambdify.py:h5",
+    "log:sympy:28032_28079:28032:sympy/utilities/lambdify.py:h6",
+    "log:sympy:28032_28079:28032:sympy/utilities/lambdify.py:h7",
+    "log:sympy:28032_28079:28032:sympy/utilities/lambdify.py:h8",
+    "log:sympy:28032_28079:28032:sympy/utilities/lambdify.py:h9",
+    "log:sympy:28032_28079:28032:sympy/utilities/lambdify.py:h10",
+    "log:sympy:28032_28079:28032:sympy/utilities/lambdify.py:h11"
+   ],
+   "hold_ms": 7,
+   "t_submit_epoch": 1791573075964,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sympy_utilities_lambdify.py-w0-0002",
+   "total_ms": 20.56,
+   "t_done_epoch": 1791573075984
+  }
+ ],
+ "admit_stats": null,
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sympy_printing_numpy.py-w0-0001",
+   "path": "sympy/printing/numpy.py",
+   "pid": 2212257,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-sympy_printing_numpy_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sympy_printing_numpy_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:2a9abec929104912980b1b60419122ff8963dc498aec582f6c3253cef07bed37"
+   ],
+   "lock_wait_ms": 0.12,
+   "t_start_epoch_ms": 1791573075867.3,
+   "pre_apply_hash": "sha256:2a9abec929104912980b1b60419122ff8963dc498aec582f6c3253cef07bed37",
+   "receipt_before_hash": "sha256:2a9abec929104912980b1b60419122ff8963dc498aec582f6c3253cef07bed37",
+   "receipt_after_hash": "sha256:bc507c6c54fa4140b468972c3cf13595701f41a2bc208e85629c2a2bc644950c",
+   "post_apply_hash": "sha256:bc507c6c54fa4140b468972c3cf13595701f41a2bc208e85629c2a2bc644950c",
+   "t_end_epoch_ms": 1791573075963.76,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:11:15.963+08:00",
+   "batch_id": "cb-sympy_printing_numpy.py-w0-0001",
+   "path": "sympy/printing/numpy.py",
+   "proposalIds": [
+    "prop-hist-w0-sympy_printing_numpy_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sympy_printing_numpy_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-sympy_printing_numpy_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-sympy_printing_numpy_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-sympy_printing_numpy_py",
+     "logical_id": "prop-hist-w0-sympy_printing_numpy_py",
+     "attempt_id": "att-prop-hist-w0-sympy_printing_numpy_py-r0",
+     "proposal_id": "prop-hist-w0-sympy_printing_numpy_py",
+     "actorId": "writer-28032"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.26,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:2a9abec929104912980b1b60419122ff8963dc498aec582f6c3253cef07bed37",
+   "written": true,
+   "output_digest": "sha256:bc507c6c54fa4140b468972c3cf13595701f41a2bc208e85629c2a2bc644950c",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  },
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sympy_utilities_lambdify.py-w0-0002",
+   "path": "sympy/utilities/lambdify.py",
+   "pid": 2212257,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-sympy_utilities_lambdify_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sympy_utilities_lambdify_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:95ea62784c48d7d42f6583eb1a5fd665a170b5af18641a3a020c439f0ab4d68c"
+   ],
+   "lock_wait_ms": 0,
+   "t_start_epoch_ms": 1791573075973.39,
+   "pre_apply_hash": "sha256:95ea62784c48d7d42f6583eb1a5fd665a170b5af18641a3a020c439f0ab4d68c",
+   "receipt_before_hash": "sha256:95ea62784c48d7d42f6583eb1a5fd665a170b5af18641a3a020c439f0ab4d68c",
+   "receipt_after_hash": "sha256:8146765ba989123928ad45978afdf0a74e791f2bc6e6f92d8814e914ee9fa29b",
+   "post_apply_hash": "sha256:8146765ba989123928ad45978afdf0a74e791f2bc6e6f92d8814e914ee9fa29b",
+   "t_end_epoch_ms": 1791573075984.75,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:11:15.984+08:00",
+   "batch_id": "cb-sympy_utilities_lambdify.py-w0-0002",
+   "path": "sympy/utilities/lambdify.py",
+   "proposalIds": [
+    "prop-hist-w0-sympy_utilities_lambdify_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sympy_utilities_lambdify_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-sympy_utilities_lambdify_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-sympy_utilities_lambdify_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-sympy_utilities_lambdify_py",
+     "logical_id": "prop-hist-w0-sympy_utilities_lambdify_py",
+     "attempt_id": "att-prop-hist-w0-sympy_utilities_lambdify_py-r0",
+     "proposal_id": "prop-hist-w0-sympy_utilities_lambdify_py",
+     "actorId": "writer-28032"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.01,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:95ea62784c48d7d42f6583eb1a5fd665a170b5af18641a3a020c439f0ab4d68c",
+   "written": true,
+   "output_digest": "sha256:8146765ba989123928ad45978afdf0a74e791f2bc6e6f92d8814e914ee9fa29b",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-8aa78e6048ce5338",
+  "proposalIds": [
+    "prop-hist-w0-docs_src_security_tutorial005_py39_py"
+  ],
+  "targetFiles": [
+    "docs_src/security/tutorial005_py39.py"
+  ],
+  "appliedFiles": [],
+  "fileBeforeHashes": {},
+  "fileAfterHashes": {},
+  "permissions": {
+    "fileWrite": [
+      "docs_src/security/tutorial005_py39.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "blocked",
+  "blockedReasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w0-docs_src_security_tutorial005_py39_py' context mismatch at base line 118: expected \"        username: str = payload.get(\\\"sub\\\")\", found \"        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])\" [proposals: prop-hist-w0-docs_src_security_tutorial005_py39_py]"
+  ],
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-8aa78e6048ce5338",
+    "planId": "merge-8aa78e6048ce5338",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-8aa78e6048ce5338",
+        "planId": "merge-8aa78e6048ce5338",
+        "request_identity": [
+          "prop-hist-w0-docs_src_security_tutorial005_py39_py"
+        ],
+        "actor_ids": [
+          "writer-11189"
+        ],
+        "request_files": [
+          "docs_src/security/tutorial005_py39.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/fastapi/runs/fastapi_11189_11589__bare_composer__s2/artifacts/steward/cb-docs_src_security_tutorial005_py39.py-w0-0004.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-DOCS_SRC_SECURITY_TUTORIAL005_PY39_PY"
+        ],
+        "commit_sha": "20898b725e1e07ae28ae18ca8cf5308489f54e74"
+      }
+    ]
+  }
+}

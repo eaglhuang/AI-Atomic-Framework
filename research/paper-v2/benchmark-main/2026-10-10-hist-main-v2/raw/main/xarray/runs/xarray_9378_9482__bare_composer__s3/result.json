@@ -1,0 +1,109 @@
+{
+ "pair_id": "xarray:9378_9482",
+ "stratum": "O2",
+ "arm": "bare_composer",
+ "plant": null,
+ "seed_k": 3,
+ "seed": 866299370,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 469,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 12,
+  "by_verdict": {
+   "correct": 6,
+   "blocked_absent": 6
+  },
+  "completed": 6,
+  "lost_effects": 0,
+  "blocked": 6,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 2,
+  "files_full_bytes_exact": 2,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {
+  "compose-context-mismatch: proposal 'prop-hist-w1-xarray_core_datatree_py' contex": 6
+ },
+ "structure": {
+  "xarray/core/datatree.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "xarray/core/treenode.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "xarray/core/datatree.py": true,
+  "xarray/core/treenode.py": true
+ },
+ "final_exists": {
+  "xarray/core/datatree.py": true,
+  "xarray/core/treenode.py": true
+ },
+ "files": [
+  {
+   "path": "xarray/core/datatree.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:925900f556129ef714b415244a199a9a800c4635bf8b3baa522e763c2a689138",
+   "final_digest": "sha256:7e1fc5407440a897acf359cd5e248faca004c34085fd1f96321ccaccb7045511",
+   "expected_digests": [
+    "sha256:7e1fc5407440a897acf359cd5e248faca004c34085fd1f96321ccaccb7045511"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/core/treenode.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:da524db0c88228815bd64c9fd9d01af4ac0d34f587364757d060be555f50cced",
+   "final_digest": "sha256:126b673646a83be0963315659203fd15feac8ff9b1346497004c34ec44e72cc1",
+   "expected_digests": [
+    "sha256:126b673646a83be0963315659203fd15feac8ff9b1346497004c34ec44e72cc1"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "xarray/core/datatree.py": "sha256:7e1fc5407440a897acf359cd5e248faca004c34085fd1f96321ccaccb7045511",
+  "xarray/core/treenode.py": "sha256:126b673646a83be0963315659203fd15feac8ff9b1346497004c34ec44e72cc1"
+ }
+}

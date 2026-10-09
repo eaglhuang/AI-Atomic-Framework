@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-64c1ed661e169a24",
+  "proposalIds": [
+    "prop-hist-w1-sympy_integrals_meijerint_py"
+  ],
+  "targetFiles": [
+    "sympy/integrals/meijerint.py"
+  ],
+  "appliedFiles": [
+    "sympy/integrals/meijerint.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/integrals/meijerint.py": "2efc1fef52d3404c61fbd55e1d696a2c29beb9b677c585a9743d3857c14ce0fd"
+  },
+  "fileAfterHashes": {
+    "sympy/integrals/meijerint.py": "c8eb2b1c903b768a35b83b26b224ea2b64e5cb8245df4b00e511254fdda57de7"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/integrals/meijerint.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-64c1ed661e169a24",
+    "planId": "merge-64c1ed661e169a24",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-64c1ed661e169a24",
+        "planId": "merge-64c1ed661e169a24",
+        "request_identity": [
+          "prop-hist-w1-sympy_integrals_meijerint_py"
+        ],
+        "actor_ids": [
+          "writer-27863"
+        ],
+        "request_files": [
+          "sympy/integrals/meijerint.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/integrals/meijerint.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/oldpin/runs/sympy_27839_27863__steward__s0/artifacts/steward/cb-sympy_integrals_meijerint.py-w1-0005.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_INTEGRALS_MEIJERINT_PY"
+        ],
+        "commit_sha": "a2cf46541103ad0f2ae6db544fabb27338edb416"
+      }
+    ]
+  }
+}

@@ -1,0 +1,137 @@
+{
+ "writer": 0,
+ "pr": 12708,
+ "pid": 2464976,
+ "init_ms": 109.385828,
+ "start_offset_ms": 12,
+ "file_order": [
+  "src/_pytest/debugging.py"
+ ],
+ "holds": {
+  "src/_pytest/debugging.py": 8
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 12708,
+   "path": "src/_pytest/debugging.py",
+   "intents": [
+    "log:pytest:12708_12769:12708:src/_pytest/debugging.py:h0",
+    "log:pytest:12708_12769:12708:src/_pytest/debugging.py:h1",
+    "log:pytest:12708_12769:12708:src/_pytest/debugging.py:h2",
+    "log:pytest:12708_12769:12708:src/_pytest/debugging.py:h3",
+    "log:pytest:12708_12769:12708:src/_pytest/debugging.py:h4",
+    "log:pytest:12708_12769:12708:src/_pytest/debugging.py:h5",
+    "log:pytest:12708_12769:12708:src/_pytest/debugging.py:h6",
+    "log:pytest:12708_12769:12708:src/_pytest/debugging.py:h7",
+    "log:pytest:12708_12769:12708:src/_pytest/debugging.py:h8",
+    "log:pytest:12708_12769:12708:src/_pytest/debugging.py:h9"
+   ],
+   "hold_ms": 8,
+   "t_submit_epoch": 1791575277860,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 135,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-src__pytest_debugging.py-w0-0001",
+   "total_ms": 261.18,
+   "t_done_epoch": 1791575278121
+  }
+ ],
+ "admit_stats": {
+  "txns": 3,
+  "cas_conflicts": 1
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-src__pytest_debugging.py-w0-0001",
+   "path": "src/_pytest/debugging.py",
+   "pid": 2464976,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-src_pytest_debugging_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-src_pytest_debugging_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:c919a639ec6c683785932dfb22b0f67bdb2fcfc09679b07b2f67d2532e0bbee1"
+   ],
+   "lock_wait_ms": 0.12,
+   "t_start_epoch_ms": 1791575278006.56,
+   "pre_apply_hash": "sha256:c919a639ec6c683785932dfb22b0f67bdb2fcfc09679b07b2f67d2532e0bbee1",
+   "receipt_before_hash": "sha256:c919a639ec6c683785932dfb22b0f67bdb2fcfc09679b07b2f67d2532e0bbee1",
+   "receipt_after_hash": "sha256:92135319b74afc1de52e9d0fbcacb942bd31a0c56bf0db47e93423be7b27a68d",
+   "post_apply_hash": "sha256:92135319b74afc1de52e9d0fbcacb942bd31a0c56bf0db47e93423be7b27a68d",
+   "t_end_epoch_ms": 1791575278118.33,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:47:58.118+08:00",
+   "batch_id": "cb-src__pytest_debugging.py-w0-0001",
+   "path": "src/_pytest/debugging.py",
+   "proposalIds": [
+    "prop-hist-w0-src_pytest_debugging_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-src_pytest_debugging_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-src_pytest_debugging_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-src_pytest_debugging_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-src_pytest_debugging_py",
+     "logical_id": "prop-hist-w0-src_pytest_debugging_py",
+     "attempt_id": "att-prop-hist-w0-src_pytest_debugging_py-r0",
+     "proposal_id": "prop-hist-w0-src_pytest_debugging_py",
+     "actorId": "writer-12708"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.25,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:c919a639ec6c683785932dfb22b0f67bdb2fcfc09679b07b2f67d2532e0bbee1",
+   "written": true,
+   "output_digest": "sha256:92135319b74afc1de52e9d0fbcacb942bd31a0c56bf0db47e93423be7b27a68d",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

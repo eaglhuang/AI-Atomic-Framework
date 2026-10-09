@@ -1,0 +1,87 @@
+{
+ "pair_id": "sphinx:13262_13263",
+ "stratum": "O2",
+ "arm": "file_lock",
+ "plant": null,
+ "seed_k": 1,
+ "seed": 2202797293,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 300,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 9,
+  "by_verdict": {
+   "blocked_absent": 2,
+   "correct": 7
+  },
+  "completed": 7,
+  "lost_effects": 0,
+  "blocked": 2,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 1,
+  "files_full_bytes_exact": 1,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {
+  "harness-relocate-context-not-found": 2
+ },
+ "structure": {
+  "sphinx/util/typing.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "sphinx/util/typing.py": true
+ },
+ "final_exists": {
+  "sphinx/util/typing.py": true
+ },
+ "files": [
+  {
+   "path": "sphinx/util/typing.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:292f8b337ee3fbb58c75020ebfbd7193249fecf6b608db73b361ef9d48fd6585",
+   "final_digest": "sha256:22a51cc34d0644c77df7b9558cdbedd61b2104d938d3a2b6516b6b92563ad83a",
+   "expected_digests": [
+    "sha256:22a51cc34d0644c77df7b9558cdbedd61b2104d938d3a2b6516b6b92563ad83a"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "sphinx/util/typing.py": "sha256:22a51cc34d0644c77df7b9558cdbedd61b2104d938d3a2b6516b6b92563ad83a"
+ }
+}

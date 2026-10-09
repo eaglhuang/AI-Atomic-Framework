@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-37df2ac67f9dc1e3",
+  "proposalIds": [
+    "prop-hist-w1-sympy_combinatorics_homomorphisms_py"
+  ],
+  "targetFiles": [
+    "sympy/combinatorics/homomorphisms.py"
+  ],
+  "appliedFiles": [
+    "sympy/combinatorics/homomorphisms.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/combinatorics/homomorphisms.py": "1c50be85f99798b61539b919e162e62ab44ee61f6655080aed77f01cdcb09302"
+  },
+  "fileAfterHashes": {
+    "sympy/combinatorics/homomorphisms.py": "2ed31c144e8f4723721e98ef26af0ef252b7ec13f26725841817a15455fd9281"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/combinatorics/homomorphisms.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-37df2ac67f9dc1e3",
+    "planId": "merge-37df2ac67f9dc1e3",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-37df2ac67f9dc1e3",
+        "planId": "merge-37df2ac67f9dc1e3",
+        "request_identity": [
+          "prop-hist-w1-sympy_combinatorics_homomorphisms_py"
+        ],
+        "actor_ids": [
+          "writer-28662"
+        ],
+        "request_files": [
+          "sympy/combinatorics/homomorphisms.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/combinatorics/homomorphisms.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/sympy/runs/sympy_28653_28662__steward__s4/artifacts/steward/cb-sympy_combinatorics_homomorphisms.py-w1-0002.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_COMBINATORICS_HOMOMORPHISMS_PY"
+        ],
+        "commit_sha": "74852cdac720c460dd2afa892f7172667e564ac2"
+      }
+    ]
+  }
+}

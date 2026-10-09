@@ -1,0 +1,153 @@
+{
+ "pair_id": "xarray:9719_9720",
+ "stratum": "O1",
+ "arm": "file_lock",
+ "plant": null,
+ "seed_k": 3,
+ "seed": 3658679810,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 450,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 39,
+  "by_verdict": {
+   "correct": 34,
+   "blocked_absent": 5
+  },
+  "completed": 34,
+  "lost_effects": 0,
+  "blocked": 5,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 4,
+  "files_full_bytes_exact": 4,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {
+  "harness-relocate-context-not-found": 5
+ },
+ "structure": {
+  "xarray/core/dask_array_compat.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "xarray/core/duck_array_ops.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "xarray/core/rolling.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "xarray/core/variable.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "xarray/core/dask_array_compat.py": false,
+  "xarray/core/duck_array_ops.py": true,
+  "xarray/core/rolling.py": true,
+  "xarray/core/variable.py": true
+ },
+ "final_exists": {
+  "xarray/core/dask_array_compat.py": true,
+  "xarray/core/duck_array_ops.py": true,
+  "xarray/core/rolling.py": true,
+  "xarray/core/variable.py": true
+ },
+ "files": [
+  {
+   "path": "xarray/core/dask_array_compat.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "final_digest": "sha256:2524f3d240dc7c1eaf4627d37499e244467702ab8668ce5e86ac2c696561d41c",
+   "expected_digests": [
+    "sha256:2524f3d240dc7c1eaf4627d37499e244467702ab8668ce5e86ac2c696561d41c"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/core/duck_array_ops.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:2be0f4d8c7feb4237657aa37e0b57786845f44ad31330327ecc5e79933a7e326",
+   "final_digest": "sha256:8eb74f24a846519fad3a4b7a84d1994c36bc46537f17648f7e7fab161fbf2b9d",
+   "expected_digests": [
+    "sha256:8eb74f24a846519fad3a4b7a84d1994c36bc46537f17648f7e7fab161fbf2b9d"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/core/rolling.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:a8003cab51f72b47c91c9288ab46af008963dfbfa81b07a9cccb62a3892f2e2b",
+   "final_digest": "sha256:49e2e16843a6d4b3220c74a88e79929d8c10abce85d6fe89f37dfe51454b4efa",
+   "expected_digests": [
+    "sha256:49e2e16843a6d4b3220c74a88e79929d8c10abce85d6fe89f37dfe51454b4efa"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/core/variable.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:7f63a4301a8f3db4e1bbbf92d09212a6f767954bbaf43793342a5739749d58ea",
+   "final_digest": "sha256:514807841ee40b0cf2a3e0978ffc95c2c8c4acd4f421e8cbf329899f4a351cfe",
+   "expected_digests": [
+    "sha256:514807841ee40b0cf2a3e0978ffc95c2c8c4acd4f421e8cbf329899f4a351cfe"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "xarray/core/dask_array_compat.py": "sha256:2524f3d240dc7c1eaf4627d37499e244467702ab8668ce5e86ac2c696561d41c",
+  "xarray/core/duck_array_ops.py": "sha256:8eb74f24a846519fad3a4b7a84d1994c36bc46537f17648f7e7fab161fbf2b9d",
+  "xarray/core/rolling.py": "sha256:49e2e16843a6d4b3220c74a88e79929d8c10abce85d6fe89f37dfe51454b4efa",
+  "xarray/core/variable.py": "sha256:514807841ee40b0cf2a3e0978ffc95c2c8c4acd4f421e8cbf329899f4a351cfe"
+ }
+}

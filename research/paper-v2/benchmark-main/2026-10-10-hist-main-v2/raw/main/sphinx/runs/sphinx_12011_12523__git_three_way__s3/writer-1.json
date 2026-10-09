@@ -1,0 +1,75 @@
+{
+ "writer": 1,
+ "pr": 12523,
+ "pid": 2366111,
+ "init_ms": 74.423923,
+ "start_offset_ms": 17,
+ "file_order": [
+  "sphinx/config.py",
+  "sphinx/util/math.py",
+  "sphinx/domains/math.py"
+ ],
+ "holds": {
+  "sphinx/config.py": 0,
+  "sphinx/util/math.py": 1,
+  "sphinx/domains/math.py": 18
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 12523,
+   "path": "sphinx/config.py",
+   "intents": [
+    "log:sphinx:12011_12523:12523:sphinx/config.py:h0"
+   ],
+   "hold_ms": 0,
+   "t_submit_epoch": 1791574535502,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 13,
+   "outcome": "commit",
+   "total_ms": 25.74,
+   "t_done_epoch": 1791574535528
+  },
+  {
+   "writer": 1,
+   "pr": 12523,
+   "path": "sphinx/util/math.py",
+   "intents": [
+    "log:sphinx:12011_12523:12523:sphinx/util/math.py:h2"
+   ],
+   "hold_ms": 1,
+   "t_submit_epoch": 1791574535528,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "outcome": "commit",
+   "total_ms": 13.36,
+   "t_done_epoch": 1791574535541
+  },
+  {
+   "writer": 1,
+   "pr": 12523,
+   "path": "sphinx/domains/math.py",
+   "intents": [
+    "log:sphinx:12011_12523:12523:sphinx/domains/math.py:h1"
+   ],
+   "hold_ms": 18,
+   "t_submit_epoch": 1791574535541,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 6,
+   "outcome": "commit",
+   "total_ms": 32.18,
+   "t_done_epoch": 1791574535573
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 1
+ },
+ "steward_batches": null
+}

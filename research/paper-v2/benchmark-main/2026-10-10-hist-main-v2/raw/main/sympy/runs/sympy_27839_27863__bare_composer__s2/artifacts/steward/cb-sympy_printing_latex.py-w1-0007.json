@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-efcf8c476877d167",
+  "proposalIds": [
+    "prop-hist-w1-sympy_printing_latex_py"
+  ],
+  "targetFiles": [
+    "sympy/printing/latex.py"
+  ],
+  "appliedFiles": [
+    "sympy/printing/latex.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/printing/latex.py": "b0576a7d8b00a8ad0b3f41f2640d0631186a3641b9c1f91bd2d19a5ee04f17fd"
+  },
+  "fileAfterHashes": {
+    "sympy/printing/latex.py": "8c2a977b55ce58b354711373b07398dc232f6e43c12a37fcb43e228ba3d52b15"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/printing/latex.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-efcf8c476877d167",
+    "planId": "merge-efcf8c476877d167",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-efcf8c476877d167",
+        "planId": "merge-efcf8c476877d167",
+        "request_identity": [
+          "prop-hist-w1-sympy_printing_latex_py"
+        ],
+        "actor_ids": [
+          "writer-27863"
+        ],
+        "request_files": [
+          "sympy/printing/latex.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/printing/latex.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/sympy/runs/sympy_27839_27863__bare_composer__s2/artifacts/steward/cb-sympy_printing_latex.py-w1-0007.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_PRINTING_LATEX_PY"
+        ],
+        "commit_sha": "f28dad66d6ec89d478365dbec8c88f37064b968e"
+      }
+    ]
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-5f7c4effaa67bbd5",
+  "proposalIds": [
+    "prop-hist-w1-sympy_printing_llvmjitcode_py"
+  ],
+  "targetFiles": [
+    "sympy/printing/llvmjitcode.py"
+  ],
+  "appliedFiles": [
+    "sympy/printing/llvmjitcode.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/printing/llvmjitcode.py": "af92b885fd56549bc006b775f9a973bf69c5dcc72e4eaf86cd213eee3f31aa9b"
+  },
+  "fileAfterHashes": {
+    "sympy/printing/llvmjitcode.py": "3638c76e085e1f88fa49ba052037ebac8a2091cac94645bf92397333c0e90e64"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/printing/llvmjitcode.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-5f7c4effaa67bbd5",
+    "planId": "merge-5f7c4effaa67bbd5",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-5f7c4effaa67bbd5",
+        "planId": "merge-5f7c4effaa67bbd5",
+        "request_identity": [
+          "prop-hist-w1-sympy_printing_llvmjitcode_py"
+        ],
+        "actor_ids": [
+          "writer-27863"
+        ],
+        "request_files": [
+          "sympy/printing/llvmjitcode.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/printing/llvmjitcode.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/sympy/runs/sympy_27862_27863__bare_composer__s0/artifacts/steward/cb-sympy_printing_llvmjitcode.py-w1-0006.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_PRINTING_LLVMJITCODE_PY"
+        ],
+        "commit_sha": "7f00d65731ca85fc3f187900ccec5ac2d5e1e9df"
+      }
+    ]
+  }
+}

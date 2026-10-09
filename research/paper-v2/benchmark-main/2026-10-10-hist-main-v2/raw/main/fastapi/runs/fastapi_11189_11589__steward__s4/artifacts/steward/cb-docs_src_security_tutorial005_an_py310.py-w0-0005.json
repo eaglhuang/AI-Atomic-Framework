@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-dba951e507ed6aa1",
+  "proposalIds": [
+    "prop-hist-w0-docs_src_security_tutorial005_an_py310_py"
+  ],
+  "targetFiles": [
+    "docs_src/security/tutorial005_an_py310.py"
+  ],
+  "appliedFiles": [
+    "docs_src/security/tutorial005_an_py310.py"
+  ],
+  "fileBeforeHashes": {
+    "docs_src/security/tutorial005_an_py310.py": "a4db4b91bf4b859ecd63075ed463d8c716f1a7aa7c0fb25cdeedf6070b1daed8"
+  },
+  "fileAfterHashes": {
+    "docs_src/security/tutorial005_an_py310.py": "7acd8178d7c004f42a4a3fb44251da40a95298094eb6c9822aa8c5cc2602de8f"
+  },
+  "permissions": {
+    "fileWrite": [
+      "docs_src/security/tutorial005_an_py310.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-dba951e507ed6aa1",
+    "planId": "merge-dba951e507ed6aa1",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-dba951e507ed6aa1",
+        "planId": "merge-dba951e507ed6aa1",
+        "request_identity": [
+          "prop-hist-w0-docs_src_security_tutorial005_an_py310_py"
+        ],
+        "actor_ids": [
+          "writer-11189"
+        ],
+        "request_files": [
+          "docs_src/security/tutorial005_an_py310.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "docs_src/security/tutorial005_an_py310.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/fastapi/runs/fastapi_11189_11589__steward__s4/artifacts/steward/cb-docs_src_security_tutorial005_an_py310.py-w0-0005.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-DOCS_SRC_SECURITY_TUTORIAL005_AN_PY310_PY"
+        ],
+        "commit_sha": "a1f5310cf71c6564bcdc200cedbf94a5d4ceb9cb"
+      }
+    ]
+  }
+}

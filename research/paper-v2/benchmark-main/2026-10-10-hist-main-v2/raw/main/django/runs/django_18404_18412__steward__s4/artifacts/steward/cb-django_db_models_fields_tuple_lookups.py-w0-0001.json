@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-31edcb658528fad2",
+  "proposalIds": [
+    "prop-hist-w0-django_db_models_fields_tuple_lookups_py"
+  ],
+  "targetFiles": [
+    "django/db/models/fields/tuple_lookups.py"
+  ],
+  "appliedFiles": [],
+  "fileBeforeHashes": {},
+  "fileAfterHashes": {},
+  "permissions": {
+    "fileWrite": [
+      "django/db/models/fields/tuple_lookups.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "blocked",
+  "blockedReasons": [
+    "file-hash-drift: Target file does not exist: django/db/models/fields/tuple_lookups.py"
+  ],
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-31edcb658528fad2",
+    "planId": "merge-31edcb658528fad2",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-31edcb658528fad2",
+        "planId": "merge-31edcb658528fad2",
+        "request_identity": [
+          "prop-hist-w0-django_db_models_fields_tuple_lookups_py"
+        ],
+        "actor_ids": [
+          "writer-18404"
+        ],
+        "request_files": [
+          "django/db/models/fields/tuple_lookups.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/django/runs/django_18404_18412__steward__s4/artifacts/steward/cb-django_db_models_fields_tuple_lookups.py-w0-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-DJANGO_DB_MODELS_FIELDS_TUPLE_LOOKUPS_PY"
+        ],
+        "commit_sha": "3ecde946a39f3041bcc18664a1b325405f4c2a71"
+      }
+    ]
+  }
+}

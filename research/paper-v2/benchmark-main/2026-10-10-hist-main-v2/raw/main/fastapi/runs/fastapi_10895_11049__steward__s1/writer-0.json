@@ -1,0 +1,128 @@
+{
+ "writer": 0,
+ "pr": 10895,
+ "pid": 2382854,
+ "init_ms": 109.961653,
+ "start_offset_ms": 6,
+ "file_order": [
+  "fastapi/routing.py"
+ ],
+ "holds": {
+  "fastapi/routing.py": 14
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 10895,
+   "path": "fastapi/routing.py",
+   "intents": [
+    "log:fastapi:10895_11049:10895:fastapi/routing.py:h0"
+   ],
+   "hold_ms": 14,
+   "t_submit_epoch": 1791574655494,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 20,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-fastapi_routing.py-w0-0001",
+   "total_ms": 140.23,
+   "t_done_epoch": 1791574655635
+  }
+ ],
+ "admit_stats": {
+  "txns": 2,
+  "cas_conflicts": 0
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-fastapi_routing.py-w0-0001",
+   "path": "fastapi/routing.py",
+   "pid": 2382854,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-fastapi_routing_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-fastapi_routing_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:613583dc27f0ab54711cdd3ef562520fd2785b7492879da82b1614b9dd97b5c6"
+   ],
+   "lock_wait_ms": 0.12,
+   "t_start_epoch_ms": 1791574655533.59,
+   "pre_apply_hash": "sha256:613583dc27f0ab54711cdd3ef562520fd2785b7492879da82b1614b9dd97b5c6",
+   "receipt_before_hash": "sha256:613583dc27f0ab54711cdd3ef562520fd2785b7492879da82b1614b9dd97b5c6",
+   "receipt_after_hash": "sha256:5245d16d7e410a98f44aa97cd0ad30083f42392594cbeceab5508959f3a3db45",
+   "post_apply_hash": "sha256:5245d16d7e410a98f44aa97cd0ad30083f42392594cbeceab5508959f3a3db45",
+   "t_end_epoch_ms": 1791574655630,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:37:35.630+08:00",
+   "batch_id": "cb-fastapi_routing.py-w0-0001",
+   "path": "fastapi/routing.py",
+   "proposalIds": [
+    "prop-hist-w0-fastapi_routing_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-fastapi_routing_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-fastapi_routing_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-fastapi_routing_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-fastapi_routing_py",
+     "logical_id": "prop-hist-w0-fastapi_routing_py",
+     "attempt_id": "att-prop-hist-w0-fastapi_routing_py-r0",
+     "proposal_id": "prop-hist-w0-fastapi_routing_py",
+     "actorId": "writer-10895"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.28,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:613583dc27f0ab54711cdd3ef562520fd2785b7492879da82b1614b9dd97b5c6",
+   "written": true,
+   "output_digest": "sha256:5245d16d7e410a98f44aa97cd0ad30083f42392594cbeceab5508959f3a3db45",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

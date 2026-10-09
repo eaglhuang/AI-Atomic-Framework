@@ -1,0 +1,135 @@
+{
+ "writer": 0,
+ "pr": 8324,
+ "pid": 2460232,
+ "init_ms": 93.631908,
+ "start_offset_ms": 12,
+ "file_order": [
+  "xarray/coding/times.py"
+ ],
+ "holds": {
+  "xarray/coding/times.py": 25
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 8324,
+   "path": "xarray/coding/times.py",
+   "intents": [
+    "log:xarray:8324_10081:8324:xarray/coding/times.py:h0",
+    "log:xarray:8324_10081:8324:xarray/coding/times.py:h1",
+    "log:xarray:8324_10081:8324:xarray/coding/times.py:h2",
+    "log:xarray:8324_10081:8324:xarray/coding/times.py:h3"
+   ],
+   "hold_ms": 25,
+   "t_submit_epoch": 1791575238078,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 15,
+   "outcome": "blocked",
+   "blocked_reason": "file-hash-drift: Target file hash sha256:431e827949a4c5354e2371e209b05318ea231c6160da1988567a7e59c09456a5 does not match proposal fileBeforeHash sha256:009d450793d9c8ef40748df739d0b8405147ccf5c5e291a723853805dcbfdc83.",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "file-hash-drift: Target file hash sha256:431e827949a4c5354e2371e209b05318ea231c6160da1988567a7e59c09456a5 does not match proposal fileBeforeHash sha256:009d450793d9c8ef40748df739d0b8405147ccf5c5e291a723853805dcbfdc83."
+   ],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-xarray_coding_times.py-w0-0001",
+   "total_ms": 156.19,
+   "t_done_epoch": 1791575238234
+  }
+ ],
+ "admit_stats": {
+  "txns": 2,
+  "cas_conflicts": 0
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-xarray_coding_times.py-w0-0001",
+   "path": "xarray/coding/times.py",
+   "pid": 2460232,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-xarray_coding_times_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-xarray_coding_times_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:009d450793d9c8ef40748df739d0b8405147ccf5c5e291a723853805dcbfdc83"
+   ],
+   "lock_wait_ms": 0.17,
+   "t_start_epoch_ms": 1791575238121.8,
+   "pre_apply_hash": "sha256:009d450793d9c8ef40748df739d0b8405147ccf5c5e291a723853805dcbfdc83",
+   "receipt_before_hash": null,
+   "receipt_after_hash": null,
+   "post_apply_hash": "sha256:431e827949a4c5354e2371e209b05318ea231c6160da1988567a7e59c09456a5",
+   "t_end_epoch_ms": 1791575238231.28,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "blocked",
+   "written": false,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:47:18.231+08:00",
+   "batch_id": "cb-xarray_coding_times.py-w0-0001",
+   "path": "xarray/coding/times.py",
+   "proposalIds": [
+    "prop-hist-w0-xarray_coding_times_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-xarray_coding_times_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-xarray_coding_times_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-xarray_coding_times_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-xarray_coding_times_py",
+     "logical_id": "prop-hist-w0-xarray_coding_times_py",
+     "attempt_id": "att-prop-hist-w0-xarray_coding_times_py-r0",
+     "proposal_id": "prop-hist-w0-xarray_coding_times_py",
+     "actorId": "writer-8324"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "file-hash-drift: Target file hash sha256:431e827949a4c5354e2371e209b05318ea231c6160da1988567a7e59c09456a5 does not match proposal fileBeforeHash sha256:009d450793d9c8ef40748df739d0b8405147ccf5c5e291a723853805dcbfdc83."
+   ],
+   "blocked_reason": "file-hash-drift: Target file hash sha256:431e827949a4c5354e2371e209b05318ea231c6160da1988567a7e59c09456a5 does not match proposal fileBeforeHash sha256:009d450793d9c8ef40748df739d0b8405147ccf5c5e291a723853805dcbfdc83.",
+   "window_wait_ms": 0.34,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:009d450793d9c8ef40748df739d0b8405147ccf5c5e291a723853805dcbfdc83",
+   "written": false,
+   "output_digest": null,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "file-hash-drift: Target file hash sha256:431e827949a4c5354e2371e209b05318ea231c6160da1988567a7e59c09456a5 does not match proposal fileBeforeHash sha256:009d450793d9c8ef40748df739d0b8405147ccf5c5e291a723853805dcbfdc83."
+  }
+ ]
+}

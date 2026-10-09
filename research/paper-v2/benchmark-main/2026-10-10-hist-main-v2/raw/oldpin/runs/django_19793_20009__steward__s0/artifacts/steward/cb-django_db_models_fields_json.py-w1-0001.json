@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-7fc3bc09744a29a3",
+  "proposalIds": [
+    "prop-hist-w1-django_db_models_fields_json_py"
+  ],
+  "targetFiles": [
+    "django/db/models/fields/json.py"
+  ],
+  "appliedFiles": [],
+  "fileBeforeHashes": {},
+  "fileAfterHashes": {},
+  "permissions": {
+    "fileWrite": [
+      "django/db/models/fields/json.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "blocked",
+  "blockedReasons": [
+    "canonical target base hash is stale: django/db/models/fields/json.py"
+  ],
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-7fc3bc09744a29a3",
+    "planId": "merge-7fc3bc09744a29a3",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-7fc3bc09744a29a3",
+        "planId": "merge-7fc3bc09744a29a3",
+        "request_identity": [
+          "prop-hist-w1-django_db_models_fields_json_py"
+        ],
+        "actor_ids": [
+          "writer-20009"
+        ],
+        "request_files": [
+          "django/db/models/fields/json.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/oldpin/runs/django_19793_20009__steward__s0/artifacts/steward/cb-django_db_models_fields_json.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-DJANGO_DB_MODELS_FIELDS_JSON_PY"
+        ],
+        "commit_sha": "70722cb814fb6f892ca851e392b4c8c3ef7b1277"
+      }
+    ]
+  }
+}

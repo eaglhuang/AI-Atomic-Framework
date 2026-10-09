@@ -1,0 +1,150 @@
+{
+ "pair_id": "sphinx:12506_12545",
+ "stratum": "O3",
+ "arm": "steward",
+ "plant": null,
+ "seed_k": 2,
+ "seed": 576630800,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-5692474f/AI-Atomic-Framework-5692474f7db70ab52a7a71c8af4867609e7e4b43",
+ "wall_ms": 990,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 8,
+  "by_verdict": {
+   "correct": 8
+  },
+  "completed": 8,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 4,
+  "files_full_bytes_exact": 4,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "sphinx/builders/html/__init__.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sphinx/directives/patches.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sphinx/writers/html5.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sphinx/writers/latex.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "sphinx/builders/html/__init__.py": true,
+  "sphinx/directives/patches.py": true,
+  "sphinx/writers/html5.py": true,
+  "sphinx/writers/latex.py": true
+ },
+ "final_exists": {
+  "sphinx/builders/html/__init__.py": true,
+  "sphinx/directives/patches.py": true,
+  "sphinx/writers/html5.py": true,
+  "sphinx/writers/latex.py": true
+ },
+ "files": [
+  {
+   "path": "sphinx/builders/html/__init__.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:209f977b6ca2a030e99373b1dd94502feba967fe69bd891d7b191d7aa6fa02cd",
+   "final_digest": "sha256:d23763d04948fe6bd517f5396bbf995f5a26ae94d7d5164865360209d1aa58b5",
+   "expected_digests": [
+    "sha256:d23763d04948fe6bd517f5396bbf995f5a26ae94d7d5164865360209d1aa58b5"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sphinx/directives/patches.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:ebd83452c6f558c67ac662517b20c70cefac353ccabe4ae168ffd2fd5c227e27",
+   "final_digest": "sha256:0b08809e43a131bfe1bae5b7c5aa257648b52376e1bea13295a795bad9440795",
+   "expected_digests": [
+    "sha256:0b08809e43a131bfe1bae5b7c5aa257648b52376e1bea13295a795bad9440795"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sphinx/writers/html5.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:98ab4b92f1410d19f74218a752ce5f4c84a405a28d075df80aa6d122277411d2",
+   "final_digest": "sha256:a32358926146f13ccfc0b1687b371f386f0d4731b95fcd5b0262f231e3f75e32",
+   "expected_digests": [
+    "sha256:a32358926146f13ccfc0b1687b371f386f0d4731b95fcd5b0262f231e3f75e32"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sphinx/writers/latex.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:026dd25f70c192d8d9b178a0609335e97acb2c0ac0a7283db2c2321e3a33ce6f",
+   "final_digest": "sha256:8a869f0a169932fdf8c684152559069575171e6508e2805d706698d4419c19b2",
+   "expected_digests": [
+    "sha256:8a869f0a169932fdf8c684152559069575171e6508e2805d706698d4419c19b2"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "sphinx/builders/html/__init__.py": "sha256:d23763d04948fe6bd517f5396bbf995f5a26ae94d7d5164865360209d1aa58b5",
+  "sphinx/directives/patches.py": "sha256:0b08809e43a131bfe1bae5b7c5aa257648b52376e1bea13295a795bad9440795",
+  "sphinx/writers/html5.py": "sha256:a32358926146f13ccfc0b1687b371f386f0d4731b95fcd5b0262f231e3f75e32",
+  "sphinx/writers/latex.py": "sha256:8a869f0a169932fdf8c684152559069575171e6508e2805d706698d4419c19b2"
+ }
+}

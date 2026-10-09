@@ -1,0 +1,57 @@
+{
+ "writer": 0,
+ "pr": 9700,
+ "pid": 2406046,
+ "init_ms": 66.885559,
+ "start_offset_ms": 20,
+ "file_order": [
+  "docs_src/custom_docs_ui/tutorial001.py",
+  "fastapi/openapi/docs.py"
+ ],
+ "holds": {
+  "docs_src/custom_docs_ui/tutorial001.py": 15,
+  "fastapi/openapi/docs.py": 13
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 9700,
+   "path": "docs_src/custom_docs_ui/tutorial001.py",
+   "intents": [
+    "log:fastapi:9700_11459:9700:docs_src/custom_docs_ui/tutorial001.py:h0"
+   ],
+   "hold_ms": 15,
+   "t_submit_epoch": 1791574807496,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 18,
+   "outcome": "commit",
+   "total_ms": 43.14,
+   "t_done_epoch": 1791574807539
+  },
+  {
+   "writer": 0,
+   "pr": 9700,
+   "path": "fastapi/openapi/docs.py",
+   "intents": [
+    "log:fastapi:9700_11459:9700:fastapi/openapi/docs.py:h1"
+   ],
+   "hold_ms": 13,
+   "t_submit_epoch": 1791574807539,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 8,
+   "outcome": "blocked",
+   "blocked_reason": "git-base-drift",
+   "total_ms": 26.72,
+   "t_done_epoch": 1791574807566
+  }
+ ],
+ "admit_stats": {
+  "txns": 4,
+  "cas_conflicts": 4
+ },
+ "steward_batches": null
+}

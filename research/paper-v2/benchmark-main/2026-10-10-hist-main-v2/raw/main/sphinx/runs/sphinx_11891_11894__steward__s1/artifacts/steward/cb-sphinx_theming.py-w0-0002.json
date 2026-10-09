@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-36f1e9af8f058f26",
+  "proposalIds": [
+    "prop-hist-w0-sphinx_theming_py"
+  ],
+  "targetFiles": [
+    "sphinx/theming.py"
+  ],
+  "appliedFiles": [
+    "sphinx/theming.py"
+  ],
+  "fileBeforeHashes": {
+    "sphinx/theming.py": "fc59b5116f2537a686ca80fdf0c456151aef42e83a77a7379e62ef76d519b9da"
+  },
+  "fileAfterHashes": {
+    "sphinx/theming.py": "d5ff92af4fecc5290c58d479d32ce1dc1f1cd7b94f4b51b30997a9ca46f83f7b"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sphinx/theming.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-36f1e9af8f058f26",
+    "planId": "merge-36f1e9af8f058f26",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-36f1e9af8f058f26",
+        "planId": "merge-36f1e9af8f058f26",
+        "request_identity": [
+          "prop-hist-w0-sphinx_theming_py"
+        ],
+        "actor_ids": [
+          "writer-11891"
+        ],
+        "request_files": [
+          "sphinx/theming.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sphinx/theming.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/sphinx/runs/sphinx_11891_11894__steward__s1/artifacts/steward/cb-sphinx_theming.py-w0-0002.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SPHINX_THEMING_PY"
+        ],
+        "commit_sha": "558c14b9b6729c110c120ef1aff56f0dbf61990b"
+      }
+    ]
+  }
+}

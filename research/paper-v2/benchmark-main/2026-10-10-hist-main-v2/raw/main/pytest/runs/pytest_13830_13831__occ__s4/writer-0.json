@@ -1,0 +1,68 @@
+{
+ "writer": 0,
+ "pr": 13830,
+ "pid": 2294348,
+ "init_ms": 86.332134,
+ "start_offset_ms": 3,
+ "file_order": [
+  "src/_pytest/config/findpaths.py",
+  "src/_pytest/config/__init__.py"
+ ],
+ "holds": {
+  "src/_pytest/config/findpaths.py": 18,
+  "src/_pytest/config/__init__.py": 2
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 13830,
+   "path": "src/_pytest/config/findpaths.py",
+   "intents": [
+    "log:pytest:13830_13831:13830:src/_pytest/config/findpaths.py:h5",
+    "log:pytest:13830_13831:13830:src/_pytest/config/findpaths.py:h6",
+    "log:pytest:13830_13831:13830:src/_pytest/config/findpaths.py:h7",
+    "log:pytest:13830_13831:13830:src/_pytest/config/findpaths.py:h8",
+    "log:pytest:13830_13831:13830:src/_pytest/config/findpaths.py:h9",
+    "log:pytest:13830_13831:13830:src/_pytest/config/findpaths.py:h10"
+   ],
+   "hold_ms": 18,
+   "t_submit_epoch": 1791573970715,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 14,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 42,
+   "t_done_epoch": 1791573970757
+  },
+  {
+   "writer": 0,
+   "pr": 13830,
+   "path": "src/_pytest/config/__init__.py",
+   "intents": [
+    "log:pytest:13830_13831:13830:src/_pytest/config/__init__.py:h0",
+    "log:pytest:13830_13831:13830:src/_pytest/config/__init__.py:h1",
+    "log:pytest:13830_13831:13830:src/_pytest/config/__init__.py:h2",
+    "log:pytest:13830_13831:13830:src/_pytest/config/__init__.py:h3",
+    "log:pytest:13830_13831:13830:src/_pytest/config/__init__.py:h4"
+   ],
+   "hold_ms": 2,
+   "t_submit_epoch": 1791573970757,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "queue",
+   "admit_wait_ms": 19,
+   "outcome": "blocked",
+   "blocked_reason": "occ-relocate-context-not-found",
+   "occ_retries": 0,
+   "total_ms": 24.77,
+   "t_done_epoch": 1791573970782
+  }
+ ],
+ "admit_stats": {
+  "txns": 5,
+  "cas_conflicts": 0
+ },
+ "steward_batches": null
+}

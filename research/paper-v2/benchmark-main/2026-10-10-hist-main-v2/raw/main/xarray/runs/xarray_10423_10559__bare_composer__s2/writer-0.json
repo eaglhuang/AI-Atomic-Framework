@@ -1,0 +1,273 @@
+{
+ "writer": 0,
+ "pr": 10423,
+ "pid": 2256132,
+ "init_ms": 80.145103,
+ "start_offset_ms": 12,
+ "file_order": [
+  "xarray/core/extension_array.py",
+  "xarray/core/dtypes.py",
+  "xarray/core/duck_array_ops.py"
+ ],
+ "holds": {
+  "xarray/core/extension_array.py": 21,
+  "xarray/core/dtypes.py": 28,
+  "xarray/core/duck_array_ops.py": 6
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 10423,
+   "path": "xarray/core/extension_array.py",
+   "intents": [
+    "log:xarray:10423_10559:10423:xarray/core/extension_array.py:h16",
+    "log:xarray:10423_10559:10423:xarray/core/extension_array.py:h17",
+    "log:xarray:10423_10559:10423:xarray/core/extension_array.py:h18",
+    "log:xarray:10423_10559:10423:xarray/core/extension_array.py:h19",
+    "log:xarray:10423_10559:10423:xarray/core/extension_array.py:h20",
+    "log:xarray:10423_10559:10423:xarray/core/extension_array.py:h21",
+    "log:xarray:10423_10559:10423:xarray/core/extension_array.py:h22",
+    "log:xarray:10423_10559:10423:xarray/core/extension_array.py:h23",
+    "log:xarray:10423_10559:10423:xarray/core/extension_array.py:h24",
+    "log:xarray:10423_10559:10423:xarray/core/extension_array.py:h25",
+    "log:xarray:10423_10559:10423:xarray/core/extension_array.py:h26",
+    "log:xarray:10423_10559:10423:xarray/core/extension_array.py:h27",
+    "log:xarray:10423_10559:10423:xarray/core/extension_array.py:h28",
+    "log:xarray:10423_10559:10423:xarray/core/extension_array.py:h29"
+   ],
+   "hold_ms": 21,
+   "t_submit_epoch": 1791573509078,
+   "outcome": "blocked",
+   "blocked_reason": "compose-context-mismatch: proposal 'prop-hist-w0-xarray_core_extension_array_py' context mismatch at base line 11: expected \"from pandas.api.types import is_extension_array_dtype\", found \"\" [proposals: prop-hist-w0-xarray_core_extension_array_py]",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w0-xarray_core_extension_array_py' context mismatch at base line 11: expected \"from pandas.api.types import is_extension_array_dtype\", found \"\" [proposals: prop-hist-w0-xarray_core_extension_array_py]"
+   ],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-xarray_core_extension_array.py-w0-0001",
+   "total_ms": 124.62,
+   "t_done_epoch": 1791573509203
+  },
+  {
+   "writer": 0,
+   "pr": 10423,
+   "path": "xarray/core/dtypes.py",
+   "intents": [
+    "log:xarray:10423_10559:10423:xarray/core/dtypes.py:h0",
+    "log:xarray:10423_10559:10423:xarray/core/dtypes.py:h1",
+    "log:xarray:10423_10559:10423:xarray/core/dtypes.py:h2",
+    "log:xarray:10423_10559:10423:xarray/core/dtypes.py:h3",
+    "log:xarray:10423_10559:10423:xarray/core/dtypes.py:h4",
+    "log:xarray:10423_10559:10423:xarray/core/dtypes.py:h5",
+    "log:xarray:10423_10559:10423:xarray/core/dtypes.py:h6",
+    "log:xarray:10423_10559:10423:xarray/core/dtypes.py:h7",
+    "log:xarray:10423_10559:10423:xarray/core/dtypes.py:h8",
+    "log:xarray:10423_10559:10423:xarray/core/dtypes.py:h9",
+    "log:xarray:10423_10559:10423:xarray/core/dtypes.py:h10"
+   ],
+   "hold_ms": 28,
+   "t_submit_epoch": 1791573509203,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-xarray_core_dtypes.py-w0-0002",
+   "total_ms": 43.3,
+   "t_done_epoch": 1791573509246
+  },
+  {
+   "writer": 0,
+   "pr": 10423,
+   "path": "xarray/core/duck_array_ops.py",
+   "intents": [
+    "log:xarray:10423_10559:10423:xarray/core/duck_array_ops.py:h11",
+    "log:xarray:10423_10559:10423:xarray/core/duck_array_ops.py:h12",
+    "log:xarray:10423_10559:10423:xarray/core/duck_array_ops.py:h13",
+    "log:xarray:10423_10559:10423:xarray/core/duck_array_ops.py:h14",
+    "log:xarray:10423_10559:10423:xarray/core/duck_array_ops.py:h15"
+   ],
+   "hold_ms": 6,
+   "t_submit_epoch": 1791573509246,
+   "outcome": "blocked",
+   "blocked_reason": "harness-relocate-context-not-found",
+   "total_ms": 6.83,
+   "t_done_epoch": 1791573509253
+  }
+ ],
+ "admit_stats": null,
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-xarray_core_extension_array.py-w0-0001",
+   "path": "xarray/core/extension_array.py",
+   "pid": 2256132,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-xarray_core_extension_array_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-xarray_core_extension_array_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:0a9495d8a02e9ced0c877f2bd59b28747ed485dc99db852ed6c5b28642c5ffb7"
+   ],
+   "lock_wait_ms": 0.14,
+   "t_start_epoch_ms": 1791573509102.72,
+   "pre_apply_hash": "sha256:0a9495d8a02e9ced0c877f2bd59b28747ed485dc99db852ed6c5b28642c5ffb7",
+   "receipt_before_hash": null,
+   "receipt_after_hash": null,
+   "post_apply_hash": "sha256:4aa69966663d61b44e1b6492f4310586e2641cd48255981812dcf426a2901df4",
+   "t_end_epoch_ms": 1791573509203.12,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "blocked",
+   "written": false,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:18:29.203+08:00",
+   "batch_id": "cb-xarray_core_extension_array.py-w0-0001",
+   "path": "xarray/core/extension_array.py",
+   "proposalIds": [
+    "prop-hist-w0-xarray_core_extension_array_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-xarray_core_extension_array_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-xarray_core_extension_array_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-xarray_core_extension_array_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-xarray_core_extension_array_py",
+     "logical_id": "prop-hist-w0-xarray_core_extension_array_py",
+     "attempt_id": "att-prop-hist-w0-xarray_core_extension_array_py-r0",
+     "proposal_id": "prop-hist-w0-xarray_core_extension_array_py",
+     "actorId": "writer-10423"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w0-xarray_core_extension_array_py' context mismatch at base line 11: expected \"from pandas.api.types import is_extension_array_dtype\", found \"\" [proposals: prop-hist-w0-xarray_core_extension_array_py]"
+   ],
+   "blocked_reason": "compose-context-mismatch: proposal 'prop-hist-w0-xarray_core_extension_array_py' context mismatch at base line 11: expected \"from pandas.api.types import is_extension_array_dtype\", found \"\" [proposals: prop-hist-w0-xarray_core_extension_array_py]",
+   "window_wait_ms": 0.27,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:0a9495d8a02e9ced0c877f2bd59b28747ed485dc99db852ed6c5b28642c5ffb7",
+   "written": false,
+   "output_digest": null,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "compose-context-mismatch: proposal 'prop-hist-w0-xarray_core_extension_array_py' context mismatch at base line 11: expected \"from pandas.api.types import is_extension_array_dtype\", found \"\" [proposals: prop-hist-w0-xarray_core_extension_array_py]"
+  },
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-xarray_core_dtypes.py-w0-0002",
+   "path": "xarray/core/dtypes.py",
+   "pid": 2256132,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-xarray_core_dtypes_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-xarray_core_dtypes_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:0666ad81eb6a325b51f43c7ac9be522fac1b8e4688584484ea1ba6e0f3092b05"
+   ],
+   "lock_wait_ms": 0,
+   "t_start_epoch_ms": 1791573509231.65,
+   "pre_apply_hash": "sha256:0666ad81eb6a325b51f43c7ac9be522fac1b8e4688584484ea1ba6e0f3092b05",
+   "receipt_before_hash": "sha256:0666ad81eb6a325b51f43c7ac9be522fac1b8e4688584484ea1ba6e0f3092b05",
+   "receipt_after_hash": "sha256:bd6c00adf865e80b257c14bf4b44972003d75cf8ad233e8162b0b967db43b204",
+   "post_apply_hash": "sha256:bd6c00adf865e80b257c14bf4b44972003d75cf8ad233e8162b0b967db43b204",
+   "t_end_epoch_ms": 1791573509246.73,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:18:29.246+08:00",
+   "batch_id": "cb-xarray_core_dtypes.py-w0-0002",
+   "path": "xarray/core/dtypes.py",
+   "proposalIds": [
+    "prop-hist-w0-xarray_core_dtypes_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-xarray_core_dtypes_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-xarray_core_dtypes_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-xarray_core_dtypes_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-xarray_core_dtypes_py",
+     "logical_id": "prop-hist-w0-xarray_core_dtypes_py",
+     "attempt_id": "att-prop-hist-w0-xarray_core_dtypes_py-r0",
+     "proposal_id": "prop-hist-w0-xarray_core_dtypes_py",
+     "actorId": "writer-10423"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.03,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:0666ad81eb6a325b51f43c7ac9be522fac1b8e4688584484ea1ba6e0f3092b05",
+   "written": true,
+   "output_digest": "sha256:bd6c00adf865e80b257c14bf4b44972003d75cf8ad233e8162b0b967db43b204",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

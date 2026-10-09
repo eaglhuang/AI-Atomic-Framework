@@ -1,0 +1,116 @@
+{
+ "pair_id": "sympy:26412_26438",
+ "stratum": "O1",
+ "arm": "steward",
+ "plant": null,
+ "seed_k": 1,
+ "seed": 4187936361,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-5692474f/AI-Atomic-Framework-5692474f7db70ab52a7a71c8af4867609e7e4b43",
+ "wall_ms": 561,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 8,
+  "by_verdict": {
+   "correct": 5,
+   "lost": 1,
+   "blocked_absent": 2
+  },
+  "completed": 5,
+  "lost_effects": 1,
+  "blocked": 2,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 2,
+  "files_full_bytes_exact": 1,
+  "corrupted_files": 1,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": true,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {
+  "harness-relocate-context-not-found": 2
+ },
+ "structure": {
+  "sympy/physics/mechanics/__init__.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/physics/mechanics/actuator.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "sympy/physics/mechanics/__init__.py": true,
+  "sympy/physics/mechanics/actuator.py": true
+ },
+ "final_exists": {
+  "sympy/physics/mechanics/__init__.py": true,
+  "sympy/physics/mechanics/actuator.py": true
+ },
+ "files": [
+  {
+   "path": "sympy/physics/mechanics/__init__.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:18e5e5c5c9ccb9c539cdcffc3243384a6ba8034cf51934a1c14f3e8bfdb0e1ed",
+   "final_digest": "sha256:a558c017588ca0723adfdee2f6307e2f4fd20bb0b00dd294cca70d07a73bbb13",
+   "expected_digests": [
+    "sha256:a558c017588ca0723adfdee2f6307e2f4fd20bb0b00dd294cca70d07a73bbb13"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/physics/mechanics/actuator.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:edf2f1f7eb12914c04bebdaa40eec0f4ab0c356b77258c8f5b4383df89134665",
+   "final_digest": "sha256:3a3a592638701191d28de1da5d2539138f19868f25a717c1dca5df7d3862a898",
+   "expected_digests": [
+    "sha256:430fc8ca6e962ed45322fdbbe44552f8b228a93defccb05e5f0994b2ab85e6b3"
+   ],
+   "full_bytes_exact": false,
+   "judged_by": "myers-fallback",
+   "frame_ok": false,
+   "frame_violations": [
+    {
+     "kind": "foreign_line",
+     "near_expected_line": 937,
+     "actual": "        return f'{self.__class__.__name__}({self._coefficient_of_kinetic_friction}, {self._normal_force}, {self._tangential_friction_force}, {self._coulomb_friction_constant}, {self._velocity}, {self.pathway})'\n"
+    }
+   ],
+   "n_frame_violations": 1,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "sympy/physics/mechanics/__init__.py": "sha256:a558c017588ca0723adfdee2f6307e2f4fd20bb0b00dd294cca70d07a73bbb13",
+  "sympy/physics/mechanics/actuator.py": "sha256:3a3a592638701191d28de1da5d2539138f19868f25a717c1dca5df7d3862a898"
+ }
+}

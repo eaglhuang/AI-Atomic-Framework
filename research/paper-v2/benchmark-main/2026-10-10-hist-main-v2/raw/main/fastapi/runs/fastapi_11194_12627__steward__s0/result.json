@@ -1,0 +1,87 @@
+{
+ "pair_id": "fastapi:11194_12627",
+ "stratum": "O3",
+ "arm": "steward",
+ "plant": null,
+ "seed_k": 0,
+ "seed": 1796883757,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 547,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 9,
+  "by_verdict": {
+   "blocked_absent": 4,
+   "correct": 5
+  },
+  "completed": 5,
+  "lost_effects": 0,
+  "blocked": 4,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 1,
+  "files_full_bytes_exact": 1,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {
+  "compose-context-mismatch: proposal 'prop-hist-w0-fastapi_dependencies_utils_py' ": 4
+ },
+ "structure": {
+  "fastapi/dependencies/utils.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "fastapi/dependencies/utils.py": true
+ },
+ "final_exists": {
+  "fastapi/dependencies/utils.py": true
+ },
+ "files": [
+  {
+   "path": "fastapi/dependencies/utils.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:a2cd3d9026126dab1e43b31509d8eb656693c6ba455135aa0d80184d9e6ab7fc",
+   "final_digest": "sha256:52a3751f493fe0f0a73fe9d160da6ea757dd22ecc4c751796553ba5ae551c781",
+   "expected_digests": [
+    "sha256:52a3751f493fe0f0a73fe9d160da6ea757dd22ecc4c751796553ba5ae551c781"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "fastapi/dependencies/utils.py": "sha256:52a3751f493fe0f0a73fe9d160da6ea757dd22ecc4c751796553ba5ae551c781"
+ }
+}

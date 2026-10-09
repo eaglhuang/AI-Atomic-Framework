@@ -1,0 +1,247 @@
+{
+ "writer": 0,
+ "pr": 9677,
+ "pid": 2451007,
+ "init_ms": 90.396368,
+ "start_offset_ms": 7,
+ "file_order": [
+  "xarray/core/datatree_io.py",
+  "xarray/core/datatree.py"
+ ],
+ "holds": {
+  "xarray/core/datatree_io.py": 28,
+  "xarray/core/datatree.py": 27
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 9677,
+   "path": "xarray/core/datatree_io.py",
+   "intents": [
+    "log:xarray:9677_9687:9677:xarray/core/datatree_io.py:h6",
+    "log:xarray:9677_9687:9677:xarray/core/datatree_io.py:h7",
+    "log:xarray:9677_9687:9677:xarray/core/datatree_io.py:h8",
+    "log:xarray:9677_9687:9677:xarray/core/datatree_io.py:h9",
+    "log:xarray:9677_9687:9677:xarray/core/datatree_io.py:h10",
+    "log:xarray:9677_9687:9677:xarray/core/datatree_io.py:h11"
+   ],
+   "hold_ms": 28,
+   "t_submit_epoch": 1791575139844,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 16,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-xarray_core_datatree_io.py-w0-0001",
+   "total_ms": 152.06,
+   "t_done_epoch": 1791575139996
+  },
+  {
+   "writer": 0,
+   "pr": 9677,
+   "path": "xarray/core/datatree.py",
+   "intents": [
+    "log:xarray:9677_9687:9677:xarray/core/datatree.py:h0",
+    "log:xarray:9677_9687:9677:xarray/core/datatree.py:h1",
+    "log:xarray:9677_9687:9677:xarray/core/datatree.py:h2",
+    "log:xarray:9677_9687:9677:xarray/core/datatree.py:h3",
+    "log:xarray:9677_9687:9677:xarray/core/datatree.py:h4",
+    "log:xarray:9677_9687:9677:xarray/core/datatree.py:h5"
+   ],
+   "hold_ms": 27,
+   "t_submit_epoch": 1791575139996,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-xarray_core_datatree.py-w0-0002",
+   "total_ms": 47.07,
+   "t_done_epoch": 1791575140043
+  }
+ ],
+ "admit_stats": {
+  "txns": 4,
+  "cas_conflicts": 3
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-xarray_core_datatree_io.py-w0-0001",
+   "path": "xarray/core/datatree_io.py",
+   "pid": 2451007,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-xarray_core_datatree_io_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-xarray_core_datatree_io_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:6924294cd9ff3563025173e9989d910f1f4038e3bd8a77ce48ec08da59c6427d"
+   ],
+   "lock_wait_ms": 0.13,
+   "t_start_epoch_ms": 1791575139891.49,
+   "pre_apply_hash": "sha256:6924294cd9ff3563025173e9989d910f1f4038e3bd8a77ce48ec08da59c6427d",
+   "receipt_before_hash": "sha256:6924294cd9ff3563025173e9989d910f1f4038e3bd8a77ce48ec08da59c6427d",
+   "receipt_after_hash": "sha256:bdaced85df70f81b039419c5c342e1c8361efbacc9f3894554d60801e3712917",
+   "post_apply_hash": "sha256:bdaced85df70f81b039419c5c342e1c8361efbacc9f3894554d60801e3712917",
+   "t_end_epoch_ms": 1791575139992.4,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:45:39.992+08:00",
+   "batch_id": "cb-xarray_core_datatree_io.py-w0-0001",
+   "path": "xarray/core/datatree_io.py",
+   "proposalIds": [
+    "prop-hist-w0-xarray_core_datatree_io_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-xarray_core_datatree_io_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-xarray_core_datatree_io_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-xarray_core_datatree_io_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-xarray_core_datatree_io_py",
+     "logical_id": "prop-hist-w0-xarray_core_datatree_io_py",
+     "attempt_id": "att-prop-hist-w0-xarray_core_datatree_io_py-r0",
+     "proposal_id": "prop-hist-w0-xarray_core_datatree_io_py",
+     "actorId": "writer-9677"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.25,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:6924294cd9ff3563025173e9989d910f1f4038e3bd8a77ce48ec08da59c6427d",
+   "written": true,
+   "output_digest": "sha256:bdaced85df70f81b039419c5c342e1c8361efbacc9f3894554d60801e3712917",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "steward_applied"
+  },
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-xarray_core_datatree.py-w0-0002",
+   "path": "xarray/core/datatree.py",
+   "pid": 2451007,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-xarray_core_datatree_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-xarray_core_datatree_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:e5547b0fbea7b1a1d275bccb0132318864aeab2016bf3c790b064ecceb62f6b1"
+   ],
+   "lock_wait_ms": 0,
+   "t_start_epoch_ms": 1791575140029.72,
+   "pre_apply_hash": "sha256:e5547b0fbea7b1a1d275bccb0132318864aeab2016bf3c790b064ecceb62f6b1",
+   "receipt_before_hash": "sha256:e5547b0fbea7b1a1d275bccb0132318864aeab2016bf3c790b064ecceb62f6b1",
+   "receipt_after_hash": "sha256:9d882379a5df05ead5a01d308eefe7b953011364390f84e5695775377c8e0594",
+   "post_apply_hash": "sha256:9d882379a5df05ead5a01d308eefe7b953011364390f84e5695775377c8e0594",
+   "t_end_epoch_ms": 1791575140041.06,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:45:40.041+08:00",
+   "batch_id": "cb-xarray_core_datatree.py-w0-0002",
+   "path": "xarray/core/datatree.py",
+   "proposalIds": [
+    "prop-hist-w0-xarray_core_datatree_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-xarray_core_datatree_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-xarray_core_datatree_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-xarray_core_datatree_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-xarray_core_datatree_py",
+     "logical_id": "prop-hist-w0-xarray_core_datatree_py",
+     "attempt_id": "att-prop-hist-w0-xarray_core_datatree_py-r0",
+     "proposal_id": "prop-hist-w0-xarray_core_datatree_py",
+     "actorId": "writer-9677"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.01,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:e5547b0fbea7b1a1d275bccb0132318864aeab2016bf3c790b064ecceb62f6b1",
+   "written": true,
+   "output_digest": "sha256:9d882379a5df05ead5a01d308eefe7b953011364390f84e5695775377c8e0594",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

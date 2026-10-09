@@ -1,0 +1,326 @@
+{
+ "pair_id": "sympy:25150_26442",
+ "stratum": "O3",
+ "arm": "steward",
+ "plant": null,
+ "seed_k": 4,
+ "seed": 3074132995,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 1079,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 28,
+  "by_verdict": {
+   "correct": 28
+  },
+  "completed": 28,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 12,
+  "files_full_bytes_exact": 12,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "sympy/core/function.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/matrices/expressions/matadd.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/matrices/expressions/matexpr.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/matrices/expressions/matpow.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/matrices/expressions/special.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/matrices/expressions/trace.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/matrices/matrixbase.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/tensor/array/array_derivatives.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/tensor/array/expressions/array_expressions.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/tensor/array/expressions/arrayexpr_derivatives.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/tensor/array/expressions/from_array_to_matrix.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/tensor/array/expressions/from_matrix_to_array.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "sympy/core/function.py": true,
+  "sympy/matrices/expressions/matadd.py": true,
+  "sympy/matrices/expressions/matexpr.py": true,
+  "sympy/matrices/expressions/matpow.py": true,
+  "sympy/matrices/expressions/special.py": true,
+  "sympy/matrices/expressions/trace.py": true,
+  "sympy/matrices/matrixbase.py": true,
+  "sympy/tensor/array/array_derivatives.py": true,
+  "sympy/tensor/array/expressions/array_expressions.py": true,
+  "sympy/tensor/array/expressions/arrayexpr_derivatives.py": true,
+  "sympy/tensor/array/expressions/from_array_to_matrix.py": true,
+  "sympy/tensor/array/expressions/from_matrix_to_array.py": true
+ },
+ "final_exists": {
+  "sympy/core/function.py": true,
+  "sympy/matrices/expressions/matadd.py": true,
+  "sympy/matrices/expressions/matexpr.py": true,
+  "sympy/matrices/expressions/matpow.py": true,
+  "sympy/matrices/expressions/special.py": true,
+  "sympy/matrices/expressions/trace.py": true,
+  "sympy/matrices/matrixbase.py": true,
+  "sympy/tensor/array/array_derivatives.py": true,
+  "sympy/tensor/array/expressions/array_expressions.py": true,
+  "sympy/tensor/array/expressions/arrayexpr_derivatives.py": true,
+  "sympy/tensor/array/expressions/from_array_to_matrix.py": true,
+  "sympy/tensor/array/expressions/from_matrix_to_array.py": true
+ },
+ "files": [
+  {
+   "path": "sympy/core/function.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:0aa89e3a32435a9f3affea43dcfdd0910b39bc5c5b91578f35a9dccbb2634e92",
+   "final_digest": "sha256:0770fdc5be9f6e57c5eda17ef33fe7d6dfa31275a8692e3b2b7f85e177cf7104",
+   "expected_digests": [
+    "sha256:0770fdc5be9f6e57c5eda17ef33fe7d6dfa31275a8692e3b2b7f85e177cf7104"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/matrices/expressions/matadd.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:d0c49a9da9751ca544b82044a5e84ac1f517e1fb8cf54332e858361f99e8034b",
+   "final_digest": "sha256:abdbb386255476fa8935dd4dc9e443c533b364ddb7ffd32fe152794222ed562f",
+   "expected_digests": [
+    "sha256:abdbb386255476fa8935dd4dc9e443c533b364ddb7ffd32fe152794222ed562f"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/matrices/expressions/matexpr.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:b99299f71a63d5e15ac9bf31b1339bf26d286309bd077f587fe73c5308af5e86",
+   "final_digest": "sha256:a154ef49a94769158fba5dc60c2fa024880e2c3cf02d1ce92bbaba2461d2f4b0",
+   "expected_digests": [
+    "sha256:a154ef49a94769158fba5dc60c2fa024880e2c3cf02d1ce92bbaba2461d2f4b0"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/matrices/expressions/matpow.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:a6eb98078f70af55b3171853f437135ad1766c60c559c6c9ee8875e004d0011b",
+   "final_digest": "sha256:374466314cc785b1166b99d71f837fcd44673293fc46864dab8dd060e82695f4",
+   "expected_digests": [
+    "sha256:374466314cc785b1166b99d71f837fcd44673293fc46864dab8dd060e82695f4"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/matrices/expressions/special.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:872c24ca03908dc2441909f67c6e1d17ca14a972f7378d94d53c5b749af8fba1",
+   "final_digest": "sha256:23f9316cd1e80dfdd56347d0631775a6917a572836c10d1ee0ff67af0b6df221",
+   "expected_digests": [
+    "sha256:23f9316cd1e80dfdd56347d0631775a6917a572836c10d1ee0ff67af0b6df221"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/matrices/expressions/trace.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:b24af9dcbbecb4b579620f6191a45bd325ab4ddc42f6ef791be63321cf34693b",
+   "final_digest": "sha256:8dd28046eaf0799fc8450d5747d7b528a466850b239439c1e765730a1a115d81",
+   "expected_digests": [
+    "sha256:8dd28046eaf0799fc8450d5747d7b528a466850b239439c1e765730a1a115d81"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/matrices/matrixbase.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:e49d4c1b5744ebe0c51f9e1864ab88029c4c8a134f04f8b4b88baf82a4d98ba1",
+   "final_digest": "sha256:43954a96fabe9fda4e0a4cff15e467a2e4fd380aeb27a73980d3cff8bdffee24",
+   "expected_digests": [
+    "sha256:43954a96fabe9fda4e0a4cff15e467a2e4fd380aeb27a73980d3cff8bdffee24"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/tensor/array/array_derivatives.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:73e818780feaa57398dda7b1cb3ee9b12aa64d5206541adc183bd2916e5d655d",
+   "final_digest": "sha256:ad99fef75bbbdaddf7d589a957bd4d1f892c0c35369ac1dc5af85335e283a3cd",
+   "expected_digests": [
+    "sha256:ad99fef75bbbdaddf7d589a957bd4d1f892c0c35369ac1dc5af85335e283a3cd"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/tensor/array/expressions/array_expressions.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:546c54c5ac840cc8eb5430381837e128dfae3a36e81d9c0e81f9cc6f0ae776fd",
+   "final_digest": "sha256:7064f929ce00d5054db899a0a1a1c4474a7db63695564441db434d7c6f6ee7ba",
+   "expected_digests": [
+    "sha256:7064f929ce00d5054db899a0a1a1c4474a7db63695564441db434d7c6f6ee7ba"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/tensor/array/expressions/arrayexpr_derivatives.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:5bdf9b6362cbf3794b48d1d722dcea8ce82f7fe1c80db5173e8570f2e3b299c8",
+   "final_digest": "sha256:df1576e3376dd70cb2608b8f51ead8be3ee713dd6367896b68fe71136e652876",
+   "expected_digests": [
+    "sha256:df1576e3376dd70cb2608b8f51ead8be3ee713dd6367896b68fe71136e652876"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/tensor/array/expressions/from_array_to_matrix.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:775b07f6f72061aa26c7fdd4b814c6ddf653cd9741c7eaa8260957269ad8b933",
+   "final_digest": "sha256:32857c9658e9114c0f07dafeed7eac1a5d152bd905270f11eb8ba3d30c4594f9",
+   "expected_digests": [
+    "sha256:32857c9658e9114c0f07dafeed7eac1a5d152bd905270f11eb8ba3d30c4594f9"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/tensor/array/expressions/from_matrix_to_array.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:c8863546ea45f7e1555778d92eca96c59d5c928135f87910c8cf1c4089b8fc6b",
+   "final_digest": "sha256:8722d7e2c90443fcbd32843105b0661b2daa9a492ea6b7f2ed70711598c062c3",
+   "expected_digests": [
+    "sha256:8722d7e2c90443fcbd32843105b0661b2daa9a492ea6b7f2ed70711598c062c3"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "sympy/core/function.py": "sha256:0770fdc5be9f6e57c5eda17ef33fe7d6dfa31275a8692e3b2b7f85e177cf7104",
+  "sympy/matrices/expressions/matadd.py": "sha256:abdbb386255476fa8935dd4dc9e443c533b364ddb7ffd32fe152794222ed562f",
+  "sympy/matrices/expressions/matexpr.py": "sha256:a154ef49a94769158fba5dc60c2fa024880e2c3cf02d1ce92bbaba2461d2f4b0",
+  "sympy/matrices/expressions/matpow.py": "sha256:374466314cc785b1166b99d71f837fcd44673293fc46864dab8dd060e82695f4",
+  "sympy/matrices/expressions/special.py": "sha256:23f9316cd1e80dfdd56347d0631775a6917a572836c10d1ee0ff67af0b6df221",
+  "sympy/matrices/expressions/trace.py": "sha256:8dd28046eaf0799fc8450d5747d7b528a466850b239439c1e765730a1a115d81",
+  "sympy/matrices/matrixbase.py": "sha256:43954a96fabe9fda4e0a4cff15e467a2e4fd380aeb27a73980d3cff8bdffee24",
+  "sympy/tensor/array/array_derivatives.py": "sha256:ad99fef75bbbdaddf7d589a957bd4d1f892c0c35369ac1dc5af85335e283a3cd",
+  "sympy/tensor/array/expressions/array_expressions.py": "sha256:7064f929ce00d5054db899a0a1a1c4474a7db63695564441db434d7c6f6ee7ba",
+  "sympy/tensor/array/expressions/arrayexpr_derivatives.py": "sha256:df1576e3376dd70cb2608b8f51ead8be3ee713dd6367896b68fe71136e652876",
+  "sympy/tensor/array/expressions/from_array_to_matrix.py": "sha256:32857c9658e9114c0f07dafeed7eac1a5d152bd905270f11eb8ba3d30c4594f9",
+  "sympy/tensor/array/expressions/from_matrix_to_array.py": "sha256:8722d7e2c90443fcbd32843105b0661b2daa9a492ea6b7f2ed70711598c062c3"
+ }
+}

@@ -1,0 +1,361 @@
+{
+ "writer": 0,
+ "pr": 10519,
+ "pid": 2461557,
+ "init_ms": 82.01689499999999,
+ "start_offset_ms": 7,
+ "file_order": [
+  "xarray/groupers.py",
+  "xarray/core/dataset.py",
+  "xarray/core/types.py"
+ ],
+ "holds": {
+  "xarray/groupers.py": 9,
+  "xarray/core/dataset.py": 0,
+  "xarray/core/types.py": 13
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 10519,
+   "path": "xarray/groupers.py",
+   "intents": [
+    "log:xarray:10519_10528:10519:xarray/groupers.py:h13",
+    "log:xarray:10519_10528:10519:xarray/groupers.py:h14",
+    "log:xarray:10519_10528:10519:xarray/groupers.py:h15",
+    "log:xarray:10519_10528:10519:xarray/groupers.py:h16",
+    "log:xarray:10519_10528:10519:xarray/groupers.py:h17"
+   ],
+   "hold_ms": 9,
+   "t_submit_epoch": 1791575252285,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 25,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-xarray_groupers.py-w0-0001",
+   "total_ms": 148.23,
+   "t_done_epoch": 1791575252433
+  },
+  {
+   "writer": 0,
+   "pr": 10519,
+   "path": "xarray/core/dataset.py",
+   "intents": [
+    "log:xarray:10519_10528:10519:xarray/core/dataset.py:h0",
+    "log:xarray:10519_10528:10519:xarray/core/dataset.py:h1",
+    "log:xarray:10519_10528:10519:xarray/core/dataset.py:h2",
+    "log:xarray:10519_10528:10519:xarray/core/dataset.py:h3",
+    "log:xarray:10519_10528:10519:xarray/core/dataset.py:h4",
+    "log:xarray:10519_10528:10519:xarray/core/dataset.py:h5",
+    "log:xarray:10519_10528:10519:xarray/core/dataset.py:h6",
+    "log:xarray:10519_10528:10519:xarray/core/dataset.py:h7",
+    "log:xarray:10519_10528:10519:xarray/core/dataset.py:h8",
+    "log:xarray:10519_10528:10519:xarray/core/dataset.py:h9",
+    "log:xarray:10519_10528:10519:xarray/core/dataset.py:h10"
+   ],
+   "hold_ms": 0,
+   "t_submit_epoch": 1791575252433,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-xarray_core_dataset.py-w0-0002",
+   "total_ms": 47.84,
+   "t_done_epoch": 1791575252481
+  },
+  {
+   "writer": 0,
+   "pr": 10519,
+   "path": "xarray/core/types.py",
+   "intents": [
+    "log:xarray:10519_10528:10519:xarray/core/types.py:h11",
+    "log:xarray:10519_10528:10519:xarray/core/types.py:h12"
+   ],
+   "hold_ms": 13,
+   "t_submit_epoch": 1791575252481,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-xarray_core_types.py-w0-0003",
+   "total_ms": 29.21,
+   "t_done_epoch": 1791575252510
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 1
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-xarray_groupers.py-w0-0001",
+   "path": "xarray/groupers.py",
+   "pid": 2461557,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-xarray_groupers_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-xarray_groupers_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:2e7836e322d2a3d620f5385e71c9532cd14b46b7c9263347c3bf68f09706687e"
+   ],
+   "lock_wait_ms": 0.16,
+   "t_start_epoch_ms": 1791575252323.96,
+   "pre_apply_hash": "sha256:2e7836e322d2a3d620f5385e71c9532cd14b46b7c9263347c3bf68f09706687e",
+   "receipt_before_hash": "sha256:2e7836e322d2a3d620f5385e71c9532cd14b46b7c9263347c3bf68f09706687e",
+   "receipt_after_hash": "sha256:7a8bbfe95aa8d2d09fff17b90660b4ff9464212aa1258a17c50d838f04223665",
+   "post_apply_hash": "sha256:7a8bbfe95aa8d2d09fff17b90660b4ff9464212aa1258a17c50d838f04223665",
+   "t_end_epoch_ms": 1791575252430.2,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:47:32.430+08:00",
+   "batch_id": "cb-xarray_groupers.py-w0-0001",
+   "path": "xarray/groupers.py",
+   "proposalIds": [
+    "prop-hist-w0-xarray_groupers_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-xarray_groupers_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-xarray_groupers_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-xarray_groupers_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-xarray_groupers_py",
+     "logical_id": "prop-hist-w0-xarray_groupers_py",
+     "attempt_id": "att-prop-hist-w0-xarray_groupers_py-r0",
+     "proposal_id": "prop-hist-w0-xarray_groupers_py",
+     "actorId": "writer-10519"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.35,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:2e7836e322d2a3d620f5385e71c9532cd14b46b7c9263347c3bf68f09706687e",
+   "written": true,
+   "output_digest": "sha256:7a8bbfe95aa8d2d09fff17b90660b4ff9464212aa1258a17c50d838f04223665",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "steward_applied"
+  },
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-xarray_core_dataset.py-w0-0002",
+   "path": "xarray/core/dataset.py",
+   "pid": 2461557,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-xarray_core_dataset_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-xarray_core_dataset_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:1ccc4dba906377fe3d8efce69da37b318c17f86ac490b6045adfd6740ed929cd"
+   ],
+   "lock_wait_ms": 0,
+   "t_start_epoch_ms": 1791575252447.3,
+   "pre_apply_hash": "sha256:1ccc4dba906377fe3d8efce69da37b318c17f86ac490b6045adfd6740ed929cd",
+   "receipt_before_hash": "sha256:1ccc4dba906377fe3d8efce69da37b318c17f86ac490b6045adfd6740ed929cd",
+   "receipt_after_hash": "sha256:0c88a8899fc95b08e6a59492d04e069aed879f70f5e29cdd2af5ed35efd24afb",
+   "post_apply_hash": "sha256:0c88a8899fc95b08e6a59492d04e069aed879f70f5e29cdd2af5ed35efd24afb",
+   "t_end_epoch_ms": 1791575252477.81,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:47:32.477+08:00",
+   "batch_id": "cb-xarray_core_dataset.py-w0-0002",
+   "path": "xarray/core/dataset.py",
+   "proposalIds": [
+    "prop-hist-w0-xarray_core_dataset_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-xarray_core_dataset_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-xarray_core_dataset_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-xarray_core_dataset_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-xarray_core_dataset_py",
+     "logical_id": "prop-hist-w0-xarray_core_dataset_py",
+     "attempt_id": "att-prop-hist-w0-xarray_core_dataset_py-r0",
+     "proposal_id": "prop-hist-w0-xarray_core_dataset_py",
+     "actorId": "writer-10519"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.01,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:1ccc4dba906377fe3d8efce69da37b318c17f86ac490b6045adfd6740ed929cd",
+   "written": true,
+   "output_digest": "sha256:0c88a8899fc95b08e6a59492d04e069aed879f70f5e29cdd2af5ed35efd24afb",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "steward_applied"
+  },
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-xarray_core_types.py-w0-0003",
+   "path": "xarray/core/types.py",
+   "pid": 2461557,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-xarray_core_types_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-xarray_core_types_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:1dbf6458d468b63dc442ebfe56a96d46f7e3459486bb711d1ac3079e8b9c6023"
+   ],
+   "lock_wait_ms": 0,
+   "t_start_epoch_ms": 1791575252499.66,
+   "pre_apply_hash": "sha256:1dbf6458d468b63dc442ebfe56a96d46f7e3459486bb711d1ac3079e8b9c6023",
+   "receipt_before_hash": "sha256:1dbf6458d468b63dc442ebfe56a96d46f7e3459486bb711d1ac3079e8b9c6023",
+   "receipt_after_hash": "sha256:6310a1c7147177d097ff20d27522ec483c613ebcd0309b04da30a5c5ac233e08",
+   "post_apply_hash": "sha256:6310a1c7147177d097ff20d27522ec483c613ebcd0309b04da30a5c5ac233e08",
+   "t_end_epoch_ms": 1791575252507.05,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:47:32.507+08:00",
+   "batch_id": "cb-xarray_core_types.py-w0-0003",
+   "path": "xarray/core/types.py",
+   "proposalIds": [
+    "prop-hist-w0-xarray_core_types_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-xarray_core_types_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-xarray_core_types_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-xarray_core_types_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-xarray_core_types_py",
+     "logical_id": "prop-hist-w0-xarray_core_types_py",
+     "attempt_id": "att-prop-hist-w0-xarray_core_types_py-r0",
+     "proposal_id": "prop-hist-w0-xarray_core_types_py",
+     "actorId": "writer-10519"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.01,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:1dbf6458d468b63dc442ebfe56a96d46f7e3459486bb711d1ac3079e8b9c6023",
+   "written": true,
+   "output_digest": "sha256:6310a1c7147177d097ff20d27522ec483c613ebcd0309b04da30a5c5ac233e08",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

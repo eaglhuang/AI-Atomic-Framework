@@ -1,0 +1,84 @@
+{
+ "pair_id": "sphinx:13262_13263",
+ "stratum": "O2",
+ "arm": "git_three_way",
+ "plant": null,
+ "seed_k": 1,
+ "seed": 2202797293,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 404,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 9,
+  "by_verdict": {
+   "correct": 9
+  },
+  "completed": 9,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 1,
+  "files_full_bytes_exact": 1,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "sphinx/util/typing.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "sphinx/util/typing.py": true
+ },
+ "final_exists": {
+  "sphinx/util/typing.py": true
+ },
+ "files": [
+  {
+   "path": "sphinx/util/typing.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:292f8b337ee3fbb58c75020ebfbd7193249fecf6b608db73b361ef9d48fd6585",
+   "final_digest": "sha256:5d4ff1fddfa6bfd63b0d27671de12f9fc31816aa5e252e2cb2688e5a3a61af1c",
+   "expected_digests": [
+    "sha256:5d4ff1fddfa6bfd63b0d27671de12f9fc31816aa5e252e2cb2688e5a3a61af1c"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "sphinx/util/typing.py": "sha256:5d4ff1fddfa6bfd63b0d27671de12f9fc31816aa5e252e2cb2688e5a3a61af1c"
+ }
+}

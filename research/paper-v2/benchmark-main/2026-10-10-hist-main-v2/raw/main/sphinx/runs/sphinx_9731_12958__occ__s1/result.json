@@ -1,0 +1,84 @@
+{
+ "pair_id": "sphinx:9731_12958",
+ "stratum": "O3",
+ "arm": "occ",
+ "plant": null,
+ "seed_k": 1,
+ "seed": 3770880952,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 355,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 4,
+  "by_verdict": {
+   "correct": 4
+  },
+  "completed": 4,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 1,
+  "files_full_bytes_exact": 1,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "sphinx/builders/html/__init__.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "sphinx/builders/html/__init__.py": true
+ },
+ "final_exists": {
+  "sphinx/builders/html/__init__.py": true
+ },
+ "files": [
+  {
+   "path": "sphinx/builders/html/__init__.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:8e196d70cabaf17fd0604342e521bbb2b588d6bfbfaf360ed9d261020016af36",
+   "final_digest": "sha256:16a4176af802b7ca62da8b6c6c18df3bb660d676c46e011863695bd506d02cb3",
+   "expected_digests": [
+    "sha256:16a4176af802b7ca62da8b6c6c18df3bb660d676c46e011863695bd506d02cb3"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "sphinx/builders/html/__init__.py": "sha256:16a4176af802b7ca62da8b6c6c18df3bb660d676c46e011863695bd506d02cb3"
+ }
+}

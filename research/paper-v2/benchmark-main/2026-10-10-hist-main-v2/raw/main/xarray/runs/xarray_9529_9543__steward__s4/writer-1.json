@@ -1,0 +1,486 @@
+{
+ "writer": 1,
+ "pr": 9543,
+ "pid": 2274626,
+ "init_ms": 120.028304,
+ "start_offset_ms": 17,
+ "file_order": [
+  "xarray/core/coordinate_transform.py",
+  "xarray/core/indexes.py",
+  "xarray/core/indexing.py",
+  "xarray/__init__.py",
+  "xarray/indexes/__init__.py"
+ ],
+ "holds": {
+  "xarray/core/coordinate_transform.py": 0,
+  "xarray/core/indexes.py": 14,
+  "xarray/core/indexing.py": 9,
+  "xarray/__init__.py": 23,
+  "xarray/indexes/__init__.py": 3
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 9543,
+   "path": "xarray/core/coordinate_transform.py",
+   "intents": [
+    "log:xarray:9529_9543:9543:xarray/core/coordinate_transform.py:h2"
+   ],
+   "hold_ms": 0,
+   "t_submit_epoch": 1791573739665,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 15,
+   "outcome": "blocked",
+   "blocked_reason": "file-hash-drift: Target file does not exist: xarray/core/coordinate_transform.py",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "file-hash-drift: Target file does not exist: xarray/core/coordinate_transform.py"
+   ],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-xarray_core_coordinate_transform.py-w1-0001",
+   "total_ms": 108.51,
+   "t_done_epoch": 1791573739773
+  },
+  {
+   "writer": 1,
+   "pr": 9543,
+   "path": "xarray/core/indexes.py",
+   "intents": [
+    "log:xarray:9529_9543:9543:xarray/core/indexes.py:h3",
+    "log:xarray:9529_9543:9543:xarray/core/indexes.py:h4",
+    "log:xarray:9529_9543:9543:xarray/core/indexes.py:h5",
+    "log:xarray:9529_9543:9543:xarray/core/indexes.py:h6"
+   ],
+   "hold_ms": 14,
+   "t_submit_epoch": 1791573739773,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-xarray_core_indexes.py-w1-0002",
+   "total_ms": 43.51,
+   "t_done_epoch": 1791573739817
+  },
+  {
+   "writer": 1,
+   "pr": 9543,
+   "path": "xarray/core/indexing.py",
+   "intents": [
+    "log:xarray:9529_9543:9543:xarray/core/indexing.py:h7",
+    "log:xarray:9529_9543:9543:xarray/core/indexing.py:h8",
+    "log:xarray:9529_9543:9543:xarray/core/indexing.py:h9"
+   ],
+   "hold_ms": 9,
+   "t_submit_epoch": 1791573739817,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 48,
+   "outcome": "blocked",
+   "blocked_reason": "harness-relocate-context-not-found",
+   "total_ms": 61.98,
+   "t_done_epoch": 1791573739879
+  },
+  {
+   "writer": 1,
+   "pr": 9543,
+   "path": "xarray/__init__.py",
+   "intents": [
+    "log:xarray:9529_9543:9543:xarray/__init__.py:h0",
+    "log:xarray:9529_9543:9543:xarray/__init__.py:h1"
+   ],
+   "hold_ms": 23,
+   "t_submit_epoch": 1791573739879,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-xarray___init__.py-w1-0003",
+   "total_ms": 39.18,
+   "t_done_epoch": 1791573739918
+  },
+  {
+   "writer": 1,
+   "pr": 9543,
+   "path": "xarray/indexes/__init__.py",
+   "intents": [
+    "log:xarray:9529_9543:9543:xarray/indexes/__init__.py:h10",
+    "log:xarray:9529_9543:9543:xarray/indexes/__init__.py:h11"
+   ],
+   "hold_ms": 3,
+   "t_submit_epoch": 1791573739918,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-xarray_indexes___init__.py-w1-0004",
+   "total_ms": 18.92,
+   "t_done_epoch": 1791573739937
+  }
+ ],
+ "admit_stats": {
+  "txns": 11,
+  "cas_conflicts": 13
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-xarray_core_coordinate_transform.py-w1-0001",
+   "path": "xarray/core/coordinate_transform.py",
+   "pid": 2274626,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-xarray_core_coordinate_transform_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-xarray_core_coordinate_transform_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   ],
+   "lock_wait_ms": 0.11,
+   "t_start_epoch_ms": 1791573739683.23,
+   "pre_apply_hash": null,
+   "receipt_before_hash": null,
+   "receipt_after_hash": null,
+   "post_apply_hash": null,
+   "t_end_epoch_ms": 1791573739767.48,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "blocked",
+   "written": false,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:22:19.767+08:00",
+   "batch_id": "cb-xarray_core_coordinate_transform.py-w1-0001",
+   "path": "xarray/core/coordinate_transform.py",
+   "proposalIds": [
+    "prop-hist-w1-xarray_core_coordinate_transform_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-xarray_core_coordinate_transform_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-xarray_core_coordinate_transform_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-xarray_core_coordinate_transform_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-xarray_core_coordinate_transform_py",
+     "logical_id": "prop-hist-w1-xarray_core_coordinate_transform_py",
+     "attempt_id": "att-prop-hist-w1-xarray_core_coordinate_transform_py-r0",
+     "proposal_id": "prop-hist-w1-xarray_core_coordinate_transform_py",
+     "actorId": "writer-9543"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "file-hash-drift: Target file does not exist: xarray/core/coordinate_transform.py"
+   ],
+   "blocked_reason": "file-hash-drift: Target file does not exist: xarray/core/coordinate_transform.py",
+   "window_wait_ms": 0.26,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "written": false,
+   "output_digest": null,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "file-hash-drift: Target file does not exist: xarray/core/coordinate_transform.py"
+  },
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-xarray_core_indexes.py-w1-0002",
+   "path": "xarray/core/indexes.py",
+   "pid": 2274626,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-xarray_core_indexes_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-xarray_core_indexes_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:b4ef6ad0da46057914a9082f455c0a78fc937da21dbe87ac5f9f46643856158b"
+   ],
+   "lock_wait_ms": 0,
+   "t_start_epoch_ms": 1791573739793.69,
+   "pre_apply_hash": "sha256:b4ef6ad0da46057914a9082f455c0a78fc937da21dbe87ac5f9f46643856158b",
+   "receipt_before_hash": "sha256:b4ef6ad0da46057914a9082f455c0a78fc937da21dbe87ac5f9f46643856158b",
+   "receipt_after_hash": "sha256:8297f7b9f5dbaa08f86f70566d1f77705f3ba8d6e0177280bb87e83f4d8659b3",
+   "post_apply_hash": "sha256:8297f7b9f5dbaa08f86f70566d1f77705f3ba8d6e0177280bb87e83f4d8659b3",
+   "t_end_epoch_ms": 1791573739809.23,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:22:19.809+08:00",
+   "batch_id": "cb-xarray_core_indexes.py-w1-0002",
+   "path": "xarray/core/indexes.py",
+   "proposalIds": [
+    "prop-hist-w1-xarray_core_indexes_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-xarray_core_indexes_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-xarray_core_indexes_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-xarray_core_indexes_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-xarray_core_indexes_py",
+     "logical_id": "prop-hist-w1-xarray_core_indexes_py",
+     "attempt_id": "att-prop-hist-w1-xarray_core_indexes_py-r0",
+     "proposal_id": "prop-hist-w1-xarray_core_indexes_py",
+     "actorId": "writer-9543"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.02,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:b4ef6ad0da46057914a9082f455c0a78fc937da21dbe87ac5f9f46643856158b",
+   "written": true,
+   "output_digest": "sha256:8297f7b9f5dbaa08f86f70566d1f77705f3ba8d6e0177280bb87e83f4d8659b3",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  },
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-xarray___init__.py-w1-0003",
+   "path": "xarray/__init__.py",
+   "pid": 2274626,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-xarray_init_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-xarray_init_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:34e16014786a3888aa4793cf8b16f4ac300fa879d8d931d2fb6aa286b7fb7cf6"
+   ],
+   "lock_wait_ms": 0,
+   "t_start_epoch_ms": 1791573739905.32,
+   "pre_apply_hash": "sha256:34e16014786a3888aa4793cf8b16f4ac300fa879d8d931d2fb6aa286b7fb7cf6",
+   "receipt_before_hash": "sha256:34e16014786a3888aa4793cf8b16f4ac300fa879d8d931d2fb6aa286b7fb7cf6",
+   "receipt_after_hash": "sha256:4756d8298712e333bf169a15434d290a1c8e7155889bfe09999d7d275d2c664c",
+   "post_apply_hash": "sha256:4756d8298712e333bf169a15434d290a1c8e7155889bfe09999d7d275d2c664c",
+   "t_end_epoch_ms": 1791573739914.2,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:22:19.914+08:00",
+   "batch_id": "cb-xarray___init__.py-w1-0003",
+   "path": "xarray/__init__.py",
+   "proposalIds": [
+    "prop-hist-w1-xarray_init_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-xarray_init_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-xarray_init_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-xarray_init_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-xarray_init_py",
+     "logical_id": "prop-hist-w1-xarray_init_py",
+     "attempt_id": "att-prop-hist-w1-xarray_init_py-r0",
+     "proposal_id": "prop-hist-w1-xarray_init_py",
+     "actorId": "writer-9543"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.01,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:34e16014786a3888aa4793cf8b16f4ac300fa879d8d931d2fb6aa286b7fb7cf6",
+   "written": true,
+   "output_digest": "sha256:4756d8298712e333bf169a15434d290a1c8e7155889bfe09999d7d275d2c664c",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  },
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-xarray_indexes___init__.py-w1-0004",
+   "path": "xarray/indexes/__init__.py",
+   "pid": 2274626,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-xarray_indexes_init_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-xarray_indexes_init_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:cd0bda7c6dc497a184d0657cd45b55f9c1c469f63ad9b2cebdc2e21526e294e3"
+   ],
+   "lock_wait_ms": 0,
+   "t_start_epoch_ms": 1791573739925.29,
+   "pre_apply_hash": "sha256:cd0bda7c6dc497a184d0657cd45b55f9c1c469f63ad9b2cebdc2e21526e294e3",
+   "receipt_before_hash": "sha256:cd0bda7c6dc497a184d0657cd45b55f9c1c469f63ad9b2cebdc2e21526e294e3",
+   "receipt_after_hash": "sha256:2859f5094184c17c64746c724c311677bb1db1592a11e420839e9f5ca280f97c",
+   "post_apply_hash": "sha256:2859f5094184c17c64746c724c311677bb1db1592a11e420839e9f5ca280f97c",
+   "t_end_epoch_ms": 1791573739933.96,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:22:19.933+08:00",
+   "batch_id": "cb-xarray_indexes___init__.py-w1-0004",
+   "path": "xarray/indexes/__init__.py",
+   "proposalIds": [
+    "prop-hist-w1-xarray_indexes_init_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-xarray_indexes_init_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-xarray_indexes_init_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-xarray_indexes_init_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-xarray_indexes_init_py",
+     "logical_id": "prop-hist-w1-xarray_indexes_init_py",
+     "attempt_id": "att-prop-hist-w1-xarray_indexes_init_py-r0",
+     "proposal_id": "prop-hist-w1-xarray_indexes_init_py",
+     "actorId": "writer-9543"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.01,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:cd0bda7c6dc497a184d0657cd45b55f9c1c469f63ad9b2cebdc2e21526e294e3",
+   "written": true,
+   "output_digest": "sha256:2859f5094184c17c64746c724c311677bb1db1592a11e420839e9f5ca280f97c",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

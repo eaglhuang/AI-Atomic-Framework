@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-bb9ef102ef191cfd",
+  "proposalIds": [
+    "prop-hist-w0-sympy_matrices_utilities_py"
+  ],
+  "targetFiles": [
+    "sympy/matrices/utilities.py"
+  ],
+  "appliedFiles": [
+    "sympy/matrices/utilities.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/matrices/utilities.py": "c4e346fdd1d3a941199d748debe90fefa2816669a0300fdcf6d6f084fafee445"
+  },
+  "fileAfterHashes": {
+    "sympy/matrices/utilities.py": "83cd918dc7f9a27e5a53db8eddedb51f8e91bc1e19b315928556286deec84eda"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/matrices/utilities.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-bb9ef102ef191cfd",
+    "planId": "merge-bb9ef102ef191cfd",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-bb9ef102ef191cfd",
+        "planId": "merge-bb9ef102ef191cfd",
+        "request_identity": [
+          "prop-hist-w0-sympy_matrices_utilities_py"
+        ],
+        "actor_ids": [
+          "writer-28805"
+        ],
+        "request_files": [
+          "sympy/matrices/utilities.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/matrices/utilities.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/sympy/runs/sympy_28805_28807__steward__s2/artifacts/steward/cb-sympy_matrices_utilities.py-w0-0005.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SYMPY_MATRICES_UTILITIES_PY"
+        ],
+        "commit_sha": "d26e8d880039bf1f97fd639d193f159a0f4e4479"
+      }
+    ]
+  }
+}

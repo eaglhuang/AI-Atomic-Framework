@@ -1,0 +1,148 @@
+{
+ "writer": 1,
+ "pr": 11846,
+ "pid": 2344058,
+ "init_ms": 68.781892,
+ "start_offset_ms": 17,
+ "file_order": [
+  "sphinx/domains/c.py",
+  "sphinx/builders/html/__init__.py",
+  "sphinx/transforms/compact_bullet_list.py",
+  "sphinx/domains/cpp.py",
+  "sphinx/pycode/ast.py",
+  "sphinx/ext/inheritance_diagram.py"
+ ],
+ "holds": {
+  "sphinx/domains/c.py": 23,
+  "sphinx/builders/html/__init__.py": 10,
+  "sphinx/transforms/compact_bullet_list.py": 6,
+  "sphinx/domains/cpp.py": 0,
+  "sphinx/pycode/ast.py": 11,
+  "sphinx/ext/inheritance_diagram.py": 8
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 11846,
+   "path": "sphinx/domains/c.py",
+   "intents": [
+    "log:sphinx:11766_11846:11846:sphinx/domains/c.py:h4"
+   ],
+   "hold_ms": 23,
+   "t_submit_epoch": 1791574355243,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 16,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 48.59,
+   "t_done_epoch": 1791574355292
+  },
+  {
+   "writer": 1,
+   "pr": 11846,
+   "path": "sphinx/builders/html/__init__.py",
+   "intents": [
+    "log:sphinx:11766_11846:11846:sphinx/builders/html/__init__.py:h0",
+    "log:sphinx:11766_11846:11846:sphinx/builders/html/__init__.py:h1",
+    "log:sphinx:11766_11846:11846:sphinx/builders/html/__init__.py:h2",
+    "log:sphinx:11766_11846:11846:sphinx/builders/html/__init__.py:h3"
+   ],
+   "hold_ms": 10,
+   "t_submit_epoch": 1791574355292,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "lock_spins": 0,
+   "outcome": "blocked",
+   "blocked_reason": "harness-relocate-context-not-found",
+   "total_ms": 17.54,
+   "t_done_epoch": 1791574355310
+  },
+  {
+   "writer": 1,
+   "pr": 11846,
+   "path": "sphinx/transforms/compact_bullet_list.py",
+   "intents": [
+    "log:sphinx:11766_11846:11846:sphinx/transforms/compact_bullet_list.py:h9"
+   ],
+   "hold_ms": 6,
+   "t_submit_epoch": 1791574355310,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 12.43,
+   "t_done_epoch": 1791574355322
+  },
+  {
+   "writer": 1,
+   "pr": 11846,
+   "path": "sphinx/domains/cpp.py",
+   "intents": [
+    "log:sphinx:11766_11846:11846:sphinx/domains/cpp.py:h5",
+    "log:sphinx:11766_11846:11846:sphinx/domains/cpp.py:h6"
+   ],
+   "hold_ms": 0,
+   "t_submit_epoch": 1791574355322,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 15.51,
+   "t_done_epoch": 1791574355338
+  },
+  {
+   "writer": 1,
+   "pr": 11846,
+   "path": "sphinx/pycode/ast.py",
+   "intents": [
+    "log:sphinx:11766_11846:11846:sphinx/pycode/ast.py:h8"
+   ],
+   "hold_ms": 11,
+   "t_submit_epoch": 1791574355338,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 17.35,
+   "t_done_epoch": 1791574355355
+  },
+  {
+   "writer": 1,
+   "pr": 11846,
+   "path": "sphinx/ext/inheritance_diagram.py",
+   "intents": [
+    "log:sphinx:11766_11846:11846:sphinx/ext/inheritance_diagram.py:h7"
+   ],
+   "hold_ms": 8,
+   "t_submit_epoch": 1791574355355,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 14.52,
+   "t_done_epoch": 1791574355369
+  }
+ ],
+ "admit_stats": {
+  "txns": 12,
+  "cas_conflicts": 5
+ },
+ "steward_batches": null
+}

@@ -1,0 +1,57 @@
+{
+ "writer": 1,
+ "pr": 11295,
+ "pid": 2391184,
+ "init_ms": 64.494711,
+ "start_offset_ms": 0,
+ "file_order": [
+  "fastapi/security/open_id_connect_url.py",
+  "fastapi/security/oauth2.py"
+ ],
+ "holds": {
+  "fastapi/security/open_id_connect_url.py": 15,
+  "fastapi/security/oauth2.py": 15
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 11295,
+   "path": "fastapi/security/open_id_connect_url.py",
+   "intents": [
+    "log:fastapi:9783_11295:11295:fastapi/security/open_id_connect_url.py:h2"
+   ],
+   "hold_ms": 15,
+   "t_submit_epoch": 1791574710246,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 13,
+   "outcome": "commit",
+   "total_ms": 38.6,
+   "t_done_epoch": 1791574710285
+  },
+  {
+   "writer": 1,
+   "pr": 11295,
+   "path": "fastapi/security/oauth2.py",
+   "intents": [
+    "log:fastapi:9783_11295:11295:fastapi/security/oauth2.py:h0",
+    "log:fastapi:9783_11295:11295:fastapi/security/oauth2.py:h1"
+   ],
+   "hold_ms": 15,
+   "t_submit_epoch": 1791574710285,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 5,
+   "outcome": "commit",
+   "total_ms": 27.22,
+   "t_done_epoch": 1791574710312
+  }
+ ],
+ "admit_stats": {
+  "txns": 4,
+  "cas_conflicts": 0
+ },
+ "steward_batches": null
+}

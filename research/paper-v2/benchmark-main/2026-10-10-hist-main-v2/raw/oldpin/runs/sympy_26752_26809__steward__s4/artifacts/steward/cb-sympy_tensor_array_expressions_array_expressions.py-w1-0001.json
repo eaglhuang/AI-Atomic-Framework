@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-c6d8750b7f56d48d",
+  "proposalIds": [
+    "prop-hist-w1-sympy_tensor_array_expressions_array_expressions_py"
+  ],
+  "targetFiles": [
+    "sympy/tensor/array/expressions/array_expressions.py"
+  ],
+  "appliedFiles": [],
+  "fileBeforeHashes": {},
+  "fileAfterHashes": {},
+  "permissions": {
+    "fileWrite": [
+      "sympy/tensor/array/expressions/array_expressions.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "blocked",
+  "blockedReasons": [
+    "file-hash-drift: Target file hash sha256:d0c1d2f7f401ffdf0fbf58ad0d95a6c395b9ebb2a55c6173f98f955f2a73a2a2 does not match proposal fileBeforeHash sha256:1736959e0f0f29997274200f099c233809d1ecd7afc73062bfba90fdd460daeb."
+  ],
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-c6d8750b7f56d48d",
+    "planId": "merge-c6d8750b7f56d48d",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-c6d8750b7f56d48d",
+        "planId": "merge-c6d8750b7f56d48d",
+        "request_identity": [
+          "prop-hist-w1-sympy_tensor_array_expressions_array_expressions_py"
+        ],
+        "actor_ids": [
+          "writer-26809"
+        ],
+        "request_files": [
+          "sympy/tensor/array/expressions/array_expressions.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/oldpin/runs/sympy_26752_26809__steward__s4/artifacts/steward/cb-sympy_tensor_array_expressions_array_expressions.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_TENSOR_ARRAY_EXPRESSIONS_ARRAY_EXPRESSIONS_PY"
+        ],
+        "commit_sha": "9ef7d045be3535d81143c2468ea4d997bebc507d"
+      }
+    ]
+  }
+}

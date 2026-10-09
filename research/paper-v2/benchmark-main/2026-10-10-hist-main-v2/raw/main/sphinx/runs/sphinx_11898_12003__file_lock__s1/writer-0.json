@@ -1,0 +1,134 @@
+{
+ "writer": 0,
+ "pr": 11898,
+ "pid": 2339861,
+ "init_ms": 73.83412799999999,
+ "start_offset_ms": 4,
+ "file_order": [
+  "sphinx/util/fileutil.py",
+  "sphinx/util/inspect.py",
+  "sphinx/roles.py",
+  "sphinx/util/inventory.py",
+  "sphinx/util/nodes.py"
+ ],
+ "holds": {
+  "sphinx/util/fileutil.py": 0,
+  "sphinx/util/inspect.py": 26,
+  "sphinx/roles.py": 6,
+  "sphinx/util/inventory.py": 6,
+  "sphinx/util/nodes.py": 10
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 11898,
+   "path": "sphinx/util/fileutil.py",
+   "intents": [
+    "log:sphinx:11898_12003:11898:sphinx/util/fileutil.py:h1",
+    "log:sphinx:11898_12003:11898:sphinx/util/fileutil.py:h2",
+    "log:sphinx:11898_12003:11898:sphinx/util/fileutil.py:h3"
+   ],
+   "hold_ms": 0,
+   "t_submit_epoch": 1791574321644,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 18,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 26.07,
+   "t_done_epoch": 1791574321670
+  },
+  {
+   "writer": 0,
+   "pr": 11898,
+   "path": "sphinx/util/inspect.py",
+   "intents": [
+    "log:sphinx:11898_12003:11898:sphinx/util/inspect.py:h4",
+    "log:sphinx:11898_12003:11898:sphinx/util/inspect.py:h5",
+    "log:sphinx:11898_12003:11898:sphinx/util/inspect.py:h6",
+    "log:sphinx:11898_12003:11898:sphinx/util/inspect.py:h7",
+    "log:sphinx:11898_12003:11898:sphinx/util/inspect.py:h8",
+    "log:sphinx:11898_12003:11898:sphinx/util/inspect.py:h9",
+    "log:sphinx:11898_12003:11898:sphinx/util/inspect.py:h10"
+   ],
+   "hold_ms": 26,
+   "t_submit_epoch": 1791574321670,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "queue",
+   "admit_wait_ms": 7,
+   "lock_spins": 0,
+   "outcome": "blocked",
+   "blocked_reason": "harness-relocate-context-not-found",
+   "total_ms": 37.11,
+   "t_done_epoch": 1791574321707
+  },
+  {
+   "writer": 0,
+   "pr": 11898,
+   "path": "sphinx/roles.py",
+   "intents": [
+    "log:sphinx:11898_12003:11898:sphinx/roles.py:h0"
+   ],
+   "hold_ms": 6,
+   "t_submit_epoch": 1791574321707,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 11.5,
+   "t_done_epoch": 1791574321718
+  },
+  {
+   "writer": 0,
+   "pr": 11898,
+   "path": "sphinx/util/inventory.py",
+   "intents": [
+    "log:sphinx:11898_12003:11898:sphinx/util/inventory.py:h11",
+    "log:sphinx:11898_12003:11898:sphinx/util/inventory.py:h12",
+    "log:sphinx:11898_12003:11898:sphinx/util/inventory.py:h13",
+    "log:sphinx:11898_12003:11898:sphinx/util/inventory.py:h14"
+   ],
+   "hold_ms": 6,
+   "t_submit_epoch": 1791574321718,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 10.83,
+   "t_done_epoch": 1791574321729
+  },
+  {
+   "writer": 0,
+   "pr": 11898,
+   "path": "sphinx/util/nodes.py",
+   "intents": [
+    "log:sphinx:11898_12003:11898:sphinx/util/nodes.py:h15"
+   ],
+   "hold_ms": 10,
+   "t_submit_epoch": 1791574321729,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 18.52,
+   "t_done_epoch": 1791574321748
+  }
+ ],
+ "admit_stats": {
+  "txns": 11,
+  "cas_conflicts": 9
+ },
+ "steward_batches": null
+}

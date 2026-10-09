@@ -1,0 +1,60 @@
+{
+ "writer": 1,
+ "pr": 9453,
+ "pid": 2254299,
+ "init_ms": 89.676511,
+ "start_offset_ms": 6,
+ "file_order": [
+  "xarray/core/datatree.py",
+  "xarray/core/treenode.py"
+ ],
+ "holds": {
+  "xarray/core/datatree.py": 2,
+  "xarray/core/treenode.py": 5
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 9453,
+   "path": "xarray/core/datatree.py",
+   "intents": [
+    "log:xarray:9451_9453:9453:xarray/core/datatree.py:h0"
+   ],
+   "hold_ms": 2,
+   "t_submit_epoch": 1791573489179,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 17,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 25.88,
+   "t_done_epoch": 1791573489205
+  },
+  {
+   "writer": 1,
+   "pr": 9453,
+   "path": "xarray/core/treenode.py",
+   "intents": [
+    "log:xarray:9451_9453:9453:xarray/core/treenode.py:h1",
+    "log:xarray:9451_9453:9453:xarray/core/treenode.py:h2"
+   ],
+   "hold_ms": 5,
+   "t_submit_epoch": 1791573489205,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "queue",
+   "admit_wait_ms": 15,
+   "outcome": "blocked",
+   "blocked_reason": "occ-relocate-context-not-found",
+   "occ_retries": 0,
+   "total_ms": 23.49,
+   "t_done_epoch": 1791573489228
+  }
+ ],
+ "admit_stats": {
+  "txns": 5,
+  "cas_conflicts": 6
+ },
+ "steward_batches": null
+}

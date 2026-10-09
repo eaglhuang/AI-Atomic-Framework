@@ -1,0 +1,132 @@
+{
+ "writer": 1,
+ "pr": 26298,
+ "pid": 2444396,
+ "init_ms": 101.72833600000001,
+ "start_offset_ms": 9,
+ "file_order": [
+  "sympy/functions/special/bessel.py"
+ ],
+ "holds": {
+  "sympy/functions/special/bessel.py": 1
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 26298,
+   "path": "sympy/functions/special/bessel.py",
+   "intents": [
+    "log:sympy:25664_26298:26298:sympy/functions/special/bessel.py:h0",
+    "log:sympy:25664_26298:26298:sympy/functions/special/bessel.py:h1",
+    "log:sympy:25664_26298:26298:sympy/functions/special/bessel.py:h2",
+    "log:sympy:25664_26298:26298:sympy/functions/special/bessel.py:h3",
+    "log:sympy:25664_26298:26298:sympy/functions/special/bessel.py:h4"
+   ],
+   "hold_ms": 1,
+   "t_submit_epoch": 1791575084224,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 130,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sympy_functions_special_bessel.py-w1-0001",
+   "total_ms": 239.11,
+   "t_done_epoch": 1791575084463
+  }
+ ],
+ "admit_stats": {
+  "txns": 3,
+  "cas_conflicts": 1
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sympy_functions_special_bessel.py-w1-0001",
+   "path": "sympy/functions/special/bessel.py",
+   "pid": 2444396,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-sympy_functions_special_bessel_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sympy_functions_special_bessel_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:9830e554739f3f0beb8c3ca6964a968242d7e5453ff53eda701267a5028db900"
+   ],
+   "lock_wait_ms": 0.13,
+   "t_start_epoch_ms": 1791575084358.41,
+   "pre_apply_hash": "sha256:9830e554739f3f0beb8c3ca6964a968242d7e5453ff53eda701267a5028db900",
+   "receipt_before_hash": "sha256:9830e554739f3f0beb8c3ca6964a968242d7e5453ff53eda701267a5028db900",
+   "receipt_after_hash": "sha256:cd0254bc3c4496002d2b23762368b2f81d35e81b33bbab3966ec0fbbb654ee55",
+   "post_apply_hash": "sha256:cd0254bc3c4496002d2b23762368b2f81d35e81b33bbab3966ec0fbbb654ee55",
+   "t_end_epoch_ms": 1791575084458.65,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:44:44.458+08:00",
+   "batch_id": "cb-sympy_functions_special_bessel.py-w1-0001",
+   "path": "sympy/functions/special/bessel.py",
+   "proposalIds": [
+    "prop-hist-w1-sympy_functions_special_bessel_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sympy_functions_special_bessel_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-sympy_functions_special_bessel_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-sympy_functions_special_bessel_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-sympy_functions_special_bessel_py",
+     "logical_id": "prop-hist-w1-sympy_functions_special_bessel_py",
+     "attempt_id": "att-prop-hist-w1-sympy_functions_special_bessel_py-r0",
+     "proposal_id": "prop-hist-w1-sympy_functions_special_bessel_py",
+     "actorId": "writer-26298"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.24,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:9830e554739f3f0beb8c3ca6964a968242d7e5453ff53eda701267a5028db900",
+   "written": true,
+   "output_digest": "sha256:cd0254bc3c4496002d2b23762368b2f81d35e81b33bbab3966ec0fbbb654ee55",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

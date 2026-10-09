@@ -1,0 +1,103 @@
+{
+ "writer": 0,
+ "pr": 11735,
+ "pid": 2360287,
+ "init_ms": 65.206162,
+ "start_offset_ms": 18,
+ "file_order": [
+  "sphinx/registry.py",
+  "sphinx/environment/__init__.py",
+  "sphinx/domains/cpp.py",
+  "sphinx/ext/autosummary/__init__.py"
+ ],
+ "holds": {
+  "sphinx/registry.py": 15,
+  "sphinx/environment/__init__.py": 10,
+  "sphinx/domains/cpp.py": 5,
+  "sphinx/ext/autosummary/__init__.py": 7
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 11735,
+   "path": "sphinx/registry.py",
+   "intents": [
+    "log:sphinx:11735_11836:11735:sphinx/registry.py:h4"
+   ],
+   "hold_ms": 15,
+   "t_submit_epoch": 1791574494655,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 90,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 110.58,
+   "t_done_epoch": 1791574494766
+  },
+  {
+   "writer": 0,
+   "pr": 11735,
+   "path": "sphinx/environment/__init__.py",
+   "intents": [
+    "log:sphinx:11735_11836:11735:sphinx/environment/__init__.py:h2"
+   ],
+   "hold_ms": 10,
+   "t_submit_epoch": 1791574494766,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 17.29,
+   "t_done_epoch": 1791574494783
+  },
+  {
+   "writer": 0,
+   "pr": 11735,
+   "path": "sphinx/domains/cpp.py",
+   "intents": [
+    "log:sphinx:11735_11836:11735:sphinx/domains/cpp.py:h0",
+    "log:sphinx:11735_11836:11735:sphinx/domains/cpp.py:h1"
+   ],
+   "hold_ms": 5,
+   "t_submit_epoch": 1791574494783,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 9,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 22.36,
+   "t_done_epoch": 1791574494806
+  },
+  {
+   "writer": 0,
+   "pr": 11735,
+   "path": "sphinx/ext/autosummary/__init__.py",
+   "intents": [
+    "log:sphinx:11735_11836:11735:sphinx/ext/autosummary/__init__.py:h3"
+   ],
+   "hold_ms": 7,
+   "t_submit_epoch": 1791574494806,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 13.35,
+   "t_done_epoch": 1791574494819
+  }
+ ],
+ "admit_stats": {
+  "txns": 8,
+  "cas_conflicts": 35
+ },
+ "steward_batches": null
+}

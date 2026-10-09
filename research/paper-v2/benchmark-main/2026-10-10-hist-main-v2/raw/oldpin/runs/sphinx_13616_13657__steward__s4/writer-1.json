@@ -1,0 +1,131 @@
+{
+ "writer": 1,
+ "pr": 13657,
+ "pid": 2477293,
+ "init_ms": 95.155207,
+ "start_offset_ms": 15,
+ "file_order": [
+  "sphinx/writers/latex.py"
+ ],
+ "holds": {
+  "sphinx/writers/latex.py": 14
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 13657,
+   "path": "sphinx/writers/latex.py",
+   "intents": [
+    "log:sphinx:13616_13657:13657:sphinx/writers/latex.py:h0",
+    "log:sphinx:13616_13657:13657:sphinx/writers/latex.py:h1",
+    "log:sphinx:13616_13657:13657:sphinx/writers/latex.py:h2",
+    "log:sphinx:13616_13657:13657:sphinx/writers/latex.py:h3"
+   ],
+   "hold_ms": 14,
+   "t_submit_epoch": 1791575368914,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 18,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sphinx_writers_latex.py-w1-0001",
+   "total_ms": 156.3,
+   "t_done_epoch": 1791575369070
+  }
+ ],
+ "admit_stats": {
+  "txns": 2,
+  "cas_conflicts": 2
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sphinx_writers_latex.py-w1-0001",
+   "path": "sphinx/writers/latex.py",
+   "pid": 2477293,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-sphinx_writers_latex_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sphinx_writers_latex_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:ab0d888e309ef12fbe50e48c9ac532970119b351b032216d0df40f58a604876f"
+   ],
+   "lock_wait_ms": 0.11,
+   "t_start_epoch_ms": 1791575368949.53,
+   "pre_apply_hash": "sha256:ab0d888e309ef12fbe50e48c9ac532970119b351b032216d0df40f58a604876f",
+   "receipt_before_hash": "sha256:ab0d888e309ef12fbe50e48c9ac532970119b351b032216d0df40f58a604876f",
+   "receipt_after_hash": "sha256:0e6bb1766b96776c6794130f6b83f68680d88ffffd3bf6f0b96f4363b0d82675",
+   "post_apply_hash": "sha256:0e6bb1766b96776c6794130f6b83f68680d88ffffd3bf6f0b96f4363b0d82675",
+   "t_end_epoch_ms": 1791575369058,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:49:29.058+08:00",
+   "batch_id": "cb-sphinx_writers_latex.py-w1-0001",
+   "path": "sphinx/writers/latex.py",
+   "proposalIds": [
+    "prop-hist-w1-sphinx_writers_latex_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sphinx_writers_latex_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-sphinx_writers_latex_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-sphinx_writers_latex_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-sphinx_writers_latex_py",
+     "logical_id": "prop-hist-w1-sphinx_writers_latex_py",
+     "attempt_id": "att-prop-hist-w1-sphinx_writers_latex_py-r0",
+     "proposal_id": "prop-hist-w1-sphinx_writers_latex_py",
+     "actorId": "writer-13657"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.21,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:ab0d888e309ef12fbe50e48c9ac532970119b351b032216d0df40f58a604876f",
+   "written": true,
+   "output_digest": "sha256:0e6bb1766b96776c6794130f6b83f68680d88ffffd3bf6f0b96f4363b0d82675",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

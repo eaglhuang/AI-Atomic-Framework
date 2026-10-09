@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-c26ac8656bc256aa",
+  "proposalIds": [
+    "prop-hist-w1-fastapi_compat_v2_py"
+  ],
+  "targetFiles": [
+    "fastapi/_compat/v2.py"
+  ],
+  "appliedFiles": [
+    "fastapi/_compat/v2.py"
+  ],
+  "fileBeforeHashes": {
+    "fastapi/_compat/v2.py": "2a91b80bf0a5cef83ac0e158422faa14e6c4e098f24fa72306af5ed0e330befd"
+  },
+  "fileAfterHashes": {
+    "fastapi/_compat/v2.py": "31a1f6a5799b7fd4e3b31ae9311969498729da9fcb426c8093aaeb0432e016df"
+  },
+  "permissions": {
+    "fileWrite": [
+      "fastapi/_compat/v2.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-c26ac8656bc256aa",
+    "planId": "merge-c26ac8656bc256aa",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-c26ac8656bc256aa",
+        "planId": "merge-c26ac8656bc256aa",
+        "request_identity": [
+          "prop-hist-w1-fastapi_compat_v2_py"
+        ],
+        "actor_ids": [
+          "writer-14430"
+        ],
+        "request_files": [
+          "fastapi/_compat/v2.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "fastapi/_compat/v2.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/fastapi/runs/fastapi_13207_14430__steward__s1/artifacts/steward/cb-fastapi__compat_v2.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-FASTAPI_COMPAT_V2_PY"
+        ],
+        "commit_sha": "221a66fef4a5199ab46695cd98a0826a2338dbb2"
+      }
+    ]
+  }
+}

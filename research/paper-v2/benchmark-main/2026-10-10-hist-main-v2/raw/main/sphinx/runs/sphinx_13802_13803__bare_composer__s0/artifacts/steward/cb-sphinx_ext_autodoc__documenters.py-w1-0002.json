@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-e542c0104a3930c8",
+  "proposalIds": [
+    "prop-hist-w1-sphinx_ext_autodoc_documenters_py"
+  ],
+  "targetFiles": [
+    "sphinx/ext/autodoc/_documenters.py"
+  ],
+  "appliedFiles": [],
+  "fileBeforeHashes": {},
+  "fileAfterHashes": {},
+  "permissions": {
+    "fileWrite": [
+      "sphinx/ext/autodoc/_documenters.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "blocked",
+  "blockedReasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w1-sphinx_ext_autodoc_documenters_py' context mismatch at base line 1048: expected \"        if self.object is not None and self.__all__ is None:\", found \"        if self.__all__ is None and not self.options.ignore_module_all:\" [proposals: prop-hist-w1-sphinx_ext_autodoc_documenters_py]"
+  ],
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-e542c0104a3930c8",
+    "planId": "merge-e542c0104a3930c8",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-e542c0104a3930c8",
+        "planId": "merge-e542c0104a3930c8",
+        "request_identity": [
+          "prop-hist-w1-sphinx_ext_autodoc_documenters_py"
+        ],
+        "actor_ids": [
+          "writer-13803"
+        ],
+        "request_files": [
+          "sphinx/ext/autodoc/_documenters.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/sphinx/runs/sphinx_13802_13803__bare_composer__s0/artifacts/steward/cb-sphinx_ext_autodoc__documenters.py-w1-0002.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SPHINX_EXT_AUTODOC_DOCUMENTERS_PY"
+        ],
+        "commit_sha": "266c90f768af8639499e86ed8fffac769c24cde6"
+      }
+    ]
+  }
+}

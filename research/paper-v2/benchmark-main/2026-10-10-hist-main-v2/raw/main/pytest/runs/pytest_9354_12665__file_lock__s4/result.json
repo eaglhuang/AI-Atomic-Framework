@@ -1,0 +1,84 @@
+{
+ "pair_id": "pytest:9354_12665",
+ "stratum": "O3",
+ "arm": "file_lock",
+ "plant": null,
+ "seed_k": 4,
+ "seed": 2559619696,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 345,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 6,
+  "by_verdict": {
+   "correct": 6
+  },
+  "completed": 6,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 1,
+  "files_full_bytes_exact": 1,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "src/_pytest/python_api.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "src/_pytest/python_api.py": true
+ },
+ "final_exists": {
+  "src/_pytest/python_api.py": true
+ },
+ "files": [
+  {
+   "path": "src/_pytest/python_api.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:b42b864eb958964fb0c419afbe6ac6e6176a5a1a8c2785e288ec970ed051a757",
+   "final_digest": "sha256:7e345d1002794facb43a422ecd8b5e58c285c428eb151e91b637d4554d6ffa47",
+   "expected_digests": [
+    "sha256:7e345d1002794facb43a422ecd8b5e58c285c428eb151e91b637d4554d6ffa47"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "src/_pytest/python_api.py": "sha256:7e345d1002794facb43a422ecd8b5e58c285c428eb151e91b637d4554d6ffa47"
+ }
+}

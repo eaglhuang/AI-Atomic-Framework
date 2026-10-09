@@ -1,0 +1,133 @@
+{
+ "writer": 0,
+ "pr": 12038,
+ "pid": 2322523,
+ "init_ms": 74.643113,
+ "start_offset_ms": 20,
+ "file_order": [
+  "src/_pytest/fixtures.py"
+ ],
+ "holds": {
+  "src/_pytest/fixtures.py": 22
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 12038,
+   "path": "src/_pytest/fixtures.py",
+   "intents": [
+    "log:pytest:12038_12048:12038:src/_pytest/fixtures.py:h0",
+    "log:pytest:12038_12048:12038:src/_pytest/fixtures.py:h1",
+    "log:pytest:12038_12048:12038:src/_pytest/fixtures.py:h2",
+    "log:pytest:12038_12048:12038:src/_pytest/fixtures.py:h3",
+    "log:pytest:12038_12048:12038:src/_pytest/fixtures.py:h4",
+    "log:pytest:12038_12048:12038:src/_pytest/fixtures.py:h5",
+    "log:pytest:12038_12048:12038:src/_pytest/fixtures.py:h6",
+    "log:pytest:12038_12048:12038:src/_pytest/fixtures.py:h7",
+    "log:pytest:12038_12048:12038:src/_pytest/fixtures.py:h8"
+   ],
+   "hold_ms": 22,
+   "t_submit_epoch": 1791574181577,
+   "outcome": "blocked",
+   "blocked_reason": "file-hash-drift: Target file hash sha256:cd4f1610c0f4c2fbe1b791f44b0f581a4ece554bd79ee1f235eab20ed532b618 does not match proposal fileBeforeHash sha256:b7816cff709f66271f129f0cbf02875167e623cd84c4efaf25e1475174f65595.",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "file-hash-drift: Target file hash sha256:cd4f1610c0f4c2fbe1b791f44b0f581a4ece554bd79ee1f235eab20ed532b618 does not match proposal fileBeforeHash sha256:b7816cff709f66271f129f0cbf02875167e623cd84c4efaf25e1475174f65595."
+   ],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-src__pytest_fixtures.py-w0-0001",
+   "total_ms": 156.24,
+   "t_done_epoch": 1791574181733
+  }
+ ],
+ "admit_stats": null,
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-src__pytest_fixtures.py-w0-0001",
+   "path": "src/_pytest/fixtures.py",
+   "pid": 2322523,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-src_pytest_fixtures_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-src_pytest_fixtures_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:b7816cff709f66271f129f0cbf02875167e623cd84c4efaf25e1475174f65595"
+   ],
+   "lock_wait_ms": 0.16,
+   "t_start_epoch_ms": 1791574181604.91,
+   "pre_apply_hash": "sha256:b7816cff709f66271f129f0cbf02875167e623cd84c4efaf25e1475174f65595",
+   "receipt_before_hash": null,
+   "receipt_after_hash": null,
+   "post_apply_hash": "sha256:cd4f1610c0f4c2fbe1b791f44b0f581a4ece554bd79ee1f235eab20ed532b618",
+   "t_end_epoch_ms": 1791574181732.73,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "blocked",
+   "written": false,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:29:41.732+08:00",
+   "batch_id": "cb-src__pytest_fixtures.py-w0-0001",
+   "path": "src/_pytest/fixtures.py",
+   "proposalIds": [
+    "prop-hist-w0-src_pytest_fixtures_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-src_pytest_fixtures_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-src_pytest_fixtures_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-src_pytest_fixtures_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-src_pytest_fixtures_py",
+     "logical_id": "prop-hist-w0-src_pytest_fixtures_py",
+     "attempt_id": "att-prop-hist-w0-src_pytest_fixtures_py-r0",
+     "proposal_id": "prop-hist-w0-src_pytest_fixtures_py",
+     "actorId": "writer-12038"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "file-hash-drift: Target file hash sha256:cd4f1610c0f4c2fbe1b791f44b0f581a4ece554bd79ee1f235eab20ed532b618 does not match proposal fileBeforeHash sha256:b7816cff709f66271f129f0cbf02875167e623cd84c4efaf25e1475174f65595."
+   ],
+   "blocked_reason": "file-hash-drift: Target file hash sha256:cd4f1610c0f4c2fbe1b791f44b0f581a4ece554bd79ee1f235eab20ed532b618 does not match proposal fileBeforeHash sha256:b7816cff709f66271f129f0cbf02875167e623cd84c4efaf25e1475174f65595.",
+   "window_wait_ms": 0.38,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:b7816cff709f66271f129f0cbf02875167e623cd84c4efaf25e1475174f65595",
+   "written": false,
+   "output_digest": null,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "file-hash-drift: Target file hash sha256:cd4f1610c0f4c2fbe1b791f44b0f581a4ece554bd79ee1f235eab20ed532b618 does not match proposal fileBeforeHash sha256:b7816cff709f66271f129f0cbf02875167e623cd84c4efaf25e1475174f65595."
+  }
+ ]
+}

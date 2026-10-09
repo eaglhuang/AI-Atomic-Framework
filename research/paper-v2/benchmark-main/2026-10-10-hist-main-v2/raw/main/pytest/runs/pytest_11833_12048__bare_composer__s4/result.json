@@ -1,0 +1,87 @@
+{
+ "pair_id": "pytest:11833_12048",
+ "stratum": "O2",
+ "arm": "bare_composer",
+ "plant": null,
+ "seed_k": 4,
+ "seed": 765549949,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 448,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 11,
+  "by_verdict": {
+   "blocked_absent": 8,
+   "correct": 3
+  },
+  "completed": 3,
+  "lost_effects": 0,
+  "blocked": 8,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 1,
+  "files_full_bytes_exact": 1,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {
+  "file-hash-drift: Target file hash sha256": 8
+ },
+ "structure": {
+  "src/_pytest/fixtures.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "src/_pytest/fixtures.py": true
+ },
+ "final_exists": {
+  "src/_pytest/fixtures.py": true
+ },
+ "files": [
+  {
+   "path": "src/_pytest/fixtures.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:fd1269b369657921407d632b83259a53f073f6a14951ec9f220fb0d357f4767a",
+   "final_digest": "sha256:47d6c557c12e41e4063d530303ca86237d49b62875080bebdb127c74fe03d091",
+   "expected_digests": [
+    "sha256:47d6c557c12e41e4063d530303ca86237d49b62875080bebdb127c74fe03d091"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "src/_pytest/fixtures.py": "sha256:47d6c557c12e41e4063d530303ca86237d49b62875080bebdb127c74fe03d091"
+ }
+}

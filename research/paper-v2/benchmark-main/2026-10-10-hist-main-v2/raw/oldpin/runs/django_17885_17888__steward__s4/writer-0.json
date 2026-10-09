@@ -1,0 +1,129 @@
+{
+ "writer": 0,
+ "pr": 17885,
+ "pid": 2439283,
+ "init_ms": 90.484602,
+ "start_offset_ms": 5,
+ "file_order": [
+  "django/contrib/admin/options.py"
+ ],
+ "holds": {
+  "django/contrib/admin/options.py": 26
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 17885,
+   "path": "django/contrib/admin/options.py",
+   "intents": [
+    "log:django:17885_17888:17885:django/contrib/admin/options.py:h0",
+    "log:django:17885_17888:17885:django/contrib/admin/options.py:h1"
+   ],
+   "hold_ms": 26,
+   "t_submit_epoch": 1791575039927,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 13,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-django_contrib_admin_options.py-w0-0001",
+   "total_ms": 149.89,
+   "t_done_epoch": 1791575040077
+  }
+ ],
+ "admit_stats": {
+  "txns": 2,
+  "cas_conflicts": 0
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-django_contrib_admin_options.py-w0-0001",
+   "path": "django/contrib/admin/options.py",
+   "pid": 2439283,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-django_contrib_admin_options_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-django_contrib_admin_options_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:4a89e111323486b31f9b14804d2faf96c4fd87dcaf2bb841453c5e974c5375d1"
+   ],
+   "lock_wait_ms": 0.14,
+   "t_start_epoch_ms": 1791575039971.33,
+   "pre_apply_hash": "sha256:4a89e111323486b31f9b14804d2faf96c4fd87dcaf2bb841453c5e974c5375d1",
+   "receipt_before_hash": "sha256:4a89e111323486b31f9b14804d2faf96c4fd87dcaf2bb841453c5e974c5375d1",
+   "receipt_after_hash": "sha256:59c7e000fc92df7cb0f5e0ea37499e4cb20cbe4293bfdec21656f1ef0eb70af1",
+   "post_apply_hash": "sha256:59c7e000fc92df7cb0f5e0ea37499e4cb20cbe4293bfdec21656f1ef0eb70af1",
+   "t_end_epoch_ms": 1791575040074.05,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:44:00.074+08:00",
+   "batch_id": "cb-django_contrib_admin_options.py-w0-0001",
+   "path": "django/contrib/admin/options.py",
+   "proposalIds": [
+    "prop-hist-w0-django_contrib_admin_options_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-django_contrib_admin_options_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-django_contrib_admin_options_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-django_contrib_admin_options_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-django_contrib_admin_options_py",
+     "logical_id": "prop-hist-w0-django_contrib_admin_options_py",
+     "attempt_id": "att-prop-hist-w0-django_contrib_admin_options_py-r0",
+     "proposal_id": "prop-hist-w0-django_contrib_admin_options_py",
+     "actorId": "writer-17885"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.3,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:4a89e111323486b31f9b14804d2faf96c4fd87dcaf2bb841453c5e974c5375d1",
+   "written": true,
+   "output_digest": "sha256:59c7e000fc92df7cb0f5e0ea37499e4cb20cbe4293bfdec21656f1ef0eb70af1",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

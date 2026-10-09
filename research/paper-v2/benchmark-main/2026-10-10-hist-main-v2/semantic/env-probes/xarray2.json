@@ -1,0 +1,71 @@
+{
+ "method": "STALE union-test-set, new failures only",
+ "python": "/workspace/scratch/hist/envs/xarray/bin/python",
+ "results": {
+  "xarray:9766_9771": {
+   "arm_runs": {},
+   "base_valid": false,
+   "conditions": {
+    "A": [
+     {
+      "failed": [
+       "xarray/tests/test_dataarray.py::TestDataArray::test_copy_coords[True-expected_orig0]",
+       "xarray/tests/test_dataset.py::TestDataset::test_copy_coords[True-expected_orig0]"
+      ],
+      "n": 1374,
+      "rc": 0,
+      "secs": 13.3,
+      "stderr_tail": "",
+      "tag": "A#0"
+     }
+    ],
+    "B": [
+     {
+      "failed": [
+       "xarray/tests/test_dataarray.py::TestDataArray::test_copy_coords[True-expected_orig0]",
+       "xarray/tests/test_dataset.py::TestDataset::test_copy_coords[True-expected_orig0]"
+      ],
+      "n": 1374,
+      "rc": 0,
+      "secs": 13.8,
+      "stderr_tail": "",
+      "tag": "B#0"
+     }
+    ],
+    "b": {
+     "failed": [
+      "xarray/tests/test_dataarray.py::TestDataArray::test_copy_coords[True-expected_orig0]",
+      "xarray/tests/test_dataset.py::TestDataset::test_copy_coords[True-expected_orig0]"
+     ],
+     "n": 1374,
+     "rc": 0,
+     "secs": 13.1,
+     "stderr_tail": "",
+     "tag": "b"
+    },
+    "gold": {
+     "failed": [
+      "xarray/tests/test_dataarray.py::TestDataArray::test_copy_coords[True-expected_orig0]",
+      "xarray/tests/test_dataset.py::TestDataset::test_copy_coords[True-expected_orig0]"
+     ],
+     "n": 1374,
+     "rc": 0,
+     "secs": 13.6,
+     "stderr_tail": "",
+     "tag": "gold"
+    }
+   },
+   "f2p_A": [],
+   "f2p_B": [],
+   "flaky": [],
+   "historical_interference": [],
+   "labels": [
+    "xarray/tests/test_dataarray.py",
+    "xarray/tests/test_dataset.py",
+    "xarray/tests/test_duck_array_ops.py"
+   ],
+   "pair_id": "xarray:9766_9771",
+   "status": "evaluated-base-invalid (semantic endpoint excluded per prereg)"
+  }
+ }
+}

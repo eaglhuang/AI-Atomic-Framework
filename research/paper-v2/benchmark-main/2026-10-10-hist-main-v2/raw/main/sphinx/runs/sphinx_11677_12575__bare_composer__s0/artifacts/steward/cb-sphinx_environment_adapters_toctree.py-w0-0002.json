@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-d5402dc94374d6fa",
+  "proposalIds": [
+    "prop-hist-w0-sphinx_environment_adapters_toctree_py"
+  ],
+  "targetFiles": [
+    "sphinx/environment/adapters/toctree.py"
+  ],
+  "appliedFiles": [
+    "sphinx/environment/adapters/toctree.py"
+  ],
+  "fileBeforeHashes": {
+    "sphinx/environment/adapters/toctree.py": "dc70afd3ce63da43d135908a483553010b0704716613e1597c84e667a08056d9"
+  },
+  "fileAfterHashes": {
+    "sphinx/environment/adapters/toctree.py": "07398aa7a4754350580bd9a54389f09bac341322d3276701f968c758536dc701"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sphinx/environment/adapters/toctree.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-d5402dc94374d6fa",
+    "planId": "merge-d5402dc94374d6fa",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-d5402dc94374d6fa",
+        "planId": "merge-d5402dc94374d6fa",
+        "request_identity": [
+          "prop-hist-w0-sphinx_environment_adapters_toctree_py"
+        ],
+        "actor_ids": [
+          "writer-11677"
+        ],
+        "request_files": [
+          "sphinx/environment/adapters/toctree.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sphinx/environment/adapters/toctree.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/sphinx/runs/sphinx_11677_12575__bare_composer__s0/artifacts/steward/cb-sphinx_environment_adapters_toctree.py-w0-0002.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SPHINX_ENVIRONMENT_ADAPTERS_TOCTREE_PY"
+        ],
+        "commit_sha": "990638ee3834a789ab640fd89acdd635562c9565"
+      }
+    ]
+  }
+}

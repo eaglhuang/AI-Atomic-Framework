@@ -1,0 +1,130 @@
+{
+ "writer": 0,
+ "pr": 13732,
+ "pid": 2466689,
+ "init_ms": 88.18320800000001,
+ "start_offset_ms": 0,
+ "file_order": [
+  "src/_pytest/config/__init__.py"
+ ],
+ "holds": {
+  "src/_pytest/config/__init__.py": 23
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 13732,
+   "path": "src/_pytest/config/__init__.py",
+   "intents": [
+    "log:pytest:13732_13733:13732:src/_pytest/config/__init__.py:h0",
+    "log:pytest:13732_13733:13732:src/_pytest/config/__init__.py:h1",
+    "log:pytest:13732_13733:13732:src/_pytest/config/__init__.py:h2"
+   ],
+   "hold_ms": 23,
+   "t_submit_epoch": 1791575291957,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 13,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-src__pytest_config___init__.py-w0-0001",
+   "total_ms": 152.22,
+   "t_done_epoch": 1791575292109
+  }
+ ],
+ "admit_stats": {
+  "txns": 2,
+  "cas_conflicts": 0
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-src__pytest_config___init__.py-w0-0001",
+   "path": "src/_pytest/config/__init__.py",
+   "pid": 2466689,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-src_pytest_config_init_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-src_pytest_config_init_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:3bfdc0e52d23cbbc1081440faab18bc2fb031df5d20e11c2a7c25f1a2f9c753b"
+   ],
+   "lock_wait_ms": 0.12,
+   "t_start_epoch_ms": 1791575291997.4,
+   "pre_apply_hash": "sha256:3bfdc0e52d23cbbc1081440faab18bc2fb031df5d20e11c2a7c25f1a2f9c753b",
+   "receipt_before_hash": "sha256:3bfdc0e52d23cbbc1081440faab18bc2fb031df5d20e11c2a7c25f1a2f9c753b",
+   "receipt_after_hash": "sha256:3639053b1a8e2da25a9fa422d009fd7a83593c430c599762d1fdf4e8f4a1bc14",
+   "post_apply_hash": "sha256:3639053b1a8e2da25a9fa422d009fd7a83593c430c599762d1fdf4e8f4a1bc14",
+   "t_end_epoch_ms": 1791575292087.41,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:48:12.087+08:00",
+   "batch_id": "cb-src__pytest_config___init__.py-w0-0001",
+   "path": "src/_pytest/config/__init__.py",
+   "proposalIds": [
+    "prop-hist-w0-src_pytest_config_init_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-src_pytest_config_init_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-src_pytest_config_init_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-src_pytest_config_init_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-src_pytest_config_init_py",
+     "logical_id": "prop-hist-w0-src_pytest_config_init_py",
+     "attempt_id": "att-prop-hist-w0-src_pytest_config_init_py-r0",
+     "proposal_id": "prop-hist-w0-src_pytest_config_init_py",
+     "actorId": "writer-13732"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.24,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:3bfdc0e52d23cbbc1081440faab18bc2fb031df5d20e11c2a7c25f1a2f9c753b",
+   "written": true,
+   "output_digest": "sha256:3639053b1a8e2da25a9fa422d009fd7a83593c430c599762d1fdf4e8f4a1bc14",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

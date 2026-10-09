@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-5fa646342a82167f",
+  "proposalIds": [
+    "prop-hist-w1-sympy_polys_rootisolation_py"
+  ],
+  "targetFiles": [
+    "sympy/polys/rootisolation.py"
+  ],
+  "appliedFiles": [
+    "sympy/polys/rootisolation.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/polys/rootisolation.py": "bcebca7b5562dae92598c078a8dcbf11ccd24737a5314a8f077a3ba98762591d"
+  },
+  "fileAfterHashes": {
+    "sympy/polys/rootisolation.py": "7fa5450cc05858604b7f1f6145e4a6f68236ee0ba5d88ec33a0a3777c4800aa7"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/polys/rootisolation.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-5fa646342a82167f",
+    "planId": "merge-5fa646342a82167f",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-5fa646342a82167f",
+        "planId": "merge-5fa646342a82167f",
+        "request_identity": [
+          "prop-hist-w1-sympy_polys_rootisolation_py"
+        ],
+        "actor_ids": [
+          "writer-26187"
+        ],
+        "request_files": [
+          "sympy/polys/rootisolation.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/polys/rootisolation.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/sympy/runs/sympy_25186_26187__bare_composer__s4/artifacts/steward/cb-sympy_polys_rootisolation.py-w1-0002.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_POLYS_ROOTISOLATION_PY"
+        ],
+        "commit_sha": "2b46ce63dc637c7d294ec1874bfc2d38baf0bbbc"
+      }
+    ]
+  }
+}

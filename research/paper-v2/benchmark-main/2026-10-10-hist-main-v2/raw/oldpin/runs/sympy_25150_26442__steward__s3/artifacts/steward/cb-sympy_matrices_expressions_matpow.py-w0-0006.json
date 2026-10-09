@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-5e87fed475de3c40",
+  "proposalIds": [
+    "prop-hist-w0-sympy_matrices_expressions_matpow_py"
+  ],
+  "targetFiles": [
+    "sympy/matrices/expressions/matpow.py"
+  ],
+  "appliedFiles": [
+    "sympy/matrices/expressions/matpow.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/matrices/expressions/matpow.py": "a6eb98078f70af55b3171853f437135ad1766c60c559c6c9ee8875e004d0011b"
+  },
+  "fileAfterHashes": {
+    "sympy/matrices/expressions/matpow.py": "374466314cc785b1166b99d71f837fcd44673293fc46864dab8dd060e82695f4"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/matrices/expressions/matpow.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-5e87fed475de3c40",
+    "planId": "merge-5e87fed475de3c40",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-5e87fed475de3c40",
+        "planId": "merge-5e87fed475de3c40",
+        "request_identity": [
+          "prop-hist-w0-sympy_matrices_expressions_matpow_py"
+        ],
+        "actor_ids": [
+          "writer-25150"
+        ],
+        "request_files": [
+          "sympy/matrices/expressions/matpow.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/matrices/expressions/matpow.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/oldpin/runs/sympy_25150_26442__steward__s3/artifacts/steward/cb-sympy_matrices_expressions_matpow.py-w0-0006.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SYMPY_MATRICES_EXPRESSIONS_MATPOW_PY"
+        ],
+        "commit_sha": "f658d98c24e9055b4d6969f92dc830bb0ccfa044"
+      }
+    ]
+  }
+}

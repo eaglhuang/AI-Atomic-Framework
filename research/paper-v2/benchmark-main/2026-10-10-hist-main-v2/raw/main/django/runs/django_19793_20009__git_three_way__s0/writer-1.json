@@ -1,0 +1,65 @@
+{
+ "writer": 1,
+ "pr": 20009,
+ "pid": 2178773,
+ "init_ms": 81.396495,
+ "start_offset_ms": 16,
+ "file_order": [
+  "django/db/models/fields/json.py",
+  "django/db/models/lookups.py"
+ ],
+ "holds": {
+  "django/db/models/fields/json.py": 3,
+  "django/db/models/lookups.py": 11
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 20009,
+   "path": "django/db/models/fields/json.py",
+   "intents": [
+    "log:django:19793_20009:20009:django/db/models/fields/json.py:h0",
+    "log:django:19793_20009:20009:django/db/models/fields/json.py:h1",
+    "log:django:19793_20009:20009:django/db/models/fields/json.py:h2",
+    "log:django:19793_20009:20009:django/db/models/fields/json.py:h3",
+    "log:django:19793_20009:20009:django/db/models/fields/json.py:h4",
+    "log:django:19793_20009:20009:django/db/models/fields/json.py:h5",
+    "log:django:19793_20009:20009:django/db/models/fields/json.py:h6"
+   ],
+   "hold_ms": 3,
+   "t_submit_epoch": 1791572797052,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 17,
+   "outcome": "blocked",
+   "blocked_reason": "git-base-drift",
+   "total_ms": 33.57,
+   "t_done_epoch": 1791572797086
+  },
+  {
+   "writer": 1,
+   "pr": 20009,
+   "path": "django/db/models/lookups.py",
+   "intents": [
+    "log:django:19793_20009:20009:django/db/models/lookups.py:h7",
+    "log:django:19793_20009:20009:django/db/models/lookups.py:h8",
+    "log:django:19793_20009:20009:django/db/models/lookups.py:h9"
+   ],
+   "hold_ms": 11,
+   "t_submit_epoch": 1791572797086,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "commit",
+   "total_ms": 22.17,
+   "t_done_epoch": 1791572797108
+  }
+ ],
+ "admit_stats": {
+  "txns": 4,
+  "cas_conflicts": 7
+ },
+ "steward_batches": null
+}

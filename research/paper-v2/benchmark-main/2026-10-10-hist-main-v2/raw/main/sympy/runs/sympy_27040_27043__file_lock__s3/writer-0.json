@@ -1,0 +1,108 @@
+{
+ "writer": 0,
+ "pr": 27040,
+ "pid": 2219483,
+ "init_ms": 71.486128,
+ "start_offset_ms": 19,
+ "file_order": [
+  "sympy/geometry/line.py",
+  "sympy/physics/vector/vector.py",
+  "sympy/physics/vector/dyadic.py"
+ ],
+ "holds": {
+  "sympy/geometry/line.py": 25,
+  "sympy/physics/vector/vector.py": 12,
+  "sympy/physics/vector/dyadic.py": 26
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 27040,
+   "path": "sympy/geometry/line.py",
+   "intents": [
+    "log:sympy:27040_27043:27040:sympy/geometry/line.py:h0"
+   ],
+   "hold_ms": 25,
+   "t_submit_epoch": 1791573147754,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 16,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 47.37,
+   "t_done_epoch": 1791573147801
+  },
+  {
+   "writer": 0,
+   "pr": 27040,
+   "path": "sympy/physics/vector/vector.py",
+   "intents": [
+    "log:sympy:27040_27043:27040:sympy/physics/vector/vector.py:h22",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/vector.py:h23",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/vector.py:h24",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/vector.py:h25",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/vector.py:h26",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/vector.py:h27",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/vector.py:h28",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/vector.py:h29"
+   ],
+   "hold_ms": 12,
+   "t_submit_epoch": 1791573147801,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "queue",
+   "admit_wait_ms": 15,
+   "lock_spins": 0,
+   "outcome": "blocked",
+   "blocked_reason": "harness-relocate-context-not-found",
+   "total_ms": 31.79,
+   "t_done_epoch": 1791573147833
+  },
+  {
+   "writer": 0,
+   "pr": 27040,
+   "path": "sympy/physics/vector/dyadic.py",
+   "intents": [
+    "log:sympy:27040_27043:27040:sympy/physics/vector/dyadic.py:h1",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/dyadic.py:h2",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/dyadic.py:h3",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/dyadic.py:h4",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/dyadic.py:h5",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/dyadic.py:h6",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/dyadic.py:h7",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/dyadic.py:h8",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/dyadic.py:h9",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/dyadic.py:h10",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/dyadic.py:h11",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/dyadic.py:h12",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/dyadic.py:h13",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/dyadic.py:h14",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/dyadic.py:h15",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/dyadic.py:h16",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/dyadic.py:h17",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/dyadic.py:h18",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/dyadic.py:h19",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/dyadic.py:h20",
+    "log:sympy:27040_27043:27040:sympy/physics/vector/dyadic.py:h21"
+   ],
+   "hold_ms": 26,
+   "t_submit_epoch": 1791573147833,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "queue",
+   "admit_wait_ms": 24,
+   "lock_spins": 0,
+   "outcome": "blocked",
+   "blocked_reason": "harness-relocate-context-not-found",
+   "total_ms": 53.26,
+   "t_done_epoch": 1791573147886
+  }
+ ],
+ "admit_stats": {
+  "txns": 8,
+  "cas_conflicts": 3
+ },
+ "steward_batches": null
+}

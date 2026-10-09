@@ -1,0 +1,460 @@
+{
+ "method": "STALE union-test-set, new failures only",
+ "python": "/workspace/scratch/hist/envs/fastapi-st0.41.3/bin/python",
+ "results": {
+  "fastapi:11194_12627": {
+   "arm_runs": {
+    "fastapi_11194_12627__bare_composer__s0": {
+     "status": "not-evaluable:not-all-intents-completed"
+    },
+    "fastapi_11194_12627__bare_composer__s1": {
+     "status": "not-evaluable:not-all-intents-completed"
+    },
+    "fastapi_11194_12627__bare_composer__s2": {
+     "arm_regression": [],
+     "gold_relative_regression": [],
+     "same_bytes_as_gold": true,
+     "status": "evaluated"
+    },
+    "fastapi_11194_12627__bare_composer__s3": {
+     "status": "not-evaluable:not-all-intents-completed"
+    },
+    "fastapi_11194_12627__bare_composer__s4": {
+     "status": "not-evaluable:not-all-intents-completed"
+    },
+    "fastapi_11194_12627__file_lock__s0": {
+     "arm_regression": [],
+     "gold_relative_regression": [],
+     "same_bytes_as_gold": true,
+     "status": "evaluated"
+    },
+    "fastapi_11194_12627__file_lock__s1": {
+     "arm_regression": [],
+     "gold_relative_regression": [],
+     "same_bytes_as_gold": true,
+     "status": "evaluated"
+    },
+    "fastapi_11194_12627__file_lock__s2": {
+     "arm_regression": [],
+     "gold_relative_regression": [],
+     "same_bytes_as_gold": true,
+     "status": "evaluated"
+    },
+    "fastapi_11194_12627__file_lock__s3": {
+     "arm_regression": [],
+     "gold_relative_regression": [],
+     "same_bytes_as_gold": true,
+     "status": "evaluated"
+    },
+    "fastapi_11194_12627__file_lock__s4": {
+     "arm_regression": [],
+     "gold_relative_regression": [],
+     "same_bytes_as_gold": true,
+     "status": "evaluated"
+    },
+    "fastapi_11194_12627__git_three_way__s0": {
+     "arm_regression": [],
+     "gold_relative_regression": [],
+     "same_bytes_as_gold": true,
+     "status": "evaluated"
+    },
+    "fastapi_11194_12627__git_three_way__s1": {
+     "status": "not-evaluable:not-all-intents-completed"
+    },
+    "fastapi_11194_12627__git_three_way__s2": {
+     "arm_regression": [],
+     "gold_relative_regression": [],
+     "same_bytes_as_gold": true,
+     "status": "evaluated"
+    },
+    "fastapi_11194_12627__git_three_way__s3": {
+     "arm_regression": [],
+     "gold_relative_regression": [],
+     "same_bytes_as_gold": true,
+     "status": "evaluated"
+    },
+    "fastapi_11194_12627__git_three_way__s4": {
+     "arm_regression": [],
+     "gold_relative_regression": [],
+     "same_bytes_as_gold": true,
+     "status": "evaluated"
+    },
+    "fastapi_11194_12627__occ__s0": {
+     "arm_regression": [],
+     "gold_relative_regression": [],
+     "same_bytes_as_gold": true,
+     "status": "evaluated"
+    },
+    "fastapi_11194_12627__occ__s1": {
+     "arm_regression": [],
+     "gold_relative_regression": [],
+     "same_bytes_as_gold": true,
+     "status": "evaluated"
+    },
+    "fastapi_11194_12627__occ__s2": {
+     "arm_regression": [],
+     "gold_relative_regression": [],
+     "same_bytes_as_gold": true,
+     "status": "evaluated"
+    },
+    "fastapi_11194_12627__occ__s3": {
+     "arm_regression": [],
+     "gold_relative_regression": [],
+     "same_bytes_as_gold": true,
+     "status": "evaluated"
+    },
+    "fastapi_11194_12627__occ__s4": {
+     "arm_regression": [],
+     "gold_relative_regression": [],
+     "same_bytes_as_gold": true,
+     "status": "evaluated"
+    },
+    "fastapi_11194_12627__steward__s0": {
+     "status": "not-evaluable:not-all-intents-completed"
+    },
+    "fastapi_11194_12627__steward__s1": {
+     "arm_regression": [],
+     "gold_relative_regression": [],
+     "same_bytes_as_gold": true,
+     "status": "evaluated"
+    },
+    "fastapi_11194_12627__steward__s2": {
+     "status": "not-evaluable:not-all-intents-completed"
+    },
+    "fastapi_11194_12627__steward__s3": {
+     "status": "not-evaluable:not-all-intents-completed"
+    },
+    "fastapi_11194_12627__steward__s4": {
+     "status": "not-evaluable:not-all-intents-completed"
+    }
+   },
+   "base_valid": false,
+   "conditions": {
+    "A": [
+     {
+      "failed": [],
+      "n": 15,
+      "rc": 0,
+      "secs": 1.4,
+      "stderr_tail": "",
+      "tag": "A#0"
+     },
+     {
+      "failed": [],
+      "n": 15,
+      "rc": 0,
+      "secs": 1.3,
+      "stderr_tail": "",
+      "tag": "A#1"
+     },
+     {
+      "failed": [],
+      "n": 15,
+      "rc": 0,
+      "secs": 1.4,
+      "stderr_tail": "",
+      "tag": "A#2"
+     }
+    ],
+    "B": [
+     {
+      "failed": [
+       "tests/test_file_and_form_order_issue_9116.py::test_file_form_order[/file_after_form]",
+       "tests/test_file_and_form_order_issue_9116.py::test_file_list_form_order[/file_list_after_form]"
+      ],
+      "n": 15,
+      "rc": 1,
+      "secs": 1.3,
+      "stderr_tail": "",
+      "tag": "B#0"
+     },
+     {
+      "failed": [
+       "tests/test_file_and_form_order_issue_9116.py::test_file_form_order[/file_after_form]",
+       "tests/test_file_and_form_order_issue_9116.py::test_file_list_form_order[/file_list_after_form]"
+      ],
+      "n": 15,
+      "rc": 1,
+      "secs": 1.3,
+      "stderr_tail": "",
+      "tag": "B#1"
+     },
+     {
+      "failed": [
+       "tests/test_file_and_form_order_issue_9116.py::test_file_form_order[/file_after_form]",
+       "tests/test_file_and_form_order_issue_9116.py::test_file_list_form_order[/file_list_after_form]"
+      ],
+      "n": 15,
+      "rc": 1,
+      "secs": 1.3,
+      "stderr_tail": "",
+      "tag": "B#2"
+     }
+    ],
+    "b": {
+     "failed": [
+      "tests/test_file_and_form_order_issue_9116.py::test_file_form_order[/file_after_form]",
+      "tests/test_file_and_form_order_issue_9116.py::test_file_list_form_order[/file_list_after_form]"
+     ],
+     "n": 15,
+     "rc": 1,
+     "secs": 1.4,
+     "stderr_tail": "",
+     "tag": "b"
+    },
+    "gold": {
+     "failed": [],
+     "n": 15,
+     "rc": 0,
+     "secs": 1.3,
+     "stderr_tail": "",
+     "tag": "gold"
+    }
+   },
+   "f2p_A": [
+    "tests/test_file_and_form_order_issue_9116.py::test_file_form_order[/file_after_form]",
+    "tests/test_file_and_form_order_issue_9116.py::test_file_list_form_order[/file_list_after_form]"
+   ],
+   "f2p_B": [],
+   "flaky": [],
+   "historical_interference": [],
+   "labels": [
+    "tests/test_file_and_form_order_issue_9116.py",
+    "tests/test_multipart_installation.py"
+   ],
+   "pair_id": "fastapi:11194_12627",
+   "status": "evaluated-base-invalid (semantic endpoint excluded per prereg)"
+  },
+  "fastapi:6039_12971": {
+   "arm_runs": {
+    "fastapi_6039_12971__bare_composer__s0": {
+     "status": "not-evaluable:not-all-intents-completed"
+    },
+    "fastapi_6039_12971__bare_composer__s1": {
+     "arm_regression": [],
+     "gold_relative_regression": [],
+     "same_bytes_as_gold": true,
+     "status": "evaluated"
+    },
+    "fastapi_6039_12971__bare_composer__s2": {
+     "arm_regression": [],
+     "gold_relative_regression": [],
+     "same_bytes_as_gold": true,
+     "status": "evaluated"
+    },
+    "fastapi_6039_12971__bare_composer__s3": {
+     "status": "not-evaluable:not-all-intents-completed"
+    },
+    "fastapi_6039_12971__bare_composer__s4": {
+     "status": "not-evaluable:not-all-intents-completed"
+    },
+    "fastapi_6039_12971__file_lock__s0": {
+     "arm_regression": [],
+     "gold_relative_regression": [],
+     "same_bytes_as_gold": true,
+     "status": "evaluated"
+    },
+    "fastapi_6039_12971__file_lock__s1": {
+     "arm_regression": [],
+     "gold_relative_regression": [],
+     "same_bytes_as_gold": true,
+     "status": "evaluated"
+    },
+    "fastapi_6039_12971__file_lock__s2": {
+     "arm_regression": [],
+     "gold_relative_regression": [],
+     "same_bytes_as_gold": true,
+     "status": "evaluated"
+    },
+    "fastapi_6039_12971__file_lock__s3": {
+     "arm_regression": [],
+     "gold_relative_regression": [],
+     "same_bytes_as_gold": true,
+     "status": "evaluated"
+    },
+    "fastapi_6039_12971__file_lock__s4": {
+     "arm_regression": [],
+     "gold_relative_regression": [],
+     "same_bytes_as_gold": true,
+     "status": "evaluated"
+    },
+    "fastapi_6039_12971__git_three_way__s0": {
+     "arm_regression": [],
+     "gold_relative_regression": [],
+     "same_bytes_as_gold": true,
+     "status": "evaluated"
+    },
+    "fastapi_6039_12971__git_three_way__s1": {
+     "status": "not-evaluable:not-all-intents-completed"
+    },
+    "fastapi_6039_12971__git_three_way__s2": {
+     "arm_regression": [],
+     "gold_relative_regression": [],
+     "same_bytes_as_gold": true,
+     "status": "evaluated"
+    },
+    "fastapi_6039_12971__git_three_way__s3": {
+     "status": "not-evaluable:not-all-intents-completed"
+    },
+    "fastapi_6039_12971__git_three_way__s4": {
+     "arm_regression": [],
+     "gold_relative_regression": [],
+     "same_bytes_as_gold": true,
+     "status": "evaluated"
+    },
+    "fastapi_6039_12971__occ__s0": {
+     "arm_regression": [],
+     "gold_relative_regression": [],
+     "same_bytes_as_gold": true,
+     "status": "evaluated"
+    },
+    "fastapi_6039_12971__occ__s1": {
+     "arm_regression": [],
+     "gold_relative_regression": [],
+     "same_bytes_as_gold": true,
+     "status": "evaluated"
+    },
+    "fastapi_6039_12971__occ__s2": {
+     "arm_regression": [],
+     "gold_relative_regression": [],
+     "same_bytes_as_gold": true,
+     "status": "evaluated"
+    },
+    "fastapi_6039_12971__occ__s3": {
+     "arm_regression": [],
+     "gold_relative_regression": [],
+     "same_bytes_as_gold": true,
+     "status": "evaluated"
+    },
+    "fastapi_6039_12971__occ__s4": {
+     "arm_regression": [],
+     "gold_relative_regression": [],
+     "same_bytes_as_gold": true,
+     "status": "evaluated"
+    },
+    "fastapi_6039_12971__steward__s0": {
+     "status": "not-evaluable:not-all-intents-completed"
+    },
+    "fastapi_6039_12971__steward__s1": {
+     "status": "not-evaluable:not-all-intents-completed"
+    },
+    "fastapi_6039_12971__steward__s2": {
+     "arm_regression": [],
+     "gold_relative_regression": [],
+     "same_bytes_as_gold": true,
+     "status": "evaluated"
+    },
+    "fastapi_6039_12971__steward__s3": {
+     "arm_regression": [],
+     "gold_relative_regression": [],
+     "same_bytes_as_gold": true,
+     "status": "evaluated"
+    },
+    "fastapi_6039_12971__steward__s4": {
+     "status": "not-evaluable:not-all-intents-completed"
+    }
+   },
+   "base_valid": false,
+   "conditions": {
+    "A": [
+     {
+      "failed": [
+       "tests/test_get_model_definitions_formfeed_escape.py::test_openapi_schema"
+      ],
+      "n": 26,
+      "rc": 1,
+      "secs": 1.5,
+      "stderr_tail": "",
+      "tag": "A#0"
+     },
+     {
+      "failed": [
+       "tests/test_get_model_definitions_formfeed_escape.py::test_openapi_schema"
+      ],
+      "n": 26,
+      "rc": 1,
+      "secs": 1.4,
+      "stderr_tail": "",
+      "tag": "A#1"
+     },
+     {
+      "failed": [
+       "tests/test_get_model_definitions_formfeed_escape.py::test_openapi_schema"
+      ],
+      "n": 26,
+      "rc": 1,
+      "secs": 1.4,
+      "stderr_tail": "",
+      "tag": "A#2"
+     }
+    ],
+    "B": [
+     {
+      "failed": [
+       "tests/test_get_model_definitions_formfeed_escape.py::test_openapi_schema"
+      ],
+      "n": 26,
+      "rc": 1,
+      "secs": 1.3,
+      "stderr_tail": "",
+      "tag": "B#0"
+     },
+     {
+      "failed": [
+       "tests/test_get_model_definitions_formfeed_escape.py::test_openapi_schema"
+      ],
+      "n": 26,
+      "rc": 1,
+      "secs": 1.4,
+      "stderr_tail": "",
+      "tag": "B#1"
+     },
+     {
+      "failed": [
+       "tests/test_get_model_definitions_formfeed_escape.py::test_openapi_schema"
+      ],
+      "n": 26,
+      "rc": 1,
+      "secs": 1.4,
+      "stderr_tail": "",
+      "tag": "B#2"
+     }
+    ],
+    "b": {
+     "failed": [
+      "tests/test_get_model_definitions_formfeed_escape.py::test_openapi_schema"
+     ],
+     "n": 26,
+     "rc": 1,
+     "secs": 1.4,
+     "stderr_tail": "",
+     "tag": "b"
+    },
+    "gold": {
+     "failed": [
+      "tests/test_get_model_definitions_formfeed_escape.py::test_openapi_schema"
+     ],
+     "n": 26,
+     "rc": 1,
+     "secs": 1.4,
+     "stderr_tail": "",
+     "tag": "gold"
+    }
+   },
+   "f2p_A": [],
+   "f2p_B": [],
+   "flaky": [],
+   "historical_interference": [],
+   "labels": [
+    "tests/test_get_model_definitions_formfeed_escape.py",
+    "tests/test_tutorial/test_query_params_str_validations/test_tutorial010.py",
+    "tests/test_tutorial/test_query_params_str_validations/test_tutorial010_an.py",
+    "tests/test_tutorial/test_query_params_str_validations/test_tutorial010_an_py310.py",
+    "tests/test_tutorial/test_query_params_str_validations/test_tutorial010_an_py39.py",
+    "tests/test_tutorial/test_query_params_str_validations/test_tutorial010_py310.py"
+   ],
+   "pair_id": "fastapi:6039_12971",
+   "status": "evaluated-base-invalid (semantic endpoint excluded per prereg)"
+  }
+ }
+}

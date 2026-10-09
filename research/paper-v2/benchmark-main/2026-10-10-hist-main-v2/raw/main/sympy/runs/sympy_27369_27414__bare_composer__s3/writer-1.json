@@ -1,0 +1,121 @@
+{
+ "writer": 1,
+ "pr": 27414,
+ "pid": 2210193,
+ "init_ms": 97.722877,
+ "start_offset_ms": 11,
+ "file_order": [
+  "sympy/algebras/quaternion.py"
+ ],
+ "holds": {
+  "sympy/algebras/quaternion.py": 15
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 27414,
+   "path": "sympy/algebras/quaternion.py",
+   "intents": [
+    "log:sympy:27369_27414:27414:sympy/algebras/quaternion.py:h0"
+   ],
+   "hold_ms": 15,
+   "t_submit_epoch": 1791573057769,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sympy_algebras_quaternion.py-w1-0001",
+   "total_ms": 141.24,
+   "t_done_epoch": 1791573057910
+  }
+ ],
+ "admit_stats": null,
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sympy_algebras_quaternion.py-w1-0001",
+   "path": "sympy/algebras/quaternion.py",
+   "pid": 2210193,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-sympy_algebras_quaternion_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sympy_algebras_quaternion_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:b336f89dff071224b98a2c12ad7a79991bac7e20cc4ee73cf90ea530ab81ae47"
+   ],
+   "lock_wait_ms": 0.19,
+   "t_start_epoch_ms": 1791573057795.02,
+   "pre_apply_hash": "sha256:b336f89dff071224b98a2c12ad7a79991bac7e20cc4ee73cf90ea530ab81ae47",
+   "receipt_before_hash": "sha256:b336f89dff071224b98a2c12ad7a79991bac7e20cc4ee73cf90ea530ab81ae47",
+   "receipt_after_hash": "sha256:8b6164be38f5e2f03a1ad5e07129290f056621873b4f9cd3d61c38f6c6fffed3",
+   "post_apply_hash": "sha256:8b6164be38f5e2f03a1ad5e07129290f056621873b4f9cd3d61c38f6c6fffed3",
+   "t_end_epoch_ms": 1791573057910.35,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:10:57.910+08:00",
+   "batch_id": "cb-sympy_algebras_quaternion.py-w1-0001",
+   "path": "sympy/algebras/quaternion.py",
+   "proposalIds": [
+    "prop-hist-w1-sympy_algebras_quaternion_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sympy_algebras_quaternion_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-sympy_algebras_quaternion_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-sympy_algebras_quaternion_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-sympy_algebras_quaternion_py",
+     "logical_id": "prop-hist-w1-sympy_algebras_quaternion_py",
+     "attempt_id": "att-prop-hist-w1-sympy_algebras_quaternion_py-r0",
+     "proposal_id": "prop-hist-w1-sympy_algebras_quaternion_py",
+     "actorId": "writer-27414"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.41,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:b336f89dff071224b98a2c12ad7a79991bac7e20cc4ee73cf90ea530ab81ae47",
+   "written": true,
+   "output_digest": "sha256:8b6164be38f5e2f03a1ad5e07129290f056621873b4f9cd3d61c38f6c6fffed3",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

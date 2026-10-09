@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-6d4d30fec4c62af8",
+  "proposalIds": [
+    "prop-hist-w1-sympy_physics_control_init_py"
+  ],
+  "targetFiles": [
+    "sympy/physics/control/__init__.py"
+  ],
+  "appliedFiles": [
+    "sympy/physics/control/__init__.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/physics/control/__init__.py": "ce369821083ef603800b65ea1eef2a6afb6b74e2b6de25a41f5b0bb68777355e"
+  },
+  "fileAfterHashes": {
+    "sympy/physics/control/__init__.py": "1048443922bda26a8e4942f61b5ce089d55632df5de6af6e6092e5b30551a9a2"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/physics/control/__init__.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-6d4d30fec4c62af8",
+    "planId": "merge-6d4d30fec4c62af8",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-6d4d30fec4c62af8",
+        "planId": "merge-6d4d30fec4c62af8",
+        "request_identity": [
+          "prop-hist-w1-sympy_physics_control_init_py"
+        ],
+        "actor_ids": [
+          "writer-27067"
+        ],
+        "request_files": [
+          "sympy/physics/control/__init__.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/physics/control/__init__.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/sympy/runs/sympy_27052_27067__steward__s4/artifacts/steward/cb-sympy_physics_control___init__.py-w1-0002.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_PHYSICS_CONTROL_INIT_PY"
+        ],
+        "commit_sha": "0576959ab48c65b88dcacc541bf1b364b946931d"
+      }
+    ]
+  }
+}

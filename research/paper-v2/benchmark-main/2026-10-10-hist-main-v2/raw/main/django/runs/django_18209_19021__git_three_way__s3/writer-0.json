@@ -1,0 +1,94 @@
+{
+ "writer": 0,
+ "pr": 18209,
+ "pid": 2180080,
+ "init_ms": 75.98219,
+ "start_offset_ms": 13,
+ "file_order": [
+  "django/db/backends/mysql/schema.py",
+  "django/db/backends/oracle/schema.py",
+  "django/db/backends/base/schema.py",
+  "django/db/backends/sqlite3/schema.py"
+ ],
+ "holds": {
+  "django/db/backends/mysql/schema.py": 7,
+  "django/db/backends/oracle/schema.py": 19,
+  "django/db/backends/base/schema.py": 15,
+  "django/db/backends/sqlite3/schema.py": 16
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 18209,
+   "path": "django/db/backends/mysql/schema.py",
+   "intents": [
+    "log:django:18209_19021:18209:django/db/backends/mysql/schema.py:h1"
+   ],
+   "hold_ms": 7,
+   "t_submit_epoch": 1791572808873,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 19,
+   "outcome": "commit",
+   "total_ms": 38.46,
+   "t_done_epoch": 1791572808912
+  },
+  {
+   "writer": 0,
+   "pr": 18209,
+   "path": "django/db/backends/oracle/schema.py",
+   "intents": [
+    "log:django:18209_19021:18209:django/db/backends/oracle/schema.py:h2"
+   ],
+   "hold_ms": 19,
+   "t_submit_epoch": 1791572808912,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 11,
+   "outcome": "commit",
+   "total_ms": 38.93,
+   "t_done_epoch": 1791572808950
+  },
+  {
+   "writer": 0,
+   "pr": 18209,
+   "path": "django/db/backends/base/schema.py",
+   "intents": [
+    "log:django:18209_19021:18209:django/db/backends/base/schema.py:h0"
+   ],
+   "hold_ms": 15,
+   "t_submit_epoch": 1791572808950,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 5,
+   "outcome": "commit",
+   "total_ms": 31.48,
+   "t_done_epoch": 1791572808982
+  },
+  {
+   "writer": 0,
+   "pr": 18209,
+   "path": "django/db/backends/sqlite3/schema.py",
+   "intents": [
+    "log:django:18209_19021:18209:django/db/backends/sqlite3/schema.py:h3"
+   ],
+   "hold_ms": 16,
+   "t_submit_epoch": 1791572808982,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 5,
+   "outcome": "commit",
+   "total_ms": 28.38,
+   "t_done_epoch": 1791572809010
+  }
+ ],
+ "admit_stats": {
+  "txns": 8,
+  "cas_conflicts": 7
+ },
+ "steward_batches": null
+}

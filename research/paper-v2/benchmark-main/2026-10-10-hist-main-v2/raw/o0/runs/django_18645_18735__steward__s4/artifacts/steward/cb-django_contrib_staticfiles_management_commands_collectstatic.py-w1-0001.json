@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-8709140819faa9b1",
+  "proposalIds": [
+    "prop-hist-w1-django_contrib_staticfiles_management_commands_collectstatic_py"
+  ],
+  "targetFiles": [
+    "django/contrib/staticfiles/management/commands/collectstatic.py"
+  ],
+  "appliedFiles": [
+    "django/contrib/staticfiles/management/commands/collectstatic.py"
+  ],
+  "fileBeforeHashes": {
+    "django/contrib/staticfiles/management/commands/collectstatic.py": "65deb9760283f099579a80dbde283ab6f6646b880c57fe9e81b2dca112c9d520"
+  },
+  "fileAfterHashes": {
+    "django/contrib/staticfiles/management/commands/collectstatic.py": "160b0da0a63ca5af40e2c432b6f9f2775f6acc562d3a4610ff006d8031102e2f"
+  },
+  "permissions": {
+    "fileWrite": [
+      "django/contrib/staticfiles/management/commands/collectstatic.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-8709140819faa9b1",
+    "planId": "merge-8709140819faa9b1",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-8709140819faa9b1",
+        "planId": "merge-8709140819faa9b1",
+        "request_identity": [
+          "prop-hist-w1-django_contrib_staticfiles_management_commands_collectstatic_py"
+        ],
+        "actor_ids": [
+          "writer-18735"
+        ],
+        "request_files": [
+          "django/contrib/staticfiles/management/commands/collectstatic.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "django/contrib/staticfiles/management/commands/collectstatic.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/o0/runs/django_18645_18735__steward__s4/artifacts/steward/cb-django_contrib_staticfiles_management_commands_collectstatic.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-DJANGO_CONTRIB_STATICFILES_MANAGEMENT_COMMANDS_COLLECTSTATIC_PY"
+        ],
+        "commit_sha": "39fd7636d2a3076e7a6719bb00a1c4a8115be848"
+      }
+    ]
+  }
+}

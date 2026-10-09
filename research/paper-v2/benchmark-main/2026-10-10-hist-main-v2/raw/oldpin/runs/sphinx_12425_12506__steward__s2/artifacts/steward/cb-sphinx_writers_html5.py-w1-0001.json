@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-a3ca3e8fbcb24a95",
+  "proposalIds": [
+    "prop-hist-w1-sphinx_writers_html5_py"
+  ],
+  "targetFiles": [
+    "sphinx/writers/html5.py"
+  ],
+  "appliedFiles": [],
+  "fileBeforeHashes": {},
+  "fileAfterHashes": {},
+  "permissions": {
+    "fileWrite": [
+      "sphinx/writers/html5.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "blocked",
+  "blockedReasons": [
+    "file-hash-drift: Target file hash sha256:98ab4b92f1410d19f74218a752ce5f4c84a405a28d075df80aa6d122277411d2 does not match proposal fileBeforeHash sha256:b35b9bf829f64735295861298c8846eb070854763df6b5ff71fe4fdb592951b3."
+  ],
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-a3ca3e8fbcb24a95",
+    "planId": "merge-a3ca3e8fbcb24a95",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-a3ca3e8fbcb24a95",
+        "planId": "merge-a3ca3e8fbcb24a95",
+        "request_identity": [
+          "prop-hist-w1-sphinx_writers_html5_py"
+        ],
+        "actor_ids": [
+          "writer-12506"
+        ],
+        "request_files": [
+          "sphinx/writers/html5.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/oldpin/runs/sphinx_12425_12506__steward__s2/artifacts/steward/cb-sphinx_writers_html5.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SPHINX_WRITERS_HTML5_PY"
+        ],
+        "commit_sha": "14a139d19f23faf8edbfcf26f32f15d7c75beb12"
+      }
+    ]
+  }
+}

@@ -1,0 +1,87 @@
+{
+ "pair_id": "fastapi:6039_12971",
+ "stratum": "O3",
+ "arm": "steward",
+ "plant": null,
+ "seed_k": 2,
+ "seed": 1957702308,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-5692474f/AI-Atomic-Framework-5692474f7db70ab52a7a71c8af4867609e7e4b43",
+ "wall_ms": 443,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 5,
+  "by_verdict": {
+   "correct": 2,
+   "blocked_absent": 3
+  },
+  "completed": 2,
+  "lost_effects": 0,
+  "blocked": 3,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 1,
+  "files_full_bytes_exact": 1,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {
+  "canonical target base hash is stale: fastapi/_compat.py": 3
+ },
+ "structure": {
+  "fastapi/_compat.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "fastapi/_compat.py": true
+ },
+ "final_exists": {
+  "fastapi/_compat.py": true
+ },
+ "files": [
+  {
+   "path": "fastapi/_compat.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:aeba71acf805e5f09422720a69e55dd2c7154c545491994747da6ec6f4eb701d",
+   "final_digest": "sha256:4da20ec3d3f71bb0e2bf0b61bfd132d0e175c6ce55e090b57efd9b4438e31b6f",
+   "expected_digests": [
+    "sha256:4da20ec3d3f71bb0e2bf0b61bfd132d0e175c6ce55e090b57efd9b4438e31b6f"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "fastapi/_compat.py": "sha256:4da20ec3d3f71bb0e2bf0b61bfd132d0e175c6ce55e090b57efd9b4438e31b6f"
+ }
+}

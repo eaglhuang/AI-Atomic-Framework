@@ -1,0 +1,197 @@
+{
+ "pair_id": "django:19745_19756",
+ "stratum": "O1",
+ "arm": "git_three_way",
+ "plant": null,
+ "seed_k": 3,
+ "seed": 2570736805,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 457,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 28,
+  "by_verdict": {
+   "correct": 26,
+   "blocked_absent": 2
+  },
+  "completed": 26,
+  "lost_effects": 0,
+  "blocked": 2,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 6,
+  "files_full_bytes_exact": 6,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {
+  "git-merge-conflict": 2
+ },
+ "structure": {
+  "django/contrib/auth/__init__.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "django/contrib/auth/hashers.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "django/contrib/auth/tokens.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "django/core/signing.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "django/middleware/csrf.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "django/utils/crypto.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "django/contrib/auth/__init__.py": true,
+  "django/contrib/auth/hashers.py": true,
+  "django/contrib/auth/tokens.py": true,
+  "django/core/signing.py": true,
+  "django/middleware/csrf.py": true,
+  "django/utils/crypto.py": true
+ },
+ "final_exists": {
+  "django/contrib/auth/__init__.py": true,
+  "django/contrib/auth/hashers.py": true,
+  "django/contrib/auth/tokens.py": true,
+  "django/core/signing.py": true,
+  "django/middleware/csrf.py": true,
+  "django/utils/crypto.py": true
+ },
+ "files": [
+  {
+   "path": "django/contrib/auth/__init__.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:714641647b744ad98a20cb59338ab2b9db827dc0de7ecde8b7ba72ae22fff058",
+   "final_digest": "sha256:1b0d5824f8ba6c5a62ec1a20ff93ba6c0b64e8c0471179a4e1304e70114d3c66",
+   "expected_digests": [
+    "sha256:1b0d5824f8ba6c5a62ec1a20ff93ba6c0b64e8c0471179a4e1304e70114d3c66"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "django/contrib/auth/hashers.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:4b2467427e8fea871e49a479a068c45c92683936ac56f3e6568fe23fa7e42b26",
+   "final_digest": "sha256:d4878daa11510ccd5e6add22e462e85b518a0c75ae056d178bcd12b9faf4efa4",
+   "expected_digests": [
+    "sha256:d4878daa11510ccd5e6add22e462e85b518a0c75ae056d178bcd12b9faf4efa4"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "django/contrib/auth/tokens.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:963a9058ed1d024778e7e6c127a5bce6865953da448f3361dd56d97de00dc314",
+   "final_digest": "sha256:f25127420524c5711a0a608ea164e13eaf96f180162db3a58aa13e350c4c3087",
+   "expected_digests": [
+    "sha256:f25127420524c5711a0a608ea164e13eaf96f180162db3a58aa13e350c4c3087"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "django/core/signing.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:e76b4fa0a141bba9f1f001ce0cf1500564d9fa3762945c8ee43e6bd55aae5cb3",
+   "final_digest": "sha256:2d81cce6ba36dda878add11bb0e7602589bc800adfc94d45234ed94aca4450fb",
+   "expected_digests": [
+    "sha256:2d81cce6ba36dda878add11bb0e7602589bc800adfc94d45234ed94aca4450fb"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "django/middleware/csrf.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:53fb67e165f9aa3ab11b3800b5ba597ef9bfbbf34a40c5ba51314b8628f78eaf",
+   "final_digest": "sha256:e0652418bde5fd73841cea52664a3e4e067b13f1912ef5ee81b2659327fec1e4",
+   "expected_digests": [
+    "sha256:e0652418bde5fd73841cea52664a3e4e067b13f1912ef5ee81b2659327fec1e4"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "django/utils/crypto.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:33f369447ca854de7b27fa43427a0cd77e7ed97f067b511fe0bdb6e71ca4e15e",
+   "final_digest": "sha256:9104402b97299d2a91d0e3a898310e1b0d2556dfe8c5e80e4a7f71dee5797db7",
+   "expected_digests": [
+    "sha256:9104402b97299d2a91d0e3a898310e1b0d2556dfe8c5e80e4a7f71dee5797db7"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "django/contrib/auth/__init__.py": "sha256:1b0d5824f8ba6c5a62ec1a20ff93ba6c0b64e8c0471179a4e1304e70114d3c66",
+  "django/contrib/auth/hashers.py": "sha256:d4878daa11510ccd5e6add22e462e85b518a0c75ae056d178bcd12b9faf4efa4",
+  "django/contrib/auth/tokens.py": "sha256:f25127420524c5711a0a608ea164e13eaf96f180162db3a58aa13e350c4c3087",
+  "django/core/signing.py": "sha256:2d81cce6ba36dda878add11bb0e7602589bc800adfc94d45234ed94aca4450fb",
+  "django/middleware/csrf.py": "sha256:e0652418bde5fd73841cea52664a3e4e067b13f1912ef5ee81b2659327fec1e4",
+  "django/utils/crypto.py": "sha256:9104402b97299d2a91d0e3a898310e1b0d2556dfe8c5e80e4a7f71dee5797db7"
+ }
+}

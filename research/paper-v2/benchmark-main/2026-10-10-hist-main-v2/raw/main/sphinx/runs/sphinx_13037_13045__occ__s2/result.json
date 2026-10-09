@@ -1,0 +1,197 @@
+{
+ "pair_id": "sphinx:13037_13045",
+ "stratum": "O1",
+ "arm": "occ",
+ "plant": null,
+ "seed_k": 2,
+ "seed": 3310411469,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 622,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 77,
+  "by_verdict": {
+   "correct": 75,
+   "blocked_absent": 2
+  },
+  "completed": 75,
+  "lost_effects": 0,
+  "blocked": 2,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 6,
+  "files_full_bytes_exact": 6,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {
+  "occ-relocate-context-not-found": 2
+ },
+ "structure": {
+  "sphinx/builders/_epub_base.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sphinx/builders/dirhtml.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sphinx/builders/html/__init__.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sphinx/builders/singlehtml.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sphinx/search/__init__.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sphinx/util/inventory.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "sphinx/builders/_epub_base.py": true,
+  "sphinx/builders/dirhtml.py": true,
+  "sphinx/builders/html/__init__.py": true,
+  "sphinx/builders/singlehtml.py": true,
+  "sphinx/search/__init__.py": true,
+  "sphinx/util/inventory.py": true
+ },
+ "final_exists": {
+  "sphinx/builders/_epub_base.py": true,
+  "sphinx/builders/dirhtml.py": true,
+  "sphinx/builders/html/__init__.py": true,
+  "sphinx/builders/singlehtml.py": true,
+  "sphinx/search/__init__.py": true,
+  "sphinx/util/inventory.py": true
+ },
+ "files": [
+  {
+   "path": "sphinx/builders/_epub_base.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:f85188199fb80aedca5aa79bd907e9ac12a5eb1ed112de62e2e26f044c1955e1",
+   "final_digest": "sha256:09c60e060defe50ba5d600727c9f4cead683267d5869aa15a12749b948614ec0",
+   "expected_digests": [
+    "sha256:09c60e060defe50ba5d600727c9f4cead683267d5869aa15a12749b948614ec0"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sphinx/builders/dirhtml.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:927241f1803198e8f898ec79016a6a6c3c6cf9054f269669b23b84bd1cc076a8",
+   "final_digest": "sha256:de1da2954d9d6010e474bff8cbbf7337653c97435fcc84808b3d46652ad60924",
+   "expected_digests": [
+    "sha256:de1da2954d9d6010e474bff8cbbf7337653c97435fcc84808b3d46652ad60924"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sphinx/builders/html/__init__.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:d7c2cf3aef16682fa7f03bb6f18c0179528f9e6c714522527ef411df4ac56325",
+   "final_digest": "sha256:9ca15e9a426667bae4f5c776c40ea559e0cfff8806756ee5d94f6ebeb3b4f489",
+   "expected_digests": [
+    "sha256:9ca15e9a426667bae4f5c776c40ea559e0cfff8806756ee5d94f6ebeb3b4f489"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sphinx/builders/singlehtml.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:57926829a79da89c95113c318272762b005cec4655d26dd3d3c01a8a489d6695",
+   "final_digest": "sha256:00b58af4629cfce929b308eac5a89540caf27623598c22bf43fe41cae50925b8",
+   "expected_digests": [
+    "sha256:00b58af4629cfce929b308eac5a89540caf27623598c22bf43fe41cae50925b8"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sphinx/search/__init__.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:bd313edab68528faecba02dad525a59d7ce74379727d0a79b976ae19c644816a",
+   "final_digest": "sha256:61071b9d12eac1298700403ccdceb06a757a2e268c73e9d6242409a9c6665b12",
+   "expected_digests": [
+    "sha256:61071b9d12eac1298700403ccdceb06a757a2e268c73e9d6242409a9c6665b12"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sphinx/util/inventory.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:fcc5ffce374c0596e6825f003a28c17e205dd5a3293fb8ff2664624118759f98",
+   "final_digest": "sha256:0f631e82af98ee804c330d920be4cd961c01437d209480f3ae8af00363f42817",
+   "expected_digests": [
+    "sha256:0f631e82af98ee804c330d920be4cd961c01437d209480f3ae8af00363f42817"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "sphinx/builders/_epub_base.py": "sha256:09c60e060defe50ba5d600727c9f4cead683267d5869aa15a12749b948614ec0",
+  "sphinx/builders/dirhtml.py": "sha256:de1da2954d9d6010e474bff8cbbf7337653c97435fcc84808b3d46652ad60924",
+  "sphinx/builders/html/__init__.py": "sha256:9ca15e9a426667bae4f5c776c40ea559e0cfff8806756ee5d94f6ebeb3b4f489",
+  "sphinx/builders/singlehtml.py": "sha256:00b58af4629cfce929b308eac5a89540caf27623598c22bf43fe41cae50925b8",
+  "sphinx/search/__init__.py": "sha256:61071b9d12eac1298700403ccdceb06a757a2e268c73e9d6242409a9c6665b12",
+  "sphinx/util/inventory.py": "sha256:0f631e82af98ee804c330d920be4cd961c01437d209480f3ae8af00363f42817"
+ }
+}

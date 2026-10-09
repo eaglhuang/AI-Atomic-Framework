@@ -1,0 +1,58 @@
+{
+ "writer": 1,
+ "pr": 8547,
+ "pid": 2288850,
+ "init_ms": 66.414578,
+ "start_offset_ms": 2,
+ "file_order": [
+  "xarray/namedarray/core.py",
+  "xarray/core/common.py"
+ ],
+ "holds": {
+  "xarray/namedarray/core.py": 29,
+  "xarray/core/common.py": 30
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 8547,
+   "path": "xarray/namedarray/core.py",
+   "intents": [
+    "log:xarray:8380_8547:8547:xarray/namedarray/core.py:h1"
+   ],
+   "hold_ms": 29,
+   "t_submit_epoch": 1791573914930,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 14,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 50.08,
+   "t_done_epoch": 1791573914980
+  },
+  {
+   "writer": 1,
+   "pr": 8547,
+   "path": "xarray/core/common.py",
+   "intents": [
+    "log:xarray:8380_8547:8547:xarray/core/common.py:h0"
+   ],
+   "hold_ms": 30,
+   "t_submit_epoch": 1791573914980,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 5,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 41.33,
+   "t_done_epoch": 1791573915022
+  }
+ ],
+ "admit_stats": {
+  "txns": 4,
+  "cas_conflicts": 0
+ },
+ "steward_batches": null
+}

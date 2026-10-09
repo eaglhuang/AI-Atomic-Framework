@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-4eccc4d65cd33151",
+  "proposalIds": [
+    "prop-hist-w1-sympy_ntheory_digits_py"
+  ],
+  "targetFiles": [
+    "sympy/ntheory/digits.py"
+  ],
+  "appliedFiles": [
+    "sympy/ntheory/digits.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/ntheory/digits.py": "994752ecf7effba182cd8f47a5c418e2ccf0f1b702ab60a3afa1973df2a02ac4"
+  },
+  "fileAfterHashes": {
+    "sympy/ntheory/digits.py": "2211c8863937d9739bb5804429b32bad9183d757ab417fe1dc0fac97d39318b7"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/ntheory/digits.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-4eccc4d65cd33151",
+    "planId": "merge-4eccc4d65cd33151",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-4eccc4d65cd33151",
+        "planId": "merge-4eccc4d65cd33151",
+        "request_identity": [
+          "prop-hist-w1-sympy_ntheory_digits_py"
+        ],
+        "actor_ids": [
+          "writer-28807"
+        ],
+        "request_files": [
+          "sympy/ntheory/digits.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/ntheory/digits.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/sympy/runs/sympy_28805_28807__bare_composer__s3/artifacts/steward/cb-sympy_ntheory_digits.py-w1-0002.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_NTHEORY_DIGITS_PY"
+        ],
+        "commit_sha": "0fffdc33e0bcec5dc1af970da4df33c97960b513"
+      }
+    ]
+  }
+}

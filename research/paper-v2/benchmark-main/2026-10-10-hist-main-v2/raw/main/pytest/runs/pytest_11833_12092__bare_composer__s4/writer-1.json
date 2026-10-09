@@ -1,0 +1,137 @@
+{
+ "writer": 1,
+ "pr": 12092,
+ "pid": 2292116,
+ "init_ms": 73.69517499999999,
+ "start_offset_ms": 3,
+ "file_order": [
+  "src/_pytest/fixtures.py"
+ ],
+ "holds": {
+  "src/_pytest/fixtures.py": 21
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 12092,
+   "path": "src/_pytest/fixtures.py",
+   "intents": [
+    "log:pytest:11833_12092:12092:src/_pytest/fixtures.py:h0",
+    "log:pytest:11833_12092:12092:src/_pytest/fixtures.py:h1",
+    "log:pytest:11833_12092:12092:src/_pytest/fixtures.py:h2",
+    "log:pytest:11833_12092:12092:src/_pytest/fixtures.py:h3",
+    "log:pytest:11833_12092:12092:src/_pytest/fixtures.py:h4",
+    "log:pytest:11833_12092:12092:src/_pytest/fixtures.py:h5",
+    "log:pytest:11833_12092:12092:src/_pytest/fixtures.py:h6",
+    "log:pytest:11833_12092:12092:src/_pytest/fixtures.py:h7",
+    "log:pytest:11833_12092:12092:src/_pytest/fixtures.py:h8",
+    "log:pytest:11833_12092:12092:src/_pytest/fixtures.py:h9",
+    "log:pytest:11833_12092:12092:src/_pytest/fixtures.py:h10",
+    "log:pytest:11833_12092:12092:src/_pytest/fixtures.py:h11",
+    "log:pytest:11833_12092:12092:src/_pytest/fixtures.py:h12"
+   ],
+   "hold_ms": 21,
+   "t_submit_epoch": 1791573953631,
+   "outcome": "blocked",
+   "blocked_reason": "compose-context-mismatch: proposal 'prop-hist-w1-src_pytest_fixtures_py' context mismatch at base line 552: expected \"                raise\", found \"                fixturedef = self._getnextfixturedef(argname)\" [proposals: prop-hist-w1-src_pytest_fixtures_py]",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w1-src_pytest_fixtures_py' context mismatch at base line 552: expected \"                raise\", found \"                fixturedef = self._getnextfixturedef(argname)\" [proposals: prop-hist-w1-src_pytest_fixtures_py]"
+   ],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-src__pytest_fixtures.py-w1-0001",
+   "total_ms": 146.77,
+   "t_done_epoch": 1791573953778
+  }
+ ],
+ "admit_stats": null,
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-src__pytest_fixtures.py-w1-0001",
+   "path": "src/_pytest/fixtures.py",
+   "pid": 2292116,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-src_pytest_fixtures_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-src_pytest_fixtures_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:fd1269b369657921407d632b83259a53f073f6a14951ec9f220fb0d357f4767a"
+   ],
+   "lock_wait_ms": 0.11,
+   "t_start_epoch_ms": 1791573953656.52,
+   "pre_apply_hash": "sha256:fd1269b369657921407d632b83259a53f073f6a14951ec9f220fb0d357f4767a",
+   "receipt_before_hash": null,
+   "receipt_after_hash": null,
+   "post_apply_hash": "sha256:4aee447e1d76dd50a4a940a5d7e0923dbd2dc5c450e5a2131540d8bac7fcd9a7",
+   "t_end_epoch_ms": 1791573953777.52,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "blocked",
+   "written": false,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:25:53.777+08:00",
+   "batch_id": "cb-src__pytest_fixtures.py-w1-0001",
+   "path": "src/_pytest/fixtures.py",
+   "proposalIds": [
+    "prop-hist-w1-src_pytest_fixtures_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-src_pytest_fixtures_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-src_pytest_fixtures_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-src_pytest_fixtures_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-src_pytest_fixtures_py",
+     "logical_id": "prop-hist-w1-src_pytest_fixtures_py",
+     "attempt_id": "att-prop-hist-w1-src_pytest_fixtures_py-r0",
+     "proposal_id": "prop-hist-w1-src_pytest_fixtures_py",
+     "actorId": "writer-12092"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w1-src_pytest_fixtures_py' context mismatch at base line 552: expected \"                raise\", found \"                fixturedef = self._getnextfixturedef(argname)\" [proposals: prop-hist-w1-src_pytest_fixtures_py]"
+   ],
+   "blocked_reason": "compose-context-mismatch: proposal 'prop-hist-w1-src_pytest_fixtures_py' context mismatch at base line 552: expected \"                raise\", found \"                fixturedef = self._getnextfixturedef(argname)\" [proposals: prop-hist-w1-src_pytest_fixtures_py]",
+   "window_wait_ms": 0.23,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:fd1269b369657921407d632b83259a53f073f6a14951ec9f220fb0d357f4767a",
+   "written": false,
+   "output_digest": null,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "compose-context-mismatch: proposal 'prop-hist-w1-src_pytest_fixtures_py' context mismatch at base line 552: expected \"                raise\", found \"                fixturedef = self._getnextfixturedef(argname)\" [proposals: prop-hist-w1-src_pytest_fixtures_py]"
+  }
+ ]
+}

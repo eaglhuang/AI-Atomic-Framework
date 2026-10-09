@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-fa2cf2c0ec064d90",
+  "proposalIds": [
+    "prop-hist-w1-sphinx_ext_intersphinx_resolve_py"
+  ],
+  "targetFiles": [
+    "sphinx/ext/intersphinx/_resolve.py"
+  ],
+  "appliedFiles": [
+    "sphinx/ext/intersphinx/_resolve.py"
+  ],
+  "fileBeforeHashes": {
+    "sphinx/ext/intersphinx/_resolve.py": "2d7496fa6b516fcbb6849b63d567b299c5babe2d4990889e709d1ceb7394763e"
+  },
+  "fileAfterHashes": {
+    "sphinx/ext/intersphinx/_resolve.py": "a5561afee9e42ce31983cde52f27ca2b5e2e7381c95b0efedcf3ea26aca2e3b2"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sphinx/ext/intersphinx/_resolve.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-fa2cf2c0ec064d90",
+    "planId": "merge-fa2cf2c0ec064d90",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-fa2cf2c0ec064d90",
+        "planId": "merge-fa2cf2c0ec064d90",
+        "request_identity": [
+          "prop-hist-w1-sphinx_ext_intersphinx_resolve_py"
+        ],
+        "actor_ids": [
+          "writer-12087"
+        ],
+        "request_files": [
+          "sphinx/ext/intersphinx/_resolve.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sphinx/ext/intersphinx/_resolve.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/sphinx/runs/sphinx_12083_12087__bare_composer__s3/artifacts/steward/cb-sphinx_ext_intersphinx__resolve.py-w1-0003.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SPHINX_EXT_INTERSPHINX_RESOLVE_PY"
+        ],
+        "commit_sha": "f9689f01bee8a463f44c16b3c49a204a18e23db7"
+      }
+    ]
+  }
+}

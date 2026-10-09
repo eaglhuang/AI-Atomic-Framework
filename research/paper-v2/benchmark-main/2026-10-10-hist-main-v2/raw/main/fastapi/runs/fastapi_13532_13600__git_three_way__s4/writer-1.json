@@ -1,0 +1,73 @@
+{
+ "writer": 1,
+ "pr": 13600,
+ "pid": 2404027,
+ "init_ms": 189.408277,
+ "start_offset_ms": 9,
+ "file_order": [
+  "fastapi/applications.py",
+  "fastapi/routing.py"
+ ],
+ "holds": {
+  "fastapi/applications.py": 15,
+  "fastapi/routing.py": 23
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 13600,
+   "path": "fastapi/applications.py",
+   "intents": [
+    "log:fastapi:13532_13600:13600:fastapi/applications.py:h0",
+    "log:fastapi:13532_13600:13600:fastapi/applications.py:h1",
+    "log:fastapi:13532_13600:13600:fastapi/applications.py:h2",
+    "log:fastapi:13532_13600:13600:fastapi/applications.py:h3",
+    "log:fastapi:13532_13600:13600:fastapi/applications.py:h4",
+    "log:fastapi:13532_13600:13600:fastapi/applications.py:h5",
+    "log:fastapi:13532_13600:13600:fastapi/applications.py:h6",
+    "log:fastapi:13532_13600:13600:fastapi/applications.py:h7",
+    "log:fastapi:13532_13600:13600:fastapi/applications.py:h8"
+   ],
+   "hold_ms": 15,
+   "t_submit_epoch": 1791574795745,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 44,
+   "outcome": "blocked",
+   "blocked_reason": "git-base-drift",
+   "total_ms": 78.87,
+   "t_done_epoch": 1791574795824
+  },
+  {
+   "writer": 1,
+   "pr": 13600,
+   "path": "fastapi/routing.py",
+   "intents": [
+    "log:fastapi:13532_13600:13600:fastapi/routing.py:h9",
+    "log:fastapi:13532_13600:13600:fastapi/routing.py:h10",
+    "log:fastapi:13532_13600:13600:fastapi/routing.py:h11",
+    "log:fastapi:13532_13600:13600:fastapi/routing.py:h12",
+    "log:fastapi:13532_13600:13600:fastapi/routing.py:h13",
+    "log:fastapi:13532_13600:13600:fastapi/routing.py:h14",
+    "log:fastapi:13532_13600:13600:fastapi/routing.py:h15",
+    "log:fastapi:13532_13600:13600:fastapi/routing.py:h16",
+    "log:fastapi:13532_13600:13600:fastapi/routing.py:h17"
+   ],
+   "hold_ms": 23,
+   "t_submit_epoch": 1791574795824,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 6,
+   "outcome": "commit",
+   "total_ms": 43.65,
+   "t_done_epoch": 1791574795868
+  }
+ ],
+ "admit_stats": {
+  "txns": 4,
+  "cas_conflicts": 6
+ },
+ "steward_batches": null
+}

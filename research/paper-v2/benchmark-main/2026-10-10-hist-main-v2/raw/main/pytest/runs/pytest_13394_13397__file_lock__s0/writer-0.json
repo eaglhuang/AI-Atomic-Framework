@@ -1,0 +1,88 @@
+{
+ "writer": 0,
+ "pr": 13394,
+ "pid": 2292169,
+ "init_ms": 78.663085,
+ "start_offset_ms": 0,
+ "file_order": [
+  "src/_pytest/terminal.py",
+  "src/_pytest/pytester.py",
+  "src/_pytest/junitxml.py"
+ ],
+ "holds": {
+  "src/_pytest/terminal.py": 1,
+  "src/_pytest/pytester.py": 27,
+  "src/_pytest/junitxml.py": 11
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 13394,
+   "path": "src/_pytest/terminal.py",
+   "intents": [
+    "log:pytest:13394_13397:13394:src/_pytest/terminal.py:h6",
+    "log:pytest:13394_13397:13394:src/_pytest/terminal.py:h7",
+    "log:pytest:13394_13397:13394:src/_pytest/terminal.py:h8",
+    "log:pytest:13394_13397:13394:src/_pytest/terminal.py:h9"
+   ],
+   "hold_ms": 1,
+   "t_submit_epoch": 1791573953871,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 16,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 26.26,
+   "t_done_epoch": 1791573953897
+  },
+  {
+   "writer": 0,
+   "pr": 13394,
+   "path": "src/_pytest/pytester.py",
+   "intents": [
+    "log:pytest:13394_13397:13394:src/_pytest/pytester.py:h2",
+    "log:pytest:13394_13397:13394:src/_pytest/pytester.py:h3",
+    "log:pytest:13394_13397:13394:src/_pytest/pytester.py:h4",
+    "log:pytest:13394_13397:13394:src/_pytest/pytester.py:h5"
+   ],
+   "hold_ms": 27,
+   "t_submit_epoch": 1791573953897,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 33.76,
+   "t_done_epoch": 1791573953931
+  },
+  {
+   "writer": 0,
+   "pr": 13394,
+   "path": "src/_pytest/junitxml.py",
+   "intents": [
+    "log:pytest:13394_13397:13394:src/_pytest/junitxml.py:h0",
+    "log:pytest:13394_13397:13394:src/_pytest/junitxml.py:h1"
+   ],
+   "hold_ms": 11,
+   "t_submit_epoch": 1791573953931,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 7,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 20.95,
+   "t_done_epoch": 1791573953952
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 4
+ },
+ "steward_batches": null
+}

@@ -1,0 +1,146 @@
+{
+ "writer": 0,
+ "pr": 11189,
+ "pid": 2381564,
+ "init_ms": 71.64508,
+ "start_offset_ms": 9,
+ "file_order": [
+  "docs_src/security/tutorial005_py39.py",
+  "docs_src/security/tutorial005_py310.py",
+  "docs_src/security/tutorial005_an_py310.py",
+  "docs_src/security/tutorial005_an.py",
+  "docs_src/security/tutorial005_an_py39.py",
+  "docs_src/security/tutorial005.py"
+ ],
+ "holds": {
+  "docs_src/security/tutorial005_py39.py": 24,
+  "docs_src/security/tutorial005_py310.py": 28,
+  "docs_src/security/tutorial005_an_py310.py": 12,
+  "docs_src/security/tutorial005_an.py": 12,
+  "docs_src/security/tutorial005_an_py39.py": 1,
+  "docs_src/security/tutorial005.py": 7
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 11189,
+   "path": "docs_src/security/tutorial005_py39.py",
+   "intents": [
+    "log:fastapi:11189_11589:11189:docs_src/security/tutorial005_py39.py:h10",
+    "log:fastapi:11189_11589:11189:docs_src/security/tutorial005_py39.py:h11"
+   ],
+   "hold_ms": 24,
+   "t_submit_epoch": 1791574646571,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 16,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 46.2,
+   "t_done_epoch": 1791574646617
+  },
+  {
+   "writer": 0,
+   "pr": 11189,
+   "path": "docs_src/security/tutorial005_py310.py",
+   "intents": [
+    "log:fastapi:11189_11589:11189:docs_src/security/tutorial005_py310.py:h8",
+    "log:fastapi:11189_11589:11189:docs_src/security/tutorial005_py310.py:h9"
+   ],
+   "hold_ms": 28,
+   "t_submit_epoch": 1791574646617,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 5,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 36.64,
+   "t_done_epoch": 1791574646654
+  },
+  {
+   "writer": 0,
+   "pr": 11189,
+   "path": "docs_src/security/tutorial005_an_py310.py",
+   "intents": [
+    "log:fastapi:11189_11589:11189:docs_src/security/tutorial005_an_py310.py:h4",
+    "log:fastapi:11189_11589:11189:docs_src/security/tutorial005_an_py310.py:h5"
+   ],
+   "hold_ms": 12,
+   "t_submit_epoch": 1791574646654,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 18.51,
+   "t_done_epoch": 1791574646673
+  },
+  {
+   "writer": 0,
+   "pr": 11189,
+   "path": "docs_src/security/tutorial005_an.py",
+   "intents": [
+    "log:fastapi:11189_11589:11189:docs_src/security/tutorial005_an.py:h2",
+    "log:fastapi:11189_11589:11189:docs_src/security/tutorial005_an.py:h3"
+   ],
+   "hold_ms": 12,
+   "t_submit_epoch": 1791574646673,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 18.55,
+   "t_done_epoch": 1791574646691
+  },
+  {
+   "writer": 0,
+   "pr": 11189,
+   "path": "docs_src/security/tutorial005_an_py39.py",
+   "intents": [
+    "log:fastapi:11189_11589:11189:docs_src/security/tutorial005_an_py39.py:h6",
+    "log:fastapi:11189_11589:11189:docs_src/security/tutorial005_an_py39.py:h7"
+   ],
+   "hold_ms": 1,
+   "t_submit_epoch": 1791574646691,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "queue",
+   "admit_wait_ms": 10,
+   "outcome": "blocked",
+   "blocked_reason": "occ-relocate-context-not-found",
+   "occ_retries": 0,
+   "total_ms": 15.33,
+   "t_done_epoch": 1791574646707
+  },
+  {
+   "writer": 0,
+   "pr": 11189,
+   "path": "docs_src/security/tutorial005.py",
+   "intents": [
+    "log:fastapi:11189_11589:11189:docs_src/security/tutorial005.py:h0",
+    "log:fastapi:11189_11589:11189:docs_src/security/tutorial005.py:h1"
+   ],
+   "hold_ms": 7,
+   "t_submit_epoch": 1791574646707,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "blocked",
+   "blocked_reason": "occ-relocate-context-not-found",
+   "occ_retries": 0,
+   "total_ms": 13.77,
+   "t_done_epoch": 1791574646720
+  }
+ ],
+ "admit_stats": {
+  "txns": 13,
+  "cas_conflicts": 5
+ },
+ "steward_batches": null
+}

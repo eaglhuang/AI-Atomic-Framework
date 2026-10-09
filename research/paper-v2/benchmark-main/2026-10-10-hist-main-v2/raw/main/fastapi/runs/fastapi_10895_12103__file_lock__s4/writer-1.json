@@ -1,0 +1,88 @@
+{
+ "writer": 1,
+ "pr": 12103,
+ "pid": 2375937,
+ "init_ms": 78.392898,
+ "start_offset_ms": 11,
+ "file_order": [
+  "fastapi/routing.py",
+  "fastapi/dependencies/utils.py",
+  "fastapi/utils.py"
+ ],
+ "holds": {
+  "fastapi/routing.py": 9,
+  "fastapi/dependencies/utils.py": 10,
+  "fastapi/utils.py": 8
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 12103,
+   "path": "fastapi/routing.py",
+   "intents": [
+    "log:fastapi:10895_12103:12103:fastapi/routing.py:h3",
+    "log:fastapi:10895_12103:12103:fastapi/routing.py:h4",
+    "log:fastapi:10895_12103:12103:fastapi/routing.py:h5"
+   ],
+   "hold_ms": 9,
+   "t_submit_epoch": 1791574606721,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 15,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 33.73,
+   "t_done_epoch": 1791574606755
+  },
+  {
+   "writer": 1,
+   "pr": 12103,
+   "path": "fastapi/dependencies/utils.py",
+   "intents": [
+    "log:fastapi:10895_12103:12103:fastapi/dependencies/utils.py:h0",
+    "log:fastapi:10895_12103:12103:fastapi/dependencies/utils.py:h1",
+    "log:fastapi:10895_12103:12103:fastapi/dependencies/utils.py:h2"
+   ],
+   "hold_ms": 10,
+   "t_submit_epoch": 1791574606755,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 16.03,
+   "t_done_epoch": 1791574606771
+  },
+  {
+   "writer": 1,
+   "pr": 12103,
+   "path": "fastapi/utils.py",
+   "intents": [
+    "log:fastapi:10895_12103:12103:fastapi/utils.py:h6",
+    "log:fastapi:10895_12103:12103:fastapi/utils.py:h7",
+    "log:fastapi:10895_12103:12103:fastapi/utils.py:h8",
+    "log:fastapi:10895_12103:12103:fastapi/utils.py:h9"
+   ],
+   "hold_ms": 8,
+   "t_submit_epoch": 1791574606771,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 13.01,
+   "t_done_epoch": 1791574606784
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 0
+ },
+ "steward_batches": null
+}

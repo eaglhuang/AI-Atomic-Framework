@@ -1,0 +1,238 @@
+{
+ "writer": 1,
+ "pr": 27067,
+ "pid": 2213846,
+ "init_ms": 97.12191499999999,
+ "start_offset_ms": 6,
+ "file_order": [
+  "sympy/physics/control/control_plots.py",
+  "sympy/physics/control/__init__.py"
+ ],
+ "holds": {
+  "sympy/physics/control/control_plots.py": 30,
+  "sympy/physics/control/__init__.py": 25
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 27067,
+   "path": "sympy/physics/control/control_plots.py",
+   "intents": [
+    "log:sympy:27052_27067:27067:sympy/physics/control/control_plots.py:h2",
+    "log:sympy:27052_27067:27067:sympy/physics/control/control_plots.py:h3",
+    "log:sympy:27052_27067:27067:sympy/physics/control/control_plots.py:h4",
+    "log:sympy:27052_27067:27067:sympy/physics/control/control_plots.py:h5"
+   ],
+   "hold_ms": 30,
+   "t_submit_epoch": 1791573085709,
+   "outcome": "blocked",
+   "blocked_reason": "file-hash-drift: Target file hash sha256:82c960467c734692585c4cfd13bb1bf09f19ce421a3be8375047544ce19fbaa9 does not match proposal fileBeforeHash sha256:35f27e403403139921338141ed66418365b3a64675805fbea2bbbaf7987b917f.",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "file-hash-drift: Target file hash sha256:82c960467c734692585c4cfd13bb1bf09f19ce421a3be8375047544ce19fbaa9 does not match proposal fileBeforeHash sha256:35f27e403403139921338141ed66418365b3a64675805fbea2bbbaf7987b917f."
+   ],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sympy_physics_control_control_plots.py-w1-0001",
+   "total_ms": 128.38,
+   "t_done_epoch": 1791573085838
+  },
+  {
+   "writer": 1,
+   "pr": 27067,
+   "path": "sympy/physics/control/__init__.py",
+   "intents": [
+    "log:sympy:27052_27067:27067:sympy/physics/control/__init__.py:h0",
+    "log:sympy:27052_27067:27067:sympy/physics/control/__init__.py:h1"
+   ],
+   "hold_ms": 25,
+   "t_submit_epoch": 1791573085838,
+   "outcome": "blocked",
+   "blocked_reason": "file-hash-drift: Target file hash sha256:f744e4ec889973092d08ab28c827a718ebd2bea01e63ef47f79167a7a353e9d9 does not match proposal fileBeforeHash sha256:ce369821083ef603800b65ea1eef2a6afb6b74e2b6de25a41f5b0bb68777355e.",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "file-hash-drift: Target file hash sha256:f744e4ec889973092d08ab28c827a718ebd2bea01e63ef47f79167a7a353e9d9 does not match proposal fileBeforeHash sha256:ce369821083ef603800b65ea1eef2a6afb6b74e2b6de25a41f5b0bb68777355e."
+   ],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sympy_physics_control___init__.py-w1-0002",
+   "total_ms": 29.77,
+   "t_done_epoch": 1791573085868
+  }
+ ],
+ "admit_stats": null,
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sympy_physics_control_control_plots.py-w1-0001",
+   "path": "sympy/physics/control/control_plots.py",
+   "pid": 2213846,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-sympy_physics_control_control_plots_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sympy_physics_control_control_plots_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:35f27e403403139921338141ed66418365b3a64675805fbea2bbbaf7987b917f"
+   ],
+   "lock_wait_ms": 0.12,
+   "t_start_epoch_ms": 1791573085743.44,
+   "pre_apply_hash": "sha256:35f27e403403139921338141ed66418365b3a64675805fbea2bbbaf7987b917f",
+   "receipt_before_hash": null,
+   "receipt_after_hash": null,
+   "post_apply_hash": "sha256:82c960467c734692585c4cfd13bb1bf09f19ce421a3be8375047544ce19fbaa9",
+   "t_end_epoch_ms": 1791573085837.7,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "blocked",
+   "written": false,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:11:25.837+08:00",
+   "batch_id": "cb-sympy_physics_control_control_plots.py-w1-0001",
+   "path": "sympy/physics/control/control_plots.py",
+   "proposalIds": [
+    "prop-hist-w1-sympy_physics_control_control_plots_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sympy_physics_control_control_plots_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-sympy_physics_control_control_plots_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-sympy_physics_control_control_plots_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-sympy_physics_control_control_plots_py",
+     "logical_id": "prop-hist-w1-sympy_physics_control_control_plots_py",
+     "attempt_id": "att-prop-hist-w1-sympy_physics_control_control_plots_py-r0",
+     "proposal_id": "prop-hist-w1-sympy_physics_control_control_plots_py",
+     "actorId": "writer-27067"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "file-hash-drift: Target file hash sha256:82c960467c734692585c4cfd13bb1bf09f19ce421a3be8375047544ce19fbaa9 does not match proposal fileBeforeHash sha256:35f27e403403139921338141ed66418365b3a64675805fbea2bbbaf7987b917f."
+   ],
+   "blocked_reason": "file-hash-drift: Target file hash sha256:82c960467c734692585c4cfd13bb1bf09f19ce421a3be8375047544ce19fbaa9 does not match proposal fileBeforeHash sha256:35f27e403403139921338141ed66418365b3a64675805fbea2bbbaf7987b917f.",
+   "window_wait_ms": 0.26,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:35f27e403403139921338141ed66418365b3a64675805fbea2bbbaf7987b917f",
+   "written": false,
+   "output_digest": null,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "file-hash-drift: Target file hash sha256:82c960467c734692585c4cfd13bb1bf09f19ce421a3be8375047544ce19fbaa9 does not match proposal fileBeforeHash sha256:35f27e403403139921338141ed66418365b3a64675805fbea2bbbaf7987b917f."
+  },
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sympy_physics_control___init__.py-w1-0002",
+   "path": "sympy/physics/control/__init__.py",
+   "pid": 2213846,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-sympy_physics_control_init_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sympy_physics_control_init_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:ce369821083ef603800b65ea1eef2a6afb6b74e2b6de25a41f5b0bb68777355e"
+   ],
+   "lock_wait_ms": 0,
+   "t_start_epoch_ms": 1791573085863.31,
+   "pre_apply_hash": "sha256:ce369821083ef603800b65ea1eef2a6afb6b74e2b6de25a41f5b0bb68777355e",
+   "receipt_before_hash": null,
+   "receipt_after_hash": null,
+   "post_apply_hash": "sha256:f744e4ec889973092d08ab28c827a718ebd2bea01e63ef47f79167a7a353e9d9",
+   "t_end_epoch_ms": 1791573085867.98,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "blocked",
+   "written": false,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:11:25.868+08:00",
+   "batch_id": "cb-sympy_physics_control___init__.py-w1-0002",
+   "path": "sympy/physics/control/__init__.py",
+   "proposalIds": [
+    "prop-hist-w1-sympy_physics_control_init_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sympy_physics_control_init_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-sympy_physics_control_init_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-sympy_physics_control_init_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-sympy_physics_control_init_py",
+     "logical_id": "prop-hist-w1-sympy_physics_control_init_py",
+     "attempt_id": "att-prop-hist-w1-sympy_physics_control_init_py-r0",
+     "proposal_id": "prop-hist-w1-sympy_physics_control_init_py",
+     "actorId": "writer-27067"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "file-hash-drift: Target file hash sha256:f744e4ec889973092d08ab28c827a718ebd2bea01e63ef47f79167a7a353e9d9 does not match proposal fileBeforeHash sha256:ce369821083ef603800b65ea1eef2a6afb6b74e2b6de25a41f5b0bb68777355e."
+   ],
+   "blocked_reason": "file-hash-drift: Target file hash sha256:f744e4ec889973092d08ab28c827a718ebd2bea01e63ef47f79167a7a353e9d9 does not match proposal fileBeforeHash sha256:ce369821083ef603800b65ea1eef2a6afb6b74e2b6de25a41f5b0bb68777355e.",
+   "window_wait_ms": 0.02,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:ce369821083ef603800b65ea1eef2a6afb6b74e2b6de25a41f5b0bb68777355e",
+   "written": false,
+   "output_digest": null,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "file-hash-drift: Target file hash sha256:f744e4ec889973092d08ab28c827a718ebd2bea01e63ef47f79167a7a353e9d9 does not match proposal fileBeforeHash sha256:ce369821083ef603800b65ea1eef2a6afb6b74e2b6de25a41f5b0bb68777355e."
+  }
+ ]
+}

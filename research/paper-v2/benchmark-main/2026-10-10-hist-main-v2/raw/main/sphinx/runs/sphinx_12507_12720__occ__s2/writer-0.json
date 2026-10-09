@@ -1,0 +1,102 @@
+{
+ "writer": 0,
+ "pr": 12507,
+ "pid": 2355751,
+ "init_ms": 75.30502100000001,
+ "start_offset_ms": 1,
+ "file_order": [
+  "sphinx/application.py",
+  "sphinx/directives/admonitions.py",
+  "sphinx/writers/html5.py",
+  "sphinx/directives/other.py"
+ ],
+ "holds": {
+  "sphinx/application.py": 6,
+  "sphinx/directives/admonitions.py": 19,
+  "sphinx/writers/html5.py": 27,
+  "sphinx/directives/other.py": 12
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 12507,
+   "path": "sphinx/application.py",
+   "intents": [
+    "log:sphinx:12507_12720:12507:sphinx/application.py:h0"
+   ],
+   "hold_ms": 6,
+   "t_submit_epoch": 1791574451799,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 15,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 30.32,
+   "t_done_epoch": 1791574451829
+  },
+  {
+   "writer": 0,
+   "pr": 12507,
+   "path": "sphinx/directives/admonitions.py",
+   "intents": [
+    "log:sphinx:12507_12720:12507:sphinx/directives/admonitions.py:h1"
+   ],
+   "hold_ms": 19,
+   "t_submit_epoch": 1791574451829,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 5,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 28.13,
+   "t_done_epoch": 1791574451857
+  },
+  {
+   "writer": 0,
+   "pr": 12507,
+   "path": "sphinx/writers/html5.py",
+   "intents": [
+    "log:sphinx:12507_12720:12507:sphinx/writers/html5.py:h5",
+    "log:sphinx:12507_12720:12507:sphinx/writers/html5.py:h6",
+    "log:sphinx:12507_12720:12507:sphinx/writers/html5.py:h7"
+   ],
+   "hold_ms": 27,
+   "t_submit_epoch": 1791574451857,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 37.1,
+   "t_done_epoch": 1791574451894
+  },
+  {
+   "writer": 0,
+   "pr": 12507,
+   "path": "sphinx/directives/other.py",
+   "intents": [
+    "log:sphinx:12507_12720:12507:sphinx/directives/other.py:h2",
+    "log:sphinx:12507_12720:12507:sphinx/directives/other.py:h3",
+    "log:sphinx:12507_12720:12507:sphinx/directives/other.py:h4"
+   ],
+   "hold_ms": 12,
+   "t_submit_epoch": 1791574451894,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 24.11,
+   "t_done_epoch": 1791574451918
+  }
+ ],
+ "admit_stats": {
+  "txns": 8,
+  "cas_conflicts": 1
+ },
+ "steward_batches": null
+}

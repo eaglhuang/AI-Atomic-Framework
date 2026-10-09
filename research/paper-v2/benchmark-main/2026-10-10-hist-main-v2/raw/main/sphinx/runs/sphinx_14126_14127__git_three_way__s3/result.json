@@ -1,0 +1,194 @@
+{
+ "pair_id": "sphinx:14126_14127",
+ "stratum": "O2",
+ "arm": "git_three_way",
+ "plant": null,
+ "seed_k": 3,
+ "seed": 624880613,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 576,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 26,
+  "by_verdict": {
+   "correct": 26
+  },
+  "completed": 26,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 6,
+  "files_full_bytes_exact": 6,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "sphinx/application.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sphinx/events.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sphinx/ext/autodoc/_dynamic/_member_finder.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sphinx/ext/autodoc/_event_listeners.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sphinx/ext/napoleon/__init__.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sphinx/ext/napoleon/docstring.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "sphinx/application.py": true,
+  "sphinx/events.py": true,
+  "sphinx/ext/autodoc/_dynamic/_member_finder.py": true,
+  "sphinx/ext/autodoc/_event_listeners.py": true,
+  "sphinx/ext/napoleon/__init__.py": true,
+  "sphinx/ext/napoleon/docstring.py": true
+ },
+ "final_exists": {
+  "sphinx/application.py": true,
+  "sphinx/events.py": true,
+  "sphinx/ext/autodoc/_dynamic/_member_finder.py": true,
+  "sphinx/ext/autodoc/_event_listeners.py": true,
+  "sphinx/ext/napoleon/__init__.py": true,
+  "sphinx/ext/napoleon/docstring.py": true
+ },
+ "files": [
+  {
+   "path": "sphinx/application.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:f14fd09d5a8c9a2b230c82e18656318753d6ad5db07df766e4390854f6c51fa6",
+   "final_digest": "sha256:14bac987f5e9c8a5163e746e7a225cee89c9a93c4fae99d5198b272490fc5209",
+   "expected_digests": [
+    "sha256:14bac987f5e9c8a5163e746e7a225cee89c9a93c4fae99d5198b272490fc5209"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sphinx/events.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:2fccf91b2855576b93a0cdeff30d450ec504e16576ef05e889cde4b1ab4888e2",
+   "final_digest": "sha256:c993a4942a96328dda03f1b3b6d7756f4477f38cc00e720a6fc1c2401053a796",
+   "expected_digests": [
+    "sha256:c993a4942a96328dda03f1b3b6d7756f4477f38cc00e720a6fc1c2401053a796"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sphinx/ext/autodoc/_dynamic/_member_finder.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:67287bca1b75b432d5050c540c859c359fb7378fd4358bf7645f29d6914e4ad0",
+   "final_digest": "sha256:b369c48c9bc73bd681c8849739bba0b3fc6b1379308df099c96eaf5dc17d30d1",
+   "expected_digests": [
+    "sha256:b369c48c9bc73bd681c8849739bba0b3fc6b1379308df099c96eaf5dc17d30d1"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sphinx/ext/autodoc/_event_listeners.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:b2daccde93791456e2112f669c22b55e2a5eb7098f8331ddd8ebb9bab8ab6f5f",
+   "final_digest": "sha256:8f02d11498edc3b183c8aa547a4f2597c1000767b233a9ab6f5937fc9cdfea18",
+   "expected_digests": [
+    "sha256:8f02d11498edc3b183c8aa547a4f2597c1000767b233a9ab6f5937fc9cdfea18"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sphinx/ext/napoleon/__init__.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:5079a62f4de01310e0d781bd3b5955f652da126143ed25bc2e4406056efd6ed2",
+   "final_digest": "sha256:c39c556c99c9d0648ac0f2980ee0211b39ea1a4e0ea309d9cb8a5b73af580bbd",
+   "expected_digests": [
+    "sha256:c39c556c99c9d0648ac0f2980ee0211b39ea1a4e0ea309d9cb8a5b73af580bbd"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sphinx/ext/napoleon/docstring.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:4ce59cd6b1552c597e54f4750dd0c1bcb2d74bf7e3b3a0fcc41499ac8a0cec17",
+   "final_digest": "sha256:a2fc19322c36110e2b33d246445d2c707e32759d234900d933bb9977af5980a2",
+   "expected_digests": [
+    "sha256:a2fc19322c36110e2b33d246445d2c707e32759d234900d933bb9977af5980a2"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "sphinx/application.py": "sha256:14bac987f5e9c8a5163e746e7a225cee89c9a93c4fae99d5198b272490fc5209",
+  "sphinx/events.py": "sha256:c993a4942a96328dda03f1b3b6d7756f4477f38cc00e720a6fc1c2401053a796",
+  "sphinx/ext/autodoc/_dynamic/_member_finder.py": "sha256:b369c48c9bc73bd681c8849739bba0b3fc6b1379308df099c96eaf5dc17d30d1",
+  "sphinx/ext/autodoc/_event_listeners.py": "sha256:8f02d11498edc3b183c8aa547a4f2597c1000767b233a9ab6f5937fc9cdfea18",
+  "sphinx/ext/napoleon/__init__.py": "sha256:c39c556c99c9d0648ac0f2980ee0211b39ea1a4e0ea309d9cb8a5b73af580bbd",
+  "sphinx/ext/napoleon/docstring.py": "sha256:a2fc19322c36110e2b33d246445d2c707e32759d234900d933bb9977af5980a2"
+ }
+}

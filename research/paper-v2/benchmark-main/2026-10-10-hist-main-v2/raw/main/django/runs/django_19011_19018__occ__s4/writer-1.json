@@ -1,0 +1,82 @@
+{
+ "writer": 1,
+ "pr": 19018,
+ "pid": 2190564,
+ "init_ms": 73.822509,
+ "start_offset_ms": 16,
+ "file_order": [
+  "django/db/models/options.py",
+  "django/db/models/base.py",
+  "django/db/models/query.py"
+ ],
+ "holds": {
+  "django/db/models/options.py": 4,
+  "django/db/models/base.py": 1,
+  "django/db/models/query.py": 28
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 19018,
+   "path": "django/db/models/options.py",
+   "intents": [
+    "log:django:19011_19018:19018:django/db/models/options.py:h3"
+   ],
+   "hold_ms": 4,
+   "t_submit_epoch": 1791572888942,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 22,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 33.86,
+   "t_done_epoch": 1791572888976
+  },
+  {
+   "writer": 1,
+   "pr": 19018,
+   "path": "django/db/models/base.py",
+   "intents": [
+    "log:django:19011_19018:19018:django/db/models/base.py:h0",
+    "log:django:19011_19018:19018:django/db/models/base.py:h1",
+    "log:django:19011_19018:19018:django/db/models/base.py:h2"
+   ],
+   "hold_ms": 1,
+   "t_submit_epoch": 1791572888976,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 11.74,
+   "t_done_epoch": 1791572888988
+  },
+  {
+   "writer": 1,
+   "pr": 19018,
+   "path": "django/db/models/query.py",
+   "intents": [
+    "log:django:19011_19018:19018:django/db/models/query.py:h4",
+    "log:django:19011_19018:19018:django/db/models/query.py:h5",
+    "log:django:19011_19018:19018:django/db/models/query.py:h6"
+   ],
+   "hold_ms": 28,
+   "t_submit_epoch": 1791572888988,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 36.55,
+   "t_done_epoch": 1791572889025
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 1
+ },
+ "steward_batches": null
+}

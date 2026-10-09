@@ -1,0 +1,58 @@
+{
+ "writer": 0,
+ "pr": 12716,
+ "pid": 2299658,
+ "init_ms": 66.288697,
+ "start_offset_ms": 14,
+ "file_order": [
+  "src/_pytest/assertion/rewrite.py",
+  "src/_pytest/pathlib.py"
+ ],
+ "holds": {
+  "src/_pytest/assertion/rewrite.py": 11,
+  "src/_pytest/pathlib.py": 14
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 12716,
+   "path": "src/_pytest/assertion/rewrite.py",
+   "intents": [
+    "log:pytest:12716_12752:12716:src/_pytest/assertion/rewrite.py:h0"
+   ],
+   "hold_ms": 11,
+   "t_submit_epoch": 1791574011909,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 21,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 39.08,
+   "t_done_epoch": 1791574011948
+  },
+  {
+   "writer": 0,
+   "pr": 12716,
+   "path": "src/_pytest/pathlib.py",
+   "intents": [
+    "log:pytest:12716_12752:12716:src/_pytest/pathlib.py:h1"
+   ],
+   "hold_ms": 14,
+   "t_submit_epoch": 1791574011948,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 21.9,
+   "t_done_epoch": 1791574011969
+  }
+ ],
+ "admit_stats": {
+  "txns": 4,
+  "cas_conflicts": 1
+ },
+ "steward_batches": null
+}

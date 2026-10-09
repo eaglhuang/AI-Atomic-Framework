@@ -1,0 +1,82 @@
+{
+ "writer": 0,
+ "pr": 9722,
+ "pid": 2277874,
+ "init_ms": 79.04115200000001,
+ "start_offset_ms": 15,
+ "file_order": [
+  "xarray/core/indexing.py",
+  "xarray/core/dataset.py",
+  "xarray/plot/utils.py"
+ ],
+ "holds": {
+  "xarray/core/indexing.py": 5,
+  "xarray/core/dataset.py": 12,
+  "xarray/plot/utils.py": 23
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 9722,
+   "path": "xarray/core/indexing.py",
+   "intents": [
+    "log:xarray:9722_9727:9722:xarray/core/indexing.py:h2"
+   ],
+   "hold_ms": 5,
+   "t_submit_epoch": 1791573776538,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 19,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 33.01,
+   "t_done_epoch": 1791573776571
+  },
+  {
+   "writer": 0,
+   "pr": 9722,
+   "path": "xarray/core/dataset.py",
+   "intents": [
+    "log:xarray:9722_9727:9722:xarray/core/dataset.py:h0",
+    "log:xarray:9722_9727:9722:xarray/core/dataset.py:h1"
+   ],
+   "hold_ms": 12,
+   "t_submit_epoch": 1791573776571,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 5,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 29.44,
+   "t_done_epoch": 1791573776601
+  },
+  {
+   "writer": 0,
+   "pr": 9722,
+   "path": "xarray/plot/utils.py",
+   "intents": [
+    "log:xarray:9722_9727:9722:xarray/plot/utils.py:h3"
+   ],
+   "hold_ms": 23,
+   "t_submit_epoch": 1791573776601,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 6,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 36.79,
+   "t_done_epoch": 1791573776637
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 10
+ },
+ "steward_batches": null
+}

@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-c0f4d430df502094",
+  "proposalIds": [
+    "prop-hist-w0-sympy_ntheory_factor_py"
+  ],
+  "targetFiles": [
+    "sympy/ntheory/factor_.py"
+  ],
+  "appliedFiles": [],
+  "fileBeforeHashes": {},
+  "fileAfterHashes": {},
+  "permissions": {
+    "fileWrite": [
+      "sympy/ntheory/factor_.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "blocked",
+  "blockedReasons": [
+    "file-hash-drift: Target file hash sha256:50d4c848ead6636718065e5fa4fd1208f7610fc07efa4087e8ecf1175f575000 does not match proposal fileBeforeHash sha256:e2ab55af863937f570a4dff2b60d73fa810865802fadffa0524e717211fa3703."
+  ],
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-c0f4d430df502094",
+    "planId": "merge-c0f4d430df502094",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-c0f4d430df502094",
+        "planId": "merge-c0f4d430df502094",
+        "request_identity": [
+          "prop-hist-w0-sympy_ntheory_factor_py"
+        ],
+        "actor_ids": [
+          "writer-27193"
+        ],
+        "request_files": [
+          "sympy/ntheory/factor_.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/sympy/runs/sympy_27193_27239__bare_composer__s2/artifacts/steward/cb-sympy_ntheory_factor_.py-w0-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SYMPY_NTHEORY_FACTOR_PY"
+        ],
+        "commit_sha": "f686e3d887647513e893685683905f8e44db10fb"
+      }
+    ]
+  }
+}

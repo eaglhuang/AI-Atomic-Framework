@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-31edcb658528fad2",
+  "proposalIds": [
+    "prop-hist-w0-django_db_models_fields_tuple_lookups_py"
+  ],
+  "targetFiles": [
+    "django/db/models/fields/tuple_lookups.py"
+  ],
+  "appliedFiles": [
+    "django/db/models/fields/tuple_lookups.py"
+  ],
+  "fileBeforeHashes": {
+    "django/db/models/fields/tuple_lookups.py": "6dcb28db6937fde67152e5d4f82a71ff2ad10cf9dae87279a03aa83439d1061b"
+  },
+  "fileAfterHashes": {
+    "django/db/models/fields/tuple_lookups.py": "9f630b2e285ea1903166c731d9c1fe01fc70e1cf5b52f7e64cd439f940872029"
+  },
+  "permissions": {
+    "fileWrite": [
+      "django/db/models/fields/tuple_lookups.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-31edcb658528fad2",
+    "planId": "merge-31edcb658528fad2",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-31edcb658528fad2",
+        "planId": "merge-31edcb658528fad2",
+        "request_identity": [
+          "prop-hist-w0-django_db_models_fields_tuple_lookups_py"
+        ],
+        "actor_ids": [
+          "writer-18485"
+        ],
+        "request_files": [
+          "django/db/models/fields/tuple_lookups.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "django/db/models/fields/tuple_lookups.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/django/runs/django_18485_18565__steward__s1/artifacts/steward/cb-django_db_models_fields_tuple_lookups.py-w0-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-DJANGO_DB_MODELS_FIELDS_TUPLE_LOOKUPS_PY"
+        ],
+        "commit_sha": "ad810b0916a758019feae1a39679a90eb208038b"
+      }
+    ]
+  }
+}

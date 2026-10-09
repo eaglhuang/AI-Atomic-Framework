@@ -1,0 +1,63 @@
+{
+ "writer": 0,
+ "pr": 9199,
+ "pid": 2275794,
+ "init_ms": 70.58903,
+ "start_offset_ms": 15,
+ "file_order": [
+  "xarray/backends/netCDF4_.py",
+  "xarray/backends/h5netcdf_.py"
+ ],
+ "holds": {
+  "xarray/backends/netCDF4_.py": 18,
+  "xarray/backends/h5netcdf_.py": 3
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 9199,
+   "path": "xarray/backends/netCDF4_.py",
+   "intents": [
+    "log:xarray:9199_9243:9199:xarray/backends/netCDF4_.py:h4",
+    "log:xarray:9199_9243:9199:xarray/backends/netCDF4_.py:h5"
+   ],
+   "hold_ms": 18,
+   "t_submit_epoch": 1791573748392,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 24,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 48.83,
+   "t_done_epoch": 1791573748440
+  },
+  {
+   "writer": 0,
+   "pr": 9199,
+   "path": "xarray/backends/h5netcdf_.py",
+   "intents": [
+    "log:xarray:9199_9243:9199:xarray/backends/h5netcdf_.py:h0",
+    "log:xarray:9199_9243:9199:xarray/backends/h5netcdf_.py:h1",
+    "log:xarray:9199_9243:9199:xarray/backends/h5netcdf_.py:h2",
+    "log:xarray:9199_9243:9199:xarray/backends/h5netcdf_.py:h3"
+   ],
+   "hold_ms": 3,
+   "t_submit_epoch": 1791573748440,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "outcome": "blocked",
+   "blocked_reason": "occ-relocate-context-not-found",
+   "occ_retries": 0,
+   "total_ms": 8.54,
+   "t_done_epoch": 1791573748449
+  }
+ ],
+ "admit_stats": {
+  "txns": 4,
+  "cas_conflicts": 1
+ },
+ "steward_batches": null
+}

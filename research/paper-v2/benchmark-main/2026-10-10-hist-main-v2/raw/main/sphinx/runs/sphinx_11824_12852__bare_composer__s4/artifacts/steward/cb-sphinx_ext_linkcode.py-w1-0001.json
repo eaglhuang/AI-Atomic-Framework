@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-9fb32d877252e0e1",
+  "proposalIds": [
+    "prop-hist-w1-sphinx_ext_linkcode_py"
+  ],
+  "targetFiles": [
+    "sphinx/ext/linkcode.py"
+  ],
+  "appliedFiles": [],
+  "fileBeforeHashes": {},
+  "fileAfterHashes": {},
+  "permissions": {
+    "fileWrite": [
+      "sphinx/ext/linkcode.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "blocked",
+  "blockedReasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w1-sphinx_ext_linkcode_py' context mismatch at base line 30: expected \"        raise LinkcodeError(msg)\", found \"\" [proposals: prop-hist-w1-sphinx_ext_linkcode_py]"
+  ],
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-9fb32d877252e0e1",
+    "planId": "merge-9fb32d877252e0e1",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-9fb32d877252e0e1",
+        "planId": "merge-9fb32d877252e0e1",
+        "request_identity": [
+          "prop-hist-w1-sphinx_ext_linkcode_py"
+        ],
+        "actor_ids": [
+          "writer-12852"
+        ],
+        "request_files": [
+          "sphinx/ext/linkcode.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/sphinx/runs/sphinx_11824_12852__bare_composer__s4/artifacts/steward/cb-sphinx_ext_linkcode.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SPHINX_EXT_LINKCODE_PY"
+        ],
+        "commit_sha": "d79fbfb4de0686d89ec459fdf26ce68018b31782"
+      }
+    ]
+  }
+}

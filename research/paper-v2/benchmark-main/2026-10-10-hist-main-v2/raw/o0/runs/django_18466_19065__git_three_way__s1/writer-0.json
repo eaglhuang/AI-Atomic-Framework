@@ -1,0 +1,69 @@
+{
+ "writer": 0,
+ "pr": 18466,
+ "pid": 2409890,
+ "init_ms": 76.19335,
+ "start_offset_ms": 20,
+ "file_order": [
+  "django/contrib/auth/admin.py",
+  "django/contrib/auth/views.py"
+ ],
+ "holds": {
+  "django/contrib/auth/admin.py": 19,
+  "django/contrib/auth/views.py": 11
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 18466,
+   "path": "django/contrib/auth/admin.py",
+   "intents": [
+    "log:django:18466_19065:18466:django/contrib/auth/admin.py:h0",
+    "log:django:18466_19065:18466:django/contrib/auth/admin.py:h1",
+    "log:django:18466_19065:18466:django/contrib/auth/admin.py:h2"
+   ],
+   "hold_ms": 19,
+   "t_submit_epoch": 1791574831389,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 19,
+   "outcome": "commit",
+   "total_ms": 48.71,
+   "t_done_epoch": 1791574831437
+  },
+  {
+   "writer": 0,
+   "pr": 18466,
+   "path": "django/contrib/auth/views.py",
+   "intents": [
+    "log:django:18466_19065:18466:django/contrib/auth/views.py:h3",
+    "log:django:18466_19065:18466:django/contrib/auth/views.py:h4",
+    "log:django:18466_19065:18466:django/contrib/auth/views.py:h5",
+    "log:django:18466_19065:18466:django/contrib/auth/views.py:h6",
+    "log:django:18466_19065:18466:django/contrib/auth/views.py:h7",
+    "log:django:18466_19065:18466:django/contrib/auth/views.py:h8",
+    "log:django:18466_19065:18466:django/contrib/auth/views.py:h9",
+    "log:django:18466_19065:18466:django/contrib/auth/views.py:h10",
+    "log:django:18466_19065:18466:django/contrib/auth/views.py:h11",
+    "log:django:18466_19065:18466:django/contrib/auth/views.py:h12",
+    "log:django:18466_19065:18466:django/contrib/auth/views.py:h13",
+    "log:django:18466_19065:18466:django/contrib/auth/views.py:h14"
+   ],
+   "hold_ms": 11,
+   "t_submit_epoch": 1791574831437,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "total_ms": 22.73,
+   "t_done_epoch": 1791574831460
+  }
+ ],
+ "admit_stats": {
+  "txns": 4,
+  "cas_conflicts": 4
+ },
+ "steward_batches": null
+}

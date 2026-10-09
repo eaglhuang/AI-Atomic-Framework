@@ -1,0 +1,241 @@
+{
+ "pair_id": "sympy:28805_28807",
+ "stratum": "O1",
+ "arm": "bare_composer",
+ "plant": null,
+ "seed_k": 3,
+ "seed": 2430668064,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 1015,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 22,
+  "by_verdict": {
+   "correct": 19,
+   "blocked_absent": 3
+  },
+  "completed": 19,
+  "lost_effects": 0,
+  "blocked": 3,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 8,
+  "files_full_bytes_exact": 8,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {
+  "harness-relocate-context-not-found": 3
+ },
+ "structure": {
+  "sympy/core/expr.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/matrices/eigen.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/matrices/utilities.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/ntheory/digits.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/polys/polyroots.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/polys/polytools.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/polys/polyutils.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/utilities/iterables.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "sympy/core/expr.py": true,
+  "sympy/matrices/eigen.py": true,
+  "sympy/matrices/utilities.py": true,
+  "sympy/ntheory/digits.py": true,
+  "sympy/polys/polyroots.py": true,
+  "sympy/polys/polytools.py": true,
+  "sympy/polys/polyutils.py": true,
+  "sympy/utilities/iterables.py": true
+ },
+ "final_exists": {
+  "sympy/core/expr.py": true,
+  "sympy/matrices/eigen.py": true,
+  "sympy/matrices/utilities.py": true,
+  "sympy/ntheory/digits.py": true,
+  "sympy/polys/polyroots.py": true,
+  "sympy/polys/polytools.py": true,
+  "sympy/polys/polyutils.py": true,
+  "sympy/utilities/iterables.py": true
+ },
+ "files": [
+  {
+   "path": "sympy/core/expr.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:80dc5ec02ff639142eecaaabba2f8d5d9bf883d17d16777bd4bbf76d4f188a90",
+   "final_digest": "sha256:2c7d57e11456a19eaa501f535878c05f6b9351b5bb24f71f91e5f0eada98ec2f",
+   "expected_digests": [
+    "sha256:2c7d57e11456a19eaa501f535878c05f6b9351b5bb24f71f91e5f0eada98ec2f"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/matrices/eigen.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:8306b2d4734df8213109882459447b6b509605a4530aeb0f0d1ab0df8be89e4b",
+   "final_digest": "sha256:355f539784fc0b96389190dc886df8396b35a90743fe0a5f129cd5b1b3115290",
+   "expected_digests": [
+    "sha256:355f539784fc0b96389190dc886df8396b35a90743fe0a5f129cd5b1b3115290"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/matrices/utilities.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:c4e346fdd1d3a941199d748debe90fefa2816669a0300fdcf6d6f084fafee445",
+   "final_digest": "sha256:83cd918dc7f9a27e5a53db8eddedb51f8e91bc1e19b315928556286deec84eda",
+   "expected_digests": [
+    "sha256:83cd918dc7f9a27e5a53db8eddedb51f8e91bc1e19b315928556286deec84eda"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/ntheory/digits.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:994752ecf7effba182cd8f47a5c418e2ccf0f1b702ab60a3afa1973df2a02ac4",
+   "final_digest": "sha256:2211c8863937d9739bb5804429b32bad9183d757ab417fe1dc0fac97d39318b7",
+   "expected_digests": [
+    "sha256:2211c8863937d9739bb5804429b32bad9183d757ab417fe1dc0fac97d39318b7"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/polys/polyroots.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:1de4f1660bb5770dea23ea4a95baca088bb049a78bfa6cb8cb8d8e9e8e045ba5",
+   "final_digest": "sha256:c049df576f82955cdc5a5690129a0869c09a01012a834019167ef2dd060c3810",
+   "expected_digests": [
+    "sha256:c049df576f82955cdc5a5690129a0869c09a01012a834019167ef2dd060c3810"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/polys/polytools.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:4aedf75dfc72b3f79a5e850b1709c3dd4317db679f924aa09c445781499f2a50",
+   "final_digest": "sha256:29c4f62a5ca6185161f8a8713be5d3efe2c92bfc04c0fa47dffc909418aa65d9",
+   "expected_digests": [
+    "sha256:29c4f62a5ca6185161f8a8713be5d3efe2c92bfc04c0fa47dffc909418aa65d9"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/polys/polyutils.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:b832e65bf5fa234addf698a4a2c7982e9bb7ecaf8ab93e88a756335e7d43a768",
+   "final_digest": "sha256:ca700a941d68ea74b20e31d30ec8169a32ba8731db69b1537701ffd838b80ea6",
+   "expected_digests": [
+    "sha256:ca700a941d68ea74b20e31d30ec8169a32ba8731db69b1537701ffd838b80ea6"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/utilities/iterables.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:7989073b31a711d93ab5786b86fd1ce4f68c92d6f952feec8d492a2faed4d10a",
+   "final_digest": "sha256:ec5b21c558e5246839bc3fffb5dd7d97c08a3363c1667da6025a24642f63e75a",
+   "expected_digests": [
+    "sha256:ec5b21c558e5246839bc3fffb5dd7d97c08a3363c1667da6025a24642f63e75a"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "sympy/core/expr.py": "sha256:2c7d57e11456a19eaa501f535878c05f6b9351b5bb24f71f91e5f0eada98ec2f",
+  "sympy/matrices/eigen.py": "sha256:355f539784fc0b96389190dc886df8396b35a90743fe0a5f129cd5b1b3115290",
+  "sympy/matrices/utilities.py": "sha256:83cd918dc7f9a27e5a53db8eddedb51f8e91bc1e19b315928556286deec84eda",
+  "sympy/ntheory/digits.py": "sha256:2211c8863937d9739bb5804429b32bad9183d757ab417fe1dc0fac97d39318b7",
+  "sympy/polys/polyroots.py": "sha256:c049df576f82955cdc5a5690129a0869c09a01012a834019167ef2dd060c3810",
+  "sympy/polys/polytools.py": "sha256:29c4f62a5ca6185161f8a8713be5d3efe2c92bfc04c0fa47dffc909418aa65d9",
+  "sympy/polys/polyutils.py": "sha256:ca700a941d68ea74b20e31d30ec8169a32ba8731db69b1537701ffd838b80ea6",
+  "sympy/utilities/iterables.py": "sha256:ec5b21c558e5246839bc3fffb5dd7d97c08a3363c1667da6025a24642f63e75a"
+ }
+}

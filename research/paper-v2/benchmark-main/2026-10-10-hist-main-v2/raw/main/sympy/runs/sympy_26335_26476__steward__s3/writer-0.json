@@ -1,0 +1,128 @@
+{
+ "writer": 0,
+ "pr": 26335,
+ "pid": 2232134,
+ "init_ms": 121.737155,
+ "start_offset_ms": 17,
+ "file_order": [
+  "sympy/tensor/tensor.py"
+ ],
+ "holds": {
+  "sympy/tensor/tensor.py": 9
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 26335,
+   "path": "sympy/tensor/tensor.py",
+   "intents": [
+    "log:sympy:26335_26476:26335:sympy/tensor/tensor.py:h0"
+   ],
+   "hold_ms": 9,
+   "t_submit_epoch": 1791573261574,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 20,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sympy_tensor_tensor.py-w0-0001",
+   "total_ms": 161.01,
+   "t_done_epoch": 1791573261735
+  }
+ ],
+ "admit_stats": {
+  "txns": 2,
+  "cas_conflicts": 1
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sympy_tensor_tensor.py-w0-0001",
+   "path": "sympy/tensor/tensor.py",
+   "pid": 2232134,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-sympy_tensor_tensor_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sympy_tensor_tensor_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:409ca813a98be976f82d578ba49f1df6cdccec6d060c8697848b977d56803fb2"
+   ],
+   "lock_wait_ms": 0.12,
+   "t_start_epoch_ms": 1791573261608.34,
+   "pre_apply_hash": "sha256:409ca813a98be976f82d578ba49f1df6cdccec6d060c8697848b977d56803fb2",
+   "receipt_before_hash": "sha256:983e8754b54adeddc81707beab457a64f15e81b144d367749e902eae27ce6a12",
+   "receipt_after_hash": "sha256:7be1eed2dfa29145789cfd7be4fdd25a2adeca1954c4460ec01a3ba208e15516",
+   "post_apply_hash": "sha256:7be1eed2dfa29145789cfd7be4fdd25a2adeca1954c4460ec01a3ba208e15516",
+   "t_end_epoch_ms": 1791573261731.28,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": true,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:14:21.731+08:00",
+   "batch_id": "cb-sympy_tensor_tensor.py-w0-0001",
+   "path": "sympy/tensor/tensor.py",
+   "proposalIds": [
+    "prop-hist-w0-sympy_tensor_tensor_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sympy_tensor_tensor_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-sympy_tensor_tensor_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-sympy_tensor_tensor_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-sympy_tensor_tensor_py",
+     "logical_id": "prop-hist-w0-sympy_tensor_tensor_py",
+     "attempt_id": "att-prop-hist-w0-sympy_tensor_tensor_py-r0",
+     "proposal_id": "prop-hist-w0-sympy_tensor_tensor_py",
+     "actorId": "writer-26335"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.26,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:409ca813a98be976f82d578ba49f1df6cdccec6d060c8697848b977d56803fb2",
+   "written": true,
+   "output_digest": "sha256:7be1eed2dfa29145789cfd7be4fdd25a2adeca1954c4460ec01a3ba208e15516",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

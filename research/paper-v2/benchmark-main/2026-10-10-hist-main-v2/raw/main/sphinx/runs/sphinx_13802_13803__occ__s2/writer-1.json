@@ -1,0 +1,63 @@
+{
+ "writer": 1,
+ "pr": 13803,
+ "pid": 2336175,
+ "init_ms": 89.96622399999998,
+ "start_offset_ms": 20,
+ "file_order": [
+  "sphinx/ext/autodoc/_documenters.py",
+  "sphinx/ext/autodoc/importer.py"
+ ],
+ "holds": {
+  "sphinx/ext/autodoc/_documenters.py": 25,
+  "sphinx/ext/autodoc/importer.py": 15
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 13803,
+   "path": "sphinx/ext/autodoc/_documenters.py",
+   "intents": [
+    "log:sphinx:13802_13803:13803:sphinx/ext/autodoc/_documenters.py:h0",
+    "log:sphinx:13802_13803:13803:sphinx/ext/autodoc/_documenters.py:h1",
+    "log:sphinx:13802_13803:13803:sphinx/ext/autodoc/_documenters.py:h2",
+    "log:sphinx:13802_13803:13803:sphinx/ext/autodoc/_documenters.py:h3"
+   ],
+   "hold_ms": 25,
+   "t_submit_epoch": 1791574295222,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 55,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 89.9,
+   "t_done_epoch": 1791574295312
+  },
+  {
+   "writer": 1,
+   "pr": 13803,
+   "path": "sphinx/ext/autodoc/importer.py",
+   "intents": [
+    "log:sphinx:13802_13803:13803:sphinx/ext/autodoc/importer.py:h4",
+    "log:sphinx:13802_13803:13803:sphinx/ext/autodoc/importer.py:h5"
+   ],
+   "hold_ms": 15,
+   "t_submit_epoch": 1791574295312,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 5,
+   "outcome": "blocked",
+   "blocked_reason": "occ-relocate-context-not-found",
+   "occ_retries": 0,
+   "total_ms": 23.74,
+   "t_done_epoch": 1791574295336
+  }
+ ],
+ "admit_stats": {
+  "txns": 4,
+  "cas_conflicts": 4
+ },
+ "steward_batches": null
+}

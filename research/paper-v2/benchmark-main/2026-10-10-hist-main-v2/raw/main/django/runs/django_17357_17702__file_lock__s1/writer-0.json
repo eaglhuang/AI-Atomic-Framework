@@ -1,0 +1,109 @@
+{
+ "writer": 0,
+ "pr": 17357,
+ "pid": 2193224,
+ "init_ms": 75.482492,
+ "start_offset_ms": 12,
+ "file_order": [
+  "django/contrib/admin/checks.py",
+  "django/contrib/admin/templatetags/admin_list.py",
+  "django/contrib/admin/utils.py",
+  "django/contrib/admin/views/main.py"
+ ],
+ "holds": {
+  "django/contrib/admin/checks.py": 14,
+  "django/contrib/admin/templatetags/admin_list.py": 1,
+  "django/contrib/admin/utils.py": 4,
+  "django/contrib/admin/views/main.py": 24
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 17357,
+   "path": "django/contrib/admin/checks.py",
+   "intents": [
+    "log:django:17357_17702:17357:django/contrib/admin/checks.py:h0"
+   ],
+   "hold_ms": 14,
+   "t_submit_epoch": 1791572913203,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 28,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 51.64,
+   "t_done_epoch": 1791572913254
+  },
+  {
+   "writer": 0,
+   "pr": 17357,
+   "path": "django/contrib/admin/templatetags/admin_list.py",
+   "intents": [
+    "log:django:17357_17702:17357:django/contrib/admin/templatetags/admin_list.py:h1",
+    "log:django:17357_17702:17357:django/contrib/admin/templatetags/admin_list.py:h2"
+   ],
+   "hold_ms": 1,
+   "t_submit_epoch": 1791572913254,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 6.41,
+   "t_done_epoch": 1791572913261
+  },
+  {
+   "writer": 0,
+   "pr": 17357,
+   "path": "django/contrib/admin/utils.py",
+   "intents": [
+    "log:django:17357_17702:17357:django/contrib/admin/utils.py:h3",
+    "log:django:17357_17702:17357:django/contrib/admin/utils.py:h4",
+    "log:django:17357_17702:17357:django/contrib/admin/utils.py:h5",
+    "log:django:17357_17702:17357:django/contrib/admin/utils.py:h6",
+    "log:django:17357_17702:17357:django/contrib/admin/utils.py:h7"
+   ],
+   "hold_ms": 4,
+   "t_submit_epoch": 1791572913261,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 8.83,
+   "t_done_epoch": 1791572913270
+  },
+  {
+   "writer": 0,
+   "pr": 17357,
+   "path": "django/contrib/admin/views/main.py",
+   "intents": [
+    "log:django:17357_17702:17357:django/contrib/admin/views/main.py:h8",
+    "log:django:17357_17702:17357:django/contrib/admin/views/main.py:h9",
+    "log:django:17357_17702:17357:django/contrib/admin/views/main.py:h10"
+   ],
+   "hold_ms": 24,
+   "t_submit_epoch": 1791572913270,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 30.73,
+   "t_done_epoch": 1791572913300
+  }
+ ],
+ "admit_stats": {
+  "txns": 8,
+  "cas_conflicts": 3
+ },
+ "steward_batches": null
+}

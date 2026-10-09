@@ -1,0 +1,126 @@
+{
+ "writer": 0,
+ "pr": 13537,
+ "pid": 2371549,
+ "init_ms": 72.867133,
+ "start_offset_ms": 10,
+ "file_order": [
+  "fastapi/dependencies/utils.py"
+ ],
+ "holds": {
+  "fastapi/dependencies/utils.py": 12
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 13537,
+   "path": "fastapi/dependencies/utils.py",
+   "intents": [
+    "log:fastapi:13537_14303:13537:fastapi/dependencies/utils.py:h0",
+    "log:fastapi:13537_14303:13537:fastapi/dependencies/utils.py:h1"
+   ],
+   "hold_ms": 12,
+   "t_submit_epoch": 1791574580376,
+   "outcome": "blocked",
+   "blocked_reason": "compose-context-mismatch: proposal 'prop-hist-w0-fastapi_dependencies_utils_py' context mismatch at base line 901: expected \"    for key, value in received_body.items():\", found \"    for key in received_body.keys():\" [proposals: prop-hist-w0-fastapi_dependencies_utils_py]",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w0-fastapi_dependencies_utils_py' context mismatch at base line 901: expected \"    for key, value in received_body.items():\", found \"    for key in received_body.keys():\" [proposals: prop-hist-w0-fastapi_dependencies_utils_py]"
+   ],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-fastapi_dependencies_utils.py-w0-0001",
+   "total_ms": 96.51,
+   "t_done_epoch": 1791574580472
+  }
+ ],
+ "admit_stats": null,
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-fastapi_dependencies_utils.py-w0-0001",
+   "path": "fastapi/dependencies/utils.py",
+   "pid": 2371549,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-fastapi_dependencies_utils_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-fastapi_dependencies_utils_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:a04ca5c36817375586f40d1a4c6fa89f083ec1c40dc977b68401a9677e645c64"
+   ],
+   "lock_wait_ms": 0.15,
+   "t_start_epoch_ms": 1791574580391.03,
+   "pre_apply_hash": "sha256:a04ca5c36817375586f40d1a4c6fa89f083ec1c40dc977b68401a9677e645c64",
+   "receipt_before_hash": null,
+   "receipt_after_hash": null,
+   "post_apply_hash": "sha256:66c370b985fa392beed628b2c6ec684e4c605aeead91efbb0d05336c87fb5968",
+   "t_end_epoch_ms": 1791574580472.1,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "blocked",
+   "written": false,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:36:20.472+08:00",
+   "batch_id": "cb-fastapi_dependencies_utils.py-w0-0001",
+   "path": "fastapi/dependencies/utils.py",
+   "proposalIds": [
+    "prop-hist-w0-fastapi_dependencies_utils_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-fastapi_dependencies_utils_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-fastapi_dependencies_utils_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-fastapi_dependencies_utils_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-fastapi_dependencies_utils_py",
+     "logical_id": "prop-hist-w0-fastapi_dependencies_utils_py",
+     "attempt_id": "att-prop-hist-w0-fastapi_dependencies_utils_py-r0",
+     "proposal_id": "prop-hist-w0-fastapi_dependencies_utils_py",
+     "actorId": "writer-13537"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w0-fastapi_dependencies_utils_py' context mismatch at base line 901: expected \"    for key, value in received_body.items():\", found \"    for key in received_body.keys():\" [proposals: prop-hist-w0-fastapi_dependencies_utils_py]"
+   ],
+   "blocked_reason": "compose-context-mismatch: proposal 'prop-hist-w0-fastapi_dependencies_utils_py' context mismatch at base line 901: expected \"    for key, value in received_body.items():\", found \"    for key in received_body.keys():\" [proposals: prop-hist-w0-fastapi_dependencies_utils_py]",
+   "window_wait_ms": 0.32,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:a04ca5c36817375586f40d1a4c6fa89f083ec1c40dc977b68401a9677e645c64",
+   "written": false,
+   "output_digest": null,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "compose-context-mismatch: proposal 'prop-hist-w0-fastapi_dependencies_utils_py' context mismatch at base line 901: expected \"    for key, value in received_body.items():\", found \"    for key in received_body.keys():\" [proposals: prop-hist-w0-fastapi_dependencies_utils_py]"
+  }
+ ]
+}

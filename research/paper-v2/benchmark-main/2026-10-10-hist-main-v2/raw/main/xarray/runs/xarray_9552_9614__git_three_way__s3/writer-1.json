@@ -1,0 +1,81 @@
+{
+ "writer": 1,
+ "pr": 9614,
+ "pid": 2251817,
+ "init_ms": 63.730472000000006,
+ "start_offset_ms": 2,
+ "file_order": [
+  "xarray/backends/zarr.py",
+  "xarray/backends/netCDF4_.py",
+  "xarray/backends/h5netcdf_.py"
+ ],
+ "holds": {
+  "xarray/backends/zarr.py": 6,
+  "xarray/backends/netCDF4_.py": 24,
+  "xarray/backends/h5netcdf_.py": 14
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 9614,
+   "path": "xarray/backends/zarr.py",
+   "intents": [
+    "log:xarray:9552_9614:9614:xarray/backends/zarr.py:h6",
+    "log:xarray:9552_9614:9614:xarray/backends/zarr.py:h7",
+    "log:xarray:9552_9614:9614:xarray/backends/zarr.py:h8"
+   ],
+   "hold_ms": 6,
+   "t_submit_epoch": 1791573456843,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 14,
+   "outcome": "commit",
+   "total_ms": 31.16,
+   "t_done_epoch": 1791573456874
+  },
+  {
+   "writer": 1,
+   "pr": 9614,
+   "path": "xarray/backends/netCDF4_.py",
+   "intents": [
+    "log:xarray:9552_9614:9614:xarray/backends/netCDF4_.py:h3",
+    "log:xarray:9552_9614:9614:xarray/backends/netCDF4_.py:h4",
+    "log:xarray:9552_9614:9614:xarray/backends/netCDF4_.py:h5"
+   ],
+   "hold_ms": 24,
+   "t_submit_epoch": 1791573456874,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "total_ms": 34.34,
+   "t_done_epoch": 1791573456909
+  },
+  {
+   "writer": 1,
+   "pr": 9614,
+   "path": "xarray/backends/h5netcdf_.py",
+   "intents": [
+    "log:xarray:9552_9614:9614:xarray/backends/h5netcdf_.py:h0",
+    "log:xarray:9552_9614:9614:xarray/backends/h5netcdf_.py:h1",
+    "log:xarray:9552_9614:9614:xarray/backends/h5netcdf_.py:h2"
+   ],
+   "hold_ms": 14,
+   "t_submit_epoch": 1791573456909,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 5,
+   "outcome": "commit",
+   "total_ms": 27.63,
+   "t_done_epoch": 1791573456936
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 0
+ },
+ "steward_batches": null
+}

@@ -1,0 +1,87 @@
+{
+ "writer": 1,
+ "pr": 9614,
+ "pid": 2251211,
+ "init_ms": 78.996978,
+ "start_offset_ms": 8,
+ "file_order": [
+  "xarray/backends/zarr.py",
+  "xarray/backends/h5netcdf_.py",
+  "xarray/backends/netCDF4_.py"
+ ],
+ "holds": {
+  "xarray/backends/zarr.py": 30,
+  "xarray/backends/h5netcdf_.py": 20,
+  "xarray/backends/netCDF4_.py": 22
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 9614,
+   "path": "xarray/backends/zarr.py",
+   "intents": [
+    "log:xarray:9552_9614:9614:xarray/backends/zarr.py:h6",
+    "log:xarray:9552_9614:9614:xarray/backends/zarr.py:h7",
+    "log:xarray:9552_9614:9614:xarray/backends/zarr.py:h8"
+   ],
+   "hold_ms": 30,
+   "t_submit_epoch": 1791573448970,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 19,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 54.22,
+   "t_done_epoch": 1791573449025
+  },
+  {
+   "writer": 1,
+   "pr": 9614,
+   "path": "xarray/backends/h5netcdf_.py",
+   "intents": [
+    "log:xarray:9552_9614:9614:xarray/backends/h5netcdf_.py:h0",
+    "log:xarray:9552_9614:9614:xarray/backends/h5netcdf_.py:h1",
+    "log:xarray:9552_9614:9614:xarray/backends/h5netcdf_.py:h2"
+   ],
+   "hold_ms": 20,
+   "t_submit_epoch": 1791573449025,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 30.43,
+   "t_done_epoch": 1791573449055
+  },
+  {
+   "writer": 1,
+   "pr": 9614,
+   "path": "xarray/backends/netCDF4_.py",
+   "intents": [
+    "log:xarray:9552_9614:9614:xarray/backends/netCDF4_.py:h3",
+    "log:xarray:9552_9614:9614:xarray/backends/netCDF4_.py:h4",
+    "log:xarray:9552_9614:9614:xarray/backends/netCDF4_.py:h5"
+   ],
+   "hold_ms": 22,
+   "t_submit_epoch": 1791573449055,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 42.16,
+   "t_done_epoch": 1791573449097
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 0
+ },
+ "steward_batches": null
+}

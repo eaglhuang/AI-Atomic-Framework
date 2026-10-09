@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-fb395dc83f8f03cf",
+  "proposalIds": [
+    "prop-hist-w1-sympy_physics_continuum_mechanics_beam_py"
+  ],
+  "targetFiles": [
+    "sympy/physics/continuum_mechanics/beam.py"
+  ],
+  "appliedFiles": [
+    "sympy/physics/continuum_mechanics/beam.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/physics/continuum_mechanics/beam.py": "2dadc2d75cb1a978ac19483d76588258eed7b40511e6f3f5c4e40da9fdfecb85"
+  },
+  "fileAfterHashes": {
+    "sympy/physics/continuum_mechanics/beam.py": "5dc4acb279a9af55163c71d57d441fd154cf706d778bbd35d7ccce48f9d72f72"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/physics/continuum_mechanics/beam.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-fb395dc83f8f03cf",
+    "planId": "merge-fb395dc83f8f03cf",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-fb395dc83f8f03cf",
+        "planId": "merge-fb395dc83f8f03cf",
+        "request_identity": [
+          "prop-hist-w1-sympy_physics_continuum_mechanics_beam_py"
+        ],
+        "actor_ids": [
+          "writer-28185"
+        ],
+        "request_files": [
+          "sympy/physics/continuum_mechanics/beam.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/physics/continuum_mechanics/beam.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/oldpin/runs/sympy_28143_28185__steward__s1/artifacts/steward/cb-sympy_physics_continuum_mechanics_beam.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_PHYSICS_CONTINUUM_MECHANICS_BEAM_PY"
+        ],
+        "commit_sha": "290ab6192b99d10e4508259094f39e6a7fece86a"
+      }
+    ]
+  }
+}

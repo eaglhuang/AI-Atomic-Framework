@@ -1,0 +1,118 @@
+{
+ "writer": 1,
+ "pr": 12127,
+ "pid": 2386944,
+ "init_ms": 82.813289,
+ "start_offset_ms": 17,
+ "file_order": [
+  "scripts/playwright/request_form_models/image01.py",
+  "fastapi/dependencies/utils.py",
+  "docs_src/request_form_models/tutorial001.py",
+  "docs_src/request_form_models/tutorial001_an_py39.py",
+  "docs_src/request_form_models/tutorial001_an.py"
+ ],
+ "holds": {
+  "scripts/playwright/request_form_models/image01.py": 3,
+  "fastapi/dependencies/utils.py": 22,
+  "docs_src/request_form_models/tutorial001.py": 22,
+  "docs_src/request_form_models/tutorial001_an_py39.py": 25,
+  "docs_src/request_form_models/tutorial001_an.py": 11
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 12127,
+   "path": "scripts/playwright/request_form_models/image01.py",
+   "intents": [
+    "log:fastapi:11194_12127:12127:scripts/playwright/request_form_models/image01.py:h9"
+   ],
+   "hold_ms": 3,
+   "t_submit_epoch": 1791574683345,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 17,
+   "outcome": "commit",
+   "total_ms": 28.41,
+   "t_done_epoch": 1791574683374
+  },
+  {
+   "writer": 1,
+   "pr": 12127,
+   "path": "fastapi/dependencies/utils.py",
+   "intents": [
+    "log:fastapi:11194_12127:12127:fastapi/dependencies/utils.py:h3",
+    "log:fastapi:11194_12127:12127:fastapi/dependencies/utils.py:h4",
+    "log:fastapi:11194_12127:12127:fastapi/dependencies/utils.py:h5",
+    "log:fastapi:11194_12127:12127:fastapi/dependencies/utils.py:h6",
+    "log:fastapi:11194_12127:12127:fastapi/dependencies/utils.py:h7",
+    "log:fastapi:11194_12127:12127:fastapi/dependencies/utils.py:h8"
+   ],
+   "hold_ms": 22,
+   "t_submit_epoch": 1791574683374,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "queue",
+   "admit_wait_ms": 12,
+   "outcome": "commit",
+   "total_ms": 43.76,
+   "t_done_epoch": 1791574683417
+  },
+  {
+   "writer": 1,
+   "pr": 12127,
+   "path": "docs_src/request_form_models/tutorial001.py",
+   "intents": [
+    "log:fastapi:11194_12127:12127:docs_src/request_form_models/tutorial001.py:h0"
+   ],
+   "hold_ms": 22,
+   "t_submit_epoch": 1791574683417,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "total_ms": 29.95,
+   "t_done_epoch": 1791574683447
+  },
+  {
+   "writer": 1,
+   "pr": 12127,
+   "path": "docs_src/request_form_models/tutorial001_an_py39.py",
+   "intents": [
+    "log:fastapi:11194_12127:12127:docs_src/request_form_models/tutorial001_an_py39.py:h2"
+   ],
+   "hold_ms": 25,
+   "t_submit_epoch": 1791574683447,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "commit",
+   "total_ms": 39,
+   "t_done_epoch": 1791574683486
+  },
+  {
+   "writer": 1,
+   "pr": 12127,
+   "path": "docs_src/request_form_models/tutorial001_an.py",
+   "intents": [
+    "log:fastapi:11194_12127:12127:docs_src/request_form_models/tutorial001_an.py:h1"
+   ],
+   "hold_ms": 11,
+   "t_submit_epoch": 1791574683486,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "outcome": "commit",
+   "total_ms": 22.76,
+   "t_done_epoch": 1791574683509
+  }
+ ],
+ "admit_stats": {
+  "txns": 11,
+  "cas_conflicts": 2
+ },
+ "steward_batches": null
+}

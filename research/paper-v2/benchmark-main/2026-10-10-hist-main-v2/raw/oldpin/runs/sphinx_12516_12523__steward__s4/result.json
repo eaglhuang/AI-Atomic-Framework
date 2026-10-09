@@ -1,0 +1,128 @@
+{
+ "pair_id": "sphinx:12516_12523",
+ "stratum": "O3",
+ "arm": "steward",
+ "plant": null,
+ "seed_k": 4,
+ "seed": 2513239266,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-5692474f/AI-Atomic-Framework-5692474f7db70ab52a7a71c8af4867609e7e4b43",
+ "wall_ms": 528,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 12,
+  "by_verdict": {
+   "correct": 12
+  },
+  "completed": 12,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 3,
+  "files_full_bytes_exact": 3,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "sphinx/config.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sphinx/domains/math.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sphinx/util/math.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "sphinx/config.py": true,
+  "sphinx/domains/math.py": true,
+  "sphinx/util/math.py": true
+ },
+ "final_exists": {
+  "sphinx/config.py": true,
+  "sphinx/domains/math.py": true,
+  "sphinx/util/math.py": true
+ },
+ "files": [
+  {
+   "path": "sphinx/config.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:cb5493604cbb9204edbe046ac791964732a300462cde91917f717068633d33ff",
+   "final_digest": "sha256:36a05daa65a407ebd53db7820d9af5d281e6ae8c81cb683122b644fe0b62970d",
+   "expected_digests": [
+    "sha256:36a05daa65a407ebd53db7820d9af5d281e6ae8c81cb683122b644fe0b62970d"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sphinx/domains/math.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:8a58a2456b4ac28db967de04e3490e06ce119e5f62d1e8271767251d6cf0fa48",
+   "final_digest": "sha256:38917778a119586b51e3321085ade5fedc54054c44b2b0f59c741cf870c3a8d9",
+   "expected_digests": [
+    "sha256:38917778a119586b51e3321085ade5fedc54054c44b2b0f59c741cf870c3a8d9"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sphinx/util/math.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:ce67f74cc443f401c8c443da384d776542a373fbf0bf90aade28f68508644512",
+   "final_digest": "sha256:1ae06a6efba741f384d89a718c5b14a16c2e8c385669810b733248c8d1b32e11",
+   "expected_digests": [
+    "sha256:1ae06a6efba741f384d89a718c5b14a16c2e8c385669810b733248c8d1b32e11"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "sphinx/config.py": "sha256:36a05daa65a407ebd53db7820d9af5d281e6ae8c81cb683122b644fe0b62970d",
+  "sphinx/domains/math.py": "sha256:38917778a119586b51e3321085ade5fedc54054c44b2b0f59c741cf870c3a8d9",
+  "sphinx/util/math.py": "sha256:1ae06a6efba741f384d89a718c5b14a16c2e8c385669810b733248c8d1b32e11"
+ }
+}

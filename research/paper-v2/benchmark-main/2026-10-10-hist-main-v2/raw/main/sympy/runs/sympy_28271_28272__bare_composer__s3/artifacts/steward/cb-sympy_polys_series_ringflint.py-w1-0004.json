@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-aabf7820788e5329",
+  "proposalIds": [
+    "prop-hist-w1-sympy_polys_series_ringflint_py"
+  ],
+  "targetFiles": [
+    "sympy/polys/series/ringflint.py"
+  ],
+  "appliedFiles": [
+    "sympy/polys/series/ringflint.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/polys/series/ringflint.py": "22cdf8bde8f0a16bf4c1574feaf40fd99646bae943ccc9396016278e24756ff1"
+  },
+  "fileAfterHashes": {
+    "sympy/polys/series/ringflint.py": "8f9260b881c0a1aad0253421036dd71928a727f18328c56cd7da8b60508579e3"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/polys/series/ringflint.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-aabf7820788e5329",
+    "planId": "merge-aabf7820788e5329",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-aabf7820788e5329",
+        "planId": "merge-aabf7820788e5329",
+        "request_identity": [
+          "prop-hist-w1-sympy_polys_series_ringflint_py"
+        ],
+        "actor_ids": [
+          "writer-28272"
+        ],
+        "request_files": [
+          "sympy/polys/series/ringflint.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/polys/series/ringflint.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/sympy/runs/sympy_28271_28272__bare_composer__s3/artifacts/steward/cb-sympy_polys_series_ringflint.py-w1-0004.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_POLYS_SERIES_RINGFLINT_PY"
+        ],
+        "commit_sha": "e72cc0918ab67ef532f82b3f87937aabdf3a5283"
+      }
+    ]
+  }
+}

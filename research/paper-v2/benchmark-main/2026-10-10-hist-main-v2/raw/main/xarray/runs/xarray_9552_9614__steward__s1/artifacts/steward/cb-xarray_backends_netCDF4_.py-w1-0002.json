@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-e5489a507d0b2e15",
+  "proposalIds": [
+    "prop-hist-w1-xarray_backends_netCDF4_py"
+  ],
+  "targetFiles": [
+    "xarray/backends/netCDF4_.py"
+  ],
+  "appliedFiles": [
+    "xarray/backends/netCDF4_.py"
+  ],
+  "fileBeforeHashes": {
+    "xarray/backends/netCDF4_.py": "7f7a5f5b8f75b7e578bc8c6362a7f9a670b75d5515baac77bea80a6f8c7241a4"
+  },
+  "fileAfterHashes": {
+    "xarray/backends/netCDF4_.py": "c645046e8bf0bae72761a2967e2a4751ddc852b08b65fa54fbaee3bb9a230938"
+  },
+  "permissions": {
+    "fileWrite": [
+      "xarray/backends/netCDF4_.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-e5489a507d0b2e15",
+    "planId": "merge-e5489a507d0b2e15",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-e5489a507d0b2e15",
+        "planId": "merge-e5489a507d0b2e15",
+        "request_identity": [
+          "prop-hist-w1-xarray_backends_netCDF4_py"
+        ],
+        "actor_ids": [
+          "writer-9614"
+        ],
+        "request_files": [
+          "xarray/backends/netCDF4_.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "xarray/backends/netCDF4_.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/xarray/runs/xarray_9552_9614__steward__s1/artifacts/steward/cb-xarray_backends_netCDF4_.py-w1-0002.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-XARRAY_BACKENDS_NETCDF4_PY"
+        ],
+        "commit_sha": "0e7a53263767a249de62efa91c9de202d59fd156"
+      }
+    ]
+  }
+}

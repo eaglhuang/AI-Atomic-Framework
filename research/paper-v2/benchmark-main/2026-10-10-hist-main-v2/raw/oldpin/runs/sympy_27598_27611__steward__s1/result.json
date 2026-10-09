@@ -1,0 +1,85 @@
+{
+ "pair_id": "sympy:27598_27611",
+ "stratum": "O3",
+ "arm": "steward",
+ "plant": null,
+ "seed_k": 1,
+ "seed": 693260187,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-5692474f/AI-Atomic-Framework-5692474f7db70ab52a7a71c8af4867609e7e4b43",
+ "wall_ms": 663,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 4,
+  "by_verdict": {
+   "lost": 3,
+   "correct": 1
+  },
+  "completed": 1,
+  "lost_effects": 3,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 1,
+  "files_full_bytes_exact": 0,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": true,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "sympy/polys/polytools.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "sympy/polys/polytools.py": true
+ },
+ "final_exists": {
+  "sympy/polys/polytools.py": true
+ },
+ "files": [
+  {
+   "path": "sympy/polys/polytools.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:fd207bbae82a575dea9ec1545ca61cace439858658d2e1f10ced3ba5a492d94a",
+   "final_digest": "sha256:4310eb7e039988b5571fad97d361740507e2c325b67955996d8c014844833632",
+   "expected_digests": [
+    "sha256:b51ee5719a246fdea611c9dd7e28c871d9956a008ccff405948556b0e3b5c21f"
+   ],
+   "full_bytes_exact": false,
+   "judged_by": "tiling",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "sympy/polys/polytools.py": "sha256:4310eb7e039988b5571fad97d361740507e2c325b67955996d8c014844833632"
+ }
+}

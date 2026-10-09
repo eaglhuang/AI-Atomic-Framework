@@ -1,0 +1,90 @@
+{
+ "writer": 0,
+ "pr": 12346,
+ "pid": 2295537,
+ "init_ms": 77.051661,
+ "start_offset_ms": 6,
+ "file_order": [
+  "src/pytest/__init__.py",
+  "src/_pytest/python.py",
+  "src/_pytest/warning_types.py"
+ ],
+ "holds": {
+  "src/pytest/__init__.py": 24,
+  "src/_pytest/python.py": 21,
+  "src/_pytest/warning_types.py": 2
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 12346,
+   "path": "src/pytest/__init__.py",
+   "intents": [
+    "log:pytest:12346_12744:12346:src/pytest/__init__.py:h9",
+    "log:pytest:12346_12744:12346:src/pytest/__init__.py:h10",
+    "log:pytest:12346_12744:12346:src/pytest/__init__.py:h11"
+   ],
+   "hold_ms": 24,
+   "t_submit_epoch": 1791573979565,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 25,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 54.36,
+   "t_done_epoch": 1791573979619
+  },
+  {
+   "writer": 0,
+   "pr": 12346,
+   "path": "src/_pytest/python.py",
+   "intents": [
+    "log:pytest:12346_12744:12346:src/_pytest/python.py:h0",
+    "log:pytest:12346_12744:12346:src/_pytest/python.py:h1",
+    "log:pytest:12346_12744:12346:src/_pytest/python.py:h2",
+    "log:pytest:12346_12744:12346:src/_pytest/python.py:h3",
+    "log:pytest:12346_12744:12346:src/_pytest/python.py:h4",
+    "log:pytest:12346_12744:12346:src/_pytest/python.py:h5",
+    "log:pytest:12346_12744:12346:src/_pytest/python.py:h6"
+   ],
+   "hold_ms": 21,
+   "t_submit_epoch": 1791573979619,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 30.4,
+   "t_done_epoch": 1791573979650
+  },
+  {
+   "writer": 0,
+   "pr": 12346,
+   "path": "src/_pytest/warning_types.py",
+   "intents": [
+    "log:pytest:12346_12744:12346:src/_pytest/warning_types.py:h7",
+    "log:pytest:12346_12744:12346:src/_pytest/warning_types.py:h8"
+   ],
+   "hold_ms": 2,
+   "t_submit_epoch": 1791573979650,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 7.17,
+   "t_done_epoch": 1791573979657
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 3
+ },
+ "steward_batches": null
+}

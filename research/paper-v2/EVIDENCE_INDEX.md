@@ -291,6 +291,25 @@ r6 上傳包拆成多個獨立 tarball，都解到同一個 `generations/r6-2026
 - 基準遺失照實列出：git_three_way 24（5 runs）、occ 24（4 runs）、bare_composer 1 遺失＋3 損毀。
 - 未執行：xarray、pytest、Sphinx、FastAPI 主批次、O0、舊 pin、語意終點。要等作者決定（修 ATM 換 pin 開新 generation，或以同 pin 另標續跑）。
 
+## 18. HIST main run v2 (2026-10-10): full rerun on the EOF-fixed ATM b1fd9d22 (9,750/9,750 runs, 0 steward counterexamples)
+
+> Author-executed, not independently reproduced. CI only checks that the files match SHA256SUMS. Descriptive only; no win claims.
+> The 450-run matrix is still not done. The stopped generation `2026-10-10-hist-main` stays unchanged as the "before fix" record.
+
+| generation | path | contents | SHA256SUMS sha256 | files | verify |
+|---|---|---|---|---:|---|
+| main run v2 | `benchmark-main/2026-10-10-hist-main-v2/` | Full rerun under prereg v1.1: main 7,500 + O0 750 + old pin 1,500 steward = 9,750 runs; semantic endpoint; before/after; EOF-fix gate forensics | `c8289e15b1d2707e3bbbc7d96102b299daad4030e5ae596a74e3dbbd46df5111` | 76,692 (excluding SHA256SUMS) | `sh benchmark-main/2026-10-10-hist-main-v2/verify.sh benchmark-main/2026-10-10-hist-main-v2` → 76692 OK |
+
+- **ATM b1fd9d22** (PR #252, the EOF-newline fix). The harness is unchanged.
+- **Gate:** in the single-writer repro, steward output is byte-identical to git apply.
+- **Main set, steward:** completed 29,077/34,300 (84.8%), failed runs 0/1,500, lost 0, corrupted 0.
+  - Blocked 5,223: harness relocation 4,468 + 12, ATM hash drift 483, ATM re-compose mismatch 140, new file 120.
+- **Baseline losses** are listed as is: git_three_way 36 lost (16 runs), occ 32 (10 runs), bare_composer 3 corrupted (2 runs).
+- **O0:** 0 failed runs in every arm.
+- **Old pin 5692474f, steward:** 25 failed runs, 57 lost effects, 5 corrupted files (secondary set).
+- **Semantic endpoint:** 52 base-valid pairs, 0 arm regressions in every arm.
+- **Before/after** (Django+SymPy, 2,500 runs), steward: lost 4 → 0, corrupted 4 → 0, failed runs 4 → 0.
+
 ## 6. 不在 repo 的參照
 - ATM pin 原始碼：GitHub `eaglhuang/AI-Atomic-Framework` commit `5692474f7db70ab52a7a71c8af4867609e7e4b43`（r3 另加 `bea35380d7f381f998c9930fa95f01b999c7f208`，box tarball `/workspace/atm-main-bea35380/atm-main.tar.gz` sha256 `9346e5b175b176618f435aeb4b41ab93ef7575f9bf77d77c47a5aeac87ad34b5`；r4 另加 `2118bc66efb3ac3bc0ddaede6a2f7cb18526b030`，box tarball `/workspace/atm-main-2118bc66/atm-main.tar.gz` sha256 `aa959607c35c51b7fc3c4e3d81b3d9e979ee62f4d9361ef9e9f5ee72e78abd88`；r5 另加 `37847584e24afc08ea58cfe380bb5b1220fbe335`，box tarball `/workspace/atm-main-37847584/atm-main.tar.gz` sha256 `e17a90ddceaf3c70d580c96e31f14cf8251d5a664985c1eb494f0d8db8045e3d`；r6 另加 `b35a6141bd5bfbaec654f1cd3079323581b04074`，box tarball `/workspace/atm-main-b35a6141/atm-main.tar.gz` sha256 `93fa7839d8e0fee51e5ad224833df2b57397fead3e77e0528117f21f5d5e59ef`）；box tarball `/workspace/atm-main-5692474f/atm-main.tar.gz` sha256 `1d498a397e6a5db119d40b8f539dc165cb0028fbfe9577f953023f8ec8d45795`。
 - 論文 v1：arXiv:2607.00041（box `refs/` 有副本，未上傳）。

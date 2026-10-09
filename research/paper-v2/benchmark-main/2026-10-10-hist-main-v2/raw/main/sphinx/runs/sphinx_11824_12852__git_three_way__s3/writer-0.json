@@ -1,0 +1,58 @@
+{
+ "writer": 0,
+ "pr": 11824,
+ "pid": 2343826,
+ "init_ms": 83.76822,
+ "start_offset_ms": 8,
+ "file_order": [
+  "sphinx/application.py",
+  "sphinx/ext/linkcode.py"
+ ],
+ "holds": {
+  "sphinx/application.py": 24,
+  "sphinx/ext/linkcode.py": 13
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 11824,
+   "path": "sphinx/application.py",
+   "intents": [
+    "log:sphinx:11824_12852:11824:sphinx/application.py:h0"
+   ],
+   "hold_ms": 24,
+   "t_submit_epoch": 1791574353861,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 13,
+   "outcome": "commit",
+   "total_ms": 61.42,
+   "t_done_epoch": 1791574353922
+  },
+  {
+   "writer": 0,
+   "pr": 11824,
+   "path": "sphinx/ext/linkcode.py",
+   "intents": [
+    "log:sphinx:11824_12852:11824:sphinx/ext/linkcode.py:h1",
+    "log:sphinx:11824_12852:11824:sphinx/ext/linkcode.py:h2"
+   ],
+   "hold_ms": 13,
+   "t_submit_epoch": 1791574353922,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "blocked",
+   "blocked_reason": "git-merge-conflict",
+   "total_ms": 22.65,
+   "t_done_epoch": 1791574353945
+  }
+ ],
+ "admit_stats": {
+  "txns": 4,
+  "cas_conflicts": 0
+ },
+ "steward_batches": null
+}

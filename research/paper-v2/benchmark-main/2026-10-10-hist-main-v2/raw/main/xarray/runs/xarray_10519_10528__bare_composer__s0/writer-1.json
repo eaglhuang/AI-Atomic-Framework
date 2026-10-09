@@ -1,0 +1,126 @@
+{
+ "writer": 1,
+ "pr": 10528,
+ "pid": 2289926,
+ "init_ms": 72.316033,
+ "start_offset_ms": 5,
+ "file_order": [
+  "xarray/core/dataset.py"
+ ],
+ "holds": {
+  "xarray/core/dataset.py": 8
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 10528,
+   "path": "xarray/core/dataset.py",
+   "intents": [
+    "log:xarray:10519_10528:10528:xarray/core/dataset.py:h0",
+    "log:xarray:10519_10528:10528:xarray/core/dataset.py:h1"
+   ],
+   "hold_ms": 8,
+   "t_submit_epoch": 1791573932357,
+   "outcome": "blocked",
+   "blocked_reason": "compose-context-mismatch: proposal 'prop-hist-w1-xarray_core_dataset_py' context mismatch at base line 5807: expected \"                other_names.update(idx_other_names)\", found \"        assert_no_index_corrupted(self.xindexes, names_set)\" [proposals: prop-hist-w1-xarray_core_dataset_py]",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w1-xarray_core_dataset_py' context mismatch at base line 5807: expected \"                other_names.update(idx_other_names)\", found \"        assert_no_index_corrupted(self.xindexes, names_set)\" [proposals: prop-hist-w1-xarray_core_dataset_py]"
+   ],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-xarray_core_dataset.py-w1-0001",
+   "total_ms": 160.98,
+   "t_done_epoch": 1791573932518
+  }
+ ],
+ "admit_stats": null,
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-xarray_core_dataset.py-w1-0001",
+   "path": "xarray/core/dataset.py",
+   "pid": 2289926,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-xarray_core_dataset_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-xarray_core_dataset_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:35e08562ad53bb7b3366f716f86318592b4f1220746563cd5bc3022dcb7454ae"
+   ],
+   "lock_wait_ms": 0.13,
+   "t_start_epoch_ms": 1791573932377.29,
+   "pre_apply_hash": "sha256:35e08562ad53bb7b3366f716f86318592b4f1220746563cd5bc3022dcb7454ae",
+   "receipt_before_hash": null,
+   "receipt_after_hash": null,
+   "post_apply_hash": "sha256:5196066e9e09dcd8ea18f418c6527684a9a96b2bd523beb03f52b064fb652d13",
+   "t_end_epoch_ms": 1791573932517.52,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "blocked",
+   "written": false,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:25:32.517+08:00",
+   "batch_id": "cb-xarray_core_dataset.py-w1-0001",
+   "path": "xarray/core/dataset.py",
+   "proposalIds": [
+    "prop-hist-w1-xarray_core_dataset_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-xarray_core_dataset_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-xarray_core_dataset_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-xarray_core_dataset_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-xarray_core_dataset_py",
+     "logical_id": "prop-hist-w1-xarray_core_dataset_py",
+     "attempt_id": "att-prop-hist-w1-xarray_core_dataset_py-r0",
+     "proposal_id": "prop-hist-w1-xarray_core_dataset_py",
+     "actorId": "writer-10528"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w1-xarray_core_dataset_py' context mismatch at base line 5807: expected \"                other_names.update(idx_other_names)\", found \"        assert_no_index_corrupted(self.xindexes, names_set)\" [proposals: prop-hist-w1-xarray_core_dataset_py]"
+   ],
+   "blocked_reason": "compose-context-mismatch: proposal 'prop-hist-w1-xarray_core_dataset_py' context mismatch at base line 5807: expected \"                other_names.update(idx_other_names)\", found \"        assert_no_index_corrupted(self.xindexes, names_set)\" [proposals: prop-hist-w1-xarray_core_dataset_py]",
+   "window_wait_ms": 0.27,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:35e08562ad53bb7b3366f716f86318592b4f1220746563cd5bc3022dcb7454ae",
+   "written": false,
+   "output_digest": null,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "compose-context-mismatch: proposal 'prop-hist-w1-xarray_core_dataset_py' context mismatch at base line 5807: expected \"                other_names.update(idx_other_names)\", found \"        assert_no_index_corrupted(self.xindexes, names_set)\" [proposals: prop-hist-w1-xarray_core_dataset_py]"
+  }
+ ]
+}

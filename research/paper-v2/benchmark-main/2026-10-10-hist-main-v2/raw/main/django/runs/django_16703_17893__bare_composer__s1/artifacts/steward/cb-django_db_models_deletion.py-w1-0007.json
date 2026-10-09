@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-cf258f65904a013c",
+  "proposalIds": [
+    "prop-hist-w1-django_db_models_deletion_py"
+  ],
+  "targetFiles": [
+    "django/db/models/deletion.py"
+  ],
+  "appliedFiles": [
+    "django/db/models/deletion.py"
+  ],
+  "fileBeforeHashes": {
+    "django/db/models/deletion.py": "c1e3f33e227d8710e700af37b7aa49aaa734abeca2a89be728894350664e885b"
+  },
+  "fileAfterHashes": {
+    "django/db/models/deletion.py": "f9dd75cca6a1c9d1b736ec9e33e1d92e9d5913d1d6bd96cc2bc0c41343f35794"
+  },
+  "permissions": {
+    "fileWrite": [
+      "django/db/models/deletion.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-cf258f65904a013c",
+    "planId": "merge-cf258f65904a013c",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-cf258f65904a013c",
+        "planId": "merge-cf258f65904a013c",
+        "request_identity": [
+          "prop-hist-w1-django_db_models_deletion_py"
+        ],
+        "actor_ids": [
+          "writer-17893"
+        ],
+        "request_files": [
+          "django/db/models/deletion.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "django/db/models/deletion.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/django/runs/django_16703_17893__bare_composer__s1/artifacts/steward/cb-django_db_models_deletion.py-w1-0007.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-DJANGO_DB_MODELS_DELETION_PY"
+        ],
+        "commit_sha": "6149a6d360ea1d1a222dfb72aa0213f94994bdbc"
+      }
+    ]
+  }
+}

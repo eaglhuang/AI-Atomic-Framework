@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-8883b44e90fcd678",
+  "proposalIds": [
+    "prop-hist-w0-sphinx_ext_autodoc_dynamic_member_finder_py"
+  ],
+  "targetFiles": [
+    "sphinx/ext/autodoc/_dynamic/_member_finder.py"
+  ],
+  "appliedFiles": [
+    "sphinx/ext/autodoc/_dynamic/_member_finder.py"
+  ],
+  "fileBeforeHashes": {
+    "sphinx/ext/autodoc/_dynamic/_member_finder.py": "67287bca1b75b432d5050c540c859c359fb7378fd4358bf7645f29d6914e4ad0"
+  },
+  "fileAfterHashes": {
+    "sphinx/ext/autodoc/_dynamic/_member_finder.py": "b369c48c9bc73bd681c8849739bba0b3fc6b1379308df099c96eaf5dc17d30d1"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sphinx/ext/autodoc/_dynamic/_member_finder.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-8883b44e90fcd678",
+    "planId": "merge-8883b44e90fcd678",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-8883b44e90fcd678",
+        "planId": "merge-8883b44e90fcd678",
+        "request_identity": [
+          "prop-hist-w0-sphinx_ext_autodoc_dynamic_member_finder_py"
+        ],
+        "actor_ids": [
+          "writer-14126"
+        ],
+        "request_files": [
+          "sphinx/ext/autodoc/_dynamic/_member_finder.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sphinx/ext/autodoc/_dynamic/_member_finder.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/oldpin/runs/sphinx_14126_14127__steward__s2/artifacts/steward/cb-sphinx_ext_autodoc__dynamic__member_finder.py-w0-0003.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SPHINX_EXT_AUTODOC_DYNAMIC_MEMBER_FINDER_PY"
+        ],
+        "commit_sha": "184772a9258fe5c6a352e9fac8539e9296f58baf"
+      }
+    ]
+  }
+}

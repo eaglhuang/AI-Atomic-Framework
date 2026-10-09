@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-a1119c3521c9ab06",
+  "proposalIds": [
+    "prop-hist-w1-sphinx_ext_inheritance_diagram_py"
+  ],
+  "targetFiles": [
+    "sphinx/ext/inheritance_diagram.py"
+  ],
+  "appliedFiles": [
+    "sphinx/ext/inheritance_diagram.py"
+  ],
+  "fileBeforeHashes": {
+    "sphinx/ext/inheritance_diagram.py": "a1cc66ec90030f7fc4778de32be2ed6b0a117cee88a308c81aa254f94ecbf378"
+  },
+  "fileAfterHashes": {
+    "sphinx/ext/inheritance_diagram.py": "1e9c5aefc41f9aa8f274ebb1fe9141d3393decca3f8f2d51924c8f1b11baac49"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sphinx/ext/inheritance_diagram.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-a1119c3521c9ab06",
+    "planId": "merge-a1119c3521c9ab06",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-a1119c3521c9ab06",
+        "planId": "merge-a1119c3521c9ab06",
+        "request_identity": [
+          "prop-hist-w1-sphinx_ext_inheritance_diagram_py"
+        ],
+        "actor_ids": [
+          "writer-12653"
+        ],
+        "request_files": [
+          "sphinx/ext/inheritance_diagram.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sphinx/ext/inheritance_diagram.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/sphinx/runs/sphinx_12637_12653__steward__s2/artifacts/steward/cb-sphinx_ext_inheritance_diagram.py-w1-0012.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SPHINX_EXT_INHERITANCE_DIAGRAM_PY"
+        ],
+        "commit_sha": "d46ad499b71c226464f02aa3f7a0d0d06db53379"
+      }
+    ]
+  }
+}

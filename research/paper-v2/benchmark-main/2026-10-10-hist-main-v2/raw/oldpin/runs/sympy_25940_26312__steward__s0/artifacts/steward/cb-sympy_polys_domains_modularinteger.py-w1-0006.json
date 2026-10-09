@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-89cc777808fdcfe6",
+  "proposalIds": [
+    "prop-hist-w1-sympy_polys_domains_modularinteger_py"
+  ],
+  "targetFiles": [
+    "sympy/polys/domains/modularinteger.py"
+  ],
+  "appliedFiles": [
+    "sympy/polys/domains/modularinteger.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/polys/domains/modularinteger.py": "15e7d2be1b19b6a3885f5382a1b41b38b920a6a22dc1a342761d7f185b406dcc"
+  },
+  "fileAfterHashes": {
+    "sympy/polys/domains/modularinteger.py": "93a82c91bd1eca95ddaca251c51de5ffbe665639880869da3b2ec57513301bc1"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/polys/domains/modularinteger.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-89cc777808fdcfe6",
+    "planId": "merge-89cc777808fdcfe6",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-89cc777808fdcfe6",
+        "planId": "merge-89cc777808fdcfe6",
+        "request_identity": [
+          "prop-hist-w1-sympy_polys_domains_modularinteger_py"
+        ],
+        "actor_ids": [
+          "writer-26312"
+        ],
+        "request_files": [
+          "sympy/polys/domains/modularinteger.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/polys/domains/modularinteger.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/oldpin/runs/sympy_25940_26312__steward__s0/artifacts/steward/cb-sympy_polys_domains_modularinteger.py-w1-0006.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_POLYS_DOMAINS_MODULARINTEGER_PY"
+        ],
+        "commit_sha": "956bf89b9c07c29a62dc6d1a874dd598f97afab5"
+      }
+    ]
+  }
+}

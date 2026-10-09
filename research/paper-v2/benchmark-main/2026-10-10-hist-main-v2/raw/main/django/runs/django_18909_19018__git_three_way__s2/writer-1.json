@@ -1,0 +1,79 @@
+{
+ "writer": 1,
+ "pr": 19018,
+ "pid": 2202298,
+ "init_ms": 66.04874799999999,
+ "start_offset_ms": 15,
+ "file_order": [
+  "django/db/models/query.py",
+  "django/db/models/options.py",
+  "django/db/models/base.py"
+ ],
+ "holds": {
+  "django/db/models/query.py": 30,
+  "django/db/models/options.py": 25,
+  "django/db/models/base.py": 15
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 19018,
+   "path": "django/db/models/query.py",
+   "intents": [
+    "log:django:18909_19018:19018:django/db/models/query.py:h4",
+    "log:django:18909_19018:19018:django/db/models/query.py:h5",
+    "log:django:18909_19018:19018:django/db/models/query.py:h6"
+   ],
+   "hold_ms": 30,
+   "t_submit_epoch": 1791572994455,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 17,
+   "outcome": "commit",
+   "total_ms": 61.24,
+   "t_done_epoch": 1791572994516
+  },
+  {
+   "writer": 1,
+   "pr": 19018,
+   "path": "django/db/models/options.py",
+   "intents": [
+    "log:django:18909_19018:19018:django/db/models/options.py:h3"
+   ],
+   "hold_ms": 25,
+   "t_submit_epoch": 1791572994516,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "outcome": "commit",
+   "total_ms": 38.81,
+   "t_done_epoch": 1791572994555
+  },
+  {
+   "writer": 1,
+   "pr": 19018,
+   "path": "django/db/models/base.py",
+   "intents": [
+    "log:django:18909_19018:19018:django/db/models/base.py:h0",
+    "log:django:18909_19018:19018:django/db/models/base.py:h1",
+    "log:django:18909_19018:19018:django/db/models/base.py:h2"
+   ],
+   "hold_ms": 15,
+   "t_submit_epoch": 1791572994555,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "commit",
+   "total_ms": 26.68,
+   "t_done_epoch": 1791572994582
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 1
+ },
+ "steward_batches": null
+}

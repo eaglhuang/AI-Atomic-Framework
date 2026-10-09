@@ -1,0 +1,106 @@
+{
+ "pair_id": "fastapi:9700_11459",
+ "stratum": "O3",
+ "arm": "steward",
+ "plant": null,
+ "seed_k": 1,
+ "seed": 3923875231,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 555,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 5,
+  "by_verdict": {
+   "correct": 5
+  },
+  "completed": 5,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 2,
+  "files_full_bytes_exact": 2,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "docs_src/custom_docs_ui/tutorial001.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "fastapi/openapi/docs.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "docs_src/custom_docs_ui/tutorial001.py": true,
+  "fastapi/openapi/docs.py": true
+ },
+ "final_exists": {
+  "docs_src/custom_docs_ui/tutorial001.py": true,
+  "fastapi/openapi/docs.py": true
+ },
+ "files": [
+  {
+   "path": "docs_src/custom_docs_ui/tutorial001.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:7649bc71f276a19586d15f13213b549bb80fe371e9bee81184ce221479cbc7b8",
+   "final_digest": "sha256:a72e8cc9ca74f2450041827f0f2335cc98ae8c308b63413b35d43ce18cce08ac",
+   "expected_digests": [
+    "sha256:a72e8cc9ca74f2450041827f0f2335cc98ae8c308b63413b35d43ce18cce08ac"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "fastapi/openapi/docs.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:20d41de1d145c8ec1c92bb65ae431b5b3b322356b8c2fcfc73b4bfbb4bd880ea",
+   "final_digest": "sha256:cd20efe3163a5c770ab1a1b8cf29351ea4a7ad9b5f645041d09ed9064e581cf1",
+   "expected_digests": [
+    "sha256:cd20efe3163a5c770ab1a1b8cf29351ea4a7ad9b5f645041d09ed9064e581cf1"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "docs_src/custom_docs_ui/tutorial001.py": "sha256:a72e8cc9ca74f2450041827f0f2335cc98ae8c308b63413b35d43ce18cce08ac",
+  "fastapi/openapi/docs.py": "sha256:cd20efe3163a5c770ab1a1b8cf29351ea4a7ad9b5f645041d09ed9064e581cf1"
+ }
+}

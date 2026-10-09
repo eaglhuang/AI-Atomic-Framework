@@ -1,0 +1,38 @@
+{
+ "writer": 1,
+ "pr": 18524,
+ "pid": 2409425,
+ "init_ms": 69.94372200000001,
+ "start_offset_ms": 12,
+ "file_order": [
+  "django/contrib/postgres/operations.py"
+ ],
+ "holds": {
+  "django/contrib/postgres/operations.py": 7
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 18524,
+   "path": "django/contrib/postgres/operations.py",
+   "intents": [
+    "log:django:18496_18524:18524:django/contrib/postgres/operations.py:h0"
+   ],
+   "hold_ms": 7,
+   "t_submit_epoch": 1791574828111,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 17,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 31.77,
+   "t_done_epoch": 1791574828143
+  }
+ ],
+ "admit_stats": {
+  "txns": 2,
+  "cas_conflicts": 2
+ },
+ "steward_batches": null
+}

@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-53993e66f8854150",
+  "proposalIds": [
+    "prop-hist-w1-sympy_solvers_deutils_py"
+  ],
+  "targetFiles": [
+    "sympy/solvers/deutils.py"
+  ],
+  "appliedFiles": [
+    "sympy/solvers/deutils.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/solvers/deutils.py": "e9d088a19a97f26173efb4a94f50ce33f239caf770535b543274db036be360c1"
+  },
+  "fileAfterHashes": {
+    "sympy/solvers/deutils.py": "8ee92a0f0e891997e5dfa1d11636485ff034fe26ab9936b0234529ef3e6d4037"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/solvers/deutils.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-53993e66f8854150",
+    "planId": "merge-53993e66f8854150",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-53993e66f8854150",
+        "planId": "merge-53993e66f8854150",
+        "request_identity": [
+          "prop-hist-w1-sympy_solvers_deutils_py"
+        ],
+        "actor_ids": [
+          "writer-27892"
+        ],
+        "request_files": [
+          "sympy/solvers/deutils.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/solvers/deutils.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/sympy/runs/sympy_27686_27892__bare_composer__s4/artifacts/steward/cb-sympy_solvers_deutils.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_SOLVERS_DEUTILS_PY"
+        ],
+        "commit_sha": "93bb8a11e22224a4cb05dc512903cd14e12ad849"
+      }
+    ]
+  }
+}

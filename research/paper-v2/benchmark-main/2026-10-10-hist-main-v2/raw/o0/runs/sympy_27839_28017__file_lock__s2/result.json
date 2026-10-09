@@ -1,0 +1,150 @@
+{
+ "pair_id": "sympy:27839_28017",
+ "stratum": "O0",
+ "arm": "file_lock",
+ "plant": null,
+ "seed_k": 2,
+ "seed": 2282231574,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 608,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 13,
+  "by_verdict": {
+   "correct": 13
+  },
+  "completed": 13,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 4,
+  "files_full_bytes_exact": 4,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "sympy/assumptions/ask.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/assumptions/handlers/sets.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/assumptions/predicates/sets.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/integrals/manualintegrate.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "sympy/assumptions/ask.py": true,
+  "sympy/assumptions/handlers/sets.py": true,
+  "sympy/assumptions/predicates/sets.py": true,
+  "sympy/integrals/manualintegrate.py": true
+ },
+ "final_exists": {
+  "sympy/assumptions/ask.py": true,
+  "sympy/assumptions/handlers/sets.py": true,
+  "sympy/assumptions/predicates/sets.py": true,
+  "sympy/integrals/manualintegrate.py": true
+ },
+ "files": [
+  {
+   "path": "sympy/assumptions/ask.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:0765bc096fbdca7bd8a9f057f7fe2a08b8424b013483f8141aaabb94ce74c149",
+   "final_digest": "sha256:6a60e2495b5ec83278b450695a8b47a434cdf63c25f005a22d90e43205a1e5ba",
+   "expected_digests": [
+    "sha256:6a60e2495b5ec83278b450695a8b47a434cdf63c25f005a22d90e43205a1e5ba"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/assumptions/handlers/sets.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:8c94879c8843be6e59a58b652725adc5cad3ff4e15451e4c94548b663068f816",
+   "final_digest": "sha256:d5ed2eb9330bd758785a8c47564eea4b747e6ddb9a4916dad654e607400a4abc",
+   "expected_digests": [
+    "sha256:d5ed2eb9330bd758785a8c47564eea4b747e6ddb9a4916dad654e607400a4abc"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/assumptions/predicates/sets.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:f9b4d55daf97d7ec9f5e520accc056fc9c48aae792e4f744c04cc28732277b7f",
+   "final_digest": "sha256:e75a0ec9a1864f690f7c61fac508cbaf13d2e199d4f258bcb292dc913884e7d0",
+   "expected_digests": [
+    "sha256:e75a0ec9a1864f690f7c61fac508cbaf13d2e199d4f258bcb292dc913884e7d0"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/integrals/manualintegrate.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:b0eff9fbda5b7912a1652b84c179baa24c69bd1b1ba5065eadb2c1751743b69e",
+   "final_digest": "sha256:c48281f7225c9ccc4af91dd1c22ef5f80f474ae71cd9f592b110ab8937948b4c",
+   "expected_digests": [
+    "sha256:c48281f7225c9ccc4af91dd1c22ef5f80f474ae71cd9f592b110ab8937948b4c"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "sympy/assumptions/ask.py": "sha256:6a60e2495b5ec83278b450695a8b47a434cdf63c25f005a22d90e43205a1e5ba",
+  "sympy/assumptions/handlers/sets.py": "sha256:d5ed2eb9330bd758785a8c47564eea4b747e6ddb9a4916dad654e607400a4abc",
+  "sympy/assumptions/predicates/sets.py": "sha256:e75a0ec9a1864f690f7c61fac508cbaf13d2e199d4f258bcb292dc913884e7d0",
+  "sympy/integrals/manualintegrate.py": "sha256:c48281f7225c9ccc4af91dd1c22ef5f80f474ae71cd9f592b110ab8937948b4c"
+ }
+}

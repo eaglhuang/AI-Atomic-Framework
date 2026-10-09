@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-ceded2aa546effc8",
+  "proposalIds": [
+    "prop-hist-w1-django_contrib_gis_geos_prototypes_predicates_py"
+  ],
+  "targetFiles": [
+    "django/contrib/gis/geos/prototypes/predicates.py"
+  ],
+  "appliedFiles": [
+    "django/contrib/gis/geos/prototypes/predicates.py"
+  ],
+  "fileBeforeHashes": {
+    "django/contrib/gis/geos/prototypes/predicates.py": "f8d78d7a669893396f1f3712d6f5e204a3c7b978fe581e3013fc51092b563e83"
+  },
+  "fileAfterHashes": {
+    "django/contrib/gis/geos/prototypes/predicates.py": "07ac2a00217ef30f76e334592792dd1bc1c8b78add0e3082c3cfad4ae30b9b91"
+  },
+  "permissions": {
+    "fileWrite": [
+      "django/contrib/gis/geos/prototypes/predicates.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-ceded2aa546effc8",
+    "planId": "merge-ceded2aa546effc8",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-ceded2aa546effc8",
+        "planId": "merge-ceded2aa546effc8",
+        "request_identity": [
+          "prop-hist-w1-django_contrib_gis_geos_prototypes_predicates_py"
+        ],
+        "actor_ids": [
+          "writer-19023"
+        ],
+        "request_files": [
+          "django/contrib/gis/geos/prototypes/predicates.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "django/contrib/gis/geos/prototypes/predicates.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/django/runs/django_18786_19023__steward__s2/artifacts/steward/cb-django_contrib_gis_geos_prototypes_predicates.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-DJANGO_CONTRIB_GIS_GEOS_PROTOTYPES_PREDICATES_PY"
+        ],
+        "commit_sha": "8a68fa479c3bb47028ab2efef275ecee1d4b8d50"
+      }
+    ]
+  }
+}

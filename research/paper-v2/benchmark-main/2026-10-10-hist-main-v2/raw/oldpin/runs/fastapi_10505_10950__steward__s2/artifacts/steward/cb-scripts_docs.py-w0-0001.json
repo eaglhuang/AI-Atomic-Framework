@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-b9302fd1ecabec59",
+  "proposalIds": [
+    "prop-hist-w0-scripts_docs_py"
+  ],
+  "targetFiles": [
+    "scripts/docs.py"
+  ],
+  "appliedFiles": [
+    "scripts/docs.py"
+  ],
+  "fileBeforeHashes": {
+    "scripts/docs.py": "5f61d6b6443b553f23fac0ddc5546139219168646dd0df16d51d8a718c94df01"
+  },
+  "fileAfterHashes": {
+    "scripts/docs.py": "01a7e8cedc91a0784e9f1dfe31f1a8df7a527cc240ad544655a785eb0e4a268f"
+  },
+  "permissions": {
+    "fileWrite": [
+      "scripts/docs.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-b9302fd1ecabec59",
+    "planId": "merge-b9302fd1ecabec59",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-b9302fd1ecabec59",
+        "planId": "merge-b9302fd1ecabec59",
+        "request_identity": [
+          "prop-hist-w0-scripts_docs_py"
+        ],
+        "actor_ids": [
+          "writer-10505"
+        ],
+        "request_files": [
+          "scripts/docs.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "scripts/docs.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/oldpin/runs/fastapi_10505_10950__steward__s2/artifacts/steward/cb-scripts_docs.py-w0-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SCRIPTS_DOCS_PY"
+        ],
+        "commit_sha": "de16492a7b4788df13e01e4f29e54e9bb4e8f3b0"
+      }
+    ]
+  }
+}

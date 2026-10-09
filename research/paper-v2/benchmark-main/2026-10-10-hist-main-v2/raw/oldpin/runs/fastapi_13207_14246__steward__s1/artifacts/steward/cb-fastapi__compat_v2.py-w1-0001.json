@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-c26ac8656bc256aa",
+  "proposalIds": [
+    "prop-hist-w1-fastapi_compat_v2_py"
+  ],
+  "targetFiles": [
+    "fastapi/_compat/v2.py"
+  ],
+  "appliedFiles": [],
+  "fileBeforeHashes": {},
+  "fileAfterHashes": {},
+  "permissions": {
+    "fileWrite": [
+      "fastapi/_compat/v2.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "blocked",
+  "blockedReasons": [
+    "canonical target base hash is stale: fastapi/_compat/v2.py"
+  ],
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-c26ac8656bc256aa",
+    "planId": "merge-c26ac8656bc256aa",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-c26ac8656bc256aa",
+        "planId": "merge-c26ac8656bc256aa",
+        "request_identity": [
+          "prop-hist-w1-fastapi_compat_v2_py"
+        ],
+        "actor_ids": [
+          "writer-14246"
+        ],
+        "request_files": [
+          "fastapi/_compat/v2.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/oldpin/runs/fastapi_13207_14246__steward__s1/artifacts/steward/cb-fastapi__compat_v2.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-FASTAPI_COMPAT_V2_PY"
+        ],
+        "commit_sha": "ecc99102c8209653bb06b7ff2e9fae51cb278a11"
+      }
+    ]
+  }
+}

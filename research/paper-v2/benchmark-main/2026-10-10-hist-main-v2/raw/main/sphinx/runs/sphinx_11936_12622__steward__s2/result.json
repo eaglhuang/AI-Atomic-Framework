@@ -1,0 +1,150 @@
+{
+ "pair_id": "sphinx:11936_12622",
+ "stratum": "O2",
+ "arm": "steward",
+ "plant": null,
+ "seed_k": 2,
+ "seed": 3736991227,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 606,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 17,
+  "by_verdict": {
+   "correct": 17
+  },
+  "completed": 17,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 4,
+  "files_full_bytes_exact": 4,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "sphinx/ext/autodoc/__init__.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sphinx/registry.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sphinx/util/inspect.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sphinx/util/typing.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "sphinx/ext/autodoc/__init__.py": true,
+  "sphinx/registry.py": true,
+  "sphinx/util/inspect.py": true,
+  "sphinx/util/typing.py": true
+ },
+ "final_exists": {
+  "sphinx/ext/autodoc/__init__.py": true,
+  "sphinx/registry.py": true,
+  "sphinx/util/inspect.py": true,
+  "sphinx/util/typing.py": true
+ },
+ "files": [
+  {
+   "path": "sphinx/ext/autodoc/__init__.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:68661200cc2e19842f203369dfae66ec333cdfdca19f8c2ef8d7ca10ace092d4",
+   "final_digest": "sha256:3619b29aa98f3a2715e0df5ab41369487145b7d194f09a74cf70467780d2bd19",
+   "expected_digests": [
+    "sha256:3619b29aa98f3a2715e0df5ab41369487145b7d194f09a74cf70467780d2bd19"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sphinx/registry.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:450a0735dd156871050f77c605b10b26536e56c1214c38b48ea36705d3bc7b26",
+   "final_digest": "sha256:20301ba3eb15e201d9681f095cee5a9fc8c2b17d39b6cd68763a309d406f482b",
+   "expected_digests": [
+    "sha256:20301ba3eb15e201d9681f095cee5a9fc8c2b17d39b6cd68763a309d406f482b"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sphinx/util/inspect.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:05d96d100fb49592a109c09adc3992ee4215ed77f92994ba77c54a7fab8b34c2",
+   "final_digest": "sha256:41fc857e0ecec03106f0f9efc5138e2405180d0149b4b81d0ea05ea7dd4c878c",
+   "expected_digests": [
+    "sha256:41fc857e0ecec03106f0f9efc5138e2405180d0149b4b81d0ea05ea7dd4c878c"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sphinx/util/typing.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:9d266d5a0330e08a91923a65c4f00d4e54ddecd8f986f52b4fa54b56a4e13bd3",
+   "final_digest": "sha256:9a420c07ace150b09452899427413edac64679c635d2c256a23d5cff2d4503ec",
+   "expected_digests": [
+    "sha256:9a420c07ace150b09452899427413edac64679c635d2c256a23d5cff2d4503ec"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "sphinx/ext/autodoc/__init__.py": "sha256:3619b29aa98f3a2715e0df5ab41369487145b7d194f09a74cf70467780d2bd19",
+  "sphinx/registry.py": "sha256:20301ba3eb15e201d9681f095cee5a9fc8c2b17d39b6cd68763a309d406f482b",
+  "sphinx/util/inspect.py": "sha256:41fc857e0ecec03106f0f9efc5138e2405180d0149b4b81d0ea05ea7dd4c878c",
+  "sphinx/util/typing.py": "sha256:9a420c07ace150b09452899427413edac64679c635d2c256a23d5cff2d4503ec"
+ }
+}

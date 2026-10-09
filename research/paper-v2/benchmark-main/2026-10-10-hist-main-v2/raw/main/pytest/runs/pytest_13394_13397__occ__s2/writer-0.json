@@ -1,0 +1,86 @@
+{
+ "writer": 0,
+ "pr": 13394,
+ "pid": 2292539,
+ "init_ms": 67.353395,
+ "start_offset_ms": 12,
+ "file_order": [
+  "src/_pytest/pytester.py",
+  "src/_pytest/junitxml.py",
+  "src/_pytest/terminal.py"
+ ],
+ "holds": {
+  "src/_pytest/pytester.py": 7,
+  "src/_pytest/junitxml.py": 5,
+  "src/_pytest/terminal.py": 13
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 13394,
+   "path": "src/_pytest/pytester.py",
+   "intents": [
+    "log:pytest:13394_13397:13394:src/_pytest/pytester.py:h2",
+    "log:pytest:13394_13397:13394:src/_pytest/pytester.py:h3",
+    "log:pytest:13394_13397:13394:src/_pytest/pytester.py:h4",
+    "log:pytest:13394_13397:13394:src/_pytest/pytester.py:h5"
+   ],
+   "hold_ms": 7,
+   "t_submit_epoch": 1791573957284,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 15,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 30.44,
+   "t_done_epoch": 1791573957314
+  },
+  {
+   "writer": 0,
+   "pr": 13394,
+   "path": "src/_pytest/junitxml.py",
+   "intents": [
+    "log:pytest:13394_13397:13394:src/_pytest/junitxml.py:h0",
+    "log:pytest:13394_13397:13394:src/_pytest/junitxml.py:h1"
+   ],
+   "hold_ms": 5,
+   "t_submit_epoch": 1791573957314,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 6,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 14.91,
+   "t_done_epoch": 1791573957329
+  },
+  {
+   "writer": 0,
+   "pr": 13394,
+   "path": "src/_pytest/terminal.py",
+   "intents": [
+    "log:pytest:13394_13397:13394:src/_pytest/terminal.py:h6",
+    "log:pytest:13394_13397:13394:src/_pytest/terminal.py:h7",
+    "log:pytest:13394_13397:13394:src/_pytest/terminal.py:h8",
+    "log:pytest:13394_13397:13394:src/_pytest/terminal.py:h9"
+   ],
+   "hold_ms": 13,
+   "t_submit_epoch": 1791573957329,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 5,
+   "outcome": "blocked",
+   "blocked_reason": "occ-relocate-context-not-found",
+   "occ_retries": 0,
+   "total_ms": 20.84,
+   "t_done_epoch": 1791573957350
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 7
+ },
+ "steward_batches": null
+}

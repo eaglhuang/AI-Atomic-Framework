@@ -1,0 +1,263 @@
+{
+ "pair_id": "sympy:27839_27863",
+ "stratum": "O1",
+ "arm": "bare_composer",
+ "plant": null,
+ "seed_k": 2,
+ "seed": 1559683930,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 1322,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 36,
+  "by_verdict": {
+   "correct": 30,
+   "blocked_absent": 6
+  },
+  "completed": 30,
+  "lost_effects": 0,
+  "blocked": 6,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 9,
+  "files_full_bytes_exact": 9,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {
+  "harness-relocate-context-not-found": 6
+ },
+ "structure": {
+  "sympy/functions/combinatorial/numbers.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/integrals/laplace.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/integrals/manualintegrate.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/integrals/meijerint.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/printing/latex.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/printing/llvmjitcode.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/printing/mathml.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/simplify/fu.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/utilities/timeutils.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "sympy/functions/combinatorial/numbers.py": true,
+  "sympy/integrals/laplace.py": true,
+  "sympy/integrals/manualintegrate.py": true,
+  "sympy/integrals/meijerint.py": true,
+  "sympy/printing/latex.py": true,
+  "sympy/printing/llvmjitcode.py": true,
+  "sympy/printing/mathml.py": true,
+  "sympy/simplify/fu.py": true,
+  "sympy/utilities/timeutils.py": true
+ },
+ "final_exists": {
+  "sympy/functions/combinatorial/numbers.py": true,
+  "sympy/integrals/laplace.py": true,
+  "sympy/integrals/manualintegrate.py": true,
+  "sympy/integrals/meijerint.py": true,
+  "sympy/printing/latex.py": true,
+  "sympy/printing/llvmjitcode.py": true,
+  "sympy/printing/mathml.py": true,
+  "sympy/simplify/fu.py": true,
+  "sympy/utilities/timeutils.py": true
+ },
+ "files": [
+  {
+   "path": "sympy/functions/combinatorial/numbers.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:7ecc7f3bb386c781e276fca78c6e56ce410bdf75b10d2092e3108c21b7aa4d3f",
+   "final_digest": "sha256:0e0cc69d65e004ff49f84cbd3e5c00152b4f7e7c8bf71395b1b793d40c3ed4a0",
+   "expected_digests": [
+    "sha256:0e0cc69d65e004ff49f84cbd3e5c00152b4f7e7c8bf71395b1b793d40c3ed4a0"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/integrals/laplace.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:12d8fc8f43c4772bae6a1268f95c2bde7703596ee290609e226415ea70b36246",
+   "final_digest": "sha256:cb9371677fe736d73e3444d85b0e2285aecb4d533d3a4f4d58fb663145ed6708",
+   "expected_digests": [
+    "sha256:cb9371677fe736d73e3444d85b0e2285aecb4d533d3a4f4d58fb663145ed6708"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/integrals/manualintegrate.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:b0eff9fbda5b7912a1652b84c179baa24c69bd1b1ba5065eadb2c1751743b69e",
+   "final_digest": "sha256:c48281f7225c9ccc4af91dd1c22ef5f80f474ae71cd9f592b110ab8937948b4c",
+   "expected_digests": [
+    "sha256:c48281f7225c9ccc4af91dd1c22ef5f80f474ae71cd9f592b110ab8937948b4c"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/integrals/meijerint.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:2efc1fef52d3404c61fbd55e1d696a2c29beb9b677c585a9743d3857c14ce0fd",
+   "final_digest": "sha256:c8eb2b1c903b768a35b83b26b224ea2b64e5cb8245df4b00e511254fdda57de7",
+   "expected_digests": [
+    "sha256:c8eb2b1c903b768a35b83b26b224ea2b64e5cb8245df4b00e511254fdda57de7"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/printing/latex.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:b0576a7d8b00a8ad0b3f41f2640d0631186a3641b9c1f91bd2d19a5ee04f17fd",
+   "final_digest": "sha256:8c2a977b55ce58b354711373b07398dc232f6e43c12a37fcb43e228ba3d52b15",
+   "expected_digests": [
+    "sha256:8c2a977b55ce58b354711373b07398dc232f6e43c12a37fcb43e228ba3d52b15"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/printing/llvmjitcode.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:af92b885fd56549bc006b775f9a973bf69c5dcc72e4eaf86cd213eee3f31aa9b",
+   "final_digest": "sha256:3638c76e085e1f88fa49ba052037ebac8a2091cac94645bf92397333c0e90e64",
+   "expected_digests": [
+    "sha256:3638c76e085e1f88fa49ba052037ebac8a2091cac94645bf92397333c0e90e64"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/printing/mathml.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:f56ab0c9da64b821e753384ed091107375aeca93b6ecfbe7fa9c09b0c4f8e344",
+   "final_digest": "sha256:513ee0e39a0b4eabe7ac2d485197aacb01d357af8b50295fb8e17f53800c95a2",
+   "expected_digests": [
+    "sha256:513ee0e39a0b4eabe7ac2d485197aacb01d357af8b50295fb8e17f53800c95a2"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/simplify/fu.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:b64b8f588c2b7c6419ebb850d59dd9d5a6851fee8592ef44e3be16d0634fdfe9",
+   "final_digest": "sha256:7b17af9a4d69e1880400ef8c993821edc1bb73254c305f29eef675ca6c302a22",
+   "expected_digests": [
+    "sha256:7b17af9a4d69e1880400ef8c993821edc1bb73254c305f29eef675ca6c302a22"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/utilities/timeutils.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:0d4b5060e3642675a353616f01bbf1b913241a65e92cc79a88e707ed1f4eb3da",
+   "final_digest": "sha256:3cd1f2bee10ceba5045cb17cc9ee8f32295c1032bbe41f7069bdda8bc6bd732a",
+   "expected_digests": [
+    "sha256:3cd1f2bee10ceba5045cb17cc9ee8f32295c1032bbe41f7069bdda8bc6bd732a"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "sympy/functions/combinatorial/numbers.py": "sha256:0e0cc69d65e004ff49f84cbd3e5c00152b4f7e7c8bf71395b1b793d40c3ed4a0",
+  "sympy/integrals/laplace.py": "sha256:cb9371677fe736d73e3444d85b0e2285aecb4d533d3a4f4d58fb663145ed6708",
+  "sympy/integrals/manualintegrate.py": "sha256:c48281f7225c9ccc4af91dd1c22ef5f80f474ae71cd9f592b110ab8937948b4c",
+  "sympy/integrals/meijerint.py": "sha256:c8eb2b1c903b768a35b83b26b224ea2b64e5cb8245df4b00e511254fdda57de7",
+  "sympy/printing/latex.py": "sha256:8c2a977b55ce58b354711373b07398dc232f6e43c12a37fcb43e228ba3d52b15",
+  "sympy/printing/llvmjitcode.py": "sha256:3638c76e085e1f88fa49ba052037ebac8a2091cac94645bf92397333c0e90e64",
+  "sympy/printing/mathml.py": "sha256:513ee0e39a0b4eabe7ac2d485197aacb01d357af8b50295fb8e17f53800c95a2",
+  "sympy/simplify/fu.py": "sha256:7b17af9a4d69e1880400ef8c993821edc1bb73254c305f29eef675ca6c302a22",
+  "sympy/utilities/timeutils.py": "sha256:3cd1f2bee10ceba5045cb17cc9ee8f32295c1032bbe41f7069bdda8bc6bd732a"
+ }
+}

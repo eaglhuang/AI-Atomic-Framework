@@ -1,0 +1,79 @@
+{
+ "writer": 1,
+ "pr": 11825,
+ "pid": 2301191,
+ "init_ms": 64.18443400000001,
+ "start_offset_ms": 2,
+ "file_order": [
+  "src/_pytest/fixtures.py",
+  "src/_pytest/hookspec.py",
+  "src/_pytest/config/__init__.py"
+ ],
+ "holds": {
+  "src/_pytest/fixtures.py": 3,
+  "src/_pytest/hookspec.py": 0,
+  "src/_pytest/config/__init__.py": 4
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 11825,
+   "path": "src/_pytest/fixtures.py",
+   "intents": [
+    "log:pytest:9496_11825:11825:src/_pytest/fixtures.py:h3",
+    "log:pytest:9496_11825:11825:src/_pytest/fixtures.py:h4"
+   ],
+   "hold_ms": 3,
+   "t_submit_epoch": 1791574023090,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 14,
+   "outcome": "commit",
+   "total_ms": 30.68,
+   "t_done_epoch": 1791574023121
+  },
+  {
+   "writer": 1,
+   "pr": 11825,
+   "path": "src/_pytest/hookspec.py",
+   "intents": [
+    "log:pytest:9496_11825:11825:src/_pytest/hookspec.py:h5",
+    "log:pytest:9496_11825:11825:src/_pytest/hookspec.py:h6"
+   ],
+   "hold_ms": 0,
+   "t_submit_epoch": 1791574023121,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 27,
+   "outcome": "commit",
+   "total_ms": 36.12,
+   "t_done_epoch": 1791574023157
+  },
+  {
+   "writer": 1,
+   "pr": 11825,
+   "path": "src/_pytest/config/__init__.py",
+   "intents": [
+    "log:pytest:9496_11825:11825:src/_pytest/config/__init__.py:h0",
+    "log:pytest:9496_11825:11825:src/_pytest/config/__init__.py:h1",
+    "log:pytest:9496_11825:11825:src/_pytest/config/__init__.py:h2"
+   ],
+   "hold_ms": 4,
+   "t_submit_epoch": 1791574023157,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "total_ms": 13.95,
+   "t_done_epoch": 1791574023171
+  }
+ ],
+ "admit_stats": {
+  "txns": 7,
+  "cas_conflicts": 3
+ },
+ "steward_batches": null
+}

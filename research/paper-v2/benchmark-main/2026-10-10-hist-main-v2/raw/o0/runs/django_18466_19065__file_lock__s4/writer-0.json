@@ -1,0 +1,73 @@
+{
+ "writer": 0,
+ "pr": 18466,
+ "pid": 2410272,
+ "init_ms": 64.85129500000001,
+ "start_offset_ms": 18,
+ "file_order": [
+  "django/contrib/auth/views.py",
+  "django/contrib/auth/admin.py"
+ ],
+ "holds": {
+  "django/contrib/auth/views.py": 8,
+  "django/contrib/auth/admin.py": 27
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 18466,
+   "path": "django/contrib/auth/views.py",
+   "intents": [
+    "log:django:18466_19065:18466:django/contrib/auth/views.py:h3",
+    "log:django:18466_19065:18466:django/contrib/auth/views.py:h4",
+    "log:django:18466_19065:18466:django/contrib/auth/views.py:h5",
+    "log:django:18466_19065:18466:django/contrib/auth/views.py:h6",
+    "log:django:18466_19065:18466:django/contrib/auth/views.py:h7",
+    "log:django:18466_19065:18466:django/contrib/auth/views.py:h8",
+    "log:django:18466_19065:18466:django/contrib/auth/views.py:h9",
+    "log:django:18466_19065:18466:django/contrib/auth/views.py:h10",
+    "log:django:18466_19065:18466:django/contrib/auth/views.py:h11",
+    "log:django:18466_19065:18466:django/contrib/auth/views.py:h12",
+    "log:django:18466_19065:18466:django/contrib/auth/views.py:h13",
+    "log:django:18466_19065:18466:django/contrib/auth/views.py:h14"
+   ],
+   "hold_ms": 8,
+   "t_submit_epoch": 1791574833431,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 16,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 28.92,
+   "t_done_epoch": 1791574833460
+  },
+  {
+   "writer": 0,
+   "pr": 18466,
+   "path": "django/contrib/auth/admin.py",
+   "intents": [
+    "log:django:18466_19065:18466:django/contrib/auth/admin.py:h0",
+    "log:django:18466_19065:18466:django/contrib/auth/admin.py:h1",
+    "log:django:18466_19065:18466:django/contrib/auth/admin.py:h2"
+   ],
+   "hold_ms": 27,
+   "t_submit_epoch": 1791574833460,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 33.18,
+   "t_done_epoch": 1791574833493
+  }
+ ],
+ "admit_stats": {
+  "txns": 4,
+  "cas_conflicts": 1
+ },
+ "steward_batches": null
+}

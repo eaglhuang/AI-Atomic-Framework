@@ -1,0 +1,240 @@
+{
+ "writer": 0,
+ "pr": 27686,
+ "pid": 2242250,
+ "init_ms": 102.298406,
+ "start_offset_ms": 6,
+ "file_order": [
+  "sympy/solvers/ode/single.py",
+  "sympy/solvers/ode/ode.py"
+ ],
+ "holds": {
+  "sympy/solvers/ode/single.py": 11,
+  "sympy/solvers/ode/ode.py": 6
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 27686,
+   "path": "sympy/solvers/ode/single.py",
+   "intents": [
+    "log:sympy:27686_27930:27686:sympy/solvers/ode/single.py:h1",
+    "log:sympy:27686_27930:27686:sympy/solvers/ode/single.py:h2",
+    "log:sympy:27686_27930:27686:sympy/solvers/ode/single.py:h3",
+    "log:sympy:27686_27930:27686:sympy/solvers/ode/single.py:h4"
+   ],
+   "hold_ms": 11,
+   "t_submit_epoch": 1791573358833,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 16,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sympy_solvers_ode_single.py-w0-0001",
+   "total_ms": 167.21,
+   "t_done_epoch": 1791573359000
+  },
+  {
+   "writer": 0,
+   "pr": 27686,
+   "path": "sympy/solvers/ode/ode.py",
+   "intents": [
+    "log:sympy:27686_27930:27686:sympy/solvers/ode/ode.py:h0"
+   ],
+   "hold_ms": 6,
+   "t_submit_epoch": 1791573359000,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 7,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sympy_solvers_ode_ode.py-w0-0002",
+   "total_ms": 32.73,
+   "t_done_epoch": 1791573359032
+  }
+ ],
+ "admit_stats": {
+  "txns": 4,
+  "cas_conflicts": 4
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sympy_solvers_ode_single.py-w0-0001",
+   "path": "sympy/solvers/ode/single.py",
+   "pid": 2242250,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-sympy_solvers_ode_single_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sympy_solvers_ode_single_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:faa07130ff2c3230aa2bd944c35573d2635dbfcf3da10bf2388d36fa4abc34ab"
+   ],
+   "lock_wait_ms": 0.13,
+   "t_start_epoch_ms": 1791573358864.58,
+   "pre_apply_hash": "sha256:faa07130ff2c3230aa2bd944c35573d2635dbfcf3da10bf2388d36fa4abc34ab",
+   "receipt_before_hash": "sha256:faa07130ff2c3230aa2bd944c35573d2635dbfcf3da10bf2388d36fa4abc34ab",
+   "receipt_after_hash": "sha256:fad0bfa25d1e7105f3b5f29e5a197b7592d57bb14fb2246bd6d792c7856e4628",
+   "post_apply_hash": "sha256:fad0bfa25d1e7105f3b5f29e5a197b7592d57bb14fb2246bd6d792c7856e4628",
+   "t_end_epoch_ms": 1791573358994.47,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:15:58.994+08:00",
+   "batch_id": "cb-sympy_solvers_ode_single.py-w0-0001",
+   "path": "sympy/solvers/ode/single.py",
+   "proposalIds": [
+    "prop-hist-w0-sympy_solvers_ode_single_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sympy_solvers_ode_single_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-sympy_solvers_ode_single_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-sympy_solvers_ode_single_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-sympy_solvers_ode_single_py",
+     "logical_id": "prop-hist-w0-sympy_solvers_ode_single_py",
+     "attempt_id": "att-prop-hist-w0-sympy_solvers_ode_single_py-r0",
+     "proposal_id": "prop-hist-w0-sympy_solvers_ode_single_py",
+     "actorId": "writer-27686"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.28,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:faa07130ff2c3230aa2bd944c35573d2635dbfcf3da10bf2388d36fa4abc34ab",
+   "written": true,
+   "output_digest": "sha256:fad0bfa25d1e7105f3b5f29e5a197b7592d57bb14fb2246bd6d792c7856e4628",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  },
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sympy_solvers_ode_ode.py-w0-0002",
+   "path": "sympy/solvers/ode/ode.py",
+   "pid": 2242250,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-sympy_solvers_ode_ode_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sympy_solvers_ode_ode_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:103dd28f3946793db5e55bd386355cf8dd09577de86f94253ede2ad83c79277d"
+   ],
+   "lock_wait_ms": 0,
+   "t_start_epoch_ms": 1791573359016.17,
+   "pre_apply_hash": "sha256:103dd28f3946793db5e55bd386355cf8dd09577de86f94253ede2ad83c79277d",
+   "receipt_before_hash": "sha256:103dd28f3946793db5e55bd386355cf8dd09577de86f94253ede2ad83c79277d",
+   "receipt_after_hash": "sha256:89b58db724e89a11168cb0c8fb1e5d444da287f24bf5d8986fb5a8c99a283ec6",
+   "post_apply_hash": "sha256:89b58db724e89a11168cb0c8fb1e5d444da287f24bf5d8986fb5a8c99a283ec6",
+   "t_end_epoch_ms": 1791573359030.6,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:15:59.030+08:00",
+   "batch_id": "cb-sympy_solvers_ode_ode.py-w0-0002",
+   "path": "sympy/solvers/ode/ode.py",
+   "proposalIds": [
+    "prop-hist-w0-sympy_solvers_ode_ode_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sympy_solvers_ode_ode_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-sympy_solvers_ode_ode_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-sympy_solvers_ode_ode_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-sympy_solvers_ode_ode_py",
+     "logical_id": "prop-hist-w0-sympy_solvers_ode_ode_py",
+     "attempt_id": "att-prop-hist-w0-sympy_solvers_ode_ode_py-r0",
+     "proposal_id": "prop-hist-w0-sympy_solvers_ode_ode_py",
+     "actorId": "writer-27686"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.02,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:103dd28f3946793db5e55bd386355cf8dd09577de86f94253ede2ad83c79277d",
+   "written": true,
+   "output_digest": "sha256:89b58db724e89a11168cb0c8fb1e5d444da287f24bf5d8986fb5a8c99a283ec6",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

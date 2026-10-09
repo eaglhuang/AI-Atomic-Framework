@@ -1,0 +1,39 @@
+{
+ "writer": 0,
+ "pr": 10240,
+ "pid": 2397650,
+ "init_ms": 68.067828,
+ "start_offset_ms": 3,
+ "file_order": [
+  "fastapi/applications.py"
+ ],
+ "holds": {
+  "fastapi/applications.py": 29
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 10240,
+   "path": "fastapi/applications.py",
+   "intents": [
+    "log:fastapi:10240_11099:10240:fastapi/applications.py:h0"
+   ],
+   "hold_ms": 29,
+   "t_submit_epoch": 1791574753527,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 20,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 61.04,
+   "t_done_epoch": 1791574753588
+  }
+ ],
+ "admit_stats": {
+  "txns": 2,
+  "cas_conflicts": 0
+ },
+ "steward_batches": null
+}

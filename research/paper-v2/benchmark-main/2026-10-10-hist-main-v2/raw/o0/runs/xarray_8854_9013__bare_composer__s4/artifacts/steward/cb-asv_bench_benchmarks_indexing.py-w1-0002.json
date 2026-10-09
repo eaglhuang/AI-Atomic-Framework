@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-f4f07140f343473e",
+  "proposalIds": [
+    "prop-hist-w1-asv_bench_benchmarks_indexing_py"
+  ],
+  "targetFiles": [
+    "asv_bench/benchmarks/indexing.py"
+  ],
+  "appliedFiles": [
+    "asv_bench/benchmarks/indexing.py"
+  ],
+  "fileBeforeHashes": {
+    "asv_bench/benchmarks/indexing.py": "5136ca789c599edc0a260e1c222161510a723b9f2f9b68623024a47c4ce8adf3"
+  },
+  "fileAfterHashes": {
+    "asv_bench/benchmarks/indexing.py": "7602ed01e7d0ea65a055795ec62d10accbfeb28da7ffc51c48cb4354626fb076"
+  },
+  "permissions": {
+    "fileWrite": [
+      "asv_bench/benchmarks/indexing.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-f4f07140f343473e",
+    "planId": "merge-f4f07140f343473e",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-f4f07140f343473e",
+        "planId": "merge-f4f07140f343473e",
+        "request_identity": [
+          "prop-hist-w1-asv_bench_benchmarks_indexing_py"
+        ],
+        "actor_ids": [
+          "writer-9013"
+        ],
+        "request_files": [
+          "asv_bench/benchmarks/indexing.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "asv_bench/benchmarks/indexing.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/o0/runs/xarray_8854_9013__bare_composer__s4/artifacts/steward/cb-asv_bench_benchmarks_indexing.py-w1-0002.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-ASV_BENCH_BENCHMARKS_INDEXING_PY"
+        ],
+        "commit_sha": "30d29d27f4199a2a74a5f4391d8adf41b30c2273"
+      }
+    ]
+  }
+}

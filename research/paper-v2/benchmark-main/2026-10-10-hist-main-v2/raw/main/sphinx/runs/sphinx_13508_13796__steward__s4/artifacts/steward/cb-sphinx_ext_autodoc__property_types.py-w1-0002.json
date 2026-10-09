@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-d407e1b0bc83e26f",
+  "proposalIds": [
+    "prop-hist-w1-sphinx_ext_autodoc_property_types_py"
+  ],
+  "targetFiles": [
+    "sphinx/ext/autodoc/_property_types.py"
+  ],
+  "appliedFiles": [],
+  "fileBeforeHashes": {},
+  "fileAfterHashes": {},
+  "permissions": {
+    "fileWrite": [
+      "sphinx/ext/autodoc/_property_types.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "blocked",
+  "blockedReasons": [
+    "file-hash-drift: Target file does not exist: sphinx/ext/autodoc/_property_types.py"
+  ],
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-d407e1b0bc83e26f",
+    "planId": "merge-d407e1b0bc83e26f",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-d407e1b0bc83e26f",
+        "planId": "merge-d407e1b0bc83e26f",
+        "request_identity": [
+          "prop-hist-w1-sphinx_ext_autodoc_property_types_py"
+        ],
+        "actor_ids": [
+          "writer-13796"
+        ],
+        "request_files": [
+          "sphinx/ext/autodoc/_property_types.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/sphinx/runs/sphinx_13508_13796__steward__s4/artifacts/steward/cb-sphinx_ext_autodoc__property_types.py-w1-0002.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SPHINX_EXT_AUTODOC_PROPERTY_TYPES_PY"
+        ],
+        "commit_sha": "2c62f2c61d0a54effeb5baa15446062d20c18326"
+      }
+    ]
+  }
+}

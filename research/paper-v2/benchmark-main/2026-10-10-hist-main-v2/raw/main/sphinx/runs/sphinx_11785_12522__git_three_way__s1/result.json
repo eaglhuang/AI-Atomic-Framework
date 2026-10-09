@@ -1,0 +1,150 @@
+{
+ "pair_id": "sphinx:11785_12522",
+ "stratum": "O3",
+ "arm": "git_three_way",
+ "plant": null,
+ "seed_k": 1,
+ "seed": 2331613706,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 373,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 9,
+  "by_verdict": {
+   "correct": 9
+  },
+  "completed": 9,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 4,
+  "files_full_bytes_exact": 4,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "sphinx/ext/autodoc/directive.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sphinx/util/nodes.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sphinx/util/parsing.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sphinx/util/typing.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "sphinx/ext/autodoc/directive.py": true,
+  "sphinx/util/nodes.py": true,
+  "sphinx/util/parsing.py": true,
+  "sphinx/util/typing.py": true
+ },
+ "final_exists": {
+  "sphinx/ext/autodoc/directive.py": true,
+  "sphinx/util/nodes.py": true,
+  "sphinx/util/parsing.py": true,
+  "sphinx/util/typing.py": true
+ },
+ "files": [
+  {
+   "path": "sphinx/ext/autodoc/directive.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:f8f079dd954a38f14aba6ebd235a270926c8a37c16acc659f000584ee49fd59f",
+   "final_digest": "sha256:22a0cb26773dd7f4b1aa5424051db21a82bf7b04f30a31b0a33098d1e3f91c76",
+   "expected_digests": [
+    "sha256:22a0cb26773dd7f4b1aa5424051db21a82bf7b04f30a31b0a33098d1e3f91c76"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sphinx/util/nodes.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:201a47aa3c0beccd1c69c7ba146951746480950514287024f73178c2c8342a73",
+   "final_digest": "sha256:d8176efce30411c1dc4215fe5ac2bcf34915078ac466d33cfd6cf5d1c815ebe6",
+   "expected_digests": [
+    "sha256:d8176efce30411c1dc4215fe5ac2bcf34915078ac466d33cfd6cf5d1c815ebe6"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sphinx/util/parsing.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:cdec3c99d22000b943dc9dd125a4b12f49236f560232d8460fe18313d6124526",
+   "final_digest": "sha256:dc5de66d5d8e8c72d49eb536b6bc10c4a69b7e4ff1d1cf3fa2708a18d0cd5099",
+   "expected_digests": [
+    "sha256:dc5de66d5d8e8c72d49eb536b6bc10c4a69b7e4ff1d1cf3fa2708a18d0cd5099"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sphinx/util/typing.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:cd1c26e0717bfe9c2253354a23a517c5e975bef6afd82ecb1a334b074d2ecf83",
+   "final_digest": "sha256:ee71904d400996fec4aa852013c547d3507cd41fdf4a793082d41e23603854ea",
+   "expected_digests": [
+    "sha256:ee71904d400996fec4aa852013c547d3507cd41fdf4a793082d41e23603854ea"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "sphinx/ext/autodoc/directive.py": "sha256:22a0cb26773dd7f4b1aa5424051db21a82bf7b04f30a31b0a33098d1e3f91c76",
+  "sphinx/util/nodes.py": "sha256:d8176efce30411c1dc4215fe5ac2bcf34915078ac466d33cfd6cf5d1c815ebe6",
+  "sphinx/util/parsing.py": "sha256:dc5de66d5d8e8c72d49eb536b6bc10c4a69b7e4ff1d1cf3fa2708a18d0cd5099",
+  "sphinx/util/typing.py": "sha256:ee71904d400996fec4aa852013c547d3507cd41fdf4a793082d41e23603854ea"
+ }
+}

@@ -1,0 +1,62 @@
+{
+ "writer": 1,
+ "pr": 14254,
+ "pid": 2374791,
+ "init_ms": 63.569552,
+ "start_offset_ms": 3,
+ "file_order": [
+  "fastapi/dependencies/utils.py",
+  "fastapi/params.py"
+ ],
+ "holds": {
+  "fastapi/dependencies/utils.py": 18,
+  "fastapi/params.py": 17
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 14254,
+   "path": "fastapi/dependencies/utils.py",
+   "intents": [
+    "log:fastapi:5624_14254:14254:fastapi/dependencies/utils.py:h0"
+   ],
+   "hold_ms": 18,
+   "t_submit_epoch": 1791574598824,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 13,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 39.18,
+   "t_done_epoch": 1791574598863
+  },
+  {
+   "writer": 1,
+   "pr": 14254,
+   "path": "fastapi/params.py",
+   "intents": [
+    "log:fastapi:5624_14254:14254:fastapi/params.py:h1",
+    "log:fastapi:5624_14254:14254:fastapi/params.py:h2",
+    "log:fastapi:5624_14254:14254:fastapi/params.py:h3",
+    "log:fastapi:5624_14254:14254:fastapi/params.py:h4",
+    "log:fastapi:5624_14254:14254:fastapi/params.py:h5"
+   ],
+   "hold_ms": 17,
+   "t_submit_epoch": 1791574598863,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 26.57,
+   "t_done_epoch": 1791574598890
+  }
+ ],
+ "admit_stats": {
+  "txns": 4,
+  "cas_conflicts": 0
+ },
+ "steward_batches": null
+}

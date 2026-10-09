@@ -1,0 +1,128 @@
+{
+ "pair_id": "django:18466_19065",
+ "stratum": "O0",
+ "arm": "git_three_way",
+ "plant": null,
+ "seed_k": 4,
+ "seed": 3166102928,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 335,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 16,
+  "by_verdict": {
+   "correct": 16
+  },
+  "completed": 16,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 3,
+  "files_full_bytes_exact": 3,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "django/contrib/auth/admin.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "django/contrib/auth/views.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "django/db/backends/postgresql/compiler.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "django/contrib/auth/admin.py": true,
+  "django/contrib/auth/views.py": true,
+  "django/db/backends/postgresql/compiler.py": true
+ },
+ "final_exists": {
+  "django/contrib/auth/admin.py": true,
+  "django/contrib/auth/views.py": true,
+  "django/db/backends/postgresql/compiler.py": true
+ },
+ "files": [
+  {
+   "path": "django/contrib/auth/admin.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:dc5a75ea66d215677bfef490b8e0097b5af08566ad416ffaf50496c97674dd97",
+   "final_digest": "sha256:b1a0c41400fd69b293e831dc38b9ad95959abdd95fd6dfc59855757adb374527",
+   "expected_digests": [
+    "sha256:b1a0c41400fd69b293e831dc38b9ad95959abdd95fd6dfc59855757adb374527"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "django/contrib/auth/views.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:479b5d493836a87daa6b54781c2dd543b2b4c5b0975bbe7dad14e095c8c17b82",
+   "final_digest": "sha256:c8f4ac862d0eb7148590d96a90b4b9ccccb23084089fc8f7cad8237f4858beea",
+   "expected_digests": [
+    "sha256:c8f4ac862d0eb7148590d96a90b4b9ccccb23084089fc8f7cad8237f4858beea"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "django/db/backends/postgresql/compiler.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:ec3a2a5dcab656696cae917bc4045a183f615c75b935a6d9693a7985c5f38a30",
+   "final_digest": "sha256:f05c8ed152ed2cdb6e1c1f9d7e1fef5048f9b8a20f1cc6d77ca43c4715a6bdcd",
+   "expected_digests": [
+    "sha256:f05c8ed152ed2cdb6e1c1f9d7e1fef5048f9b8a20f1cc6d77ca43c4715a6bdcd"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "django/contrib/auth/admin.py": "sha256:b1a0c41400fd69b293e831dc38b9ad95959abdd95fd6dfc59855757adb374527",
+  "django/contrib/auth/views.py": "sha256:c8f4ac862d0eb7148590d96a90b4b9ccccb23084089fc8f7cad8237f4858beea",
+  "django/db/backends/postgresql/compiler.py": "sha256:f05c8ed152ed2cdb6e1c1f9d7e1fef5048f9b8a20f1cc6d77ca43c4715a6bdcd"
+ }
+}

@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-f5ecae74aa6da74c",
+  "proposalIds": [
+    "prop-hist-w0-django_middleware_csrf_py"
+  ],
+  "targetFiles": [
+    "django/middleware/csrf.py"
+  ],
+  "appliedFiles": [
+    "django/middleware/csrf.py"
+  ],
+  "fileBeforeHashes": {
+    "django/middleware/csrf.py": "53fb67e165f9aa3ab11b3800b5ba597ef9bfbbf34a40c5ba51314b8628f78eaf"
+  },
+  "fileAfterHashes": {
+    "django/middleware/csrf.py": "e0652418bde5fd73841cea52664a3e4e067b13f1912ef5ee81b2659327fec1e4"
+  },
+  "permissions": {
+    "fileWrite": [
+      "django/middleware/csrf.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-f5ecae74aa6da74c",
+    "planId": "merge-f5ecae74aa6da74c",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-f5ecae74aa6da74c",
+        "planId": "merge-f5ecae74aa6da74c",
+        "request_identity": [
+          "prop-hist-w0-django_middleware_csrf_py"
+        ],
+        "actor_ids": [
+          "writer-19745"
+        ],
+        "request_files": [
+          "django/middleware/csrf.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "django/middleware/csrf.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/django/runs/django_19745_19756__bare_composer__s4/artifacts/steward/cb-django_middleware_csrf.py-w0-0005.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-DJANGO_MIDDLEWARE_CSRF_PY"
+        ],
+        "commit_sha": "38c7cb522775ebaed7ae347f5578da0126421cd8"
+      }
+    ]
+  }
+}

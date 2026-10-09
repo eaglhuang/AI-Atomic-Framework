@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-d41311720ec05d0f",
+  "proposalIds": [
+    "prop-hist-w0-sympy_matrices_matrixbase_py"
+  ],
+  "targetFiles": [
+    "sympy/matrices/matrixbase.py"
+  ],
+  "appliedFiles": [
+    "sympy/matrices/matrixbase.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/matrices/matrixbase.py": "7f321f1a9b9775d2e62ac20d0611608eeeebab793dab5c90bdae283a0a28574e"
+  },
+  "fileAfterHashes": {
+    "sympy/matrices/matrixbase.py": "4ad7e935638d5c35900debe8bb0137f909227984f9fe085dc6ec31904f7e7571"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/matrices/matrixbase.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-d41311720ec05d0f",
+    "planId": "merge-d41311720ec05d0f",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-d41311720ec05d0f",
+        "planId": "merge-d41311720ec05d0f",
+        "request_identity": [
+          "prop-hist-w0-sympy_matrices_matrixbase_py"
+        ],
+        "actor_ids": [
+          "writer-27369"
+        ],
+        "request_files": [
+          "sympy/matrices/matrixbase.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/matrices/matrixbase.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/oldpin/runs/sympy_27369_27567__steward__s2/artifacts/steward/cb-sympy_matrices_matrixbase.py-w0-0003.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SYMPY_MATRICES_MATRIXBASE_PY"
+        ],
+        "commit_sha": "81d4c1dd3a65133e0f5fce39cc185a5c339d9456"
+      }
+    ]
+  }
+}

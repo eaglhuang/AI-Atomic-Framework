@@ -1,0 +1,142 @@
+{
+ "writer": 1,
+ "pr": 26718,
+ "pid": 2207833,
+ "init_ms": 69.403968,
+ "start_offset_ms": 20,
+ "file_order": [
+  "sympy/physics/control/lti.py"
+ ],
+ "holds": {
+  "sympy/physics/control/lti.py": 15
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 26718,
+   "path": "sympy/physics/control/lti.py",
+   "intents": [
+    "log:sympy:26685_26718:26718:sympy/physics/control/lti.py:h0",
+    "log:sympy:26685_26718:26718:sympy/physics/control/lti.py:h1",
+    "log:sympy:26685_26718:26718:sympy/physics/control/lti.py:h2",
+    "log:sympy:26685_26718:26718:sympy/physics/control/lti.py:h3",
+    "log:sympy:26685_26718:26718:sympy/physics/control/lti.py:h4",
+    "log:sympy:26685_26718:26718:sympy/physics/control/lti.py:h5",
+    "log:sympy:26685_26718:26718:sympy/physics/control/lti.py:h6",
+    "log:sympy:26685_26718:26718:sympy/physics/control/lti.py:h7",
+    "log:sympy:26685_26718:26718:sympy/physics/control/lti.py:h8",
+    "log:sympy:26685_26718:26718:sympy/physics/control/lti.py:h9",
+    "log:sympy:26685_26718:26718:sympy/physics/control/lti.py:h10",
+    "log:sympy:26685_26718:26718:sympy/physics/control/lti.py:h11",
+    "log:sympy:26685_26718:26718:sympy/physics/control/lti.py:h12",
+    "log:sympy:26685_26718:26718:sympy/physics/control/lti.py:h13",
+    "log:sympy:26685_26718:26718:sympy/physics/control/lti.py:h14",
+    "log:sympy:26685_26718:26718:sympy/physics/control/lti.py:h15",
+    "log:sympy:26685_26718:26718:sympy/physics/control/lti.py:h16",
+    "log:sympy:26685_26718:26718:sympy/physics/control/lti.py:h17"
+   ],
+   "hold_ms": 15,
+   "t_submit_epoch": 1791573040115,
+   "outcome": "blocked",
+   "blocked_reason": "compose-context-mismatch: proposal 'prop-hist-w1-sympy_physics_control_lti_py' context mismatch at base line 1818: expected \"    Examples\", found \"        type of systems passed.\" [proposals: prop-hist-w1-sympy_physics_control_lti_py]",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w1-sympy_physics_control_lti_py' context mismatch at base line 1818: expected \"    Examples\", found \"        type of systems passed.\" [proposals: prop-hist-w1-sympy_physics_control_lti_py]"
+   ],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sympy_physics_control_lti.py-w1-0001",
+   "total_ms": 140.74,
+   "t_done_epoch": 1791573040256
+  }
+ ],
+ "admit_stats": null,
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sympy_physics_control_lti.py-w1-0001",
+   "path": "sympy/physics/control/lti.py",
+   "pid": 2207833,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-sympy_physics_control_lti_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sympy_physics_control_lti_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:ec3536f2647e5b331374959e68ce458ed814be54390df1b0d49f6b2e8999a77e"
+   ],
+   "lock_wait_ms": 0.16,
+   "t_start_epoch_ms": 1791573040138.24,
+   "pre_apply_hash": "sha256:ec3536f2647e5b331374959e68ce458ed814be54390df1b0d49f6b2e8999a77e",
+   "receipt_before_hash": null,
+   "receipt_after_hash": null,
+   "post_apply_hash": "sha256:a5ffeccc6e6cc463ba3f99384ae5826aef48bf00c8b3d369996f649ccb9a6ff8",
+   "t_end_epoch_ms": 1791573040255.66,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "blocked",
+   "written": false,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:10:40.255+08:00",
+   "batch_id": "cb-sympy_physics_control_lti.py-w1-0001",
+   "path": "sympy/physics/control/lti.py",
+   "proposalIds": [
+    "prop-hist-w1-sympy_physics_control_lti_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sympy_physics_control_lti_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-sympy_physics_control_lti_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-sympy_physics_control_lti_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-sympy_physics_control_lti_py",
+     "logical_id": "prop-hist-w1-sympy_physics_control_lti_py",
+     "attempt_id": "att-prop-hist-w1-sympy_physics_control_lti_py-r0",
+     "proposal_id": "prop-hist-w1-sympy_physics_control_lti_py",
+     "actorId": "writer-26718"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w1-sympy_physics_control_lti_py' context mismatch at base line 1818: expected \"    Examples\", found \"        type of systems passed.\" [proposals: prop-hist-w1-sympy_physics_control_lti_py]"
+   ],
+   "blocked_reason": "compose-context-mismatch: proposal 'prop-hist-w1-sympy_physics_control_lti_py' context mismatch at base line 1818: expected \"    Examples\", found \"        type of systems passed.\" [proposals: prop-hist-w1-sympy_physics_control_lti_py]",
+   "window_wait_ms": 0.36,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:ec3536f2647e5b331374959e68ce458ed814be54390df1b0d49f6b2e8999a77e",
+   "written": false,
+   "output_digest": null,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "compose-context-mismatch: proposal 'prop-hist-w1-sympy_physics_control_lti_py' context mismatch at base line 1818: expected \"    Examples\", found \"        type of systems passed.\" [proposals: prop-hist-w1-sympy_physics_control_lti_py]"
+  }
+ ]
+}

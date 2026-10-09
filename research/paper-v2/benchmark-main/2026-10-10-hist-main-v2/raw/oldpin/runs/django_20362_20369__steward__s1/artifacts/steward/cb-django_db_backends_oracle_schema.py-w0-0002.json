@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-f9b283abc89aca0e",
+  "proposalIds": [
+    "prop-hist-w0-django_db_backends_oracle_schema_py"
+  ],
+  "targetFiles": [
+    "django/db/backends/oracle/schema.py"
+  ],
+  "appliedFiles": [
+    "django/db/backends/oracle/schema.py"
+  ],
+  "fileBeforeHashes": {
+    "django/db/backends/oracle/schema.py": "d052d00c4f954ad896fb504c9387b154be2c079eae9c01e7cb699662ee8cca06"
+  },
+  "fileAfterHashes": {
+    "django/db/backends/oracle/schema.py": "6642bd4b3285bbae513361f1e0801d8af3b470e7b9ce0df05a54f1927ead7894"
+  },
+  "permissions": {
+    "fileWrite": [
+      "django/db/backends/oracle/schema.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-f9b283abc89aca0e",
+    "planId": "merge-f9b283abc89aca0e",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-f9b283abc89aca0e",
+        "planId": "merge-f9b283abc89aca0e",
+        "request_identity": [
+          "prop-hist-w0-django_db_backends_oracle_schema_py"
+        ],
+        "actor_ids": [
+          "writer-20362"
+        ],
+        "request_files": [
+          "django/db/backends/oracle/schema.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "django/db/backends/oracle/schema.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/oldpin/runs/django_20362_20369__steward__s1/artifacts/steward/cb-django_db_backends_oracle_schema.py-w0-0002.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-DJANGO_DB_BACKENDS_ORACLE_SCHEMA_PY"
+        ],
+        "commit_sha": "c2a99d062de1f8f7ba87fbd7fc258bab3af601b7"
+      }
+    ]
+  }
+}

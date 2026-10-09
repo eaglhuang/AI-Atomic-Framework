@@ -1,0 +1,106 @@
+{
+ "pair_id": "fastapi:4972_12970",
+ "stratum": "O3",
+ "arm": "bare_composer",
+ "plant": null,
+ "seed_k": 0,
+ "seed": 4104213787,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 459,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 3,
+  "by_verdict": {
+   "correct": 3
+  },
+  "completed": 3,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 2,
+  "files_full_bytes_exact": 2,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "fastapi/encoders.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "fastapi/routing.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "fastapi/encoders.py": true,
+  "fastapi/routing.py": true
+ },
+ "final_exists": {
+  "fastapi/encoders.py": true,
+  "fastapi/routing.py": true
+ },
+ "files": [
+  {
+   "path": "fastapi/encoders.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:2efc1898578ecf8b55c2f801a02e6bbd99dbafb859afbdca1ab53c3bbcd2a6d5",
+   "final_digest": "sha256:aff7ce80cca5ae59c20d38775bdbb65b466c1d326a2212e953a422a47332d26f",
+   "expected_digests": [
+    "sha256:aff7ce80cca5ae59c20d38775bdbb65b466c1d326a2212e953a422a47332d26f"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "fastapi/routing.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:8271919cecccf8204e623ee12346d9942ff973e4502a1e813e696c0c3f08554a",
+   "final_digest": "sha256:687e2dc9fbecd35a18322c0725c681fd43f087972bb212ffa34fd8b075d656ae",
+   "expected_digests": [
+    "sha256:687e2dc9fbecd35a18322c0725c681fd43f087972bb212ffa34fd8b075d656ae"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "fastapi/encoders.py": "sha256:aff7ce80cca5ae59c20d38775bdbb65b466c1d326a2212e953a422a47332d26f",
+  "fastapi/routing.py": "sha256:687e2dc9fbecd35a18322c0725c681fd43f087972bb212ffa34fd8b075d656ae"
+ }
+}

@@ -1,0 +1,132 @@
+{
+ "writer": 1,
+ "pr": 10969,
+ "pid": 2487475,
+ "init_ms": 98.40429099999999,
+ "start_offset_ms": 18,
+ "file_order": [
+  "fastapi/utils.py"
+ ],
+ "holds": {
+  "fastapi/utils.py": 27
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 10969,
+   "path": "fastapi/utils.py",
+   "intents": [
+    "log:fastapi:9704_10969:10969:fastapi/utils.py:h0"
+   ],
+   "hold_ms": 27,
+   "t_submit_epoch": 1791575443248,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 196,
+   "outcome": "blocked",
+   "blocked_reason": "canonical target base hash is stale: fastapi/utils.py",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "canonical target base hash is stale: fastapi/utils.py"
+   ],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-fastapi_utils.py-w1-0001",
+   "total_ms": 332.05,
+   "t_done_epoch": 1791575443580
+  }
+ ],
+ "admit_stats": {
+  "txns": 2,
+  "cas_conflicts": 77
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-fastapi_utils.py-w1-0001",
+   "path": "fastapi/utils.py",
+   "pid": 2487475,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-fastapi_utils_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-fastapi_utils_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:ae949ab07a60a283c87deebbc94dc7cce303bfb3edc621bdc7a2be6e1bba675f"
+   ],
+   "lock_wait_ms": 0.11,
+   "t_start_epoch_ms": 1791575443473.4,
+   "pre_apply_hash": "sha256:ae949ab07a60a283c87deebbc94dc7cce303bfb3edc621bdc7a2be6e1bba675f",
+   "receipt_before_hash": null,
+   "receipt_after_hash": null,
+   "post_apply_hash": "sha256:a502abc0f56e55becbf177837555008246156d342b0d264d64f305a19efae8a3",
+   "t_end_epoch_ms": 1791575443578.05,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "blocked",
+   "written": false,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:50:43.578+08:00",
+   "batch_id": "cb-fastapi_utils.py-w1-0001",
+   "path": "fastapi/utils.py",
+   "proposalIds": [
+    "prop-hist-w1-fastapi_utils_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-fastapi_utils_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-fastapi_utils_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-fastapi_utils_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-fastapi_utils_py",
+     "logical_id": "prop-hist-w1-fastapi_utils_py",
+     "attempt_id": "att-prop-hist-w1-fastapi_utils_py-r0",
+     "proposal_id": "prop-hist-w1-fastapi_utils_py",
+     "actorId": "writer-10969"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "canonical target base hash is stale: fastapi/utils.py"
+   ],
+   "blocked_reason": "canonical target base hash is stale: fastapi/utils.py",
+   "window_wait_ms": 0.24,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:ae949ab07a60a283c87deebbc94dc7cce303bfb3edc621bdc7a2be6e1bba675f",
+   "written": false,
+   "output_digest": null,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "canonical target base hash is stale: fastapi/utils.py"
+  }
+ ]
+}

@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-16bbada08d4f5246",
+  "proposalIds": [
+    "prop-hist-w1-django_contrib_postgres_constraints_py"
+  ],
+  "targetFiles": [
+    "django/contrib/postgres/constraints.py"
+  ],
+  "appliedFiles": [
+    "django/contrib/postgres/constraints.py"
+  ],
+  "fileBeforeHashes": {
+    "django/contrib/postgres/constraints.py": "3bf1cec54160b17f84580135fb00393dc9d071182625260c74122ac13c475b65"
+  },
+  "fileAfterHashes": {
+    "django/contrib/postgres/constraints.py": "516b4386198e24797692381bc07986f9c75ec0c0aeb6c017f08d06070db4e2b3"
+  },
+  "permissions": {
+    "fileWrite": [
+      "django/contrib/postgres/constraints.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-16bbada08d4f5246",
+    "planId": "merge-16bbada08d4f5246",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-16bbada08d4f5246",
+        "planId": "merge-16bbada08d4f5246",
+        "request_identity": [
+          "prop-hist-w1-django_contrib_postgres_constraints_py"
+        ],
+        "actor_ids": [
+          "writer-18425"
+        ],
+        "request_files": [
+          "django/contrib/postgres/constraints.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "django/contrib/postgres/constraints.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/oldpin/runs/django_17723_18425__steward__s1/artifacts/steward/cb-django_contrib_postgres_constraints.py-w1-0004.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-DJANGO_CONTRIB_POSTGRES_CONSTRAINTS_PY"
+        ],
+        "commit_sha": "eec08f9e54e57fb217d03b90f6968632ed57516d"
+      }
+    ]
+  }
+}

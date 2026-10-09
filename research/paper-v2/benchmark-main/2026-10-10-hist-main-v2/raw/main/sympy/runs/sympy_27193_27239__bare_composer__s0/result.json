@@ -1,0 +1,150 @@
+{
+ "pair_id": "sympy:27193_27239",
+ "stratum": "O3",
+ "arm": "bare_composer",
+ "plant": null,
+ "seed_k": 0,
+ "seed": 1469525407,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 598,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 18,
+  "by_verdict": {
+   "correct": 18
+  },
+  "completed": 18,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 4,
+  "files_full_bytes_exact": 4,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "sympy/__init__.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/ntheory/__init__.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/ntheory/factor_.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/ntheory/primetest.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "sympy/__init__.py": true,
+  "sympy/ntheory/__init__.py": true,
+  "sympy/ntheory/factor_.py": true,
+  "sympy/ntheory/primetest.py": true
+ },
+ "final_exists": {
+  "sympy/__init__.py": true,
+  "sympy/ntheory/__init__.py": true,
+  "sympy/ntheory/factor_.py": true,
+  "sympy/ntheory/primetest.py": true
+ },
+ "files": [
+  {
+   "path": "sympy/__init__.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:af7d1716a5ccdf21e077be548befd986e9fcf0a15b7914c0afef3c104bec2b96",
+   "final_digest": "sha256:c879d5f419671fa5529672871c788d1313cf325aeb36986c2947577d2bce39cf",
+   "expected_digests": [
+    "sha256:c879d5f419671fa5529672871c788d1313cf325aeb36986c2947577d2bce39cf"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/ntheory/__init__.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:365e368277eb7f45ae94ab45fbe39304ffab85b765fae57b35d5e1ceb45a085a",
+   "final_digest": "sha256:7cc7789a58fc60536adc890fa62996ce10f42b27807ac70efbbd925c0177cf72",
+   "expected_digests": [
+    "sha256:7cc7789a58fc60536adc890fa62996ce10f42b27807ac70efbbd925c0177cf72"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/ntheory/factor_.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:e2ab55af863937f570a4dff2b60d73fa810865802fadffa0524e717211fa3703",
+   "final_digest": "sha256:ebdbc657b87afe539a8859cba23cb8c0de51774b34a1911bcc89850cbe76a7d5",
+   "expected_digests": [
+    "sha256:ebdbc657b87afe539a8859cba23cb8c0de51774b34a1911bcc89850cbe76a7d5"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/ntheory/primetest.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:b9e5503c36fa75a1ca495569c7d15ec46fb4ff4ae645f55ea06a568bca76b71d",
+   "final_digest": "sha256:5a33dddc131f3fb3687c2065c0327de40d7b5f8614269227d84afe0c5cd8391e",
+   "expected_digests": [
+    "sha256:5a33dddc131f3fb3687c2065c0327de40d7b5f8614269227d84afe0c5cd8391e"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "sympy/__init__.py": "sha256:c879d5f419671fa5529672871c788d1313cf325aeb36986c2947577d2bce39cf",
+  "sympy/ntheory/__init__.py": "sha256:7cc7789a58fc60536adc890fa62996ce10f42b27807ac70efbbd925c0177cf72",
+  "sympy/ntheory/factor_.py": "sha256:ebdbc657b87afe539a8859cba23cb8c0de51774b34a1911bcc89850cbe76a7d5",
+  "sympy/ntheory/primetest.py": "sha256:5a33dddc131f3fb3687c2065c0327de40d7b5f8614269227d84afe0c5cd8391e"
+ }
+}

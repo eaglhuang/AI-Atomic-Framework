@@ -1,0 +1,241 @@
+{
+ "writer": 0,
+ "pr": 9105,
+ "pid": 2273463,
+ "init_ms": 78.609851,
+ "start_offset_ms": 17,
+ "file_order": [
+  "xarray/coding/calendar_ops.py",
+  "xarray/core/accessor_dt.py"
+ ],
+ "holds": {
+  "xarray/coding/calendar_ops.py": 0,
+  "xarray/core/accessor_dt.py": 21
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 9105,
+   "path": "xarray/coding/calendar_ops.py",
+   "intents": [
+    "log:xarray:9105_9192:9105:xarray/coding/calendar_ops.py:h0",
+    "log:xarray:9105_9192:9105:xarray/coding/calendar_ops.py:h1",
+    "log:xarray:9105_9192:9105:xarray/coding/calendar_ops.py:h2",
+    "log:xarray:9105_9192:9105:xarray/coding/calendar_ops.py:h3",
+    "log:xarray:9105_9192:9105:xarray/coding/calendar_ops.py:h4",
+    "log:xarray:9105_9192:9105:xarray/coding/calendar_ops.py:h5",
+    "log:xarray:9105_9192:9105:xarray/coding/calendar_ops.py:h6",
+    "log:xarray:9105_9192:9105:xarray/coding/calendar_ops.py:h7",
+    "log:xarray:9105_9192:9105:xarray/coding/calendar_ops.py:h8",
+    "log:xarray:9105_9192:9105:xarray/coding/calendar_ops.py:h9",
+    "log:xarray:9105_9192:9105:xarray/coding/calendar_ops.py:h10"
+   ],
+   "hold_ms": 0,
+   "t_submit_epoch": 1791573729460,
+   "outcome": "blocked",
+   "blocked_reason": "compose-context-mismatch: proposal 'prop-hist-w0-xarray_coding_calendar_ops_py' context mismatch at base line 8: expected \"from xarray.coding.times import _should_cftime_be_used, convert_times\", found \"from xarray.coding.times import (\" [proposals: prop-hist-w0-xarray_coding_calendar_ops_py]",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w0-xarray_coding_calendar_ops_py' context mismatch at base line 8: expected \"from xarray.coding.times import _should_cftime_be_used, convert_times\", found \"from xarray.coding.times import (\" [proposals: prop-hist-w0-xarray_coding_calendar_ops_py]"
+   ],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-xarray_coding_calendar_ops.py-w0-0001",
+   "total_ms": 117.39,
+   "t_done_epoch": 1791573729577
+  },
+  {
+   "writer": 0,
+   "pr": 9105,
+   "path": "xarray/core/accessor_dt.py",
+   "intents": [
+    "log:xarray:9105_9192:9105:xarray/core/accessor_dt.py:h11",
+    "log:xarray:9105_9192:9105:xarray/core/accessor_dt.py:h12"
+   ],
+   "hold_ms": 21,
+   "t_submit_epoch": 1791573729582,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-xarray_core_accessor_dt.py-w0-0002",
+   "total_ms": 39.78,
+   "t_done_epoch": 1791573729617
+  }
+ ],
+ "admit_stats": null,
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-xarray_coding_calendar_ops.py-w0-0001",
+   "path": "xarray/coding/calendar_ops.py",
+   "pid": 2273463,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-xarray_coding_calendar_ops_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-xarray_coding_calendar_ops_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:f20f74fcbda0530f56bd9847c4e1209872ce0d4561e704c7eeed23a26f77d905"
+   ],
+   "lock_wait_ms": 0.12,
+   "t_start_epoch_ms": 1791573729465.52,
+   "pre_apply_hash": "sha256:f20f74fcbda0530f56bd9847c4e1209872ce0d4561e704c7eeed23a26f77d905",
+   "receipt_before_hash": null,
+   "receipt_after_hash": null,
+   "post_apply_hash": "sha256:e6eb34aaff125f88316038457e677f56fc97f79edd67ff96b92fa5c3094eceb6",
+   "t_end_epoch_ms": 1791573729577.45,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "blocked",
+   "written": false,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:22:09.577+08:00",
+   "batch_id": "cb-xarray_coding_calendar_ops.py-w0-0001",
+   "path": "xarray/coding/calendar_ops.py",
+   "proposalIds": [
+    "prop-hist-w0-xarray_coding_calendar_ops_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-xarray_coding_calendar_ops_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-xarray_coding_calendar_ops_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-xarray_coding_calendar_ops_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-xarray_coding_calendar_ops_py",
+     "logical_id": "prop-hist-w0-xarray_coding_calendar_ops_py",
+     "attempt_id": "att-prop-hist-w0-xarray_coding_calendar_ops_py-r0",
+     "proposal_id": "prop-hist-w0-xarray_coding_calendar_ops_py",
+     "actorId": "writer-9105"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w0-xarray_coding_calendar_ops_py' context mismatch at base line 8: expected \"from xarray.coding.times import _should_cftime_be_used, convert_times\", found \"from xarray.coding.times import (\" [proposals: prop-hist-w0-xarray_coding_calendar_ops_py]"
+   ],
+   "blocked_reason": "compose-context-mismatch: proposal 'prop-hist-w0-xarray_coding_calendar_ops_py' context mismatch at base line 8: expected \"from xarray.coding.times import _should_cftime_be_used, convert_times\", found \"from xarray.coding.times import (\" [proposals: prop-hist-w0-xarray_coding_calendar_ops_py]",
+   "window_wait_ms": 0.26,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:f20f74fcbda0530f56bd9847c4e1209872ce0d4561e704c7eeed23a26f77d905",
+   "written": false,
+   "output_digest": null,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "compose-context-mismatch: proposal 'prop-hist-w0-xarray_coding_calendar_ops_py' context mismatch at base line 8: expected \"from xarray.coding.times import _should_cftime_be_used, convert_times\", found \"from xarray.coding.times import (\" [proposals: prop-hist-w0-xarray_coding_calendar_ops_py]"
+  },
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-xarray_core_accessor_dt.py-w0-0002",
+   "path": "xarray/core/accessor_dt.py",
+   "pid": 2273463,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-xarray_core_accessor_dt_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-xarray_core_accessor_dt_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:7add23a079779abb51da3e61e95a2b930ef0a0a82c807ccef9e0602ef6a231fa"
+   ],
+   "lock_wait_ms": 0,
+   "t_start_epoch_ms": 1791573729603.47,
+   "pre_apply_hash": "sha256:7add23a079779abb51da3e61e95a2b930ef0a0a82c807ccef9e0602ef6a231fa",
+   "receipt_before_hash": "sha256:7add23a079779abb51da3e61e95a2b930ef0a0a82c807ccef9e0602ef6a231fa",
+   "receipt_after_hash": "sha256:72abca967a85171640e351f86bc50cd500bf7c0ed04908391052693c5736b56a",
+   "post_apply_hash": "sha256:72abca967a85171640e351f86bc50cd500bf7c0ed04908391052693c5736b56a",
+   "t_end_epoch_ms": 1791573729617.61,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:22:09.617+08:00",
+   "batch_id": "cb-xarray_core_accessor_dt.py-w0-0002",
+   "path": "xarray/core/accessor_dt.py",
+   "proposalIds": [
+    "prop-hist-w0-xarray_core_accessor_dt_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-xarray_core_accessor_dt_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-xarray_core_accessor_dt_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-xarray_core_accessor_dt_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-xarray_core_accessor_dt_py",
+     "logical_id": "prop-hist-w0-xarray_core_accessor_dt_py",
+     "attempt_id": "att-prop-hist-w0-xarray_core_accessor_dt_py-r0",
+     "proposal_id": "prop-hist-w0-xarray_core_accessor_dt_py",
+     "actorId": "writer-9105"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.01,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:7add23a079779abb51da3e61e95a2b930ef0a0a82c807ccef9e0602ef6a231fa",
+   "written": true,
+   "output_digest": "sha256:72abca967a85171640e351f86bc50cd500bf7c0ed04908391052693c5736b56a",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

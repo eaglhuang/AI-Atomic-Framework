@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-8cbe568f1ca46b92",
+  "proposalIds": [
+    "prop-hist-w1-sympy_core_basic_py"
+  ],
+  "targetFiles": [
+    "sympy/core/basic.py"
+  ],
+  "appliedFiles": [],
+  "fileBeforeHashes": {},
+  "fileAfterHashes": {},
+  "permissions": {
+    "fileWrite": [
+      "sympy/core/basic.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "blocked",
+  "blockedReasons": [
+    "file-hash-drift: Target file hash sha256:2d50eb7580b3556aa9e6b62b0fe9fcdd4357021dc7c56c8c018bda1ec708f5cf does not match proposal fileBeforeHash sha256:359bb7e7e0c38a12ceb63bb4f4b4e02b2a2087da1af2f10defb73a1ea03abffb."
+  ],
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-8cbe568f1ca46b92",
+    "planId": "merge-8cbe568f1ca46b92",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-8cbe568f1ca46b92",
+        "planId": "merge-8cbe568f1ca46b92",
+        "request_identity": [
+          "prop-hist-w1-sympy_core_basic_py"
+        ],
+        "actor_ids": [
+          "writer-27175"
+        ],
+        "request_files": [
+          "sympy/core/basic.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/oldpin/runs/sympy_27086_27175__steward__s2/artifacts/steward/cb-sympy_core_basic.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_CORE_BASIC_PY"
+        ],
+        "commit_sha": "43fbd096fe49747f3d559adedc2d67e4ff98eaaa"
+      }
+    ]
+  }
+}

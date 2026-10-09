@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-ca27c816be3228cb",
+  "proposalIds": [
+    "prop-hist-w0-sympy_abc_py"
+  ],
+  "targetFiles": [
+    "sympy/abc.py"
+  ],
+  "appliedFiles": [
+    "sympy/abc.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/abc.py": "3f589029f5e5ec8bade99e58f7b4261abfd4aa2019eaa47e7a844cb5869c19f0"
+  },
+  "fileAfterHashes": {
+    "sympy/abc.py": "13fc7361465e5144b735a12b9e033519fc5d8b7465c37fd74bfb188fabd4a7ee"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/abc.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-ca27c816be3228cb",
+    "planId": "merge-ca27c816be3228cb",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-ca27c816be3228cb",
+        "planId": "merge-ca27c816be3228cb",
+        "request_identity": [
+          "prop-hist-w0-sympy_abc_py"
+        ],
+        "actor_ids": [
+          "writer-27353"
+        ],
+        "request_files": [
+          "sympy/abc.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/abc.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/sympy/runs/sympy_27353_27997__bare_composer__s1/artifacts/steward/cb-sympy_abc.py-w0-0005.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SYMPY_ABC_PY"
+        ],
+        "commit_sha": "8148ef2f5048be51bf2d5902dbfd7920af11fa00"
+      }
+    ]
+  }
+}

@@ -1,0 +1,128 @@
+{
+ "writer": 0,
+ "pr": 11833,
+ "pid": 2296128,
+ "init_ms": 73.19544400000001,
+ "start_offset_ms": 7,
+ "file_order": [
+  "src/_pytest/fixtures.py"
+ ],
+ "holds": {
+  "src/_pytest/fixtures.py": 10
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 11833,
+   "path": "src/_pytest/fixtures.py",
+   "intents": [
+    "log:pytest:11833_12048:11833:src/_pytest/fixtures.py:h0",
+    "log:pytest:11833_12048:11833:src/_pytest/fixtures.py:h1",
+    "log:pytest:11833_12048:11833:src/_pytest/fixtures.py:h2",
+    "log:pytest:11833_12048:11833:src/_pytest/fixtures.py:h3",
+    "log:pytest:11833_12048:11833:src/_pytest/fixtures.py:h4",
+    "log:pytest:11833_12048:11833:src/_pytest/fixtures.py:h5",
+    "log:pytest:11833_12048:11833:src/_pytest/fixtures.py:h6",
+    "log:pytest:11833_12048:11833:src/_pytest/fixtures.py:h7"
+   ],
+   "hold_ms": 10,
+   "t_submit_epoch": 1791573983242,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-src__pytest_fixtures.py-w0-0001",
+   "total_ms": 120.81,
+   "t_done_epoch": 1791573983362
+  }
+ ],
+ "admit_stats": null,
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-src__pytest_fixtures.py-w0-0001",
+   "path": "src/_pytest/fixtures.py",
+   "pid": 2296128,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-src_pytest_fixtures_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-src_pytest_fixtures_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:fd1269b369657921407d632b83259a53f073f6a14951ec9f220fb0d357f4767a"
+   ],
+   "lock_wait_ms": 0.12,
+   "t_start_epoch_ms": 1791573983256.2,
+   "pre_apply_hash": "sha256:fd1269b369657921407d632b83259a53f073f6a14951ec9f220fb0d357f4767a",
+   "receipt_before_hash": "sha256:fd1269b369657921407d632b83259a53f073f6a14951ec9f220fb0d357f4767a",
+   "receipt_after_hash": "sha256:4aee447e1d76dd50a4a940a5d7e0923dbd2dc5c450e5a2131540d8bac7fcd9a7",
+   "post_apply_hash": "sha256:4aee447e1d76dd50a4a940a5d7e0923dbd2dc5c450e5a2131540d8bac7fcd9a7",
+   "t_end_epoch_ms": 1791573983362.36,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:26:23.362+08:00",
+   "batch_id": "cb-src__pytest_fixtures.py-w0-0001",
+   "path": "src/_pytest/fixtures.py",
+   "proposalIds": [
+    "prop-hist-w0-src_pytest_fixtures_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-src_pytest_fixtures_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-src_pytest_fixtures_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-src_pytest_fixtures_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-src_pytest_fixtures_py",
+     "logical_id": "prop-hist-w0-src_pytest_fixtures_py",
+     "attempt_id": "att-prop-hist-w0-src_pytest_fixtures_py-r0",
+     "proposal_id": "prop-hist-w0-src_pytest_fixtures_py",
+     "actorId": "writer-11833"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.26,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:fd1269b369657921407d632b83259a53f073f6a14951ec9f220fb0d357f4767a",
+   "written": true,
+   "output_digest": "sha256:4aee447e1d76dd50a4a940a5d7e0923dbd2dc5c450e5a2131540d8bac7fcd9a7",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

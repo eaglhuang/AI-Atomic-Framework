@@ -1,0 +1,85 @@
+{
+ "writer": 1,
+ "pr": 28017,
+ "pid": 2414598,
+ "init_ms": 76.07628700000001,
+ "start_offset_ms": 11,
+ "file_order": [
+  "sympy/assumptions/ask.py",
+  "sympy/assumptions/handlers/sets.py",
+  "sympy/assumptions/predicates/sets.py"
+ ],
+ "holds": {
+  "sympy/assumptions/ask.py": 19,
+  "sympy/assumptions/handlers/sets.py": 0,
+  "sympy/assumptions/predicates/sets.py": 23
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 28017,
+   "path": "sympy/assumptions/ask.py",
+   "intents": [
+    "log:sympy:27839_28017:28017:sympy/assumptions/ask.py:h0"
+   ],
+   "hold_ms": 19,
+   "t_submit_epoch": 1791574860706,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 16,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 41.6,
+   "t_done_epoch": 1791574860748
+  },
+  {
+   "writer": 1,
+   "pr": 28017,
+   "path": "sympy/assumptions/handlers/sets.py",
+   "intents": [
+    "log:sympy:27839_28017:28017:sympy/assumptions/handlers/sets.py:h1",
+    "log:sympy:27839_28017:28017:sympy/assumptions/handlers/sets.py:h2",
+    "log:sympy:27839_28017:28017:sympy/assumptions/handlers/sets.py:h3",
+    "log:sympy:27839_28017:28017:sympy/assumptions/handlers/sets.py:h4",
+    "log:sympy:27839_28017:28017:sympy/assumptions/handlers/sets.py:h5",
+    "log:sympy:27839_28017:28017:sympy/assumptions/handlers/sets.py:h6"
+   ],
+   "hold_ms": 0,
+   "t_submit_epoch": 1791574860748,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 10.95,
+   "t_done_epoch": 1791574860759
+  },
+  {
+   "writer": 1,
+   "pr": 28017,
+   "path": "sympy/assumptions/predicates/sets.py",
+   "intents": [
+    "log:sympy:27839_28017:28017:sympy/assumptions/predicates/sets.py:h7",
+    "log:sympy:27839_28017:28017:sympy/assumptions/predicates/sets.py:h8",
+    "log:sympy:27839_28017:28017:sympy/assumptions/predicates/sets.py:h9"
+   ],
+   "hold_ms": 23,
+   "t_submit_epoch": 1791574860759,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 6,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 34.99,
+   "t_done_epoch": 1791574860794
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 2
+ },
+ "steward_batches": null
+}

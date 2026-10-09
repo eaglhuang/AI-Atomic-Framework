@@ -1,0 +1,62 @@
+{
+ "writer": 1,
+ "pr": 13211,
+ "pid": 2424272,
+ "init_ms": 71.026622,
+ "start_offset_ms": 10,
+ "file_order": [
+  "sphinx/domains/__init__.py",
+  "sphinx/util/docutils.py"
+ ],
+ "holds": {
+  "sphinx/domains/__init__.py": 0,
+  "sphinx/util/docutils.py": 8
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 13211,
+   "path": "sphinx/domains/__init__.py",
+   "intents": [
+    "log:sphinx:11280_13211:13211:sphinx/domains/__init__.py:h0",
+    "log:sphinx:11280_13211:13211:sphinx/domains/__init__.py:h1",
+    "log:sphinx:11280_13211:13211:sphinx/domains/__init__.py:h2"
+   ],
+   "hold_ms": 0,
+   "t_submit_epoch": 1791574931938,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 26,
+   "outcome": "commit",
+   "total_ms": 38.05,
+   "t_done_epoch": 1791574931976
+  },
+  {
+   "writer": 1,
+   "pr": 13211,
+   "path": "sphinx/util/docutils.py",
+   "intents": [
+    "log:sphinx:11280_13211:13211:sphinx/util/docutils.py:h3",
+    "log:sphinx:11280_13211:13211:sphinx/util/docutils.py:h4",
+    "log:sphinx:11280_13211:13211:sphinx/util/docutils.py:h5",
+    "log:sphinx:11280_13211:13211:sphinx/util/docutils.py:h6",
+    "log:sphinx:11280_13211:13211:sphinx/util/docutils.py:h7"
+   ],
+   "hold_ms": 8,
+   "t_submit_epoch": 1791574931976,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 88,
+   "outcome": "commit",
+   "total_ms": 106.85,
+   "t_done_epoch": 1791574932083
+  }
+ ],
+ "admit_stats": {
+  "txns": 4,
+  "cas_conflicts": 1
+ },
+ "steward_batches": null
+}

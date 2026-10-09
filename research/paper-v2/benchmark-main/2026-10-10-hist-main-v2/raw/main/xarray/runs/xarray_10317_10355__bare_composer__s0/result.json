@@ -1,0 +1,131 @@
+{
+ "pair_id": "xarray:10317_10355",
+ "stratum": "O1",
+ "arm": "bare_composer",
+ "plant": null,
+ "seed_k": 0,
+ "seed": 928665040,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 519,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 29,
+  "by_verdict": {
+   "correct": 26,
+   "blocked_absent": 3
+  },
+  "completed": 26,
+  "lost_effects": 0,
+  "blocked": 3,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 3,
+  "files_full_bytes_exact": 3,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {
+  "file-hash-drift: Target file hash sha256": 3
+ },
+ "structure": {
+  "xarray/core/extension_array.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "xarray/core/formatting.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "xarray/core/indexing.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "xarray/core/extension_array.py": true,
+  "xarray/core/formatting.py": true,
+  "xarray/core/indexing.py": true
+ },
+ "final_exists": {
+  "xarray/core/extension_array.py": true,
+  "xarray/core/formatting.py": true,
+  "xarray/core/indexing.py": true
+ },
+ "files": [
+  {
+   "path": "xarray/core/extension_array.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:bc2e3a06cf1d5debc81a2fa28e87d6905b006fe92e2c391b22bd0f1eafce0992",
+   "final_digest": "sha256:8c2a57565d64eb68236abdd8812e5449d575d6a2cffa0b72d26cae5c6fec123c",
+   "expected_digests": [
+    "sha256:8c2a57565d64eb68236abdd8812e5449d575d6a2cffa0b72d26cae5c6fec123c"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/core/formatting.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:5cf1444523d26f2fbd99372603e15588e301e074e28aae9ae2720616a80c7348",
+   "final_digest": "sha256:7fb9a0add882906e950af8ad7b709ea717c5db7502aa3cd0cf3570ee88526e22",
+   "expected_digests": [
+    "sha256:7fb9a0add882906e950af8ad7b709ea717c5db7502aa3cd0cf3570ee88526e22"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/core/indexing.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:dd8d878d87367258537cadc41b83cea23449e5bfc8cb40aebfceb10237e577fe",
+   "final_digest": "sha256:656cfd35def5ffe87911aaf940c8b79b9abf50b645c047dfeae1c5e554709d8f",
+   "expected_digests": [
+    "sha256:656cfd35def5ffe87911aaf940c8b79b9abf50b645c047dfeae1c5e554709d8f"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "xarray/core/extension_array.py": "sha256:8c2a57565d64eb68236abdd8812e5449d575d6a2cffa0b72d26cae5c6fec123c",
+  "xarray/core/formatting.py": "sha256:7fb9a0add882906e950af8ad7b709ea717c5db7502aa3cd0cf3570ee88526e22",
+  "xarray/core/indexing.py": "sha256:656cfd35def5ffe87911aaf940c8b79b9abf50b645c047dfeae1c5e554709d8f"
+ }
+}

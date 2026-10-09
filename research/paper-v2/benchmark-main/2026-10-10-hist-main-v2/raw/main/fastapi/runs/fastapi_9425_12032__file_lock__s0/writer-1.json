@@ -1,0 +1,82 @@
+{
+ "writer": 1,
+ "pr": 12032,
+ "pid": 2387345,
+ "init_ms": 74.15942100000001,
+ "start_offset_ms": 10,
+ "file_order": [
+  "fastapi/routing.py",
+  "fastapi/dependencies/utils.py",
+  "fastapi/utils.py"
+ ],
+ "holds": {
+  "fastapi/routing.py": 30,
+  "fastapi/dependencies/utils.py": 23,
+  "fastapi/utils.py": 2
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 12032,
+   "path": "fastapi/routing.py",
+   "intents": [
+    "log:fastapi:9425_12032:12032:fastapi/routing.py:h1",
+    "log:fastapi:9425_12032:12032:fastapi/routing.py:h2"
+   ],
+   "hold_ms": 30,
+   "t_submit_epoch": 1791574685856,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 20,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 59.78,
+   "t_done_epoch": 1791574685916
+  },
+  {
+   "writer": 1,
+   "pr": 12032,
+   "path": "fastapi/dependencies/utils.py",
+   "intents": [
+    "log:fastapi:9425_12032:12032:fastapi/dependencies/utils.py:h0"
+   ],
+   "hold_ms": 23,
+   "t_submit_epoch": 1791574685916,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 30.47,
+   "t_done_epoch": 1791574685946
+  },
+  {
+   "writer": 1,
+   "pr": 12032,
+   "path": "fastapi/utils.py",
+   "intents": [
+    "log:fastapi:9425_12032:12032:fastapi/utils.py:h3"
+   ],
+   "hold_ms": 2,
+   "t_submit_epoch": 1791574685946,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 8.65,
+   "t_done_epoch": 1791574685955
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 0
+ },
+ "steward_batches": null
+}

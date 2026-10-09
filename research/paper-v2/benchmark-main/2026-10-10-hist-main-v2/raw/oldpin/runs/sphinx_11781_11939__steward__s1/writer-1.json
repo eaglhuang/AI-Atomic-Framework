@@ -1,0 +1,132 @@
+{
+ "writer": 1,
+ "pr": 11939,
+ "pid": 2478265,
+ "init_ms": 97.58936,
+ "start_offset_ms": 8,
+ "file_order": [
+  "sphinx/environment/__init__.py"
+ ],
+ "holds": {
+  "sphinx/environment/__init__.py": 25
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 11939,
+   "path": "sphinx/environment/__init__.py",
+   "intents": [
+    "log:sphinx:11781_11939:11939:sphinx/environment/__init__.py:h0"
+   ],
+   "hold_ms": 25,
+   "t_submit_epoch": 1791575377537,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 21,
+   "outcome": "blocked",
+   "blocked_reason": "canonical target base hash is stale: sphinx/environment/__init__.py",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "canonical target base hash is stale: sphinx/environment/__init__.py"
+   ],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sphinx_environment___init__.py-w1-0001",
+   "total_ms": 163.82,
+   "t_done_epoch": 1791575377701
+  }
+ ],
+ "admit_stats": {
+  "txns": 2,
+  "cas_conflicts": 1
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sphinx_environment___init__.py-w1-0001",
+   "path": "sphinx/environment/__init__.py",
+   "pid": 2478265,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-sphinx_environment_init_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sphinx_environment_init_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:f986cbe0f8581542d933e91e2ec33bda1c740d5bd200e7493c6f6354d138f7ca"
+   ],
+   "lock_wait_ms": 0.15,
+   "t_start_epoch_ms": 1791575377586.91,
+   "pre_apply_hash": "sha256:f986cbe0f8581542d933e91e2ec33bda1c740d5bd200e7493c6f6354d138f7ca",
+   "receipt_before_hash": null,
+   "receipt_after_hash": null,
+   "post_apply_hash": "sha256:9776e00213fd010a9f06c3644f76d4bad0a8d17c9aef4b103bbac2cd5d90d2e1",
+   "t_end_epoch_ms": 1791575377698.22,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "blocked",
+   "written": false,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T03:49:37.698+08:00",
+   "batch_id": "cb-sphinx_environment___init__.py-w1-0001",
+   "path": "sphinx/environment/__init__.py",
+   "proposalIds": [
+    "prop-hist-w1-sphinx_environment_init_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sphinx_environment_init_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-sphinx_environment_init_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-sphinx_environment_init_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-sphinx_environment_init_py",
+     "logical_id": "prop-hist-w1-sphinx_environment_init_py",
+     "attempt_id": "att-prop-hist-w1-sphinx_environment_init_py-r0",
+     "proposal_id": "prop-hist-w1-sphinx_environment_init_py",
+     "actorId": "writer-11939"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "canonical target base hash is stale: sphinx/environment/__init__.py"
+   ],
+   "blocked_reason": "canonical target base hash is stale: sphinx/environment/__init__.py",
+   "window_wait_ms": 0.32,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:f986cbe0f8581542d933e91e2ec33bda1c740d5bd200e7493c6f6354d138f7ca",
+   "written": false,
+   "output_digest": null,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "canonical target base hash is stale: sphinx/environment/__init__.py"
+  }
+ ]
+}

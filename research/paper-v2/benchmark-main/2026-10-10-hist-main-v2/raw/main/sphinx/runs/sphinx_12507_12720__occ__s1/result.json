@@ -1,0 +1,150 @@
+{
+ "pair_id": "sphinx:12507_12720",
+ "stratum": "O3",
+ "arm": "occ",
+ "plant": null,
+ "seed_k": 1,
+ "seed": 4109779181,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 374,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 11,
+  "by_verdict": {
+   "correct": 11
+  },
+  "completed": 11,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 4,
+  "files_full_bytes_exact": 4,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "sphinx/application.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sphinx/directives/admonitions.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sphinx/directives/other.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sphinx/writers/html5.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "sphinx/application.py": true,
+  "sphinx/directives/admonitions.py": false,
+  "sphinx/directives/other.py": true,
+  "sphinx/writers/html5.py": true
+ },
+ "final_exists": {
+  "sphinx/application.py": true,
+  "sphinx/directives/admonitions.py": true,
+  "sphinx/directives/other.py": true,
+  "sphinx/writers/html5.py": true
+ },
+ "files": [
+  {
+   "path": "sphinx/application.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:5f3fab86cc10c43207e1b6e9829031e0abdd5cb6375e1ee8084fe3b2a0b77395",
+   "final_digest": "sha256:11d23423fc0398616641281ffecd444d074a12138c2a5bebf69041041146e9b6",
+   "expected_digests": [
+    "sha256:11d23423fc0398616641281ffecd444d074a12138c2a5bebf69041041146e9b6"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sphinx/directives/admonitions.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "final_digest": "sha256:771abc6bce43f00d2932b7162a1e7dbc5a7d597c11b0b8c090ed54bede9dc08a",
+   "expected_digests": [
+    "sha256:771abc6bce43f00d2932b7162a1e7dbc5a7d597c11b0b8c090ed54bede9dc08a"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sphinx/directives/other.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:013313ccdbef08786f44dc983e4b4a5d7b5286abba5fdac4943f105dfebe04df",
+   "final_digest": "sha256:dd1ad122ede6148505ecc6c8f4f26a9b93995bce9718eb3854e57eb5c14c2d2c",
+   "expected_digests": [
+    "sha256:dd1ad122ede6148505ecc6c8f4f26a9b93995bce9718eb3854e57eb5c14c2d2c"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sphinx/writers/html5.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:b35b9bf829f64735295861298c8846eb070854763df6b5ff71fe4fdb592951b3",
+   "final_digest": "sha256:d178f1c74fefdf370ce74706557bd465348913066466078b631fe7e64c1b22d4",
+   "expected_digests": [
+    "sha256:d178f1c74fefdf370ce74706557bd465348913066466078b631fe7e64c1b22d4"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "sphinx/application.py": "sha256:11d23423fc0398616641281ffecd444d074a12138c2a5bebf69041041146e9b6",
+  "sphinx/directives/admonitions.py": "sha256:771abc6bce43f00d2932b7162a1e7dbc5a7d597c11b0b8c090ed54bede9dc08a",
+  "sphinx/directives/other.py": "sha256:dd1ad122ede6148505ecc6c8f4f26a9b93995bce9718eb3854e57eb5c14c2d2c",
+  "sphinx/writers/html5.py": "sha256:d178f1c74fefdf370ce74706557bd465348913066466078b631fe7e64c1b22d4"
+ }
+}

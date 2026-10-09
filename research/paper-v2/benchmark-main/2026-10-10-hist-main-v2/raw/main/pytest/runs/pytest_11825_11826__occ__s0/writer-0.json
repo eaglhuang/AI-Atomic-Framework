@@ -1,0 +1,82 @@
+{
+ "writer": 0,
+ "pr": 11825,
+ "pid": 2317180,
+ "init_ms": 77.949182,
+ "start_offset_ms": 14,
+ "file_order": [
+  "src/_pytest/config/__init__.py",
+  "src/_pytest/hookspec.py",
+  "src/_pytest/fixtures.py"
+ ],
+ "holds": {
+  "src/_pytest/config/__init__.py": 18,
+  "src/_pytest/hookspec.py": 18,
+  "src/_pytest/fixtures.py": 2
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 11825,
+   "path": "src/_pytest/config/__init__.py",
+   "intents": [
+    "log:pytest:11825_11826:11825:src/_pytest/config/__init__.py:h0",
+    "log:pytest:11825_11826:11825:src/_pytest/config/__init__.py:h1",
+    "log:pytest:11825_11826:11825:src/_pytest/config/__init__.py:h2"
+   ],
+   "hold_ms": 18,
+   "t_submit_epoch": 1791574142033,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 24,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 52.05,
+   "t_done_epoch": 1791574142085
+  },
+  {
+   "writer": 0,
+   "pr": 11825,
+   "path": "src/_pytest/hookspec.py",
+   "intents": [
+    "log:pytest:11825_11826:11825:src/_pytest/hookspec.py:h5",
+    "log:pytest:11825_11826:11825:src/_pytest/hookspec.py:h6"
+   ],
+   "hold_ms": 18,
+   "t_submit_epoch": 1791574142085,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 8,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 32.61,
+   "t_done_epoch": 1791574142118
+  },
+  {
+   "writer": 0,
+   "pr": 11825,
+   "path": "src/_pytest/fixtures.py",
+   "intents": [
+    "log:pytest:11825_11826:11825:src/_pytest/fixtures.py:h3",
+    "log:pytest:11825_11826:11825:src/_pytest/fixtures.py:h4"
+   ],
+   "hold_ms": 2,
+   "t_submit_epoch": 1791574142118,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 11.64,
+   "t_done_epoch": 1791574142130
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 10
+ },
+ "steward_batches": null
+}

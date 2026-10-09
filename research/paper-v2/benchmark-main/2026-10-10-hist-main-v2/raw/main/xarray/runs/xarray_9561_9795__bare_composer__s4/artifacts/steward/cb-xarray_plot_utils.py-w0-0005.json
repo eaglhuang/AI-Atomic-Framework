@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-86c3697c277d54be",
+  "proposalIds": [
+    "prop-hist-w0-xarray_plot_utils_py"
+  ],
+  "targetFiles": [
+    "xarray/plot/utils.py"
+  ],
+  "appliedFiles": [
+    "xarray/plot/utils.py"
+  ],
+  "fileBeforeHashes": {
+    "xarray/plot/utils.py": "e0e416c8bcab38240d4307f88a4b0bc734b5fc45409f54cc9e205fc246837db6"
+  },
+  "fileAfterHashes": {
+    "xarray/plot/utils.py": "d784c46db32fd731b8fe2911e3341ce2cbb2bca766f44d1db1ecfb0502ba5899"
+  },
+  "permissions": {
+    "fileWrite": [
+      "xarray/plot/utils.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-86c3697c277d54be",
+    "planId": "merge-86c3697c277d54be",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-86c3697c277d54be",
+        "planId": "merge-86c3697c277d54be",
+        "request_identity": [
+          "prop-hist-w0-xarray_plot_utils_py"
+        ],
+        "actor_ids": [
+          "writer-9561"
+        ],
+        "request_files": [
+          "xarray/plot/utils.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "xarray/plot/utils.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/xarray/runs/xarray_9561_9795__bare_composer__s4/artifacts/steward/cb-xarray_plot_utils.py-w0-0005.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-XARRAY_PLOT_UTILS_PY"
+        ],
+        "commit_sha": "070e14e8b6222afd05738a557057f2089c49281a"
+      }
+    ]
+  }
+}

@@ -1,0 +1,62 @@
+{
+ "writer": 1,
+ "pr": 28662,
+ "pid": 2216300,
+ "init_ms": 67.22349600000001,
+ "start_offset_ms": 14,
+ "file_order": [
+  "sympy/combinatorics/coset_table.py",
+  "sympy/combinatorics/homomorphisms.py"
+ ],
+ "holds": {
+  "sympy/combinatorics/coset_table.py": 15,
+  "sympy/combinatorics/homomorphisms.py": 1
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 28662,
+   "path": "sympy/combinatorics/coset_table.py",
+   "intents": [
+    "log:sympy:28653_28662:28662:sympy/combinatorics/coset_table.py:h0"
+   ],
+   "hold_ms": 15,
+   "t_submit_epoch": 1791573110714,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 34,
+   "outcome": "blocked",
+   "blocked_reason": "occ-relocate-context-not-found",
+   "occ_retries": 0,
+   "total_ms": 53.89,
+   "t_done_epoch": 1791573110768
+  },
+  {
+   "writer": 1,
+   "pr": 28662,
+   "path": "sympy/combinatorics/homomorphisms.py",
+   "intents": [
+    "log:sympy:28653_28662:28662:sympy/combinatorics/homomorphisms.py:h1",
+    "log:sympy:28653_28662:28662:sympy/combinatorics/homomorphisms.py:h2",
+    "log:sympy:28653_28662:28662:sympy/combinatorics/homomorphisms.py:h3",
+    "log:sympy:28653_28662:28662:sympy/combinatorics/homomorphisms.py:h4"
+   ],
+   "hold_ms": 1,
+   "t_submit_epoch": 1791573110768,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 7.08,
+   "t_done_epoch": 1791573110775
+  }
+ ],
+ "admit_stats": {
+  "txns": 5,
+  "cas_conflicts": 3
+ },
+ "steward_batches": null
+}

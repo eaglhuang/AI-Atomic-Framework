@@ -1,0 +1,84 @@
+{
+ "writer": 1,
+ "pr": 14077,
+ "pid": 2396055,
+ "init_ms": 66.818927,
+ "start_offset_ms": 9,
+ "file_order": [
+  "docs_src/handling_errors/tutorial005.py",
+  "fastapi/openapi/utils.py",
+  "fastapi/exception_handlers.py"
+ ],
+ "holds": {
+  "docs_src/handling_errors/tutorial005.py": 9,
+  "fastapi/openapi/utils.py": 0,
+  "fastapi/exception_handlers.py": 21
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 14077,
+   "path": "docs_src/handling_errors/tutorial005.py",
+   "intents": [
+    "log:fastapi:13713_14077:14077:docs_src/handling_errors/tutorial005.py:h0",
+    "log:fastapi:13713_14077:14077:docs_src/handling_errors/tutorial005.py:h1"
+   ],
+   "hold_ms": 9,
+   "t_submit_epoch": 1791574743550,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 13,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 28.05,
+   "t_done_epoch": 1791574743578
+  },
+  {
+   "writer": 1,
+   "pr": 14077,
+   "path": "fastapi/openapi/utils.py",
+   "intents": [
+    "log:fastapi:13713_14077:14077:fastapi/openapi/utils.py:h4",
+    "log:fastapi:13713_14077:14077:fastapi/openapi/utils.py:h5"
+   ],
+   "hold_ms": 0,
+   "t_submit_epoch": 1791574743578,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 5,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 10.01,
+   "t_done_epoch": 1791574743588
+  },
+  {
+   "writer": 1,
+   "pr": 14077,
+   "path": "fastapi/exception_handlers.py",
+   "intents": [
+    "log:fastapi:13713_14077:14077:fastapi/exception_handlers.py:h2",
+    "log:fastapi:13713_14077:14077:fastapi/exception_handlers.py:h3"
+   ],
+   "hold_ms": 21,
+   "t_submit_epoch": 1791574743588,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 28.78,
+   "t_done_epoch": 1791574743617
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 2
+ },
+ "steward_batches": null
+}

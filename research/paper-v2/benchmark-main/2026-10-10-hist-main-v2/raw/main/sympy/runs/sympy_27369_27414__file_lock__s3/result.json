@@ -1,0 +1,197 @@
+{
+ "pair_id": "sympy:27369_27414",
+ "stratum": "O1",
+ "arm": "file_lock",
+ "plant": null,
+ "seed_k": 3,
+ "seed": 1925328119,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b1fd9d22/AI-Atomic-Framework-b1fd9d224ff2d6db7abe49b0c7348515667f13e8",
+ "wall_ms": 617,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 109,
+  "by_verdict": {
+   "blocked_absent": 89,
+   "correct": 20
+  },
+  "completed": 20,
+  "lost_effects": 0,
+  "blocked": 89,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 6,
+  "files_full_bytes_exact": 6,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {
+  "harness-relocate-context-not-found": 89
+ },
+ "structure": {
+  "sympy/algebras/quaternion.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/core/expr.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/functions/elementary/complexes.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/integrals/integrals.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/matrices/matrixbase.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/polys/matrices/domainmatrix.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "sympy/algebras/quaternion.py": true,
+  "sympy/core/expr.py": true,
+  "sympy/functions/elementary/complexes.py": true,
+  "sympy/integrals/integrals.py": true,
+  "sympy/matrices/matrixbase.py": true,
+  "sympy/polys/matrices/domainmatrix.py": true
+ },
+ "final_exists": {
+  "sympy/algebras/quaternion.py": true,
+  "sympy/core/expr.py": true,
+  "sympy/functions/elementary/complexes.py": true,
+  "sympy/integrals/integrals.py": true,
+  "sympy/matrices/matrixbase.py": true,
+  "sympy/polys/matrices/domainmatrix.py": true
+ },
+ "files": [
+  {
+   "path": "sympy/algebras/quaternion.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:b336f89dff071224b98a2c12ad7a79991bac7e20cc4ee73cf90ea530ab81ae47",
+   "final_digest": "sha256:8b6164be38f5e2f03a1ad5e07129290f056621873b4f9cd3d61c38f6c6fffed3",
+   "expected_digests": [
+    "sha256:8b6164be38f5e2f03a1ad5e07129290f056621873b4f9cd3d61c38f6c6fffed3"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/core/expr.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:c370a0d4bad4f0957152350e32067a4dc1c2cc18319755518938549df9e2c1b4",
+   "final_digest": "sha256:ae6ba28153256c4797804eaa2bbaa9c4ff1381596732833abc713a07249a2b3d",
+   "expected_digests": [
+    "sha256:ae6ba28153256c4797804eaa2bbaa9c4ff1381596732833abc713a07249a2b3d"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/functions/elementary/complexes.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:d3ec544b894736e8ae71617f6619a38585913094d5cb4b76bf55a8b6a12f3933",
+   "final_digest": "sha256:570f175098ef5ffb2ff4ff99fc8b7f2032ffc4e171aa8c9f2da56085e0078146",
+   "expected_digests": [
+    "sha256:570f175098ef5ffb2ff4ff99fc8b7f2032ffc4e171aa8c9f2da56085e0078146"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/integrals/integrals.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:0d5fdd8ad6b3032541a540b3b1414d898bef411a897f1dd41a39d2101d8729c8",
+   "final_digest": "sha256:71ead21797eecfcf1ac3a70ca75c61ce5f4e09b45f1584f438df717a82823876",
+   "expected_digests": [
+    "sha256:71ead21797eecfcf1ac3a70ca75c61ce5f4e09b45f1584f438df717a82823876"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/matrices/matrixbase.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:7f321f1a9b9775d2e62ac20d0611608eeeebab793dab5c90bdae283a0a28574e",
+   "final_digest": "sha256:4ad7e935638d5c35900debe8bb0137f909227984f9fe085dc6ec31904f7e7571",
+   "expected_digests": [
+    "sha256:4ad7e935638d5c35900debe8bb0137f909227984f9fe085dc6ec31904f7e7571"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/polys/matrices/domainmatrix.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:ad5384227eef87f446781ba53752714b780cc948195c6f1cd0e9e8ee2b447186",
+   "final_digest": "sha256:6c8e84103b9e574d459b537ff7576143bdcb05c26e8c0bcfb9f4206ed8d0e21a",
+   "expected_digests": [
+    "sha256:6c8e84103b9e574d459b537ff7576143bdcb05c26e8c0bcfb9f4206ed8d0e21a"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "sympy/algebras/quaternion.py": "sha256:8b6164be38f5e2f03a1ad5e07129290f056621873b4f9cd3d61c38f6c6fffed3",
+  "sympy/core/expr.py": "sha256:ae6ba28153256c4797804eaa2bbaa9c4ff1381596732833abc713a07249a2b3d",
+  "sympy/functions/elementary/complexes.py": "sha256:570f175098ef5ffb2ff4ff99fc8b7f2032ffc4e171aa8c9f2da56085e0078146",
+  "sympy/integrals/integrals.py": "sha256:71ead21797eecfcf1ac3a70ca75c61ce5f4e09b45f1584f438df717a82823876",
+  "sympy/matrices/matrixbase.py": "sha256:4ad7e935638d5c35900debe8bb0137f909227984f9fe085dc6ec31904f7e7571",
+  "sympy/polys/matrices/domainmatrix.py": "sha256:6c8e84103b9e574d459b537ff7576143bdcb05c26e8c0bcfb9f4206ed8d0e21a"
+ }
+}

@@ -1,0 +1,104 @@
+{
+ "writer": 0,
+ "pr": 10227,
+ "pid": 2271890,
+ "init_ms": 66.511766,
+ "start_offset_ms": 17,
+ "file_order": [
+  "xarray/core/dataset.py",
+  "xarray/core/common.py",
+  "xarray/util/generate_aggregations.py",
+  "xarray/core/groupby.py"
+ ],
+ "holds": {
+  "xarray/core/dataset.py": 24,
+  "xarray/core/common.py": 26,
+  "xarray/util/generate_aggregations.py": 2,
+  "xarray/core/groupby.py": 10
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 10227,
+   "path": "xarray/core/dataset.py",
+   "intents": [
+    "log:xarray:10227_10559:10227:xarray/core/dataset.py:h1",
+    "log:xarray:10227_10559:10227:xarray/core/dataset.py:h2"
+   ],
+   "hold_ms": 24,
+   "t_submit_epoch": 1791573709312,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 32,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 73.55,
+   "t_done_epoch": 1791573709385
+  },
+  {
+   "writer": 0,
+   "pr": 10227,
+   "path": "xarray/core/common.py",
+   "intents": [
+    "log:xarray:10227_10559:10227:xarray/core/common.py:h0"
+   ],
+   "hold_ms": 26,
+   "t_submit_epoch": 1791573709385,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 5,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 35.79,
+   "t_done_epoch": 1791573709421
+  },
+  {
+   "writer": 0,
+   "pr": 10227,
+   "path": "xarray/util/generate_aggregations.py",
+   "intents": [
+    "log:xarray:10227_10559:10227:xarray/util/generate_aggregations.py:h5"
+   ],
+   "hold_ms": 2,
+   "t_submit_epoch": 1791573709421,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 48.69,
+   "t_done_epoch": 1791573709470
+  },
+  {
+   "writer": 0,
+   "pr": 10227,
+   "path": "xarray/core/groupby.py",
+   "intents": [
+    "log:xarray:10227_10559:10227:xarray/core/groupby.py:h3",
+    "log:xarray:10227_10559:10227:xarray/core/groupby.py:h4"
+   ],
+   "hold_ms": 10,
+   "t_submit_epoch": 1791573709470,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 18,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 32.9,
+   "t_done_epoch": 1791573709503
+  }
+ ],
+ "admit_stats": {
+  "txns": 8,
+  "cas_conflicts": 7
+ },
+ "steward_batches": null
+}

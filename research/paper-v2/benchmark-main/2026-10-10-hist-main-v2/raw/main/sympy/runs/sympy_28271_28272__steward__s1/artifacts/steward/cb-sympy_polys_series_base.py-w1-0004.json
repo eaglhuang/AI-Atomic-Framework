@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-ba26ed739b34cda8",
+  "proposalIds": [
+    "prop-hist-w1-sympy_polys_series_base_py"
+  ],
+  "targetFiles": [
+    "sympy/polys/series/base.py"
+  ],
+  "appliedFiles": [
+    "sympy/polys/series/base.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/polys/series/base.py": "6c0218d6044c8f8647a5bd46f3a814d8b8ff479b39c3cfdc49c29857829aa396"
+  },
+  "fileAfterHashes": {
+    "sympy/polys/series/base.py": "b0dd8c3972c74d3c02c08257704fe7887fe0c4c1cac173520b70ef642a117409"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/polys/series/base.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-ba26ed739b34cda8",
+    "planId": "merge-ba26ed739b34cda8",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-ba26ed739b34cda8",
+        "planId": "merge-ba26ed739b34cda8",
+        "request_identity": [
+          "prop-hist-w1-sympy_polys_series_base_py"
+        ],
+        "actor_ids": [
+          "writer-28272"
+        ],
+        "request_files": [
+          "sympy/polys/series/base.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/polys/series/base.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/sympy/runs/sympy_28271_28272__steward__s1/artifacts/steward/cb-sympy_polys_series_base.py-w1-0004.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_POLYS_SERIES_BASE_PY"
+        ],
+        "commit_sha": "8e0e7131eb268ee3398e016f5e0357d5635a2e4a"
+      }
+    ]
+  }
+}

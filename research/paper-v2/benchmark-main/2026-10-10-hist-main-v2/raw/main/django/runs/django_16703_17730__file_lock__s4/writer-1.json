@@ -1,0 +1,89 @@
+{
+ "writer": 1,
+ "pr": 17730,
+ "pid": 2192879,
+ "init_ms": 72.20932400000001,
+ "start_offset_ms": 20,
+ "file_order": [
+  "django/db/models/sql/query.py",
+  "django/db/models/sql/where.py",
+  "django/db/models/expressions.py"
+ ],
+ "holds": {
+  "django/db/models/sql/query.py": 4,
+  "django/db/models/sql/where.py": 10,
+  "django/db/models/expressions.py": 15
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 17730,
+   "path": "django/db/models/sql/query.py",
+   "intents": [
+    "log:django:16703_17730:17730:django/db/models/sql/query.py:h8"
+   ],
+   "hold_ms": 4,
+   "t_submit_epoch": 1791572909483,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 16,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 25.24,
+   "t_done_epoch": 1791572909509
+  },
+  {
+   "writer": 1,
+   "pr": 17730,
+   "path": "django/db/models/sql/where.py",
+   "intents": [
+    "log:django:16703_17730:17730:django/db/models/sql/where.py:h9",
+    "log:django:16703_17730:17730:django/db/models/sql/where.py:h10"
+   ],
+   "hold_ms": 10,
+   "t_submit_epoch": 1791572909509,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 10,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 24.42,
+   "t_done_epoch": 1791572909533
+  },
+  {
+   "writer": 1,
+   "pr": 17730,
+   "path": "django/db/models/expressions.py",
+   "intents": [
+    "log:django:16703_17730:17730:django/db/models/expressions.py:h0",
+    "log:django:16703_17730:17730:django/db/models/expressions.py:h1",
+    "log:django:16703_17730:17730:django/db/models/expressions.py:h2",
+    "log:django:16703_17730:17730:django/db/models/expressions.py:h3",
+    "log:django:16703_17730:17730:django/db/models/expressions.py:h4",
+    "log:django:16703_17730:17730:django/db/models/expressions.py:h5",
+    "log:django:16703_17730:17730:django/db/models/expressions.py:h6",
+    "log:django:16703_17730:17730:django/db/models/expressions.py:h7"
+   ],
+   "hold_ms": 15,
+   "t_submit_epoch": 1791572909533,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 25.34,
+   "t_done_epoch": 1791572909558
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 5
+ },
+ "steward_batches": null
+}

@@ -1,0 +1,63 @@
+{
+ "writer": 1,
+ "pr": 17888,
+ "pid": 2198136,
+ "init_ms": 67.986577,
+ "start_offset_ms": 11,
+ "file_order": [
+  "django/contrib/admin/options.py",
+  "django/contrib/admin/checks.py"
+ ],
+ "holds": {
+  "django/contrib/admin/options.py": 8,
+  "django/contrib/admin/checks.py": 14
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 17888,
+   "path": "django/contrib/admin/options.py",
+   "intents": [
+    "log:django:17885_17888:17888:django/contrib/admin/options.py:h4"
+   ],
+   "hold_ms": 8,
+   "t_submit_epoch": 1791572955518,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 51,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 70.71,
+   "t_done_epoch": 1791572955589
+  },
+  {
+   "writer": 1,
+   "pr": 17888,
+   "path": "django/contrib/admin/checks.py",
+   "intents": [
+    "log:django:17885_17888:17888:django/contrib/admin/checks.py:h0",
+    "log:django:17885_17888:17888:django/contrib/admin/checks.py:h1",
+    "log:django:17885_17888:17888:django/contrib/admin/checks.py:h2",
+    "log:django:17885_17888:17888:django/contrib/admin/checks.py:h3"
+   ],
+   "hold_ms": 14,
+   "t_submit_epoch": 1791572955589,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 20.48,
+   "t_done_epoch": 1791572955609
+  }
+ ],
+ "admit_stats": {
+  "txns": 5,
+  "cas_conflicts": 1
+ },
+ "steward_batches": null
+}

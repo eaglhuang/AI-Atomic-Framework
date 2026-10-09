@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-6b2c7bd94313330a",
+  "proposalIds": [
+    "prop-hist-w1-sphinx_config_py"
+  ],
+  "targetFiles": [
+    "sphinx/config.py"
+  ],
+  "appliedFiles": [
+    "sphinx/config.py"
+  ],
+  "fileBeforeHashes": {
+    "sphinx/config.py": "9a54605a7b9a906ebad707b89ac2d4bbad84a83fa09a8cac6de69e2f7f04aaf5"
+  },
+  "fileAfterHashes": {
+    "sphinx/config.py": "70998a60880fbe6a5ff6ebfba7a0dd4dfb8b06da99e157146d7585a79ba998a2"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sphinx/config.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-6b2c7bd94313330a",
+    "planId": "merge-6b2c7bd94313330a",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-6b2c7bd94313330a",
+        "planId": "merge-6b2c7bd94313330a",
+        "request_identity": [
+          "prop-hist-w1-sphinx_config_py"
+        ],
+        "actor_ids": [
+          "writer-12658"
+        ],
+        "request_files": [
+          "sphinx/config.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sphinx/config.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/oldpin/runs/sphinx_12657_12658__steward__s3/artifacts/steward/cb-sphinx_config.py-w1-0007.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SPHINX_CONFIG_PY"
+        ],
+        "commit_sha": "a73a7d7d952e5eb803f9e7d5ac7c38f0d62e6c49"
+      }
+    ]
+  }
+}

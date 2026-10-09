@@ -1,0 +1,57 @@
+{
+ "writer": 1,
+ "pr": 12861,
+ "pid": 2304255,
+ "init_ms": 97.079478,
+ "start_offset_ms": 5,
+ "file_order": [
+  "src/_pytest/python.py",
+  "src/_pytest/mark/structures.py"
+ ],
+ "holds": {
+  "src/_pytest/python.py": 24,
+  "src/_pytest/mark/structures.py": 20
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 12861,
+   "path": "src/_pytest/python.py",
+   "intents": [
+    "log:pytest:12346_12861:12861:src/_pytest/python.py:h2"
+   ],
+   "hold_ms": 24,
+   "t_submit_epoch": 1791574044375,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 14,
+   "outcome": "commit",
+   "total_ms": 50.74,
+   "t_done_epoch": 1791574044426
+  },
+  {
+   "writer": 1,
+   "pr": 12861,
+   "path": "src/_pytest/mark/structures.py",
+   "intents": [
+    "log:pytest:12346_12861:12861:src/_pytest/mark/structures.py:h0",
+    "log:pytest:12346_12861:12861:src/_pytest/mark/structures.py:h1"
+   ],
+   "hold_ms": 20,
+   "t_submit_epoch": 1791574044426,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 9,
+   "outcome": "commit",
+   "total_ms": 36.48,
+   "t_done_epoch": 1791574044463
+  }
+ ],
+ "admit_stats": {
+  "txns": 4,
+  "cas_conflicts": 6
+ },
+ "steward_batches": null
+}

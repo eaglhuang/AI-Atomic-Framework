@@ -1,0 +1,83 @@
+{
+ "writer": 0,
+ "pr": 13394,
+ "pid": 2292564,
+ "init_ms": 72.52532200000002,
+ "start_offset_ms": 12,
+ "file_order": [
+  "src/_pytest/pytester.py",
+  "src/_pytest/junitxml.py",
+  "src/_pytest/terminal.py"
+ ],
+ "holds": {
+  "src/_pytest/pytester.py": 7,
+  "src/_pytest/junitxml.py": 5,
+  "src/_pytest/terminal.py": 13
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 13394,
+   "path": "src/_pytest/pytester.py",
+   "intents": [
+    "log:pytest:13394_13397:13394:src/_pytest/pytester.py:h2",
+    "log:pytest:13394_13397:13394:src/_pytest/pytester.py:h3",
+    "log:pytest:13394_13397:13394:src/_pytest/pytester.py:h4",
+    "log:pytest:13394_13397:13394:src/_pytest/pytester.py:h5"
+   ],
+   "hold_ms": 7,
+   "t_submit_epoch": 1791573957285,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 20,
+   "outcome": "commit",
+   "total_ms": 42.32,
+   "t_done_epoch": 1791573957327
+  },
+  {
+   "writer": 0,
+   "pr": 13394,
+   "path": "src/_pytest/junitxml.py",
+   "intents": [
+    "log:pytest:13394_13397:13394:src/_pytest/junitxml.py:h0",
+    "log:pytest:13394_13397:13394:src/_pytest/junitxml.py:h1"
+   ],
+   "hold_ms": 5,
+   "t_submit_epoch": 1791573957327,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "total_ms": 14.29,
+   "t_done_epoch": 1791573957341
+  },
+  {
+   "writer": 0,
+   "pr": 13394,
+   "path": "src/_pytest/terminal.py",
+   "intents": [
+    "log:pytest:13394_13397:13394:src/_pytest/terminal.py:h6",
+    "log:pytest:13394_13397:13394:src/_pytest/terminal.py:h7",
+    "log:pytest:13394_13397:13394:src/_pytest/terminal.py:h8",
+    "log:pytest:13394_13397:13394:src/_pytest/terminal.py:h9"
+   ],
+   "hold_ms": 13,
+   "t_submit_epoch": 1791573957341,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "outcome": "blocked",
+   "blocked_reason": "git-merge-conflict",
+   "total_ms": 25.88,
+   "t_done_epoch": 1791573957367
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 9
+ },
+ "steward_batches": null
+}

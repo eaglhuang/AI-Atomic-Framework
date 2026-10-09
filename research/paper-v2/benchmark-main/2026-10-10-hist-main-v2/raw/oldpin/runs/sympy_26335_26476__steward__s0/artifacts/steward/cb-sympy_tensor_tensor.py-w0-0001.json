@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-43d895db2786e06d",
+  "proposalIds": [
+    "prop-hist-w0-sympy_tensor_tensor_py"
+  ],
+  "targetFiles": [
+    "sympy/tensor/tensor.py"
+  ],
+  "appliedFiles": [],
+  "fileBeforeHashes": {},
+  "fileAfterHashes": {},
+  "permissions": {
+    "fileWrite": [
+      "sympy/tensor/tensor.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "blocked",
+  "blockedReasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w0-sympy_tensor_tensor_py' hunk at old line 2983 starts past the end of a 224-line base [proposals: prop-hist-w0-sympy_tensor_tensor_py]"
+  ],
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-43d895db2786e06d",
+    "planId": "merge-43d895db2786e06d",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-43d895db2786e06d",
+        "planId": "merge-43d895db2786e06d",
+        "request_identity": [
+          "prop-hist-w0-sympy_tensor_tensor_py"
+        ],
+        "actor_ids": [
+          "writer-26335"
+        ],
+        "request_files": [
+          "sympy/tensor/tensor.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/oldpin/runs/sympy_26335_26476__steward__s0/artifacts/steward/cb-sympy_tensor_tensor.py-w0-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SYMPY_TENSOR_TENSOR_PY"
+        ],
+        "commit_sha": "ac47d323ea2ca7f26408cca42e4150cae6b05f75"
+      }
+    ]
+  }
+}

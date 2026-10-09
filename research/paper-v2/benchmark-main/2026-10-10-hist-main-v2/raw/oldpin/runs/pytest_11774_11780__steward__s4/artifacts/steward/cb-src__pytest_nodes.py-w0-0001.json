@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-6799e94c632532b7",
+  "proposalIds": [
+    "prop-hist-w0-src_pytest_nodes_py"
+  ],
+  "targetFiles": [
+    "src/_pytest/nodes.py"
+  ],
+  "appliedFiles": [
+    "src/_pytest/nodes.py"
+  ],
+  "fileBeforeHashes": {
+    "src/_pytest/nodes.py": "20520c9d79bf28c450de665c7598db944514b830bb57dea0dd1934adbdd462b3"
+  },
+  "fileAfterHashes": {
+    "src/_pytest/nodes.py": "d5e1d65063856e1c4d6173de8e1b855ec2f84418744dd849092a87ccfbbbc297"
+  },
+  "permissions": {
+    "fileWrite": [
+      "src/_pytest/nodes.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-6799e94c632532b7",
+    "planId": "merge-6799e94c632532b7",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-6799e94c632532b7",
+        "planId": "merge-6799e94c632532b7",
+        "request_identity": [
+          "prop-hist-w0-src_pytest_nodes_py"
+        ],
+        "actor_ids": [
+          "writer-11774"
+        ],
+        "request_files": [
+          "src/_pytest/nodes.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "src/_pytest/nodes.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/oldpin/runs/pytest_11774_11780__steward__s4/artifacts/steward/cb-src__pytest_nodes.py-w0-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SRC_PYTEST_NODES_PY"
+        ],
+        "commit_sha": "d72690379c9537bf6e05a2efd24c569553a7a92e"
+      }
+    ]
+  }
+}

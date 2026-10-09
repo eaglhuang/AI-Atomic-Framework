@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-dcfad35551a4ab9f",
+  "proposalIds": [
+    "prop-hist-w0-fastapi_compat_v2_py"
+  ],
+  "targetFiles": [
+    "fastapi/_compat/v2.py"
+  ],
+  "appliedFiles": [],
+  "fileBeforeHashes": {},
+  "fileAfterHashes": {},
+  "permissions": {
+    "fileWrite": [
+      "fastapi/_compat/v2.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "blocked",
+  "blockedReasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w0-fastapi_compat_v2_py' context mismatch at base line 210: expected \"    flat_models = get_flat_models_from_fields(fields, known_models=set())\", found \"    validation_fields = [field for field in fields if field.mode == \\\"validation\\\"]\" [proposals: prop-hist-w0-fastapi_compat_v2_py]"
+  ],
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-dcfad35551a4ab9f",
+    "planId": "merge-dcfad35551a4ab9f",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-dcfad35551a4ab9f",
+        "planId": "merge-dcfad35551a4ab9f",
+        "request_identity": [
+          "prop-hist-w0-fastapi_compat_v2_py"
+        ],
+        "actor_ids": [
+          "writer-13207"
+        ],
+        "request_files": [
+          "fastapi/_compat/v2.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/fastapi/runs/fastapi_13207_14246__bare_composer__s0/artifacts/steward/cb-fastapi__compat_v2.py-w0-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-FASTAPI_COMPAT_V2_PY"
+        ],
+        "commit_sha": "e7f0e4563545795ed658e93396ba026e3fb9bb36"
+      }
+    ]
+  }
+}

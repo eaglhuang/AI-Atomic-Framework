@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-f7f321c2d5f645fc",
+  "proposalIds": [
+    "prop-hist-w1-sympy_physics_control_lti_py"
+  ],
+  "targetFiles": [
+    "sympy/physics/control/lti.py"
+  ],
+  "appliedFiles": [
+    "sympy/physics/control/lti.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/physics/control/lti.py": "859312f91e14854165b9c2228849c2b0aceae2f4518cef0ac7f667ef71f32ec4"
+  },
+  "fileAfterHashes": {
+    "sympy/physics/control/lti.py": "12a207eca412be301a19214bac6f6146afd030da906effb1d8118aa44ff58b11"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/physics/control/lti.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-f7f321c2d5f645fc",
+    "planId": "merge-f7f321c2d5f645fc",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-f7f321c2d5f645fc",
+        "planId": "merge-f7f321c2d5f645fc",
+        "request_identity": [
+          "prop-hist-w1-sympy_physics_control_lti_py"
+        ],
+        "actor_ids": [
+          "writer-28011"
+        ],
+        "request_files": [
+          "sympy/physics/control/lti.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/physics/control/lti.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/sympy/runs/sympy_27986_28011__bare_composer__s4/artifacts/steward/cb-sympy_physics_control_lti.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_PHYSICS_CONTROL_LTI_PY"
+        ],
+        "commit_sha": "bab2032ef8164633b6fd1646a53fe8766569af1c"
+      }
+    ]
+  }
+}

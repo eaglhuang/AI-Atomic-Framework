@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-b8ba05e1e98c4990",
+  "proposalIds": [
+    "prop-hist-w1-utils_babel_runner_py"
+  ],
+  "targetFiles": [
+    "utils/babel_runner.py"
+  ],
+  "appliedFiles": [],
+  "fileBeforeHashes": {},
+  "fileAfterHashes": {},
+  "permissions": {
+    "fileWrite": [
+      "utils/babel_runner.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "blocked",
+  "blockedReasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w1-utils_babel_runner_py' context mismatch at base line 233: expected \"\", found \"    try:\" [proposals: prop-hist-w1-utils_babel_runner_py]"
+  ],
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-b8ba05e1e98c4990",
+    "planId": "merge-b8ba05e1e98c4990",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-b8ba05e1e98c4990",
+        "planId": "merge-b8ba05e1e98c4990",
+        "request_identity": [
+          "prop-hist-w1-utils_babel_runner_py"
+        ],
+        "actor_ids": [
+          "writer-12090"
+        ],
+        "request_files": [
+          "utils/babel_runner.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/sphinx/runs/sphinx_11916_12090__bare_composer__s2/artifacts/steward/cb-utils_babel_runner.py-w1-0002.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-UTILS_BABEL_RUNNER_PY"
+        ],
+        "commit_sha": "dfd0f19b3dc703c2e8fe099e3011474ac4f2096b"
+      }
+    ]
+  }
+}

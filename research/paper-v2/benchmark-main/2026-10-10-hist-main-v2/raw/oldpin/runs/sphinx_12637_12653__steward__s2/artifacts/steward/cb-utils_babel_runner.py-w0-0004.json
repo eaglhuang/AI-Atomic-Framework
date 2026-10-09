@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-481b25f9bccfc684",
+  "proposalIds": [
+    "prop-hist-w0-utils_babel_runner_py"
+  ],
+  "targetFiles": [
+    "utils/babel_runner.py"
+  ],
+  "appliedFiles": [
+    "utils/babel_runner.py"
+  ],
+  "fileBeforeHashes": {
+    "utils/babel_runner.py": "e54a43222078dc784a8dca965f5919e18890e1d5bac2d9ca25b850e7ed1a9007"
+  },
+  "fileAfterHashes": {
+    "utils/babel_runner.py": "cbb13241a612ca6df9bb765ba16c95d921ccb9c947f9bb2f96320738a16790d3"
+  },
+  "permissions": {
+    "fileWrite": [
+      "utils/babel_runner.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-481b25f9bccfc684",
+    "planId": "merge-481b25f9bccfc684",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-481b25f9bccfc684",
+        "planId": "merge-481b25f9bccfc684",
+        "request_identity": [
+          "prop-hist-w0-utils_babel_runner_py"
+        ],
+        "actor_ids": [
+          "writer-12637"
+        ],
+        "request_files": [
+          "utils/babel_runner.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "utils/babel_runner.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/oldpin/runs/sphinx_12637_12653__steward__s2/artifacts/steward/cb-utils_babel_runner.py-w0-0004.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-UTILS_BABEL_RUNNER_PY"
+        ],
+        "commit_sha": "943b5a524178da840df427b267c67608a643c3e4"
+      }
+    ]
+  }
+}

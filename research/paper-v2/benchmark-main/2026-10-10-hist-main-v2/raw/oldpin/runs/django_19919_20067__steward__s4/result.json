@@ -1,0 +1,153 @@
+{
+ "pair_id": "django:19919_20067",
+ "stratum": "O3",
+ "arm": "steward",
+ "plant": null,
+ "seed_k": 4,
+ "seed": 2097202514,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-5692474f/AI-Atomic-Framework-5692474f7db70ab52a7a71c8af4867609e7e4b43",
+ "wall_ms": 490,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 37,
+  "by_verdict": {
+   "blocked_absent": 1,
+   "correct": 36
+  },
+  "completed": 36,
+  "lost_effects": 0,
+  "blocked": 1,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 4,
+  "files_full_bytes_exact": 4,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {
+  "canonical target base hash is stale: django/core/serializers/base.py": 1
+ },
+ "structure": {
+  "django/core/serializers/base.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "django/core/serializers/python.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "django/core/serializers/xml_serializer.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "django/db/models/fields/related_descriptors.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "django/core/serializers/base.py": true,
+  "django/core/serializers/python.py": true,
+  "django/core/serializers/xml_serializer.py": true,
+  "django/db/models/fields/related_descriptors.py": true
+ },
+ "final_exists": {
+  "django/core/serializers/base.py": true,
+  "django/core/serializers/python.py": true,
+  "django/core/serializers/xml_serializer.py": true,
+  "django/db/models/fields/related_descriptors.py": true
+ },
+ "files": [
+  {
+   "path": "django/core/serializers/base.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:88ea9d04944aa140550fa5095ff4390bc7155e11d70f2d3ea0304e0944aec156",
+   "final_digest": "sha256:c06d0030999f6e28847ff2660c6266bc5c809dc3ee714439f2e363c9c04d30fb",
+   "expected_digests": [
+    "sha256:c06d0030999f6e28847ff2660c6266bc5c809dc3ee714439f2e363c9c04d30fb"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "django/core/serializers/python.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:d4507f5bc09c7388c06aff2d801d5685035ac8bc7da0d7993cb8821c115dcf51",
+   "final_digest": "sha256:cd295c5b9bd311ca1e9f5fef0ed188ab9ad08c56471e5def89c01afbbe17969b",
+   "expected_digests": [
+    "sha256:cd295c5b9bd311ca1e9f5fef0ed188ab9ad08c56471e5def89c01afbbe17969b"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "django/core/serializers/xml_serializer.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:0970c870530e9d942ac8f9796e78ec7ab98e327bc31ddd9deaefc78490b9c3c9",
+   "final_digest": "sha256:5a7419bb8b6590ce4560df48f0ae722d94830d7d6b9c97d4bff78821f623f261",
+   "expected_digests": [
+    "sha256:5a7419bb8b6590ce4560df48f0ae722d94830d7d6b9c97d4bff78821f623f261"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "django/db/models/fields/related_descriptors.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:d6cf84b4b2b81d950a1addb0c50508e4f4ba79a27e43c89580731bdf82f144da",
+   "final_digest": "sha256:2ca5c0230461f0d195a3753fe599a3551ef6bb0f6706fe755c0cd4bdf48bcc32",
+   "expected_digests": [
+    "sha256:2ca5c0230461f0d195a3753fe599a3551ef6bb0f6706fe755c0cd4bdf48bcc32"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "django/core/serializers/base.py": "sha256:c06d0030999f6e28847ff2660c6266bc5c809dc3ee714439f2e363c9c04d30fb",
+  "django/core/serializers/python.py": "sha256:cd295c5b9bd311ca1e9f5fef0ed188ab9ad08c56471e5def89c01afbbe17969b",
+  "django/core/serializers/xml_serializer.py": "sha256:5a7419bb8b6590ce4560df48f0ae722d94830d7d6b9c97d4bff78821f623f261",
+  "django/db/models/fields/related_descriptors.py": "sha256:2ca5c0230461f0d195a3753fe599a3551ef6bb0f6706fe755c0cd4bdf48bcc32"
+ }
+}

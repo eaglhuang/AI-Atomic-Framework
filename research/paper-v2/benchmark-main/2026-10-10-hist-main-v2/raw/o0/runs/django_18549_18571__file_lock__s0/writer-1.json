@@ -1,0 +1,39 @@
+{
+ "writer": 1,
+ "pr": 18571,
+ "pid": 2410417,
+ "init_ms": 87.71790000000001,
+ "start_offset_ms": 17,
+ "file_order": [
+  "django/contrib/admin/views/main.py"
+ ],
+ "holds": {
+  "django/contrib/admin/views/main.py": 26
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 18571,
+   "path": "django/contrib/admin/views/main.py",
+   "intents": [
+    "log:django:18549_18571:18571:django/contrib/admin/views/main.py:h0"
+   ],
+   "hold_ms": 26,
+   "t_submit_epoch": 1791574834288,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 14,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 45,
+   "t_done_epoch": 1791574834333
+  }
+ ],
+ "admit_stats": {
+  "txns": 2,
+  "cas_conflicts": 0
+ },
+ "steward_batches": null
+}

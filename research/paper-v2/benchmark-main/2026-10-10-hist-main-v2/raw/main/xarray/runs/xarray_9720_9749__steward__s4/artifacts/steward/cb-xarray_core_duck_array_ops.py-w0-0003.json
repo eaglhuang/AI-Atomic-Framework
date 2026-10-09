@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-1a0101852637c0c8",
+  "proposalIds": [
+    "prop-hist-w0-xarray_core_duck_array_ops_py"
+  ],
+  "targetFiles": [
+    "xarray/core/duck_array_ops.py"
+  ],
+  "appliedFiles": [
+    "xarray/core/duck_array_ops.py"
+  ],
+  "fileBeforeHashes": {
+    "xarray/core/duck_array_ops.py": "ff478d0876e0bca3139c49ad1f6d037ad82f1fe0ded9d6a0585dd3133a545306"
+  },
+  "fileAfterHashes": {
+    "xarray/core/duck_array_ops.py": "89d5399c333ff159c2afa52f21fc3eca5360584e7e238398325f0fd6a64edc38"
+  },
+  "permissions": {
+    "fileWrite": [
+      "xarray/core/duck_array_ops.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-1a0101852637c0c8",
+    "planId": "merge-1a0101852637c0c8",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-1a0101852637c0c8",
+        "planId": "merge-1a0101852637c0c8",
+        "request_identity": [
+          "prop-hist-w0-xarray_core_duck_array_ops_py"
+        ],
+        "actor_ids": [
+          "writer-9720"
+        ],
+        "request_files": [
+          "xarray/core/duck_array_ops.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "xarray/core/duck_array_ops.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/xarray/runs/xarray_9720_9749__steward__s4/artifacts/steward/cb-xarray_core_duck_array_ops.py-w0-0003.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-XARRAY_CORE_DUCK_ARRAY_OPS_PY"
+        ],
+        "commit_sha": "3e801c378b6bbe26f33a7f18d83e9acd41b3d97b"
+      }
+    ]
+  }
+}

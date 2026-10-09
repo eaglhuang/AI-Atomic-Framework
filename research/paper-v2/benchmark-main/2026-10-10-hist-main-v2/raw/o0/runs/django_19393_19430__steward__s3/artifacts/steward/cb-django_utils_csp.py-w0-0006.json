@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-e469e52fd14c8e21",
+  "proposalIds": [
+    "prop-hist-w0-django_utils_csp_py"
+  ],
+  "targetFiles": [
+    "django/utils/csp.py"
+  ],
+  "appliedFiles": [],
+  "fileBeforeHashes": {},
+  "fileAfterHashes": {},
+  "permissions": {
+    "fileWrite": [
+      "django/utils/csp.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "blocked",
+  "blockedReasons": [
+    "file-hash-drift: Target file does not exist: django/utils/csp.py"
+  ],
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-e469e52fd14c8e21",
+    "planId": "merge-e469e52fd14c8e21",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-e469e52fd14c8e21",
+        "planId": "merge-e469e52fd14c8e21",
+        "request_identity": [
+          "prop-hist-w0-django_utils_csp_py"
+        ],
+        "actor_ids": [
+          "writer-19393"
+        ],
+        "request_files": [
+          "django/utils/csp.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/o0/runs/django_19393_19430__steward__s3/artifacts/steward/cb-django_utils_csp.py-w0-0006.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-DJANGO_UTILS_CSP_PY"
+        ],
+        "commit_sha": "7c262a3be6a3f400cfa71ad64853de3833dec501"
+      }
+    ]
+  }
+}

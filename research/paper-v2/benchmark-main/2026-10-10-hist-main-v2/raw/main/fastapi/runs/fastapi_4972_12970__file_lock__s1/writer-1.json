@@ -1,0 +1,60 @@
+{
+ "writer": 1,
+ "pr": 12970,
+ "pid": 2392009,
+ "init_ms": 82.14590799999999,
+ "start_offset_ms": 2,
+ "file_order": [
+  "fastapi/encoders.py",
+  "fastapi/routing.py"
+ ],
+ "holds": {
+  "fastapi/encoders.py": 26,
+  "fastapi/routing.py": 9
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 12970,
+   "path": "fastapi/encoders.py",
+   "intents": [
+    "log:fastapi:4972_12970:12970:fastapi/encoders.py:h0"
+   ],
+   "hold_ms": 26,
+   "t_submit_epoch": 1791574715268,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 13,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 42.92,
+   "t_done_epoch": 1791574715310
+  },
+  {
+   "writer": 1,
+   "pr": 12970,
+   "path": "fastapi/routing.py",
+   "intents": [
+    "log:fastapi:4972_12970:12970:fastapi/routing.py:h1"
+   ],
+   "hold_ms": 9,
+   "t_submit_epoch": 1791574715311,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 18.83,
+   "t_done_epoch": 1791574715329
+  }
+ ],
+ "admit_stats": {
+  "txns": 4,
+  "cas_conflicts": 0
+ },
+ "steward_batches": null
+}

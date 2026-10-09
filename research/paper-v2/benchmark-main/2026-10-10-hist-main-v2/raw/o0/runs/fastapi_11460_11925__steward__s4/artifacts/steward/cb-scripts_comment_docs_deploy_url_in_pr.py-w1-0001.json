@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-26fdefd2ffbac3f3",
+  "proposalIds": [
+    "prop-hist-w1-scripts_comment_docs_deploy_url_in_pr_py"
+  ],
+  "targetFiles": [
+    "scripts/comment_docs_deploy_url_in_pr.py"
+  ],
+  "appliedFiles": [],
+  "fileBeforeHashes": {},
+  "fileAfterHashes": {},
+  "permissions": {
+    "fileWrite": [
+      "scripts/comment_docs_deploy_url_in_pr.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "blocked",
+  "blockedReasons": [
+    "file-hash-drift: Target file does not exist: scripts/comment_docs_deploy_url_in_pr.py"
+  ],
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-26fdefd2ffbac3f3",
+    "planId": "merge-26fdefd2ffbac3f3",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-26fdefd2ffbac3f3",
+        "planId": "merge-26fdefd2ffbac3f3",
+        "request_identity": [
+          "prop-hist-w1-scripts_comment_docs_deploy_url_in_pr_py"
+        ],
+        "actor_ids": [
+          "writer-11925"
+        ],
+        "request_files": [
+          "scripts/comment_docs_deploy_url_in_pr.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/o0/runs/fastapi_11460_11925__steward__s4/artifacts/steward/cb-scripts_comment_docs_deploy_url_in_pr.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SCRIPTS_COMMENT_DOCS_DEPLOY_URL_IN_PR_PY"
+        ],
+        "commit_sha": "b981c14a7c4651d5b15f929c4a6e84e335a7a8d5"
+      }
+    ]
+  }
+}

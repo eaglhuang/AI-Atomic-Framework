@@ -1,0 +1,96 @@
+{
+ "writer": 0,
+ "pr": 12637,
+ "pid": 2359356,
+ "init_ms": 65.844278,
+ "start_offset_ms": 20,
+ "file_order": [
+  "sphinx/environment/__init__.py",
+  "sphinx/search/__init__.py",
+  "sphinx/ext/autodoc/__init__.py",
+  "utils/babel_runner.py"
+ ],
+ "holds": {
+  "sphinx/environment/__init__.py": 25,
+  "sphinx/search/__init__.py": 28,
+  "sphinx/ext/autodoc/__init__.py": 22,
+  "utils/babel_runner.py": 6
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 12637,
+   "path": "sphinx/environment/__init__.py",
+   "intents": [
+    "log:sphinx:12637_12653:12637:sphinx/environment/__init__.py:h0"
+   ],
+   "hold_ms": 25,
+   "t_submit_epoch": 1791574479237,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 22,
+   "outcome": "commit",
+   "total_ms": 59.62,
+   "t_done_epoch": 1791574479297
+  },
+  {
+   "writer": 0,
+   "pr": 12637,
+   "path": "sphinx/search/__init__.py",
+   "intents": [
+    "log:sphinx:12637_12653:12637:sphinx/search/__init__.py:h3"
+   ],
+   "hold_ms": 28,
+   "t_submit_epoch": 1791574479297,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 6,
+   "outcome": "commit",
+   "total_ms": 46.76,
+   "t_done_epoch": 1791574479344
+  },
+  {
+   "writer": 0,
+   "pr": 12637,
+   "path": "sphinx/ext/autodoc/__init__.py",
+   "intents": [
+    "log:sphinx:12637_12653:12637:sphinx/ext/autodoc/__init__.py:h1",
+    "log:sphinx:12637_12653:12637:sphinx/ext/autodoc/__init__.py:h2"
+   ],
+   "hold_ms": 22,
+   "t_submit_epoch": 1791574479344,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 5,
+   "outcome": "blocked",
+   "blocked_reason": "git-base-drift",
+   "total_ms": 39.31,
+   "t_done_epoch": 1791574479383
+  },
+  {
+   "writer": 0,
+   "pr": 12637,
+   "path": "utils/babel_runner.py",
+   "intents": [
+    "log:sphinx:12637_12653:12637:utils/babel_runner.py:h4"
+   ],
+   "hold_ms": 6,
+   "t_submit_epoch": 1791574479383,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 7,
+   "outcome": "commit",
+   "total_ms": 20.39,
+   "t_done_epoch": 1791574479403
+  }
+ ],
+ "admit_stats": {
+  "txns": 8,
+  "cas_conflicts": 13
+ },
+ "steward_batches": null
+}

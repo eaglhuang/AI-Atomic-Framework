@@ -1,0 +1,60 @@
+{
+ "writer": 0,
+ "pr": 11824,
+ "pid": 2343511,
+ "init_ms": 65.02725699999999,
+ "start_offset_ms": 7,
+ "file_order": [
+  "sphinx/application.py",
+  "sphinx/ext/linkcode.py"
+ ],
+ "holds": {
+  "sphinx/application.py": 20,
+  "sphinx/ext/linkcode.py": 4
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 11824,
+   "path": "sphinx/application.py",
+   "intents": [
+    "log:sphinx:11824_12852:11824:sphinx/application.py:h0"
+   ],
+   "hold_ms": 20,
+   "t_submit_epoch": 1791574352143,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 16,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 42.73,
+   "t_done_epoch": 1791574352186
+  },
+  {
+   "writer": 0,
+   "pr": 11824,
+   "path": "sphinx/ext/linkcode.py",
+   "intents": [
+    "log:sphinx:11824_12852:11824:sphinx/ext/linkcode.py:h1",
+    "log:sphinx:11824_12852:11824:sphinx/ext/linkcode.py:h2"
+   ],
+   "hold_ms": 4,
+   "t_submit_epoch": 1791574352186,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "queue",
+   "admit_wait_ms": 15,
+   "outcome": "blocked",
+   "blocked_reason": "occ-relocate-context-not-found",
+   "occ_retries": 0,
+   "total_ms": 21.64,
+   "t_done_epoch": 1791574352208
+  }
+ ],
+ "admit_stats": {
+  "txns": 5,
+  "cas_conflicts": 0
+ },
+ "steward_batches": null
+}

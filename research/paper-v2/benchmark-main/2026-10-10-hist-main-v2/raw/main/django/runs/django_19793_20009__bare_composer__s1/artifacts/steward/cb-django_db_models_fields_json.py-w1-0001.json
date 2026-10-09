@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-7fc3bc09744a29a3",
+  "proposalIds": [
+    "prop-hist-w1-django_db_models_fields_json_py"
+  ],
+  "targetFiles": [
+    "django/db/models/fields/json.py"
+  ],
+  "appliedFiles": [],
+  "fileBeforeHashes": {},
+  "fileAfterHashes": {},
+  "permissions": {
+    "fileWrite": [
+      "django/db/models/fields/json.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "blocked",
+  "blockedReasons": [
+    "file-hash-drift: Target file hash sha256:05b2ceac272e4f5081259fd468ca0b33f3753a0926a0425cfa77e26c43c4d9ed does not match proposal fileBeforeHash sha256:1d22cd914e53b27fc46a606abb480da2f7cfc6a7cd0399209ababa5d659f33c1."
+  ],
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-7fc3bc09744a29a3",
+    "planId": "merge-7fc3bc09744a29a3",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-7fc3bc09744a29a3",
+        "planId": "merge-7fc3bc09744a29a3",
+        "request_identity": [
+          "prop-hist-w1-django_db_models_fields_json_py"
+        ],
+        "actor_ids": [
+          "writer-20009"
+        ],
+        "request_files": [
+          "django/db/models/fields/json.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/django/runs/django_19793_20009__bare_composer__s1/artifacts/steward/cb-django_db_models_fields_json.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-DJANGO_DB_MODELS_FIELDS_JSON_PY"
+        ],
+        "commit_sha": "c909ad357624d5e333b2d2daaffa60b0be053324"
+      }
+    ]
+  }
+}

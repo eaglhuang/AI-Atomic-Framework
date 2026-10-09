@@ -1,0 +1,111 @@
+{
+ "writer": 0,
+ "pr": 27193,
+ "pid": 2233091,
+ "init_ms": 72.705155,
+ "start_offset_ms": 16,
+ "file_order": [
+  "sympy/__init__.py",
+  "sympy/ntheory/__init__.py",
+  "sympy/ntheory/factor_.py",
+  "sympy/ntheory/primetest.py"
+ ],
+ "holds": {
+  "sympy/__init__.py": 17,
+  "sympy/ntheory/__init__.py": 30,
+  "sympy/ntheory/factor_.py": 6,
+  "sympy/ntheory/primetest.py": 22
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 27193,
+   "path": "sympy/__init__.py",
+   "intents": [
+    "log:sympy:27193_27239:27193:sympy/__init__.py:h0",
+    "log:sympy:27193_27239:27193:sympy/__init__.py:h1"
+   ],
+   "hold_ms": 17,
+   "t_submit_epoch": 1791573268999,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 16,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 38.4,
+   "t_done_epoch": 1791573269038
+  },
+  {
+   "writer": 0,
+   "pr": 27193,
+   "path": "sympy/ntheory/__init__.py",
+   "intents": [
+    "log:sympy:27193_27239:27193:sympy/ntheory/__init__.py:h2",
+    "log:sympy:27193_27239:27193:sympy/ntheory/__init__.py:h3"
+   ],
+   "hold_ms": 30,
+   "t_submit_epoch": 1791573269038,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 36.91,
+   "t_done_epoch": 1791573269075
+  },
+  {
+   "writer": 0,
+   "pr": 27193,
+   "path": "sympy/ntheory/factor_.py",
+   "intents": [
+    "log:sympy:27193_27239:27193:sympy/ntheory/factor_.py:h4",
+    "log:sympy:27193_27239:27193:sympy/ntheory/factor_.py:h5",
+    "log:sympy:27193_27239:27193:sympy/ntheory/factor_.py:h6",
+    "log:sympy:27193_27239:27193:sympy/ntheory/factor_.py:h7",
+    "log:sympy:27193_27239:27193:sympy/ntheory/factor_.py:h8",
+    "log:sympy:27193_27239:27193:sympy/ntheory/factor_.py:h9",
+    "log:sympy:27193_27239:27193:sympy/ntheory/factor_.py:h10",
+    "log:sympy:27193_27239:27193:sympy/ntheory/factor_.py:h11"
+   ],
+   "hold_ms": 6,
+   "t_submit_epoch": 1791573269075,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 13.48,
+   "t_done_epoch": 1791573269088
+  },
+  {
+   "writer": 0,
+   "pr": 27193,
+   "path": "sympy/ntheory/primetest.py",
+   "intents": [
+    "log:sympy:27193_27239:27193:sympy/ntheory/primetest.py:h12"
+   ],
+   "hold_ms": 22,
+   "t_submit_epoch": 1791573269088,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 27.02,
+   "t_done_epoch": 1791573269115
+  }
+ ],
+ "admit_stats": {
+  "txns": 8,
+  "cas_conflicts": 1
+ },
+ "steward_batches": null
+}

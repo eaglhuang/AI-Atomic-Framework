@@ -1,0 +1,86 @@
+{
+ "writer": 1,
+ "pr": 12103,
+ "pid": 2375671,
+ "init_ms": 68.04862599999998,
+ "start_offset_ms": 2,
+ "file_order": [
+  "fastapi/utils.py",
+  "fastapi/dependencies/utils.py",
+  "fastapi/routing.py"
+ ],
+ "holds": {
+  "fastapi/utils.py": 14,
+  "fastapi/dependencies/utils.py": 15,
+  "fastapi/routing.py": 12
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 12103,
+   "path": "fastapi/utils.py",
+   "intents": [
+    "log:fastapi:10895_12103:12103:fastapi/utils.py:h6",
+    "log:fastapi:10895_12103:12103:fastapi/utils.py:h7",
+    "log:fastapi:10895_12103:12103:fastapi/utils.py:h8",
+    "log:fastapi:10895_12103:12103:fastapi/utils.py:h9"
+   ],
+   "hold_ms": 14,
+   "t_submit_epoch": 1791574604838,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 31,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 50.77,
+   "t_done_epoch": 1791574604889
+  },
+  {
+   "writer": 1,
+   "pr": 12103,
+   "path": "fastapi/dependencies/utils.py",
+   "intents": [
+    "log:fastapi:10895_12103:12103:fastapi/dependencies/utils.py:h0",
+    "log:fastapi:10895_12103:12103:fastapi/dependencies/utils.py:h1",
+    "log:fastapi:10895_12103:12103:fastapi/dependencies/utils.py:h2"
+   ],
+   "hold_ms": 15,
+   "t_submit_epoch": 1791574604889,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 1,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 21.4,
+   "t_done_epoch": 1791574604910
+  },
+  {
+   "writer": 1,
+   "pr": 12103,
+   "path": "fastapi/routing.py",
+   "intents": [
+    "log:fastapi:10895_12103:12103:fastapi/routing.py:h3",
+    "log:fastapi:10895_12103:12103:fastapi/routing.py:h4",
+    "log:fastapi:10895_12103:12103:fastapi/routing.py:h5"
+   ],
+   "hold_ms": 12,
+   "t_submit_epoch": 1791574604910,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "blocked",
+   "blocked_reason": "occ-relocate-context-not-found",
+   "occ_retries": 0,
+   "total_ms": 20.42,
+   "t_done_epoch": 1791574604930
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 1
+ },
+ "steward_batches": null
+}

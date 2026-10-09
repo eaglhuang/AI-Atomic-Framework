@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-0caf74e133871c6d",
+  "proposalIds": [
+    "prop-hist-w1-src_pytest_timing_py"
+  ],
+  "targetFiles": [
+    "src/_pytest/timing.py"
+  ],
+  "appliedFiles": [
+    "src/_pytest/timing.py"
+  ],
+  "fileBeforeHashes": {
+    "src/_pytest/timing.py": "c06d6ea202fa90b53b8d83b243e6254374f691c4795b67079c755c21943d886e"
+  },
+  "fileAfterHashes": {
+    "src/_pytest/timing.py": "e546f1058005b6a6ada31f9d2c0f58acd2b00b008f7e3a3419779acb2154a229"
+  },
+  "permissions": {
+    "fileWrite": [
+      "src/_pytest/timing.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-0caf74e133871c6d",
+    "planId": "merge-0caf74e133871c6d",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-0caf74e133871c6d",
+        "planId": "merge-0caf74e133871c6d",
+        "request_identity": [
+          "prop-hist-w1-src_pytest_timing_py"
+        ],
+        "actor_ids": [
+          "writer-13397"
+        ],
+        "request_files": [
+          "src/_pytest/timing.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "src/_pytest/timing.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-v2-2026-10-10/main/pytest/runs/pytest_13394_13397__bare_composer__s1/artifacts/steward/cb-src__pytest_timing.py-w1-0002.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SRC_PYTEST_TIMING_PY"
+        ],
+        "commit_sha": "d834e4579611936c0a107b3f0ee160bb27314930"
+      }
+    ]
+  }
+}
