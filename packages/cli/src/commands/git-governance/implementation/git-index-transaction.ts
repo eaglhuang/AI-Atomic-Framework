@@ -440,24 +440,43 @@ export function deferForeignStagedFiles(cwd: LegacyValue, taskId: LegacyValue, u
 }
 
 export function deferStagedFilePaths(cwd: LegacyValue, taskId: LegacyValue, filesInput: LegacyValue) {
-  const files = uniqueSorted(
-    filesInput.map(normalizeRelativePath).filter(Boolean),
-  );
+  const files = [...new Set<string>(filesInput)].filter(Boolean).sort();
   if (files.length === 0) return null;
+  // A rename is one index change: parking only its destination leaks the
+  // source deletion into the intervening commit.
+  const renames = runGitCommand(cwd, ["diff", "--cached", "--name-status", "-z", "--diff-filter=R"]).split("\0");
+  for (let index = 0; index + 2 < renames.length; index += 3) {
+    const pair = renames.slice(index + 1, index + 3);
+    if (pair.some((filePath) => files.includes(filePath))) {
+      for (const filePath of pair) if (!files.includes(filePath)) files.push(filePath);
+    }
+  }
+  files.sort();
   const entries: LegacyValue[] = [];
   forEachPathspecBatch(
-    { paths: files, fixedArgs: ["ls-files", "-s", "--"] },
+    { paths: files, fixedArgs: ["--literal-pathspecs", "ls-files", "-s", "-z", "--"] },
     (batch) => {
-      for (const match of runGitCommand(cwd, ["ls-files", "-s", "--", ...batch])
-        .split(/\r?\n/)
-        .map((line: LegacyValue) => line.match(/^(\d+) ([0-9a-f]+) \d+\t(.+)$/i))
+      for (const match of runGitCommand(cwd, ["--literal-pathspecs", "ls-files", "-s", "-z", "--", ...batch])
+        .split("\0")
+        .map((line: LegacyValue) => line.match(/^(\d+) ([0-9a-f]+) (\d+)\t([\s\S]+)$/i))
         .filter((candidate: LegacyValue) => candidate !== null)) {
-        const [, mode, blobId, filePath] = match;
-        entries.push({ path: normalizeRelativePath(filePath), mode, blobId });
+        const [, mode, blobId, stage, filePath] = match;
+        if (stage !== "0") throw new Error(`Cannot defer an unresolved index entry: ${filePath}.`);
+        entries.push({ path: filePath, mode, blobId });
       }
     },
   );
-  if (entries.length !== files.length) {
+  const deletions = new Set(entries.length < files.length
+    ? runGitCommand(cwd, ["diff", "--cached", "--name-only", "-z", "--no-renames", "--diff-filter=D"]).split("\0").filter(Boolean)
+    : []);
+  const capturedPaths = new Set(entries.map((entry) => entry.path));
+  for (const filePath of files) {
+    if (!capturedPaths.has(filePath) && deletions.has(filePath)) {
+      entries.push({ path: filePath, deleted: true });
+      capturedPaths.add(filePath);
+    }
+  }
+  if (entries.length !== files.length || files.some((filePath) => !capturedPaths.has(filePath))) {
     throw new Error(
       `Cannot defer foreign staged files without a complete index snapshot: expected ${files.length} entries, captured ${entries.length}.`,
     );
@@ -470,8 +489,8 @@ export function deferStagedFilePaths(cwd: LegacyValue, taskId: LegacyValue, file
     "utf8",
   );
   forEachPathspecBatch(
-    { paths: files, fixedArgs: ["restore", "--staged", "--"] },
-    (batch) => runGitCommand(cwd, ["restore", "--staged", "--", ...batch], ["ignore", "pipe", "pipe"]),
+    { paths: files, fixedArgs: ["--literal-pathspecs", "restore", "--staged", "--"] },
+    (batch) => runGitCommand(cwd, ["--literal-pathspecs", "restore", "--staged", "--", ...batch], ["ignore", "pipe", "pipe"]),
   );
   return snapshotPath;
 }
@@ -483,24 +502,22 @@ export function cleanupDeferredForeignStagedSnapshot(cwd: LegacyValue, snapshotP
   const snapshot = JSON.parse(readFileSync(absolutePath, "utf8"));
   const entries = Array.isArray(snapshot?.entries) ? snapshot.entries : [];
   for (const entry of entries) {
-    const filePath = normalizeRelativePath(entry?.path);
+    const filePath = typeof entry?.path === "string" ? entry.path : "";
     const mode = String(entry?.mode ?? "");
     const blobId = String(entry?.blobId ?? "");
-    if (!filePath || !/^\d+$/.test(mode) || !/^[0-9a-f]+$/i.test(blobId)) {
+    if (!filePath || (entry.deleted !== true && (!/^\d+$/.test(mode) || !/^[0-9a-f]+$/i.test(blobId)))) {
       throw new Error(`Invalid deferred foreign staged snapshot entry in ${snapshotPath}.`);
     }
-    runGitCommand(
-      cwd,
-      ["update-index", "--add", "--cacheinfo", `${mode},${blobId},${filePath}`],
-      ["ignore", "pipe", "pipe"],
-    );
-    const restoredEntry = runGitCommand(cwd, ["ls-files", "-s", "--", filePath]);
-    if (!restoredEntry.includes(`${mode} ${blobId} 0\t${filePath}`)) {
+    runGitCommand(cwd, entry.deleted === true
+      ? ["--literal-pathspecs", "update-index", "--force-remove", "--", filePath]
+      : ["update-index", "--add", "--cacheinfo", `${mode},${blobId},${filePath}`], ["ignore", "pipe", "pipe"]);
+    const restoredEntry = runGitCommand(cwd, ["--literal-pathspecs", "ls-files", "-s", "-z", "--", filePath]);
+    if (restoredEntry !== (entry.deleted === true ? "" : `${mode} ${blobId} 0\t${filePath}\0`)) {
       throw new Error(`Deferred foreign staged entry was not restored: ${filePath}.`);
     }
   }
   rmSync(absolutePath, { force: true });
-  return entries.map((entry: LegacyValue) => normalizeRelativePath(entry.path));
+  return entries.map((entry: LegacyValue) => entry.path).sort();
 }
 
 export function recordGitIndexRestoreFailure(cwd: LegacyValue, input: LegacyValue) {

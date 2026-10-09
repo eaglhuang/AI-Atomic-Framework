@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "date": "2026-10-09",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Source repair validated; remote integration and frozen publication pending",
+  "id": "ATM-BUG-2026-10-09-001",
+  "area": "Deferred foreign staged index preservation",
+  "finding": "Production deferStagedFilePaths parsed quoted newline-delimited Git index entries as literal paths, corrupting Unicode restoration after unstaging. Staged deletions had no index entry and were refused. The shared argv batch planner stripped significant whitespace and changed backslashes; rename destination-only input left its source deletion staged.",
+  "expectedBehavior": "Preserve exact path bytes, staged blobs and deletions without changing worktree content. Park both ends of a selected rename. Fail before index mutation for missing or unresolved entries. Restoration must leave an intervening independent commit intact.",
+  "evidenceOrRepro": "The actual production-body real-Git regression tests/cli/git-change-read-integrity.test.ts failed on Unicode restoration before repair and passed afterward. Coverage includes partial staging followed by an independent commit, Unicode and leading-space paths, deletion plus rename, recreated unstaged worktree content, missing and unmerged capture paths, and byte-preserving argv batching. Framework auto-stage batching, commit-failure index restoration and encoding argv-budget tests also pass. No canonical index was used by the regression fixture.",
+  "followUp": "Integrate under required CI and publish the repaired runner before claiming executable adoption. Add adjacent capture/restore fault and concurrent-index mutation coverage; these are not proved by the current focused tests. Existing malformed historical snapshots are not automatically rewritten. No new gate, CLI command or WIP log registry is introduced."
+}
