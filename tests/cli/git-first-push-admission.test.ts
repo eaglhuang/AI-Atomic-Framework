@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { evaluateGitAdmission } from '../../packages/core/src/git/admission.ts';
@@ -26,14 +26,19 @@ try {
   assert.equal(first.outcome, 'no-op', JSON.stringify(first.diagnostics));
   assert.match(first.recommendedNextStep, /remote branch.*does not exist/i);
   assert.equal(first.topology.remoteSha, 'absent');
+  const attempts = path.join(local, '.atm/runtime/git-push-attempts');
+  const attemptFiles = () => existsSync(attempts) ? readdirSync(attempts) : [];
   const preview = runGitPush({ ...input, dryRun: true });
   assert.equal(preview.ok, true);
+  assert.deepEqual(attemptFiles(), [], 'successful preview must clean its transient record');
   assert.equal(git(root, ['--git-dir', remote, 'for-each-ref', 'refs/heads/feature']), '', 'dry-run must not create the branch');
   const published = runGitPush(input);
   assert.equal(published.ok, true);
   assert.equal(published.evidence.hostPush?.exitCode, 0, 'the wrapper must actually push a verified absent branch');
+  assert.deepEqual(attemptFiles(), [], 'successful push must clean its transient record');
   assert.equal(git(root, ['--git-dir', remote, 'rev-parse', 'refs/heads/feature']), git(local, ['rev-parse', 'HEAD']));
   assert.equal(runGitPush(input).evidence.hostPush, null, 'an already synchronized branch must remain a no-op');
+  assert.deepEqual(attemptFiles(), [], 'successful retry must not accumulate records');
   assert.equal(evaluateGitAdmission(input).outcome, 'no-op', 'retry after branch creation must succeed');
   git(local, ['checkout', '-b', 'second-feature']);
   assert.equal(evaluateGitAdmission({ ...input, branch: 'second-feature' }).outcome, 'no-op',
@@ -54,6 +59,13 @@ try {
   const unavailable = runGitPush(input);
   assert.equal(unavailable.ok, false);
   assert.equal(unavailable.evidence.hostPush, null, 'inaccessible remote must not invoke host push');
+  assert.equal(attemptFiles().length, 1, 'failed admission must retain its recovery record');
+  const recoveryFile = attemptFiles()[0];
+  const recoveryBytes = readFileSync(path.join(attempts, recoveryFile), 'utf8');
+  git(local, ['remote', 'set-url', 'origin', remote]);
+  assert.equal(runGitPush(input).ok, true);
+  assert.deepEqual(attemptFiles(), [recoveryFile], 'successful retry must not overwrite or remove earlier recovery');
+  assert.equal(readFileSync(path.join(attempts, recoveryFile), 'utf8'), recoveryBytes);
   console.log('[git-first-push-admission.test] ok');
 } finally {
   rmSync(root, { recursive: true, force: true });
