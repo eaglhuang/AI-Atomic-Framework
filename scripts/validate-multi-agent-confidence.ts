@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { spawnCliCapture } from './lib/cli-json-spawn.ts';
 import { supportedAgentProfiles } from '../packages/cli/src/commands/agent-confidence.ts';
 import { collectAgentPackRows, renderAgentMatrixMarkdown } from './render-agent-matrix.ts';
 
@@ -22,9 +23,9 @@ function assert(condition: any, message: any) {
 }
 
 function runAtm(args: any, cwd = root) {
-  const result = spawnSync(process.execPath, [path.join(root, 'atm.mjs'), ...args], {
+  const result = spawnCliCapture(process.execPath, [path.join(root, 'atm.mjs'), ...args], {
     cwd,
-    encoding: 'utf8'
+    label: `atm ${args.join(' ')}`
   });
   const payload = (result.stdout || result.stderr || '').trim();
   let parsed;

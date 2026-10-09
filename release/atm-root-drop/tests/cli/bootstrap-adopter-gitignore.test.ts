@@ -30,9 +30,15 @@ try {
   assert.match(gitignore, /^\.atm\/runtime\/locks\/$/m);
   assert.match(gitignore, /^\.atm\/runtime\/quickfix-lock\.json$/m);
   assert.match(gitignore, /^node_modules\/$/m, 'the installed ATM CLI dependency is ignored');
+  assert.match(gitignore, /^\.atm\/runtime\/lane-sessions\/$/m, 'claim lanes are ignored');
+
+  assert.equal(bootstrap.json.evidence.gitattributes.status, 'created');
+  const attributes = readFileSync(path.join(cwd, '.gitattributes'), 'utf8');
+  assert.match(attributes, /^\.atm\/\*\* text eol=lf$/m, 'generated files keep LF so Windows autocrlf does not warn');
 
   assert.equal((await atm(cwd, ['bootstrap'])).json.evidence.gitignore.status, 'existing');
   assert.equal(readFileSync(path.join(cwd, '.gitignore'), 'utf8'), gitignore, 'a second bootstrap does not duplicate the block');
+  assert.equal(readFileSync(path.join(cwd, '.gitattributes'), 'utf8'), attributes, 'a second bootstrap does not duplicate the attributes block');
 
   git(cwd, ['add', '-A']);
   git(cwd, ['commit', '-qm', 'init', '--no-verify']);

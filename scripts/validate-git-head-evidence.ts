@@ -3,6 +3,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { spawnCliCapture } from './lib/cli-json-spawn.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const atmRunnerPath = resolveAtmRunnerPath();
@@ -38,10 +39,10 @@ function runGit(cwd: any, args: any) {
 }
 
 function runAtmDoctor(cwd: any) {
-  const result = spawnSync(process.execPath, [atmRunnerPath, 'doctor', '--cwd', cwd, '--json'], {
+  const result = spawnCliCapture(process.execPath, [atmRunnerPath, 'doctor', '--cwd', cwd, '--json'], {
     cwd,
-    encoding: 'utf8',
-    env: createSanitizedGitEnv()
+    env: createSanitizedGitEnv(),
+    label: 'atm doctor --json'
   });
   const payload = extractJsonPayload((result.stdout || result.stderr || '').trim());
   return {
@@ -81,27 +82,27 @@ function initGitRepo(repo: any) {
 }
 
 function bootstrap(repo: any) {
-  const result = spawnSync(process.execPath, [atmRunnerPath, 'bootstrap', '--cwd', repo, '--json'], {
+  const result = spawnCliCapture(process.execPath, [atmRunnerPath, 'bootstrap', '--cwd', repo, '--json'], {
     cwd: repo,
-    encoding: 'utf8'
+    label: 'atm bootstrap --json'
   });
   const payload = (result.stdout || result.stderr || '').trim();
   const parsed = payload ? JSON.parse(payload) : {};
   assert(result.status === 0, 'bootstrap must exit 0');
   assert(parsed.ok === true, 'bootstrap must report ok=true');
 
-  const atmChart = spawnSync(process.execPath, [atmRunnerPath, 'atm-chart', 'render', '--cwd', repo, '--json'], {
+  const atmChart = spawnCliCapture(process.execPath, [atmRunnerPath, 'atm-chart', 'render', '--cwd', repo, '--json'], {
     cwd: repo,
-    encoding: 'utf8'
+    label: 'atm-chart render --json'
   });
   const atmChartPayload = (atmChart.stdout || atmChart.stderr || '').trim();
   const atmChartParsed = atmChartPayload ? JSON.parse(atmChartPayload) : {};
   assert(atmChart.status === 0, 'atm-chart render must exit 0');
   assert(atmChartParsed.ok === true, 'atm-chart render must report ok=true');
 
-  const welcome = spawnSync(process.execPath, [atmRunnerPath, 'welcome', '--cwd', repo, '--json'], {
+  const welcome = spawnCliCapture(process.execPath, [atmRunnerPath, 'welcome', '--cwd', repo, '--json'], {
     cwd: repo,
-    encoding: 'utf8'
+    label: 'atm welcome --json'
   });
   const welcomePayload = (welcome.stdout || welcome.stderr || '').trim();
   const welcomeParsed = welcomePayload ? JSON.parse(welcomePayload) : {};

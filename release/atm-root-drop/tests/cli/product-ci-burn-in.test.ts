@@ -35,6 +35,25 @@ assert.equal(short.observed?.currentConsecutiveSuccessStreak, 3);
 assert.equal(short.observed?.retryCount, 0);
 assert.equal(short.observed?.averageRepairTimeMs, null);
 
+const successfulAttempts = [1, 2].map((runAttempt) => ({
+    runAttempt,
+    attemptStartedAt: `2026-02-01T00:${runAttempt === 1 ? '00' : '10'}:00Z`,
+    attemptCompletedAt: `2026-02-01T00:${runAttempt === 1 ? '05' : '20'}:00Z`,
+    workflowConclusion: 'success', productJobConclusion: 'success', failureClass: null,
+    productJob: { jobId: 200 + runAttempt, jobName: 'Product CI', jobUrl: `https://example.com/jobs/${200 + runAttempt}` },
+  }));
+const successfulRerun = run(20, '2026-02-01T00:00:00Z', 'success', {
+  lifecycle: { firstFailureAt: null, retryCount: 1, lastAttemptAt: '2026-02-01T00:20:00Z', repairAcceptedAt: null, failureClass: null },
+  attempts: successfulAttempts,
+});
+const rerunPolicy = { minCompletedRuns: 1, minCalendarDays: 0 };
+const successfulRerunReport = evaluateBurnIn([successfulRerun], rerunPolicy);
+assert.equal(successfulRerunReport.claimStatus, 'long-term-green', 'proven successful reruns have no fictional failure to repair');
+assert.equal(successfulRerunReport.observed?.retryCount, 1, 'retain the actual rerun count');
+assert.equal(evaluateBurnIn([{ ...successfulRerun, attempts: undefined }], rerunPolicy).claimStatus, 'invalid-input', 'unproven reruns remain rejected');
+assert.equal(evaluateBurnIn([{ ...successfulRerun, attempts: successfulAttempts.slice(1) }], rerunPolicy).claimStatus, 'invalid-input', 'missing earlier attempts remain rejected');
+assert.equal(evaluateBurnIn([{ ...successfulRerun, attempts: successfulAttempts.map((attempt, index) => ({ ...attempt, productJobConclusion: index === 0 ? 'failure' : 'success' })) }], rerunPolicy).claimStatus, 'invalid-input', 'a real failure cannot disappear from lifecycle evidence');
+
 const failure = evaluateBurnIn([base[0], run(2, '2026-01-15T00:00:00Z', 'failure'), base[2]], { minCompletedRuns: 3, minCalendarDays: 30 });
 assert.equal(failure.claimStatus, 'unexplained-failure');
 assert.ok(failure.reasons.includes('unexplained-failure-present'));
@@ -159,4 +178,4 @@ const badPolicy = evaluateBurnIn(base, { ...window, failurePolicy: 'lenient' as 
 assert.equal(badPolicy.claimStatus, 'invalid-input');
 assert.ok(badPolicy.reasons.includes('invalid-failurePolicy'));
 
-console.log('product-ci-burn-in tests: 19/19 passed');
+console.log('product-ci-burn-in tests: ok');

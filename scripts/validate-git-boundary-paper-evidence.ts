@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
-import { execFileSync, spawnSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
+import { spawnCliCapture } from './lib/cli-json-spawn.ts';
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -33,9 +34,9 @@ function runGit(cwd: string, args: string[]) {
 }
 
 function runNode(args: string[], cwd: string) {
-  return spawnSync(process.execPath, args, {
+  return spawnCliCapture(process.execPath, args, {
     cwd,
-    encoding: 'utf8'
+    label: args.join(' ')
   });
 }
 

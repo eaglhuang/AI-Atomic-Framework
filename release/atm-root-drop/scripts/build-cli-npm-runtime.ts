@@ -1,3 +1,4 @@
+import { writeBuildIdentity, treeFiles, sourceIdentity } from './release-artifact-manifest.ts';
 import { chmodSync, copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
@@ -7,14 +8,16 @@ import ts from 'typescript';
 import { embeddedATMChartSchemaAssets } from '../packages/cli/src/commands/atm-chart/constants.ts';
 
 const OMITTED_PUBLIC_ASSETS = [
-  /^_vendor\/agent-pack-claude-code\/templates\//,
-  /^_vendor\/integrations-core\/templates\/skills\/atm-deep-module-refactor\.files\/references\//,
-  /^_vendor\/integrations-core\/templates\/skills\/atm-governance-router\.files\/references\/(?:entry-friction|fallback-design|learning-loop|route-interpretation)\.md$/
+  /^_vendor\/agent-pack-claude-code\/templates\//
 ] as const;
+// Keep the complete Skill reference closure within the installed path budget.
+// Only the layout root is compacted; original dist-relative module paths stay intact.
+const RUNTIME_LAYOUT_ROOT = 'data';
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export async function buildCliNpmRuntime(options: { repositoryRoot?: string; sourceDistRoot?: string; outputRoot?: string } = {}) {
   const root = path.resolve(options.repositoryRoot ?? repositoryRoot);
+  const buildSourceSnapshot = JSON.stringify(sourceIdentity(root));
   const packageRoot = path.join(root, 'packages', 'cli');
   const sourceDistRoot = path.resolve(options.sourceDistRoot ?? path.join(packageRoot, 'dist'));
   const defaultRuntimeRoot = path.join(sourceDistRoot, 'npm-runtime');
@@ -63,11 +66,14 @@ export async function buildCliNpmRuntime(options: { repositoryRoot?: string; sou
       : emitDeclarationFromSource(path.join(packageRoot, 'src', 'index.ts'));
     writeFileSync(path.join(runtimeRoot, 'index.d.ts'), declaration, 'utf8');
 
-    copyRuntimeAssets(sourceDistRoot, path.join(runtimeRoot, 'layout'), defaultRuntimeRoot);
+    copyRuntimeAssets(sourceDistRoot, path.join(runtimeRoot, RUNTIME_LAYOUT_ROOT), defaultRuntimeRoot);
+    if (JSON.stringify(sourceIdentity(root)) !== buildSourceSnapshot) throw new Error('Source inputs changed during npm runtime build');
+    const packageVersion = JSON.parse(readFileSync(path.join(packageRoot, 'package.json'), 'utf8')).version as string;
+    writeBuildIdentity(root, runtimeRoot, '@ai-atomic-framework/cli', packageVersion, treeFiles(runtimeRoot));
     const files = listFiles(runtimeRoot)
       .map((file) => ({
         path: path.relative(runtimeRoot, file).replace(/\\/g, '/'),
-        kind: path.relative(runtimeRoot, file).replace(/\\/g, '/').startsWith('layout/')
+        kind: path.relative(runtimeRoot, file).replace(/\\/g, '/').startsWith(`${RUNTIME_LAYOUT_ROOT}/`)
           ? 'immutable-runtime-asset'
           : 'runtime-entrypoint',
         bytes: statSync(file).size,
@@ -84,6 +90,7 @@ export async function buildCliNpmRuntime(options: { repositoryRoot?: string; sou
         runtime: 'runtime.mjs'
       },
       moduleIdentity: 'original-dist-relative-url',
+      layoutRoot: RUNTIME_LAYOUT_ROOT,
       publicSurface: 'adopter-core',
       publicCommands: [
         'next', 'doctor', 'guide', 'init', 'create', 'taskflow', 'welcome',
@@ -142,7 +149,7 @@ function preserveModuleIdentityPlugin(sourceDistRoot: string): Plugin {
         if (relativePath.startsWith(`..${path.sep}`) || path.isAbsolute(relativePath)) return null;
         const source = readFileSync(absolutePath, 'utf8');
         if (!source.includes('import.meta.url')) return null;
-        const virtualModuleUrl = `./layout/${relativePath.replace(/\\/g, '/')}`;
+        const virtualModuleUrl = `./${RUNTIME_LAYOUT_ROOT}/${relativePath.replace(/\\/g, '/')}`;
         return {
           contents: rewriteImportMetaUrls(source, absolutePath, virtualModuleUrl),
           loader: 'js'

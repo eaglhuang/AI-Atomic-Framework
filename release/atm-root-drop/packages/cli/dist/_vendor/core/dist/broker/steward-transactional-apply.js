@@ -3,7 +3,9 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync,
 import os from 'node:os';
 import path from 'node:path';
 import { sortProposalsForCompose } from './merge-plan.js';
-import { applyUnifiedPatch } from './unified-patch.js';
+import { commitCanonicalFiles, defaultStewardCommitLockRoot } from './steward-commit-guard.js';
+import { composeTextPatchesAgainstBase } from './steward-base-composer.js';
+import { applyUnifiedPatch, UnifiedPatchApplicationError } from './unified-patch.js';
 export function buildPatchProposalComposition(input) {
     const sorted = sortProposalsForCompose(input.proposals);
     const byFile = new Map();
@@ -16,10 +18,18 @@ export function buildPatchProposalComposition(input) {
     const fileSlices = [];
     const attribution = [];
     const selectedIds = [];
+    let blocked = null;
+    let checkedPermutationCount = 0;
     for (const [filePath, proposals] of [...byFile].sort((left, right) => left[0].localeCompare(right[0]))) {
         const targetPath = path.resolve(input.cwd, filePath);
         const before = readFileSync(targetPath, 'utf8');
-        const after = composeProposalPatchesAgainstImmutableBase(before, proposals);
+        const composed = composeProposalPatchesAgainstImmutableBase(filePath, before, proposals);
+        if (!composed.ok) {
+            blocked = composed.block;
+            break;
+        }
+        checkedPermutationCount += composed.checkedPermutationCount;
+        const after = composed.content;
         for (const proposal of proposals) {
             selectedIds.push(proposal.proposalId);
             attribution.push({
@@ -51,16 +61,18 @@ export function buildPatchProposalComposition(input) {
         baseTree: 'in-memory',
         outputTree: 'in-memory',
         bounded: true,
-        selectedRequestIds: selectedIds.sort((left, right) => left.localeCompare(right)),
+        selectedRequestIds: blocked ? [] : selectedIds.sort((left, right) => left.localeCompare(right)),
         skippedRequestIds: [],
-        blockedRequestIds: [],
+        blockedRequestIds: blocked ? [...new Set(sorted.map((proposal) => proposal.proposalId))].sort((left, right) => left.localeCompare(right)) : [],
         fileSlices: fileSlices.sort((left, right) => left.filePath.localeCompare(right.filePath)),
         memberAttribution: attribution.sort((left, right) => left.requestId.localeCompare(right.requestId)),
         serializabilityProof: {
-            legalSerialOrder: selectedIds.sort((left, right) => left.localeCompare(right)),
-            permutationStable: true,
+            legalSerialOrder: blocked ? [] : selectedIds.sort((left, right) => left.localeCompare(right)),
+            // Each file is rendered under every checked proposal order; a differing
+            // render blocks the composition, so reaching here means it was stable.
+            permutationStable: blocked === null,
             equivalentOutputHash: outputDigest,
-            checkedPermutationCount: Math.max(1, selectedIds.length)
+            checkedPermutationCount: Math.max(1, checkedPermutationCount)
         },
         rollback: {
             strategy: 'discard-temp-tree',
@@ -72,45 +84,53 @@ export function buildPatchProposalComposition(input) {
     };
     return {
         plan,
-        outputFiles: outputFiles.sort((left, right) => left.filePath.localeCompare(right.filePath))
+        outputFiles: blocked ? [] : outputFiles.sort((left, right) => left.filePath.localeCompare(right.filePath)),
+        blocked
     };
 }
 /**
  * Compose each proposal against the same immutable source bytes.  Text patches
- * normally retain strict ordered unified-patch semantics.  JSON-pointer
- * proposals are different: their declared pointers describe disjoint semantic
- * slices, so applying their textual hunks one after another can make the
- * second hunk's surrounding context stale despite a conflict-free intent.
+ * go through the base composer, which resolves every hunk against the base and
+ * fails closed on overlap.  JSON-pointer proposals are different: their
+ * declared pointers describe disjoint semantic slices, so they are merged as
+ * JSON values and fall back to the text route on any hidden mutation.
  */
-function composeProposalPatchesAgainstImmutableBase(before, proposals) {
+function composeProposalPatchesAgainstImmutableBase(filePath, before, proposals) {
+    const textRoute = () => composeTextPatchesAgainstBase(filePath, before, proposals);
     const pointers = proposals.map((proposal) => declaredSingleJsonPointer(proposal));
     const useJsonPointerComposition = pointers.every((pointer) => pointer !== null)
         && new Set(pointers).size === pointers.length;
-    if (!useJsonPointerComposition) {
-        return proposals.reduce((content, proposal) => applyUnifiedPatch(content, proposal.patch), before);
-    }
+    if (!useJsonPointerComposition)
+        return textRoute();
     let baseDocument;
     try {
         baseDocument = JSON.parse(before);
     }
     catch {
-        return proposals.reduce((content, proposal) => applyUnifiedPatch(content, proposal.patch), before);
+        return textRoute();
     }
-    if (!isJsonObject(baseDocument)) {
-        return proposals.reduce((content, proposal) => applyUnifiedPatch(content, proposal.patch), before);
-    }
+    if (!isJsonObject(baseDocument))
+        return textRoute();
     const composed = structuredClone(baseDocument);
     for (const [index, proposal] of proposals.entries()) {
         const pointer = pointers[index];
-        const patched = JSON.parse(applyUnifiedPatch(before, proposal.patch));
+        let patched;
+        try {
+            patched = JSON.parse(applyUnifiedPatch(before, proposal.patch));
+        }
+        catch (error) {
+            if (!(error instanceof UnifiedPatchApplicationError) && !(error instanceof SyntaxError))
+                throw error;
+            return textRoute();
+        }
         if (!isJsonObject(patched) || !isOnlyDeclaredPointerMutation(baseDocument, patched, pointer)) {
             // A JSON anchor is an authority boundary, never a hint: any hidden
             // mutation falls back to the strict text route and fails closed if stale.
-            return proposals.reduce((content, entry) => applyUnifiedPatch(content, entry.patch), before);
+            return textRoute();
         }
         setJsonPointer(composed, pointer, readJsonPointer(patched, pointer));
     }
-    return `${JSON.stringify(composed, null, 2)}\n`;
+    return { ok: true, content: `${JSON.stringify(composed, null, 2)}\n`, checkedPermutationCount: 1 };
 }
 function declaredSingleJsonPointer(proposal) {
     if (proposal.anchors.length !== 1 || proposal.anchors[0]?.kind !== 'json-pointer')
@@ -187,6 +207,7 @@ export function applyTransactionalStewardPlan(input) {
     const scopeSet = new Set(input.scopeFiles.map(normalizePath));
     const fileSlices = [...input.plan.fileSlices].sort((left, right) => left.filePath.localeCompare(right.filePath));
     const blockedReasons = [];
+    const staleReasons = [];
     if (input.writerRole !== 'neutral-steward') {
         blockedReasons.push('canonical writes require the neutral-steward writer role');
     }
@@ -197,6 +218,7 @@ export function applyTransactionalStewardPlan(input) {
     if (input.semanticValidation.ok !== true || input.semanticValidation.candidateDigest !== candidateDigest || input.semanticValidation.outputDigest !== candidateDigest) {
         blockedReasons.push('semantic validation receipt does not authorize the exact composed candidate digest');
     }
+    input.commitHooks?.beforePrecheck?.();
     for (const slice of fileSlices) {
         if (!scopeSet.has(normalizePath(slice.filePath))) {
             blockedReasons.push(`declared output is outside steward scope: ${slice.filePath}`);
@@ -219,8 +241,9 @@ export function applyTransactionalStewardPlan(input) {
             continue;
         }
         const before = readFileSync(targetPath, 'utf8');
-        if (hashContent(before) !== slice.baseHash) {
-            blockedReasons.push(`canonical target base hash is stale: ${slice.filePath}`);
+        const observed = hashContent(before);
+        if (observed !== slice.baseHash) {
+            staleReasons.push(`re-compose: canonical target base hash is stale: ${slice.filePath} (expected ${slice.baseHash}, observed ${observed}). Re-read the file and compose again against the current bytes.`);
         }
     }
     if (blockedReasons.length > 0) {
@@ -235,11 +258,20 @@ export function applyTransactionalStewardPlan(input) {
             })
         };
     }
+    if (staleReasons.length > 0) {
+        return {
+            ok: false,
+            receipt: buildReceipt(input, {
+                candidateDigest,
+                canonicalRoot: cwd,
+                files: [],
+                verdict: 're-compose',
+                blockedReasons: staleReasons
+            })
+        };
+    }
     const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-steward-apply-'));
-    const backups = new Map();
-    const writtenFiles = [];
-    const receipts = [];
-    let failedFile = null;
+    let materializeError = null;
     try {
         // Materialize all candidates away from the canonical tree before any side effect.
         for (const slice of fileSlices) {
@@ -251,67 +283,95 @@ export function applyTransactionalStewardPlan(input) {
                 throw new Error(`temporary output hash mismatch: ${slice.filePath}`);
             }
         }
-        let writeCount = 0;
-        for (const slice of fileSlices) {
-            const output = outputByPath.get(normalizePath(slice.filePath));
-            const targetPath = resolveInsideRoot(cwd, slice.filePath);
-            const before = readFileSync(targetPath, 'utf8');
-            backups.set(slice.filePath, before);
-            failedFile = slice.filePath;
-            if (input.failAfterWrites !== undefined && writeCount >= input.failAfterWrites) {
-                throw new Error(`injected apply failure before ${slice.filePath}`);
-            }
-            // The neutral steward is the only owner of this canonical write primitive.
-            writeFileSync(targetPath, output.content, 'utf8');
-            writeCount += 1;
-            writtenFiles.push(slice.filePath);
-            receipts.push({
-                filePath: slice.filePath,
-                beforeHash: hashContent(before),
-                afterHash: hashContent(output.content),
-                canonicalWriteCount: 1,
-                tempOutputHash: slice.outputHash
-            });
-        }
-        return {
-            ok: true,
-            receipt: buildReceipt(input, {
-                candidateDigest,
-                canonicalRoot: cwd,
-                files: receipts,
-                verdict: 'applied',
-                blockedReasons: []
-            })
-        };
     }
     catch (error) {
-        const restoredFiles = [];
-        for (const [filePath, content] of [...backups].reverse()) {
-            const targetPath = resolveInsideRoot(cwd, filePath);
-            if (!targetPath)
-                continue;
-            writeFileSync(targetPath, content, 'utf8');
-            restoredFiles.push(filePath);
-        }
+        materializeError = error instanceof Error ? error : new Error(String(error));
+    }
+    finally {
+        rmSync(tempRoot, { recursive: true, force: true });
+    }
+    if (materializeError) {
         return {
             ok: false,
             receipt: buildReceipt(input, {
                 candidateDigest,
                 canonicalRoot: cwd,
-                files: receipts,
+                files: [],
                 verdict: 'rolled-back',
-                blockedReasons: [error instanceof Error ? error.message : String(error)],
+                blockedReasons: [materializeError.message],
                 compensation: {
-                    restoredFiles: restoredFiles.sort((left, right) => left.localeCompare(right)),
-                    failedFile,
-                    reason: writtenFiles.length > 0 ? 'restored canonical files after partial apply failure' : 'discarded materialized temp outputs before canonical write'
+                    restoredFiles: [],
+                    failedFile: null,
+                    reason: 'discarded materialized temp outputs before canonical write'
                 }
             })
         };
     }
-    finally {
-        rmSync(tempRoot, { recursive: true, force: true });
+    // The barrier sits outside the commit lock so a peer can finish its own commit first.
+    input.commitHooks?.afterPrecheck?.();
+    const committed = commitCanonicalFiles({
+        entries: fileSlices.map((slice) => ({
+            filePath: slice.filePath,
+            targetPath: resolveInsideRoot(cwd, slice.filePath),
+            expectedBaseHash: slice.baseHash,
+            content: outputByPath.get(normalizePath(slice.filePath)).content,
+            outputHash: slice.outputHash
+        })),
+        cwd,
+        lockRoot: input.commitLockRoot ?? defaultStewardCommitLockRoot(cwd),
+        lockWaitMs: input.commitLockWaitMs,
+        lockPollMs: input.commitLockPollMs,
+        failAfterWrites: input.failAfterWrites,
+        commitFault: input.commitFault
+    });
+    const files = committed.files.map((file) => ({
+        filePath: file.filePath,
+        beforeHash: file.beforeHash,
+        afterHash: file.afterHash,
+        canonicalWriteCount: 1,
+        tempOutputHash: file.outputHash
+    }));
+    if (committed.status === 'applied') {
+        return {
+            ok: true,
+            receipt: buildReceipt(input, {
+                candidateDigest,
+                canonicalRoot: cwd,
+                files,
+                verdict: 'applied',
+                blockedReasons: []
+            })
+        };
     }
+    if (committed.status === 'rolled-back') {
+        return {
+            ok: false,
+            receipt: buildReceipt(input, {
+                candidateDigest,
+                canonicalRoot: cwd,
+                files,
+                verdict: 'rolled-back',
+                blockedReasons: [committed.reason],
+                compensation: {
+                    restoredFiles: committed.restoredFiles,
+                    failedFile: committed.failedFile,
+                    reason: files.length > 0
+                        ? 'restored canonical files after partial apply failure'
+                        : 'discarded materialized temp outputs before canonical write'
+                }
+            })
+        };
+    }
+    return {
+        ok: false,
+        receipt: buildReceipt(input, {
+            candidateDigest,
+            canonicalRoot: cwd,
+            files: [],
+            verdict: committed.status,
+            blockedReasons: [committed.reason]
+        })
+    };
 }
 function buildReceipt(input, details) {
     return {

@@ -1,3 +1,4 @@
+import { existsSync, readFileSync } from 'node:fs';
 import { createInterface } from 'node:readline/promises';
 import path from 'node:path';
 import { runBootstrap } from './bootstrap-entry.js';
@@ -12,7 +13,18 @@ import { codexBridgeManifest, codexHostBridge } from './setup/codex-bridge.js';
 import { safeIntegrationHooks } from './integration/safe-hooks.js';
 import { preflightBootstrap } from './setup/bootstrap-preflight.js';
 import { setupRunnerPath } from './setup/runner.js';
-import { ensureSetupProjectRunner } from './setup/project-runner.js';
+import { ensureSetupProjectRunner, preflightSetupProjectRunner } from './setup/project-runner.js';
+function isAdopterProjectRoot(dir) {
+    const packageJson = path.join(dir, 'package.json');
+    if (existsSync(packageJson)) {
+        try {
+            if (JSON.parse(readFileSync(packageJson, 'utf8')).name === 'ai-atomic-framework')
+                return false;
+        }
+        catch { /* unreadable package.json still marks a project */ }
+    }
+    return existsSync(path.join(dir, '.git')) || existsSync(packageJson);
+}
 /** One composition of existing project governance. No agent login/global writes. */
 export async function runSetup(argv, input = {}) {
     const spec = getCommandSpec('setup');
@@ -36,7 +48,12 @@ export async function runSetup(argv, input = {}) {
         }
     }
     const targetOption = parsed.options.cwd;
-    const target = typeof targetOption === 'string' ? targetOption : (await ask('Which project directory should receive ATM?')).trim();
+    // Running setup from inside a project means that project: only ask (or fail
+    // in noninteractive mode) when the current directory is not a project root.
+    const cwdLooksLikeProject = isAdopterProjectRoot(process.cwd());
+    const target = typeof targetOption === 'string' ? targetOption
+        : !interactive && cwdLooksLikeProject ? process.cwd()
+            : (await ask('Which project directory should receive ATM?')).trim();
     if (!target)
         throw new CliError('ATM_SETUP_CANCELLED', 'Setup cancelled before writing: no project was selected.', { exitCode: 2 });
     const cwd = validateSetupTarget(target, input.detection?.homeDir, input.detection?.env);
@@ -58,6 +75,7 @@ export async function runSetup(argv, input = {}) {
     const recoveryArgs = [runner, 'setup', '--cwd', cwd, '--agents', agents.length ? agents.join(',') : 'none', '--json'];
     try {
         preflightBootstrap(cwd);
+        preflightSetupProjectRunner(cwd);
         // Plan every adapter before bootstrap writes any configuration that could
         // alter detection. No --force is used, including on repeat installations.
         for (const id of agents) {
@@ -109,7 +127,8 @@ export async function runSetup(argv, input = {}) {
     }
     return makeResult({
         ok: failure === null, command: 'setup', cwd,
-        messages: [message(failure ? 'error' : 'info', failure ? 'ATM_SETUP_FAILED' : dryRun ? 'ATM_SETUP_PLAN_READY' : 'ATM_SETUP_READY', failure ?? (dryRun ? 'Setup preflight passed without writing.' : `ATM setup verified for ${cwd}.`))],
+        messages: [message(failure ? 'error' : 'info', failure ? 'ATM_SETUP_FAILED' : dryRun ? 'ATM_SETUP_PLAN_READY' : 'ATM_SETUP_READY', failure ?? (dryRun ? 'Setup preflight passed without writing.' : `ATM setup verified for ${cwd}.`)),
+            ...(failure || dryRun ? [] : [message('info', 'ATM_SETUP_TRY_NEXT', 'Next: open this project in your AI editor and say: "Use ATM governance to inspect this repo and suggest the next safe improvement."')])],
         evidence: { dryRun, projectRoot: cwd, agents, cliOnly: agents.length === 0, detection,
             detectionMeaning: 'Configuration paths and explicit editor environment hints are not proof of installation, authentication, or an active agent session.',
             globalWrites: false, steps, failure, projectRunner,

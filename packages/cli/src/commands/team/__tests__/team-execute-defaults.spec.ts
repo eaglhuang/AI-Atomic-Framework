@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { mergeTeamProviderSelectionConfig, resolveTeamProviderSelection } from '../../../../../core/src/team-runtime/provider-selection.ts';
 import { createTempWorkspace, initializeGitRepository } from '../../../temp-workspace.ts';
@@ -81,6 +81,8 @@ function testRoleProviderOverrideStillWinsOverGlobalDefault() {
 }
 
 async function testProviderExecutionUsesGlobalDefaultsForAllRoles() {
+  const cwd = createTempWorkspace('atm-team-provider-execution-defaults-');
+  try {
   const selectionConfig = mergeTeamProviderSelectionConfig({
     cliGlobalDefault: {
       providerId: 'openai',
@@ -94,7 +96,7 @@ async function testProviderExecutionUsesGlobalDefaultsForAllRoles() {
     selectionConfig
   });
   const execution = await runTeamProviderExecution({
-    cwd: process.cwd(),
+    cwd,
     taskId: 'TASK-TEAM-EXEC-DEFAULTS',
     teamRunId: 'team-exec-defaults',
     recipe: l1Recipe,
@@ -134,6 +136,9 @@ async function testProviderExecutionUsesGlobalDefaultsForAllRoles() {
   });
   assert.equal(execution.blockedReason, null);
   assert.equal(execution.results.length, 4, 'top-level defaults must execute every active roster role');
+  } finally {
+    rmSync(cwd, { recursive: true, force: true });
+  }
 }
 
 function testEmptyExecutionSetFailsClosed() {
@@ -148,6 +153,7 @@ function testEmptyExecutionSetFailsClosed() {
 
 async function testTeamStartExecuteWithGlobalDefaultsPopulatesRoles() {
   const cwd = createTempWorkspace('atm-team-execute-defaults-start-');
+  try {
   initializeGitRepository(cwd);
   const taskId = 'TASK-TEAM-EXEC-DEFAULTS-START';
   mkdirSync(path.join(cwd, '.atm', 'history', 'tasks'), { recursive: true });
@@ -176,6 +182,9 @@ async function testTeamStartExecuteWithGlobalDefaultsPopulatesRoles() {
   assert.match(String(evidence.runtimeContract?.selectionReason ?? ''), /cli-global-default/);
   assert.ok((evidence.providerOrchestration?.results?.length ?? 0) > 0, 'global defaults must populate provider execution roles');
   assert.notEqual(evidence.providerOrchestration?.blockedReason, 'broker-only-runtime-never-spawns');
+  } finally {
+    rmSync(cwd, { recursive: true, force: true });
+  }
 }
 
 testCliGlobalDefaultPopulatesEveryActiveRole();

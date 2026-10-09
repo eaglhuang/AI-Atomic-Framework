@@ -1,3 +1,5 @@
+import { captureIndexRestorationSnapshot } from './index-restoration.ts';
+import { resolveCandidateAttribution } from './candidate-attribution.ts';
 import { resolveCommitLaneSessionId } from './command-router.ts';
 import { resolveTaskScopedCommitBundle } from './commit-bundle-resolution.ts';
 import { captureGitHeadEvidencePreparation } from './git-head-evidence-transaction.ts';
@@ -113,6 +115,17 @@ const taskDocument = options.taskId
 const { usesFrameworkClaimCommit, frameworkClaimRequired, frameworkClaimFiles, frameworkClaimTaskId, frameworkClaimResolution } = resolveFrameworkCommitAuthorityContext({
   cwd: options.cwd, taskId: options.taskId, actorId, taskExists: taskDocument !== null,
 });
+const selectedAttribution = resolveCandidateAttribution({
+  cwd: options.cwd, actorId, taskId: options.taskId ?? frameworkClaimTaskId, phase: 'selection',
+  autoStage: options.autoStage && !(usesFrameworkClaimCommit && readStagedFiles(options.cwd).includes(actorRegistryRelativePath)),
+  ...((options.deliverySliceManifestPath || options.deliverySliceReceiptPath) ? { candidateFiles: [] } : {}),
+});
+if (selectedAttribution.registryChanged && selectedAttribution.ok && selectedAttribution.identity
+  && (selectedAttribution.identity.gitName !== gitName || selectedAttribution.identity.gitEmail !== gitEmail)) {
+  throw new CliError(selectedAttribution.identity.gitName !== gitName ? 'ATM_COMMIT_AUTHOR_NAME_MISMATCH' : 'ATM_COMMIT_AUTHOR_EMAIL_MISMATCH', 'Resolved Git author differs from the selected candidate identity. Configure the actor-local identity to match the intended staged candidate before retrying.', {
+    exitCode: 1, details: { requiredCommand: buildIdentitySetRequiredCommand(options.cwd, actorId) },
+  });
+}
 
 // `git record-commit` reaches this executor only after its own strict
 // low-risk record allowlist, single-owner check, and payload assertion path
@@ -170,6 +183,7 @@ let deferredForeignStagedSnapshotPath = null;
 
 let taskScopedBundleReport = null;
 const liveIndexSnapshotBeforeCommitAttempt = readStagedFiles(options.cwd);
+const liveIndexRestorationSnapshotBeforeCommitAttempt = captureIndexRestorationSnapshot(options.cwd);
 
 if (options.taskId && !session && !bypassesActiveSession) {
     throw new CliError(
@@ -315,5 +329,5 @@ writeGitCommitAttemptStatus(options.cwd, commitAttemptStatusPath, {
     liveIndexResidueRollback: [],
   });
 assertDryRunReachedNoExecutor(dryRunPurity, { taskId: options.taskId ?? null, usesFrameworkClaimCommit });
-return executeGitCommit(options, { actorId, args, autoStagedFrameworkPaths, branchName, branchRef, bypassesActiveSession, claimForTrailers, commitAttemptStartedAt, commitAttemptStatusPath, commitCommand, commitTimeoutMs, deferredForeignStagedSnapshotPath, frameworkClaimCommitFiles, gitEmail, gitHeadEvidenceSnapshotBeforeCommitAttempt, gitName, headShaAtCommitStart, headShaBeforeCommit, hookBypassRequest, hookTaskId, laneSessionId, liveIndexSnapshotBeforeCommitAttempt, profile, protectedOverrideAudit, protectedOverrideOutcome, rawCopyableCommitCommand, retryCommand, session, statusCommand, taskDocument, taskScopedBundleReport, trailers });
+return executeGitCommit(options, { liveIndexRestorationSnapshotBeforeCommitAttempt, actorId, args, autoStagedFrameworkPaths, branchName, branchRef, bypassesActiveSession, claimForTrailers, commitAttemptStartedAt, commitAttemptStatusPath, commitCommand, commitTimeoutMs, deferredForeignStagedSnapshotPath, frameworkClaimCommitFiles, gitEmail, gitHeadEvidenceSnapshotBeforeCommitAttempt, gitName, headShaAtCommitStart, headShaBeforeCommit, hookBypassRequest, hookTaskId, laneSessionId, liveIndexSnapshotBeforeCommitAttempt, profile, protectedOverrideAudit, protectedOverrideOutcome, rawCopyableCommitCommand, retryCommand, session, statusCommand, taskDocument, taskScopedBundleReport, trailers });
 }

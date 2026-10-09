@@ -1,7 +1,7 @@
 import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, statSync, utimesSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { spawnCliCapture } from './lib/cli-json-spawn.ts';
 import { createTempWorkspace } from './temp-root.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -52,9 +52,9 @@ function assert(condition: any, message: any) {
 }
 
 function runAtm(args: any, cwd: any) {
-  const result = spawnSync(process.execPath, [path.join(cwd, 'atm.mjs'), ...args], {
+  const result = spawnCliCapture(process.execPath, [path.join(cwd, 'atm.mjs'), ...args], {
     cwd,
-    encoding: 'utf8'
+    label: `atm ${args.join(' ')}`
   });
   const payload = (result.stdout || result.stderr || '').trim();
   if (payload.includes('ATM_RUNNER_SYNC_REQUIRED') || payload.includes('ATM_RUNNER_STALE_WRITE_REFUSED')) {
@@ -76,9 +76,9 @@ function runAtm(args: any, cwd: any) {
 }
 
 function runAtmSourceCli(args: any, cwd: any) {
-  const result = spawnSync(process.execPath, ['--strip-types', path.join(cwd, 'packages', 'cli', 'src', 'atm.ts'), ...args], {
+  const result = spawnCliCapture(process.execPath, ['--strip-types', path.join(cwd, 'packages', 'cli', 'src', 'atm.ts'), ...args], {
     cwd,
-    encoding: 'utf8'
+    label: `source-cli ${args.join(' ')}`
   });
   const payload = (result.stdout || result.stderr || '').trim();
   let parsed;

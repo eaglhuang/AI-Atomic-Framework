@@ -10,7 +10,7 @@ import { quoteCliValue, toTaskCandidateView, uniqueSorted } from '../view-projec
 import { extractPathLikeStringsFromPrompt, isPathAllowedByScope } from '../../work-channels.ts';
 import { makeResult, message, parseJsonText } from '../../shared.ts';
 import { allowsPlanningMirror } from '../match-and-sort.ts';
-import { finalizeImportedTaskSummary, normalizeOptionalString } from '../route-resolution.ts';
+import { buildPromptSuggestedRoutes, finalizeImportedTaskSummary, normalizeOptionalString } from '../route-resolution.ts';
 import { buildNextMessages } from './message-assembly.ts';
 import { buildTaskDeliveryPrinciple } from './channel-playbook.ts';
 import { mentionsNotCurrentTask } from './active-work-summary.ts';
@@ -154,10 +154,22 @@ export function buildActiveTaskDivergenceResult(input: {
   const divergence = detectActiveTaskDivergence(input.cwd, input.taskIntent, input.importedTaskQueue);
   if (!divergence) return null;
   const activeTaskId = divergence.activeTask.workItemId;
+  // Different work is not attached to the active task, but it is not a dead
+  // end either: offer the same claimable routes as an unscoped prompt, plus
+  // resuming the active task.
+  const suggestedRoutes = [
+    ...buildPromptSuggestedRoutes(input.taskIntent?.userPrompt?.trim() || '<current user prompt>'),
+    {
+      when: `the request is really part of ${activeTaskId}: resume it as its owner`,
+      channel: 'resume',
+      command: `node atm.mjs next --claim --actor ${divergence.activeTask.activeClaimActorId ?? '<id>'} --task ${activeTaskId} --json`
+    }
+  ];
   const nextAction = {
     status: 'active-task-divergence-blocked',
-    command: 'node atm.mjs next --prompt "<specific task id or imported task card>" --json',
-    reason: `the prompt appears to diverge from active task ${activeTaskId}; ATM will not attach new work to the active task silently`,
+    command: suggestedRoutes[1].command,
+    reason: `the prompt appears to diverge from active task ${activeTaskId}; ATM will not attach new work to the active task silently. Claim the new work separately with suggestedRoutes, or resume ${activeTaskId}`,
+    suggestedRoutes,
     activeTask: toTaskCandidateView(divergence.activeTask),
     divergence,
     decisionOptions: [

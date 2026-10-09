@@ -1,3 +1,7 @@
+import '../cli/runtime-identity-shared-resolver.test.ts';
+import '../cli/create-atm-exact-version.test.ts';
+import './release-artifact-parity.test.ts';
+import '../cli/runtime-build-identity.test.ts';
 import assert from 'node:assert/strict';
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';

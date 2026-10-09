@@ -204,6 +204,7 @@ function runSealedBuild(buildTarget: BuildTarget): void {
     });
     timePhase(timings, 'artifactSyncMs', () => writeSealedBuildMetadata({
       cwd: repoRoot,
+      buildTarget,
       sealedSourceSha,
       buildInputsTreeHash,
       buildDecision: cacheDecision.decision,
@@ -334,6 +335,7 @@ function runSealedBuild(buildTarget: BuildTarget): void {
     timings.totalElapsedMs = elapsedSince(timings.startedAt);
     writeSealedBuildMetadata({
       cwd: repoRoot,
+      buildTarget,
       sealedSourceSha,
       buildInputsTreeHash,
       buildDecision,

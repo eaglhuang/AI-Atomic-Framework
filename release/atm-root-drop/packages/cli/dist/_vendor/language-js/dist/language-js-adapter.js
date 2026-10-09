@@ -34,16 +34,29 @@ export function createJavaScriptLanguageAdapter(policyOverrides = {}) {
 }
 export function detectProjectProfile(repositoryRoot) {
     const packageJsonPath = path.join(repositoryRoot, 'package.json');
-    const packageJson = existsSync(packageJsonPath)
-        ? JSON.parse(readFileSync(packageJsonPath, 'utf8'))
-        : {};
-    const scripts = packageJson.scripts ?? {};
+    const scripts = readPackageScripts(packageJsonPath);
     return {
         packageManager: detectPackageManager(repositoryRoot),
         testCommand: scripts.test ? createPackageManagerCommand(repositoryRoot, 'test') : null,
         typecheckCommand: scripts.typecheck ? createPackageManagerCommand(repositoryRoot, 'typecheck') : null,
         lintCommand: scripts.lint ? createPackageManagerCommand(repositoryRoot, 'lint') : null
     };
+}
+// A package.json the user is mid-way through editing must not crash every ATM
+// command that profiles the project; profile it as having no scripts, and let
+// the package manager report the syntax error when a script actually runs.
+function readPackageScripts(packageJsonPath) {
+    if (!existsSync(packageJsonPath))
+        return {};
+    try {
+        const parsed = JSON.parse(readFileSync(packageJsonPath, 'utf8'));
+        return parsed && typeof parsed.scripts === 'object' && parsed.scripts !== null
+            ? parsed.scripts
+            : {};
+    }
+    catch {
+        return {};
+    }
 }
 export function validateComputeAtom(request, profile = createUnknownProfile(), basePolicy = defaultJavaScriptImportPolicy) {
     const policy = mergePolicy(basePolicy, request.importPolicy);

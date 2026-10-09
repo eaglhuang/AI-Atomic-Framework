@@ -1,5 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
-import path from 'node:path';
+import { inspectFrameworkIdentity } from '../../../core/src/project/framework-identity.ts';
 
 export type SkillTier = 'entry' | 'specialist' | 'emergency';
 export type SkillInstallProfileId = 'adopter-bootstrap' | 'framework-full' | 'role-oriented' | 'emergency-explicit';
@@ -60,19 +59,10 @@ export function selectDefaultSkillInstallProfile(input: {
   readonly targetScope?: SkillTargetScope | null;
 }): SkillInstallProfileId {
   if (input.targetScope === 'framework') return 'framework-full';
+  if (input.targetScope === 'adopter') return 'adopter-bootstrap';
   if (input.targetScope === 'role') return 'role-oriented';
   if (input.targetScope === 'emergency') return 'emergency-explicit';
-  const packageJsonPath = path.join(input.repositoryRoot, 'package.json');
-  if (existsSync(packageJsonPath)) {
-    try {
-      const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf8')) as Record<string, unknown>;
-      if (packageJson.name === 'ai-atomic-framework' || packageJson.name === '@ai-atomic-framework/root') {
-        return 'framework-full';
-      }
-    } catch {
-      return 'adopter-bootstrap';
-    }
-  }
+  if (inspectFrameworkIdentity(input.repositoryRoot).kind === 'framework') return 'framework-full';
   return 'adopter-bootstrap';
 }
 

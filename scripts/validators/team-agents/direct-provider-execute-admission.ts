@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
 import { inspectTeamRuntimeBackendCapabilities } from '../../../packages/cli/src/commands/integration.ts';
@@ -53,6 +53,7 @@ export async function runDirectProviderExecuteAdmissionValidatorCase(taskCase: s
   assert.equal(roleOverrideRuntime.modelId, 'role-model');
 
   const cwd = createTempWorkspace('atm-direct-provider-admission-');
+  try {
   initializeGitRepository(cwd);
   const readiness = inspectTeamRuntimeBackendCapabilities(cwd);
   assert.deepEqual(readiness.capabilities.map((entry) => entry.providerId).sort(), [...TEAM_DIRECT_API_PROVIDER_IDS].sort());
@@ -101,4 +102,7 @@ export async function runDirectProviderExecuteAdmissionValidatorCase(taskCase: s
 
   console.log('[validate-team-agents] ok (direct-provider-execute-admission)');
   return true;
+  } finally {
+    rmSync(cwd, { recursive: true, force: true });
+  }
 }

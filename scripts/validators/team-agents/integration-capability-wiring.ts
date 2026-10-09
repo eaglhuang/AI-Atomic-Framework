@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
 import { inspectTeamRuntimeBackendCapabilities } from '../../../packages/cli/src/commands/integration.ts';
@@ -10,6 +10,7 @@ export async function runIntegrationCapabilityWiringValidatorCase(taskCase: stri
   if (taskCase !== 'integration-capability-wiring') return false;
 
   const tempRoot = createTempWorkspace('atm-team-runtime-backend-');
+  try {
   const manifestDir = path.join(tempRoot, '.atm', 'integrations');
   mkdirSync(manifestDir, { recursive: true });
   writeFileSync(path.join(manifestDir, 'codex.manifest.json'), JSON.stringify({
@@ -61,4 +62,7 @@ export async function runIntegrationCapabilityWiringValidatorCase(taskCase: stri
 
   console.log('[validate-team-agents] ok (integration-capability-wiring)');
   return true;
+  } finally {
+    rmSync(tempRoot, { recursive: true, force: true });
+  }
 }

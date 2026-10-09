@@ -49,6 +49,14 @@ const EMPTY_HISTORICAL_DELIVERY_BUCKETS: HistoricalDeliveryFileBuckets = {
   ignoredFiles: []
 };
 
+// These markers are emitted by governed WIP preservation. A scope waiver
+// cannot turn an explicitly non-delivery snapshot into closeout evidence.
+const NON_DELIVERY_MARKERS = [
+  /^ATM-WIP:\s*true\s*$/im,
+  /^ATM-Delivery:\s*false\s*$/im,
+  /^ATM-Closeout-Eligible:\s*false\s*$/im
+] as const;
+
 export function categorizeHistoricalCommitFiles(input: {
   readonly taskId: string;
   readonly changedFiles: readonly string[];
@@ -145,6 +153,19 @@ export function inspectHistoricalDelivery(input: {
     };
   }
   const changedFiles = readGitNameOnly(input.cwd, ['show', '--pretty=format:', '--name-only', commitSha, '--']);
+  const commitMessage = readCommitMessage(input.cwd, commitSha);
+  if (commitMessage === null || NON_DELIVERY_MARKERS.some((marker) => marker.test(commitMessage))) {
+    return {
+      requestedRef,
+      commitSha,
+      ok: false,
+      reason: commitMessage === null ? 'commit-message-unavailable' : 'commit-marked-non-delivery',
+      changedFiles,
+      deliverableFiles: [],
+      fileBuckets: EMPTY_HISTORICAL_DELIVERY_BUCKETS,
+      waiverApplied: false
+    };
+  }
   const fileBuckets = categorizeHistoricalCommitFiles({
     taskId: input.taskId,
     changedFiles,
@@ -259,10 +280,6 @@ function verifyScopedHistoricalDeliveryRef(input: {
   readonly declaredFiles: readonly string[];
 }): string | null {
   if (input.declaredFiles.length === 0) return null;
-  const commitMsg = readGitScalar(input.cwd, ['log', '-n', '1', '--format=%B', input.requestedRef]);
-  if (commitMsg && (commitMsg.includes('ATM-WIP: true') || commitMsg.includes('ATM-Delivery: false'))) {
-    return null;
-  }
   const report = inspectHistoricalDelivery({
     cwd: input.cwd,
     taskId: input.taskId,
@@ -457,6 +474,18 @@ function isDeclaredRunnerOutputPath(filePath: string, declaredFiles: readonly st
 function readGitScalar(cwd: string, args: readonly string[]): string | null {
   try {
     return execFileSync('git', ['-C', cwd, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim() || null;
+  } catch {
+    return null;
+  }
+}
+
+function readCommitMessage(cwd: string, commitSha: string): string | null {
+  try {
+    // An empty message is valid; a failed/oversized read is not evidence that
+    // eligibility markers are absent. Preserve this distinction fail-closed.
+    return execFileSync('git', ['-C', cwd, 'show', '-s', '--format=%B', commitSha, '--'], {
+      encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe']
+    });
   } catch {
     return null;
   }

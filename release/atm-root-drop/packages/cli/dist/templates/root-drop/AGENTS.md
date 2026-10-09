@@ -13,6 +13,8 @@ If the request says to finish all task cards, a whole plan, a task family, or mu
 
 Use `{{ATM_COMMAND_PREFIX}} next --json` only as read-only repository orientation when there is no current user prompt.
 
+For ordinary work with no matching task card, open one yourself with `{{ATM_COMMAND_PREFIX}} taskflow open --write --actor <id> --title "<title>" --goal "<goal>" --scope-path "<files>" --validator "<command>" --json` (cards live in `docs/tasks/`), claim it with `next --claim --task <TASK-ID>`, and pass the playbook's `--lane-session <id>` to every later ATM command.
+
 First-contact behavior:
 
 1. For user-requested task work, run `{{ATM_COMMAND_PREFIX}} next --prompt "<current user prompt>" --json`; use `{{ATM_COMMAND_PREFIX}} next --json` only as read-only orientation when no user prompt is available.
