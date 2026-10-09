@@ -1,0 +1,81 @@
+{
+ "writer": 0,
+ "pr": 18847,
+ "pid": 1503673,
+ "init_ms": 69.503637,
+ "start_offset_ms": 13,
+ "file_order": [
+  "django/db/backends/postgresql/operations.py",
+  "django/db/models/sql/compiler.py",
+  "django/db/backends/postgresql/compiler.py"
+ ],
+ "holds": {
+  "django/db/backends/postgresql/operations.py": 29,
+  "django/db/models/sql/compiler.py": 20,
+  "django/db/backends/postgresql/compiler.py": 11
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 18847,
+   "path": "django/db/backends/postgresql/operations.py",
+   "intents": [
+    "log:django:18847_18895:18847:django/db/backends/postgresql/operations.py:h1",
+    "log:django:18847_18895:18847:django/db/backends/postgresql/operations.py:h2",
+    "log:django:18847_18895:18847:django/db/backends/postgresql/operations.py:h3"
+   ],
+   "hold_ms": 29,
+   "t_submit_epoch": 1791538386108,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 16,
+   "outcome": "commit",
+   "total_ms": 57.63,
+   "t_done_epoch": 1791538386165
+  },
+  {
+   "writer": 0,
+   "pr": 18847,
+   "path": "django/db/models/sql/compiler.py",
+   "intents": [
+    "log:django:18847_18895:18847:django/db/models/sql/compiler.py:h4",
+    "log:django:18847_18895:18847:django/db/models/sql/compiler.py:h5",
+    "log:django:18847_18895:18847:django/db/models/sql/compiler.py:h6",
+    "log:django:18847_18895:18847:django/db/models/sql/compiler.py:h7",
+    "log:django:18847_18895:18847:django/db/models/sql/compiler.py:h8"
+   ],
+   "hold_ms": 20,
+   "t_submit_epoch": 1791538386165,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "total_ms": 32.9,
+   "t_done_epoch": 1791538386198
+  },
+  {
+   "writer": 0,
+   "pr": 18847,
+   "path": "django/db/backends/postgresql/compiler.py",
+   "intents": [
+    "log:django:18847_18895:18847:django/db/backends/postgresql/compiler.py:h0"
+   ],
+   "hold_ms": 11,
+   "t_submit_epoch": 1791538386198,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "total_ms": 22.02,
+   "t_done_epoch": 1791538386220
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 1
+ },
+ "steward_batches": null
+}

@@ -1,0 +1,39 @@
+{
+ "writer": 1,
+ "pr": 19884,
+ "pid": 1496226,
+ "init_ms": 70.824834,
+ "start_offset_ms": 13,
+ "file_order": [
+  "django/db/models/base.py"
+ ],
+ "holds": {
+  "django/db/models/base.py": 23
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 19884,
+   "path": "django/db/models/base.py",
+   "intents": [
+    "log:django:17554_19884:19884:django/db/models/base.py:h0"
+   ],
+   "hold_ms": 23,
+   "t_submit_epoch": 1791538356303,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 14,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 48.77,
+   "t_done_epoch": 1791538356352
+  }
+ ],
+ "admit_stats": {
+  "txns": 2,
+  "cas_conflicts": 0
+ },
+ "steward_batches": null
+}

@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-af8ed1a94e993f58",
+  "proposalIds": [
+    "prop-hist-w1-django_forms_models_py"
+  ],
+  "targetFiles": [
+    "django/forms/models.py"
+  ],
+  "appliedFiles": [
+    "django/forms/models.py"
+  ],
+  "fileBeforeHashes": {
+    "django/forms/models.py": "95271659af2e7dd63f44701eb41c9a82be95b478ff6aa48d577ef0241d33b488"
+  },
+  "fileAfterHashes": {
+    "django/forms/models.py": "87377c2058c83fca9ab90428708fd47f78c5d239d99123b10c367439f5a8da62"
+  },
+  "permissions": {
+    "fileWrite": [
+      "django/forms/models.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-af8ed1a94e993f58",
+    "planId": "merge-af8ed1a94e993f58",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-af8ed1a94e993f58",
+        "planId": "merge-af8ed1a94e993f58",
+        "request_identity": [
+          "prop-hist-w1-django_forms_models_py"
+        ],
+        "actor_ids": [
+          "writer-18245"
+        ],
+        "request_files": [
+          "django/forms/models.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "django/forms/models.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-bench/trial-pilot-2026-10-09/runs/django_18237_18245__steward__s1/artifacts/steward/cb-django_forms_models.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-DJANGO_FORMS_MODELS_PY"
+        ],
+        "commit_sha": "b27beeef60d91dd1c783573be39770265bfa8b67"
+      }
+    ]
+  }
+}

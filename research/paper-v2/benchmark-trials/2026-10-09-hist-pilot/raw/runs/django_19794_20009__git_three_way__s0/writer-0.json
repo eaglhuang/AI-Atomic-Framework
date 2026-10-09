@@ -1,0 +1,83 @@
+{
+ "writer": 0,
+ "pr": 19794,
+ "pid": 1512235,
+ "init_ms": 97.848965,
+ "start_offset_ms": 14,
+ "file_order": [
+  "django/db/models/fields/json.py",
+  "django/contrib/postgres/fields/array.py",
+  "django/db/models/__init__.py"
+ ],
+ "holds": {
+  "django/db/models/fields/json.py": 26,
+  "django/contrib/postgres/fields/array.py": 12,
+  "django/db/models/__init__.py": 2
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 19794,
+   "path": "django/db/models/fields/json.py",
+   "intents": [
+    "log:django:19794_20009:19794:django/db/models/fields/json.py:h3",
+    "log:django:19794_20009:19794:django/db/models/fields/json.py:h4",
+    "log:django:19794_20009:19794:django/db/models/fields/json.py:h5",
+    "log:django:19794_20009:19794:django/db/models/fields/json.py:h6",
+    "log:django:19794_20009:19794:django/db/models/fields/json.py:h7",
+    "log:django:19794_20009:19794:django/db/models/fields/json.py:h8",
+    "log:django:19794_20009:19794:django/db/models/fields/json.py:h9",
+    "log:django:19794_20009:19794:django/db/models/fields/json.py:h10"
+   ],
+   "hold_ms": 26,
+   "t_submit_epoch": 1791538418463,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 19,
+   "outcome": "commit",
+   "total_ms": 56.42,
+   "t_done_epoch": 1791538418519
+  },
+  {
+   "writer": 0,
+   "pr": 19794,
+   "path": "django/contrib/postgres/fields/array.py",
+   "intents": [
+    "log:django:19794_20009:19794:django/contrib/postgres/fields/array.py:h0"
+   ],
+   "hold_ms": 12,
+   "t_submit_epoch": 1791538418519,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "total_ms": 23.23,
+   "t_done_epoch": 1791538418542
+  },
+  {
+   "writer": 0,
+   "pr": 19794,
+   "path": "django/db/models/__init__.py",
+   "intents": [
+    "log:django:19794_20009:19794:django/db/models/__init__.py:h1",
+    "log:django:19794_20009:19794:django/db/models/__init__.py:h2"
+   ],
+   "hold_ms": 2,
+   "t_submit_epoch": 1791538418542,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 6,
+   "outcome": "commit",
+   "total_ms": 17.64,
+   "t_done_epoch": 1791538418560
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 1
+ },
+ "steward_batches": null
+}

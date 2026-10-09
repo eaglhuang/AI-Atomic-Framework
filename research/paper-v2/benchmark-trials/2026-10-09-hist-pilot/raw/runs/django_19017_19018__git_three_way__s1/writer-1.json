@@ -1,0 +1,79 @@
+{
+ "writer": 1,
+ "pr": 19018,
+ "pid": 1505978,
+ "init_ms": 83.553305,
+ "start_offset_ms": 10,
+ "file_order": [
+  "django/db/models/base.py",
+  "django/db/models/options.py",
+  "django/db/models/query.py"
+ ],
+ "holds": {
+  "django/db/models/base.py": 21,
+  "django/db/models/options.py": 13,
+  "django/db/models/query.py": 20
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 19018,
+   "path": "django/db/models/base.py",
+   "intents": [
+    "log:django:19017_19018:19018:django/db/models/base.py:h0",
+    "log:django:19017_19018:19018:django/db/models/base.py:h1",
+    "log:django:19017_19018:19018:django/db/models/base.py:h2"
+   ],
+   "hold_ms": 21,
+   "t_submit_epoch": 1791538394898,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 20,
+   "outcome": "commit",
+   "total_ms": 59.44,
+   "t_done_epoch": 1791538394958
+  },
+  {
+   "writer": 1,
+   "pr": 19018,
+   "path": "django/db/models/options.py",
+   "intents": [
+    "log:django:19017_19018:19018:django/db/models/options.py:h3"
+   ],
+   "hold_ms": 13,
+   "t_submit_epoch": 1791538394958,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 14,
+   "outcome": "commit",
+   "total_ms": 35.38,
+   "t_done_epoch": 1791538394993
+  },
+  {
+   "writer": 1,
+   "pr": 19018,
+   "path": "django/db/models/query.py",
+   "intents": [
+    "log:django:19017_19018:19018:django/db/models/query.py:h4",
+    "log:django:19017_19018:19018:django/db/models/query.py:h5",
+    "log:django:19017_19018:19018:django/db/models/query.py:h6"
+   ],
+   "hold_ms": 20,
+   "t_submit_epoch": 1791538394993,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "outcome": "commit",
+   "total_ms": 37.83,
+   "t_done_epoch": 1791538395031
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 4
+ },
+ "steward_batches": null
+}

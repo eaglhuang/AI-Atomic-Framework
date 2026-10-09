@@ -1,0 +1,84 @@
+{
+ "writer": 1,
+ "pr": 20063,
+ "pid": 1512668,
+ "init_ms": 83.670827,
+ "start_offset_ms": 6,
+ "file_order": [
+  "django/contrib/postgres/apps.py",
+  "django/db/backends/postgresql/introspection.py",
+  "django/db/backends/postgresql/base.py"
+ ],
+ "holds": {
+  "django/contrib/postgres/apps.py": 14,
+  "django/db/backends/postgresql/introspection.py": 14,
+  "django/db/backends/postgresql/base.py": 9
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 20063,
+   "path": "django/contrib/postgres/apps.py",
+   "intents": [
+    "log:django:20055_20063:20063:django/contrib/postgres/apps.py:h0"
+   ],
+   "hold_ms": 14,
+   "t_submit_epoch": 1791538419962,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 17,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 38.78,
+   "t_done_epoch": 1791538420001
+  },
+  {
+   "writer": 1,
+   "pr": 20063,
+   "path": "django/db/backends/postgresql/introspection.py",
+   "intents": [
+    "log:django:20055_20063:20063:django/db/backends/postgresql/introspection.py:h3",
+    "log:django:20055_20063:20063:django/db/backends/postgresql/introspection.py:h4",
+    "log:django:20055_20063:20063:django/db/backends/postgresql/introspection.py:h5"
+   ],
+   "hold_ms": 14,
+   "t_submit_epoch": 1791538420001,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 20.98,
+   "t_done_epoch": 1791538420022
+  },
+  {
+   "writer": 1,
+   "pr": 20063,
+   "path": "django/db/backends/postgresql/base.py",
+   "intents": [
+    "log:django:20055_20063:20063:django/db/backends/postgresql/base.py:h1",
+    "log:django:20055_20063:20063:django/db/backends/postgresql/base.py:h2"
+   ],
+   "hold_ms": 9,
+   "t_submit_epoch": 1791538420022,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 12,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 26.15,
+   "t_done_epoch": 1791538420048
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 14
+ },
+ "steward_batches": null
+}

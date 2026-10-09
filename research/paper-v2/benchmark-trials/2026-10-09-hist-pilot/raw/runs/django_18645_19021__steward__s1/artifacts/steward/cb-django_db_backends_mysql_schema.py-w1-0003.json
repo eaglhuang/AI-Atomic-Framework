@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-18e5ac12fe597b42",
+  "proposalIds": [
+    "prop-hist-w1-django_db_backends_mysql_schema_py"
+  ],
+  "targetFiles": [
+    "django/db/backends/mysql/schema.py"
+  ],
+  "appliedFiles": [
+    "django/db/backends/mysql/schema.py"
+  ],
+  "fileBeforeHashes": {
+    "django/db/backends/mysql/schema.py": "813d0deb975bd28992326e30d3d09c708378e1c3db5f3a1c2f4a6dcdb5295ad7"
+  },
+  "fileAfterHashes": {
+    "django/db/backends/mysql/schema.py": "ea349a3914d46ab22e90fe66c8cc3a41255aab30b228846b2956277019e33596"
+  },
+  "permissions": {
+    "fileWrite": [
+      "django/db/backends/mysql/schema.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-18e5ac12fe597b42",
+    "planId": "merge-18e5ac12fe597b42",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-18e5ac12fe597b42",
+        "planId": "merge-18e5ac12fe597b42",
+        "request_identity": [
+          "prop-hist-w1-django_db_backends_mysql_schema_py"
+        ],
+        "actor_ids": [
+          "writer-19021"
+        ],
+        "request_files": [
+          "django/db/backends/mysql/schema.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "django/db/backends/mysql/schema.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-bench/trial-pilot-2026-10-09/runs/django_18645_19021__steward__s1/artifacts/steward/cb-django_db_backends_mysql_schema.py-w1-0003.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-DJANGO_DB_BACKENDS_MYSQL_SCHEMA_PY"
+        ],
+        "commit_sha": "85db117a1e0c440f52435f5119ed3dcc3d7f3b5c"
+      }
+    ]
+  }
+}

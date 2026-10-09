@@ -1,0 +1,81 @@
+{
+ "writer": 1,
+ "pr": 20063,
+ "pid": 1512730,
+ "init_ms": 67.026599,
+ "start_offset_ms": 6,
+ "file_order": [
+  "django/contrib/postgres/apps.py",
+  "django/db/backends/postgresql/introspection.py",
+  "django/db/backends/postgresql/base.py"
+ ],
+ "holds": {
+  "django/contrib/postgres/apps.py": 14,
+  "django/db/backends/postgresql/introspection.py": 14,
+  "django/db/backends/postgresql/base.py": 9
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 20063,
+   "path": "django/contrib/postgres/apps.py",
+   "intents": [
+    "log:django:20055_20063:20063:django/contrib/postgres/apps.py:h0"
+   ],
+   "hold_ms": 14,
+   "t_submit_epoch": 1791538420067,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 14,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 36.3,
+   "t_done_epoch": 1791538420103
+  },
+  {
+   "writer": 1,
+   "pr": 20063,
+   "path": "django/db/backends/postgresql/introspection.py",
+   "intents": [
+    "log:django:20055_20063:20063:django/db/backends/postgresql/introspection.py:h3",
+    "log:django:20055_20063:20063:django/db/backends/postgresql/introspection.py:h4",
+    "log:django:20055_20063:20063:django/db/backends/postgresql/introspection.py:h5"
+   ],
+   "hold_ms": 14,
+   "t_submit_epoch": 1791538420103,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 7,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 25.24,
+   "t_done_epoch": 1791538420128
+  },
+  {
+   "writer": 1,
+   "pr": 20063,
+   "path": "django/db/backends/postgresql/base.py",
+   "intents": [
+    "log:django:20055_20063:20063:django/db/backends/postgresql/base.py:h1",
+    "log:django:20055_20063:20063:django/db/backends/postgresql/base.py:h2"
+   ],
+   "hold_ms": 9,
+   "t_submit_epoch": 1791538420128,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 15.03,
+   "t_done_epoch": 1791538420143
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 2
+ },
+ "steward_batches": null
+}

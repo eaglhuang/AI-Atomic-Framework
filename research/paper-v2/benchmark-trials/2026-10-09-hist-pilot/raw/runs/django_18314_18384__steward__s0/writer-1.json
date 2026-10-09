@@ -1,0 +1,135 @@
+{
+ "writer": 1,
+ "pr": 18384,
+ "pid": 1498930,
+ "init_ms": 149.478976,
+ "start_offset_ms": 7,
+ "file_order": [
+  "django/db/models/sql/compiler.py"
+ ],
+ "holds": {
+  "django/db/models/sql/compiler.py": 17
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 18384,
+   "path": "django/db/models/sql/compiler.py",
+   "intents": [
+    "log:django:18314_18384:18384:django/db/models/sql/compiler.py:h0",
+    "log:django:18314_18384:18384:django/db/models/sql/compiler.py:h1",
+    "log:django:18314_18384:18384:django/db/models/sql/compiler.py:h2",
+    "log:django:18314_18384:18384:django/db/models/sql/compiler.py:h3"
+   ],
+   "hold_ms": 17,
+   "t_submit_epoch": 1791538367853,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 18,
+   "outcome": "blocked",
+   "blocked_reason": "compose-context-mismatch: proposal 'prop-hist-w1-django_db_models_sql_compiler_py' context mismatch at base line 1615: expected \"    def as_subquery_condition(self, alias, columns, compiler):\", found \"            # unless the database doesn't support it.\" [proposals: prop-hist-w1-django_db_models_sql_compiler_py]",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w1-django_db_models_sql_compiler_py' context mismatch at base line 1615: expected \"    def as_subquery_condition(self, alias, columns, compiler):\", found \"            # unless the database doesn't support it.\" [proposals: prop-hist-w1-django_db_models_sql_compiler_py]"
+   ],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-django_db_models_sql_compiler.py-w1-0001",
+   "total_ms": 156.68,
+   "t_done_epoch": 1791538368009
+  }
+ ],
+ "admit_stats": {
+  "txns": 2,
+  "cas_conflicts": 0
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-django_db_models_sql_compiler.py-w1-0001",
+   "path": "django/db/models/sql/compiler.py",
+   "pid": 1498930,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-django_db_models_sql_compiler_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-django_db_models_sql_compiler_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:91d0b5fb95050e05891f76f6ceffe024fe680c492cdbf4ef2ebf3f4920dc0edc"
+   ],
+   "lock_wait_ms": 0.12,
+   "t_start_epoch_ms": 1791538367892.9,
+   "pre_apply_hash": "sha256:91d0b5fb95050e05891f76f6ceffe024fe680c492cdbf4ef2ebf3f4920dc0edc",
+   "receipt_before_hash": null,
+   "receipt_after_hash": null,
+   "post_apply_hash": "sha256:d6c986dfd184a4c75ef3d60ae026533160a1f49c0b8c4a2988b494175d7392a6",
+   "t_end_epoch_ms": 1791538367982.4,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "blocked",
+   "written": false,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-09T17:32:47.982+08:00",
+   "batch_id": "cb-django_db_models_sql_compiler.py-w1-0001",
+   "path": "django/db/models/sql/compiler.py",
+   "proposalIds": [
+    "prop-hist-w1-django_db_models_sql_compiler_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-django_db_models_sql_compiler_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-django_db_models_sql_compiler_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-django_db_models_sql_compiler_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-django_db_models_sql_compiler_py",
+     "logical_id": "prop-hist-w1-django_db_models_sql_compiler_py",
+     "attempt_id": "att-prop-hist-w1-django_db_models_sql_compiler_py-r0",
+     "proposal_id": "prop-hist-w1-django_db_models_sql_compiler_py",
+     "actorId": "writer-18384"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w1-django_db_models_sql_compiler_py' context mismatch at base line 1615: expected \"    def as_subquery_condition(self, alias, columns, compiler):\", found \"            # unless the database doesn't support it.\" [proposals: prop-hist-w1-django_db_models_sql_compiler_py]"
+   ],
+   "blocked_reason": "compose-context-mismatch: proposal 'prop-hist-w1-django_db_models_sql_compiler_py' context mismatch at base line 1615: expected \"    def as_subquery_condition(self, alias, columns, compiler):\", found \"            # unless the database doesn't support it.\" [proposals: prop-hist-w1-django_db_models_sql_compiler_py]",
+   "window_wait_ms": 0.25,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:91d0b5fb95050e05891f76f6ceffe024fe680c492cdbf4ef2ebf3f4920dc0edc",
+   "written": false,
+   "output_digest": null,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "compose-context-mismatch: proposal 'prop-hist-w1-django_db_models_sql_compiler_py' context mismatch at base line 1615: expected \"    def as_subquery_condition(self, alias, columns, compiler):\", found \"            # unless the database doesn't support it.\" [proposals: prop-hist-w1-django_db_models_sql_compiler_py]"
+  }
+ ]
+}

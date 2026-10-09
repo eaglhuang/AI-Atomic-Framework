@@ -1,0 +1,78 @@
+{
+ "writer": 1,
+ "pr": 20063,
+ "pid": 1512847,
+ "init_ms": 65.31093000000001,
+ "start_offset_ms": 6,
+ "file_order": [
+  "django/contrib/postgres/apps.py",
+  "django/db/backends/postgresql/introspection.py",
+  "django/db/backends/postgresql/base.py"
+ ],
+ "holds": {
+  "django/contrib/postgres/apps.py": 14,
+  "django/db/backends/postgresql/introspection.py": 14,
+  "django/db/backends/postgresql/base.py": 9
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 20063,
+   "path": "django/contrib/postgres/apps.py",
+   "intents": [
+    "log:django:20055_20063:20063:django/contrib/postgres/apps.py:h0"
+   ],
+   "hold_ms": 14,
+   "t_submit_epoch": 1791538420804,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 25,
+   "outcome": "commit",
+   "total_ms": 47.95,
+   "t_done_epoch": 1791538420852
+  },
+  {
+   "writer": 1,
+   "pr": 20063,
+   "path": "django/db/backends/postgresql/introspection.py",
+   "intents": [
+    "log:django:20055_20063:20063:django/db/backends/postgresql/introspection.py:h3",
+    "log:django:20055_20063:20063:django/db/backends/postgresql/introspection.py:h4",
+    "log:django:20055_20063:20063:django/db/backends/postgresql/introspection.py:h5"
+   ],
+   "hold_ms": 14,
+   "t_submit_epoch": 1791538420852,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 5,
+   "outcome": "commit",
+   "total_ms": 27.94,
+   "t_done_epoch": 1791538420880
+  },
+  {
+   "writer": 1,
+   "pr": 20063,
+   "path": "django/db/backends/postgresql/base.py",
+   "intents": [
+    "log:django:20055_20063:20063:django/db/backends/postgresql/base.py:h1",
+    "log:django:20055_20063:20063:django/db/backends/postgresql/base.py:h2"
+   ],
+   "hold_ms": 9,
+   "t_submit_epoch": 1791538420880,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "outcome": "commit",
+   "total_ms": 25.34,
+   "t_done_epoch": 1791538420905
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 8
+ },
+ "steward_batches": null
+}

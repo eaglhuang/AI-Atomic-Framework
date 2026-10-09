@@ -1,0 +1,87 @@
+{
+ "pair_id": "django:19793_19873",
+ "stratum": "O3",
+ "arm": "steward",
+ "plant": null,
+ "seed_k": 0,
+ "seed": 900355940,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b35a6141/AI-Atomic-Framework-b35a6141bd5bfbaec654f1cd3079323581b04074",
+ "wall_ms": 540,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 2,
+  "by_verdict": {
+   "correct": 1,
+   "blocked_absent": 1
+  },
+  "completed": 1,
+  "lost_effects": 0,
+  "blocked": 1,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 1,
+  "files_full_bytes_exact": 1,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {
+  "file-hash-drift: Target file hash sha256": 1
+ },
+ "structure": {
+  "django/db/models/fields/json.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "django/db/models/fields/json.py": true
+ },
+ "final_exists": {
+  "django/db/models/fields/json.py": true
+ },
+ "files": [
+  {
+   "path": "django/db/models/fields/json.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:3dbdcfa12a0e39ffc42737f073155256277a7b12d71507c8957c0f37153962c3",
+   "final_digest": "sha256:1d1bc2c853b69121b179265daca50f162b909263604cf633d23c291ad0448e24",
+   "expected_digests": [
+    "sha256:1d1bc2c853b69121b179265daca50f162b909263604cf633d23c291ad0448e24"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "django/db/models/fields/json.py": "sha256:1d1bc2c853b69121b179265daca50f162b909263604cf633d23c291ad0448e24"
+ }
+}

@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-2e3f2e919d517dcc",
+  "proposalIds": [
+    "prop-hist-w1-django_contrib_postgres_fields_ranges_py"
+  ],
+  "targetFiles": [
+    "django/contrib/postgres/fields/ranges.py"
+  ],
+  "appliedFiles": [
+    "django/contrib/postgres/fields/ranges.py"
+  ],
+  "fileBeforeHashes": {
+    "django/contrib/postgres/fields/ranges.py": "21b8c0402ec8756b884aa1dd057aeb6a23863f350fff8a471dc9cbf15b98651b"
+  },
+  "fileAfterHashes": {
+    "django/contrib/postgres/fields/ranges.py": "b17f3447eab01f9c62cf6fddc41af9e2b8c141e30dbfe3155bb0be70554d3d2a"
+  },
+  "permissions": {
+    "fileWrite": [
+      "django/contrib/postgres/fields/ranges.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-2e3f2e919d517dcc",
+    "planId": "merge-2e3f2e919d517dcc",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-2e3f2e919d517dcc",
+        "planId": "merge-2e3f2e919d517dcc",
+        "request_identity": [
+          "prop-hist-w1-django_contrib_postgres_fields_ranges_py"
+        ],
+        "actor_ids": [
+          "writer-19480"
+        ],
+        "request_files": [
+          "django/contrib/postgres/fields/ranges.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "django/contrib/postgres/fields/ranges.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-bench/trial-pilot-2026-10-09/runs/django_19057_19480__bare_composer__s0/artifacts/steward/cb-django_contrib_postgres_fields_ranges.py-w1-0005.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-DJANGO_CONTRIB_POSTGRES_FIELDS_RANGES_PY"
+        ],
+        "commit_sha": "d8172034a0006bab52a0cc050dd60bf64bf246cc"
+      }
+    ]
+  }
+}

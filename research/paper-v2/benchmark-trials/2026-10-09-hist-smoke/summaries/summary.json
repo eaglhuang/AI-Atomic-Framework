@@ -1,0 +1,592 @@
+{
+ "arms": {
+  "bare_composer": {
+   "blocked": 10,
+   "blocked_by_reason": {
+    "atm-new-file-unsupported (file-hash-drift: target does not exist)": 2,
+    "compose-context-mismatch (re-compose)": 8
+   },
+   "blocked_leak": 0,
+   "by_stratum_runs": {
+    "O2": 1,
+    "O3": 2
+   },
+   "completed": 61,
+   "corrupted_files": 0,
+   "duplicate": 0,
+   "extra_files": 0,
+   "failed_runs": 0,
+   "identity_ok_all": true,
+   "intents": 71,
+   "lost_effects": 0,
+   "misplaced": 0,
+   "runs": 3,
+   "structure_violations": 0,
+   "timed_out": 0,
+   "unresolved": 0
+  },
+  "file_lock": {
+   "blocked": 0,
+   "blocked_by_reason": {},
+   "blocked_leak": 0,
+   "by_stratum_runs": {
+    "O2": 1,
+    "O3": 2
+   },
+   "completed": 71,
+   "corrupted_files": 0,
+   "duplicate": 0,
+   "extra_files": 0,
+   "failed_runs": 0,
+   "identity_ok_all": true,
+   "intents": 71,
+   "lost_effects": 0,
+   "misplaced": 0,
+   "runs": 3,
+   "structure_violations": 0,
+   "timed_out": 0,
+   "unresolved": 0
+  },
+  "git_three_way": {
+   "blocked": 0,
+   "blocked_by_reason": {},
+   "blocked_leak": 0,
+   "by_stratum_runs": {
+    "O2": 1,
+    "O3": 2
+   },
+   "completed": 71,
+   "corrupted_files": 0,
+   "duplicate": 0,
+   "extra_files": 0,
+   "failed_runs": 0,
+   "identity_ok_all": true,
+   "intents": 71,
+   "lost_effects": 0,
+   "misplaced": 0,
+   "runs": 3,
+   "structure_violations": 0,
+   "timed_out": 0,
+   "unresolved": 0
+  },
+  "occ": {
+   "blocked": 0,
+   "blocked_by_reason": {},
+   "blocked_leak": 0,
+   "by_stratum_runs": {
+    "O2": 1,
+    "O3": 2
+   },
+   "completed": 71,
+   "corrupted_files": 0,
+   "duplicate": 0,
+   "extra_files": 0,
+   "failed_runs": 0,
+   "identity_ok_all": true,
+   "intents": 71,
+   "lost_effects": 0,
+   "misplaced": 0,
+   "runs": 3,
+   "structure_violations": 0,
+   "timed_out": 0,
+   "unresolved": 0
+  },
+  "steward": {
+   "blocked": 2,
+   "blocked_by_reason": {
+    "atm-new-file-unsupported (file-hash-drift: target does not exist)": 2
+   },
+   "blocked_leak": 0,
+   "by_stratum_runs": {
+    "O2": 1,
+    "O3": 2
+   },
+   "completed": 69,
+   "corrupted_files": 0,
+   "duplicate": 0,
+   "extra_files": 0,
+   "failed_runs": 0,
+   "identity_ok_all": true,
+   "intents": 71,
+   "lost_effects": 0,
+   "misplaced": 0,
+   "runs": 3,
+   "structure_violations": 0,
+   "timed_out": 0,
+   "unresolved": 0
+  }
+ },
+ "harness_errors": [],
+ "label": "HIST smoke (Django, 3 pairs x 5 arms x 1 seed + 15 planted-fault runs) 2026-10-09",
+ "plants": [
+  {
+   "corrupted": 1,
+   "detected": true,
+   "extra": 0,
+   "foreign_writes": 0,
+   "lost": 0,
+   "pair_id": "django:19063_19119",
+   "plant": "plant_flip_frame_byte",
+   "plant_log": [
+    {
+     "line": 7,
+     "path": "django/contrib/auth/forms.py",
+     "plant": "plant_flip_frame_byte"
+    }
+   ],
+   "run_failed": true
+  },
+  {
+   "corrupted": 0,
+   "detected": true,
+   "extra": 1,
+   "foreign_writes": 0,
+   "lost": 0,
+   "pair_id": "django:19063_19119",
+   "plant": "plant_foreign_file",
+   "plant_log": [
+    {
+     "kind": "orphan-tmp",
+     "path": ".forms.py.planted.atm-tmp",
+     "plant": "plant_foreign_file"
+    }
+   ],
+   "run_failed": true
+  },
+  {
+   "corrupted": 0,
+   "detected": true,
+   "extra": 0,
+   "foreign_writes": 0,
+   "lost": 1,
+   "pair_id": "django:19063_19119",
+   "plant": "plant_revert_hunk",
+   "plant_log": [
+    {
+     "changed": true,
+     "logical_id": "log:django:19063_19119:19119:django/contrib/auth/forms.py:h0",
+     "path": "django/contrib/auth/forms.py",
+     "plant": "plant_revert_hunk"
+    }
+   ],
+   "run_failed": true
+  },
+  {
+   "corrupted": 1,
+   "detected": true,
+   "extra": 0,
+   "foreign_writes": 0,
+   "lost": 2,
+   "pair_id": "django:19063_19119",
+   "plant": "plant_torn_tail",
+   "plant_log": [
+    {
+     "kept_bytes": 14510,
+     "path": "django/contrib/auth/forms.py",
+     "plant": "plant_torn_tail"
+    }
+   ],
+   "run_failed": true
+  },
+  {
+   "corrupted": 0,
+   "detected": true,
+   "extra": 0,
+   "foreign_writes": 0,
+   "lost": 9,
+   "pair_id": "django:19063_19119",
+   "plant": "planted_raw_overwrite",
+   "plant_log": [],
+   "run_failed": true
+  },
+  {
+   "corrupted": 1,
+   "detected": true,
+   "extra": 0,
+   "foreign_writes": 0,
+   "lost": 0,
+   "pair_id": "django:20045_20060",
+   "plant": "plant_flip_frame_byte",
+   "plant_log": [
+    {
+     "line": 8,
+     "path": "django/utils/html.py",
+     "plant": "plant_flip_frame_byte"
+    }
+   ],
+   "run_failed": true
+  },
+  {
+   "corrupted": 0,
+   "detected": true,
+   "extra": 1,
+   "foreign_writes": 0,
+   "lost": 0,
+   "pair_id": "django:20045_20060",
+   "plant": "plant_foreign_file",
+   "plant_log": [
+    {
+     "kind": "orphan-tmp",
+     "path": ".html.py.planted.atm-tmp",
+     "plant": "plant_foreign_file"
+    }
+   ],
+   "run_failed": true
+  },
+  {
+   "corrupted": 0,
+   "detected": true,
+   "extra": 0,
+   "foreign_writes": 0,
+   "lost": 1,
+   "pair_id": "django:20045_20060",
+   "plant": "plant_revert_hunk",
+   "plant_log": [
+    {
+     "changed": true,
+     "logical_id": "log:django:20045_20060:20060:django/utils/html.py:h0",
+     "path": "django/utils/html.py",
+     "plant": "plant_revert_hunk"
+    }
+   ],
+   "run_failed": true
+  },
+  {
+   "corrupted": 1,
+   "detected": true,
+   "extra": 0,
+   "foreign_writes": 0,
+   "lost": 6,
+   "pair_id": "django:20045_20060",
+   "plant": "plant_torn_tail",
+   "plant_log": [
+    {
+     "kept_bytes": 12907,
+     "path": "django/utils/html.py",
+     "plant": "plant_torn_tail"
+    }
+   ],
+   "run_failed": true
+  },
+  {
+   "corrupted": 0,
+   "detected": true,
+   "extra": 0,
+   "foreign_writes": 0,
+   "lost": 7,
+   "pair_id": "django:20045_20060",
+   "plant": "planted_raw_overwrite",
+   "plant_log": [],
+   "run_failed": true
+  },
+  {
+   "corrupted": 1,
+   "detected": true,
+   "extra": 0,
+   "foreign_writes": 0,
+   "lost": 0,
+   "pair_id": "django:20055_20101",
+   "plant": "plant_flip_frame_byte",
+   "plant_log": [
+    {
+     "line": 7,
+     "path": "django/db/backends/base/features.py",
+     "plant": "plant_flip_frame_byte"
+    }
+   ],
+   "run_failed": true
+  },
+  {
+   "corrupted": 0,
+   "detected": true,
+   "extra": 1,
+   "foreign_writes": 0,
+   "lost": 0,
+   "pair_id": "django:20055_20101",
+   "plant": "plant_foreign_file",
+   "plant_log": [
+    {
+     "kind": "orphan-tmp",
+     "path": ".features.py.planted.atm-tmp",
+     "plant": "plant_foreign_file"
+    }
+   ],
+   "run_failed": true
+  },
+  {
+   "corrupted": 0,
+   "detected": true,
+   "extra": 0,
+   "foreign_writes": 0,
+   "lost": 1,
+   "pair_id": "django:20055_20101",
+   "plant": "plant_revert_hunk",
+   "plant_log": [
+    {
+     "changed": true,
+     "logical_id": "log:django:20055_20101:20101:django/db/backends/base/features.py:h0",
+     "path": "django/db/backends/base/features.py",
+     "plant": "plant_revert_hunk"
+    }
+   ],
+   "run_failed": true
+  },
+  {
+   "corrupted": 1,
+   "detected": true,
+   "extra": 0,
+   "foreign_writes": 0,
+   "lost": 2,
+   "pair_id": "django:20055_20101",
+   "plant": "plant_torn_tail",
+   "plant_log": [
+    {
+     "kept_bytes": 12013,
+     "path": "django/db/backends/base/features.py",
+     "plant": "plant_torn_tail"
+    }
+   ],
+   "run_failed": true
+  },
+  {
+   "corrupted": 0,
+   "detected": true,
+   "extra": 0,
+   "foreign_writes": 0,
+   "lost": 5,
+   "pair_id": "django:20055_20101",
+   "plant": "planted_raw_overwrite",
+   "plant_log": [],
+   "run_failed": true
+  }
+ ],
+ "semantic": {
+  "by_arm": {
+   "bare_composer": {
+    "arm_regression_tests": 0,
+    "evaluated_runs": 0,
+    "gold_relative_regression_tests": 0,
+    "not_evaluable_runs": 3,
+    "same_bytes_as_gold": 0
+   },
+   "file_lock": {
+    "arm_regression_tests": 0,
+    "evaluated_runs": 1,
+    "gold_relative_regression_tests": 0,
+    "not_evaluable_runs": 2,
+    "same_bytes_as_gold": 0
+   },
+   "git_three_way": {
+    "arm_regression_tests": 0,
+    "evaluated_runs": 1,
+    "gold_relative_regression_tests": 0,
+    "not_evaluable_runs": 2,
+    "same_bytes_as_gold": 0
+   },
+   "occ": {
+    "arm_regression_tests": 0,
+    "evaluated_runs": 1,
+    "gold_relative_regression_tests": 0,
+    "not_evaluable_runs": 2,
+    "same_bytes_as_gold": 0
+   },
+   "steward": {
+    "arm_regression_tests": 0,
+    "evaluated_runs": 0,
+    "gold_relative_regression_tests": 0,
+    "not_evaluable_runs": 3,
+    "same_bytes_as_gold": 0
+   }
+  },
+  "pairs": {
+   "django:19063_19119": {
+    "base_valid": true,
+    "f2p_A": [
+     "admin_utils.tests.NestedObjectsTests.test_cyclic",
+     "admin_utils.tests.NestedObjectsTests.test_non_added_parent",
+     "admin_utils.tests.NestedObjectsTests.test_on_delete_do_nothing",
+     "admin_utils.tests.NestedObjectsTests.test_queries",
+     "admin_utils.tests.NestedObjectsTests.test_relation_on_abstract",
+     "admin_utils.tests.NestedObjectsTests.test_siblings",
+     "admin_utils.tests.NestedObjectsTests.test_unrelated_roots",
+     "admin_utils.tests.UtilsTests.test_build_q_object_from_lookup_parameters",
+     "admin_utils.tests.UtilsTests.test_display_for_field_password_name_not_user_model",
+     "admin_utils.tests.UtilsTests.test_empty_value_display_booleanfield",
+     "admin_utils.tests.UtilsTests.test_empty_value_display_choices",
+     "admin_utils.tests.UtilsTests.test_empty_value_display_for_field",
+     "admin_utils.tests.UtilsTests.test_flatten",
+     "admin_utils.tests.UtilsTests.test_flatten_fieldsets",
+     "admin_utils.tests.UtilsTests.test_help_text_for_field",
+     "admin_utils.tests.UtilsTests.test_json_display_for_field",
+     "admin_utils.tests.UtilsTests.test_label_for_field",
+     "admin_utils.tests.UtilsTests.test_label_for_field_failed_lookup",
+     "admin_utils.tests.UtilsTests.test_label_for_field_form_argument",
+     "admin_utils.tests.UtilsTests.test_label_for_property",
+     "admin_utils.tests.UtilsTests.test_list_display_for_value",
+     "admin_utils.tests.UtilsTests.test_list_display_for_value_boolean",
+     "admin_utils.tests.UtilsTests.test_list_display_for_value_empty",
+     "admin_utils.tests.UtilsTests.test_number_formats_display_for_field",
+     "admin_utils.tests.UtilsTests.test_number_formats_with_thousand_separator_display_for_field",
+     "admin_utils.tests.UtilsTests.test_password_display_for_field_user_model",
+     "admin_utils.tests.UtilsTests.test_quote",
+     "admin_utils.tests.UtilsTests.test_related_name",
+     "admin_utils.tests.UtilsTests.test_safestring_in_field_label",
+     "admin_utils.tests.UtilsTests.test_url_display_for_field",
+     "admin_utils.tests.UtilsTests.test_values_from_lookup_field",
+     "auth_tests.test_templatetags.RenderPasswordAsHashTests.test_invalid_password",
+     "auth_tests.test_templatetags.RenderPasswordAsHashTests.test_no_password",
+     "auth_tests.test_templatetags.RenderPasswordAsHashTests.test_valid_password"
+    ],
+    "f2p_B": [
+     "auth_tests.test_forms.CustomUserCreationFormTest.test_custom_form_with_non_required_password",
+     "auth_tests.test_forms.SensitiveVariablesTest.test_passwords_marked_as_sensitive_in_admin_forms"
+    ],
+    "flaky": [],
+    "historical_interference": [],
+    "labels": [
+     "admin_utils.tests",
+     "auth_tests.test_forms",
+     "auth_tests.test_templatetags",
+     "auth_tests.test_views"
+    ],
+    "status": "evaluated"
+   },
+   "django:20045_20060": {
+    "base_valid": false,
+    "f2p_A": [],
+    "f2p_B": [
+     "utils_tests.test_html.TestUtilsHtml.test_urlize"
+    ],
+    "flaky": [],
+    "historical_interference": [],
+    "labels": [
+     "utils_tests.test_html"
+    ],
+    "status": "evaluated-base-invalid (semantic endpoint excluded per prereg)"
+   },
+   "django:20055_20101": {
+    "base_valid": false,
+    "f2p_A": [
+     "inspectdb.tests.InspectDBTestCase.test_attribute_name_not_python_keyword",
+     "inspectdb.tests.InspectDBTestCase.test_char_field_db_collation",
+     "inspectdb.tests.InspectDBTestCase.test_char_field_unlimited",
+     "inspectdb.tests.InspectDBTestCase.test_custom_fields",
+     "inspectdb.tests.InspectDBTestCase.test_custom_normalize_table_name",
+     "inspectdb.tests.InspectDBTestCase.test_db_comments",
+     "inspectdb.tests.InspectDBTestCase.test_decimal_field_no_precision",
+     "inspectdb.tests.InspectDBTestCase.test_digits_column_name_introspection",
+     "inspectdb.tests.InspectDBTestCase.test_field_types",
+     "inspectdb.tests.InspectDBTestCase.test_foreign_key_db_on_delete",
+     "inspectdb.tests.InspectDBTestCase.test_foreign_key_to_field",
+     "inspectdb.tests.InspectDBTestCase.test_introspection_errors",
+     "inspectdb.tests.InspectDBTestCase.test_json_field",
+     "inspectdb.tests.InspectDBTestCase.test_managed_models",
+     "inspectdb.tests.InspectDBTestCase.test_number_field_types",
+     "inspectdb.tests.InspectDBTestCase.test_same_relations",
+     "inspectdb.tests.InspectDBTestCase.test_special_column_name_introspection",
+     "inspectdb.tests.InspectDBTestCase.test_stealth_table_name_filter_option",
+     "inspectdb.tests.InspectDBTestCase.test_table_name_introspection",
+     "inspectdb.tests.InspectDBTestCase.test_table_option",
+     "inspectdb.tests.InspectDBTestCase.test_table_with_func_unique_constraint",
+     "inspectdb.tests.InspectDBTestCase.test_text_field_db_collation",
+     "inspectdb.tests.InspectDBTestCase.test_unique_together_meta",
+     "inspectdb.tests.InspectDBTestCase.test_unsupported_unique_together",
+     "inspectdb.tests.InspectDBTransactionalTests.test_composite_primary_key",
+     "inspectdb.tests.InspectDBTransactionalTests.test_composite_primary_key_not_unique_together",
+     "inspectdb.tests.InspectDBTransactionalTests.test_foreign_data_wrapper",
+     "inspectdb.tests.InspectDBTransactionalTests.test_include_materialized_views",
+     "inspectdb.tests.InspectDBTransactionalTests.test_include_partitions",
+     "inspectdb.tests.InspectDBTransactionalTests.test_include_views",
+     "invalid_models_tests.test_ordinary_fields.AutoFieldTests.test_max_length_warning",
+     "invalid_models_tests.test_ordinary_fields.AutoFieldTests.test_primary_key",
+     "invalid_models_tests.test_ordinary_fields.AutoFieldTests.test_valid_case",
+     "invalid_models_tests.test_ordinary_fields.BinaryFieldTests.test_str_default_value",
+     "invalid_models_tests.test_ordinary_fields.BinaryFieldTests.test_valid_default_value",
+     "invalid_models_tests.test_ordinary_fields.CharFieldTests.test_bad_db_index_value",
+     "invalid_models_tests.test_ordinary_fields.CharFieldTests.test_bad_max_length_value",
+     "invalid_models_tests.test_ordinary_fields.CharFieldTests.test_bad_validators",
+     "invalid_models_tests.test_ordinary_fields.CharFieldTests.test_choices_containing_lazy",
+     "invalid_models_tests.test_ordinary_fields.CharFieldTests.test_choices_containing_non_pairs",
+     "invalid_models_tests.test_ordinary_fields.CharFieldTests.test_choices_in_max_length",
+     "invalid_models_tests.test_ordinary_fields.CharFieldTests.test_choices_named_group",
+     "invalid_models_tests.test_ordinary_fields.CharFieldTests.test_choices_named_group_bad_structure",
+     "invalid_models_tests.test_ordinary_fields.CharFieldTests.test_choices_named_group_lazy",
+     "invalid_models_tests.test_ordinary_fields.CharFieldTests.test_choices_named_group_non_pairs",
+     "invalid_models_tests.test_ordinary_fields.CharFieldTests.test_db_collation",
+     "invalid_models_tests.test_ordinary_fields.CharFieldTests.test_db_collation_required_db_features",
+     "invalid_models_tests.test_ordinary_fields.CharFieldTests.test_iterable_of_iterable_choices",
+     "invalid_models_tests.test_ordinary_fields.CharFieldTests.test_lazy_choices",
+     "invalid_models_tests.test_ordinary_fields.CharFieldTests.test_missing_max_length",
+     "invalid_models_tests.test_ordinary_fields.CharFieldTests.test_negative_max_length",
+     "invalid_models_tests.test_ordinary_fields.CharFieldTests.test_non_iterable_choices",
+     "invalid_models_tests.test_ordinary_fields.CharFieldTests.test_non_iterable_choices_two_letters",
+     "invalid_models_tests.test_ordinary_fields.CharFieldTests.test_str_max_length_type",
+     "invalid_models_tests.test_ordinary_fields.CharFieldTests.test_str_max_length_value",
+     "invalid_models_tests.test_ordinary_fields.CharFieldTests.test_too_long_char_field_under_mysql",
+     "invalid_models_tests.test_ordinary_fields.CharFieldTests.test_valid_field",
+     "invalid_models_tests.test_ordinary_fields.DateFieldTests.test_auto_now_and_auto_now_add_raise_error",
+     "invalid_models_tests.test_ordinary_fields.DateFieldTests.test_fix_default_value",
+     "invalid_models_tests.test_ordinary_fields.DateFieldTests.test_fix_default_value_tz",
+     "invalid_models_tests.test_ordinary_fields.DateTimeFieldTests.test_fix_default_value",
+     "invalid_models_tests.test_ordinary_fields.DateTimeFieldTests.test_fix_default_value_tz",
+     "invalid_models_tests.test_ordinary_fields.DbCommentTests.test_db_comment",
+     "invalid_models_tests.test_ordinary_fields.DbCommentTests.test_db_comment_required_db_features",
+     "invalid_models_tests.test_ordinary_fields.DecimalFieldTests.test_bad_values_of_max_digits_and_decimal_places",
+     "invalid_models_tests.test_ordinary_fields.DecimalFieldTests.test_both_attributes_omitted",
+     "invalid_models_tests.test_ordinary_fields.DecimalFieldTests.test_both_attributes_omitted_required_db_features",
+     "invalid_models_tests.test_ordinary_fields.DecimalFieldTests.test_decimal_places_greater_than_max_digits",
+     "invalid_models_tests.test_ordinary_fields.DecimalFieldTests.test_negative_max_digits_and_decimal_places",
+     "invalid_models_tests.test_ordinary_fields.DecimalFieldTests.test_only_decimal_places_defined",
+     "invalid_models_tests.test_ordinary_fields.DecimalFieldTests.test_only_max_digits_defined",
+     "invalid_models_tests.test_ordinary_fields.DecimalFieldTests.test_valid_field",
+     "invalid_models_tests.test_ordinary_fields.FileFieldTests.test_primary_key",
+     "invalid_models_tests.test_ordinary_fields.FileFieldTests.test_upload_to_callable_not_checked",
+     "invalid_models_tests.test_ordinary_fields.FileFieldTests.test_upload_to_starts_with_slash",
+     "invalid_models_tests.test_ordinary_fields.FileFieldTests.test_valid_case",
+     "invalid_models_tests.test_ordinary_fields.FileFieldTests.test_valid_default_case",
+     "invalid_models_tests.test_ordinary_fields.FilePathFieldTests.test_forbidden_files_and_folders",
+     "invalid_models_tests.test_ordinary_fields.GeneratedFieldTests.test_not_supported",
+     "invalid_models_tests.test_ordinary_fields.GeneratedFieldTests.test_not_supported_stored",
+     "invalid_models_tests.test_ordinary_fields.GeneratedFieldTests.test_not_supported_stored_required_db_features",
+     "invalid_models_tests.test_ordinary_fields.GeneratedFieldTests.test_not_supported_virtual",
+     "invalid_models_tests.test_ordinary_fields.GeneratedFieldTests.test_not_supported_virtual_required_db_features",
+     "invalid_models_tests.test_ordinary_fields.GeneratedFieldTests.test_output_field_charfield_unlimited_error",
+     "invalid_models_tests.test_ordinary_fields.GeneratedFieldTests.test_output_field_check_error",
+     "invalid_models_tests.test_ordinary_fields.GeneratedFieldTests.test_output_field_check_warning",
+     "invalid_models_tests.test_ordinary_fields.GenericIPAddressFieldTests.test_non_nullable_blank",
+     "invalid_models_tests.test_ordinary_fields.ImageFieldTests.test_pillow_installed",
+     "invalid_models_tests.test_ordinary_fields.IntegerFieldTests.test_max_length_warning",
+     "invalid_models_tests.test_ordinary_fields.IntegerFieldTests.test_non_iterable_choices",
+     "invalid_models_tests.test_ordinary_fields.IntegerFieldTests.test_non_iterable_choices_number",
+     "invalid_models_tests.test_ordinary_fields.InvalidDBDefaultTests.test_db_default",
+     "invalid_models_tests.test_ordinary_fields.InvalidDBDefaultTests.test_db_default_combined_invalid",
+     "invalid_models_tests.test_ordinary_fields.InvalidDBDefaultTests.test_db_default_expression_invalid",
+     "invalid_models_tests.test_ordinary_fields.InvalidDBDefaultTests.test_db_default_expression_required_db_features",
+     "invalid_models_tests.test_ordinary_fields.InvalidDBDefaultTests.test_db_default_function_arguments_invalid",
+     "invalid_models_tests.test_ordinary_fields.InvalidDBDefaultTests.test_db_default_literal",
+     "invalid_models_tests.test_ordinary_fields.InvalidDBDefaultTests.test_db_default_required_db_features",
+     "invalid_models_tests.test_ordinary_fields.InvalidDBDefaultTests.test_literals_not_treated_as_expressions",
+     "invalid_models_tests.test_ordinary_fields.JSONFieldTests.test_invalid_default",
+     "invalid_models_tests.test_ordinary_fields.JSONFieldTests.test_valid_callable_default",
+     "invalid_models_tests.test_ordinary_fields.JSONFieldTests.test_valid_default",
+     "invalid_models_tests.test_ordinary_fields.JSONFieldTests.test_valid_default_none",
+     "invalid_models_tests.test_ordinary_fields.TextFieldTests.test_db_collation",
+     "invalid_models_tests.test_ordinary_fields.TextFieldTests.test_db_collation_required_db_features",
+     "invalid_models_tests.test_ordinary_fields.TextFieldTests.test_max_length_warning",
+     "invalid_models_tests.test_ordinary_fields.TimeFieldTests.test_fix_default_value",
+     "invalid_models_tests.test_ordinary_fields.TimeFieldTests.test_fix_default_value_tz",
+     "invalid_models_tests.test_ordinary_fields.UUIDFieldTests.test_choices_named_group"
+    ],
+    "f2p_B": [],
+    "flaky": [],
+    "historical_interference": [],
+    "labels": [
+     "db_functions.test_uuid",
+     "inspectdb.tests",
+     "invalid_models_tests.test_ordinary_fields"
+    ],
+    "status": "evaluated-base-invalid (semantic endpoint excluded per prereg)"
+   }
+  }
+ }
+}

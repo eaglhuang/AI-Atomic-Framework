@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-36a85f8b5c54fac2",
+  "proposalIds": [
+    "prop-hist-w1-django_contrib_postgres_indexes_py"
+  ],
+  "targetFiles": [
+    "django/contrib/postgres/indexes.py"
+  ],
+  "appliedFiles": [
+    "django/contrib/postgres/indexes.py"
+  ],
+  "fileBeforeHashes": {
+    "django/contrib/postgres/indexes.py": "a87e7f90a8fb260d37f1c0ccf38646aef10db021755be10bfb9c577fc5a18b86"
+  },
+  "fileAfterHashes": {
+    "django/contrib/postgres/indexes.py": "63bcd168da4e5e0937b3e5ebc6e669ab9477285faea3d4953af89c84956180d1"
+  },
+  "permissions": {
+    "fileWrite": [
+      "django/contrib/postgres/indexes.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-36a85f8b5c54fac2",
+    "planId": "merge-36a85f8b5c54fac2",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-36a85f8b5c54fac2",
+        "planId": "merge-36a85f8b5c54fac2",
+        "request_identity": [
+          "prop-hist-w1-django_contrib_postgres_indexes_py"
+        ],
+        "actor_ids": [
+          "writer-19480"
+        ],
+        "request_files": [
+          "django/contrib/postgres/indexes.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "django/contrib/postgres/indexes.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-bench/trial-pilot-2026-10-09/runs/django_19057_19480__steward__s1/artifacts/steward/cb-django_contrib_postgres_indexes.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-DJANGO_CONTRIB_POSTGRES_INDEXES_PY"
+        ],
+        "commit_sha": "d8172034a0006bab52a0cc050dd60bf64bf246cc"
+      }
+    ]
+  }
+}

@@ -1,0 +1,125 @@
+{
+ "writer": 0,
+ "pr": 19732,
+ "pid": 1511543,
+ "init_ms": 98.826313,
+ "start_offset_ms": 15,
+ "file_order": [
+  "django/forms/models.py"
+ ],
+ "holds": {
+  "django/forms/models.py": 28
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 19732,
+   "path": "django/forms/models.py",
+   "intents": [
+    "log:django:19732_19744:19732:django/forms/models.py:h0"
+   ],
+   "hold_ms": 28,
+   "t_submit_epoch": 1791538415978,
+   "outcome": "blocked",
+   "blocked_reason": "compose-context-mismatch: proposal 'prop-hist-w0-django_forms_models_py' context mismatch at base line 1134: expected \"            if isinstance(self.form._meta.fields, tuple):\", found \"            self.form._meta.fields = list(self.form._meta.fields)\" [proposals: prop-hist-w0-django_forms_models_py]",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w0-django_forms_models_py' context mismatch at base line 1134: expected \"            if isinstance(self.form._meta.fields, tuple):\", found \"            self.form._meta.fields = list(self.form._meta.fields)\" [proposals: prop-hist-w0-django_forms_models_py]"
+   ],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-django_forms_models.py-w0-0001",
+   "total_ms": 163.82,
+   "t_done_epoch": 1791538416142
+  }
+ ],
+ "admit_stats": null,
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-django_forms_models.py-w0-0001",
+   "path": "django/forms/models.py",
+   "pid": 1511543,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-django_forms_models_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-django_forms_models_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:c565a46c3af495ddc0ada728ada08f52249b67eb2e7a6d7d59ca1200b95a87bb"
+   ],
+   "lock_wait_ms": 0.22,
+   "t_start_epoch_ms": 1791538416013.06,
+   "pre_apply_hash": "sha256:c565a46c3af495ddc0ada728ada08f52249b67eb2e7a6d7d59ca1200b95a87bb",
+   "receipt_before_hash": null,
+   "receipt_after_hash": null,
+   "post_apply_hash": "sha256:6db667a8ee2858904a63845a9624c61f96a3cbbb9ed48931536e2675b44a953d",
+   "t_end_epoch_ms": 1791538416141.63,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "blocked",
+   "written": false,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-09T17:33:36.141+08:00",
+   "batch_id": "cb-django_forms_models.py-w0-0001",
+   "path": "django/forms/models.py",
+   "proposalIds": [
+    "prop-hist-w0-django_forms_models_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-django_forms_models_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-django_forms_models_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-django_forms_models_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-django_forms_models_py",
+     "logical_id": "prop-hist-w0-django_forms_models_py",
+     "attempt_id": "att-prop-hist-w0-django_forms_models_py-r0",
+     "proposal_id": "prop-hist-w0-django_forms_models_py",
+     "actorId": "writer-19732"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w0-django_forms_models_py' context mismatch at base line 1134: expected \"            if isinstance(self.form._meta.fields, tuple):\", found \"            self.form._meta.fields = list(self.form._meta.fields)\" [proposals: prop-hist-w0-django_forms_models_py]"
+   ],
+   "blocked_reason": "compose-context-mismatch: proposal 'prop-hist-w0-django_forms_models_py' context mismatch at base line 1134: expected \"            if isinstance(self.form._meta.fields, tuple):\", found \"            self.form._meta.fields = list(self.form._meta.fields)\" [proposals: prop-hist-w0-django_forms_models_py]",
+   "window_wait_ms": 0.28,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:c565a46c3af495ddc0ada728ada08f52249b67eb2e7a6d7d59ca1200b95a87bb",
+   "written": false,
+   "output_digest": null,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "compose-context-mismatch: proposal 'prop-hist-w0-django_forms_models_py' context mismatch at base line 1134: expected \"            if isinstance(self.form._meta.fields, tuple):\", found \"            self.form._meta.fields = list(self.form._meta.fields)\" [proposals: prop-hist-w0-django_forms_models_py]"
+  }
+ ]
+}

@@ -1,0 +1,84 @@
+{
+ "pair_id": "django:18572_18605",
+ "stratum": "O3",
+ "arm": "steward",
+ "plant": null,
+ "seed_k": 0,
+ "seed": 2706160893,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b35a6141/AI-Atomic-Framework-b35a6141bd5bfbaec654f1cd3079323581b04074",
+ "wall_ms": 571,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 26,
+  "by_verdict": {
+   "correct": 26
+  },
+  "completed": 26,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 1,
+  "files_full_bytes_exact": 1,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "django/db/models/fields/tuple_lookups.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "django/db/models/fields/tuple_lookups.py": true
+ },
+ "final_exists": {
+  "django/db/models/fields/tuple_lookups.py": true
+ },
+ "files": [
+  {
+   "path": "django/db/models/fields/tuple_lookups.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:9f630b2e285ea1903166c731d9c1fe01fc70e1cf5b52f7e64cd439f940872029",
+   "final_digest": "sha256:b09ff9d219ec0d8cf7b41171a8113d3e3c52683ece0f4e5d8475dbc108a62fd4",
+   "expected_digests": [
+    "sha256:b09ff9d219ec0d8cf7b41171a8113d3e3c52683ece0f4e5d8475dbc108a62fd4"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "django/db/models/fields/tuple_lookups.py": "sha256:b09ff9d219ec0d8cf7b41171a8113d3e3c52683ece0f4e5d8475dbc108a62fd4"
+ }
+}

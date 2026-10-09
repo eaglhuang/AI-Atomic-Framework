@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-d95e13366c510471",
+  "proposalIds": [
+    "prop-hist-w0-django_contrib_auth_templatetags_auth_py"
+  ],
+  "targetFiles": [
+    "django/contrib/auth/templatetags/auth.py"
+  ],
+  "appliedFiles": [],
+  "fileBeforeHashes": {},
+  "fileAfterHashes": {},
+  "permissions": {
+    "fileWrite": [
+      "django/contrib/auth/templatetags/auth.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "blocked",
+  "blockedReasons": [
+    "file-hash-drift: Target file does not exist: django/contrib/auth/templatetags/auth.py"
+  ],
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-d95e13366c510471",
+    "planId": "merge-d95e13366c510471",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-d95e13366c510471",
+        "planId": "merge-d95e13366c510471",
+        "request_identity": [
+          "prop-hist-w0-django_contrib_auth_templatetags_auth_py"
+        ],
+        "actor_ids": [
+          "writer-19063"
+        ],
+        "request_files": [
+          "django/contrib/auth/templatetags/auth.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-bench/trial-smoke-2026-10-09/runs/django_19063_19119__plant_revert_hunk__s0/artifacts/steward/cb-django_contrib_auth_templatetags_auth.py-w0-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-DJANGO_CONTRIB_AUTH_TEMPLATETAGS_AUTH_PY"
+        ],
+        "commit_sha": "b71e4932a7e1bff06042db0e2a3cea9c3b159f10"
+      }
+    ]
+  }
+}

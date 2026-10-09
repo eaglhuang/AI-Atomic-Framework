@@ -1,0 +1,124 @@
+{
+ "writer": 1,
+ "pr": 18384,
+ "pid": 1499317,
+ "init_ms": 71.070416,
+ "start_offset_ms": 5,
+ "file_order": [
+  "django/db/models/sql/compiler.py"
+ ],
+ "holds": {
+  "django/db/models/sql/compiler.py": 5
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 18384,
+   "path": "django/db/models/sql/compiler.py",
+   "intents": [
+    "log:django:18314_18384:18384:django/db/models/sql/compiler.py:h0",
+    "log:django:18314_18384:18384:django/db/models/sql/compiler.py:h1",
+    "log:django:18314_18384:18384:django/db/models/sql/compiler.py:h2",
+    "log:django:18314_18384:18384:django/db/models/sql/compiler.py:h3"
+   ],
+   "hold_ms": 5,
+   "t_submit_epoch": 1791538369291,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-django_db_models_sql_compiler.py-w1-0001",
+   "total_ms": 126.06,
+   "t_done_epoch": 1791538369417
+  }
+ ],
+ "admit_stats": null,
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-django_db_models_sql_compiler.py-w1-0001",
+   "path": "django/db/models/sql/compiler.py",
+   "pid": 1499317,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-django_db_models_sql_compiler_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-django_db_models_sql_compiler_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:91d0b5fb95050e05891f76f6ceffe024fe680c492cdbf4ef2ebf3f4920dc0edc"
+   ],
+   "lock_wait_ms": 0.12,
+   "t_start_epoch_ms": 1791538369300.02,
+   "pre_apply_hash": "sha256:91d0b5fb95050e05891f76f6ceffe024fe680c492cdbf4ef2ebf3f4920dc0edc",
+   "receipt_before_hash": "sha256:91d0b5fb95050e05891f76f6ceffe024fe680c492cdbf4ef2ebf3f4920dc0edc",
+   "receipt_after_hash": "sha256:daa533a05859059dd5178614c66c2f30fb3c3f946721ffc847f2301b3dba7506",
+   "post_apply_hash": "sha256:daa533a05859059dd5178614c66c2f30fb3c3f946721ffc847f2301b3dba7506",
+   "t_end_epoch_ms": 1791538369417,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-09T17:32:49.417+08:00",
+   "batch_id": "cb-django_db_models_sql_compiler.py-w1-0001",
+   "path": "django/db/models/sql/compiler.py",
+   "proposalIds": [
+    "prop-hist-w1-django_db_models_sql_compiler_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-django_db_models_sql_compiler_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-django_db_models_sql_compiler_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-django_db_models_sql_compiler_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-django_db_models_sql_compiler_py",
+     "logical_id": "prop-hist-w1-django_db_models_sql_compiler_py",
+     "attempt_id": "att-prop-hist-w1-django_db_models_sql_compiler_py-r0",
+     "proposal_id": "prop-hist-w1-django_db_models_sql_compiler_py",
+     "actorId": "writer-18384"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.22,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:91d0b5fb95050e05891f76f6ceffe024fe680c492cdbf4ef2ebf3f4920dc0edc",
+   "written": true,
+   "output_digest": "sha256:daa533a05859059dd5178614c66c2f30fb3c3f946721ffc847f2301b3dba7506",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

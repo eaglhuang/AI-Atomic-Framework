@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-30be0cde05f6e19d",
+  "proposalIds": [
+    "prop-hist-w0-django_contrib_admin_templatetags_admin_list_py"
+  ],
+  "targetFiles": [
+    "django/contrib/admin/templatetags/admin_list.py"
+  ],
+  "appliedFiles": [
+    "django/contrib/admin/templatetags/admin_list.py"
+  ],
+  "fileBeforeHashes": {
+    "django/contrib/admin/templatetags/admin_list.py": "daf3d640559bd78e36902d6f0f38a263f2465f212d2623a7c1525aa2b9661726"
+  },
+  "fileAfterHashes": {
+    "django/contrib/admin/templatetags/admin_list.py": "bc0bf4832a115cd5098912da154a09be13ae9cc7ec24f707a58620bfbb3e8d1d"
+  },
+  "permissions": {
+    "fileWrite": [
+      "django/contrib/admin/templatetags/admin_list.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-30be0cde05f6e19d",
+    "planId": "merge-30be0cde05f6e19d",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-30be0cde05f6e19d",
+        "planId": "merge-30be0cde05f6e19d",
+        "request_identity": [
+          "prop-hist-w0-django_contrib_admin_templatetags_admin_list_py"
+        ],
+        "actor_ids": [
+          "writer-18958"
+        ],
+        "request_files": [
+          "django/contrib/admin/templatetags/admin_list.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "django/contrib/admin/templatetags/admin_list.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-bench/trial-pilot-2026-10-09/runs/django_18958_19078__bare_composer__s0/artifacts/steward/cb-django_contrib_admin_templatetags_admin_list.py-w0-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-DJANGO_CONTRIB_ADMIN_TEMPLATETAGS_ADMIN_LIST_PY"
+        ],
+        "commit_sha": "eb96ab2683ad78eeeaff0d77f7d0beee30b79d79"
+      }
+    ]
+  }
+}

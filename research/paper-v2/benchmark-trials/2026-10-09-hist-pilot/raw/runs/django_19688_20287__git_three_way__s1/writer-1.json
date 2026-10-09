@@ -1,0 +1,59 @@
+{
+ "writer": 1,
+ "pr": 20287,
+ "pid": 1511031,
+ "init_ms": 77.403991,
+ "start_offset_ms": 15,
+ "file_order": [
+  "django/contrib/admin/templatetags/admin_list.py",
+  "django/utils/html.py"
+ ],
+ "holds": {
+  "django/contrib/admin/templatetags/admin_list.py": 19,
+  "django/utils/html.py": 30
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 20287,
+   "path": "django/contrib/admin/templatetags/admin_list.py",
+   "intents": [
+    "log:django:19688_20287:20287:django/contrib/admin/templatetags/admin_list.py:h0",
+    "log:django:19688_20287:20287:django/contrib/admin/templatetags/admin_list.py:h1",
+    "log:django:19688_20287:20287:django/contrib/admin/templatetags/admin_list.py:h2",
+    "log:django:19688_20287:20287:django/contrib/admin/templatetags/admin_list.py:h3"
+   ],
+   "hold_ms": 19,
+   "t_submit_epoch": 1791538413894,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 22,
+   "outcome": "commit",
+   "total_ms": 53.83,
+   "t_done_epoch": 1791538413948
+  },
+  {
+   "writer": 1,
+   "pr": 20287,
+   "path": "django/utils/html.py",
+   "intents": [
+    "log:django:19688_20287:20287:django/utils/html.py:h4"
+   ],
+   "hold_ms": 30,
+   "t_submit_epoch": 1791538413948,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "outcome": "commit",
+   "total_ms": 41.03,
+   "t_done_epoch": 1791538413989
+  }
+ ],
+ "admit_stats": {
+  "txns": 4,
+  "cas_conflicts": 5
+ },
+ "steward_batches": null
+}

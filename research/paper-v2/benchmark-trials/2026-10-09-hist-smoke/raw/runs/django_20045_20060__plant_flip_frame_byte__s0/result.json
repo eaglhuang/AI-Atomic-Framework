@@ -1,0 +1,169 @@
+{
+ "pair_id": "django:20045_20060",
+ "stratum": "O3",
+ "arm": "steward",
+ "plant": "plant_flip_frame_byte",
+ "seed_k": 0,
+ "seed": 4550444,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b35a6141/AI-Atomic-Framework-b35a6141bd5bfbaec654f1cd3079323581b04074",
+ "wall_ms": 607,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 24,
+  "by_verdict": {
+   "correct": 24
+  },
+  "completed": 24,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 4,
+  "files_full_bytes_exact": 3,
+  "corrupted_files": 1,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": true,
+  "structure_violations": 1
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "django/utils/html.py": {
+   "applicable": true,
+   "final_parses": false
+  },
+  "django/utils/http.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "django/utils/numberformat.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "django/utils/text.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [
+  "django/utils/html.py"
+ ],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [
+  {
+   "plant": "plant_flip_frame_byte",
+   "path": "django/utils/html.py",
+   "line": 8
+  }
+ ],
+ "base_exists": {
+  "django/utils/html.py": true,
+  "django/utils/http.py": true,
+  "django/utils/numberformat.py": true,
+  "django/utils/text.py": true
+ },
+ "final_exists": {
+  "django/utils/html.py": true,
+  "django/utils/http.py": true,
+  "django/utils/numberformat.py": true,
+  "django/utils/text.py": true
+ },
+ "files": [
+  {
+   "path": "django/utils/html.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:09b95339006f4f82036e15dff8f69916a72ae284d24bca9e9b0c8376527ce3f5",
+   "final_digest": "sha256:209798e2f0d131ddf08b1ab0f5145931966d509ab8ca4b8e3f6cac4fb3b1a4a7",
+   "expected_digests": [
+    "sha256:b6bf46e651ef006b15f2463ce212bf28ae89a36e65b7db7b5aeb3ccbfdc90d64"
+   ],
+   "full_bytes_exact": false,
+   "judged_by": "myers-fallback",
+   "frame_ok": false,
+   "frame_violations": [
+    {
+     "kind": "frame_line_removed_or_changed",
+     "base_line": 7,
+     "expected": "from collections.abc import Mapping\n"
+    },
+    {
+     "kind": "foreign_line",
+     "near_expected_line": 8,
+     "actual": "xrom collections.abc import Mapping\n"
+    }
+   ],
+   "n_frame_violations": 2,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "django/utils/http.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:b87405ed949c7e3b89ef07cdd82d1d6dbba37497a9ce022ce7a50d18a4d15de2",
+   "final_digest": "sha256:69738e38ca75e2d722bcc46d8158c6a304a351a232ae7c61f60efe504097540f",
+   "expected_digests": [
+    "sha256:69738e38ca75e2d722bcc46d8158c6a304a351a232ae7c61f60efe504097540f"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "django/utils/numberformat.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:f0ba923267f168dd0f6124d3112e944ff0137ab7c36109fb61ae0d23bd2031a5",
+   "final_digest": "sha256:fe751d2f2077191d10f32367471e0b7f64fac3ce878d1923fd5988feb851e090",
+   "expected_digests": [
+    "sha256:fe751d2f2077191d10f32367471e0b7f64fac3ce878d1923fd5988feb851e090"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "django/utils/text.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:0b7ac9aef06742953d1feaabdabac2c1206e25cdb08f24b4402b519bf189ee7f",
+   "final_digest": "sha256:e94066e53c1a02e390c0de8382512ee40b4d98449f413375b810ec0c05009ff5",
+   "expected_digests": [
+    "sha256:e94066e53c1a02e390c0de8382512ee40b4d98449f413375b810ec0c05009ff5"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "django/utils/html.py": "sha256:209798e2f0d131ddf08b1ab0f5145931966d509ab8ca4b8e3f6cac4fb3b1a4a7",
+  "django/utils/http.py": "sha256:69738e38ca75e2d722bcc46d8158c6a304a351a232ae7c61f60efe504097540f",
+  "django/utils/numberformat.py": "sha256:fe751d2f2077191d10f32367471e0b7f64fac3ce878d1923fd5988feb851e090",
+  "django/utils/text.py": "sha256:e94066e53c1a02e390c0de8382512ee40b4d98449f413375b810ec0c05009ff5"
+ }
+}

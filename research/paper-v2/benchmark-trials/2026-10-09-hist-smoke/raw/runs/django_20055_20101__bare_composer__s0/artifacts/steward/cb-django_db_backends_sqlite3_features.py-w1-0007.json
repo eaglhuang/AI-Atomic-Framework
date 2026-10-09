@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-e4ac6be506bf56ae",
+  "proposalIds": [
+    "prop-hist-w1-django_db_backends_sqlite3_features_py"
+  ],
+  "targetFiles": [
+    "django/db/backends/sqlite3/features.py"
+  ],
+  "appliedFiles": [
+    "django/db/backends/sqlite3/features.py"
+  ],
+  "fileBeforeHashes": {
+    "django/db/backends/sqlite3/features.py": "b149705b1b5691725d53c7144309a4e5f1ebe30ad70a897293b60406ee70002f"
+  },
+  "fileAfterHashes": {
+    "django/db/backends/sqlite3/features.py": "025a943dde1ca2f9e18b4bc600e86f3102ef62f7b9c4aee9093a09df14c50713"
+  },
+  "permissions": {
+    "fileWrite": [
+      "django/db/backends/sqlite3/features.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-e4ac6be506bf56ae",
+    "planId": "merge-e4ac6be506bf56ae",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-e4ac6be506bf56ae",
+        "planId": "merge-e4ac6be506bf56ae",
+        "request_identity": [
+          "prop-hist-w1-django_db_backends_sqlite3_features_py"
+        ],
+        "actor_ids": [
+          "writer-20101"
+        ],
+        "request_files": [
+          "django/db/backends/sqlite3/features.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "django/db/backends/sqlite3/features.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-bench/trial-smoke-2026-10-09/runs/django_20055_20101__bare_composer__s0/artifacts/steward/cb-django_db_backends_sqlite3_features.py-w1-0007.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-DJANGO_DB_BACKENDS_SQLITE3_FEATURES_PY"
+        ],
+        "commit_sha": "823a9fd9113569fb5eb07afe31bed7ac99ed9a73"
+      }
+    ]
+  }
+}

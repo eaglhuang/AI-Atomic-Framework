@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-148470d01245d435",
+  "proposalIds": [
+    "prop-hist-w0-django_core_management_commands_shell_py"
+  ],
+  "targetFiles": [
+    "django/core/management/commands/shell.py"
+  ],
+  "appliedFiles": [
+    "django/core/management/commands/shell.py"
+  ],
+  "fileBeforeHashes": {
+    "django/core/management/commands/shell.py": "8c6d347a33e729ffa9471354e02eedab2e361f73ba0a7f0375e8843f900d7fea"
+  },
+  "fileAfterHashes": {
+    "django/core/management/commands/shell.py": "9e1a8d01140b2e658e76b4a7c03956abadcbd3101b129a306fdcc069b2d9e106"
+  },
+  "permissions": {
+    "fileWrite": [
+      "django/core/management/commands/shell.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-148470d01245d435",
+    "planId": "merge-148470d01245d435",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-148470d01245d435",
+        "planId": "merge-148470d01245d435",
+        "request_identity": [
+          "prop-hist-w0-django_core_management_commands_shell_py"
+        ],
+        "actor_ids": [
+          "writer-18560"
+        ],
+        "request_files": [
+          "django/core/management/commands/shell.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "django/core/management/commands/shell.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-bench/trial-pilot-2026-10-09/runs/django_18560_19264__bare_composer__s0/artifacts/steward/cb-django_core_management_commands_shell.py-w0-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-DJANGO_CORE_MANAGEMENT_COMMANDS_SHELL_PY"
+        ],
+        "commit_sha": "bc64d109768def5451c164056fb727d407742672"
+      }
+    ]
+  }
+}

@@ -1,0 +1,39 @@
+{
+ "writer": 1,
+ "pr": 19264,
+ "pid": 1501920,
+ "init_ms": 66.640534,
+ "start_offset_ms": 16,
+ "file_order": [
+  "django/core/management/commands/shell.py"
+ ],
+ "holds": {
+  "django/core/management/commands/shell.py": 29
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 19264,
+   "path": "django/core/management/commands/shell.py",
+   "intents": [
+    "log:django:18560_19264:19264:django/core/management/commands/shell.py:h0"
+   ],
+   "hold_ms": 29,
+   "t_submit_epoch": 1791538379524,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 20,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 54.68,
+   "t_done_epoch": 1791538379578
+  }
+ ],
+ "admit_stats": {
+  "txns": 2,
+  "cas_conflicts": 1
+ },
+ "steward_batches": null
+}

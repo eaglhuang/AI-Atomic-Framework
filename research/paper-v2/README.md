@@ -15,6 +15,7 @@ ATM（AI-Atomic-Framework）論文 2.0（composer＋中立 steward，RQ2 主臂 
 | r5 generation | [`generations/r5-2026-10-08/`](./generations/r5-2026-10-08/GENERATION.md)（PR #216 驗證＋四版同場重跑；**DRAFT，未再外審**；Phase 3 未做） |
 | 工作稿快照 | [`working-docs/2026-10-09/`](./working-docs/2026-10-09/SNAPSHOT.md)（DRAFT 工作稿；**不是 generation**、不主張結論；不可變。內含早期 backup 與中間版，為「所有產出都進 repo」而收錄，不適用 Generation 政策第 5 條） |
 | 校驗 | `generations/<gen>/verify.sh`（唯讀；`sha256sum -c SHA256SUMS`） |
+| benchmark-trials/2026-10-09-hist-smoke, benchmark-trials/2026-10-09-hist-pilot | 試跑（trial runs, not formal results）：歷史真實 PR benchmark 冒煙＋Django pilot，ATM pin b35a6141（2026-10-09） |
 
 ## Generation 政策
 1. **Generation 不可變（immutable）。** 一旦放入 `generations/<id>/` 並產生 `SHA256SUMS`，該目錄內任何檔案都不得修改、刪除或重新產生指紋。
@@ -40,5 +41,7 @@ sh research/paper-v2/generations/r5-2026-10-08/verify.sh
 # 預期：OK: 431 files verified (read-only) in .
 sh research/paper-v2/working-docs/2026-10-09/verify.sh
 # 預期：OK: 79 files verified (read-only) in .
+sh research/paper-v2/benchmark-trials/2026-10-09-hist-smoke/verify.sh research/paper-v2/benchmark-trials/2026-10-09-hist-smoke
+sh research/paper-v2/benchmark-trials/2026-10-09-hist-pilot/verify.sh research/paper-v2/benchmark-trials/2026-10-09-hist-pilot
 ```
 **注意：** `harness/reproduce.sh`（r1 版）的 verify 模式會重寫 manifest／checksums，**不可**用來驗證 r1（外審 P0-3）。r2–r5 已把 reproduce 拆成 verify／analyze／rerun／seal；驗證只用各代 `verify.sh`。

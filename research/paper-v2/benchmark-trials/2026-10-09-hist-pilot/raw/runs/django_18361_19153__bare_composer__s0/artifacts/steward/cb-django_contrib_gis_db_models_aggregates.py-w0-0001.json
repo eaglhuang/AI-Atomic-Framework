@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-3557860a8e4e2e1d",
+  "proposalIds": [
+    "prop-hist-w0-django_contrib_gis_db_models_aggregates_py"
+  ],
+  "targetFiles": [
+    "django/contrib/gis/db/models/aggregates.py"
+  ],
+  "appliedFiles": [
+    "django/contrib/gis/db/models/aggregates.py"
+  ],
+  "fileBeforeHashes": {
+    "django/contrib/gis/db/models/aggregates.py": "2266ee5f60212fa3e4132ac60effea288811f4549e22eafb70830854a5189e53"
+  },
+  "fileAfterHashes": {
+    "django/contrib/gis/db/models/aggregates.py": "37cecbd0dcf256ec65716544f3a9088d2301fef58bfa60adef97b158403f7685"
+  },
+  "permissions": {
+    "fileWrite": [
+      "django/contrib/gis/db/models/aggregates.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-3557860a8e4e2e1d",
+    "planId": "merge-3557860a8e4e2e1d",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-3557860a8e4e2e1d",
+        "planId": "merge-3557860a8e4e2e1d",
+        "request_identity": [
+          "prop-hist-w0-django_contrib_gis_db_models_aggregates_py"
+        ],
+        "actor_ids": [
+          "writer-18361"
+        ],
+        "request_files": [
+          "django/contrib/gis/db/models/aggregates.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "django/contrib/gis/db/models/aggregates.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-bench/trial-pilot-2026-10-09/runs/django_18361_19153__bare_composer__s0/artifacts/steward/cb-django_contrib_gis_db_models_aggregates.py-w0-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-DJANGO_CONTRIB_GIS_DB_MODELS_AGGREGATES_PY"
+        ],
+        "commit_sha": "01f12e966bbb74e2617f36949dce0b088e8d8886"
+      }
+    ]
+  }
+}

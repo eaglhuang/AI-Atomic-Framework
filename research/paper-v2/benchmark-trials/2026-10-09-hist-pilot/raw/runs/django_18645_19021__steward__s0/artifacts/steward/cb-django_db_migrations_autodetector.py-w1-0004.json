@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-f723acba908dbe76",
+  "proposalIds": [
+    "prop-hist-w1-django_db_migrations_autodetector_py"
+  ],
+  "targetFiles": [
+    "django/db/migrations/autodetector.py"
+  ],
+  "appliedFiles": [
+    "django/db/migrations/autodetector.py"
+  ],
+  "fileBeforeHashes": {
+    "django/db/migrations/autodetector.py": "85503a7a18ed77440e989e03d4e124997b50573eb6d74c832d965f35562e3d38"
+  },
+  "fileAfterHashes": {
+    "django/db/migrations/autodetector.py": "8de28785b7691d9e2d18e7480fd44b1657f62c28b3ec5c110bc24bbcef85f61e"
+  },
+  "permissions": {
+    "fileWrite": [
+      "django/db/migrations/autodetector.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-f723acba908dbe76",
+    "planId": "merge-f723acba908dbe76",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-f723acba908dbe76",
+        "planId": "merge-f723acba908dbe76",
+        "request_identity": [
+          "prop-hist-w1-django_db_migrations_autodetector_py"
+        ],
+        "actor_ids": [
+          "writer-19021"
+        ],
+        "request_files": [
+          "django/db/migrations/autodetector.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "django/db/migrations/autodetector.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-bench/trial-pilot-2026-10-09/runs/django_18645_19021__steward__s0/artifacts/steward/cb-django_db_migrations_autodetector.py-w1-0004.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-DJANGO_DB_MIGRATIONS_AUTODETECTOR_PY"
+        ],
+        "commit_sha": "7de8572c25308164e26b25dd178b5a3acd1aff25"
+      }
+    ]
+  }
+}

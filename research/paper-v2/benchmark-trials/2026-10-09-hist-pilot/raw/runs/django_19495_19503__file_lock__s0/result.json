@@ -1,0 +1,84 @@
+{
+ "pair_id": "django:19495_19503",
+ "stratum": "O3",
+ "arm": "file_lock",
+ "plant": null,
+ "seed_k": 0,
+ "seed": 3843832465,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b35a6141/AI-Atomic-Framework-b35a6141bd5bfbaec654f1cd3079323581b04074",
+ "wall_ms": 309,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 3,
+  "by_verdict": {
+   "correct": 3
+  },
+  "completed": 3,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 1,
+  "files_full_bytes_exact": 1,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "django/db/models/expressions.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "django/db/models/expressions.py": true
+ },
+ "final_exists": {
+  "django/db/models/expressions.py": true
+ },
+ "files": [
+  {
+   "path": "django/db/models/expressions.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:9f25662b9c3094f5a49598e5bc1ad3c70cd6c143f847906cae4260cf920a1d42",
+   "final_digest": "sha256:3049d6c58b2ba37d6fc3388da7d616beb4dedf68815b97f37e0f1e47c948e41e",
+   "expected_digests": [
+    "sha256:3049d6c58b2ba37d6fc3388da7d616beb4dedf68815b97f37e0f1e47c948e41e"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "django/db/models/expressions.py": "sha256:3049d6c58b2ba37d6fc3388da7d616beb4dedf68815b97f37e0f1e47c948e41e"
+ }
+}

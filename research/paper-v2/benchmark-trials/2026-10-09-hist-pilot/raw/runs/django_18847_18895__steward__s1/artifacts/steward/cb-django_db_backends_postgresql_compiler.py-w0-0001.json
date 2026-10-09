@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-0c63705b0826eb25",
+  "proposalIds": [
+    "prop-hist-w0-django_db_backends_postgresql_compiler_py"
+  ],
+  "targetFiles": [
+    "django/db/backends/postgresql/compiler.py"
+  ],
+  "appliedFiles": [],
+  "fileBeforeHashes": {},
+  "fileAfterHashes": {},
+  "permissions": {
+    "fileWrite": [
+      "django/db/backends/postgresql/compiler.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "blocked",
+  "blockedReasons": [
+    "file-hash-drift: Target file does not exist: django/db/backends/postgresql/compiler.py"
+  ],
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-0c63705b0826eb25",
+    "planId": "merge-0c63705b0826eb25",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-0c63705b0826eb25",
+        "planId": "merge-0c63705b0826eb25",
+        "request_identity": [
+          "prop-hist-w0-django_db_backends_postgresql_compiler_py"
+        ],
+        "actor_ids": [
+          "writer-18847"
+        ],
+        "request_files": [
+          "django/db/backends/postgresql/compiler.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-bench/trial-pilot-2026-10-09/runs/django_18847_18895__steward__s1/artifacts/steward/cb-django_db_backends_postgresql_compiler.py-w0-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-DJANGO_DB_BACKENDS_POSTGRESQL_COMPILER_PY"
+        ],
+        "commit_sha": "4e28e0fcdac3dc29ca294ead60fc23d6bc00acc3"
+      }
+    ]
+  }
+}
