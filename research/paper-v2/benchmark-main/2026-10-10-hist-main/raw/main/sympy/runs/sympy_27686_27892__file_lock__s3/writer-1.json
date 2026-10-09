@@ -1,0 +1,83 @@
+{
+ "writer": 1,
+ "pr": 27892,
+ "pid": 2104236,
+ "init_ms": 87.4879,
+ "start_offset_ms": 6,
+ "file_order": [
+  "sympy/solvers/pde.py",
+  "sympy/solvers/ode/ode.py",
+  "sympy/solvers/deutils.py"
+ ],
+ "holds": {
+  "sympy/solvers/pde.py": 11,
+  "sympy/solvers/ode/ode.py": 23,
+  "sympy/solvers/deutils.py": 17
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 27892,
+   "path": "sympy/solvers/pde.py",
+   "intents": [
+    "log:sympy:27686_27892:27892:sympy/solvers/pde.py:h4"
+   ],
+   "hold_ms": 11,
+   "t_submit_epoch": 1791564086589,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 16,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 31.92,
+   "t_done_epoch": 1791564086621
+  },
+  {
+   "writer": 1,
+   "pr": 27892,
+   "path": "sympy/solvers/ode/ode.py",
+   "intents": [
+    "log:sympy:27686_27892:27892:sympy/solvers/ode/ode.py:h1",
+    "log:sympy:27686_27892:27892:sympy/solvers/ode/ode.py:h2",
+    "log:sympy:27686_27892:27892:sympy/solvers/ode/ode.py:h3"
+   ],
+   "hold_ms": 23,
+   "t_submit_epoch": 1791564086621,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 34.47,
+   "t_done_epoch": 1791564086655
+  },
+  {
+   "writer": 1,
+   "pr": 27892,
+   "path": "sympy/solvers/deutils.py",
+   "intents": [
+    "log:sympy:27686_27892:27892:sympy/solvers/deutils.py:h0"
+   ],
+   "hold_ms": 17,
+   "t_submit_epoch": 1791564086655,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 23.1,
+   "t_done_epoch": 1791564086679
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 0
+ },
+ "steward_batches": null
+}

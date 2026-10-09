@@ -1,0 +1,62 @@
+{
+ "writer": 0,
+ "pr": 19012,
+ "pid": 2079191,
+ "init_ms": 95.33155400000001,
+ "start_offset_ms": 20,
+ "file_order": [
+  "django/db/models/query.py",
+  "django/contrib/contenttypes/fields.py"
+ ],
+ "holds": {
+  "django/db/models/query.py": 13,
+  "django/contrib/contenttypes/fields.py": 0
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 19012,
+   "path": "django/db/models/query.py",
+   "intents": [
+    "log:django:19012_19382:19012:django/db/models/query.py:h2",
+    "log:django:19012_19382:19012:django/db/models/query.py:h3",
+    "log:django:19012_19382:19012:django/db/models/query.py:h4",
+    "log:django:19012_19382:19012:django/db/models/query.py:h5"
+   ],
+   "hold_ms": 13,
+   "t_submit_epoch": 1791563866517,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "queue",
+   "admit_wait_ms": 24,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 46.9,
+   "t_done_epoch": 1791563866564
+  },
+  {
+   "writer": 0,
+   "pr": 19012,
+   "path": "django/contrib/contenttypes/fields.py",
+   "intents": [
+    "log:django:19012_19382:19012:django/contrib/contenttypes/fields.py:h0",
+    "log:django:19012_19382:19012:django/contrib/contenttypes/fields.py:h1"
+   ],
+   "hold_ms": 0,
+   "t_submit_epoch": 1791563866564,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 9.1,
+   "t_done_epoch": 1791563866573
+  }
+ ],
+ "admit_stats": {
+  "txns": 5,
+  "cas_conflicts": 0
+ },
+ "steward_batches": null
+}

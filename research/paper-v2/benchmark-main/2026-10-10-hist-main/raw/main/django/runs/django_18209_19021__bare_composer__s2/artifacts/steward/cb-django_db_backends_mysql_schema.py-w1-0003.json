@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-18e5ac12fe597b42",
+  "proposalIds": [
+    "prop-hist-w1-django_db_backends_mysql_schema_py"
+  ],
+  "targetFiles": [
+    "django/db/backends/mysql/schema.py"
+  ],
+  "appliedFiles": [],
+  "fileBeforeHashes": {},
+  "fileAfterHashes": {},
+  "permissions": {
+    "fileWrite": [
+      "django/db/backends/mysql/schema.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "blocked",
+  "blockedReasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w1-django_db_backends_mysql_schema_py' context mismatch at base line 222: expected \"        Keep the NULL and DEFAULT properties of the old field. If it has\", found \"        if field.db_default is not NOT_PROVIDED:\" [proposals: prop-hist-w1-django_db_backends_mysql_schema_py]"
+  ],
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-18e5ac12fe597b42",
+    "planId": "merge-18e5ac12fe597b42",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-18e5ac12fe597b42",
+        "planId": "merge-18e5ac12fe597b42",
+        "request_identity": [
+          "prop-hist-w1-django_db_backends_mysql_schema_py"
+        ],
+        "actor_ids": [
+          "writer-19021"
+        ],
+        "request_files": [
+          "django/db/backends/mysql/schema.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/django/runs/django_18209_19021__bare_composer__s2/artifacts/steward/cb-django_db_backends_mysql_schema.py-w1-0003.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-DJANGO_DB_BACKENDS_MYSQL_SCHEMA_PY"
+        ],
+        "commit_sha": "2b883c6fbf8485b9ef570dd9c818e7aecbede0e4"
+      }
+    ]
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-5607577c44f5a3a2",
+  "proposalIds": [
+    "prop-hist-w0-sympy_stats_stochastic_process_types_py"
+  ],
+  "targetFiles": [
+    "sympy/stats/stochastic_process_types.py"
+  ],
+  "appliedFiles": [
+    "sympy/stats/stochastic_process_types.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/stats/stochastic_process_types.py": "b4489040f071cf5c1f7514dfdc7713700d5b1e5e9e053de07383be19cc01f156"
+  },
+  "fileAfterHashes": {
+    "sympy/stats/stochastic_process_types.py": "7dcd65b769a581b8213ff03363fbed2f2ac3ccc7a684402ef12903aff15dce18"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/stats/stochastic_process_types.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-5607577c44f5a3a2",
+    "planId": "merge-5607577c44f5a3a2",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-5607577c44f5a3a2",
+        "planId": "merge-5607577c44f5a3a2",
+        "request_identity": [
+          "prop-hist-w0-sympy_stats_stochastic_process_types_py"
+        ],
+        "actor_ids": [
+          "writer-27353"
+        ],
+        "request_files": [
+          "sympy/stats/stochastic_process_types.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/stats/stochastic_process_types.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/sympy/runs/sympy_27353_27997__steward__s0/artifacts/steward/cb-sympy_stats_stochastic_process_types.py-w0-0008.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SYMPY_STATS_STOCHASTIC_PROCESS_TYPES_PY"
+        ],
+        "commit_sha": "5c60bf50626206ce5f7360dfe01d7fec5a21d761"
+      }
+    ]
+  }
+}

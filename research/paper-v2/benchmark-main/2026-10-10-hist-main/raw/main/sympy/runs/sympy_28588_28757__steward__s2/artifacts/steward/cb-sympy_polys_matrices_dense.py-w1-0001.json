@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-2c9b389009d8dded",
+  "proposalIds": [
+    "prop-hist-w1-sympy_polys_matrices_dense_py"
+  ],
+  "targetFiles": [
+    "sympy/polys/matrices/dense.py"
+  ],
+  "appliedFiles": [
+    "sympy/polys/matrices/dense.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/polys/matrices/dense.py": "4587688151de599a1e3bde0e6a5d667f5b09be3f899b24bf6da462f3e77d466b"
+  },
+  "fileAfterHashes": {
+    "sympy/polys/matrices/dense.py": "2c458111a2f92b7518a3edbebf954e2c691bc08fd42839dc720e7ced3ba0f07a"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/polys/matrices/dense.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-2c9b389009d8dded",
+    "planId": "merge-2c9b389009d8dded",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-2c9b389009d8dded",
+        "planId": "merge-2c9b389009d8dded",
+        "request_identity": [
+          "prop-hist-w1-sympy_polys_matrices_dense_py"
+        ],
+        "actor_ids": [
+          "writer-28757"
+        ],
+        "request_files": [
+          "sympy/polys/matrices/dense.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/polys/matrices/dense.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/sympy/runs/sympy_28588_28757__steward__s2/artifacts/steward/cb-sympy_polys_matrices_dense.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_POLYS_MATRICES_DENSE_PY"
+        ],
+        "commit_sha": "d0b36ecb1e2036bbf4689d22f0ce9fc023e701a3"
+      }
+    ]
+  }
+}

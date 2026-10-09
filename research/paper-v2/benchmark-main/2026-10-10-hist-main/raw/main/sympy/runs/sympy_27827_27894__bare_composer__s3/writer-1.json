@@ -1,0 +1,127 @@
+{
+ "writer": 1,
+ "pr": 27894,
+ "pid": 2092287,
+ "init_ms": 76.35734200000002,
+ "start_offset_ms": 14,
+ "file_order": [
+  "sympy/concrete/summations.py"
+ ],
+ "holds": {
+  "sympy/concrete/summations.py": 30
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 27894,
+   "path": "sympy/concrete/summations.py",
+   "intents": [
+    "log:sympy:27827_27894:27894:sympy/concrete/summations.py:h0",
+    "log:sympy:27827_27894:27894:sympy/concrete/summations.py:h1",
+    "log:sympy:27827_27894:27894:sympy/concrete/summations.py:h2"
+   ],
+   "hold_ms": 30,
+   "t_submit_epoch": 1791563973305,
+   "outcome": "blocked",
+   "blocked_reason": "compose-context-mismatch: proposal 'prop-hist-w1-sympy_concrete_summations_py' context mismatch at base line 1455: expected \"    def is_even_function(numer, denom):\", found \"    def get_function_symmetry(numer, denom):\" [proposals: prop-hist-w1-sympy_concrete_summations_py]",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w1-sympy_concrete_summations_py' context mismatch at base line 1455: expected \"    def is_even_function(numer, denom):\", found \"    def get_function_symmetry(numer, denom):\" [proposals: prop-hist-w1-sympy_concrete_summations_py]"
+   ],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sympy_concrete_summations.py-w1-0001",
+   "total_ms": 135.46,
+   "t_done_epoch": 1791563973441
+  }
+ ],
+ "admit_stats": null,
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sympy_concrete_summations.py-w1-0001",
+   "path": "sympy/concrete/summations.py",
+   "pid": 2092287,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-sympy_concrete_summations_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sympy_concrete_summations_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:01047e810f43af8fe6fd841746a0a22254d8ebe6619a8328bbfbda64a7b15952"
+   ],
+   "lock_wait_ms": 0.12,
+   "t_start_epoch_ms": 1791563973338.92,
+   "pre_apply_hash": "sha256:01047e810f43af8fe6fd841746a0a22254d8ebe6619a8328bbfbda64a7b15952",
+   "receipt_before_hash": null,
+   "receipt_after_hash": null,
+   "post_apply_hash": "sha256:3836fc5d7043cd56bdf61097c35e940acc7a76d8afecba6906faa6696c6e1110",
+   "t_end_epoch_ms": 1791563973440.55,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "blocked",
+   "written": false,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T00:39:33.440+08:00",
+   "batch_id": "cb-sympy_concrete_summations.py-w1-0001",
+   "path": "sympy/concrete/summations.py",
+   "proposalIds": [
+    "prop-hist-w1-sympy_concrete_summations_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sympy_concrete_summations_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-sympy_concrete_summations_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-sympy_concrete_summations_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-sympy_concrete_summations_py",
+     "logical_id": "prop-hist-w1-sympy_concrete_summations_py",
+     "attempt_id": "att-prop-hist-w1-sympy_concrete_summations_py-r0",
+     "proposal_id": "prop-hist-w1-sympy_concrete_summations_py",
+     "actorId": "writer-27894"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w1-sympy_concrete_summations_py' context mismatch at base line 1455: expected \"    def is_even_function(numer, denom):\", found \"    def get_function_symmetry(numer, denom):\" [proposals: prop-hist-w1-sympy_concrete_summations_py]"
+   ],
+   "blocked_reason": "compose-context-mismatch: proposal 'prop-hist-w1-sympy_concrete_summations_py' context mismatch at base line 1455: expected \"    def is_even_function(numer, denom):\", found \"    def get_function_symmetry(numer, denom):\" [proposals: prop-hist-w1-sympy_concrete_summations_py]",
+   "window_wait_ms": 0.31,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:01047e810f43af8fe6fd841746a0a22254d8ebe6619a8328bbfbda64a7b15952",
+   "written": false,
+   "output_digest": null,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "compose-context-mismatch: proposal 'prop-hist-w1-sympy_concrete_summations_py' context mismatch at base line 1455: expected \"    def is_even_function(numer, denom):\", found \"    def get_function_symmetry(numer, denom):\" [proposals: prop-hist-w1-sympy_concrete_summations_py]"
+  }
+ ]
+}

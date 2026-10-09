@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-cf1480a5878f572f",
+  "proposalIds": [
+    "prop-hist-w0-sympy_polys_agca_modules_py"
+  ],
+  "targetFiles": [
+    "sympy/polys/agca/modules.py"
+  ],
+  "appliedFiles": [
+    "sympy/polys/agca/modules.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/polys/agca/modules.py": "23b6a5cb3a2f1f9df4a9fc6c69aba8ee8e3a6419415d09c72d41693156ccd0f9"
+  },
+  "fileAfterHashes": {
+    "sympy/polys/agca/modules.py": "3de035dfc147b027d49fcbe476b8cf6bddb19b3abb42a9343eb758c15a0da9fd"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/polys/agca/modules.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-cf1480a5878f572f",
+    "planId": "merge-cf1480a5878f572f",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-cf1480a5878f572f",
+        "planId": "merge-cf1480a5878f572f",
+        "request_identity": [
+          "prop-hist-w0-sympy_polys_agca_modules_py"
+        ],
+        "actor_ids": [
+          "writer-26752"
+        ],
+        "request_files": [
+          "sympy/polys/agca/modules.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/polys/agca/modules.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/sympy/runs/sympy_26752_26809__steward__s4/artifacts/steward/cb-sympy_polys_agca_modules.py-w0-0004.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SYMPY_POLYS_AGCA_MODULES_PY"
+        ],
+        "commit_sha": "47b4251dacf0db524ed0eec7cdb4bb873216cd3a"
+      }
+    ]
+  }
+}

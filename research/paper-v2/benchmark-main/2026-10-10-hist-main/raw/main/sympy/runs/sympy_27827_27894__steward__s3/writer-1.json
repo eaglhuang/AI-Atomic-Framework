@@ -1,0 +1,130 @@
+{
+ "writer": 1,
+ "pr": 27894,
+ "pid": 2092169,
+ "init_ms": 104.059922,
+ "start_offset_ms": 14,
+ "file_order": [
+  "sympy/concrete/summations.py"
+ ],
+ "holds": {
+  "sympy/concrete/summations.py": 30
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 27894,
+   "path": "sympy/concrete/summations.py",
+   "intents": [
+    "log:sympy:27827_27894:27894:sympy/concrete/summations.py:h0",
+    "log:sympy:27827_27894:27894:sympy/concrete/summations.py:h1",
+    "log:sympy:27827_27894:27894:sympy/concrete/summations.py:h2"
+   ],
+   "hold_ms": 30,
+   "t_submit_epoch": 1791563972575,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 15,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sympy_concrete_summations.py-w1-0001",
+   "total_ms": 149.6,
+   "t_done_epoch": 1791563972724
+  }
+ ],
+ "admit_stats": {
+  "txns": 2,
+  "cas_conflicts": 0
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sympy_concrete_summations.py-w1-0001",
+   "path": "sympy/concrete/summations.py",
+   "pid": 2092169,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-sympy_concrete_summations_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sympy_concrete_summations_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:01047e810f43af8fe6fd841746a0a22254d8ebe6619a8328bbfbda64a7b15952"
+   ],
+   "lock_wait_ms": 0.12,
+   "t_start_epoch_ms": 1791563972624.52,
+   "pre_apply_hash": "sha256:01047e810f43af8fe6fd841746a0a22254d8ebe6619a8328bbfbda64a7b15952",
+   "receipt_before_hash": "sha256:01047e810f43af8fe6fd841746a0a22254d8ebe6619a8328bbfbda64a7b15952",
+   "receipt_after_hash": "sha256:4b8d63819c25dd99a6681dfa7c07f0bd6fc72cc7681c454c017ea21422f8e474",
+   "post_apply_hash": "sha256:4b8d63819c25dd99a6681dfa7c07f0bd6fc72cc7681c454c017ea21422f8e474",
+   "t_end_epoch_ms": 1791563972720.97,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T00:39:32.721+08:00",
+   "batch_id": "cb-sympy_concrete_summations.py-w1-0001",
+   "path": "sympy/concrete/summations.py",
+   "proposalIds": [
+    "prop-hist-w1-sympy_concrete_summations_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sympy_concrete_summations_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-sympy_concrete_summations_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-sympy_concrete_summations_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-sympy_concrete_summations_py",
+     "logical_id": "prop-hist-w1-sympy_concrete_summations_py",
+     "attempt_id": "att-prop-hist-w1-sympy_concrete_summations_py-r0",
+     "proposal_id": "prop-hist-w1-sympy_concrete_summations_py",
+     "actorId": "writer-27894"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.25,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:01047e810f43af8fe6fd841746a0a22254d8ebe6619a8328bbfbda64a7b15952",
+   "written": true,
+   "output_digest": "sha256:4b8d63819c25dd99a6681dfa7c07f0bd6fc72cc7681c454c017ea21422f8e474",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

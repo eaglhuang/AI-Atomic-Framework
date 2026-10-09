@@ -1,0 +1,125 @@
+{
+ "writer": 0,
+ "pr": 28653,
+ "pid": 2095513,
+ "init_ms": 69.10339,
+ "start_offset_ms": 18,
+ "file_order": [
+  "sympy/combinatorics/coset_table.py"
+ ],
+ "holds": {
+  "sympy/combinatorics/coset_table.py": 7
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 28653,
+   "path": "sympy/combinatorics/coset_table.py",
+   "intents": [
+    "log:sympy:28653_28662:28653:sympy/combinatorics/coset_table.py:h0"
+   ],
+   "hold_ms": 7,
+   "t_submit_epoch": 1791564001895,
+   "outcome": "blocked",
+   "blocked_reason": "compose-context-mismatch: proposal 'prop-hist-w0-sympy_combinatorics_coset_table_py' context mismatch at base line 85: expected \"        self.p_p = {}\", found \"        self.p_p = {0:self._grp.identity}\" [proposals: prop-hist-w0-sympy_combinatorics_coset_table_py]",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w0-sympy_combinatorics_coset_table_py' context mismatch at base line 85: expected \"        self.p_p = {}\", found \"        self.p_p = {0:self._grp.identity}\" [proposals: prop-hist-w0-sympy_combinatorics_coset_table_py]"
+   ],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sympy_combinatorics_coset_table.py-w0-0001",
+   "total_ms": 115.93,
+   "t_done_epoch": 1791564002011
+  }
+ ],
+ "admit_stats": null,
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sympy_combinatorics_coset_table.py-w0-0001",
+   "path": "sympy/combinatorics/coset_table.py",
+   "pid": 2095513,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-sympy_combinatorics_coset_table_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sympy_combinatorics_coset_table_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:b28a6905df22e9457eb29a5d3b3ca47cd13c7af31e7255389754f07cbe549572"
+   ],
+   "lock_wait_ms": 0.14,
+   "t_start_epoch_ms": 1791564001907.52,
+   "pre_apply_hash": "sha256:b28a6905df22e9457eb29a5d3b3ca47cd13c7af31e7255389754f07cbe549572",
+   "receipt_before_hash": null,
+   "receipt_after_hash": null,
+   "post_apply_hash": "sha256:b992a5e7f2f56c60469153d5dfc17157faeac33126bc1215d15a36154efa2374",
+   "t_end_epoch_ms": 1791564002010.99,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "blocked",
+   "written": false,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T00:40:02.011+08:00",
+   "batch_id": "cb-sympy_combinatorics_coset_table.py-w0-0001",
+   "path": "sympy/combinatorics/coset_table.py",
+   "proposalIds": [
+    "prop-hist-w0-sympy_combinatorics_coset_table_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sympy_combinatorics_coset_table_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-sympy_combinatorics_coset_table_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-sympy_combinatorics_coset_table_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-sympy_combinatorics_coset_table_py",
+     "logical_id": "prop-hist-w0-sympy_combinatorics_coset_table_py",
+     "attempt_id": "att-prop-hist-w0-sympy_combinatorics_coset_table_py-r0",
+     "proposal_id": "prop-hist-w0-sympy_combinatorics_coset_table_py",
+     "actorId": "writer-28653"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w0-sympy_combinatorics_coset_table_py' context mismatch at base line 85: expected \"        self.p_p = {}\", found \"        self.p_p = {0:self._grp.identity}\" [proposals: prop-hist-w0-sympy_combinatorics_coset_table_py]"
+   ],
+   "blocked_reason": "compose-context-mismatch: proposal 'prop-hist-w0-sympy_combinatorics_coset_table_py' context mismatch at base line 85: expected \"        self.p_p = {}\", found \"        self.p_p = {0:self._grp.identity}\" [proposals: prop-hist-w0-sympy_combinatorics_coset_table_py]",
+   "window_wait_ms": 0.27,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:b28a6905df22e9457eb29a5d3b3ca47cd13c7af31e7255389754f07cbe549572",
+   "written": false,
+   "output_digest": null,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "compose-context-mismatch: proposal 'prop-hist-w0-sympy_combinatorics_coset_table_py' context mismatch at base line 85: expected \"        self.p_p = {}\", found \"        self.p_p = {0:self._grp.identity}\" [proposals: prop-hist-w0-sympy_combinatorics_coset_table_py]"
+  }
+ ]
+}

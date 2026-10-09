@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-3b164e71eaf66900",
+  "proposalIds": [
+    "prop-hist-w1-sympy_functions_special_bessel_py"
+  ],
+  "targetFiles": [
+    "sympy/functions/special/bessel.py"
+  ],
+  "appliedFiles": [],
+  "fileBeforeHashes": {},
+  "fileAfterHashes": {},
+  "permissions": {
+    "fileWrite": [
+      "sympy/functions/special/bessel.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "blocked",
+  "blockedReasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w1-sympy_functions_special_bessel_py' context mismatch at base line 13: expected \"from sympy.functions.combinatorial.factorials import factorial\", found \"from sympy.functions.combinatorial.factorials import factorial, RisingFactorial\" [proposals: prop-hist-w1-sympy_functions_special_bessel_py]"
+  ],
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-3b164e71eaf66900",
+    "planId": "merge-3b164e71eaf66900",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-3b164e71eaf66900",
+        "planId": "merge-3b164e71eaf66900",
+        "request_identity": [
+          "prop-hist-w1-sympy_functions_special_bessel_py"
+        ],
+        "actor_ids": [
+          "writer-26147"
+        ],
+        "request_files": [
+          "sympy/functions/special/bessel.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/sympy/runs/sympy_25664_26147__bare_composer__s2/artifacts/steward/cb-sympy_functions_special_bessel.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_FUNCTIONS_SPECIAL_BESSEL_PY"
+        ],
+        "commit_sha": "3352d352be4a89d16512631f79b4766c26429011"
+      }
+    ]
+  }
+}

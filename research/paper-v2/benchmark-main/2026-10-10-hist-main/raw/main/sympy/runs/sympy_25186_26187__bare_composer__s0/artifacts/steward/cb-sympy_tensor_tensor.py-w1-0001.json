@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-9176116824c976df",
+  "proposalIds": [
+    "prop-hist-w1-sympy_tensor_tensor_py"
+  ],
+  "targetFiles": [
+    "sympy/tensor/tensor.py"
+  ],
+  "appliedFiles": [],
+  "fileBeforeHashes": {},
+  "fileAfterHashes": {},
+  "permissions": {
+    "fileWrite": [
+      "sympy/tensor/tensor.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "blocked",
+  "blockedReasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w1-sympy_tensor_tensor_py' context mismatch at base line 3328: expected \"                    indices.append(index)\", found \"                    raise TypeError(\\\"expected TensorIndex\\\")\" [proposals: prop-hist-w1-sympy_tensor_tensor_py]"
+  ],
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-9176116824c976df",
+    "planId": "merge-9176116824c976df",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-9176116824c976df",
+        "planId": "merge-9176116824c976df",
+        "request_identity": [
+          "prop-hist-w1-sympy_tensor_tensor_py"
+        ],
+        "actor_ids": [
+          "writer-26187"
+        ],
+        "request_files": [
+          "sympy/tensor/tensor.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/sympy/runs/sympy_25186_26187__bare_composer__s0/artifacts/steward/cb-sympy_tensor_tensor.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_TENSOR_TENSOR_PY"
+        ],
+        "commit_sha": "d4de92c119b1885941b537d5cda721ed87ef0f8d"
+      }
+    ]
+  }
+}

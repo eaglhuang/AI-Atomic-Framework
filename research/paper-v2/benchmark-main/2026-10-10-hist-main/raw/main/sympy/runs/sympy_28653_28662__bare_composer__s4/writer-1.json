@@ -1,0 +1,229 @@
+{
+ "writer": 1,
+ "pr": 28662,
+ "pid": 2095514,
+ "init_ms": 69.91789,
+ "start_offset_ms": 14,
+ "file_order": [
+  "sympy/combinatorics/coset_table.py",
+  "sympy/combinatorics/homomorphisms.py"
+ ],
+ "holds": {
+  "sympy/combinatorics/coset_table.py": 15,
+  "sympy/combinatorics/homomorphisms.py": 1
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 28662,
+   "path": "sympy/combinatorics/coset_table.py",
+   "intents": [
+    "log:sympy:28653_28662:28662:sympy/combinatorics/coset_table.py:h0"
+   ],
+   "hold_ms": 15,
+   "t_submit_epoch": 1791564001890,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sympy_combinatorics_coset_table.py-w1-0001",
+   "total_ms": 115.64,
+   "t_done_epoch": 1791564002006
+  },
+  {
+   "writer": 1,
+   "pr": 28662,
+   "path": "sympy/combinatorics/homomorphisms.py",
+   "intents": [
+    "log:sympy:28653_28662:28662:sympy/combinatorics/homomorphisms.py:h1",
+    "log:sympy:28653_28662:28662:sympy/combinatorics/homomorphisms.py:h2",
+    "log:sympy:28653_28662:28662:sympy/combinatorics/homomorphisms.py:h3",
+    "log:sympy:28653_28662:28662:sympy/combinatorics/homomorphisms.py:h4"
+   ],
+   "hold_ms": 1,
+   "t_submit_epoch": 1791564002006,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sympy_combinatorics_homomorphisms.py-w1-0002",
+   "total_ms": 11.07,
+   "t_done_epoch": 1791564002017
+  }
+ ],
+ "admit_stats": null,
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sympy_combinatorics_coset_table.py-w1-0001",
+   "path": "sympy/combinatorics/coset_table.py",
+   "pid": 2095514,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-sympy_combinatorics_coset_table_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sympy_combinatorics_coset_table_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:b28a6905df22e9457eb29a5d3b3ca47cd13c7af31e7255389754f07cbe549572"
+   ],
+   "lock_wait_ms": 0.19,
+   "t_start_epoch_ms": 1791564001909.42,
+   "pre_apply_hash": "sha256:b28a6905df22e9457eb29a5d3b3ca47cd13c7af31e7255389754f07cbe549572",
+   "receipt_before_hash": "sha256:b28a6905df22e9457eb29a5d3b3ca47cd13c7af31e7255389754f07cbe549572",
+   "receipt_after_hash": "sha256:b992a5e7f2f56c60469153d5dfc17157faeac33126bc1215d15a36154efa2374",
+   "post_apply_hash": "sha256:b992a5e7f2f56c60469153d5dfc17157faeac33126bc1215d15a36154efa2374",
+   "t_end_epoch_ms": 1791564002005.63,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T00:40:02.005+08:00",
+   "batch_id": "cb-sympy_combinatorics_coset_table.py-w1-0001",
+   "path": "sympy/combinatorics/coset_table.py",
+   "proposalIds": [
+    "prop-hist-w1-sympy_combinatorics_coset_table_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sympy_combinatorics_coset_table_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-sympy_combinatorics_coset_table_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-sympy_combinatorics_coset_table_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-sympy_combinatorics_coset_table_py",
+     "logical_id": "prop-hist-w1-sympy_combinatorics_coset_table_py",
+     "attempt_id": "att-prop-hist-w1-sympy_combinatorics_coset_table_py-r0",
+     "proposal_id": "prop-hist-w1-sympy_combinatorics_coset_table_py",
+     "actorId": "writer-28662"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.42,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:b28a6905df22e9457eb29a5d3b3ca47cd13c7af31e7255389754f07cbe549572",
+   "written": true,
+   "output_digest": "sha256:b992a5e7f2f56c60469153d5dfc17157faeac33126bc1215d15a36154efa2374",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  },
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sympy_combinatorics_homomorphisms.py-w1-0002",
+   "path": "sympy/combinatorics/homomorphisms.py",
+   "pid": 2095514,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-sympy_combinatorics_homomorphisms_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sympy_combinatorics_homomorphisms_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:1c50be85f99798b61539b919e162e62ab44ee61f6655080aed77f01cdcb09302"
+   ],
+   "lock_wait_ms": 0,
+   "t_start_epoch_ms": 1791564002007.88,
+   "pre_apply_hash": "sha256:1c50be85f99798b61539b919e162e62ab44ee61f6655080aed77f01cdcb09302",
+   "receipt_before_hash": "sha256:1c50be85f99798b61539b919e162e62ab44ee61f6655080aed77f01cdcb09302",
+   "receipt_after_hash": "sha256:2ed31c144e8f4723721e98ef26af0ef252b7ec13f26725841817a15455fd9281",
+   "post_apply_hash": "sha256:2ed31c144e8f4723721e98ef26af0ef252b7ec13f26725841817a15455fd9281",
+   "t_end_epoch_ms": 1791564002017.15,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T00:40:02.017+08:00",
+   "batch_id": "cb-sympy_combinatorics_homomorphisms.py-w1-0002",
+   "path": "sympy/combinatorics/homomorphisms.py",
+   "proposalIds": [
+    "prop-hist-w1-sympy_combinatorics_homomorphisms_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sympy_combinatorics_homomorphisms_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-sympy_combinatorics_homomorphisms_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-sympy_combinatorics_homomorphisms_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-sympy_combinatorics_homomorphisms_py",
+     "logical_id": "prop-hist-w1-sympy_combinatorics_homomorphisms_py",
+     "attempt_id": "att-prop-hist-w1-sympy_combinatorics_homomorphisms_py-r0",
+     "proposal_id": "prop-hist-w1-sympy_combinatorics_homomorphisms_py",
+     "actorId": "writer-28662"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.01,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:1c50be85f99798b61539b919e162e62ab44ee61f6655080aed77f01cdcb09302",
+   "written": true,
+   "output_digest": "sha256:2ed31c144e8f4723721e98ef26af0ef252b7ec13f26725841817a15455fd9281",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

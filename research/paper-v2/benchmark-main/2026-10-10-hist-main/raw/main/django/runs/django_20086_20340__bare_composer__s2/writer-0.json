@@ -1,0 +1,135 @@
+{
+ "writer": 0,
+ "pr": 20086,
+ "pid": 2050786,
+ "init_ms": 75.029841,
+ "start_offset_ms": 13,
+ "file_order": [
+  "django/template/library.py"
+ ],
+ "holds": {
+  "django/template/library.py": 29
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 20086,
+   "path": "django/template/library.py",
+   "intents": [
+    "log:django:20086_20340:20086:django/template/library.py:h0",
+    "log:django:20086_20340:20086:django/template/library.py:h1",
+    "log:django:20086_20340:20086:django/template/library.py:h2",
+    "log:django:20086_20340:20086:django/template/library.py:h3",
+    "log:django:20086_20340:20086:django/template/library.py:h4",
+    "log:django:20086_20340:20086:django/template/library.py:h5",
+    "log:django:20086_20340:20086:django/template/library.py:h6",
+    "log:django:20086_20340:20086:django/template/library.py:h7",
+    "log:django:20086_20340:20086:django/template/library.py:h8",
+    "log:django:20086_20340:20086:django/template/library.py:h9",
+    "log:django:20086_20340:20086:django/template/library.py:h10"
+   ],
+   "hold_ms": 29,
+   "t_submit_epoch": 1791563645005,
+   "outcome": "blocked",
+   "blocked_reason": "file-hash-drift: Target file hash sha256:044a148cc96959b6a3a1f505ff8d1c4054685084ede8c7439968a3b248f8bb67 does not match proposal fileBeforeHash sha256:ad01f438105fcd2df5d05dbacbcdb828f48c495f763eca4c8ae870810654a480.",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "file-hash-drift: Target file hash sha256:044a148cc96959b6a3a1f505ff8d1c4054685084ede8c7439968a3b248f8bb67 does not match proposal fileBeforeHash sha256:ad01f438105fcd2df5d05dbacbcdb828f48c495f763eca4c8ae870810654a480."
+   ],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-django_template_library.py-w0-0001",
+   "total_ms": 158.53,
+   "t_done_epoch": 1791563645163
+  }
+ ],
+ "admit_stats": null,
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-django_template_library.py-w0-0001",
+   "path": "django/template/library.py",
+   "pid": 2050786,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-django_template_library_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-django_template_library_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:ad01f438105fcd2df5d05dbacbcdb828f48c495f763eca4c8ae870810654a480"
+   ],
+   "lock_wait_ms": 0.13,
+   "t_start_epoch_ms": 1791563645040.6,
+   "pre_apply_hash": "sha256:ad01f438105fcd2df5d05dbacbcdb828f48c495f763eca4c8ae870810654a480",
+   "receipt_before_hash": null,
+   "receipt_after_hash": null,
+   "post_apply_hash": "sha256:044a148cc96959b6a3a1f505ff8d1c4054685084ede8c7439968a3b248f8bb67",
+   "t_end_epoch_ms": 1791563645163.55,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "blocked",
+   "written": false,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T00:34:05.163+08:00",
+   "batch_id": "cb-django_template_library.py-w0-0001",
+   "path": "django/template/library.py",
+   "proposalIds": [
+    "prop-hist-w0-django_template_library_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-django_template_library_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-django_template_library_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-django_template_library_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-django_template_library_py",
+     "logical_id": "prop-hist-w0-django_template_library_py",
+     "attempt_id": "att-prop-hist-w0-django_template_library_py-r0",
+     "proposal_id": "prop-hist-w0-django_template_library_py",
+     "actorId": "writer-20086"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "file-hash-drift: Target file hash sha256:044a148cc96959b6a3a1f505ff8d1c4054685084ede8c7439968a3b248f8bb67 does not match proposal fileBeforeHash sha256:ad01f438105fcd2df5d05dbacbcdb828f48c495f763eca4c8ae870810654a480."
+   ],
+   "blocked_reason": "file-hash-drift: Target file hash sha256:044a148cc96959b6a3a1f505ff8d1c4054685084ede8c7439968a3b248f8bb67 does not match proposal fileBeforeHash sha256:ad01f438105fcd2df5d05dbacbcdb828f48c495f763eca4c8ae870810654a480.",
+   "window_wait_ms": 0.29,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:ad01f438105fcd2df5d05dbacbcdb828f48c495f763eca4c8ae870810654a480",
+   "written": false,
+   "output_digest": null,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "file-hash-drift: Target file hash sha256:044a148cc96959b6a3a1f505ff8d1c4054685084ede8c7439968a3b248f8bb67 does not match proposal fileBeforeHash sha256:ad01f438105fcd2df5d05dbacbcdb828f48c495f763eca4c8ae870810654a480."
+  }
+ ]
+}

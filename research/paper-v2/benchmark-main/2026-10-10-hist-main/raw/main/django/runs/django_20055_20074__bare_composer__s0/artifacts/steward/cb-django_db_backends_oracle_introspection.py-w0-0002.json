@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-0a7d9ccacfdcedb1",
+  "proposalIds": [
+    "prop-hist-w0-django_db_backends_oracle_introspection_py"
+  ],
+  "targetFiles": [
+    "django/db/backends/oracle/introspection.py"
+  ],
+  "appliedFiles": [
+    "django/db/backends/oracle/introspection.py"
+  ],
+  "fileBeforeHashes": {
+    "django/db/backends/oracle/introspection.py": "a98efb6c54a8fe71119cb49bcf82cc4825f1902f85c7cfc86e197a794e3cbf04"
+  },
+  "fileAfterHashes": {
+    "django/db/backends/oracle/introspection.py": "3f886eb3fa07308d9535cb4bac53e9a43f5493f75ce93f6ca3cf6828e11a9f29"
+  },
+  "permissions": {
+    "fileWrite": [
+      "django/db/backends/oracle/introspection.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-0a7d9ccacfdcedb1",
+    "planId": "merge-0a7d9ccacfdcedb1",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-0a7d9ccacfdcedb1",
+        "planId": "merge-0a7d9ccacfdcedb1",
+        "request_identity": [
+          "prop-hist-w0-django_db_backends_oracle_introspection_py"
+        ],
+        "actor_ids": [
+          "writer-20055"
+        ],
+        "request_files": [
+          "django/db/backends/oracle/introspection.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "django/db/backends/oracle/introspection.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/django/runs/django_20055_20074__bare_composer__s0/artifacts/steward/cb-django_db_backends_oracle_introspection.py-w0-0002.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-DJANGO_DB_BACKENDS_ORACLE_INTROSPECTION_PY"
+        ],
+        "commit_sha": "41227763f66bee61f0b23f70ae89c660fb9d637c"
+      }
+    ]
+  }
+}

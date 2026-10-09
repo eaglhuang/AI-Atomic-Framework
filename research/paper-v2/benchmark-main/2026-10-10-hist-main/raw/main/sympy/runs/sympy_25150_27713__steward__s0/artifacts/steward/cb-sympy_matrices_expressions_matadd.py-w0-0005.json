@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-6b35d2d5f073d6d2",
+  "proposalIds": [
+    "prop-hist-w0-sympy_matrices_expressions_matadd_py"
+  ],
+  "targetFiles": [
+    "sympy/matrices/expressions/matadd.py"
+  ],
+  "appliedFiles": [
+    "sympy/matrices/expressions/matadd.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/matrices/expressions/matadd.py": "d0c49a9da9751ca544b82044a5e84ac1f517e1fb8cf54332e858361f99e8034b"
+  },
+  "fileAfterHashes": {
+    "sympy/matrices/expressions/matadd.py": "abdbb386255476fa8935dd4dc9e443c533b364ddb7ffd32fe152794222ed562f"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/matrices/expressions/matadd.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-6b35d2d5f073d6d2",
+    "planId": "merge-6b35d2d5f073d6d2",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-6b35d2d5f073d6d2",
+        "planId": "merge-6b35d2d5f073d6d2",
+        "request_identity": [
+          "prop-hist-w0-sympy_matrices_expressions_matadd_py"
+        ],
+        "actor_ids": [
+          "writer-25150"
+        ],
+        "request_files": [
+          "sympy/matrices/expressions/matadd.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/matrices/expressions/matadd.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/sympy/runs/sympy_25150_27713__steward__s0/artifacts/steward/cb-sympy_matrices_expressions_matadd.py-w0-0005.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SYMPY_MATRICES_EXPRESSIONS_MATADD_PY"
+        ],
+        "commit_sha": "4b0adebcbb727f7439a5f180cac4d5376ef704ff"
+      }
+    ]
+  }
+}

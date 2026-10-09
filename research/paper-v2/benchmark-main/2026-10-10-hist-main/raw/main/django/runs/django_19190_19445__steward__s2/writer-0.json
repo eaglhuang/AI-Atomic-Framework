@@ -1,0 +1,129 @@
+{
+ "writer": 0,
+ "pr": 19190,
+ "pid": 2067137,
+ "init_ms": 100.266785,
+ "start_offset_ms": 16,
+ "file_order": [
+  "django/db/models/query_utils.py"
+ ],
+ "holds": {
+  "django/db/models/query_utils.py": 7
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 19190,
+   "path": "django/db/models/query_utils.py",
+   "intents": [
+    "log:django:19190_19445:19190:django/db/models/query_utils.py:h0",
+    "log:django:19190_19445:19190:django/db/models/query_utils.py:h1"
+   ],
+   "hold_ms": 7,
+   "t_submit_epoch": 1791563769400,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 19,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-django_db_models_query_utils.py-w0-0001",
+   "total_ms": 134.37,
+   "t_done_epoch": 1791563769534
+  }
+ ],
+ "admit_stats": {
+  "txns": 2,
+  "cas_conflicts": 1
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-django_db_models_query_utils.py-w0-0001",
+   "path": "django/db/models/query_utils.py",
+   "pid": 2067137,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-django_db_models_query_utils_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-django_db_models_query_utils_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:42f2cb3d2d7c7fa649131e771407efbabe09017e721251650f54ebe87a5e9029"
+   ],
+   "lock_wait_ms": 0.12,
+   "t_start_epoch_ms": 1791563769429.5,
+   "pre_apply_hash": "sha256:42f2cb3d2d7c7fa649131e771407efbabe09017e721251650f54ebe87a5e9029",
+   "receipt_before_hash": "sha256:4593434092cbbf69772ca779ef7cd6a12f12757fcd52b9bc9fb843eb9b92f814",
+   "receipt_after_hash": "sha256:e0e39abee9339356c845c41dfd43b8d0777520a5dd29ad41fe6cd0130c5085e1",
+   "post_apply_hash": "sha256:e0e39abee9339356c845c41dfd43b8d0777520a5dd29ad41fe6cd0130c5085e1",
+   "t_end_epoch_ms": 1791563769532.35,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": true,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T00:36:09.532+08:00",
+   "batch_id": "cb-django_db_models_query_utils.py-w0-0001",
+   "path": "django/db/models/query_utils.py",
+   "proposalIds": [
+    "prop-hist-w0-django_db_models_query_utils_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-django_db_models_query_utils_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-django_db_models_query_utils_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-django_db_models_query_utils_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-django_db_models_query_utils_py",
+     "logical_id": "prop-hist-w0-django_db_models_query_utils_py",
+     "attempt_id": "att-prop-hist-w0-django_db_models_query_utils_py-r0",
+     "proposal_id": "prop-hist-w0-django_db_models_query_utils_py",
+     "actorId": "writer-19190"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.24,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:42f2cb3d2d7c7fa649131e771407efbabe09017e721251650f54ebe87a5e9029",
+   "written": true,
+   "output_digest": "sha256:e0e39abee9339356c845c41dfd43b8d0777520a5dd29ad41fe6cd0130c5085e1",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

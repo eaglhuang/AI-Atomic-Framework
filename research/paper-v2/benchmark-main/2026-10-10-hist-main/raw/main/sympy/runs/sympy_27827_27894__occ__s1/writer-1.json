@@ -1,0 +1,41 @@
+{
+ "writer": 1,
+ "pr": 27894,
+ "pid": 2091952,
+ "init_ms": 70.11653,
+ "start_offset_ms": 19,
+ "file_order": [
+  "sympy/concrete/summations.py"
+ ],
+ "holds": {
+  "sympy/concrete/summations.py": 11
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 27894,
+   "path": "sympy/concrete/summations.py",
+   "intents": [
+    "log:sympy:27827_27894:27894:sympy/concrete/summations.py:h0",
+    "log:sympy:27827_27894:27894:sympy/concrete/summations.py:h1",
+    "log:sympy:27827_27894:27894:sympy/concrete/summations.py:h2"
+   ],
+   "hold_ms": 11,
+   "t_submit_epoch": 1791563971187,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 36,
+   "outcome": "blocked",
+   "blocked_reason": "occ-relocate-context-not-found",
+   "occ_retries": 0,
+   "total_ms": 51.53,
+   "t_done_epoch": 1791563971239
+  }
+ ],
+ "admit_stats": {
+  "txns": 3,
+  "cas_conflicts": 5
+ },
+ "steward_batches": null
+}

@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-5af0366f9b5da27b",
+  "proposalIds": [
+    "prop-hist-w1-sympy_physics_control_control_plots_py"
+  ],
+  "targetFiles": [
+    "sympy/physics/control/control_plots.py"
+  ],
+  "appliedFiles": [],
+  "fileBeforeHashes": {},
+  "fileAfterHashes": {},
+  "permissions": {
+    "fileWrite": [
+      "sympy/physics/control/control_plots.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "blocked",
+  "blockedReasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w1-sympy_physics_control_control_plots_py' context mismatch at base line 10: expected \"from sympy.polys.domains import ZZ, QQ\", found \"from sympy.plotting.plot import plot_parametric\" [proposals: prop-hist-w1-sympy_physics_control_control_plots_py]"
+  ],
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-5af0366f9b5da27b",
+    "planId": "merge-5af0366f9b5da27b",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-5af0366f9b5da27b",
+        "planId": "merge-5af0366f9b5da27b",
+        "request_identity": [
+          "prop-hist-w1-sympy_physics_control_control_plots_py"
+        ],
+        "actor_ids": [
+          "writer-27067"
+        ],
+        "request_files": [
+          "sympy/physics/control/control_plots.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/sympy/runs/sympy_27052_27067__bare_composer__s2/artifacts/steward/cb-sympy_physics_control_control_plots.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_PHYSICS_CONTROL_CONTROL_PLOTS_PY"
+        ],
+        "commit_sha": "792e818fc299e77f5af965698e1d2cef245d5f25"
+      }
+    ]
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-f8bf0b97f6f5f035",
+  "proposalIds": [
+    "prop-hist-w0-django_contrib_gis_geos_coordseq_py"
+  ],
+  "targetFiles": [
+    "django/contrib/gis/geos/coordseq.py"
+  ],
+  "appliedFiles": [
+    "django/contrib/gis/geos/coordseq.py"
+  ],
+  "fileBeforeHashes": {
+    "django/contrib/gis/geos/coordseq.py": "bab0adaac720bdb91139ba569c593ddaa00b05de6797850f108b51a75931ecde"
+  },
+  "fileAfterHashes": {
+    "django/contrib/gis/geos/coordseq.py": "7faa19bd6b978180b5ba2438351b0fd14b4a3c4f29c34b2278117d0d727ff05e"
+  },
+  "permissions": {
+    "fileWrite": [
+      "django/contrib/gis/geos/coordseq.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-f8bf0b97f6f5f035",
+    "planId": "merge-f8bf0b97f6f5f035",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-f8bf0b97f6f5f035",
+        "planId": "merge-f8bf0b97f6f5f035",
+        "request_identity": [
+          "prop-hist-w0-django_contrib_gis_geos_coordseq_py"
+        ],
+        "actor_ids": [
+          "writer-18786"
+        ],
+        "request_files": [
+          "django/contrib/gis/geos/coordseq.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "django/contrib/gis/geos/coordseq.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/django/runs/django_18786_19023__steward__s0/artifacts/steward/cb-django_contrib_gis_geos_coordseq.py-w0-0004.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-DJANGO_CONTRIB_GIS_GEOS_COORDSEQ_PY"
+        ],
+        "commit_sha": "7d31f15d3e2baa6fe0532b61eafe3262d20ff390"
+      }
+    ]
+  }
+}

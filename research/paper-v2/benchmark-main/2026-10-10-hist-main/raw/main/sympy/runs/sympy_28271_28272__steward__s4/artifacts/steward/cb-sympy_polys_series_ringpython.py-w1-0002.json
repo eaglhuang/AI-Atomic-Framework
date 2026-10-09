@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-be79733e21c787b2",
+  "proposalIds": [
+    "prop-hist-w1-sympy_polys_series_ringpython_py"
+  ],
+  "targetFiles": [
+    "sympy/polys/series/ringpython.py"
+  ],
+  "appliedFiles": [
+    "sympy/polys/series/ringpython.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/polys/series/ringpython.py": "c297282c7c0b9ca5f813b9ad4a1e1886145ccd6f52a07ebb753e110747a69698"
+  },
+  "fileAfterHashes": {
+    "sympy/polys/series/ringpython.py": "925abffeac889ecb1c4729a0c9a8fd8ad9c1cb9a2564bbf3431776214ca70151"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/polys/series/ringpython.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-be79733e21c787b2",
+    "planId": "merge-be79733e21c787b2",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-be79733e21c787b2",
+        "planId": "merge-be79733e21c787b2",
+        "request_identity": [
+          "prop-hist-w1-sympy_polys_series_ringpython_py"
+        ],
+        "actor_ids": [
+          "writer-28272"
+        ],
+        "request_files": [
+          "sympy/polys/series/ringpython.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/polys/series/ringpython.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/sympy/runs/sympy_28271_28272__steward__s4/artifacts/steward/cb-sympy_polys_series_ringpython.py-w1-0002.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_POLYS_SERIES_RINGPYTHON_PY"
+        ],
+        "commit_sha": "d79ab19eb40ad54a9aacf2e2c30c48ad8040028f"
+      }
+    ]
+  }
+}

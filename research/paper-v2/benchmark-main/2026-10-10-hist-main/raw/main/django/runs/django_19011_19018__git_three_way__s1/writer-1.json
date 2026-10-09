@@ -1,0 +1,79 @@
+{
+ "writer": 1,
+ "pr": 19018,
+ "pid": 2067959,
+ "init_ms": 79.938422,
+ "start_offset_ms": 1,
+ "file_order": [
+  "django/db/models/query.py",
+  "django/db/models/options.py",
+  "django/db/models/base.py"
+ ],
+ "holds": {
+  "django/db/models/query.py": 27,
+  "django/db/models/options.py": 10,
+  "django/db/models/base.py": 10
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 19018,
+   "path": "django/db/models/query.py",
+   "intents": [
+    "log:django:19011_19018:19018:django/db/models/query.py:h4",
+    "log:django:19011_19018:19018:django/db/models/query.py:h5",
+    "log:django:19011_19018:19018:django/db/models/query.py:h6"
+   ],
+   "hold_ms": 27,
+   "t_submit_epoch": 1791563775515,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 13,
+   "outcome": "commit",
+   "total_ms": 59.24,
+   "t_done_epoch": 1791563775574
+  },
+  {
+   "writer": 1,
+   "pr": 19018,
+   "path": "django/db/models/options.py",
+   "intents": [
+    "log:django:19011_19018:19018:django/db/models/options.py:h3"
+   ],
+   "hold_ms": 10,
+   "t_submit_epoch": 1791563775574,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "outcome": "commit",
+   "total_ms": 21.22,
+   "t_done_epoch": 1791563775596
+  },
+  {
+   "writer": 1,
+   "pr": 19018,
+   "path": "django/db/models/base.py",
+   "intents": [
+    "log:django:19011_19018:19018:django/db/models/base.py:h0",
+    "log:django:19011_19018:19018:django/db/models/base.py:h1",
+    "log:django:19011_19018:19018:django/db/models/base.py:h2"
+   ],
+   "hold_ms": 10,
+   "t_submit_epoch": 1791563775596,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "commit",
+   "total_ms": 21.24,
+   "t_done_epoch": 1791563775617
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 0
+ },
+ "steward_batches": null
+}

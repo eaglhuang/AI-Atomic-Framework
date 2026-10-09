@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-e689d2fe0ee759be",
+  "proposalIds": [
+    "prop-hist-w1-sympy_liealgebras_weyl_group_py"
+  ],
+  "targetFiles": [
+    "sympy/liealgebras/weyl_group.py"
+  ],
+  "appliedFiles": [
+    "sympy/liealgebras/weyl_group.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/liealgebras/weyl_group.py": "e58140f2a0b81960ccd162cd47fe95829b8d1590dfc8303b7c116305c65a2e00"
+  },
+  "fileAfterHashes": {
+    "sympy/liealgebras/weyl_group.py": "3b390c227c82b7b791d5e239741f970c4c673f7392a5a72873f65c6e18efa684"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/liealgebras/weyl_group.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-e689d2fe0ee759be",
+    "planId": "merge-e689d2fe0ee759be",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-e689d2fe0ee759be",
+        "planId": "merge-e689d2fe0ee759be",
+        "request_identity": [
+          "prop-hist-w1-sympy_liealgebras_weyl_group_py"
+        ],
+        "actor_ids": [
+          "writer-28036"
+        ],
+        "request_files": [
+          "sympy/liealgebras/weyl_group.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/liealgebras/weyl_group.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/sympy/runs/sympy_28032_28036__steward__s0/artifacts/steward/cb-sympy_liealgebras_weyl_group.py-w1-0008.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_LIEALGEBRAS_WEYL_GROUP_PY"
+        ],
+        "commit_sha": "069af31118db600c79d3ed9cae76eacce0575350"
+      }
+    ]
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-6781fff31fbb5d29",
+  "proposalIds": [
+    "prop-hist-w0-sympy_combinatorics_coset_table_py"
+  ],
+  "targetFiles": [
+    "sympy/combinatorics/coset_table.py"
+  ],
+  "appliedFiles": [
+    "sympy/combinatorics/coset_table.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/combinatorics/coset_table.py": "b28a6905df22e9457eb29a5d3b3ca47cd13c7af31e7255389754f07cbe549572"
+  },
+  "fileAfterHashes": {
+    "sympy/combinatorics/coset_table.py": "b992a5e7f2f56c60469153d5dfc17157faeac33126bc1215d15a36154efa2374"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/combinatorics/coset_table.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-6781fff31fbb5d29",
+    "planId": "merge-6781fff31fbb5d29",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-6781fff31fbb5d29",
+        "planId": "merge-6781fff31fbb5d29",
+        "request_identity": [
+          "prop-hist-w0-sympy_combinatorics_coset_table_py"
+        ],
+        "actor_ids": [
+          "writer-28653"
+        ],
+        "request_files": [
+          "sympy/combinatorics/coset_table.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/combinatorics/coset_table.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/sympy/runs/sympy_28653_28662__bare_composer__s2/artifacts/steward/cb-sympy_combinatorics_coset_table.py-w0-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SYMPY_COMBINATORICS_COSET_TABLE_PY"
+        ],
+        "commit_sha": "743d1e1517619d649195281584cecdcaf9e5b5a5"
+      }
+    ]
+  }
+}

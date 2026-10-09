@@ -1,0 +1,125 @@
+{
+ "writer": 0,
+ "pr": 28224,
+ "pid": 2106113,
+ "init_ms": 75.075895,
+ "start_offset_ms": 19,
+ "file_order": [
+  "sympy/core/expr.py"
+ ],
+ "holds": {
+  "sympy/core/expr.py": 15
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 28224,
+   "path": "sympy/core/expr.py",
+   "intents": [
+    "log:sympy:28224_28231:28224:sympy/core/expr.py:h0"
+   ],
+   "hold_ms": 15,
+   "t_submit_epoch": 1791564105412,
+   "outcome": "blocked",
+   "blocked_reason": "compose-context-mismatch: proposal 'prop-hist-w0-sympy_core_expr_py' context mismatch at base line 3844: expected \"    def round(self, n=None):\", found \"        return invert(self, g, *gens, **args)\" [proposals: prop-hist-w0-sympy_core_expr_py]",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w0-sympy_core_expr_py' context mismatch at base line 3844: expected \"    def round(self, n=None):\", found \"        return invert(self, g, *gens, **args)\" [proposals: prop-hist-w0-sympy_core_expr_py]"
+   ],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sympy_core_expr.py-w0-0001",
+   "total_ms": 141.43,
+   "t_done_epoch": 1791564105553
+  }
+ ],
+ "admit_stats": null,
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sympy_core_expr.py-w0-0001",
+   "path": "sympy/core/expr.py",
+   "pid": 2106113,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-sympy_core_expr_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sympy_core_expr_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:baa27245c9416870fb4423129d933336d147e201ce24da074589f820e8a25a13"
+   ],
+   "lock_wait_ms": 0.12,
+   "t_start_epoch_ms": 1791564105431.76,
+   "pre_apply_hash": "sha256:baa27245c9416870fb4423129d933336d147e201ce24da074589f820e8a25a13",
+   "receipt_before_hash": null,
+   "receipt_after_hash": null,
+   "post_apply_hash": "sha256:d63640184d9331ab84b207e52459bc79ffec781f5d37cd2acd39bcf17f35529b",
+   "t_end_epoch_ms": 1791564105552.81,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "steward_verdict": "blocked",
+   "written": false,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T00:41:45.552+08:00",
+   "batch_id": "cb-sympy_core_expr.py-w0-0001",
+   "path": "sympy/core/expr.py",
+   "proposalIds": [
+    "prop-hist-w0-sympy_core_expr_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-sympy_core_expr_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-sympy_core_expr_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-sympy_core_expr_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-sympy_core_expr_py",
+     "logical_id": "prop-hist-w0-sympy_core_expr_py",
+     "attempt_id": "att-prop-hist-w0-sympy_core_expr_py-r0",
+     "proposal_id": "prop-hist-w0-sympy_core_expr_py",
+     "actorId": "writer-28224"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "blocked",
+   "blocked_reasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w0-sympy_core_expr_py' context mismatch at base line 3844: expected \"    def round(self, n=None):\", found \"        return invert(self, g, *gens, **args)\" [proposals: prop-hist-w0-sympy_core_expr_py]"
+   ],
+   "blocked_reason": "compose-context-mismatch: proposal 'prop-hist-w0-sympy_core_expr_py' context mismatch at base line 3844: expected \"    def round(self, n=None):\", found \"        return invert(self, g, *gens, **args)\" [proposals: prop-hist-w0-sympy_core_expr_py]",
+   "window_wait_ms": 0.27,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:baa27245c9416870fb4423129d933336d147e201ce24da074589f820e8a25a13",
+   "written": false,
+   "output_digest": null,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 0,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 0,
+   "atm_env": {},
+   "reason": "compose-context-mismatch: proposal 'prop-hist-w0-sympy_core_expr_py' context mismatch at base line 3844: expected \"    def round(self, n=None):\", found \"        return invert(self, g, *gens, **args)\" [proposals: prop-hist-w0-sympy_core_expr_py]"
+  }
+ ]
+}

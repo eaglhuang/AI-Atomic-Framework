@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-4a199a12f5d6fd14",
+  "proposalIds": [
+    "prop-hist-w1-sympy_utilities_lambdify_py"
+  ],
+  "targetFiles": [
+    "sympy/utilities/lambdify.py"
+  ],
+  "appliedFiles": [
+    "sympy/utilities/lambdify.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/utilities/lambdify.py": "95ea62784c48d7d42f6583eb1a5fd665a170b5af18641a3a020c439f0ab4d68c"
+  },
+  "fileAfterHashes": {
+    "sympy/utilities/lambdify.py": "1e83647e2f481609a24c794f3914d0197a37d2342e55fdd498fc7c89d1128cce"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/utilities/lambdify.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-4a199a12f5d6fd14",
+    "planId": "merge-4a199a12f5d6fd14",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-4a199a12f5d6fd14",
+        "planId": "merge-4a199a12f5d6fd14",
+        "request_identity": [
+          "prop-hist-w1-sympy_utilities_lambdify_py"
+        ],
+        "actor_ids": [
+          "writer-28036"
+        ],
+        "request_files": [
+          "sympy/utilities/lambdify.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/utilities/lambdify.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/sympy/runs/sympy_28032_28036__steward__s1/artifacts/steward/cb-sympy_utilities_lambdify.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_UTILITIES_LAMBDIFY_PY"
+        ],
+        "commit_sha": "28fd534704f6857b1a0c0b3c574f33e0c198de90"
+      }
+    ]
+  }
+}

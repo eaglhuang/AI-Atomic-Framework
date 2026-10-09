@@ -1,0 +1,103 @@
+{
+ "writer": 0,
+ "pr": 19088,
+ "pid": 2069356,
+ "init_ms": 83.38725399999998,
+ "start_offset_ms": 14,
+ "file_order": [
+  "django/db/models/deletion.py",
+  "django/db/backends/oracle/operations.py",
+  "django/db/backends/sqlite3/operations.py",
+  "django/db/models/query.py"
+ ],
+ "holds": {
+  "django/db/models/deletion.py": 20,
+  "django/db/backends/oracle/operations.py": 26,
+  "django/db/backends/sqlite3/operations.py": 5,
+  "django/db/models/query.py": 12
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 19088,
+   "path": "django/db/models/deletion.py",
+   "intents": [
+    "log:django:19088_19113:19088:django/db/models/deletion.py:h4",
+    "log:django:19088_19113:19088:django/db/models/deletion.py:h5"
+   ],
+   "hold_ms": 20,
+   "t_submit_epoch": 1791563786092,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 22,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 49.7,
+   "t_done_epoch": 1791563786142
+  },
+  {
+   "writer": 0,
+   "pr": 19088,
+   "path": "django/db/backends/oracle/operations.py",
+   "intents": [
+    "log:django:19088_19113:19088:django/db/backends/oracle/operations.py:h0",
+    "log:django:19088_19113:19088:django/db/backends/oracle/operations.py:h1",
+    "log:django:19088_19113:19088:django/db/backends/oracle/operations.py:h2"
+   ],
+   "hold_ms": 26,
+   "t_submit_epoch": 1791563786142,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 32.93,
+   "t_done_epoch": 1791563786175
+  },
+  {
+   "writer": 0,
+   "pr": 19088,
+   "path": "django/db/backends/sqlite3/operations.py",
+   "intents": [
+    "log:django:19088_19113:19088:django/db/backends/sqlite3/operations.py:h3"
+   ],
+   "hold_ms": 5,
+   "t_submit_epoch": 1791563786175,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 10.72,
+   "t_done_epoch": 1791563786186
+  },
+  {
+   "writer": 0,
+   "pr": 19088,
+   "path": "django/db/models/query.py",
+   "intents": [
+    "log:django:19088_19113:19088:django/db/models/query.py:h6",
+    "log:django:19088_19113:19088:django/db/models/query.py:h7",
+    "log:django:19088_19113:19088:django/db/models/query.py:h8"
+   ],
+   "hold_ms": 12,
+   "t_submit_epoch": 1791563786186,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 19.76,
+   "t_done_epoch": 1791563786206
+  }
+ ],
+ "admit_stats": {
+  "txns": 8,
+  "cas_conflicts": 4
+ },
+ "steward_batches": null
+}

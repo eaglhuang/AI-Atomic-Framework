@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-f78ea5f16fe6a691",
+  "proposalIds": [
+    "prop-hist-w1-sympy_ntheory_factor_py"
+  ],
+  "targetFiles": [
+    "sympy/ntheory/factor_.py"
+  ],
+  "appliedFiles": [
+    "sympy/ntheory/factor_.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/ntheory/factor_.py": "e2ab55af863937f570a4dff2b60d73fa810865802fadffa0524e717211fa3703"
+  },
+  "fileAfterHashes": {
+    "sympy/ntheory/factor_.py": "50d4c848ead6636718065e5fa4fd1208f7610fc07efa4087e8ecf1175f575000"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/ntheory/factor_.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-f78ea5f16fe6a691",
+    "planId": "merge-f78ea5f16fe6a691",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-f78ea5f16fe6a691",
+        "planId": "merge-f78ea5f16fe6a691",
+        "request_identity": [
+          "prop-hist-w1-sympy_ntheory_factor_py"
+        ],
+        "actor_ids": [
+          "writer-27239"
+        ],
+        "request_files": [
+          "sympy/ntheory/factor_.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/ntheory/factor_.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/sympy/runs/sympy_27193_27239__bare_composer__s2/artifacts/steward/cb-sympy_ntheory_factor_.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_NTHEORY_FACTOR_PY"
+        ],
+        "commit_sha": "9b70b8935b2dc127e5429aa1e39c8ad9ed5ad688"
+      }
+    ]
+  }
+}

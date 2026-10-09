@@ -1,0 +1,97 @@
+{
+ "writer": 1,
+ "pr": 20005,
+ "pid": 2046527,
+ "init_ms": 67.60090199999999,
+ "start_offset_ms": 14,
+ "file_order": [
+  "django/db/models/fields/json.py",
+  "django/contrib/gis/db/models/lookups.py",
+  "django/db/models/sql/compiler.py",
+  "django/db/models/lookups.py"
+ ],
+ "holds": {
+  "django/db/models/fields/json.py": 24,
+  "django/contrib/gis/db/models/lookups.py": 26,
+  "django/db/models/sql/compiler.py": 24,
+  "django/db/models/lookups.py": 20
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 20005,
+   "path": "django/db/models/fields/json.py",
+   "intents": [
+    "log:django:19794_20005:20005:django/db/models/fields/json.py:h1",
+    "log:django:19794_20005:20005:django/db/models/fields/json.py:h2"
+   ],
+   "hold_ms": 24,
+   "t_submit_epoch": 1791563613270,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 15,
+   "outcome": "commit",
+   "total_ms": 49.55,
+   "t_done_epoch": 1791563613320
+  },
+  {
+   "writer": 1,
+   "pr": 20005,
+   "path": "django/contrib/gis/db/models/lookups.py",
+   "intents": [
+    "log:django:19794_20005:20005:django/contrib/gis/db/models/lookups.py:h0"
+   ],
+   "hold_ms": 26,
+   "t_submit_epoch": 1791563613320,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "commit",
+   "total_ms": 34.89,
+   "t_done_epoch": 1791563613355
+  },
+  {
+   "writer": 1,
+   "pr": 20005,
+   "path": "django/db/models/sql/compiler.py",
+   "intents": [
+    "log:django:19794_20005:20005:django/db/models/sql/compiler.py:h6"
+   ],
+   "hold_ms": 24,
+   "t_submit_epoch": 1791563613355,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "outcome": "commit",
+   "total_ms": 38.11,
+   "t_done_epoch": 1791563613393
+  },
+  {
+   "writer": 1,
+   "pr": 20005,
+   "path": "django/db/models/lookups.py",
+   "intents": [
+    "log:django:19794_20005:20005:django/db/models/lookups.py:h3",
+    "log:django:19794_20005:20005:django/db/models/lookups.py:h4",
+    "log:django:19794_20005:20005:django/db/models/lookups.py:h5"
+   ],
+   "hold_ms": 20,
+   "t_submit_epoch": 1791563613393,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "commit",
+   "total_ms": 66.43,
+   "t_done_epoch": 1791563613459
+  }
+ ],
+ "admit_stats": {
+  "txns": 8,
+  "cas_conflicts": 1
+ },
+ "steward_batches": null
+}

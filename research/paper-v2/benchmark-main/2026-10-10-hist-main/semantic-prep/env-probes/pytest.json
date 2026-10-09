@@ -1,0 +1,65 @@
+{
+ "method": "STALE union-test-set, new failures only",
+ "python": "/workspace/scratch/hist/envs/pytest/bin/python",
+ "results": {
+  "pytest:12346_12744": {
+   "arm_runs": {},
+   "base_valid": false,
+   "conditions": {
+    "A": [
+     {
+      "failed": [
+       "testing/acceptance_test.py::TestInvocationVariants::test_cmdline_python_namespace_package"
+      ],
+      "n": 85,
+      "rc": 1,
+      "secs": 7.8,
+      "stderr_tail": "",
+      "tag": "A#0"
+     }
+    ],
+    "B": [
+     {
+      "failed": [
+       "testing/acceptance_test.py::TestInvocationVariants::test_cmdline_python_namespace_package"
+      ],
+      "n": 85,
+      "rc": 1,
+      "secs": 8.6,
+      "stderr_tail": "",
+      "tag": "B#0"
+     }
+    ],
+    "b": {
+     "failed": [
+      "testing/acceptance_test.py::TestInvocationVariants::test_cmdline_python_namespace_package"
+     ],
+     "n": 85,
+     "rc": 1,
+     "secs": 8.0,
+     "stderr_tail": "",
+     "tag": "b"
+    },
+    "gold": {
+     "failed": [
+      "testing/acceptance_test.py::TestInvocationVariants::test_cmdline_python_namespace_package"
+     ],
+     "n": 85,
+     "rc": 1,
+     "secs": 7.6,
+     "stderr_tail": "",
+     "tag": "gold"
+    }
+   },
+   "f2p_A": [],
+   "f2p_B": [],
+   "flaky": [],
+   "historical_interference": [],
+   "labels": [
+    "testing/acceptance_test.py"
+   ],
+   "pair_id": "pytest:12346_12744",
+   "status": "evaluated-base-invalid (semantic endpoint excluded per prereg)"
+  }
+ }
+}

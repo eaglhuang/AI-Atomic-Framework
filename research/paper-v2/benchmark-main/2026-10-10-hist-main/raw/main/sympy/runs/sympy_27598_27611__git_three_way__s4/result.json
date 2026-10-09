@@ -1,0 +1,84 @@
+{
+ "pair_id": "sympy:27598_27611",
+ "stratum": "O3",
+ "arm": "git_three_way",
+ "plant": null,
+ "seed_k": 4,
+ "seed": 2561255126,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-20effd45/AI-Atomic-Framework-20effd45a0c3a09c293caaea6a34face0df1c5f4",
+ "wall_ms": 690,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 4,
+  "by_verdict": {
+   "correct": 4
+  },
+  "completed": 4,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 1,
+  "files_full_bytes_exact": 1,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "sympy/polys/polytools.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "sympy/polys/polytools.py": true
+ },
+ "final_exists": {
+  "sympy/polys/polytools.py": true
+ },
+ "files": [
+  {
+   "path": "sympy/polys/polytools.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:fd207bbae82a575dea9ec1545ca61cace439858658d2e1f10ced3ba5a492d94a",
+   "final_digest": "sha256:b51ee5719a246fdea611c9dd7e28c871d9956a008ccff405948556b0e3b5c21f",
+   "expected_digests": [
+    "sha256:b51ee5719a246fdea611c9dd7e28c871d9956a008ccff405948556b0e3b5c21f"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "sympy/polys/polytools.py": "sha256:b51ee5719a246fdea611c9dd7e28c871d9956a008ccff405948556b0e3b5c21f"
+ }
+}

@@ -1,0 +1,123 @@
+{
+ "writer": 1,
+ "pr": 18425,
+ "pid": 2052619,
+ "init_ms": 65.905072,
+ "start_offset_ms": 3,
+ "file_order": [
+  "django/db/models/base.py",
+  "django/db/models/constraints.py",
+  "django/db/models/expressions.py",
+  "django/db/models/fields/__init__.py",
+  "django/contrib/postgres/constraints.py"
+ ],
+ "holds": {
+  "django/db/models/base.py": 28,
+  "django/db/models/constraints.py": 22,
+  "django/db/models/expressions.py": 15,
+  "django/db/models/fields/__init__.py": 18,
+  "django/contrib/postgres/constraints.py": 28
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 18425,
+   "path": "django/db/models/base.py",
+   "intents": [
+    "log:django:17723_18425:18425:django/db/models/base.py:h1",
+    "log:django:17723_18425:18425:django/db/models/base.py:h2"
+   ],
+   "hold_ms": 28,
+   "t_submit_epoch": 1791563658222,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 13,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 49.71,
+   "t_done_epoch": 1791563658272
+  },
+  {
+   "writer": 1,
+   "pr": 18425,
+   "path": "django/db/models/constraints.py",
+   "intents": [
+    "log:django:17723_18425:18425:django/db/models/constraints.py:h3",
+    "log:django:17723_18425:18425:django/db/models/constraints.py:h4",
+    "log:django:17723_18425:18425:django/db/models/constraints.py:h5"
+   ],
+   "hold_ms": 22,
+   "t_submit_epoch": 1791563658272,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "queue",
+   "admit_wait_ms": 9,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 41.01,
+   "t_done_epoch": 1791563658313
+  },
+  {
+   "writer": 1,
+   "pr": 18425,
+   "path": "django/db/models/expressions.py",
+   "intents": [
+    "log:django:17723_18425:18425:django/db/models/expressions.py:h6",
+    "log:django:17723_18425:18425:django/db/models/expressions.py:h7"
+   ],
+   "hold_ms": 15,
+   "t_submit_epoch": 1791563658313,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 25.27,
+   "t_done_epoch": 1791563658338
+  },
+  {
+   "writer": 1,
+   "pr": 18425,
+   "path": "django/db/models/fields/__init__.py",
+   "intents": [
+    "log:django:17723_18425:18425:django/db/models/fields/__init__.py:h8",
+    "log:django:17723_18425:18425:django/db/models/fields/__init__.py:h9"
+   ],
+   "hold_ms": 18,
+   "t_submit_epoch": 1791563658338,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 27.78,
+   "t_done_epoch": 1791563658366
+  },
+  {
+   "writer": 1,
+   "pr": 18425,
+   "path": "django/contrib/postgres/constraints.py",
+   "intents": [
+    "log:django:17723_18425:18425:django/contrib/postgres/constraints.py:h0"
+   ],
+   "hold_ms": 28,
+   "t_submit_epoch": 1791563658366,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 36.14,
+   "t_done_epoch": 1791563658402
+  }
+ ],
+ "admit_stats": {
+  "txns": 11,
+  "cas_conflicts": 0
+ },
+ "steward_batches": null
+}

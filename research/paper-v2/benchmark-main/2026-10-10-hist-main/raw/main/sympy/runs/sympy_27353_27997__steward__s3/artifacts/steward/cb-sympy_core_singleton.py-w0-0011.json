@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-39cb5c4eb7f5cdc1",
+  "proposalIds": [
+    "prop-hist-w0-sympy_core_singleton_py"
+  ],
+  "targetFiles": [
+    "sympy/core/singleton.py"
+  ],
+  "appliedFiles": [
+    "sympy/core/singleton.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/core/singleton.py": "d947a36bc189fb4f9cbc1ce5a8fc0bf6107d78eb63ac915757a9a40d93b5069e"
+  },
+  "fileAfterHashes": {
+    "sympy/core/singleton.py": "544208b4fc15c8dd5ebdc246dbc32b0450166c44baf042e6524fd2e53f1593ee"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/core/singleton.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-39cb5c4eb7f5cdc1",
+    "planId": "merge-39cb5c4eb7f5cdc1",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-39cb5c4eb7f5cdc1",
+        "planId": "merge-39cb5c4eb7f5cdc1",
+        "request_identity": [
+          "prop-hist-w0-sympy_core_singleton_py"
+        ],
+        "actor_ids": [
+          "writer-27353"
+        ],
+        "request_files": [
+          "sympy/core/singleton.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/core/singleton.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/sympy/runs/sympy_27353_27997__steward__s3/artifacts/steward/cb-sympy_core_singleton.py-w0-0011.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SYMPY_CORE_SINGLETON_PY"
+        ],
+        "commit_sha": "71a620438f7a31a0fc2dfc3bb2c15333f9b605ec"
+      }
+    ]
+  }
+}

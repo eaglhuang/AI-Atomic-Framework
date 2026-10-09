@@ -1,0 +1,101 @@
+{
+ "writer": 1,
+ "pr": 20340,
+ "pid": 2051069,
+ "init_ms": 89.394421,
+ "start_offset_ms": 5,
+ "file_order": [
+  "django/contrib/admin/templatetags/base.py",
+  "django/utils/inspect.py",
+  "django/template/library.py",
+  "django/template/base.py"
+ ],
+ "holds": {
+  "django/contrib/admin/templatetags/base.py": 17,
+  "django/utils/inspect.py": 13,
+  "django/template/library.py": 30,
+  "django/template/base.py": 23
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 20340,
+   "path": "django/contrib/admin/templatetags/base.py",
+   "intents": [
+    "log:django:20086_20340:20340:django/contrib/admin/templatetags/base.py:h0",
+    "log:django:20086_20340:20340:django/contrib/admin/templatetags/base.py:h1"
+   ],
+   "hold_ms": 17,
+   "t_submit_epoch": 1791563646960,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 17,
+   "outcome": "commit",
+   "total_ms": 48.9,
+   "t_done_epoch": 1791563647008
+  },
+  {
+   "writer": 1,
+   "pr": 20340,
+   "path": "django/utils/inspect.py",
+   "intents": [
+    "log:django:20086_20340:20340:django/utils/inspect.py:h8",
+    "log:django:20086_20340:20340:django/utils/inspect.py:h9",
+    "log:django:20086_20340:20340:django/utils/inspect.py:h10"
+   ],
+   "hold_ms": 13,
+   "t_submit_epoch": 1791563647009,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 6,
+   "outcome": "commit",
+   "total_ms": 26.81,
+   "t_done_epoch": 1791563647035
+  },
+  {
+   "writer": 1,
+   "pr": 20340,
+   "path": "django/template/library.py",
+   "intents": [
+    "log:django:20086_20340:20340:django/template/library.py:h4",
+    "log:django:20086_20340:20340:django/template/library.py:h5",
+    "log:django:20086_20340:20340:django/template/library.py:h6",
+    "log:django:20086_20340:20340:django/template/library.py:h7"
+   ],
+   "hold_ms": 30,
+   "t_submit_epoch": 1791563647035,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "commit",
+   "total_ms": 38.42,
+   "t_done_epoch": 1791563647074
+  },
+  {
+   "writer": 1,
+   "pr": 20340,
+   "path": "django/template/base.py",
+   "intents": [
+    "log:django:20086_20340:20340:django/template/base.py:h2",
+    "log:django:20086_20340:20340:django/template/base.py:h3"
+   ],
+   "hold_ms": 23,
+   "t_submit_epoch": 1791563647074,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "commit",
+   "total_ms": 34.76,
+   "t_done_epoch": 1791563647109
+  }
+ ],
+ "admit_stats": {
+  "txns": 8,
+  "cas_conflicts": 2
+ },
+ "steward_batches": null
+}

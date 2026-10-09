@@ -1,0 +1,58 @@
+{
+ "writer": 0,
+ "pr": 18412,
+ "pid": 2081538,
+ "init_ms": 89.03252599999999,
+ "start_offset_ms": 2,
+ "file_order": [
+  "django/db/models/expressions.py",
+  "django/db/models/sql/query.py"
+ ],
+ "holds": {
+  "django/db/models/expressions.py": 14,
+  "django/db/models/sql/query.py": 17
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 18412,
+   "path": "django/db/models/expressions.py",
+   "intents": [
+    "log:django:18412_18462:18412:django/db/models/expressions.py:h0"
+   ],
+   "hold_ms": 14,
+   "t_submit_epoch": 1791563889634,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 15,
+   "outcome": "commit",
+   "total_ms": 44.25,
+   "t_done_epoch": 1791563889678
+  },
+  {
+   "writer": 0,
+   "pr": 18412,
+   "path": "django/db/models/sql/query.py",
+   "intents": [
+    "log:django:18412_18462:18412:django/db/models/sql/query.py:h1",
+    "log:django:18412_18462:18412:django/db/models/sql/query.py:h2",
+    "log:django:18412_18462:18412:django/db/models/sql/query.py:h3"
+   ],
+   "hold_ms": 17,
+   "t_submit_epoch": 1791563889678,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "total_ms": 29.66,
+   "t_done_epoch": 1791563889708
+  }
+ ],
+ "admit_stats": {
+  "txns": 4,
+  "cas_conflicts": 3
+ },
+ "steward_batches": null
+}

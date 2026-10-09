@@ -1,0 +1,150 @@
+{
+ "pair_id": "django:19088_19113",
+ "stratum": "O3",
+ "arm": "bare_composer",
+ "plant": null,
+ "seed_k": 0,
+ "seed": 841163910,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-20effd45/AI-Atomic-Framework-20effd45a0c3a09c293caaea6a34face0df1c5f4",
+ "wall_ms": 712,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 11,
+  "by_verdict": {
+   "correct": 11
+  },
+  "completed": 11,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 4,
+  "files_full_bytes_exact": 4,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "django/db/backends/oracle/operations.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "django/db/backends/sqlite3/operations.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "django/db/models/deletion.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "django/db/models/query.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "django/db/backends/oracle/operations.py": true,
+  "django/db/backends/sqlite3/operations.py": true,
+  "django/db/models/deletion.py": true,
+  "django/db/models/query.py": true
+ },
+ "final_exists": {
+  "django/db/backends/oracle/operations.py": true,
+  "django/db/backends/sqlite3/operations.py": true,
+  "django/db/models/deletion.py": true,
+  "django/db/models/query.py": true
+ },
+ "files": [
+  {
+   "path": "django/db/backends/oracle/operations.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:724f96718f5b256a79abd7958d74b06889b2df49dff65d99f608fed38373724e",
+   "final_digest": "sha256:1f8906a43ada7c349d946807fd61225fc68730a9364aa12d9efc03c397de222f",
+   "expected_digests": [
+    "sha256:1f8906a43ada7c349d946807fd61225fc68730a9364aa12d9efc03c397de222f"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "django/db/backends/sqlite3/operations.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:a5a207788e7b7fbc08985afab1db7d1182cc3dc2bcef96377e9e0b5bed07ee35",
+   "final_digest": "sha256:5d37088d32452be3cd0e0996521ea0c6de40b3c8cacfa74b50d4d6d0348f954c",
+   "expected_digests": [
+    "sha256:5d37088d32452be3cd0e0996521ea0c6de40b3c8cacfa74b50d4d6d0348f954c"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "django/db/models/deletion.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:f9dd75cca6a1c9d1b736ec9e33e1d92e9d5913d1d6bd96cc2bc0c41343f35794",
+   "final_digest": "sha256:45cb0be274507192d8220f0032337ab9716e45256db303042586b7c11918b983",
+   "expected_digests": [
+    "sha256:45cb0be274507192d8220f0032337ab9716e45256db303042586b7c11918b983"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "django/db/models/query.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:3f8ca0a312097d4a9729c92f76db1ea35c6f73ed6c994689aa843d17d805ff14",
+   "final_digest": "sha256:baa34d4481a7429f1863efdc9a2b04c3ab380eb5bcb3de07be5fe57919567fad",
+   "expected_digests": [
+    "sha256:baa34d4481a7429f1863efdc9a2b04c3ab380eb5bcb3de07be5fe57919567fad"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "django/db/backends/oracle/operations.py": "sha256:1f8906a43ada7c349d946807fd61225fc68730a9364aa12d9efc03c397de222f",
+  "django/db/backends/sqlite3/operations.py": "sha256:5d37088d32452be3cd0e0996521ea0c6de40b3c8cacfa74b50d4d6d0348f954c",
+  "django/db/models/deletion.py": "sha256:45cb0be274507192d8220f0032337ab9716e45256db303042586b7c11918b983",
+  "django/db/models/query.py": "sha256:baa34d4481a7429f1863efdc9a2b04c3ab380eb5bcb3de07be5fe57919567fad"
+ }
+}

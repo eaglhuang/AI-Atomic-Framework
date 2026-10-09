@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-b8a64cc369d9a968",
+  "proposalIds": [
+    "prop-hist-w1-sympy_integrals_laplace_py"
+  ],
+  "targetFiles": [
+    "sympy/integrals/laplace.py"
+  ],
+  "appliedFiles": [
+    "sympy/integrals/laplace.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/integrals/laplace.py": "12d8fc8f43c4772bae6a1268f95c2bde7703596ee290609e226415ea70b36246"
+  },
+  "fileAfterHashes": {
+    "sympy/integrals/laplace.py": "cb9371677fe736d73e3444d85b0e2285aecb4d533d3a4f4d58fb663145ed6708"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/integrals/laplace.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-b8a64cc369d9a968",
+    "planId": "merge-b8a64cc369d9a968",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-b8a64cc369d9a968",
+        "planId": "merge-b8a64cc369d9a968",
+        "request_identity": [
+          "prop-hist-w1-sympy_integrals_laplace_py"
+        ],
+        "actor_ids": [
+          "writer-27863"
+        ],
+        "request_files": [
+          "sympy/integrals/laplace.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/integrals/laplace.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/sympy/runs/sympy_27862_27863__bare_composer__s4/artifacts/steward/cb-sympy_integrals_laplace.py-w1-0006.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_INTEGRALS_LAPLACE_PY"
+        ],
+        "commit_sha": "810bb0ba57f710e57d62dddf06ca4a1726d183bf"
+      }
+    ]
+  }
+}

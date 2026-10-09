@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-72c1f04bbd4fb355",
+  "proposalIds": [
+    "prop-hist-w1-django_template_defaulttags_py"
+  ],
+  "targetFiles": [
+    "django/template/defaulttags.py"
+  ],
+  "appliedFiles": [],
+  "fileBeforeHashes": {},
+  "fileAfterHashes": {},
+  "permissions": {
+    "fileWrite": [
+      "django/template/defaulttags.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "blocked",
+  "blockedReasons": [
+    "file-hash-drift: Target file hash sha256:6861a5771156b367ada8054658c1d624aa7e83c30075f65f631c9924e45c50e2 does not match proposal fileBeforeHash sha256:ae0f0cca72ffdd1d8bccaf70182b9275fd9aff29d53a20bb6c1e6972dcbcae1f."
+  ],
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-72c1f04bbd4fb355",
+    "planId": "merge-72c1f04bbd4fb355",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-72c1f04bbd4fb355",
+        "planId": "merge-72c1f04bbd4fb355",
+        "request_identity": [
+          "prop-hist-w1-django_template_defaulttags_py"
+        ],
+        "actor_ids": [
+          "writer-19167"
+        ],
+        "request_files": [
+          "django/template/defaulttags.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/django/runs/django_18368_19167__bare_composer__s4/artifacts/steward/cb-django_template_defaulttags.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-DJANGO_TEMPLATE_DEFAULTTAGS_PY"
+        ],
+        "commit_sha": "7fd72920c68e70594434d4c4be70e2d9193bbc3d"
+      }
+    ]
+  }
+}

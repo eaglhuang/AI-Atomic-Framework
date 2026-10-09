@@ -1,0 +1,145 @@
+{
+ "writer": 0,
+ "pr": 19057,
+ "pid": 2082512,
+ "init_ms": 85.637902,
+ "start_offset_ms": 16,
+ "file_order": [
+  "django/db/models/functions/comparison.py",
+  "django/db/models/lookups.py",
+  "django/contrib/gis/db/models/lookups.py",
+  "django/db/backends/base/schema.py",
+  "django/contrib/postgres/search.py",
+  "django/db/models/expressions.py"
+ ],
+ "holds": {
+  "django/db/models/functions/comparison.py": 12,
+  "django/db/models/lookups.py": 29,
+  "django/contrib/gis/db/models/lookups.py": 9,
+  "django/db/backends/base/schema.py": 6,
+  "django/contrib/postgres/search.py": 17,
+  "django/db/models/expressions.py": 6
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 19057,
+   "path": "django/db/models/functions/comparison.py",
+   "intents": [
+    "log:django:19057_19495:19057:django/db/models/functions/comparison.py:h13"
+   ],
+   "hold_ms": 12,
+   "t_submit_epoch": 1791563898335,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 19,
+   "outcome": "commit",
+   "total_ms": 43.89,
+   "t_done_epoch": 1791563898379
+  },
+  {
+   "writer": 0,
+   "pr": 19057,
+   "path": "django/db/models/lookups.py",
+   "intents": [
+    "log:django:19057_19495:19057:django/db/models/lookups.py:h14",
+    "log:django:19057_19495:19057:django/db/models/lookups.py:h15",
+    "log:django:19057_19495:19057:django/db/models/lookups.py:h16",
+    "log:django:19057_19495:19057:django/db/models/lookups.py:h17",
+    "log:django:19057_19495:19057:django/db/models/lookups.py:h18"
+   ],
+   "hold_ms": 29,
+   "t_submit_epoch": 1791563898379,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 6,
+   "outcome": "commit",
+   "total_ms": 42.03,
+   "t_done_epoch": 1791563898421
+  },
+  {
+   "writer": 0,
+   "pr": 19057,
+   "path": "django/contrib/gis/db/models/lookups.py",
+   "intents": [
+    "log:django:19057_19495:19057:django/contrib/gis/db/models/lookups.py:h0",
+    "log:django:19057_19495:19057:django/contrib/gis/db/models/lookups.py:h1",
+    "log:django:19057_19495:19057:django/contrib/gis/db/models/lookups.py:h2",
+    "log:django:19057_19495:19057:django/contrib/gis/db/models/lookups.py:h3"
+   ],
+   "hold_ms": 9,
+   "t_submit_epoch": 1791563898421,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "total_ms": 19.55,
+   "t_done_epoch": 1791563898441
+  },
+  {
+   "writer": 0,
+   "pr": 19057,
+   "path": "django/db/backends/base/schema.py",
+   "intents": [
+    "log:django:19057_19495:19057:django/db/backends/base/schema.py:h9",
+    "log:django:19057_19495:19057:django/db/backends/base/schema.py:h10"
+   ],
+   "hold_ms": 6,
+   "t_submit_epoch": 1791563898441,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "total_ms": 19.67,
+   "t_done_epoch": 1791563898461
+  },
+  {
+   "writer": 0,
+   "pr": 19057,
+   "path": "django/contrib/postgres/search.py",
+   "intents": [
+    "log:django:19057_19495:19057:django/contrib/postgres/search.py:h4",
+    "log:django:19057_19495:19057:django/contrib/postgres/search.py:h5",
+    "log:django:19057_19495:19057:django/contrib/postgres/search.py:h6",
+    "log:django:19057_19495:19057:django/contrib/postgres/search.py:h7",
+    "log:django:19057_19495:19057:django/contrib/postgres/search.py:h8"
+   ],
+   "hold_ms": 17,
+   "t_submit_epoch": 1791563898461,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "total_ms": 28,
+   "t_done_epoch": 1791563898489
+  },
+  {
+   "writer": 0,
+   "pr": 19057,
+   "path": "django/db/models/expressions.py",
+   "intents": [
+    "log:django:19057_19495:19057:django/db/models/expressions.py:h11",
+    "log:django:19057_19495:19057:django/db/models/expressions.py:h12"
+   ],
+   "hold_ms": 6,
+   "t_submit_epoch": 1791563898489,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "commit",
+   "total_ms": 17.02,
+   "t_done_epoch": 1791563898506
+  }
+ ],
+ "admit_stats": {
+  "txns": 12,
+  "cas_conflicts": 0
+ },
+ "steward_batches": null
+}

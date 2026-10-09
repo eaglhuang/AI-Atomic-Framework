@@ -1,0 +1,84 @@
+{
+ "pair_id": "sympy:27489_27511",
+ "stratum": "O3",
+ "arm": "file_lock",
+ "plant": null,
+ "seed_k": 0,
+ "seed": 2368824514,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-20effd45/AI-Atomic-Framework-20effd45a0c3a09c293caaea6a34face0df1c5f4",
+ "wall_ms": 454,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 3,
+  "by_verdict": {
+   "correct": 3
+  },
+  "completed": 3,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 1,
+  "files_full_bytes_exact": 1,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "sympy/assumptions/handlers/sets.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "sympy/assumptions/handlers/sets.py": true
+ },
+ "final_exists": {
+  "sympy/assumptions/handlers/sets.py": true
+ },
+ "files": [
+  {
+   "path": "sympy/assumptions/handlers/sets.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:d898761ba09ed6acfd226cefe5eb7fbfeb0cc58eb68f7ac5767a75519fcf181f",
+   "final_digest": "sha256:b4e3c84e85995ebc751d41412581e3f690456076af674e0bb67abb2a05f3f916",
+   "expected_digests": [
+    "sha256:b4e3c84e85995ebc751d41412581e3f690456076af674e0bb67abb2a05f3f916"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "sympy/assumptions/handlers/sets.py": "sha256:b4e3c84e85995ebc751d41412581e3f690456076af674e0bb67abb2a05f3f916"
+ }
+}

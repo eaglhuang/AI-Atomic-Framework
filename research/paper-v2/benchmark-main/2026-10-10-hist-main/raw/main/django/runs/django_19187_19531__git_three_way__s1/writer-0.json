@@ -1,0 +1,43 @@
+{
+ "writer": 0,
+ "pr": 19187,
+ "pid": 2072064,
+ "init_ms": 69.308238,
+ "start_offset_ms": 13,
+ "file_order": [
+  "django/db/models/sql/query.py"
+ ],
+ "holds": {
+  "django/db/models/sql/query.py": 18
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 19187,
+   "path": "django/db/models/sql/query.py",
+   "intents": [
+    "log:django:19187_19531:19187:django/db/models/sql/query.py:h0",
+    "log:django:19187_19531:19187:django/db/models/sql/query.py:h1",
+    "log:django:19187_19531:19187:django/db/models/sql/query.py:h2",
+    "log:django:19187_19531:19187:django/db/models/sql/query.py:h3",
+    "log:django:19187_19531:19187:django/db/models/sql/query.py:h4",
+    "log:django:19187_19531:19187:django/db/models/sql/query.py:h5"
+   ],
+   "hold_ms": 18,
+   "t_submit_epoch": 1791563810077,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 20,
+   "outcome": "blocked",
+   "blocked_reason": "git-base-drift",
+   "total_ms": 50.95,
+   "t_done_epoch": 1791563810128
+  }
+ ],
+ "admit_stats": {
+  "txns": 2,
+  "cas_conflicts": 1
+ },
+ "steward_batches": null
+}
