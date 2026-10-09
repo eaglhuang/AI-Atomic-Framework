@@ -113,8 +113,8 @@ const intentCidConflict: WriteIntent = {
   ]
 };
 const decCid = calculateBrokerDecision(intentCidConflict, populatedRegistry);
-check(decCid.verdict === 'blocked-cid-conflict', `Expected verdict 'blocked-cid-conflict', got '${decCid.verdict}'`);
-check(decCid.lane === 'blocked', `Expected lane 'blocked', got '${decCid.lane}'`);
+check(decCid.verdict === 'serial', `Expected cold conflict verdict 'serial', got '${decCid.verdict}'`);
+check(decCid.lane === 'serial', `Expected lane 'serial', got '${decCid.lane}'`);
 
 // Same atom overlap, disjoint write surface: must stay parallel-safe.
 const intentAtomOverlapDisjointSurface: WriteIntent = {

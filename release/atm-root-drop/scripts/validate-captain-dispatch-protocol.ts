@@ -3,6 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { compileSkillTemplatesForAdapter } from '../packages/integrations-core/src/compiler/compile.ts';
 import { loadSkillCorpusSourceSnapshot, resolveTargetedSkillProjectionRefresh } from '../packages/integrations-core/src/compiler/skill-templates.ts';
+import { readSkillGuidanceClosure } from './lib/skill-guidance-closure.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mode = process.argv.includes('--mode')
@@ -110,7 +111,7 @@ for (const relativePath of entryGateFiles) {
     continue;
   }
 
-  const content = readText(relativePath);
+  const content = readSkillGuidanceClosure(root, relativePath).text;
   for (const phrase of requiredEntryGatePhrases) {
     check(hasPhrase(content, phrase), `${relativePath} missing Captain/dispatch entry gate phrase: ${phrase}`);
   }

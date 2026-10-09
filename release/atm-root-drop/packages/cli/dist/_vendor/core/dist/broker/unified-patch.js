@@ -19,7 +19,8 @@ export class UnifiedPatchApplicationError extends Error {
     }
 }
 const HUNK_HEADER = /^@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@/;
-function parseHunks(patchText) {
+/** Parse the hunks of a unified diff; shared with the steward base composer. */
+export function parseUnifiedPatchHunks(patchText) {
     const lines = patchText.split(/\r?\n/);
     // A patch normally ends with a newline, which split() turns into a trailing
     // empty element. That element is punctuation, not a blank context line, and
@@ -71,7 +72,7 @@ function detectLineEnding(text) {
  * surface that as a blocked apply; they must not fall back to any other write.
  */
 export function applyUnifiedPatch(before, patchText) {
-    const hunks = parseHunks(patchText);
+    const hunks = parseUnifiedPatchHunks(patchText);
     if (hunks.length === 0)
         return before;
     const lineEnding = detectLineEnding(before);

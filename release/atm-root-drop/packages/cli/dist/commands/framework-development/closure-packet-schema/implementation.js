@@ -1,3 +1,5 @@
+import { inspectFrameworkIdentity } from '../../../_vendor/core/dist/project/framework-identity.js';
+import { declaredFilesFromCommaSeparated, declaredFilesFromNewlineFile } from '../files-from.js';
 import { verifiedBootstrapReportOwner } from '../../shared/bootstrap-report-provenance.js';
 import { evidencePathForTask } from '../../evidence/evidence-store.js';
 import { createHash } from 'node:crypto';
@@ -99,7 +101,7 @@ export function runFrameworkMode(argv) { const options = parseFrameworkModeArgs(
 export async function runFrameworkTempClaim(cwd, actor, files, reason, linkedTaskId, laneSessionId) { const actorId = normalizeOptionalString(actor ?? process.env.ATM_ACTOR_ID ?? process.env.AGENT_IDENTITY); if (!actorId) {
     throw new CliError('ATM_ACTOR_ID_MISSING', 'framework-mode claim requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
 } const scopedFiles = uniqueSorted(files.map(normalizeRelativePath).filter(Boolean)); if (scopedFiles.length === 0) {
-    throw new CliError('ATM_CLI_USAGE', 'framework-mode claim requires --files <csv> for the intended framework edit scope.', { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', 'framework-mode claim requires --files <csv> or --files-from <path> for the intended framework edit scope.', { exitCode: 2 });
 } const root = path.resolve(cwd); assertFrameworkGitWorktreeReady(root); const currentLaneSessionId = resolveFrameworkLaneSessionId(laneSessionId); const currentTaskId = resolveCurrentFrameworkTaskId(root, actorId, linkedTaskId, currentLaneSessionId); const staleLock = classifyFrameworkStaleLock(root, actorId, { currentTaskId, laneSessionId: currentLaneSessionId }); if (staleLock) {
     if (canAutoReconcileCompletedSelfTempLock(staleLock, actorId)) {
         return await runFrameworkTempClaimWithAutoReconcile({ root, actorId, scopedFiles, reason, currentTaskId, staleLock, laneSessionId: currentLaneSessionId });
@@ -217,17 +219,7 @@ else if (repoIdentity.isFrameworkRepo && changedFiles.length > 0) {
 function assertFrameworkGitWorktreeReady(cwd) { const readiness = inspectGitWorktreeReadiness(cwd); if (readiness.ok) {
     return;
 } throw new CliError('ATM_GIT_WORKTREE_READY_REQUIRED', 'Git local config marks this checked-out repository as bare, so framework-mode cannot safely continue until the local worktree setting is repaired.', { exitCode: 1, details: readiness }); }
-export function detectFrameworkRepoIdentity(repositoryRoot) { const root = path.resolve(repositoryRoot); const packageJson = readJsonIfExists(path.join(root, 'package.json')); const signals = []; const packageName = typeof packageJson?.name === 'string' ? packageJson.name : null; if (packageName === 'ai-atomic-framework') {
-    signals.push('package-name:ai-atomic-framework');
-} if (existsSync(path.join(root, 'packages', 'core', 'src', 'index.ts'))) {
-    signals.push('packages/core/src/index.ts');
-} if (existsSync(path.join(root, 'packages', 'cli', 'src', 'atm.ts'))) {
-    signals.push('packages/cli/src/atm.ts');
-} if (existsSync(path.join(root, 'atomic-registry.json'))) {
-    signals.push('atomic-registry.json');
-} const workspaces = Array.isArray(packageJson?.workspaces) ? packageJson.workspaces.map((entry) => String(entry)) : []; if (workspaces.includes('packages/*')) {
-    signals.push('workspace:packages/*');
-} return { isFrameworkRepo: packageName === 'ai-atomic-framework' || (workspaces.includes('packages/*') && signals.length >= 3), score: signals.length, root, name: packageName, signals }; }
+export function detectFrameworkRepoIdentity(repositoryRoot) { return inspectFrameworkIdentity(repositoryRoot); }
 export function inferFrameworkTargetRepoFromTasks(cwd) { const root = path.resolve(cwd); const currentIdentity = detectFrameworkRepoIdentity(root); if (currentIdentity.isFrameworkRepo)
     return null; for (const task of readTaskDocuments(root)) {
     if (!isOpenTaskStatus(task.status))
@@ -785,7 +777,12 @@ function parseFrameworkModeArgs(argv) { const state = { cwd: process.cwd(), acti
         continue;
     }
     if (arg === '--files') {
-        state.files = requireValue(argv, index, '--files').split(',').map((entry) => normalizeRelativePath(entry)).filter(Boolean);
+        state.files = declaredFilesFromCommaSeparated(requireValue(argv, index, '--files'));
+        index += 1;
+        continue;
+    }
+    if (arg === '--files-from') {
+        state.files = declaredFilesFromNewlineFile(requireValue(argv, index, '--files-from'));
         index += 1;
         continue;
     }

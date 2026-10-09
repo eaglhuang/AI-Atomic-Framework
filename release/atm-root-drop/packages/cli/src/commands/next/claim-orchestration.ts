@@ -26,11 +26,11 @@ import { normalizeTaskRouteStatus, type TaskIntent } from './intent-normalizers.
 import { canTaskBePreparedForClaim, isTaskAlreadyActivelyClaimed, type ImportedTaskQueue, type ImportedTaskSummary } from './route-predicates.ts';
 import { quoteCliValue, uniqueSorted } from './view-projections.ts';
 import { resolveQuickfixScope, findActiveBatchRunForIntent, findActiveTaskQueueForIntent, assertPromptBatchDoesNotConflict, reconcilePromptScopeRuntimeForClaim, inspectImportedTaskQueue, createDeterministicTaskIntent, checkPendingTaskArtifactScopeExpansion } from './route-resolution.ts';
-import { buildActiveWorkSummary, buildChannelPlaybook, buildGovernanceReadinessHint, buildNextMessages, buildTaskDeliveryPrinciple, embedTeamRecommendation, inspectFreshTaskReservationForTask, normalizeWorkPath } from './playbook-projection.ts';
+import { buildActiveWorkSummary, buildChannelPlaybook, buildGovernanceReadinessHint, buildNextMessages, buildTaskDeliveryPrinciple, embedTeamRecommendation, inspectFreshTaskReservationForTask, normalizeWorkPath, readTaskValidators } from './playbook-projection.ts';
 import { diagnoseClaimReadinessForTasks, extractClaimIntentFlag, type NextClaimIntent } from './claim-readiness.ts';
 import { buildClaimedMessage, normalizeClaimLaneSessionEnvelope, resolveCurrentLaneSessionIdForFreshReservation } from './claim-lane-session.ts';
 import { evaluateSameTaskClaimOwnership, resolveSameActorClaimLaneSessionId, throwIfNextClaimForeignActiveOwner } from '../tasks/claim-ownership.ts'; import { assertClaimLineBudgetOrExtractionAdmission } from './oversized-extraction-admission.ts'; import { assertClaimDirtyWipAdmission } from './foreign-dirty-wip-admission.ts'; export { diagnoseClaimReadinessForTasks, extractClaimIntentFlag, type ClaimReadinessDiagnostic, type ClaimReadinessReport, type ClaimReadinessTaskSummary, type NextClaimIntent } from './claim-readiness.ts';
-export async function claimNextImportedTask(input: { readonly cwd: string; readonly actor: string | undefined; readonly claimIntent?: NextClaimIntent | null; readonly autoIntent?: boolean; readonly forceClaim?: boolean; readonly claimFiles?: readonly string[]; readonly allowStaleRunner?: boolean; readonly emergencyApproval?: string | null; readonly taskIntent: TaskIntent | null; readonly importedTaskQueue: ImportedTaskQueue; readonly integrationBootstrap: ReturnType<typeof inspectIntegrationBootstrap>; readonly runtimeAdapterReadiness: ReturnType<typeof inspectRuntimeAdapterReadiness>; }) {
+export async function claimNextImportedTask(input: { readonly cwd: string; readonly actor: string | undefined; readonly claimIntent?: NextClaimIntent | null; readonly autoIntent?: boolean; readonly forceClaim?: boolean; readonly claimFiles?: readonly string[]; readonly claimAtoms?: readonly string[]; readonly allowStaleRunner?: boolean; readonly emergencyApproval?: string | null; readonly adoptUnownedWip?: boolean; readonly taskIntent: TaskIntent | null; readonly importedTaskQueue: ImportedTaskQueue; readonly integrationBootstrap: ReturnType<typeof inspectIntegrationBootstrap>; readonly runtimeAdapterReadiness: ReturnType<typeof inspectRuntimeAdapterReadiness>; }) {
   const claimStartedAt = Date.now();
   const claimLatencyPhases: Array<{ readonly phase: string; readonly durationMs: number }> = [];
   const claimIntent: NextClaimIntent = input.claimIntent ?? 'write';
@@ -259,8 +259,8 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
   parallelAdvisory = parallelPreflight.parallelAdvisory;
   brokerQueueAdmission = parallelPreflight.brokerQueueAdmission;
   claimAllowedFiles = parallelPreflight.claimAllowedFiles;
-  const allowUnownedTaskScopedRecovery = assertRunnerRecoveryClaimPreflight({ cwd: input.cwd, actorId: input.actor ?? null, allowStaleRunner: Boolean(input.allowStaleRunner), emergencyApproval: input.emergencyApproval ?? null });
-  const dirtyWipAdmission = assertClaimDirtyWipAdmission({ cwd: input.cwd, task: claimableTask, actorId: resolvedActor.actorId, laneSessionId: currentLaneSessionId, claimFiles: claimAllowedFiles, allowUnownedTaskScopedRecovery });
+  assertRunnerRecoveryClaimPreflight({ cwd: input.cwd, actorId: input.actor ?? null, allowStaleRunner: Boolean(input.allowStaleRunner), emergencyApproval: input.emergencyApproval ?? null });
+  const dirtyWipAdmission = assertClaimDirtyWipAdmission({ cwd: input.cwd, task: claimableTask, actorId: resolvedActor.actorId, laneSessionId: currentLaneSessionId, claimFiles: claimAllowedFiles, allowUnownedTaskScopedRecovery: input.adoptUnownedWip === true });
   const planScopedPreflight = buildPlanScopedRoutingPreflight({ cwd: input.cwd, task: claimableTask, selectedTasks: importedTaskQueue.promptScope?.selectedTasks ?? [claimableTask], taskIntent: input.taskIntent, actorId: resolvedActor.actorId, laneSessionId: currentLaneSessionId, dirtyWipAdmission, command: `node atm.mjs next --claim --actor ${resolvedActor.actorId} --task ${claimableTask.workItemId} --auto-intent --json` });
   const lineBudgetReport = inspectTouchedPhysicalLineBudget(input.cwd, claimAllowedFiles, { taskId: claimableTask.workItemId, actorId: resolvedActor.actorId, gate: 'claim' });
   const oversizedExtractionAdmission = assertClaimLineBudgetOrExtractionAdmission({ cwd: input.cwd, taskId: claimableTask.workItemId, taskPath: taskPathFor(input.cwd, claimableTask.workItemId), report: lineBudgetReport });
@@ -301,7 +301,8 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
       cwd: input.cwd,
       taskId: claimableTask.workItemId,
       actorId: resolvedActor.actorId,
-      targetFiles: claimAllowedFiles
+      targetFiles: claimAllowedFiles,
+      atoms: input.claimAtoms ?? []
     });
     preClaimBrokerTransaction = transaction;
     const queueAdmission = transaction.queueAdmission as BrokerQueueAdmission;
@@ -359,6 +360,7 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
       '--actor',
       resolvedActor.actorId,
       ...(autoIntent ? ['--auto-intent'] : ['--claim-intent', claimIntent]),
+      ...(input.adoptUnownedWip ? ['--adopt-unowned-wip'] : []),
       '--files',
       Array.from(new Set([
         claimableTask.taskPath,
@@ -489,7 +491,10 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
       taskId: claimableTask.workItemId,
       queueHeadTaskId: batchRun?.currentTaskId ?? claimableTask.workItemId,
       originalPrompt: batchRun?.sourcePrompt ?? input.taskIntent?.userPrompt ?? claimableTask.workItemId,
-      actorPlaceholder: resolvedActor.actorId
+      actorPlaceholder: resolvedActor.actorId,
+      claimActive: true,
+      laneSessionId: laneSession?.laneSessionId ?? null,
+      validators: readTaskValidators(taskPathFor(input.cwd, claimableTask.workItemId))
     }),
     deliveryPrinciple: buildTaskDeliveryPrinciple({
       channel: recommendedChannel === 'batch' ? 'batch' : 'normal',

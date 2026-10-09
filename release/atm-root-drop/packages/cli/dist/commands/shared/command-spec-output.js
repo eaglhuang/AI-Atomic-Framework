@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { normalizeCommandHelpMetadata } from '../help.js';
 import { projectFields, projectSummary } from '../output-projection.js';
+import { carryLaneSessionIntoPrintedCommands } from './lane-session-flag.js';
 import { CliError, enrichCommandResult, getOutputProjectionState, makeResult, message, setFieldsProjection, setOutputJsonPath, setSummaryProjection } from './result-core.js';
 export function defineCommandSpec(spec) {
     const specRecord = spec;
@@ -224,9 +225,10 @@ export function makeHelpResult(spec, cwd = process.cwd(), subcommand) {
     });
 }
 export function writeResult(result, stream, outputFormat = 'json', projectionOptions) {
-    const enriched = 'severity' in result && 'exitCode' in result && 'blocking' in result && 'diagnostics' in result
-        ? result
-        : enrichCommandResult(result);
+    const withLane = carryLaneSessionIntoPrintedCommands(result);
+    const enriched = 'severity' in withLane && 'exitCode' in withLane && 'blocking' in withLane && 'diagnostics' in withLane
+        ? withLane
+        : enrichCommandResult(withLane);
     let projectedResult = enriched;
     const projectionState = getOutputProjectionState();
     const summary = projectionOptions?.summary ?? projectionState.summary;

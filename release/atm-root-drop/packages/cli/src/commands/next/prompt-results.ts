@@ -27,6 +27,7 @@ import {
 } from './playbook-projection.ts';
 import {
   buildNonPlaybookRouteHints,
+  buildTaskScopeNotFoundRoute,
   findTaskByTaskIdReference,
   withMirrorSyncOnlyTarget,
   withMirrorSyncOnlyTargetQueue
@@ -135,8 +136,7 @@ export function buildPromptScopedNextResult(input: {
     }
     const nextAction = {
       status: planningRootMissing ? 'planning-root-missing' : 'task-scope-not-found',
-      command: planningRootMissing?.requiredCommand ?? 'node atm.mjs next --prompt "<current user prompt>" --json',
-      reason: planningRootMissing?.detail ?? 'the prompt mentions task scope, but no matching ATM task card or ledger task was found',
+      ...buildTaskScopeNotFoundRoute(input.taskIntent?.userPrompt, planningRootMissing),
       taskIntent: input.taskIntent,
       candidates: [],
       planningRootMissing,

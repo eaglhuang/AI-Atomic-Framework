@@ -2,11 +2,12 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { isLikelyPromptPathHint } from '../match-and-sort.js';
-import { CliError, parseJsonText } from '../../shared.js';
+import { CliError, parseJsonText, quoteCliValue } from '../../shared.js';
+import { isQuickfixPrompt } from '../../work-channels.js';
 import { isJournalingPrompt, normalizeTaskIntent } from '../intent-normalizers.js';
 import { isQueueRequestedPrompt } from '../route-predicates.js';
 import { uniqueInOrder, uniqueSorted } from '../view-projections.js';
-import { extractTaskFamilyRootHintsFromPrompt, extractTaskIdReferencesFromPrompt, expandTaskIdReferenceAliases, extractTaskRootHintsFromPrompt } from './matching.js';
+import { extractTaskFamilyRootHintsFromPrompt, extractTaskIdReferencesFromPrompt, expandTaskIdReferenceAliases, extractTaskRootHintsFromPrompt, isHandoffPrompt } from './matching.js';
 import { inspectImportedTaskQueue } from './queue-inspection.js';
 export function createNextProfiler(header = 'ATM_NEXT_PROFILE') {
     const enabled = process.env.ATM_NEXT_PROFILE === '1';
@@ -85,7 +86,10 @@ function readTaskIntentFile(cwd, intentPath) {
 export function createDeterministicTaskIntent(prompt, explicitTaskIds = []) {
     const journalingPrompt = isJournalingPrompt(prompt);
     const mentionedTaskIds = journalingPrompt ? [] : uniqueSorted(extractTaskIdReferencesFromPrompt(prompt).flatMap((entry) => expandTaskIdReferenceAliases(entry)));
-    const mentionedPlanPaths = journalingPrompt ? [] : uniqueSorted(extractPromptPathHints(prompt).filter((entry) => /\.md$/i.test(entry)));
+    // In a quick fix ("fix the typo in README.md") a Markdown file is the file
+    // to edit, not a plan document, unless the prompt also names a task card.
+    const quickfixFileEdit = isQuickfixPrompt(prompt) && !/任務卡|task\s*card|計畫書/i.test(prompt);
+    const mentionedPlanPaths = journalingPrompt || quickfixFileEdit ? [] : extractPromptFileTokens(prompt).filter((entry) => /\.md$/i.test(entry));
     const targetRepoHints = uniqueSorted([
         ...(/AI-Atomic-Framework|ATM\s*framework|ATM\s*\u6846\u67b6|ATM\u6846\u67b6|\u539f\u5b50\u6846\u67b6/i.test(prompt) ? ['AI-Atomic-Framework'] : [])
     ]);
@@ -107,6 +111,8 @@ export function createDeterministicTaskIntent(prompt, explicitTaskIds = []) {
         || mentionedPlanPaths.length > 0
         || taskRootHints.length > 0
         || queueRequested
+        // Handoff routing reads task references from the document, not its filename.
+        || isHandoffPrompt(prompt)
         || /\u4efb\u52d9\u5361|task\s*card|task[-_ ]?asa|\u8a08\u756b\u66f8/i.test(prompt));
     return {
         schemaId: 'atm.taskIntent.v1',
@@ -152,6 +158,79 @@ export function matchesTaskContinuationVerb(prompt) {
 }
 export function detectRequestedTaskAction(prompt) {
     return TASK_ACTION_LEXICON.find((entry) => entry.pattern.test(prompt))?.action ?? null;
+}
+// File extensions a prompt token must end with to count as a file reference
+// when it has no directory part ("README.md" yes, "item.price" no).
+const PROMPT_FILE_EXTENSIONS = new Set(['md', 'mdx', 'txt', 'json', 'jsonc', 'yml', 'yaml', 'toml', 'js', 'jsx', 'mjs', 'cjs', 'ts', 'tsx', 'mts', 'cts', 'py', 'cs', 'java', 'go', 'rs', 'rb', 'php', 'c', 'h', 'cpp', 'hpp', 'css', 'scss', 'html', 'vue', 'svelte', 'sh', 'ps1', 'sql', 'xml', 'csv']);
+/**
+ * Whitespace-delimited file references in a prompt, plus quoted paths that
+ * contain spaces. Unlike extractPromptPathHints, surrounding sentence words
+ * are never glued onto the path ("Fix the typo in README.md" -> README.md).
+ */
+export function extractPromptFileTokens(prompt) {
+    // A quote inside a word ("don't") does not open a quoted path.
+    const quotedPattern = /(?<![A-Za-z0-9])["'`]([^"'`\r\n]+)["'`](?![A-Za-z0-9])/g;
+    const quoted = [...prompt.matchAll(quotedPattern)].map((match) => match[1].trim());
+    const words = prompt.replace(quotedPattern, ' ').split(/[\s"'`,;，。、：；「」（）]+/);
+    return uniqueSorted([...quoted, ...words]
+        .map((entry) => entry.replace(/^[([{<]+|[)\]}>.:!?]+$/g, ''))
+        .filter((entry) => !/^[a-z][a-z0-9+.-]*:\/\//i.test(entry))
+        .filter((entry) => {
+        const extension = /\.([A-Za-z0-9]+)$/.exec(entry)?.[1]?.toLowerCase();
+        if (!extension || entry.length <= extension.length + 1)
+            return false;
+        return /[\\/]/.test(entry) || PROMPT_FILE_EXTENSIONS.has(extension);
+    }));
+}
+/**
+ * A first request in a new repository is rarely task-scoped. Name the one
+ * claimable shortcut (the fast quickfix channel, which needs a path-like
+ * scope) next to guidance, so an agent is not sent through
+ * guide -> orient -> start before it can claim anything. Files the prompt
+ * already names are used as that scope instead of a <path> placeholder.
+ */
+export function buildPromptSuggestedRoutes(prompt, commandPrefix = 'node atm.mjs') {
+    const files = extractPromptFileTokens(prompt);
+    return [
+        files.length > 0
+            ? {
+                when: `small change limited to ${files.join(', ')}`,
+                channel: 'fast',
+                command: `${commandPrefix} next --claim --actor <id> --prompt ${quoteCliValue(`quick fix: ${prompt}`)} --json`
+            }
+            : {
+                when: 'small change where you can name the files to edit (replace <path>)',
+                channel: 'fast',
+                command: `${commandPrefix} next --claim --actor <id> --prompt ${quoteCliValue(`quick fix: ${prompt} in <path>`)} --json`
+            },
+        {
+            when: 'unclear what the work involves',
+            channel: null,
+            command: `${commandPrefix} guide --goal ${quoteCliValue(prompt)} --cwd . --json`
+        },
+        // Guidance alone loops back to next for larger work; the exit is a task
+        // card of your own, then next --claim --task <TASK-ID>.
+        {
+            when: 'larger work: open a task card that names the files and the validator command, then claim it with next --claim --task <TASK-ID>',
+            channel: 'task-card',
+            command: `${commandPrefix} taskflow open --write --actor <id> --title ${quoteCliValue(prompt.length > 72 ? `${prompt.slice(0, 69)}...` : prompt)} --goal ${quoteCliValue(prompt)} --scope-path ${quoteCliValue(files.length > 0 ? files.join(',') : '<files>')} --validator "<command>" --json`
+        }
+    ];
+}
+/**
+ * Rerunning the same prompt cannot find a task that does not exist. A file
+ * named in an ordinary request ("fix the typo in README.md") is not a task
+ * card, so a scope miss offers the same claimable routes as an unscoped prompt.
+ */
+export function buildTaskScopeNotFoundRoute(prompt, planningRootMissing) {
+    if (planningRootMissing)
+        return { command: planningRootMissing.requiredCommand, reason: planningRootMissing.detail };
+    const suggestedRoutes = buildPromptSuggestedRoutes(prompt?.trim() || '<current user prompt>');
+    return {
+        command: suggestedRoutes[1].command,
+        reason: 'the prompt mentions task scope, but no matching ATM task card or ledger task was found; if this is ordinary work rather than an ATM task card, use suggestedRoutes',
+        suggestedRoutes
+    };
 }
 export function extractPromptPathHints(prompt) {
     const matches = prompt.match(/(?:[A-Za-z]:)?(?:[A-Za-z0-9_%\u4e00-\u9fff() -]+[\\/])+[A-Za-z0-9_%\u4e00-\u9fff(). -]+(?:\.md)?|[A-Za-z0-9_%\u4e00-\u9fff() -]+\.md/gi) ?? [];

@@ -49,16 +49,13 @@ assert.match(
   /npm version "\$version" --workspaces --include-workspace-root --no-git-tag-version --no-workspaces-update --allow-same-version/,
   'release workflow must make package version synchronization idempotent when the target version is already applied'
 );
-const publishLines = workflow.split(/\r?\n/).filter((line) => line.includes('npm publish'));
-assert.ok(publishLines.length >= 2, 'release workflow must publish in both dry-run and release branches');
-for (const line of publishLines) {
-  assert.match(line, /--workspace "\$workspace"/, 'release workflow must publish one explicit workspace at a time');
-  assert.match(line, /--include-workspace-root=false/, 'release workflow must not publish the private repository root');
-}
-assert.match(workflow, /PUBLIC_WORKSPACES=\(/, 'release workflow must declare the explicit public workspace closure');
-assert.match(workflow, /for workspace in "\$\{PUBLIC_WORKSPACES\[@\]\}"; do/, 'release workflow must iterate the explicit public workspace closure');
-assert.match(workflow, /npm view "\$workspace@\$release_version" version --json/, 'release workflow must skip versions already published during a recovery rerun');
-assert.doesNotMatch(workflow, /npm publish --workspaces/, 'release workflow must not publish example workspaces');
+const candidatePublisher = readFileSync(path.join(root, 'scripts/release-candidate.ts'), 'utf8');
+assert.match(workflow, /scripts\/release-candidate\.ts/, 'workflow must use immutable candidate orchestration');
+assert.match(candidatePublisher, /'publish', path\.join\(directory, artifact\.filename\)/, 'publication must target the sealed tarball');
+assert.match(candidatePublisher, /'--ignore-scripts'/, 'publication must not rebuild the package');
+assert.match(candidatePublisher, /process\.argv\.includes\('--dry-run'\)/, 'the same artifacts need a nonpublishing dry-run path');
+assert.match(candidatePublisher, /Existing version differs/, 'recovery must reject already-published different bytes');
+assert.doesNotMatch(candidatePublisher, /--workspace/, 'publication must never reach build-time-only workspaces');
 
 const guideCwd = mkdtempSync(path.join(os.tmpdir(), 'atm-npm-guide-prefix-'));
 const originalEntrypoint = process.argv[1];
@@ -104,7 +101,7 @@ try {
 // omit a member of it nor list a workspace outside it.
 assert.deepEqual(publishedPackages, ['@ai-atomic-framework/cli', 'create-atm'], 'only the CLI and its adoption starter may be published');
 for (const packageName of publishedPackages) {
-  assert.ok(workflow.includes(`"${packageName}"`), `release workflow must include ${packageName}`);
+  assert.ok(readFileSync(path.join(root, 'scripts/release-artifact-manifest.ts'), 'utf8').includes(`'${packageName}'`), `sealed release must include ${packageName}`);
 }
 for (const packageSpec of fixture.packages) {
   if (publishedPackages.includes(packageSpec.name)) continue;
@@ -117,7 +114,9 @@ for (const packageSpec of fixture.packages) {
 
 // A clean isolated install is only a release gate if the release actually runs
 // it before publishing, so the workflow wiring is asserted, not assumed.
-assert.match(workflow, /name: Verify public npm registry post-publish\r?\n\s+if:[^\n]+\n\s+timeout-minutes: 10\r?\n/, 'registry visibility checks must have a ten-minute wall-clock bound, including npm query time');
+const candidateRelease = readFileSync(path.join(root, 'scripts/release-candidate.ts'), 'utf8');
+assert.match(candidateRelease, /registryDeadline = Date.now\(\) \+ 10 \* 60_000/, 'registry visibility must have a ten-minute deadline');
+assert.match(candidateRelease, /timeout: registryDeadline/, 'npm requests must respect the same bounded deadline');
 const smokeIndex = workflow.indexOf('scripts/validate-npm-clean-install.ts');
 const publishIndex = workflow.indexOf('Publish public workspace closure');
 assert.ok(smokeIndex > -1, 'release workflow must run the clean-install smoke validator');

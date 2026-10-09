@@ -1,17 +1,28 @@
 import { classifyLeasePhase } from './orphan-cleanup.js';
-import { createBrokerRegistryStore, createEmptyBrokerRegistryDocument } from './registry-store.js';
+import { BrokerRegistryStoreError, createBrokerRegistryStore, createEmptyBrokerRegistryDocument } from './registry-store.js';
+import { refreshSerialQueue, releaseSerialTask } from './serial-queue/queue.js';
 export const DEFAULT_BROKER_CLEANUP_COMMAND = 'node atm.mjs broker cleanup --json';
 export function loadRegistry(filePath, options = {}) {
     const persistCleanup = options.persistCleanup !== false;
     const store = createBrokerRegistryStore(filePath);
-    const snapshot = store.read();
-    const parsed = snapshot.document;
-    const cleaned = cleanupStaleWithEvidence(parsed, { registryPath: filePath });
-    if (persistCleanup
-        && (cleaned.removedCount > 0 || cleaned.registry.currentEpoch !== parsed.currentEpoch)) {
-        saveRegistry(filePath, cleaned.registry);
+    for (let attempt = 0;; attempt++) {
+        const snapshot = store.read();
+        const parsed = snapshot.document;
+        const cleaned = cleanupStaleWithEvidence(parsed, { registryPath: filePath });
+        if (!persistCleanup || JSON.stringify(cleaned.registry) === JSON.stringify(parsed))
+            return cleaned.registry;
+        try {
+            // Compare the very snapshot we cleaned; never relabel a stale document
+            // with a newly read base, which could erase a concurrent queue writer.
+            store.write({ base: snapshot, next: cleaned.registry, transactionId: `cleanup:${process.pid}:${Date.now()}` });
+            return store.read().document;
+        }
+        catch (error) {
+            if (!(error instanceof BrokerRegistryStoreError) || error.code !== 'ATM_BROKER_REGISTRY_CAS_CONFLICT' || attempt >= 7)
+                throw error;
+            Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 1);
+        }
     }
-    return cleaned.registry;
 }
 export function saveRegistry(filePath, doc) {
     const store = createBrokerRegistryStore(filePath);
@@ -114,11 +125,11 @@ export function renewIntentLease(doc, taskId, actorId, ttlSeconds = 1800) {
     };
 }
 export function releaseTask(doc, taskId) {
-    return {
+    return releaseSerialTask({
         ...doc,
         currentEpoch: Date.now(),
         activeIntents: doc.activeIntents.filter((entry) => entry.taskId !== taskId)
-    };
+    }, taskId);
 }
 export function cleanupStale(doc, options = {}) {
     return cleanupStaleWithEvidence(doc, options).registry;
@@ -147,11 +158,11 @@ export function cleanupStaleWithEvidence(doc, options = {}) {
         ? formatRegistryResidueGuidance({ registryPath: registryPath ?? '.atm/runtime/write-broker.registry.json', removed })
         : 'No stale broker registry entries were removed.';
     return {
-        registry: {
+        registry: refreshSerialQueue({
             ...doc,
             currentEpoch: preservedEpoch,
             activeIntents: validIntents
-        },
+        }, now),
         removed,
         removedCount: removed.length,
         cleanupCommand,

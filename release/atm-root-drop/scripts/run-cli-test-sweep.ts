@@ -133,6 +133,9 @@ export async function runSweep(root: string, config: SweepConfig, only?: readonl
     });
     if (added.length === 0 || batch.length === 1) {
       for (const outcome of outcomes) results.push({ ...outcome, dirtied: batch.length === 1 ? added : [] });
+      // Preserve the writer's evidence and result; do not let the next batch's
+      // admission error replace the known failure or stash concurrent work.
+      if (added.length > 0) break;
       continue;
     }
     preserveBatchChanges(root);
@@ -175,10 +178,12 @@ async function main(): Promise<void> {
   const startedAt = Date.now();
   const selected = available.filter((test) => includeQuarantine ? quarantined.has(test) : !quarantined.has(test)).sort();
   const serial = new Set((config.serial ?? []).map((entry) => entry.test));
-  const results = [
-    ...await runSweep(root, config, selected.filter((test) => !serial.has(test)), { onBatch: (trace) => batches.push(trace) }),
-    ...await runSweep(root, { ...config, concurrency: 1 }, selected.filter((test) => serial.has(test)), { onBatch: (trace) => batches.push(trace) }),
-  ];
+  const results = await runSweep(root, config, selected.filter((test) => !serial.has(test)), { onBatch: (trace) => batches.push(trace) });
+  if (worktreeState(root).size === 0) {
+    results.push(...await runSweep(root, { ...config, concurrency: 1 }, selected.filter((test) => serial.has(test)), { onBatch: (trace) => batches.push(trace) }));
+  }
+  const completedTests = new Set(results.map((result) => result.test));
+  const skippedTests = selected.filter((test) => !completedTests.has(test));
   const failures = results.filter((result) => includeQuarantine ? isClean(result) : !isClean(result));
   const slowTests = [...results]
     .sort((left, right) => right.durationMs - left.durationMs || left.test.localeCompare(right.test))
@@ -188,9 +193,10 @@ async function main(): Promise<void> {
     .sort((left, right) => right.durationMs - left.durationMs)
     .slice(0, 20);
   const summary = {
-    ok: failures.length === 0,
+    ok: failures.length === 0 && skippedTests.length === 0,
     mode: includeQuarantine ? 'check-quarantine' : 'sweep',
     ran: results.length,
+    skippedTests,
     quarantined: quarantined.size,
     totalDurationMs: results.reduce((sum, result) => sum + result.durationMs, 0),
     wallClockDurationMs: Date.now() - startedAt,
