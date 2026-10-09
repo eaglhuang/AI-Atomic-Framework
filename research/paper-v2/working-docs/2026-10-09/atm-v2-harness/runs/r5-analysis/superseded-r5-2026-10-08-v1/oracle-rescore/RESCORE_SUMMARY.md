@@ -1,0 +1,50 @@
+# Oracle v2 analysis-only re-score（r2 P0-2）
+
+oracle：`c4-fullbytes-frame-v2`；fixture `sha256:1c985c0afddd1d2d`；raw 唯讀；輸入只用 harness terminal outcome＋最終 bytes＋fixture base（不使用 v1 verdict）。
+
+| stage | cells | ops | v1_correct | v2_correct | v1_lost | v2_lost | v1_fail | v2_fail | cells_changed | ops_changed | frame_violation_files | structure_violation_files | foreign_writes | extra_files |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| c4 | 4 | 60 | 47 | 47 | 13 | 13 | 13 | 13 | 0 | 0 | 0 | 0 | 0 | 0 |
+| d1 | 2 | 30 | 30 | 30 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| d2 | 4 | 60 | 55 | 55 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| d3 | 4 | 60 | 60 | 60 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| d4 | 3 | 45 | 42 | 42 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| d5 | 8 | 120 | 104 | 104 | 13 | 13 | 13 | 13 | 0 | 0 | 0 | 0 | 0 | 0 |
+| e1 | 48 | 630 | 611 | 611 | 14 | 14 | 14 | 14 | 0 | 0 | 0 | 0 | 0 | 0 |
+| e2 | 152 | 2035 | 1943 | 1943 | 12 | 12 | 12 | 12 | 0 | 0 | 0 | 0 | 0 | 0 |
+| e3 | 120 | 1614 | 1520 | 1520 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| e4 | 21 | 660 | 398 | 398 | 4 | 4 | 4 | 4 | 0 | 0 | 0 | 0 | 0 | 0 |
+| e5 | 6 | 82 | 67 | 67 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| gaps | 1 | 4 | 4 | 4 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| r2-e4-forensics | 151 | 5254 | 3164 | 3154 | 6 | 6 | 6 | 16 | 1 | 10 | 1 | 0 | 0 | 0 |
+| r3-matrix | 45 | 1590 | 979 | 979 | 1 | 1 | 1 | 1 | 0 | 0 | 0 | 0 | 0 | 0 |
+| r3-regression | 180 | 2340 | 2320 | 2320 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| r3-replay | 225 | 7830 | 4635 | 4635 | 12 | 12 | 12 | 12 | 0 | 0 | 0 | 0 | 0 | 0 |
+| r3-smoke | 3 | 83 | 54 | 54 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| r3-sp-noise | 30 | 1060 | 984 | 984 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| r4-matrix | 63 | 2226 | 1484 | 1484 | 2 | 2 | 2 | 2 | 0 | 0 | 0 | 0 | 0 | 0 |
+| r4-regression | 180 | 2340 | 2320 | 2320 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| r4-replay | 450 | 15660 | 10192 | 10192 | 6 | 6 | 6 | 6 | 0 | 0 | 0 | 0 | 0 | 0 |
+| r5-e5 | 30 | 410 | 339 | 339 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| r5-matrix | 87 | 3074 | 2049 | 2049 | 2 | 2 | 2 | 2 | 0 | 0 | 0 | 0 | 0 | 0 |
+| r5-regression | 198 | 2574 | 2554 | 2554 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| r5-replay | 525 | 18270 | 11662 | 11662 | 6 | 6 | 6 | 6 | 0 | 0 | 0 | 0 | 0 | 0 |
+| steward | 2 | 25 | 25 | 25 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| support | 2 | 68 | 54 | 54 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+
+skipped（fixture 不同）：0
+
+## 改判明細（v1 → v2）
+
+| cell | intent | path | v1 | v2 | reason |
+|---|---|---|---|---|---|
+| r2f-e4-p2-s17-g-r1cfg-r4 | s17-t000-i1 | src/store.ts | correct | frame_violation | skeleton_diff_at:24 |
+| r2f-e4-p2-s17-g-r1cfg-r4 | s17-t000-i3 | src/store.ts | correct | frame_violation | skeleton_diff_at:24 |
+| r2f-e4-p2-s17-g-r1cfg-r4 | s17-t000-i6 | src/store.ts | correct | frame_violation | skeleton_diff_at:24 |
+| r2f-e4-p2-s17-g-r1cfg-r4 | s17-t001-i0 | src/store.ts | correct | frame_violation | skeleton_diff_at:24 |
+| r2f-e4-p2-s17-g-r1cfg-r4 | s17-t004-i0 | src/store.ts | correct | frame_violation | skeleton_diff_at:24 |
+| r2f-e4-p2-s17-g-r1cfg-r4 | s17-t004-i1 | src/store.ts | correct | frame_violation | skeleton_diff_at:24 |
+| r2f-e4-p2-s17-g-r1cfg-r4 | s17-t004-i2 | src/store.ts | correct | frame_violation | skeleton_diff_at:24 |
+| r2f-e4-p2-s17-g-r1cfg-r4 | s17-t004-i3 | src/store.ts | correct | frame_violation | skeleton_diff_at:24 |
+| r2f-e4-p2-s17-g-r1cfg-r4 | s17-t004-i4 | src/store.ts | correct | frame_violation | skeleton_diff_at:24 |
+| r2f-e4-p2-s17-g-r1cfg-r4 | s17-t004-i5 | src/store.ts | correct | frame_violation | skeleton_diff_at:24 |
