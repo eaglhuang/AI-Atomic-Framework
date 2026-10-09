@@ -1,0 +1,6330 @@
+{
+ "test": "r5-fault-scenarios-v1",
+ "node": "v24.21.0",
+ "host_pidns": "pid:[4026532320]",
+ "unshare": "unshare from util-linux 2.41.5",
+ "pins": {
+  "b35a6141-qon": "/workspace/atm-main-b35a6141/AI-Atomic-Framework-b35a6141bd5bfbaec654f1cd3079323581b04074",
+  "b35a6141-qoff": "/workspace/atm-main-b35a6141/AI-Atomic-Framework-b35a6141bd5bfbaec654f1cd3079323581b04074"
+ },
+ "reps": 3,
+ "summary": {
+  "F2-crafted-owner | pidreuse-live-pid-wrong-starttoken | b35a6141-qon": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "B:applied": 3
+   }
+  },
+  "F2-crafted-owner | live-pid-correct-starttoken | b35a6141-qon": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "B:applied": 3
+   }
+  },
+  "F2-crafted-owner | dead-pid | b35a6141-qon": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "B:applied": 3
+   }
+  },
+  "F2-crafted-owner | legacy-v1-live-pid | b35a6141-qon": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "B:applied": 3
+   }
+  },
+  "F3-live-holder-timeout | hold3500ms | b35a6141-qon": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied B:applied": 3
+   }
+  },
+  "F4-tmpdir | same-tmpdir/B-same-region | b35a6141-qon": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied B:blocked(steward-final-patch-required)": 3
+   }
+  },
+  "F4-tmpdir | same-tmpdir/B-other-region | b35a6141-qon": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied B:applied": 3
+   }
+  },
+  "F4-tmpdir | different-tmpdir/B-same-region | b35a6141-qon": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied B:blocked(steward-final-patch-required)": 3
+   }
+  },
+  "F4-tmpdir | different-tmpdir/B-other-region | b35a6141-qon": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied B:applied": 3
+   }
+  },
+  "F2b-forged-owner-live-holder | forged-owner-dead-pid | b35a6141-qon": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied B:applied": 3
+   }
+  },
+  "F2b-forged-owner-live-holder | forged-owner-wrong-starttoken | b35a6141-qon": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied B:applied": 3
+   }
+  },
+  "F7-queue-wait-fallback | queue-wait300ms/A-hold3000ms | b35a6141-qon": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied B:blocked(recovery-required)": 3
+   }
+  },
+  "F7-queue-wait-fallback | queue-wait300ms/A-hold1200ms | b35a6141-qon": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied B:applied": 3
+   }
+  },
+  "F5-retry-exhaustion | default-policy/K=always | b35a6141-qon": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:blocked(re-compose attempts exhausted after 5 of 5)": 3
+   }
+  },
+  "F5-retry-exhaustion | default-policy/K=2 | b35a6141-qon": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied": 3
+   }
+  },
+  "F5-retry-exhaustion | default-policy/K=4 | b35a6141-qon": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied": 3
+   }
+  },
+  "F5-retry-exhaustion | maxRecompose=0/K=always | b35a6141-qon": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:blocked(re-compose attempts exhausted after 1 of 1)": 3
+   }
+  },
+  "F5-retry-exhaustion | maxRecompose=1,backoff0/K=1 | b35a6141-qon": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied": 3
+   }
+  },
+  "F5-retry-exhaustion | env:ATM_STEWARD_RECOMPOSE_POLICY maxRecompose=0/K=always | b35a6141-qon": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:blocked(re-compose attempts exhausted after 1 of 1)": 3
+   }
+  },
+  "F2-crafted-owner | pidreuse-live-pid-wrong-starttoken | b35a6141-qoff": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "B:applied": 3
+   }
+  },
+  "F2-crafted-owner | live-pid-correct-starttoken | b35a6141-qoff": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "B:applied": 3
+   }
+  },
+  "F2-crafted-owner | dead-pid | b35a6141-qoff": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "B:applied": 3
+   }
+  },
+  "F2-crafted-owner | legacy-v1-live-pid | b35a6141-qoff": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "B:applied": 3
+   }
+  },
+  "F3-live-holder-timeout | hold3500ms | b35a6141-qoff": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied B:blocked(recovery-required)": 3
+   }
+  },
+  "F4-tmpdir | same-tmpdir/B-same-region | b35a6141-qoff": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied B:blocked(steward-final-patch-required)": 3
+   }
+  },
+  "F4-tmpdir | same-tmpdir/B-other-region | b35a6141-qoff": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied B:applied": 3
+   }
+  },
+  "F4-tmpdir | different-tmpdir/B-same-region | b35a6141-qoff": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied B:blocked(steward-final-patch-required)": 3
+   }
+  },
+  "F4-tmpdir | different-tmpdir/B-other-region | b35a6141-qoff": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied B:applied": 3
+   }
+  },
+  "F2b-forged-owner-live-holder | forged-owner-dead-pid | b35a6141-qoff": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied B:blocked(recovery-required)": 3
+   }
+  },
+  "F2b-forged-owner-live-holder | forged-owner-wrong-starttoken | b35a6141-qoff": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied B:blocked(recovery-required)": 3
+   }
+  },
+  "F5-retry-exhaustion | default-policy/K=always | b35a6141-qoff": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:blocked(re-compose attempts exhausted after 5 of 5)": 3
+   }
+  },
+  "F5-retry-exhaustion | default-policy/K=2 | b35a6141-qoff": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied": 3
+   }
+  },
+  "F5-retry-exhaustion | default-policy/K=4 | b35a6141-qoff": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied": 3
+   }
+  },
+  "F5-retry-exhaustion | maxRecompose=0/K=always | b35a6141-qoff": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:blocked(re-compose attempts exhausted after 1 of 1)": 3
+   }
+  },
+  "F5-retry-exhaustion | maxRecompose=1,backoff0/K=1 | b35a6141-qoff": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied": 3
+   }
+  },
+  "F5-retry-exhaustion | env:ATM_STEWARD_RECOMPOSE_POLICY maxRecompose=0/K=always | b35a6141-qoff": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:blocked(re-compose attempts exhausted after 1 of 1)": 3
+   }
+  }
+ },
+ "runs": [
+  {
+   "scenario": "F2-crafted-owner",
+   "variant": "pidreuse-live-pid-wrong-starttoken",
+   "pin": "b35a6141-qon",
+   "rep": 1,
+   "owner_format": "v2",
+   "owner_pid_alive": true,
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1574163,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 67,
+     "owner_write_1": 145,
+     "rename_done": 145,
+     "apply_return": 146
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 79
+   },
+   "B_wall_ms": 192,
+   "lock_dir_after": true,
+   "state": {
+    "final_hash": "sha256:bc385e4d39d65ff1e3501b3d2e556dc8eded260982ee579489beb6ca0c36092b",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "B_err": null
+  },
+  {
+   "scenario": "F2-crafted-owner",
+   "variant": "pidreuse-live-pid-wrong-starttoken",
+   "pin": "b35a6141-qon",
+   "rep": 2,
+   "owner_format": "v2",
+   "owner_pid_alive": true,
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1574188,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 95,
+     "owner_write_1": 205,
+     "rename_done": 206,
+     "apply_return": 207
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 112
+   },
+   "B_wall_ms": 265,
+   "lock_dir_after": true,
+   "state": {
+    "final_hash": "sha256:bc385e4d39d65ff1e3501b3d2e556dc8eded260982ee579489beb6ca0c36092b",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "B_err": null
+  },
+  {
+   "scenario": "F2-crafted-owner",
+   "variant": "pidreuse-live-pid-wrong-starttoken",
+   "pin": "b35a6141-qon",
+   "rep": 3,
+   "owner_format": "v2",
+   "owner_pid_alive": true,
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1574209,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 63,
+     "owner_write_1": 139,
+     "rename_done": 139,
+     "apply_return": 140
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 77
+   },
+   "B_wall_ms": 192,
+   "lock_dir_after": true,
+   "state": {
+    "final_hash": "sha256:bc385e4d39d65ff1e3501b3d2e556dc8eded260982ee579489beb6ca0c36092b",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "B_err": null
+  },
+  {
+   "scenario": "F2-crafted-owner",
+   "variant": "live-pid-correct-starttoken",
+   "pin": "b35a6141-qon",
+   "rep": 1,
+   "owner_format": "v2",
+   "owner_pid_alive": true,
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1574230,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 69,
+     "owner_write_1": 149,
+     "rename_done": 149,
+     "apply_return": 150
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 81
+   },
+   "B_wall_ms": 198,
+   "lock_dir_after": true,
+   "state": {
+    "final_hash": "sha256:bc385e4d39d65ff1e3501b3d2e556dc8eded260982ee579489beb6ca0c36092b",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "B_err": null
+  },
+  {
+   "scenario": "F2-crafted-owner",
+   "variant": "live-pid-correct-starttoken",
+   "pin": "b35a6141-qon",
+   "rep": 2,
+   "owner_format": "v2",
+   "owner_pid_alive": true,
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1574251,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 64,
+     "owner_write_1": 140,
+     "rename_done": 140,
+     "apply_return": 141
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 77
+   },
+   "B_wall_ms": 186,
+   "lock_dir_after": true,
+   "state": {
+    "final_hash": "sha256:bc385e4d39d65ff1e3501b3d2e556dc8eded260982ee579489beb6ca0c36092b",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "B_err": null
+  },
+  {
+   "scenario": "F2-crafted-owner",
+   "variant": "live-pid-correct-starttoken",
+   "pin": "b35a6141-qon",
+   "rep": 3,
+   "owner_format": "v2",
+   "owner_pid_alive": true,
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1574272,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 82,
+     "owner_write_1": 173,
+     "rename_done": 174,
+     "apply_return": 175
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 93
+   },
+   "B_wall_ms": 219,
+   "lock_dir_after": true,
+   "state": {
+    "final_hash": "sha256:bc385e4d39d65ff1e3501b3d2e556dc8eded260982ee579489beb6ca0c36092b",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "B_err": null
+  },
+  {
+   "scenario": "F2-crafted-owner",
+   "variant": "dead-pid",
+   "pin": "b35a6141-qon",
+   "rep": 1,
+   "owner_format": "v2",
+   "owner_pid_alive": false,
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1574294,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 67,
+     "owner_write_1": 146,
+     "rename_done": 146,
+     "apply_return": 147
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 80
+   },
+   "B_wall_ms": 194,
+   "lock_dir_after": true,
+   "state": {
+    "final_hash": "sha256:bc385e4d39d65ff1e3501b3d2e556dc8eded260982ee579489beb6ca0c36092b",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "B_err": null
+  },
+  {
+   "scenario": "F2-crafted-owner",
+   "variant": "dead-pid",
+   "pin": "b35a6141-qon",
+   "rep": 2,
+   "owner_format": "v2",
+   "owner_pid_alive": false,
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1574316,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 67,
+     "owner_write_1": 150,
+     "rename_done": 151,
+     "apply_return": 152
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 85
+   },
+   "B_wall_ms": 205,
+   "lock_dir_after": true,
+   "state": {
+    "final_hash": "sha256:bc385e4d39d65ff1e3501b3d2e556dc8eded260982ee579489beb6ca0c36092b",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "B_err": null
+  },
+  {
+   "scenario": "F2-crafted-owner",
+   "variant": "dead-pid",
+   "pin": "b35a6141-qon",
+   "rep": 3,
+   "owner_format": "v2",
+   "owner_pid_alive": false,
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1574344,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 63,
+     "owner_write_1": 142,
+     "rename_done": 142,
+     "apply_return": 143
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 80
+   },
+   "B_wall_ms": 185,
+   "lock_dir_after": true,
+   "state": {
+    "final_hash": "sha256:bc385e4d39d65ff1e3501b3d2e556dc8eded260982ee579489beb6ca0c36092b",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "B_err": null
+  },
+  {
+   "scenario": "F2-crafted-owner",
+   "variant": "legacy-v1-live-pid",
+   "pin": "b35a6141-qon",
+   "rep": 1,
+   "owner_format": "v1(pid only)",
+   "owner_pid_alive": true,
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1574365,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 75,
+     "owner_write_1": 156,
+     "rename_done": 156,
+     "apply_return": 158
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 83
+   },
+   "B_wall_ms": 209,
+   "lock_dir_after": true,
+   "state": {
+    "final_hash": "sha256:bc385e4d39d65ff1e3501b3d2e556dc8eded260982ee579489beb6ca0c36092b",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "B_err": null
+  },
+  {
+   "scenario": "F2-crafted-owner",
+   "variant": "legacy-v1-live-pid",
+   "pin": "b35a6141-qon",
+   "rep": 2,
+   "owner_format": "v1(pid only)",
+   "owner_pid_alive": true,
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1574386,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 70,
+     "owner_write_1": 152,
+     "rename_done": 152,
+     "apply_return": 153
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 83
+   },
+   "B_wall_ms": 197,
+   "lock_dir_after": true,
+   "state": {
+    "final_hash": "sha256:bc385e4d39d65ff1e3501b3d2e556dc8eded260982ee579489beb6ca0c36092b",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "B_err": null
+  },
+  {
+   "scenario": "F2-crafted-owner",
+   "variant": "legacy-v1-live-pid",
+   "pin": "b35a6141-qon",
+   "rep": 3,
+   "owner_format": "v1(pid only)",
+   "owner_pid_alive": true,
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1574407,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 65,
+     "owner_write_1": 143,
+     "rename_done": 144,
+     "apply_return": 145
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 80
+   },
+   "B_wall_ms": 196,
+   "lock_dir_after": true,
+   "state": {
+    "final_hash": "sha256:bc385e4d39d65ff1e3501b3d2e556dc8eded260982ee579489beb6ca0c36092b",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "B_err": null
+  },
+  {
+   "scenario": "F3-live-holder-timeout",
+   "variant": "hold3500ms",
+   "pin": "b35a6141-qon",
+   "rep": 1,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1574427,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 64,
+     "owner_write_1": 147,
+     "hold_start": 147,
+     "hold_end": 3647,
+     "rename_done": 3649,
+     "apply_return": 3651
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "after-lock",
+    "hold_wait_satisfied": null,
+    "apply_ms": 3587
+   },
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1574437,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 72,
+     "owner_write_1": 3479,
+     "rename_done": 3480,
+     "apply_return": 3482
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 3410
+   },
+   "B_wall_ms": 3526,
+   "state": {
+    "final_hash": "sha256:07458bdb52f9c4f2a368b67080795f88357f928609bb330dfdd68cb86c84114a",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F3-live-holder-timeout",
+   "variant": "hold3500ms",
+   "pin": "b35a6141-qon",
+   "rep": 2,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1574476,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 75,
+     "owner_write_1": 166,
+     "hold_start": 167,
+     "hold_end": 3667,
+     "rename_done": 3668,
+     "apply_return": 3670
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "after-lock",
+    "hold_wait_satisfied": null,
+    "apply_ms": 3595
+   },
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1574486,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 73,
+     "owner_write_1": 3474,
+     "rename_done": 3475,
+     "apply_return": 3477
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 3404
+   },
+   "B_wall_ms": 3531,
+   "state": {
+    "final_hash": "sha256:07458bdb52f9c4f2a368b67080795f88357f928609bb330dfdd68cb86c84114a",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F3-live-holder-timeout",
+   "variant": "hold3500ms",
+   "pin": "b35a6141-qon",
+   "rep": 3,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1574522,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 93,
+     "owner_write_1": 205,
+     "hold_start": 205,
+     "hold_end": 3705,
+     "rename_done": 3707,
+     "apply_return": 3708
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "after-lock",
+    "hold_wait_satisfied": null,
+    "apply_ms": 3615
+   },
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1574533,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 65,
+     "owner_write_1": 3473,
+     "rename_done": 3473,
+     "apply_return": 3475
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 3410
+   },
+   "B_wall_ms": 3521,
+   "state": {
+    "final_hash": "sha256:07458bdb52f9c4f2a368b67080795f88357f928609bb330dfdd68cb86c84114a",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F4-tmpdir",
+   "variant": "same-tmpdir/B-same-region",
+   "pin": "b35a6141-qon",
+   "rep": 1,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1574565,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 73,
+     "owner_write_1": 151,
+     "hold_start": 151,
+     "hold_end": 951,
+     "rename_done": 952,
+     "apply_return": 953
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": false,
+    "apply_ms": 880
+   },
+   "B": {
+    "verdict": "blocked",
+    "reason": "steward-final-patch-required: proposal 'p-B' overlaps region 'reducers', which changed after the proposal was anchored; refusing to overwrite [proposals: p-B]",
+    "tx_attempts": 0,
+    "lock_acquires": 0,
+    "owner_writes": 0,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1574575,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 60,
+     "apply_return": 774
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 714
+   },
+   "both_inside_lock": false,
+   "state": {
+    "final_hash": "sha256:44b22d74e39aeb73417a8a8012341082d34669d9680653b2fb730e9fc4226609",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": false
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F4-tmpdir",
+   "variant": "same-tmpdir/B-same-region",
+   "pin": "b35a6141-qon",
+   "rep": 2,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1574594,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 76,
+     "owner_write_1": 155,
+     "hold_start": 156,
+     "hold_end": 956,
+     "rename_done": 956,
+     "apply_return": 958
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": false,
+    "apply_ms": 882
+   },
+   "B": {
+    "verdict": "blocked",
+    "reason": "steward-final-patch-required: proposal 'p-B' overlaps region 'reducers', which changed after the proposal was anchored; refusing to overwrite [proposals: p-B]",
+    "tx_attempts": 0,
+    "lock_acquires": 0,
+    "owner_writes": 0,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1574608,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 70,
+     "apply_return": 769
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 699
+   },
+   "both_inside_lock": false,
+   "state": {
+    "final_hash": "sha256:44b22d74e39aeb73417a8a8012341082d34669d9680653b2fb730e9fc4226609",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": false
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F4-tmpdir",
+   "variant": "same-tmpdir/B-same-region",
+   "pin": "b35a6141-qon",
+   "rep": 3,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1574636,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 69,
+     "owner_write_1": 147,
+     "hold_start": 148,
+     "hold_end": 949,
+     "rename_done": 949,
+     "apply_return": 951
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": false,
+    "apply_ms": 882
+   },
+   "B": {
+    "verdict": "blocked",
+    "reason": "steward-final-patch-required: proposal 'p-B' overlaps region 'reducers', which changed after the proposal was anchored; refusing to overwrite [proposals: p-B]",
+    "tx_attempts": 0,
+    "lock_acquires": 0,
+    "owner_writes": 0,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1574646,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 65,
+     "apply_return": 775
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 710
+   },
+   "both_inside_lock": false,
+   "state": {
+    "final_hash": "sha256:44b22d74e39aeb73417a8a8012341082d34669d9680653b2fb730e9fc4226609",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": false
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F4-tmpdir",
+   "variant": "same-tmpdir/B-other-region",
+   "pin": "b35a6141-qon",
+   "rep": 1,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1574665,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 65,
+     "owner_write_1": 154,
+     "hold_start": 155,
+     "hold_end": 955,
+     "rename_done": 955,
+     "apply_return": 957
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": false,
+    "apply_ms": 892
+   },
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1574675,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 66,
+     "owner_write_1": 775,
+     "hold_start": 776,
+     "hold_end": 776,
+     "rename_done": 776,
+     "apply_return": 777
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": true,
+    "apply_ms": 711
+   },
+   "both_inside_lock": false,
+   "state": {
+    "final_hash": "sha256:07458bdb52f9c4f2a368b67080795f88357f928609bb330dfdd68cb86c84114a",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F4-tmpdir",
+   "variant": "same-tmpdir/B-other-region",
+   "pin": "b35a6141-qon",
+   "rep": 2,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1574701,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 63,
+     "owner_write_1": 141,
+     "hold_start": 142,
+     "hold_end": 942,
+     "rename_done": 942,
+     "apply_return": 944
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": false,
+    "apply_ms": 881
+   },
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1574711,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 72,
+     "owner_write_1": 778,
+     "hold_start": 778,
+     "hold_end": 778,
+     "rename_done": 778,
+     "apply_return": 779
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": true,
+    "apply_ms": 707
+   },
+   "both_inside_lock": false,
+   "state": {
+    "final_hash": "sha256:07458bdb52f9c4f2a368b67080795f88357f928609bb330dfdd68cb86c84114a",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F4-tmpdir",
+   "variant": "same-tmpdir/B-other-region",
+   "pin": "b35a6141-qon",
+   "rep": 3,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1574740,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 59,
+     "owner_write_1": 152,
+     "hold_start": 153,
+     "hold_end": 954,
+     "rename_done": 954,
+     "apply_return": 956
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": false,
+    "apply_ms": 897
+   },
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1574750,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 61,
+     "owner_write_1": 779,
+     "hold_start": 780,
+     "hold_end": 780,
+     "rename_done": 780,
+     "apply_return": 782
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": true,
+    "apply_ms": 721
+   },
+   "both_inside_lock": false,
+   "state": {
+    "final_hash": "sha256:07458bdb52f9c4f2a368b67080795f88357f928609bb330dfdd68cb86c84114a",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F4-tmpdir",
+   "variant": "different-tmpdir/B-same-region",
+   "pin": "b35a6141-qon",
+   "rep": 1,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1574780,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 76,
+     "owner_write_1": 167,
+     "hold_start": 167,
+     "hold_end": 967,
+     "rename_done": 967,
+     "apply_return": 969
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": false,
+    "apply_ms": 893
+   },
+   "B": {
+    "verdict": "blocked",
+    "reason": "steward-final-patch-required: proposal 'p-B' overlaps region 'reducers', which changed after the proposal was anchored; refusing to overwrite [proposals: p-B]",
+    "tx_attempts": 0,
+    "lock_acquires": 0,
+    "owner_writes": 0,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1574790,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 68,
+     "apply_return": 777
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 709
+   },
+   "both_inside_lock": false,
+   "state": {
+    "final_hash": "sha256:44b22d74e39aeb73417a8a8012341082d34669d9680653b2fb730e9fc4226609",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": false
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F4-tmpdir",
+   "variant": "different-tmpdir/B-same-region",
+   "pin": "b35a6141-qon",
+   "rep": 2,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1574810,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 65,
+     "owner_write_1": 147,
+     "hold_start": 148,
+     "hold_end": 950,
+     "rename_done": 950,
+     "apply_return": 951
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": false,
+    "apply_ms": 886
+   },
+   "B": {
+    "verdict": "blocked",
+    "reason": "steward-final-patch-required: proposal 'p-B' overlaps region 'reducers', which changed after the proposal was anchored; refusing to overwrite [proposals: p-B]",
+    "tx_attempts": 0,
+    "lock_acquires": 0,
+    "owner_writes": 0,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1574820,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 71,
+     "apply_return": 770
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 699
+   },
+   "both_inside_lock": false,
+   "state": {
+    "final_hash": "sha256:44b22d74e39aeb73417a8a8012341082d34669d9680653b2fb730e9fc4226609",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": false
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F4-tmpdir",
+   "variant": "different-tmpdir/B-same-region",
+   "pin": "b35a6141-qon",
+   "rep": 3,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1574845,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 71,
+     "owner_write_1": 164,
+     "hold_start": 165,
+     "hold_end": 966,
+     "rename_done": 966,
+     "apply_return": 968
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": false,
+    "apply_ms": 897
+   },
+   "B": {
+    "verdict": "blocked",
+    "reason": "steward-final-patch-required: proposal 'p-B' overlaps region 'reducers', which changed after the proposal was anchored; refusing to overwrite [proposals: p-B]",
+    "tx_attempts": 0,
+    "lock_acquires": 0,
+    "owner_writes": 0,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1574855,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 76,
+     "apply_return": 767
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 691
+   },
+   "both_inside_lock": false,
+   "state": {
+    "final_hash": "sha256:44b22d74e39aeb73417a8a8012341082d34669d9680653b2fb730e9fc4226609",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": false
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F4-tmpdir",
+   "variant": "different-tmpdir/B-other-region",
+   "pin": "b35a6141-qon",
+   "rep": 1,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1574874,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 69,
+     "owner_write_1": 150,
+     "hold_start": 150,
+     "hold_end": 950,
+     "rename_done": 950,
+     "apply_return": 952
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": false,
+    "apply_ms": 883
+   },
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1574884,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 65,
+     "owner_write_1": 776,
+     "hold_start": 777,
+     "hold_end": 777,
+     "rename_done": 778,
+     "apply_return": 781
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": true,
+    "apply_ms": 716
+   },
+   "both_inside_lock": false,
+   "state": {
+    "final_hash": "sha256:07458bdb52f9c4f2a368b67080795f88357f928609bb330dfdd68cb86c84114a",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F4-tmpdir",
+   "variant": "different-tmpdir/B-other-region",
+   "pin": "b35a6141-qon",
+   "rep": 2,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1574910,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 72,
+     "owner_write_1": 163,
+     "hold_start": 163,
+     "hold_end": 963,
+     "rename_done": 963,
+     "apply_return": 965
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": false,
+    "apply_ms": 893
+   },
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1574920,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 74,
+     "owner_write_1": 779,
+     "hold_start": 780,
+     "hold_end": 780,
+     "rename_done": 780,
+     "apply_return": 781
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": true,
+    "apply_ms": 707
+   },
+   "both_inside_lock": false,
+   "state": {
+    "final_hash": "sha256:07458bdb52f9c4f2a368b67080795f88357f928609bb330dfdd68cb86c84114a",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F4-tmpdir",
+   "variant": "different-tmpdir/B-other-region",
+   "pin": "b35a6141-qon",
+   "rep": 3,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1574944,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 60,
+     "owner_write_1": 142,
+     "hold_start": 143,
+     "hold_end": 943,
+     "rename_done": 943,
+     "apply_return": 945
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": false,
+    "apply_ms": 885
+   },
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1574956,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 64,
+     "owner_write_1": 778,
+     "hold_start": 779,
+     "hold_end": 779,
+     "rename_done": 779,
+     "apply_return": 780
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": true,
+    "apply_ms": 716
+   },
+   "both_inside_lock": false,
+   "state": {
+    "final_hash": "sha256:07458bdb52f9c4f2a368b67080795f88357f928609bb330dfdd68cb86c84114a",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F2b-forged-owner-live-holder",
+   "variant": "forged-owner-dead-pid",
+   "pin": "b35a6141-qon",
+   "rep": 1,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1574983,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 63,
+     "owner_write_1": 142,
+     "hold_start": 143,
+     "hold_end": 3143,
+     "rename_done": 3143,
+     "apply_return": 3145
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": null,
+    "apply_ms": 3082
+   },
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1574994,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 60,
+     "owner_write_1": 2975,
+     "rename_done": 2976,
+     "apply_return": 2977
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 2917
+   },
+   "B_wall_ms": 3021,
+   "owner_before_forge": "v3",
+   "state": {
+    "final_hash": "sha256:07458bdb52f9c4f2a368b67080795f88357f928609bb330dfdd68cb86c84114a",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F2b-forged-owner-live-holder",
+   "variant": "forged-owner-dead-pid",
+   "pin": "b35a6141-qon",
+   "rep": 2,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575026,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 75,
+     "owner_write_1": 164,
+     "hold_start": 165,
+     "hold_end": 3165,
+     "rename_done": 3165,
+     "apply_return": 3167
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": null,
+    "apply_ms": 3092
+   },
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575037,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 62,
+     "owner_write_1": 2974,
+     "rename_done": 2975,
+     "apply_return": 2976
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 2914
+   },
+   "B_wall_ms": 3019,
+   "owner_before_forge": "v3",
+   "state": {
+    "final_hash": "sha256:07458bdb52f9c4f2a368b67080795f88357f928609bb330dfdd68cb86c84114a",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F2b-forged-owner-live-holder",
+   "variant": "forged-owner-dead-pid",
+   "pin": "b35a6141-qon",
+   "rep": 3,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575068,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 70,
+     "owner_write_1": 149,
+     "hold_start": 149,
+     "hold_end": 3149,
+     "rename_done": 3150,
+     "apply_return": 3151
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": null,
+    "apply_ms": 3081
+   },
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575079,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 60,
+     "owner_write_1": 2977,
+     "rename_done": 2978,
+     "apply_return": 2979
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 2919
+   },
+   "B_wall_ms": 3024,
+   "owner_before_forge": "v3",
+   "state": {
+    "final_hash": "sha256:07458bdb52f9c4f2a368b67080795f88357f928609bb330dfdd68cb86c84114a",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F2b-forged-owner-live-holder",
+   "variant": "forged-owner-wrong-starttoken",
+   "pin": "b35a6141-qon",
+   "rep": 1,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575117,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 66,
+     "owner_write_1": 144,
+     "hold_start": 145,
+     "hold_end": 3145,
+     "rename_done": 3145,
+     "apply_return": 3147
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": null,
+    "apply_ms": 3081
+   },
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575128,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 63,
+     "owner_write_1": 2971,
+     "rename_done": 2972,
+     "apply_return": 2974
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 2911
+   },
+   "B_wall_ms": 3020,
+   "owner_before_forge": "v3",
+   "state": {
+    "final_hash": "sha256:07458bdb52f9c4f2a368b67080795f88357f928609bb330dfdd68cb86c84114a",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F2b-forged-owner-live-holder",
+   "variant": "forged-owner-wrong-starttoken",
+   "pin": "b35a6141-qon",
+   "rep": 2,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575155,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 75,
+     "owner_write_1": 188,
+     "hold_start": 188,
+     "hold_end": 3188,
+     "rename_done": 3189,
+     "apply_return": 3190
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": null,
+    "apply_ms": 3115
+   },
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575166,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 84,
+     "owner_write_1": 2974,
+     "rename_done": 2975,
+     "apply_return": 2976
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 2892
+   },
+   "B_wall_ms": 3027,
+   "owner_before_forge": "v3",
+   "state": {
+    "final_hash": "sha256:07458bdb52f9c4f2a368b67080795f88357f928609bb330dfdd68cb86c84114a",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F2b-forged-owner-live-holder",
+   "variant": "forged-owner-wrong-starttoken",
+   "pin": "b35a6141-qon",
+   "rep": 3,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575203,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 62,
+     "owner_write_1": 136,
+     "hold_start": 137,
+     "hold_end": 3137,
+     "rename_done": 3137,
+     "apply_return": 3138
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": null,
+    "apply_ms": 3076
+   },
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575214,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 63,
+     "owner_write_1": 2978,
+     "rename_done": 2979,
+     "apply_return": 2980
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 2917
+   },
+   "B_wall_ms": 3025,
+   "owner_before_forge": "v3",
+   "state": {
+    "final_hash": "sha256:07458bdb52f9c4f2a368b67080795f88357f928609bb330dfdd68cb86c84114a",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F7-queue-wait-fallback",
+   "variant": "queue-wait300ms/A-hold3000ms",
+   "pin": "b35a6141-qon",
+   "rep": 1,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575252,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 63,
+     "owner_write_1": 140,
+     "hold_start": 140,
+     "hold_end": 3140,
+     "rename_done": 3141,
+     "apply_return": 3142
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": null,
+    "apply_ms": 3079
+   },
+   "B": {
+    "verdict": "blocked",
+    "reason": "recovery-required: canonical commit lock for src/store.ts stayed held for 2000ms by pid 1575252. Retry the steward apply after that owner finishes; do not overw",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 0,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575262,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 74,
+     "apply_return": 2470
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on",
+     "ATM_STEWARD_APPLY_QUEUE_WAIT_MS": "300"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 2396
+   },
+   "B_wall_ms": 3015,
+   "state": {
+    "final_hash": "sha256:44b22d74e39aeb73417a8a8012341082d34669d9680653b2fb730e9fc4226609",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": false
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F7-queue-wait-fallback",
+   "variant": "queue-wait300ms/A-hold3000ms",
+   "pin": "b35a6141-qon",
+   "rep": 2,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575298,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 65,
+     "owner_write_1": 146,
+     "hold_start": 147,
+     "hold_end": 3147,
+     "rename_done": 3147,
+     "apply_return": 3149
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": null,
+    "apply_ms": 3084
+   },
+   "B": {
+    "verdict": "blocked",
+    "reason": "recovery-required: canonical commit lock for src/store.ts stayed held for 2000ms by pid 1575298. Retry the steward apply after that owner finishes; do not overw",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 0,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575308,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 70,
+     "apply_return": 2467
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on",
+     "ATM_STEWARD_APPLY_QUEUE_WAIT_MS": "300"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 2397
+   },
+   "B_wall_ms": 3016,
+   "state": {
+    "final_hash": "sha256:44b22d74e39aeb73417a8a8012341082d34669d9680653b2fb730e9fc4226609",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": false
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F7-queue-wait-fallback",
+   "variant": "queue-wait300ms/A-hold3000ms",
+   "pin": "b35a6141-qon",
+   "rep": 3,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575344,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 72,
+     "owner_write_1": 162,
+     "hold_start": 163,
+     "hold_end": 3163,
+     "rename_done": 3163,
+     "apply_return": 3165
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": null,
+    "apply_ms": 3093
+   },
+   "B": {
+    "verdict": "blocked",
+    "reason": "recovery-required: canonical commit lock for src/store.ts stayed held for 2000ms by pid 1575344. Retry the steward apply after that owner finishes; do not overw",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 0,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575354,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 76,
+     "apply_return": 2467
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on",
+     "ATM_STEWARD_APPLY_QUEUE_WAIT_MS": "300"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 2391
+   },
+   "B_wall_ms": 3016,
+   "state": {
+    "final_hash": "sha256:44b22d74e39aeb73417a8a8012341082d34669d9680653b2fb730e9fc4226609",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": false
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F7-queue-wait-fallback",
+   "variant": "queue-wait300ms/A-hold1200ms",
+   "pin": "b35a6141-qon",
+   "rep": 1,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575387,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 68,
+     "owner_write_1": 153,
+     "hold_start": 153,
+     "hold_end": 1354,
+     "rename_done": 1354,
+     "apply_return": 1356
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": null,
+    "apply_ms": 1288
+   },
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 2,
+    "lock_acquires": 0,
+    "owner_writes": 2,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575403,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 70,
+     "owner_write_1": 1167,
+     "owner_write_2": 1177,
+     "rename_done": 1177,
+     "apply_return": 1178
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on",
+     "ATM_STEWARD_APPLY_QUEUE_WAIT_MS": "300"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 1108
+   },
+   "B_wall_ms": 1223,
+   "state": {
+    "final_hash": "sha256:07458bdb52f9c4f2a368b67080795f88357f928609bb330dfdd68cb86c84114a",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F7-queue-wait-fallback",
+   "variant": "queue-wait300ms/A-hold1200ms",
+   "pin": "b35a6141-qon",
+   "rep": 2,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575423,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 74,
+     "owner_write_1": 152,
+     "hold_start": 153,
+     "hold_end": 1353,
+     "rename_done": 1353,
+     "apply_return": 1355
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": null,
+    "apply_ms": 1281
+   },
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 2,
+    "lock_acquires": 0,
+    "owner_writes": 2,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575433,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 75,
+     "owner_write_1": 1167,
+     "owner_write_2": 1177,
+     "rename_done": 1177,
+     "apply_return": 1178
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on",
+     "ATM_STEWARD_APPLY_QUEUE_WAIT_MS": "300"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 1103
+   },
+   "B_wall_ms": 1226,
+   "state": {
+    "final_hash": "sha256:07458bdb52f9c4f2a368b67080795f88357f928609bb330dfdd68cb86c84114a",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F7-queue-wait-fallback",
+   "variant": "queue-wait300ms/A-hold1200ms",
+   "pin": "b35a6141-qon",
+   "rep": 3,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575460,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 76,
+     "owner_write_1": 172,
+     "hold_start": 173,
+     "hold_end": 1373,
+     "rename_done": 1373,
+     "apply_return": 1376
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": null,
+    "apply_ms": 1300
+   },
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 2,
+    "lock_acquires": 0,
+    "owner_writes": 2,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575470,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 67,
+     "owner_write_1": 1172,
+     "owner_write_2": 1180,
+     "rename_done": 1180,
+     "apply_return": 1181
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on",
+     "ATM_STEWARD_APPLY_QUEUE_WAIT_MS": "300"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 1114
+   },
+   "B_wall_ms": 1233,
+   "state": {
+    "final_hash": "sha256:07458bdb52f9c4f2a368b67080795f88357f928609bb330dfdd68cb86c84114a",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F5-retry-exhaustion",
+   "variant": "default-policy/K=always",
+   "pin": "b35a6141-qon",
+   "rep": 1,
+   "A": {
+    "verdict": "blocked",
+    "reason": "re-compose attempts exhausted after 5 of 5: re-compose: canonical target base hash is stale: src/store.ts (expected sha256:66e48347570d196d588dc98d38212264aca8a",
+    "tx_attempts": 5,
+    "lock_acquires": 0,
+    "owner_writes": 0,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575500,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 67,
+     "apply_return": 189
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 5,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 122
+   },
+   "wall_ms": 242,
+   "injected_lines_present": 5,
+   "state": {
+    "final_hash": "sha256:c1c2dc78de34e44cba96cb153d0177c9f587b35fe1d670f25ccf93b5164bef6e",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": false
+    },
+    "frame_ok": true
+   },
+   "err": null
+  },
+  {
+   "scenario": "F5-retry-exhaustion",
+   "variant": "default-policy/K=always",
+   "pin": "b35a6141-qon",
+   "rep": 2,
+   "A": {
+    "verdict": "blocked",
+    "reason": "re-compose attempts exhausted after 5 of 5: re-compose: canonical target base hash is stale: src/store.ts (expected sha256:66e48347570d196d588dc98d38212264aca8a",
+    "tx_attempts": 5,
+    "lock_acquires": 0,
+    "owner_writes": 0,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575520,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 88,
+     "apply_return": 213
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 5,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 125
+   },
+   "wall_ms": 268,
+   "injected_lines_present": 5,
+   "state": {
+    "final_hash": "sha256:c1c2dc78de34e44cba96cb153d0177c9f587b35fe1d670f25ccf93b5164bef6e",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": false
+    },
+    "frame_ok": true
+   },
+   "err": null
+  },
+  {
+   "scenario": "F5-retry-exhaustion",
+   "variant": "default-policy/K=always",
+   "pin": "b35a6141-qon",
+   "rep": 3,
+   "A": {
+    "verdict": "blocked",
+    "reason": "re-compose attempts exhausted after 5 of 5: re-compose: canonical target base hash is stale: src/store.ts (expected sha256:66e48347570d196d588dc98d38212264aca8a",
+    "tx_attempts": 5,
+    "lock_acquires": 0,
+    "owner_writes": 0,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575540,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 66,
+     "apply_return": 190
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 5,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 124
+   },
+   "wall_ms": 236,
+   "injected_lines_present": 5,
+   "state": {
+    "final_hash": "sha256:c1c2dc78de34e44cba96cb153d0177c9f587b35fe1d670f25ccf93b5164bef6e",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": false
+    },
+    "frame_ok": true
+   },
+   "err": null
+  },
+  {
+   "scenario": "F5-retry-exhaustion",
+   "variant": "default-policy/K=2",
+   "pin": "b35a6141-qon",
+   "rep": 1,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 3,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575560,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 64,
+     "owner_write_1": 155,
+     "rename_done": 155,
+     "apply_return": 156
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 2,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 92
+   },
+   "wall_ms": 202,
+   "injected_lines_present": 2,
+   "state": {
+    "final_hash": "sha256:a03f25bc44b2384791a5c281f033d38d5a761d8dd8d5ce27321f0b5e9bfec5d7",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true
+    },
+    "frame_ok": true
+   },
+   "err": null
+  },
+  {
+   "scenario": "F5-retry-exhaustion",
+   "variant": "default-policy/K=2",
+   "pin": "b35a6141-qon",
+   "rep": 2,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 3,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575580,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 66,
+     "owner_write_1": 164,
+     "rename_done": 164,
+     "apply_return": 165
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 2,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 99
+   },
+   "wall_ms": 210,
+   "injected_lines_present": 2,
+   "state": {
+    "final_hash": "sha256:a03f25bc44b2384791a5c281f033d38d5a761d8dd8d5ce27321f0b5e9bfec5d7",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true
+    },
+    "frame_ok": true
+   },
+   "err": null
+  },
+  {
+   "scenario": "F5-retry-exhaustion",
+   "variant": "default-policy/K=2",
+   "pin": "b35a6141-qon",
+   "rep": 3,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 3,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575600,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 69,
+     "owner_write_1": 198,
+     "rename_done": 198,
+     "apply_return": 199
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 2,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 130
+   },
+   "wall_ms": 266,
+   "injected_lines_present": 2,
+   "state": {
+    "final_hash": "sha256:a03f25bc44b2384791a5c281f033d38d5a761d8dd8d5ce27321f0b5e9bfec5d7",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true
+    },
+    "frame_ok": true
+   },
+   "err": null
+  },
+  {
+   "scenario": "F5-retry-exhaustion",
+   "variant": "default-policy/K=4",
+   "pin": "b35a6141-qon",
+   "rep": 1,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 5,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575620,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 66,
+     "owner_write_1": 199,
+     "rename_done": 199,
+     "apply_return": 200
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 4,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 134
+   },
+   "wall_ms": 250,
+   "injected_lines_present": 4,
+   "state": {
+    "final_hash": "sha256:80349cbde87c5fe65a37ab54a22e46fd2e893b0cbbbfa063c759214f70823fb2",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true
+    },
+    "frame_ok": true
+   },
+   "err": null
+  },
+  {
+   "scenario": "F5-retry-exhaustion",
+   "variant": "default-policy/K=4",
+   "pin": "b35a6141-qon",
+   "rep": 2,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 5,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575646,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 70,
+     "owner_write_1": 202,
+     "rename_done": 202,
+     "apply_return": 203
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 4,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 133
+   },
+   "wall_ms": 255,
+   "injected_lines_present": 4,
+   "state": {
+    "final_hash": "sha256:80349cbde87c5fe65a37ab54a22e46fd2e893b0cbbbfa063c759214f70823fb2",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true
+    },
+    "frame_ok": true
+   },
+   "err": null
+  },
+  {
+   "scenario": "F5-retry-exhaustion",
+   "variant": "default-policy/K=4",
+   "pin": "b35a6141-qon",
+   "rep": 3,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 5,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575666,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 69,
+     "owner_write_1": 209,
+     "rename_done": 209,
+     "apply_return": 210
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 4,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 141
+   },
+   "wall_ms": 258,
+   "injected_lines_present": 4,
+   "state": {
+    "final_hash": "sha256:80349cbde87c5fe65a37ab54a22e46fd2e893b0cbbbfa063c759214f70823fb2",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true
+    },
+    "frame_ok": true
+   },
+   "err": null
+  },
+  {
+   "scenario": "F5-retry-exhaustion",
+   "variant": "maxRecompose=0/K=always",
+   "pin": "b35a6141-qon",
+   "rep": 1,
+   "A": {
+    "verdict": "blocked",
+    "reason": "re-compose attempts exhausted after 1 of 1: re-compose: canonical target base hash is stale: src/store.ts (expected sha256:6e728ad8ee54fd1c70635a90feeca964d11c6",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 0,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575686,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 71,
+     "apply_return": 158
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 1,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 87
+   },
+   "wall_ms": 209,
+   "injected_lines_present": 1,
+   "state": {
+    "final_hash": "sha256:385212a88e42adfd3f647e2344d9bdcf7ab2ec9cad22128aed8916b5191541b9",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": false
+    },
+    "frame_ok": true
+   },
+   "err": null
+  },
+  {
+   "scenario": "F5-retry-exhaustion",
+   "variant": "maxRecompose=0/K=always",
+   "pin": "b35a6141-qon",
+   "rep": 2,
+   "A": {
+    "verdict": "blocked",
+    "reason": "re-compose attempts exhausted after 1 of 1: re-compose: canonical target base hash is stale: src/store.ts (expected sha256:6e728ad8ee54fd1c70635a90feeca964d11c6",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 0,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575706,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 90,
+     "apply_return": 182
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 1,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 92
+   },
+   "wall_ms": 242,
+   "injected_lines_present": 1,
+   "state": {
+    "final_hash": "sha256:385212a88e42adfd3f647e2344d9bdcf7ab2ec9cad22128aed8916b5191541b9",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": false
+    },
+    "frame_ok": true
+   },
+   "err": null
+  },
+  {
+   "scenario": "F5-retry-exhaustion",
+   "variant": "maxRecompose=0/K=always",
+   "pin": "b35a6141-qon",
+   "rep": 3,
+   "A": {
+    "verdict": "blocked",
+    "reason": "re-compose attempts exhausted after 1 of 1: re-compose: canonical target base hash is stale: src/store.ts (expected sha256:6e728ad8ee54fd1c70635a90feeca964d11c6",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 0,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575726,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 71,
+     "apply_return": 157
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 1,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 86
+   },
+   "wall_ms": 213,
+   "injected_lines_present": 1,
+   "state": {
+    "final_hash": "sha256:385212a88e42adfd3f647e2344d9bdcf7ab2ec9cad22128aed8916b5191541b9",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": false
+    },
+    "frame_ok": true
+   },
+   "err": null
+  },
+  {
+   "scenario": "F5-retry-exhaustion",
+   "variant": "maxRecompose=1,backoff0/K=1",
+   "pin": "b35a6141-qon",
+   "rep": 1,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 2,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575746,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 77,
+     "owner_write_1": 179,
+     "rename_done": 179,
+     "apply_return": 180
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 1,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 103
+   },
+   "wall_ms": 234,
+   "injected_lines_present": 1,
+   "state": {
+    "final_hash": "sha256:8935a346a4ee1634bacce86816a71c5f4d309866d539f20f0995ce3bb88eebf7",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true
+    },
+    "frame_ok": true
+   },
+   "err": null
+  },
+  {
+   "scenario": "F5-retry-exhaustion",
+   "variant": "maxRecompose=1,backoff0/K=1",
+   "pin": "b35a6141-qon",
+   "rep": 2,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 2,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575766,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 69,
+     "owner_write_1": 147,
+     "rename_done": 147,
+     "apply_return": 148
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 1,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 79
+   },
+   "wall_ms": 193,
+   "injected_lines_present": 1,
+   "state": {
+    "final_hash": "sha256:8935a346a4ee1634bacce86816a71c5f4d309866d539f20f0995ce3bb88eebf7",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true
+    },
+    "frame_ok": true
+   },
+   "err": null
+  },
+  {
+   "scenario": "F5-retry-exhaustion",
+   "variant": "maxRecompose=1,backoff0/K=1",
+   "pin": "b35a6141-qon",
+   "rep": 3,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 2,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575787,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 71,
+     "owner_write_1": 150,
+     "rename_done": 150,
+     "apply_return": 151
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on"
+    },
+    "injected": 1,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 80
+   },
+   "wall_ms": 195,
+   "injected_lines_present": 1,
+   "state": {
+    "final_hash": "sha256:8935a346a4ee1634bacce86816a71c5f4d309866d539f20f0995ce3bb88eebf7",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true
+    },
+    "frame_ok": true
+   },
+   "err": null
+  },
+  {
+   "scenario": "F5-retry-exhaustion",
+   "variant": "env:ATM_STEWARD_RECOMPOSE_POLICY maxRecompose=0/K=always",
+   "pin": "b35a6141-qon",
+   "rep": 1,
+   "A": {
+    "verdict": "blocked",
+    "reason": "re-compose attempts exhausted after 1 of 1: re-compose: canonical target base hash is stale: src/store.ts (expected sha256:6e728ad8ee54fd1c70635a90feeca964d11c6",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 0,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575813,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 74,
+     "apply_return": 163
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on",
+     "ATM_STEWARD_RECOMPOSE_POLICY": "{\"maxRecomposeAttempts\":0}"
+    },
+    "injected": 1,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 89
+   },
+   "wall_ms": 211,
+   "injected_lines_present": 1,
+   "state": {
+    "final_hash": "sha256:385212a88e42adfd3f647e2344d9bdcf7ab2ec9cad22128aed8916b5191541b9",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": false
+    },
+    "frame_ok": true
+   },
+   "err": null
+  },
+  {
+   "scenario": "F5-retry-exhaustion",
+   "variant": "env:ATM_STEWARD_RECOMPOSE_POLICY maxRecompose=0/K=always",
+   "pin": "b35a6141-qon",
+   "rep": 2,
+   "A": {
+    "verdict": "blocked",
+    "reason": "re-compose attempts exhausted after 1 of 1: re-compose: canonical target base hash is stale: src/store.ts (expected sha256:6e728ad8ee54fd1c70635a90feeca964d11c6",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 0,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575833,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 75,
+     "apply_return": 155
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on",
+     "ATM_STEWARD_RECOMPOSE_POLICY": "{\"maxRecomposeAttempts\":0}"
+    },
+    "injected": 1,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 80
+   },
+   "wall_ms": 207,
+   "injected_lines_present": 1,
+   "state": {
+    "final_hash": "sha256:385212a88e42adfd3f647e2344d9bdcf7ab2ec9cad22128aed8916b5191541b9",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": false
+    },
+    "frame_ok": true
+   },
+   "err": null
+  },
+  {
+   "scenario": "F5-retry-exhaustion",
+   "variant": "env:ATM_STEWARD_RECOMPOSE_POLICY maxRecompose=0/K=always",
+   "pin": "b35a6141-qon",
+   "rep": 3,
+   "A": {
+    "verdict": "blocked",
+    "reason": "re-compose attempts exhausted after 1 of 1: re-compose: canonical target base hash is stale: src/store.ts (expected sha256:6e728ad8ee54fd1c70635a90feeca964d11c6",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 0,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575853,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 65,
+     "apply_return": 139
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "on",
+     "ATM_STEWARD_RECOMPOSE_POLICY": "{\"maxRecomposeAttempts\":0}"
+    },
+    "injected": 1,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 74
+   },
+   "wall_ms": 183,
+   "injected_lines_present": 1,
+   "state": {
+    "final_hash": "sha256:385212a88e42adfd3f647e2344d9bdcf7ab2ec9cad22128aed8916b5191541b9",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": false
+    },
+    "frame_ok": true
+   },
+   "err": null
+  },
+  {
+   "scenario": "F2-crafted-owner",
+   "variant": "pidreuse-live-pid-wrong-starttoken",
+   "pin": "b35a6141-qoff",
+   "rep": 1,
+   "owner_format": "v2",
+   "owner_pid_alive": true,
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575874,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 75,
+     "owner_write_1": 149,
+     "rename_done": 150,
+     "apply_return": 151
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 76
+   },
+   "B_wall_ms": 194,
+   "lock_dir_after": true,
+   "state": {
+    "final_hash": "sha256:bc385e4d39d65ff1e3501b3d2e556dc8eded260982ee579489beb6ca0c36092b",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "B_err": null
+  },
+  {
+   "scenario": "F2-crafted-owner",
+   "variant": "pidreuse-live-pid-wrong-starttoken",
+   "pin": "b35a6141-qoff",
+   "rep": 2,
+   "owner_format": "v2",
+   "owner_pid_alive": true,
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575895,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 61,
+     "owner_write_1": 132,
+     "rename_done": 133,
+     "apply_return": 134
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 73
+   },
+   "B_wall_ms": 180,
+   "lock_dir_after": true,
+   "state": {
+    "final_hash": "sha256:bc385e4d39d65ff1e3501b3d2e556dc8eded260982ee579489beb6ca0c36092b",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "B_err": null
+  },
+  {
+   "scenario": "F2-crafted-owner",
+   "variant": "pidreuse-live-pid-wrong-starttoken",
+   "pin": "b35a6141-qoff",
+   "rep": 3,
+   "owner_format": "v2",
+   "owner_pid_alive": true,
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575920,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 70,
+     "owner_write_1": 146,
+     "rename_done": 146,
+     "apply_return": 147
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 77
+   },
+   "B_wall_ms": 202,
+   "lock_dir_after": true,
+   "state": {
+    "final_hash": "sha256:bc385e4d39d65ff1e3501b3d2e556dc8eded260982ee579489beb6ca0c36092b",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "B_err": null
+  },
+  {
+   "scenario": "F2-crafted-owner",
+   "variant": "live-pid-correct-starttoken",
+   "pin": "b35a6141-qoff",
+   "rep": 1,
+   "owner_format": "v2",
+   "owner_pid_alive": true,
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575941,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 61,
+     "owner_write_1": 133,
+     "rename_done": 133,
+     "apply_return": 134
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 73
+   },
+   "B_wall_ms": 177,
+   "lock_dir_after": true,
+   "state": {
+    "final_hash": "sha256:bc385e4d39d65ff1e3501b3d2e556dc8eded260982ee579489beb6ca0c36092b",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "B_err": null
+  },
+  {
+   "scenario": "F2-crafted-owner",
+   "variant": "live-pid-correct-starttoken",
+   "pin": "b35a6141-qoff",
+   "rep": 2,
+   "owner_format": "v2",
+   "owner_pid_alive": true,
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575962,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 62,
+     "owner_write_1": 142,
+     "rename_done": 142,
+     "apply_return": 143
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 81
+   },
+   "B_wall_ms": 184,
+   "lock_dir_after": true,
+   "state": {
+    "final_hash": "sha256:bc385e4d39d65ff1e3501b3d2e556dc8eded260982ee579489beb6ca0c36092b",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "B_err": null
+  },
+  {
+   "scenario": "F2-crafted-owner",
+   "variant": "live-pid-correct-starttoken",
+   "pin": "b35a6141-qoff",
+   "rep": 3,
+   "owner_format": "v2",
+   "owner_pid_alive": true,
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1575985,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 63,
+     "owner_write_1": 137,
+     "rename_done": 138,
+     "apply_return": 138
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 75
+   },
+   "B_wall_ms": 184,
+   "lock_dir_after": true,
+   "state": {
+    "final_hash": "sha256:bc385e4d39d65ff1e3501b3d2e556dc8eded260982ee579489beb6ca0c36092b",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "B_err": null
+  },
+  {
+   "scenario": "F2-crafted-owner",
+   "variant": "dead-pid",
+   "pin": "b35a6141-qoff",
+   "rep": 1,
+   "owner_format": "v2",
+   "owner_pid_alive": false,
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576013,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 66,
+     "owner_write_1": 145,
+     "rename_done": 146,
+     "apply_return": 146
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 80
+   },
+   "B_wall_ms": 192,
+   "lock_dir_after": true,
+   "state": {
+    "final_hash": "sha256:bc385e4d39d65ff1e3501b3d2e556dc8eded260982ee579489beb6ca0c36092b",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "B_err": null
+  },
+  {
+   "scenario": "F2-crafted-owner",
+   "variant": "dead-pid",
+   "pin": "b35a6141-qoff",
+   "rep": 2,
+   "owner_format": "v2",
+   "owner_pid_alive": false,
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576035,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 59,
+     "owner_write_1": 132,
+     "rename_done": 132,
+     "apply_return": 133
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 74
+   },
+   "B_wall_ms": 175,
+   "lock_dir_after": true,
+   "state": {
+    "final_hash": "sha256:bc385e4d39d65ff1e3501b3d2e556dc8eded260982ee579489beb6ca0c36092b",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "B_err": null
+  },
+  {
+   "scenario": "F2-crafted-owner",
+   "variant": "dead-pid",
+   "pin": "b35a6141-qoff",
+   "rep": 3,
+   "owner_format": "v2",
+   "owner_pid_alive": false,
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576057,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 62,
+     "owner_write_1": 135,
+     "rename_done": 135,
+     "apply_return": 136
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 74
+   },
+   "B_wall_ms": 180,
+   "lock_dir_after": true,
+   "state": {
+    "final_hash": "sha256:bc385e4d39d65ff1e3501b3d2e556dc8eded260982ee579489beb6ca0c36092b",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "B_err": null
+  },
+  {
+   "scenario": "F2-crafted-owner",
+   "variant": "legacy-v1-live-pid",
+   "pin": "b35a6141-qoff",
+   "rep": 1,
+   "owner_format": "v1(pid only)",
+   "owner_pid_alive": true,
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576078,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 63,
+     "owner_write_1": 135,
+     "rename_done": 136,
+     "apply_return": 136
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 73
+   },
+   "B_wall_ms": 180,
+   "lock_dir_after": true,
+   "state": {
+    "final_hash": "sha256:bc385e4d39d65ff1e3501b3d2e556dc8eded260982ee579489beb6ca0c36092b",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "B_err": null
+  },
+  {
+   "scenario": "F2-crafted-owner",
+   "variant": "legacy-v1-live-pid",
+   "pin": "b35a6141-qoff",
+   "rep": 2,
+   "owner_format": "v1(pid only)",
+   "owner_pid_alive": true,
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576099,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 63,
+     "owner_write_1": 148,
+     "rename_done": 149,
+     "apply_return": 150
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 87
+   },
+   "B_wall_ms": 196,
+   "lock_dir_after": true,
+   "state": {
+    "final_hash": "sha256:bc385e4d39d65ff1e3501b3d2e556dc8eded260982ee579489beb6ca0c36092b",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "B_err": null
+  },
+  {
+   "scenario": "F2-crafted-owner",
+   "variant": "legacy-v1-live-pid",
+   "pin": "b35a6141-qoff",
+   "rep": 3,
+   "owner_format": "v1(pid only)",
+   "owner_pid_alive": true,
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576120,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 66,
+     "owner_write_1": 140,
+     "rename_done": 141,
+     "apply_return": 141
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 75
+   },
+   "B_wall_ms": 182,
+   "lock_dir_after": true,
+   "state": {
+    "final_hash": "sha256:bc385e4d39d65ff1e3501b3d2e556dc8eded260982ee579489beb6ca0c36092b",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "B_err": null
+  },
+  {
+   "scenario": "F3-live-holder-timeout",
+   "variant": "hold3500ms",
+   "pin": "b35a6141-qoff",
+   "rep": 1,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576140,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 64,
+     "owner_write_1": 140,
+     "hold_start": 140,
+     "hold_end": 3640,
+     "rename_done": 3641,
+     "apply_return": 3642
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "after-lock",
+    "hold_wait_satisfied": null,
+    "apply_ms": 3578
+   },
+   "B": {
+    "verdict": "blocked",
+    "reason": "recovery-required: canonical commit lock for src/store.ts stayed held for 2000ms by pid 1576140. Retry the steward apply after that owner finishes; do not overw",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 0,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576150,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 64,
+     "apply_return": 2144
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 2080
+   },
+   "B_wall_ms": 3515,
+   "state": {
+    "final_hash": "sha256:44b22d74e39aeb73417a8a8012341082d34669d9680653b2fb730e9fc4226609",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": false
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F3-live-holder-timeout",
+   "variant": "hold3500ms",
+   "pin": "b35a6141-qoff",
+   "rep": 2,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576187,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 63,
+     "owner_write_1": 139,
+     "hold_start": 139,
+     "hold_end": 3640,
+     "rename_done": 3641,
+     "apply_return": 3641
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "after-lock",
+    "hold_wait_satisfied": null,
+    "apply_ms": 3578
+   },
+   "B": {
+    "verdict": "blocked",
+    "reason": "recovery-required: canonical commit lock for src/store.ts stayed held for 2000ms by pid 1576187. Retry the steward apply after that owner finishes; do not overw",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 0,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576197,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 61,
+     "apply_return": 2138
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 2077
+   },
+   "B_wall_ms": 3516,
+   "state": {
+    "final_hash": "sha256:44b22d74e39aeb73417a8a8012341082d34669d9680653b2fb730e9fc4226609",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": false
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F3-live-holder-timeout",
+   "variant": "hold3500ms",
+   "pin": "b35a6141-qoff",
+   "rep": 3,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576230,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 72,
+     "owner_write_1": 150,
+     "hold_start": 150,
+     "hold_end": 3650,
+     "rename_done": 3652,
+     "apply_return": 3653
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "after-lock",
+    "hold_wait_satisfied": null,
+    "apply_ms": 3581
+   },
+   "B": {
+    "verdict": "blocked",
+    "reason": "recovery-required: canonical commit lock for src/store.ts stayed held for 2000ms by pid 1576230. Retry the steward apply after that owner finishes; do not overw",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 0,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576240,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 81,
+     "apply_return": 2162
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 2081
+   },
+   "B_wall_ms": 3518,
+   "state": {
+    "final_hash": "sha256:44b22d74e39aeb73417a8a8012341082d34669d9680653b2fb730e9fc4226609",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": false
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F4-tmpdir",
+   "variant": "same-tmpdir/B-same-region",
+   "pin": "b35a6141-qoff",
+   "rep": 1,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576278,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 62,
+     "owner_write_1": 142,
+     "hold_start": 142,
+     "hold_end": 943,
+     "rename_done": 943,
+     "apply_return": 945
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": false,
+    "apply_ms": 883
+   },
+   "B": {
+    "verdict": "blocked",
+    "reason": "steward-final-patch-required: proposal 'p-B' overlaps region 'reducers', which changed after the proposal was anchored; refusing to overwrite [proposals: p-B]",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576288,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 60,
+     "owner_write_1": 771,
+     "apply_return": 780
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 720
+   },
+   "both_inside_lock": false,
+   "state": {
+    "final_hash": "sha256:44b22d74e39aeb73417a8a8012341082d34669d9680653b2fb730e9fc4226609",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": false
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F4-tmpdir",
+   "variant": "same-tmpdir/B-same-region",
+   "pin": "b35a6141-qoff",
+   "rep": 2,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576317,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 69,
+     "owner_write_1": 147,
+     "hold_start": 147,
+     "hold_end": 947,
+     "rename_done": 947,
+     "apply_return": 948
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": false,
+    "apply_ms": 879
+   },
+   "B": {
+    "verdict": "blocked",
+    "reason": "steward-final-patch-required: proposal 'p-B' overlaps region 'reducers', which changed after the proposal was anchored; refusing to overwrite [proposals: p-B]",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576327,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 59,
+     "owner_write_1": 772,
+     "apply_return": 780
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 721
+   },
+   "both_inside_lock": false,
+   "state": {
+    "final_hash": "sha256:44b22d74e39aeb73417a8a8012341082d34669d9680653b2fb730e9fc4226609",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": false
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F4-tmpdir",
+   "variant": "same-tmpdir/B-same-region",
+   "pin": "b35a6141-qoff",
+   "rep": 3,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576358,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 64,
+     "owner_write_1": 143,
+     "hold_start": 144,
+     "hold_end": 945,
+     "rename_done": 945,
+     "apply_return": 946
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": false,
+    "apply_ms": 882
+   },
+   "B": {
+    "verdict": "blocked",
+    "reason": "steward-final-patch-required: proposal 'p-B' overlaps region 'reducers', which changed after the proposal was anchored; refusing to overwrite [proposals: p-B]",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576368,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 73,
+     "owner_write_1": 772,
+     "apply_return": 779
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 706
+   },
+   "both_inside_lock": false,
+   "state": {
+    "final_hash": "sha256:44b22d74e39aeb73417a8a8012341082d34669d9680653b2fb730e9fc4226609",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": false
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F4-tmpdir",
+   "variant": "same-tmpdir/B-other-region",
+   "pin": "b35a6141-qoff",
+   "rep": 1,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576388,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 66,
+     "owner_write_1": 142,
+     "hold_start": 142,
+     "hold_end": 943,
+     "rename_done": 943,
+     "apply_return": 945
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": false,
+    "apply_ms": 879
+   },
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 2,
+    "lock_acquires": 0,
+    "owner_writes": 2,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576398,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 64,
+     "owner_write_1": 774,
+     "owner_write_2": 783,
+     "hold_start": 783,
+     "hold_end": 783,
+     "rename_done": 783,
+     "apply_return": 784
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": true,
+    "apply_ms": 720
+   },
+   "both_inside_lock": false,
+   "state": {
+    "final_hash": "sha256:07458bdb52f9c4f2a368b67080795f88357f928609bb330dfdd68cb86c84114a",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F4-tmpdir",
+   "variant": "same-tmpdir/B-other-region",
+   "pin": "b35a6141-qoff",
+   "rep": 2,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576424,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 67,
+     "owner_write_1": 144,
+     "hold_start": 145,
+     "hold_end": 946,
+     "rename_done": 946,
+     "apply_return": 947
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": false,
+    "apply_ms": 880
+   },
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 2,
+    "lock_acquires": 0,
+    "owner_writes": 2,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576434,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 64,
+     "owner_write_1": 774,
+     "owner_write_2": 781,
+     "hold_start": 781,
+     "hold_end": 781,
+     "rename_done": 781,
+     "apply_return": 782
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": true,
+    "apply_ms": 718
+   },
+   "both_inside_lock": false,
+   "state": {
+    "final_hash": "sha256:07458bdb52f9c4f2a368b67080795f88357f928609bb330dfdd68cb86c84114a",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F4-tmpdir",
+   "variant": "same-tmpdir/B-other-region",
+   "pin": "b35a6141-qoff",
+   "rep": 3,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576454,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 62,
+     "owner_write_1": 139,
+     "hold_start": 139,
+     "hold_end": 940,
+     "rename_done": 941,
+     "apply_return": 942
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": false,
+    "apply_ms": 880
+   },
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 2,
+    "lock_acquires": 0,
+    "owner_writes": 2,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576464,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 61,
+     "owner_write_1": 776,
+     "owner_write_2": 784,
+     "hold_start": 784,
+     "hold_end": 784,
+     "rename_done": 784,
+     "apply_return": 785
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": true,
+    "apply_ms": 724
+   },
+   "both_inside_lock": false,
+   "state": {
+    "final_hash": "sha256:07458bdb52f9c4f2a368b67080795f88357f928609bb330dfdd68cb86c84114a",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F4-tmpdir",
+   "variant": "different-tmpdir/B-same-region",
+   "pin": "b35a6141-qoff",
+   "rep": 1,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576490,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 75,
+     "owner_write_1": 153,
+     "hold_start": 154,
+     "hold_end": 954,
+     "rename_done": 954,
+     "apply_return": 955
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": false,
+    "apply_ms": 880
+   },
+   "B": {
+    "verdict": "blocked",
+    "reason": "steward-final-patch-required: proposal 'p-B' overlaps region 'reducers', which changed after the proposal was anchored; refusing to overwrite [proposals: p-B]",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576500,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 65,
+     "owner_write_1": 767,
+     "apply_return": 775
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 710
+   },
+   "both_inside_lock": false,
+   "state": {
+    "final_hash": "sha256:44b22d74e39aeb73417a8a8012341082d34669d9680653b2fb730e9fc4226609",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": false
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F4-tmpdir",
+   "variant": "different-tmpdir/B-same-region",
+   "pin": "b35a6141-qoff",
+   "rep": 2,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576525,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 61,
+     "owner_write_1": 135,
+     "hold_start": 136,
+     "hold_end": 937,
+     "rename_done": 938,
+     "apply_return": 939
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": false,
+    "apply_ms": 878
+   },
+   "B": {
+    "verdict": "blocked",
+    "reason": "steward-final-patch-required: proposal 'p-B' overlaps region 'reducers', which changed after the proposal was anchored; refusing to overwrite [proposals: p-B]",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576537,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 62,
+     "owner_write_1": 772,
+     "apply_return": 781
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 719
+   },
+   "both_inside_lock": false,
+   "state": {
+    "final_hash": "sha256:44b22d74e39aeb73417a8a8012341082d34669d9680653b2fb730e9fc4226609",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": false
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F4-tmpdir",
+   "variant": "different-tmpdir/B-same-region",
+   "pin": "b35a6141-qoff",
+   "rep": 3,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576563,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 63,
+     "owner_write_1": 139,
+     "hold_start": 140,
+     "hold_end": 940,
+     "rename_done": 940,
+     "apply_return": 941
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": false,
+    "apply_ms": 878
+   },
+   "B": {
+    "verdict": "blocked",
+    "reason": "steward-final-patch-required: proposal 'p-B' overlaps region 'reducers', which changed after the proposal was anchored; refusing to overwrite [proposals: p-B]",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576573,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 63,
+     "owner_write_1": 765,
+     "apply_return": 774
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 711
+   },
+   "both_inside_lock": false,
+   "state": {
+    "final_hash": "sha256:44b22d74e39aeb73417a8a8012341082d34669d9680653b2fb730e9fc4226609",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": false
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F4-tmpdir",
+   "variant": "different-tmpdir/B-other-region",
+   "pin": "b35a6141-qoff",
+   "rep": 1,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576593,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 69,
+     "owner_write_1": 152,
+     "hold_start": 152,
+     "hold_end": 953,
+     "rename_done": 953,
+     "apply_return": 954
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": false,
+    "apply_ms": 885
+   },
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 2,
+    "lock_acquires": 0,
+    "owner_writes": 2,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576603,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 79,
+     "owner_write_1": 765,
+     "owner_write_2": 776,
+     "hold_start": 776,
+     "hold_end": 777,
+     "rename_done": 777,
+     "apply_return": 778
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": true,
+    "apply_ms": 699
+   },
+   "both_inside_lock": false,
+   "state": {
+    "final_hash": "sha256:07458bdb52f9c4f2a368b67080795f88357f928609bb330dfdd68cb86c84114a",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F4-tmpdir",
+   "variant": "different-tmpdir/B-other-region",
+   "pin": "b35a6141-qoff",
+   "rep": 2,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576629,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 94,
+     "owner_write_1": 214,
+     "hold_start": 215,
+     "hold_end": 1016,
+     "rename_done": 1017,
+     "apply_return": 1018
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": false,
+    "apply_ms": 924
+   },
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 2,
+    "lock_acquires": 0,
+    "owner_writes": 2,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576639,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 68,
+     "owner_write_1": 767,
+     "owner_write_2": 777,
+     "hold_start": 778,
+     "hold_end": 778,
+     "rename_done": 778,
+     "apply_return": 778
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": true,
+    "apply_ms": 710
+   },
+   "both_inside_lock": false,
+   "state": {
+    "final_hash": "sha256:07458bdb52f9c4f2a368b67080795f88357f928609bb330dfdd68cb86c84114a",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F4-tmpdir",
+   "variant": "different-tmpdir/B-other-region",
+   "pin": "b35a6141-qoff",
+   "rep": 3,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576659,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 72,
+     "owner_write_1": 171,
+     "hold_start": 171,
+     "hold_end": 972,
+     "rename_done": 973,
+     "apply_return": 974
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": false,
+    "apply_ms": 902
+   },
+   "B": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 2,
+    "lock_acquires": 0,
+    "owner_writes": 2,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576675,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 67,
+     "owner_write_1": 763,
+     "owner_write_2": 772,
+     "hold_start": 772,
+     "hold_end": 772,
+     "rename_done": 772,
+     "apply_return": 773
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": true,
+    "apply_ms": 706
+   },
+   "both_inside_lock": false,
+   "state": {
+    "final_hash": "sha256:07458bdb52f9c4f2a368b67080795f88357f928609bb330dfdd68cb86c84114a",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": true
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F2b-forged-owner-live-holder",
+   "variant": "forged-owner-dead-pid",
+   "pin": "b35a6141-qoff",
+   "rep": 1,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576700,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 68,
+     "owner_write_1": 154,
+     "hold_start": 155,
+     "hold_end": 3155,
+     "rename_done": 3155,
+     "apply_return": 3157
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": null,
+    "apply_ms": 3089
+   },
+   "B": {
+    "verdict": "blocked",
+    "reason": "recovery-required: canonical commit lock for src/store.ts stayed held for 2000ms by pid 1576710. Retry the steward apply after that owner finishes; do not overw",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 0,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576711,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 71,
+     "apply_return": 2152
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 2081
+   },
+   "B_wall_ms": 3014,
+   "owner_before_forge": "v3",
+   "state": {
+    "final_hash": "sha256:44b22d74e39aeb73417a8a8012341082d34669d9680653b2fb730e9fc4226609",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": false
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F2b-forged-owner-live-holder",
+   "variant": "forged-owner-dead-pid",
+   "pin": "b35a6141-qoff",
+   "rep": 2,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576743,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 68,
+     "owner_write_1": 150,
+     "hold_start": 150,
+     "hold_end": 3151,
+     "rename_done": 3151,
+     "apply_return": 3152
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": null,
+    "apply_ms": 3084
+   },
+   "B": {
+    "verdict": "blocked",
+    "reason": "recovery-required: canonical commit lock for src/store.ts stayed held for 2000ms by pid 1576753. Retry the steward apply after that owner finishes; do not overw",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 0,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576754,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 67,
+     "apply_return": 2152
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 2085
+   },
+   "B_wall_ms": 3013,
+   "owner_before_forge": "v3",
+   "state": {
+    "final_hash": "sha256:44b22d74e39aeb73417a8a8012341082d34669d9680653b2fb730e9fc4226609",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": false
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F2b-forged-owner-live-holder",
+   "variant": "forged-owner-dead-pid",
+   "pin": "b35a6141-qoff",
+   "rep": 3,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576787,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 67,
+     "owner_write_1": 145,
+     "hold_start": 146,
+     "hold_end": 3146,
+     "rename_done": 3146,
+     "apply_return": 3148
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": null,
+    "apply_ms": 3081
+   },
+   "B": {
+    "verdict": "blocked",
+    "reason": "recovery-required: canonical commit lock for src/store.ts stayed held for 2000ms by pid 1576797. Retry the steward apply after that owner finishes; do not overw",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 0,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576798,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 82,
+     "apply_return": 2171
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 2089
+   },
+   "B_wall_ms": 3013,
+   "owner_before_forge": "v3",
+   "state": {
+    "final_hash": "sha256:44b22d74e39aeb73417a8a8012341082d34669d9680653b2fb730e9fc4226609",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": false
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F2b-forged-owner-live-holder",
+   "variant": "forged-owner-wrong-starttoken",
+   "pin": "b35a6141-qoff",
+   "rep": 1,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576834,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 67,
+     "owner_write_1": 146,
+     "hold_start": 147,
+     "hold_end": 3147,
+     "rename_done": 3148,
+     "apply_return": 3149
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": null,
+    "apply_ms": 3082
+   },
+   "B": {
+    "verdict": "blocked",
+    "reason": "recovery-required: canonical commit lock for src/store.ts stayed held for 2000ms by pid 1576834. Retry the steward apply after that owner finishes; do not overw",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 0,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576845,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 71,
+     "apply_return": 2150
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 2079
+   },
+   "B_wall_ms": 3013,
+   "owner_before_forge": "v3",
+   "state": {
+    "final_hash": "sha256:44b22d74e39aeb73417a8a8012341082d34669d9680653b2fb730e9fc4226609",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": false
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F2b-forged-owner-live-holder",
+   "variant": "forged-owner-wrong-starttoken",
+   "pin": "b35a6141-qoff",
+   "rep": 2,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576872,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 69,
+     "owner_write_1": 144,
+     "hold_start": 145,
+     "hold_end": 3145,
+     "rename_done": 3145,
+     "apply_return": 3147
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": null,
+    "apply_ms": 3078
+   },
+   "B": {
+    "verdict": "blocked",
+    "reason": "recovery-required: canonical commit lock for src/store.ts stayed held for 2000ms by pid 1576872. Retry the steward apply after that owner finishes; do not overw",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 0,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576889,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 61,
+     "apply_return": 2139
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 2078
+   },
+   "B_wall_ms": 3012,
+   "owner_before_forge": "v3",
+   "state": {
+    "final_hash": "sha256:44b22d74e39aeb73417a8a8012341082d34669d9680653b2fb730e9fc4226609",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": false
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F2b-forged-owner-live-holder",
+   "variant": "forged-owner-wrong-starttoken",
+   "pin": "b35a6141-qoff",
+   "rep": 3,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576922,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 65,
+     "owner_write_1": 143,
+     "hold_start": 144,
+     "hold_end": 3144,
+     "rename_done": 3145,
+     "apply_return": 3146
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": true,
+    "hold_point": "before-rename",
+    "hold_wait_satisfied": null,
+    "apply_ms": 3081
+   },
+   "B": {
+    "verdict": "blocked",
+    "reason": "recovery-required: canonical commit lock for src/store.ts stayed held for 2000ms by pid 1576922. Retry the steward apply after that owner finishes; do not overw",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 0,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576933,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 80,
+     "apply_return": 2166
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 0,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 2086
+   },
+   "B_wall_ms": 3015,
+   "owner_before_forge": "v3",
+   "state": {
+    "final_hash": "sha256:44b22d74e39aeb73417a8a8012341082d34669d9680653b2fb730e9fc4226609",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true,
+     "B": false
+    },
+    "frame_ok": true
+   },
+   "errs": [
+    null,
+    null
+   ]
+  },
+  {
+   "scenario": "F5-retry-exhaustion",
+   "variant": "default-policy/K=always",
+   "pin": "b35a6141-qoff",
+   "rep": 1,
+   "A": {
+    "verdict": "blocked",
+    "reason": "re-compose attempts exhausted after 5 of 5: re-compose: canonical target base hash is stale: src/store.ts (expected sha256:66e48347570d196d588dc98d38212264aca8a",
+    "tx_attempts": 5,
+    "lock_acquires": 0,
+    "owner_writes": 0,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576978,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 90,
+     "apply_return": 228
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 5,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 138
+   },
+   "wall_ms": 291,
+   "injected_lines_present": 5,
+   "state": {
+    "final_hash": "sha256:c1c2dc78de34e44cba96cb153d0177c9f587b35fe1d670f25ccf93b5164bef6e",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": false
+    },
+    "frame_ok": true
+   },
+   "err": null
+  },
+  {
+   "scenario": "F5-retry-exhaustion",
+   "variant": "default-policy/K=always",
+   "pin": "b35a6141-qoff",
+   "rep": 2,
+   "A": {
+    "verdict": "blocked",
+    "reason": "re-compose attempts exhausted after 5 of 5: re-compose: canonical target base hash is stale: src/store.ts (expected sha256:66e48347570d196d588dc98d38212264aca8a",
+    "tx_attempts": 5,
+    "lock_acquires": 0,
+    "owner_writes": 0,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1576998,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 76,
+     "apply_return": 203
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 5,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 127
+   },
+   "wall_ms": 254,
+   "injected_lines_present": 5,
+   "state": {
+    "final_hash": "sha256:c1c2dc78de34e44cba96cb153d0177c9f587b35fe1d670f25ccf93b5164bef6e",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": false
+    },
+    "frame_ok": true
+   },
+   "err": null
+  },
+  {
+   "scenario": "F5-retry-exhaustion",
+   "variant": "default-policy/K=always",
+   "pin": "b35a6141-qoff",
+   "rep": 3,
+   "A": {
+    "verdict": "blocked",
+    "reason": "re-compose attempts exhausted after 5 of 5: re-compose: canonical target base hash is stale: src/store.ts (expected sha256:66e48347570d196d588dc98d38212264aca8a",
+    "tx_attempts": 5,
+    "lock_acquires": 0,
+    "owner_writes": 0,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1577018,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 64,
+     "apply_return": 194
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 5,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 130
+   },
+   "wall_ms": 245,
+   "injected_lines_present": 5,
+   "state": {
+    "final_hash": "sha256:c1c2dc78de34e44cba96cb153d0177c9f587b35fe1d670f25ccf93b5164bef6e",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": false
+    },
+    "frame_ok": true
+   },
+   "err": null
+  },
+  {
+   "scenario": "F5-retry-exhaustion",
+   "variant": "default-policy/K=2",
+   "pin": "b35a6141-qoff",
+   "rep": 1,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 3,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1577038,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 69,
+     "owner_write_1": 173,
+     "rename_done": 174,
+     "apply_return": 175
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 2,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 106
+   },
+   "wall_ms": 221,
+   "injected_lines_present": 2,
+   "state": {
+    "final_hash": "sha256:a03f25bc44b2384791a5c281f033d38d5a761d8dd8d5ce27321f0b5e9bfec5d7",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true
+    },
+    "frame_ok": true
+   },
+   "err": null
+  },
+  {
+   "scenario": "F5-retry-exhaustion",
+   "variant": "default-policy/K=2",
+   "pin": "b35a6141-qoff",
+   "rep": 2,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 3,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1577058,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 67,
+     "owner_write_1": 160,
+     "rename_done": 160,
+     "apply_return": 161
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 2,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 94
+   },
+   "wall_ms": 207,
+   "injected_lines_present": 2,
+   "state": {
+    "final_hash": "sha256:a03f25bc44b2384791a5c281f033d38d5a761d8dd8d5ce27321f0b5e9bfec5d7",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true
+    },
+    "frame_ok": true
+   },
+   "err": null
+  },
+  {
+   "scenario": "F5-retry-exhaustion",
+   "variant": "default-policy/K=2",
+   "pin": "b35a6141-qoff",
+   "rep": 3,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 3,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1577078,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 65,
+     "owner_write_1": 163,
+     "rename_done": 164,
+     "apply_return": 164
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 2,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 99
+   },
+   "wall_ms": 208,
+   "injected_lines_present": 2,
+   "state": {
+    "final_hash": "sha256:a03f25bc44b2384791a5c281f033d38d5a761d8dd8d5ce27321f0b5e9bfec5d7",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true
+    },
+    "frame_ok": true
+   },
+   "err": null
+  },
+  {
+   "scenario": "F5-retry-exhaustion",
+   "variant": "default-policy/K=4",
+   "pin": "b35a6141-qoff",
+   "rep": 1,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 5,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1577099,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 65,
+     "owner_write_1": 187,
+     "rename_done": 188,
+     "apply_return": 188
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 4,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 123
+   },
+   "wall_ms": 233,
+   "injected_lines_present": 4,
+   "state": {
+    "final_hash": "sha256:80349cbde87c5fe65a37ab54a22e46fd2e893b0cbbbfa063c759214f70823fb2",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true
+    },
+    "frame_ok": true
+   },
+   "err": null
+  },
+  {
+   "scenario": "F5-retry-exhaustion",
+   "variant": "default-policy/K=4",
+   "pin": "b35a6141-qoff",
+   "rep": 2,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 5,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1577125,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 63,
+     "owner_write_1": 193,
+     "rename_done": 194,
+     "apply_return": 194
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 4,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 131
+   },
+   "wall_ms": 245,
+   "injected_lines_present": 4,
+   "state": {
+    "final_hash": "sha256:80349cbde87c5fe65a37ab54a22e46fd2e893b0cbbbfa063c759214f70823fb2",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true
+    },
+    "frame_ok": true
+   },
+   "err": null
+  },
+  {
+   "scenario": "F5-retry-exhaustion",
+   "variant": "default-policy/K=4",
+   "pin": "b35a6141-qoff",
+   "rep": 3,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 5,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1577145,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 68,
+     "owner_write_1": 189,
+     "rename_done": 190,
+     "apply_return": 191
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 4,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 123
+   },
+   "wall_ms": 236,
+   "injected_lines_present": 4,
+   "state": {
+    "final_hash": "sha256:80349cbde87c5fe65a37ab54a22e46fd2e893b0cbbbfa063c759214f70823fb2",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true
+    },
+    "frame_ok": true
+   },
+   "err": null
+  },
+  {
+   "scenario": "F5-retry-exhaustion",
+   "variant": "maxRecompose=0/K=always",
+   "pin": "b35a6141-qoff",
+   "rep": 1,
+   "A": {
+    "verdict": "blocked",
+    "reason": "re-compose attempts exhausted after 1 of 1: re-compose: canonical target base hash is stale: src/store.ts (expected sha256:6e728ad8ee54fd1c70635a90feeca964d11c6",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 0,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1577165,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 68,
+     "apply_return": 146
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 1,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 78
+   },
+   "wall_ms": 192,
+   "injected_lines_present": 1,
+   "state": {
+    "final_hash": "sha256:385212a88e42adfd3f647e2344d9bdcf7ab2ec9cad22128aed8916b5191541b9",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": false
+    },
+    "frame_ok": true
+   },
+   "err": null
+  },
+  {
+   "scenario": "F5-retry-exhaustion",
+   "variant": "maxRecompose=0/K=always",
+   "pin": "b35a6141-qoff",
+   "rep": 2,
+   "A": {
+    "verdict": "blocked",
+    "reason": "re-compose attempts exhausted after 1 of 1: re-compose: canonical target base hash is stale: src/store.ts (expected sha256:6e728ad8ee54fd1c70635a90feeca964d11c6",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 0,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1577185,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 61,
+     "apply_return": 135
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 1,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 74
+   },
+   "wall_ms": 176,
+   "injected_lines_present": 1,
+   "state": {
+    "final_hash": "sha256:385212a88e42adfd3f647e2344d9bdcf7ab2ec9cad22128aed8916b5191541b9",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": false
+    },
+    "frame_ok": true
+   },
+   "err": null
+  },
+  {
+   "scenario": "F5-retry-exhaustion",
+   "variant": "maxRecompose=0/K=always",
+   "pin": "b35a6141-qoff",
+   "rep": 3,
+   "A": {
+    "verdict": "blocked",
+    "reason": "re-compose attempts exhausted after 1 of 1: re-compose: canonical target base hash is stale: src/store.ts (expected sha256:6e728ad8ee54fd1c70635a90feeca964d11c6",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 0,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1577205,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 63,
+     "apply_return": 143
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 1,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 80
+   },
+   "wall_ms": 188,
+   "injected_lines_present": 1,
+   "state": {
+    "final_hash": "sha256:385212a88e42adfd3f647e2344d9bdcf7ab2ec9cad22128aed8916b5191541b9",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": false
+    },
+    "frame_ok": true
+   },
+   "err": null
+  },
+  {
+   "scenario": "F5-retry-exhaustion",
+   "variant": "maxRecompose=1,backoff0/K=1",
+   "pin": "b35a6141-qoff",
+   "rep": 1,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 2,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1577225,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 64,
+     "owner_write_1": 143,
+     "rename_done": 144,
+     "apply_return": 144
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 1,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 80
+   },
+   "wall_ms": 193,
+   "injected_lines_present": 1,
+   "state": {
+    "final_hash": "sha256:8935a346a4ee1634bacce86816a71c5f4d309866d539f20f0995ce3bb88eebf7",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true
+    },
+    "frame_ok": true
+   },
+   "err": null
+  },
+  {
+   "scenario": "F5-retry-exhaustion",
+   "variant": "maxRecompose=1,backoff0/K=1",
+   "pin": "b35a6141-qoff",
+   "rep": 2,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 2,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1577245,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 72,
+     "owner_write_1": 159,
+     "rename_done": 160,
+     "apply_return": 161
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 1,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 89
+   },
+   "wall_ms": 203,
+   "injected_lines_present": 1,
+   "state": {
+    "final_hash": "sha256:8935a346a4ee1634bacce86816a71c5f4d309866d539f20f0995ce3bb88eebf7",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true
+    },
+    "frame_ok": true
+   },
+   "err": null
+  },
+  {
+   "scenario": "F5-retry-exhaustion",
+   "variant": "maxRecompose=1,backoff0/K=1",
+   "pin": "b35a6141-qoff",
+   "rep": 3,
+   "A": {
+    "verdict": "applied",
+    "reason": "",
+    "tx_attempts": 2,
+    "lock_acquires": 0,
+    "owner_writes": 1,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1577265,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 72,
+     "owner_write_1": 146,
+     "rename_done": 147,
+     "apply_return": 148
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off"
+    },
+    "injected": 1,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 76
+   },
+   "wall_ms": 191,
+   "injected_lines_present": 1,
+   "state": {
+    "final_hash": "sha256:8935a346a4ee1634bacce86816a71c5f4d309866d539f20f0995ce3bb88eebf7",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": true
+    },
+    "frame_ok": true
+   },
+   "err": null
+  },
+  {
+   "scenario": "F5-retry-exhaustion",
+   "variant": "env:ATM_STEWARD_RECOMPOSE_POLICY maxRecompose=0/K=always",
+   "pin": "b35a6141-qoff",
+   "rep": 1,
+   "A": {
+    "verdict": "blocked",
+    "reason": "re-compose attempts exhausted after 1 of 1: re-compose: canonical target base hash is stale: src/store.ts (expected sha256:6e728ad8ee54fd1c70635a90feeca964d11c6",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 0,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1577285,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 63,
+     "apply_return": 140
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off",
+     "ATM_STEWARD_RECOMPOSE_POLICY": "{\"maxRecomposeAttempts\":0}"
+    },
+    "injected": 1,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 77
+   },
+   "wall_ms": 189,
+   "injected_lines_present": 1,
+   "state": {
+    "final_hash": "sha256:385212a88e42adfd3f647e2344d9bdcf7ab2ec9cad22128aed8916b5191541b9",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": false
+    },
+    "frame_ok": true
+   },
+   "err": null
+  },
+  {
+   "scenario": "F5-retry-exhaustion",
+   "variant": "env:ATM_STEWARD_RECOMPOSE_POLICY maxRecompose=0/K=always",
+   "pin": "b35a6141-qoff",
+   "rep": 2,
+   "A": {
+    "verdict": "blocked",
+    "reason": "re-compose attempts exhausted after 1 of 1: re-compose: canonical target base hash is stale: src/store.ts (expected sha256:6e728ad8ee54fd1c70635a90feeca964d11c6",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 0,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1577311,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 88,
+     "apply_return": 207
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off",
+     "ATM_STEWARD_RECOMPOSE_POLICY": "{\"maxRecomposeAttempts\":0}"
+    },
+    "injected": 1,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 119
+   },
+   "wall_ms": 263,
+   "injected_lines_present": 1,
+   "state": {
+    "final_hash": "sha256:385212a88e42adfd3f647e2344d9bdcf7ab2ec9cad22128aed8916b5191541b9",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": false
+    },
+    "frame_ok": true
+   },
+   "err": null
+  },
+  {
+   "scenario": "F5-retry-exhaustion",
+   "variant": "env:ATM_STEWARD_RECOMPOSE_POLICY maxRecompose=0/K=always",
+   "pin": "b35a6141-qoff",
+   "rep": 3,
+   "A": {
+    "verdict": "blocked",
+    "reason": "re-compose attempts exhausted after 1 of 1: re-compose: canonical target base hash is stale: src/store.ts (expected sha256:6e728ad8ee54fd1c70635a90feeca964d11c6",
+    "tx_attempts": 1,
+    "lock_acquires": 0,
+    "owner_writes": 0,
+    "pidns": "pid:[4026532320]",
+    "ns_pid": 1577331,
+    "rm_foreign_temps": [],
+    "t": {
+     "apply_start": 67,
+     "apply_return": 140
+    },
+    "atm_env": {
+     "ATM_STEWARD_APPLY_QUEUE": "off",
+     "ATM_STEWARD_RECOMPOSE_POLICY": "{\"maxRecomposeAttempts\":0}"
+    },
+    "injected": 1,
+    "held": false,
+    "hold_point": null,
+    "hold_wait_satisfied": null,
+    "apply_ms": 73
+   },
+   "wall_ms": 184,
+   "injected_lines_present": 1,
+   "state": {
+    "final_hash": "sha256:385212a88e42adfd3f647e2344d9bdcf7ab2ec9cad22128aed8916b5191541b9",
+    "leftover_files": [],
+    "lost_effects": [],
+    "present": {
+     "A": false
+    },
+    "frame_ok": true
+   },
+   "err": null
+  }
+ ]
+}

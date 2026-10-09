@@ -1,0 +1,156 @@
+[
+  {
+    "arm": "steward",
+    "arm_role": "main_method",
+    "diagnostic": false,
+    "correctness_competitor": true,
+    "offered": 15,
+    "committed": 15,
+    "oracle": {
+      "oracle_version": "c3-effect-bytes-v1",
+      "n_effects": 15,
+      "n_eligible": 15,
+      "by_verdict": {
+        "correct": 15
+      },
+      "correct": 15,
+      "lost": 0,
+      "blocked_absent": 0,
+      "duplicate": 0,
+      "misplaced": 0,
+      "blocked_leak": 0,
+      "unexpected_write": 0,
+      "absent_uncommitted": 0,
+      "unresolved": 0,
+      "test_pass": 15,
+      "test_fail": 0
+    },
+    "sample_tags": {
+      "arm": "steward",
+      "arm_role": "main_method",
+      "diagnostic": false,
+      "correctness_competitor": true
+    },
+    "blocked": 0,
+    "correct": 15,
+    "lost": 0,
+    "duplicate": 0,
+    "blocked_absent": 0
+  },
+  {
+    "arm": "ideal_sync",
+    "arm_role": "upper_bound",
+    "diagnostic": true,
+    "correctness_competitor": false,
+    "offered": 15,
+    "committed": 15,
+    "oracle": {
+      "oracle_version": "c3-effect-bytes-v1",
+      "n_effects": 15,
+      "n_eligible": 15,
+      "by_verdict": {
+        "correct": 15
+      },
+      "correct": 15,
+      "lost": 0,
+      "blocked_absent": 0,
+      "duplicate": 0,
+      "misplaced": 0,
+      "blocked_leak": 0,
+      "unexpected_write": 0,
+      "absent_uncommitted": 0,
+      "unresolved": 0,
+      "test_pass": 15,
+      "test_fail": 0
+    },
+    "sample_tags": {
+      "arm": "ideal_sync",
+      "arm_role": "upper_bound",
+      "diagnostic": true,
+      "correctness_competitor": false
+    },
+    "blocked": 0,
+    "correct": 15,
+    "lost": 0,
+    "duplicate": 0,
+    "blocked_absent": 0
+  },
+  {
+    "arm": "admission_only",
+    "arm_role": "motivation",
+    "diagnostic": true,
+    "correctness_competitor": false,
+    "offered": 15,
+    "committed": 15,
+    "oracle": {
+      "oracle_version": "c3-effect-bytes-v1",
+      "n_effects": 15,
+      "n_eligible": 15,
+      "by_verdict": {
+        "correct": 9,
+        "lost": 6
+      },
+      "correct": 9,
+      "lost": 6,
+      "blocked_absent": 0,
+      "duplicate": 0,
+      "misplaced": 0,
+      "blocked_leak": 0,
+      "unexpected_write": 0,
+      "absent_uncommitted": 0,
+      "unresolved": 0,
+      "test_pass": 9,
+      "test_fail": 6
+    },
+    "sample_tags": {
+      "arm": "admission_only",
+      "arm_role": "motivation",
+      "diagnostic": true,
+      "correctness_competitor": false
+    },
+    "blocked": 0,
+    "correct": 9,
+    "lost": 6,
+    "duplicate": 0,
+    "blocked_absent": 0
+  },
+  {
+    "arm": "raw_overwrite",
+    "arm_role": "baseline_raw",
+    "diagnostic": true,
+    "correctness_competitor": false,
+    "offered": 15,
+    "committed": 15,
+    "oracle": {
+      "oracle_version": "c3-effect-bytes-v1",
+      "n_effects": 15,
+      "n_eligible": 15,
+      "by_verdict": {
+        "lost": 7,
+        "correct": 8
+      },
+      "correct": 8,
+      "lost": 7,
+      "blocked_absent": 0,
+      "duplicate": 0,
+      "misplaced": 0,
+      "blocked_leak": 0,
+      "unexpected_write": 0,
+      "absent_uncommitted": 0,
+      "unresolved": 0,
+      "test_pass": 8,
+      "test_fail": 7
+    },
+    "sample_tags": {
+      "arm": "raw_overwrite",
+      "arm_role": "baseline_raw",
+      "diagnostic": true,
+      "correctness_competitor": false
+    },
+    "blocked": 0,
+    "correct": 8,
+    "lost": 7,
+    "duplicate": 0,
+    "blocked_absent": 0
+  }
+]

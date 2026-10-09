@@ -1,0 +1,1400 @@
+{
+ "summary": {
+  "test": "r3-barrier-interleave-v1",
+  "mode": "stale-proposal",
+  "atm_env": {},
+  "variant": "leader-selectors/follower-reducers",
+  "atm_monorepo": "/workspace/atm-main-bea35380/AI-Atomic-Framework-bea35380d7f381f998c9930fa95f01b999c7f208",
+  "atm_pin": "bea35380d7f381f998c9930fa95f01b999c7f208",
+  "node": "v24.21.0",
+  "reps": 20,
+  "window_hit": 20,
+  "runs_with_lost_effect": 0,
+  "lost_effects_total": 0,
+  "leader_applied": 20,
+  "follower_classes": {
+   "blocked_other": 20
+  },
+  "final_equals_leader_only": 20,
+  "final_equals_both_full_bytes": 0,
+  "leftover_files": 0,
+  "seam_ops": [
+   null
+  ],
+  "follower_commit_guard_attempts": [
+   0
+  ],
+  "leader_commit_guard_attempts": [
+   1
+  ],
+  "follower_tx_attempts": [
+   0
+  ],
+  "follower_lock_owner_writes": [
+   0
+  ],
+  "first_follower_reason": "file-hash-drift: Target file hash sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6 does not match proposal fileBeforeHash sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22."
+ },
+ "runs": [
+  {
+   "rep": 1,
+   "leader": {
+    "role": "leader",
+    "pid": 1101511,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 81,
+     "apply_return": 184
+    },
+    "commit_guard_lock_acquires": 1,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "lock_owner_writes": 1,
+    "ok": true,
+    "verdict": "applied",
+    "blockedReasons": [],
+    "receipt_before": "8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "receipt_after": "3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+    "marker": "// atm-edit barrier-leader by agent-leader"
+   },
+   "follower": {
+    "role": "follower",
+    "pid": 1101512,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 79,
+     "follower_release": 183,
+     "apply_return": 273
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "paused": true,
+    "leader_done_seen": true,
+    "disk_hash_at_resume": "sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+    "ok": false,
+    "verdict": "blocked",
+    "blockedReasons": [
+     "file-hash-drift: Target file hash sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6 does not match proposal fileBeforeHash sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22."
+    ],
+    "receipt_before": null,
+    "receipt_after": null,
+    "marker": "// atm-edit barrier-follower by agent-follower"
+   },
+   "leader_exit": 0,
+   "follower_exit": 0,
+   "stderr": {
+    "leader": "",
+    "follower": ""
+   },
+   "window_hit": true,
+   "final_hash": "sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+   "final_bytes": 230,
+   "leftover_files": [],
+   "leader_marker_present": true,
+   "follower_marker_present": false,
+   "final_equals_leader_only": true,
+   "final_equals_both_full_bytes": false,
+   "lost_effects": [],
+   "follower_class": "blocked_other"
+  },
+  {
+   "rep": 2,
+   "leader": {
+    "role": "leader",
+    "pid": 1101546,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 75,
+     "apply_return": 171
+    },
+    "commit_guard_lock_acquires": 1,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "lock_owner_writes": 1,
+    "ok": true,
+    "verdict": "applied",
+    "blockedReasons": [],
+    "receipt_before": "8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "receipt_after": "3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+    "marker": "// atm-edit barrier-leader by agent-leader"
+   },
+   "follower": {
+    "role": "follower",
+    "pid": 1101547,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 75,
+     "follower_release": 171,
+     "apply_return": 261
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "paused": true,
+    "leader_done_seen": true,
+    "disk_hash_at_resume": "sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+    "ok": false,
+    "verdict": "blocked",
+    "blockedReasons": [
+     "file-hash-drift: Target file hash sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6 does not match proposal fileBeforeHash sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22."
+    ],
+    "receipt_before": null,
+    "receipt_after": null,
+    "marker": "// atm-edit barrier-follower by agent-follower"
+   },
+   "leader_exit": 0,
+   "follower_exit": 0,
+   "stderr": {
+    "leader": "",
+    "follower": ""
+   },
+   "window_hit": true,
+   "final_hash": "sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+   "final_bytes": 230,
+   "leftover_files": [],
+   "leader_marker_present": true,
+   "follower_marker_present": false,
+   "final_equals_leader_only": true,
+   "final_equals_both_full_bytes": false,
+   "lost_effects": [],
+   "follower_class": "blocked_other"
+  },
+  {
+   "rep": 3,
+   "leader": {
+    "role": "leader",
+    "pid": 1101575,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 79,
+     "apply_return": 173
+    },
+    "commit_guard_lock_acquires": 1,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "lock_owner_writes": 1,
+    "ok": true,
+    "verdict": "applied",
+    "blockedReasons": [],
+    "receipt_before": "8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "receipt_after": "3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+    "marker": "// atm-edit barrier-leader by agent-leader"
+   },
+   "follower": {
+    "role": "follower",
+    "pid": 1101576,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 79,
+     "follower_release": 175,
+     "apply_return": 262
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "paused": true,
+    "leader_done_seen": true,
+    "disk_hash_at_resume": "sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+    "ok": false,
+    "verdict": "blocked",
+    "blockedReasons": [
+     "file-hash-drift: Target file hash sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6 does not match proposal fileBeforeHash sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22."
+    ],
+    "receipt_before": null,
+    "receipt_after": null,
+    "marker": "// atm-edit barrier-follower by agent-follower"
+   },
+   "leader_exit": 0,
+   "follower_exit": 0,
+   "stderr": {
+    "leader": "",
+    "follower": ""
+   },
+   "window_hit": true,
+   "final_hash": "sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+   "final_bytes": 230,
+   "leftover_files": [],
+   "leader_marker_present": true,
+   "follower_marker_present": false,
+   "final_equals_leader_only": true,
+   "final_equals_both_full_bytes": false,
+   "lost_effects": [],
+   "follower_class": "blocked_other"
+  },
+  {
+   "rep": 4,
+   "leader": {
+    "role": "leader",
+    "pid": 1101604,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 77,
+     "apply_return": 168
+    },
+    "commit_guard_lock_acquires": 1,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "lock_owner_writes": 1,
+    "ok": true,
+    "verdict": "applied",
+    "blockedReasons": [],
+    "receipt_before": "8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "receipt_after": "3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+    "marker": "// atm-edit barrier-leader by agent-leader"
+   },
+   "follower": {
+    "role": "follower",
+    "pid": 1101605,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 78,
+     "follower_release": 170,
+     "apply_return": 258
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "paused": true,
+    "leader_done_seen": true,
+    "disk_hash_at_resume": "sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+    "ok": false,
+    "verdict": "blocked",
+    "blockedReasons": [
+     "file-hash-drift: Target file hash sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6 does not match proposal fileBeforeHash sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22."
+    ],
+    "receipt_before": null,
+    "receipt_after": null,
+    "marker": "// atm-edit barrier-follower by agent-follower"
+   },
+   "leader_exit": 0,
+   "follower_exit": 0,
+   "stderr": {
+    "leader": "",
+    "follower": ""
+   },
+   "window_hit": true,
+   "final_hash": "sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+   "final_bytes": 230,
+   "leftover_files": [],
+   "leader_marker_present": true,
+   "follower_marker_present": false,
+   "final_equals_leader_only": true,
+   "final_equals_both_full_bytes": false,
+   "lost_effects": [],
+   "follower_class": "blocked_other"
+  },
+  {
+   "rep": 5,
+   "leader": {
+    "role": "leader",
+    "pid": 1101633,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 72,
+     "apply_return": 161
+    },
+    "commit_guard_lock_acquires": 1,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "lock_owner_writes": 1,
+    "ok": true,
+    "verdict": "applied",
+    "blockedReasons": [],
+    "receipt_before": "8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "receipt_after": "3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+    "marker": "// atm-edit barrier-leader by agent-leader"
+   },
+   "follower": {
+    "role": "follower",
+    "pid": 1101634,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 78,
+     "follower_release": 167,
+     "apply_return": 271
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "paused": true,
+    "leader_done_seen": true,
+    "disk_hash_at_resume": "sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+    "ok": false,
+    "verdict": "blocked",
+    "blockedReasons": [
+     "file-hash-drift: Target file hash sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6 does not match proposal fileBeforeHash sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22."
+    ],
+    "receipt_before": null,
+    "receipt_after": null,
+    "marker": "// atm-edit barrier-follower by agent-follower"
+   },
+   "leader_exit": 0,
+   "follower_exit": 0,
+   "stderr": {
+    "leader": "",
+    "follower": ""
+   },
+   "window_hit": true,
+   "final_hash": "sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+   "final_bytes": 230,
+   "leftover_files": [],
+   "leader_marker_present": true,
+   "follower_marker_present": false,
+   "final_equals_leader_only": true,
+   "final_equals_both_full_bytes": false,
+   "lost_effects": [],
+   "follower_class": "blocked_other"
+  },
+  {
+   "rep": 6,
+   "leader": {
+    "role": "leader",
+    "pid": 1101662,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 83,
+     "apply_return": 194
+    },
+    "commit_guard_lock_acquires": 1,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "lock_owner_writes": 1,
+    "ok": true,
+    "verdict": "applied",
+    "blockedReasons": [],
+    "receipt_before": "8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "receipt_after": "3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+    "marker": "// atm-edit barrier-leader by agent-leader"
+   },
+   "follower": {
+    "role": "follower",
+    "pid": 1101663,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 82,
+     "follower_release": 195,
+     "apply_return": 282
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "paused": true,
+    "leader_done_seen": true,
+    "disk_hash_at_resume": "sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+    "ok": false,
+    "verdict": "blocked",
+    "blockedReasons": [
+     "file-hash-drift: Target file hash sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6 does not match proposal fileBeforeHash sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22."
+    ],
+    "receipt_before": null,
+    "receipt_after": null,
+    "marker": "// atm-edit barrier-follower by agent-follower"
+   },
+   "leader_exit": 0,
+   "follower_exit": 0,
+   "stderr": {
+    "leader": "",
+    "follower": ""
+   },
+   "window_hit": true,
+   "final_hash": "sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+   "final_bytes": 230,
+   "leftover_files": [],
+   "leader_marker_present": true,
+   "follower_marker_present": false,
+   "final_equals_leader_only": true,
+   "final_equals_both_full_bytes": false,
+   "lost_effects": [],
+   "follower_class": "blocked_other"
+  },
+  {
+   "rep": 7,
+   "leader": {
+    "role": "leader",
+    "pid": 1101691,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 88,
+     "apply_return": 189
+    },
+    "commit_guard_lock_acquires": 1,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "lock_owner_writes": 1,
+    "ok": true,
+    "verdict": "applied",
+    "blockedReasons": [],
+    "receipt_before": "8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "receipt_after": "3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+    "marker": "// atm-edit barrier-leader by agent-leader"
+   },
+   "follower": {
+    "role": "follower",
+    "pid": 1101692,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 91,
+     "follower_release": 193,
+     "apply_return": 279
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "paused": true,
+    "leader_done_seen": true,
+    "disk_hash_at_resume": "sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+    "ok": false,
+    "verdict": "blocked",
+    "blockedReasons": [
+     "file-hash-drift: Target file hash sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6 does not match proposal fileBeforeHash sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22."
+    ],
+    "receipt_before": null,
+    "receipt_after": null,
+    "marker": "// atm-edit barrier-follower by agent-follower"
+   },
+   "leader_exit": 0,
+   "follower_exit": 0,
+   "stderr": {
+    "leader": "",
+    "follower": ""
+   },
+   "window_hit": true,
+   "final_hash": "sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+   "final_bytes": 230,
+   "leftover_files": [],
+   "leader_marker_present": true,
+   "follower_marker_present": false,
+   "final_equals_leader_only": true,
+   "final_equals_both_full_bytes": false,
+   "lost_effects": [],
+   "follower_class": "blocked_other"
+  },
+  {
+   "rep": 8,
+   "leader": {
+    "role": "leader",
+    "pid": 1101726,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 84,
+     "apply_return": 172
+    },
+    "commit_guard_lock_acquires": 1,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "lock_owner_writes": 1,
+    "ok": true,
+    "verdict": "applied",
+    "blockedReasons": [],
+    "receipt_before": "8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "receipt_after": "3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+    "marker": "// atm-edit barrier-leader by agent-leader"
+   },
+   "follower": {
+    "role": "follower",
+    "pid": 1101727,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 81,
+     "follower_release": 169,
+     "apply_return": 257
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "paused": true,
+    "leader_done_seen": true,
+    "disk_hash_at_resume": "sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+    "ok": false,
+    "verdict": "blocked",
+    "blockedReasons": [
+     "file-hash-drift: Target file hash sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6 does not match proposal fileBeforeHash sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22."
+    ],
+    "receipt_before": null,
+    "receipt_after": null,
+    "marker": "// atm-edit barrier-follower by agent-follower"
+   },
+   "leader_exit": 0,
+   "follower_exit": 0,
+   "stderr": {
+    "leader": "",
+    "follower": ""
+   },
+   "window_hit": true,
+   "final_hash": "sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+   "final_bytes": 230,
+   "leftover_files": [],
+   "leader_marker_present": true,
+   "follower_marker_present": false,
+   "final_equals_leader_only": true,
+   "final_equals_both_full_bytes": false,
+   "lost_effects": [],
+   "follower_class": "blocked_other"
+  },
+  {
+   "rep": 9,
+   "leader": {
+    "role": "leader",
+    "pid": 1101755,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 78,
+     "apply_return": 172
+    },
+    "commit_guard_lock_acquires": 1,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "lock_owner_writes": 1,
+    "ok": true,
+    "verdict": "applied",
+    "blockedReasons": [],
+    "receipt_before": "8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "receipt_after": "3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+    "marker": "// atm-edit barrier-leader by agent-leader"
+   },
+   "follower": {
+    "role": "follower",
+    "pid": 1101756,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 74,
+     "follower_release": 172,
+     "apply_return": 263
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "paused": true,
+    "leader_done_seen": true,
+    "disk_hash_at_resume": "sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+    "ok": false,
+    "verdict": "blocked",
+    "blockedReasons": [
+     "file-hash-drift: Target file hash sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6 does not match proposal fileBeforeHash sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22."
+    ],
+    "receipt_before": null,
+    "receipt_after": null,
+    "marker": "// atm-edit barrier-follower by agent-follower"
+   },
+   "leader_exit": 0,
+   "follower_exit": 0,
+   "stderr": {
+    "leader": "",
+    "follower": ""
+   },
+   "window_hit": true,
+   "final_hash": "sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+   "final_bytes": 230,
+   "leftover_files": [],
+   "leader_marker_present": true,
+   "follower_marker_present": false,
+   "final_equals_leader_only": true,
+   "final_equals_both_full_bytes": false,
+   "lost_effects": [],
+   "follower_class": "blocked_other"
+  },
+  {
+   "rep": 10,
+   "leader": {
+    "role": "leader",
+    "pid": 1101784,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 85,
+     "apply_return": 185
+    },
+    "commit_guard_lock_acquires": 1,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "lock_owner_writes": 1,
+    "ok": true,
+    "verdict": "applied",
+    "blockedReasons": [],
+    "receipt_before": "8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "receipt_after": "3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+    "marker": "// atm-edit barrier-leader by agent-leader"
+   },
+   "follower": {
+    "role": "follower",
+    "pid": 1101785,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 88,
+     "follower_release": 188,
+     "apply_return": 293
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "paused": true,
+    "leader_done_seen": true,
+    "disk_hash_at_resume": "sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+    "ok": false,
+    "verdict": "blocked",
+    "blockedReasons": [
+     "file-hash-drift: Target file hash sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6 does not match proposal fileBeforeHash sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22."
+    ],
+    "receipt_before": null,
+    "receipt_after": null,
+    "marker": "// atm-edit barrier-follower by agent-follower"
+   },
+   "leader_exit": 0,
+   "follower_exit": 0,
+   "stderr": {
+    "leader": "",
+    "follower": ""
+   },
+   "window_hit": true,
+   "final_hash": "sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+   "final_bytes": 230,
+   "leftover_files": [],
+   "leader_marker_present": true,
+   "follower_marker_present": false,
+   "final_equals_leader_only": true,
+   "final_equals_both_full_bytes": false,
+   "lost_effects": [],
+   "follower_class": "blocked_other"
+  },
+  {
+   "rep": 11,
+   "leader": {
+    "role": "leader",
+    "pid": 1101813,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 95,
+     "apply_return": 208
+    },
+    "commit_guard_lock_acquires": 1,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "lock_owner_writes": 1,
+    "ok": true,
+    "verdict": "applied",
+    "blockedReasons": [],
+    "receipt_before": "8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "receipt_after": "3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+    "marker": "// atm-edit barrier-leader by agent-leader"
+   },
+   "follower": {
+    "role": "follower",
+    "pid": 1101814,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 96,
+     "follower_release": 208,
+     "apply_return": 299
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "paused": true,
+    "leader_done_seen": true,
+    "disk_hash_at_resume": "sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+    "ok": false,
+    "verdict": "blocked",
+    "blockedReasons": [
+     "file-hash-drift: Target file hash sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6 does not match proposal fileBeforeHash sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22."
+    ],
+    "receipt_before": null,
+    "receipt_after": null,
+    "marker": "// atm-edit barrier-follower by agent-follower"
+   },
+   "leader_exit": 0,
+   "follower_exit": 0,
+   "stderr": {
+    "leader": "",
+    "follower": ""
+   },
+   "window_hit": true,
+   "final_hash": "sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+   "final_bytes": 230,
+   "leftover_files": [],
+   "leader_marker_present": true,
+   "follower_marker_present": false,
+   "final_equals_leader_only": true,
+   "final_equals_both_full_bytes": false,
+   "lost_effects": [],
+   "follower_class": "blocked_other"
+  },
+  {
+   "rep": 12,
+   "leader": {
+    "role": "leader",
+    "pid": 1101842,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 83,
+     "apply_return": 175
+    },
+    "commit_guard_lock_acquires": 1,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "lock_owner_writes": 1,
+    "ok": true,
+    "verdict": "applied",
+    "blockedReasons": [],
+    "receipt_before": "8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "receipt_after": "3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+    "marker": "// atm-edit barrier-leader by agent-leader"
+   },
+   "follower": {
+    "role": "follower",
+    "pid": 1101843,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 80,
+     "follower_release": 174,
+     "apply_return": 277
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "paused": true,
+    "leader_done_seen": true,
+    "disk_hash_at_resume": "sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+    "ok": false,
+    "verdict": "blocked",
+    "blockedReasons": [
+     "file-hash-drift: Target file hash sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6 does not match proposal fileBeforeHash sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22."
+    ],
+    "receipt_before": null,
+    "receipt_after": null,
+    "marker": "// atm-edit barrier-follower by agent-follower"
+   },
+   "leader_exit": 0,
+   "follower_exit": 0,
+   "stderr": {
+    "leader": "",
+    "follower": ""
+   },
+   "window_hit": true,
+   "final_hash": "sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+   "final_bytes": 230,
+   "leftover_files": [],
+   "leader_marker_present": true,
+   "follower_marker_present": false,
+   "final_equals_leader_only": true,
+   "final_equals_both_full_bytes": false,
+   "lost_effects": [],
+   "follower_class": "blocked_other"
+  },
+  {
+   "rep": 13,
+   "leader": {
+    "role": "leader",
+    "pid": 1101875,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 80,
+     "apply_return": 174
+    },
+    "commit_guard_lock_acquires": 1,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "lock_owner_writes": 1,
+    "ok": true,
+    "verdict": "applied",
+    "blockedReasons": [],
+    "receipt_before": "8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "receipt_after": "3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+    "marker": "// atm-edit barrier-leader by agent-leader"
+   },
+   "follower": {
+    "role": "follower",
+    "pid": 1101878,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 78,
+     "follower_release": 173,
+     "apply_return": 263
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "paused": true,
+    "leader_done_seen": true,
+    "disk_hash_at_resume": "sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+    "ok": false,
+    "verdict": "blocked",
+    "blockedReasons": [
+     "file-hash-drift: Target file hash sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6 does not match proposal fileBeforeHash sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22."
+    ],
+    "receipt_before": null,
+    "receipt_after": null,
+    "marker": "// atm-edit barrier-follower by agent-follower"
+   },
+   "leader_exit": 0,
+   "follower_exit": 0,
+   "stderr": {
+    "leader": "",
+    "follower": ""
+   },
+   "window_hit": true,
+   "final_hash": "sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+   "final_bytes": 230,
+   "leftover_files": [],
+   "leader_marker_present": true,
+   "follower_marker_present": false,
+   "final_equals_leader_only": true,
+   "final_equals_both_full_bytes": false,
+   "lost_effects": [],
+   "follower_class": "blocked_other"
+  },
+  {
+   "rep": 14,
+   "leader": {
+    "role": "leader",
+    "pid": 1101910,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 83,
+     "apply_return": 176
+    },
+    "commit_guard_lock_acquires": 1,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "lock_owner_writes": 1,
+    "ok": true,
+    "verdict": "applied",
+    "blockedReasons": [],
+    "receipt_before": "8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "receipt_after": "3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+    "marker": "// atm-edit barrier-leader by agent-leader"
+   },
+   "follower": {
+    "role": "follower",
+    "pid": 1101911,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 87,
+     "follower_release": 180,
+     "apply_return": 267
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "paused": true,
+    "leader_done_seen": true,
+    "disk_hash_at_resume": "sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+    "ok": false,
+    "verdict": "blocked",
+    "blockedReasons": [
+     "file-hash-drift: Target file hash sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6 does not match proposal fileBeforeHash sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22."
+    ],
+    "receipt_before": null,
+    "receipt_after": null,
+    "marker": "// atm-edit barrier-follower by agent-follower"
+   },
+   "leader_exit": 0,
+   "follower_exit": 0,
+   "stderr": {
+    "leader": "",
+    "follower": ""
+   },
+   "window_hit": true,
+   "final_hash": "sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+   "final_bytes": 230,
+   "leftover_files": [],
+   "leader_marker_present": true,
+   "follower_marker_present": false,
+   "final_equals_leader_only": true,
+   "final_equals_both_full_bytes": false,
+   "lost_effects": [],
+   "follower_class": "blocked_other"
+  },
+  {
+   "rep": 15,
+   "leader": {
+    "role": "leader",
+    "pid": 1101940,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 83,
+     "apply_return": 176
+    },
+    "commit_guard_lock_acquires": 1,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "lock_owner_writes": 1,
+    "ok": true,
+    "verdict": "applied",
+    "blockedReasons": [],
+    "receipt_before": "8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "receipt_after": "3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+    "marker": "// atm-edit barrier-leader by agent-leader"
+   },
+   "follower": {
+    "role": "follower",
+    "pid": 1101941,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 81,
+     "follower_release": 176,
+     "apply_return": 273
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "paused": true,
+    "leader_done_seen": true,
+    "disk_hash_at_resume": "sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+    "ok": false,
+    "verdict": "blocked",
+    "blockedReasons": [
+     "file-hash-drift: Target file hash sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6 does not match proposal fileBeforeHash sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22."
+    ],
+    "receipt_before": null,
+    "receipt_after": null,
+    "marker": "// atm-edit barrier-follower by agent-follower"
+   },
+   "leader_exit": 0,
+   "follower_exit": 0,
+   "stderr": {
+    "leader": "",
+    "follower": ""
+   },
+   "window_hit": true,
+   "final_hash": "sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+   "final_bytes": 230,
+   "leftover_files": [],
+   "leader_marker_present": true,
+   "follower_marker_present": false,
+   "final_equals_leader_only": true,
+   "final_equals_both_full_bytes": false,
+   "lost_effects": [],
+   "follower_class": "blocked_other"
+  },
+  {
+   "rep": 16,
+   "leader": {
+    "role": "leader",
+    "pid": 1101969,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 82,
+     "apply_return": 196
+    },
+    "commit_guard_lock_acquires": 1,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "lock_owner_writes": 1,
+    "ok": true,
+    "verdict": "applied",
+    "blockedReasons": [],
+    "receipt_before": "8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "receipt_after": "3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+    "marker": "// atm-edit barrier-leader by agent-leader"
+   },
+   "follower": {
+    "role": "follower",
+    "pid": 1101970,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 76,
+     "follower_release": 193,
+     "apply_return": 282
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "paused": true,
+    "leader_done_seen": true,
+    "disk_hash_at_resume": "sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+    "ok": false,
+    "verdict": "blocked",
+    "blockedReasons": [
+     "file-hash-drift: Target file hash sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6 does not match proposal fileBeforeHash sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22."
+    ],
+    "receipt_before": null,
+    "receipt_after": null,
+    "marker": "// atm-edit barrier-follower by agent-follower"
+   },
+   "leader_exit": 0,
+   "follower_exit": 0,
+   "stderr": {
+    "leader": "",
+    "follower": ""
+   },
+   "window_hit": true,
+   "final_hash": "sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+   "final_bytes": 230,
+   "leftover_files": [],
+   "leader_marker_present": true,
+   "follower_marker_present": false,
+   "final_equals_leader_only": true,
+   "final_equals_both_full_bytes": false,
+   "lost_effects": [],
+   "follower_class": "blocked_other"
+  },
+  {
+   "rep": 17,
+   "leader": {
+    "role": "leader",
+    "pid": 1101998,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 91,
+     "apply_return": 205
+    },
+    "commit_guard_lock_acquires": 1,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "lock_owner_writes": 1,
+    "ok": true,
+    "verdict": "applied",
+    "blockedReasons": [],
+    "receipt_before": "8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "receipt_after": "3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+    "marker": "// atm-edit barrier-leader by agent-leader"
+   },
+   "follower": {
+    "role": "follower",
+    "pid": 1101999,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 97,
+     "follower_release": 212,
+     "apply_return": 298
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "paused": true,
+    "leader_done_seen": true,
+    "disk_hash_at_resume": "sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+    "ok": false,
+    "verdict": "blocked",
+    "blockedReasons": [
+     "file-hash-drift: Target file hash sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6 does not match proposal fileBeforeHash sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22."
+    ],
+    "receipt_before": null,
+    "receipt_after": null,
+    "marker": "// atm-edit barrier-follower by agent-follower"
+   },
+   "leader_exit": 0,
+   "follower_exit": 0,
+   "stderr": {
+    "leader": "",
+    "follower": ""
+   },
+   "window_hit": true,
+   "final_hash": "sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+   "final_bytes": 230,
+   "leftover_files": [],
+   "leader_marker_present": true,
+   "follower_marker_present": false,
+   "final_equals_leader_only": true,
+   "final_equals_both_full_bytes": false,
+   "lost_effects": [],
+   "follower_class": "blocked_other"
+  },
+  {
+   "rep": 18,
+   "leader": {
+    "role": "leader",
+    "pid": 1102027,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 79,
+     "apply_return": 191
+    },
+    "commit_guard_lock_acquires": 1,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "lock_owner_writes": 1,
+    "ok": true,
+    "verdict": "applied",
+    "blockedReasons": [],
+    "receipt_before": "8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "receipt_after": "3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+    "marker": "// atm-edit barrier-leader by agent-leader"
+   },
+   "follower": {
+    "role": "follower",
+    "pid": 1102028,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 79,
+     "follower_release": 193,
+     "apply_return": 282
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "paused": true,
+    "leader_done_seen": true,
+    "disk_hash_at_resume": "sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+    "ok": false,
+    "verdict": "blocked",
+    "blockedReasons": [
+     "file-hash-drift: Target file hash sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6 does not match proposal fileBeforeHash sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22."
+    ],
+    "receipt_before": null,
+    "receipt_after": null,
+    "marker": "// atm-edit barrier-follower by agent-follower"
+   },
+   "leader_exit": 0,
+   "follower_exit": 0,
+   "stderr": {
+    "leader": "",
+    "follower": ""
+   },
+   "window_hit": true,
+   "final_hash": "sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+   "final_bytes": 230,
+   "leftover_files": [],
+   "leader_marker_present": true,
+   "follower_marker_present": false,
+   "final_equals_leader_only": true,
+   "final_equals_both_full_bytes": false,
+   "lost_effects": [],
+   "follower_class": "blocked_other"
+  },
+  {
+   "rep": 19,
+   "leader": {
+    "role": "leader",
+    "pid": 1102062,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 81,
+     "apply_return": 186
+    },
+    "commit_guard_lock_acquires": 1,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "lock_owner_writes": 1,
+    "ok": true,
+    "verdict": "applied",
+    "blockedReasons": [],
+    "receipt_before": "8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "receipt_after": "3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+    "marker": "// atm-edit barrier-leader by agent-leader"
+   },
+   "follower": {
+    "role": "follower",
+    "pid": 1102063,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 81,
+     "follower_release": 188,
+     "apply_return": 276
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "paused": true,
+    "leader_done_seen": true,
+    "disk_hash_at_resume": "sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+    "ok": false,
+    "verdict": "blocked",
+    "blockedReasons": [
+     "file-hash-drift: Target file hash sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6 does not match proposal fileBeforeHash sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22."
+    ],
+    "receipt_before": null,
+    "receipt_after": null,
+    "marker": "// atm-edit barrier-follower by agent-follower"
+   },
+   "leader_exit": 0,
+   "follower_exit": 0,
+   "stderr": {
+    "leader": "",
+    "follower": ""
+   },
+   "window_hit": true,
+   "final_hash": "sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+   "final_bytes": 230,
+   "leftover_files": [],
+   "leader_marker_present": true,
+   "follower_marker_present": false,
+   "final_equals_leader_only": true,
+   "final_equals_both_full_bytes": false,
+   "lost_effects": [],
+   "follower_class": "blocked_other"
+  },
+  {
+   "rep": 20,
+   "leader": {
+    "role": "leader",
+    "pid": 1102091,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 80,
+     "apply_return": 173
+    },
+    "commit_guard_lock_acquires": 1,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "lock_owner_writes": 1,
+    "ok": true,
+    "verdict": "applied",
+    "blockedReasons": [],
+    "receipt_before": "8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "receipt_after": "3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+    "marker": "// atm-edit barrier-leader by agent-leader"
+   },
+   "follower": {
+    "role": "follower",
+    "pid": 1102092,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 78,
+     "follower_release": 174,
+     "apply_return": 260
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "paused": true,
+    "leader_done_seen": true,
+    "disk_hash_at_resume": "sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+    "ok": false,
+    "verdict": "blocked",
+    "blockedReasons": [
+     "file-hash-drift: Target file hash sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6 does not match proposal fileBeforeHash sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22."
+    ],
+    "receipt_before": null,
+    "receipt_after": null,
+    "marker": "// atm-edit barrier-follower by agent-follower"
+   },
+   "leader_exit": 0,
+   "follower_exit": 0,
+   "stderr": {
+    "leader": "",
+    "follower": ""
+   },
+   "window_hit": true,
+   "final_hash": "sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6",
+   "final_bytes": 230,
+   "leftover_files": [],
+   "leader_marker_present": true,
+   "follower_marker_present": false,
+   "final_equals_leader_only": true,
+   "final_equals_both_full_bytes": false,
+   "lost_effects": [],
+   "follower_class": "blocked_other"
+  }
+ ]
+}
