@@ -24,7 +24,7 @@ if (files.length === 0) {
 // gate whose "found a problem" and "never ran" outcomes are indistinguishable is
 // not a gate, so the invocation is batched against the same platform argv budget
 // the Git pathspec callers already share, and a spawn that never ran is named.
-const GUARD_FIXED_ARGS = ['atm.mjs', 'guard', 'encoding', '--files', '--json'];
+const GUARD_FIXED_ARGS = ['atm.mjs', 'guard', 'encoding', '--cwd', cwd, '--files', '--json'];
 
 process.exit(runGuardInBatches(files));
 
@@ -37,7 +37,7 @@ function runGuardInBatches(guardFiles: string[]): number {
   for (const batch of batches) {
     const result = spawnSync(
       process.execPath,
-      ['atm.mjs', 'guard', 'encoding', '--files', batch.join(','), '--json'],
+      ['atm.mjs', 'guard', 'encoding', '--cwd', cwd, '--files', batch.join(','), '--json'],
       { cwd, encoding: 'utf8', stdio: ['ignore', 'inherit', 'inherit'] }
     );
     if (typeof result.status !== 'number') {
