@@ -1,0 +1,362 @@
+{
+ "F2-crafted-owner | pidreuse-live-pid-wrong-starttoken | b35a6141-qon": {
+  "n": 3,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "B:applied": 3
+  }
+ },
+ "F2-crafted-owner | live-pid-correct-starttoken | b35a6141-qon": {
+  "n": 3,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "B:applied": 3
+  }
+ },
+ "F2-crafted-owner | dead-pid | b35a6141-qon": {
+  "n": 3,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "B:applied": 3
+  }
+ },
+ "F2-crafted-owner | legacy-v1-live-pid | b35a6141-qon": {
+  "n": 3,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "B:applied": 3
+  }
+ },
+ "F3-live-holder-timeout | hold3500ms | b35a6141-qon": {
+  "n": 3,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:applied": 3
+  }
+ },
+ "F4-tmpdir | same-tmpdir/B-same-region | b35a6141-qon": {
+  "n": 3,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:blocked(steward-final-patch-required)": 3
+  }
+ },
+ "F4-tmpdir | same-tmpdir/B-other-region | b35a6141-qon": {
+  "n": 3,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:applied": 3
+  }
+ },
+ "F4-tmpdir | different-tmpdir/B-same-region | b35a6141-qon": {
+  "n": 3,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:blocked(steward-final-patch-required)": 3
+  }
+ },
+ "F4-tmpdir | different-tmpdir/B-other-region | b35a6141-qon": {
+  "n": 3,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:applied": 3
+  }
+ },
+ "F2b-forged-owner-live-holder | forged-owner-dead-pid | b35a6141-qon": {
+  "n": 3,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:applied": 3
+  }
+ },
+ "F2b-forged-owner-live-holder | forged-owner-wrong-starttoken | b35a6141-qon": {
+  "n": 3,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:applied": 3
+  }
+ },
+ "F7-queue-wait-fallback | queue-wait300ms/A-hold3000ms | b35a6141-qon": {
+  "n": 3,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:blocked(recovery-required)": 3
+  }
+ },
+ "F7-queue-wait-fallback | queue-wait300ms/A-hold1200ms | b35a6141-qon": {
+  "n": 3,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:applied": 3
+  }
+ },
+ "F5-retry-exhaustion | default-policy/K=always | b35a6141-qon": {
+  "n": 3,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:blocked(re-compose attempts exhausted after 5 of 5)": 3
+  }
+ },
+ "F5-retry-exhaustion | default-policy/K=2 | b35a6141-qon": {
+  "n": 3,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied": 3
+  }
+ },
+ "F5-retry-exhaustion | default-policy/K=4 | b35a6141-qon": {
+  "n": 3,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied": 3
+  }
+ },
+ "F5-retry-exhaustion | maxRecompose=0/K=always | b35a6141-qon": {
+  "n": 3,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:blocked(re-compose attempts exhausted after 1 of 1)": 3
+  }
+ },
+ "F5-retry-exhaustion | maxRecompose=1,backoff0/K=1 | b35a6141-qon": {
+  "n": 3,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied": 3
+  }
+ },
+ "F5-retry-exhaustion | env:ATM_STEWARD_RECOMPOSE_POLICY maxRecompose=0/K=always | b35a6141-qon": {
+  "n": 3,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:blocked(re-compose attempts exhausted after 1 of 1)": 3
+  }
+ },
+ "F2-crafted-owner | pidreuse-live-pid-wrong-starttoken | b35a6141-qoff": {
+  "n": 3,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "B:applied": 3
+  }
+ },
+ "F2-crafted-owner | live-pid-correct-starttoken | b35a6141-qoff": {
+  "n": 3,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "B:applied": 3
+  }
+ },
+ "F2-crafted-owner | dead-pid | b35a6141-qoff": {
+  "n": 3,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "B:applied": 3
+  }
+ },
+ "F2-crafted-owner | legacy-v1-live-pid | b35a6141-qoff": {
+  "n": 3,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "B:applied": 3
+  }
+ },
+ "F3-live-holder-timeout | hold3500ms | b35a6141-qoff": {
+  "n": 3,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:blocked(recovery-required)": 3
+  }
+ },
+ "F4-tmpdir | same-tmpdir/B-same-region | b35a6141-qoff": {
+  "n": 3,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:blocked(steward-final-patch-required)": 3
+  }
+ },
+ "F4-tmpdir | same-tmpdir/B-other-region | b35a6141-qoff": {
+  "n": 3,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:applied": 3
+  }
+ },
+ "F4-tmpdir | different-tmpdir/B-same-region | b35a6141-qoff": {
+  "n": 3,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:blocked(steward-final-patch-required)": 3
+  }
+ },
+ "F4-tmpdir | different-tmpdir/B-other-region | b35a6141-qoff": {
+  "n": 3,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:applied": 3
+  }
+ },
+ "F2b-forged-owner-live-holder | forged-owner-dead-pid | b35a6141-qoff": {
+  "n": 3,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:blocked(recovery-required)": 3
+  }
+ },
+ "F2b-forged-owner-live-holder | forged-owner-wrong-starttoken | b35a6141-qoff": {
+  "n": 3,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:blocked(recovery-required)": 3
+  }
+ },
+ "F5-retry-exhaustion | default-policy/K=always | b35a6141-qoff": {
+  "n": 3,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:blocked(re-compose attempts exhausted after 5 of 5)": 3
+  }
+ },
+ "F5-retry-exhaustion | default-policy/K=2 | b35a6141-qoff": {
+  "n": 3,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied": 3
+  }
+ },
+ "F5-retry-exhaustion | default-policy/K=4 | b35a6141-qoff": {
+  "n": 3,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied": 3
+  }
+ },
+ "F5-retry-exhaustion | maxRecompose=0/K=always | b35a6141-qoff": {
+  "n": 3,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:blocked(re-compose attempts exhausted after 1 of 1)": 3
+  }
+ },
+ "F5-retry-exhaustion | maxRecompose=1,backoff0/K=1 | b35a6141-qoff": {
+  "n": 3,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied": 3
+  }
+ },
+ "F5-retry-exhaustion | env:ATM_STEWARD_RECOMPOSE_POLICY maxRecompose=0/K=always | b35a6141-qoff": {
+  "n": 3,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:blocked(re-compose attempts exhausted after 1 of 1)": 3
+  }
+ }
+}
