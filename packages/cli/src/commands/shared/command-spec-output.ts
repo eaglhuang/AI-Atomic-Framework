@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { normalizeCommandHelpMetadata } from '../help.ts';
 import { projectFields, projectSummary } from '../output-projection.ts';
+import { carryLaneSessionIntoPrintedCommands } from './lane-session-flag.ts';
 import { CliError, type CommandMessage, type CommandResult, type EnrichedCommandResult, enrichCommandResult, getOutputProjectionState, makeResult, message, setFieldsProjection, setOutputJsonPath, setSummaryProjection } from './result-core.ts';
 
 export interface CommandOption {
@@ -300,9 +301,10 @@ export function writeResult(
   outputFormat = 'json',
   projectionOptions?: { summary?: boolean; fields?: string[] | null }
 ) {
-  const enriched = 'severity' in result && 'exitCode' in result && 'blocking' in result && 'diagnostics' in result
-    ? result as EnrichedCommandResult
-    : enrichCommandResult(result);
+  const withLane = carryLaneSessionIntoPrintedCommands(result);
+  const enriched = 'severity' in withLane && 'exitCode' in withLane && 'blocking' in withLane && 'diagnostics' in withLane
+    ? withLane as EnrichedCommandResult
+    : enrichCommandResult(withLane);
   let projectedResult = enriched;
   const projectionState = getOutputProjectionState();
   const summary = projectionOptions?.summary ?? projectionState.summary;

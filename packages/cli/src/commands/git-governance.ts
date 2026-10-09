@@ -84,7 +84,17 @@ export async function runAtmGit(argv: string[]) {
       ok: false,
       command: 'git',
       cwd,
-      messages: [message('error', gate.decision.code, gate.decision.reason, { taskId, action, files })],
+      messages: [message('error', gate.decision.code, gate.decision.reason, {
+        taskId,
+        action,
+        files,
+        // An expired claim is renewed through ATM; name the command instead of
+        // leaving "requires a governed claim renewal" for the agent to decode.
+        ...(gate.decision.code === 'ATM_WRITE_TICKET_STALE' ? {
+          requiredCommand: `node atm.mjs tasks renew --task ${taskId} --actor ${actorId || '<id>'} --json`,
+          then: `rerun this git ${action}`
+        } : {})
+      })],
       evidence: { action, taskId, workAdmission: { decision: gate.decision, receipt: null } }
     });
   }
