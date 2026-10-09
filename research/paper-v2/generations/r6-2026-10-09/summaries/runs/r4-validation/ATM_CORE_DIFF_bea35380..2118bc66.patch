@@ -1,0 +1,615 @@
+diff -ruN atm-main-bea35380/AI-Atomic-Framework-bea35380d7f381f998c9930fa95f01b999c7f208/packages/core/src/broker/steward-base-composer.ts atm-main-2118bc66/AI-Atomic-Framework-2118bc66efb3ac3bc0ddaede6a2f7cb18526b030/packages/core/src/broker/steward-base-composer.ts
+--- atm-main-bea35380/AI-Atomic-Framework-bea35380d7f381f998c9930fa95f01b999c7f208/packages/core/src/broker/steward-base-composer.ts	2026-10-08 10:38:16.000000000 +0800
++++ atm-main-2118bc66/AI-Atomic-Framework-2118bc66efb3ac3bc0ddaede6a2f7cb18526b030/packages/core/src/broker/steward-base-composer.ts	2026-10-08 14:27:11.000000000 +0800
+@@ -8,6 +8,7 @@
+ // a conflict is a fail-closed verdict for a steward-authored final patch, not a
+ // guess at a merged result.
+ import type { PatchProposal } from './types.ts';
++import { rebaseProposalsByRegionIdentity } from './steward-region-rebase.ts';
+ import { parseUnifiedPatchHunks } from './unified-patch.ts';
+ 
+ export type StewardCompositionBlockCode = 'compose-context-mismatch' | 'steward-final-patch-required' | 'compose-permutation-unstable';
+@@ -36,6 +37,12 @@
+ const MAX_EXHAUSTIVE_PERMUTATION_PROPOSALS = 4;
+ 
+ export function composeTextPatchesAgainstBase(filePath: string, before: string, proposals: readonly PatchProposal[]): BaseCompositionResult {
++  const declared = composeTextPatchesAtDeclaredLines(filePath, before, proposals);
++  if (declared.ok || declared.block.code !== 'compose-context-mismatch') return declared;
++  return rebaseProposalsByRegionIdentity(filePath, before, proposals) ?? declared;
++}
++
++function composeTextPatchesAtDeclaredLines(filePath: string, before: string, proposals: readonly PatchProposal[]): BaseCompositionResult {
+   const lineEnding = /\r\n/.test(before) ? '\r\n' : '\n';
+   const endsWithNewline = before.endsWith('\n');
+   const baseLines = before.split(/\r?\n/);
+diff -ruN atm-main-bea35380/AI-Atomic-Framework-bea35380d7f381f998c9930fa95f01b999c7f208/packages/core/src/broker/steward-commit-guard.ts atm-main-2118bc66/AI-Atomic-Framework-2118bc66efb3ac3bc0ddaede6a2f7cb18526b030/packages/core/src/broker/steward-commit-guard.ts
+--- atm-main-bea35380/AI-Atomic-Framework-bea35380d7f381f998c9930fa95f01b999c7f208/packages/core/src/broker/steward-commit-guard.ts	2026-10-08 10:38:16.000000000 +0800
++++ atm-main-2118bc66/AI-Atomic-Framework-2118bc66efb3ac3bc0ddaede6a2f7cb18526b030/packages/core/src/broker/steward-commit-guard.ts	2026-10-08 14:27:11.000000000 +0800
+@@ -3,7 +3,7 @@
+  * 合成與驗證留在鎖外；鎖只包住 base hash 比對與同目錄原子改名。
+  * base 不符就回 re-compose，不寫入。暫存檔寫到一半不會改到正式檔。
+  */
+-import { createHash, randomBytes } from 'node:crypto';
++import { createHash, randomBytes, randomInt } from 'node:crypto';
+ import {
+   closeSync,
+   mkdirSync,
+@@ -16,7 +16,6 @@
+   writeFileSync,
+   writeSync
+ } from 'node:fs';
+-import os from 'node:os';
+ import path from 'node:path';
+ import { hashContent } from './adapters/cas.ts';
+ 
+@@ -29,9 +28,24 @@
+   schemaId: 'atm.stewardCanonicalCommitPolicy.v1',
+   lockWaitMs: 2_000,
+   lockPollMs: 5,
+-  maxRecomposeAttempts: 1
++  /** Extra compose attempts after the first. Each attempt ends applied, blocked, rolled-back, re-compose, or recovery-required. */
++  maxRecomposeAttempts: 4,
++  recomposeBackoffMs: 4,
++  recomposeJitterMs: 3
+ } as const;
+ 
++/** attempt 從 1 起算。backoff 隨次數增加，jitter 含 0。 */
++export function stewardRecomposeDelayMs(attempt: number, backoffMs: number, jitterMs: number): number {
++  if (attempt <= 0 || backoffMs < 0 || jitterMs < 0) return 0;
++  const jitter = jitterMs === 0 ? 0 : randomInt(0, jitterMs + 1);
++  return backoffMs * attempt + jitter;
++}
++
++export function waitStewardRecomposeBackoff(attempt: number, backoffMs: number, jitterMs: number): void {
++  const delay = stewardRecomposeDelayMs(attempt, backoffMs, jitterMs);
++  if (delay > 0) Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, delay);
++}
++
+ export type StewardCommitFault =
+   | { readonly kind: 'before-rename' }
+   | { readonly kind: 'partial-temp'; readonly byteCount: number };
+@@ -59,8 +73,12 @@
+   readonly files: readonly CanonicalCommitFileReceipt[];
+ }
+ 
+-export function defaultStewardCommitLockRoot(): string {
+-  return path.join(os.tmpdir(), 'atm-steward-commit-locks');
++/**
++ * 鎖放在儲存庫的 ATM 狀態目錄，讓不同 TMPDIR 或容器共用同一份工作樹。
++ * 未給 cwd 時用 process.cwd()。
++ */
++export function defaultStewardCommitLockRoot(cwd: string = process.cwd()): string {
++  return path.join(path.resolve(cwd), '.atm', 'runtime', 'steward-commit-locks');
+ }
+ 
+ export function canonicalCommitLockPath(lockRoot: string, targetPath: string): string {
+@@ -76,13 +94,16 @@
+  */
+ export function commitCanonicalFiles(input: {
+   readonly entries: readonly CanonicalCommitEntry[];
++  readonly cwd?: string;
+   readonly lockRoot?: string;
+   readonly lockWaitMs?: number;
+   readonly lockPollMs?: number;
+   readonly failAfterWrites?: number;
+   readonly commitFault?: StewardCommitFault;
++  /** 測試用。鎖已取得、改名之前呼叫。被殺掉時鎖目錄會留給下一個持有者回收。 */
++  readonly whileLocked?: () => void;
+ }): CanonicalCommitResult {
+-  const lockRoot = input.lockRoot ?? defaultStewardCommitLockRoot();
++  const lockRoot = input.lockRoot ?? defaultStewardCommitLockRoot(input.cwd);
+   const lockWaitMs = input.lockWaitMs ?? stewardCanonicalCommitPolicy.lockWaitMs;
+   const lockPollMs = input.lockPollMs ?? stewardCanonicalCommitPolicy.lockPollMs;
+   const entries = [...input.entries].sort((left, right) => left.filePath.localeCompare(right.filePath));
+@@ -110,6 +131,7 @@
+       }
+       backups.set(entry.filePath, before);
+     }
++    input.whileLocked?.();
+     let writeCount = 0;
+     for (const entry of entries) {
+       failedFile = entry.filePath;
+@@ -190,18 +212,29 @@
+   }
+ }
+ 
++interface LockOwner {
++  readonly pid: number | null;
++  readonly startToken: string | null;
++  readonly nonce: string | null;
++}
++
++const heldNonces = new Map<string, string>();
++
+ function acquireLock(lockDir: string, waitMs: number, pollMs: number, filePath: string): void {
+   mkdirSync(path.dirname(lockDir), { recursive: true });
+   const deadline = Date.now() + waitMs;
+   while (true) {
+     try {
+       mkdirSync(lockDir);
++      const nonce = randomBytes(8).toString('hex');
++      const startToken = readProcessStartToken(process.pid) ?? '';
+       try {
+-        writeFileSync(path.join(lockDir, 'owner'), `${process.pid}\n`, { encoding: 'utf8', flag: 'wx' });
++        writeFileSync(path.join(lockDir, 'owner'), `v2\n${process.pid}\n${startToken}\n${nonce}\n`, { encoding: 'utf8', flag: 'wx' });
+       } catch (error) {
+         rmSync(lockDir, { recursive: true, force: true });
+         throw error;
+       }
++      heldNonces.set(lockDir, nonce);
+       return;
+     } catch (error) {
+       if (!isErrno(error, 'EEXIST')) throw error;
+@@ -210,7 +243,7 @@
+         continue;
+       }
+       if (Date.now() >= deadline) {
+-        throw new StewardLockTimeoutError(filePath, readHolderPid(lockDir), waitMs);
++        throw new StewardLockTimeoutError(filePath, readOwner(lockDir).pid, waitMs);
+       }
+       sleepMs(pollMs);
+     }
+@@ -218,32 +251,60 @@
+ }
+ 
+ function releaseLock(lockDir: string): void {
+-  if (readHolderPid(lockDir) !== process.pid) return;
++  const nonce = heldNonces.get(lockDir);
++  const owner = readOwner(lockDir);
++  if (!nonce || owner.nonce !== nonce || owner.pid !== process.pid) return;
++  heldNonces.delete(lockDir);
+   rmSync(lockDir, { recursive: true, force: true });
+ }
+ 
+ function holderIsDead(lockDir: string, staleIncompleteMs: number): boolean {
+-  const pid = readHolderPid(lockDir);
+-  if (pid === null) {
++  const owner = readOwner(lockDir);
++  if (owner.pid === null) {
+     try {
+       return Date.now() - statSync(lockDir).mtimeMs > staleIncompleteMs;
+     } catch {
+       return true;
+     }
+   }
+-  if (pid === process.pid) return false;
++  if (!pidIsAlive(owner.pid)) return true;
++  if (!owner.startToken) return false;
++  const current = readProcessStartToken(owner.pid);
++  return Boolean(current) && current !== owner.startToken;
++}
++
++function pidIsAlive(pid: number): boolean {
+   try {
+     process.kill(pid, 0);
+-    return false;
++    return true;
+   } catch (error) {
+-    return isErrno(error, 'ESRCH');
++    return !isErrno(error, 'ESRCH');
+   }
+ }
+ 
+-function readHolderPid(lockDir: string): number | null {
++function readOwner(lockDir: string): LockOwner {
++  try {
++    const lines = readFileSync(path.join(lockDir, 'owner'), 'utf8').split('\n');
++    if (lines[0] === 'v2') {
++      return { pid: parsePid(lines[1] ?? ''), startToken: lines[2] || null, nonce: lines[3] || null };
++    }
++    return { pid: parsePid(lines[0] ?? ''), startToken: null, nonce: null };
++  } catch {
++    return { pid: null, startToken: null, nonce: null };
++  }
++}
++
++function parsePid(value: string): number | null {
++  const pid = Number(value.trim());
++  return Number.isInteger(pid) && pid > 0 ? pid : null;
++}
++
++function readProcessStartToken(pid: number): string | null {
+   try {
+-    const pid = Number(readFileSync(path.join(lockDir, 'owner'), 'utf8').trim());
+-    return Number.isInteger(pid) && pid > 0 ? pid : null;
++    const stat = readFileSync(`/proc/${pid}/stat`, 'utf8');
++    const close = stat.lastIndexOf(')');
++    if (close < 0) return null;
++    return stat.slice(close + 1).trim().split(/\s+/)[19] ?? null;
+   } catch {
+     return null;
+   }
+diff -ruN atm-main-bea35380/AI-Atomic-Framework-bea35380d7f381f998c9930fa95f01b999c7f208/packages/core/src/broker/steward-input-validation.ts atm-main-2118bc66/AI-Atomic-Framework-2118bc66efb3ac3bc0ddaede6a2f7cb18526b030/packages/core/src/broker/steward-input-validation.ts
+--- atm-main-bea35380/AI-Atomic-Framework-bea35380d7f381f998c9930fa95f01b999c7f208/packages/core/src/broker/steward-input-validation.ts	2026-10-08 10:38:16.000000000 +0800
++++ atm-main-2118bc66/AI-Atomic-Framework-2118bc66efb3ac3bc0ddaede6a2f7cb18526b030/packages/core/src/broker/steward-input-validation.ts	2026-10-08 14:27:11.000000000 +0800
+@@ -3,6 +3,7 @@
+ // proposer from acting as the neutral steward for its own proposal.
+ import path from 'node:path';
+ import { validateBrokerProposal } from './proposal.ts';
++import { proposalRegionIdentity } from './steward-region-rebase.ts';
+ import type { StewardValidationIssue } from './steward.ts';
+ import type { MergePlan, PatchProposal } from './types.ts';
+ 
+@@ -65,7 +66,11 @@
+         issues.push({ code: 'stale-base-commit', detail: issue.detail });
+       }
+       if (issue.kind === 'file-hash-mismatch') {
+-        issues.push({ code: 'file-hash-drift', detail: issue.detail });
++        const missingFile = issue.detail.includes('does not exist');
++        // 有穩定區域身分時，hash drift 交給區域重定，而不是在計畫階段直接結束。
++        if (missingFile || proposalRegionIdentity(proposal) === null) {
++          issues.push({ code: 'file-hash-drift', detail: issue.detail });
++        }
+       }
+       if (issue.kind === 'out-of-scope-target-file') {
+         issues.push({ code: 'out-of-scope-target', detail: issue.detail });
+diff -ruN atm-main-bea35380/AI-Atomic-Framework-bea35380d7f381f998c9930fa95f01b999c7f208/packages/core/src/broker/steward-region-rebase.ts atm-main-2118bc66/AI-Atomic-Framework-2118bc66efb3ac3bc0ddaede6a2f7cb18526b030/packages/core/src/broker/steward-region-rebase.ts
+--- atm-main-bea35380/AI-Atomic-Framework-bea35380d7f381f998c9930fa95f01b999c7f208/packages/core/src/broker/steward-region-rebase.ts	1970-01-01 08:00:00.000000000 +0800
++++ atm-main-2118bc66/AI-Atomic-Framework-2118bc66efb3ac3bc0ddaede6a2f7cb18526b030/packages/core/src/broker/steward-region-rebase.ts	2026-10-08 14:27:11.000000000 +0800
+@@ -0,0 +1,194 @@
++/**
++ * 依穩定區域身分把提案重定到目前檔案。
++ * 行號只在原 base 仍吻合時使用。區域內容已被改過就擋下，不覆寫。
++ */
++import type { PatchProposal } from './types.ts';
++import { parseUnifiedPatchHunks } from './unified-patch.ts';
++import type { BaseCompositionResult, StewardCompositionBlock } from './steward-base-composer.ts';
++
++const REGION_HINT = /^L\d+:([A-Za-z0-9_.-]+)$/;
++const REGION_TAG = /<\/region:([A-Za-z0-9_.-]+)>/g;
++
++interface RegionSpan {
++  readonly regionId: string;
++  readonly openIndex: number;
++  readonly closeIndex: number;
++}
++
++interface PlannedSplice {
++  readonly proposalId: string;
++  readonly regionId: string;
++  readonly index: number;
++  readonly deleteCount: number;
++  readonly insert: readonly string[];
++}
++
++/** 錨點、符號或補丁裡唯一的 region 結尾標籤。沒有就不重定。 */
++export function proposalRegionIdentity(proposal: PatchProposal): string | null {
++  for (const anchor of proposal.anchors) {
++    const symbol = anchor.contentAnchor?.kind === 'symbol' ? anchor.contentAnchor.symbolName?.trim() : '';
++    if (symbol) return symbol;
++    const hinted = REGION_HINT.exec(anchor.hint.trim());
++    if (anchor.kind === 'line' && hinted?.[1]) return hinted[1];
++  }
++  const tags = [...proposal.patch.matchAll(REGION_TAG)].map((match) => match[1]!).filter(Boolean);
++  const unique = [...new Set(tags)];
++  return unique.length === 1 ? unique[0]! : null;
++}
++
++/**
++ * 把每個提案的舊列序列貼回它的區域。
++ * 找不到區域身分就回 null，呼叫端維持原來的行號合成結果。
++ * 同一區域被兩份提案或另一個已落地的編輯碰到時，回 blocked，不寫入。
++ */
++export function rebaseProposalsByRegionIdentity(
++  filePath: string,
++  before: string,
++  proposals: readonly PatchProposal[]
++): BaseCompositionResult | null {
++  const identities = proposals.map((proposal) => ({ proposal, regionId: proposalRegionIdentity(proposal) }));
++  if (identities.some((entry) => entry.regionId === null)) return null;
++
++  const seen = new Set<string>();
++  for (const entry of identities) {
++    const regionId = entry.regionId!;
++    if (seen.has(regionId)) {
++      const proposalIds = identities
++        .filter((candidate) => candidate.regionId === regionId)
++        .map((candidate) => candidate.proposal.proposalId)
++        .sort((left, right) => left.localeCompare(right));
++      return blocked(filePath, proposalIds, 'steward-final-patch-required', `proposals ${proposalIds.map((id) => `'${id}'`).join(' and ')} both edit region '${regionId}' of ${filePath}; overlapping region edits stay blocked`);
++    }
++    seen.add(regionId);
++  }
++
++  const lineEnding = /\r\n/.test(before) ? '\r\n' : '\n';
++  const endsWithNewline = before.endsWith('\n');
++  const lines = before.split(/\r?\n/);
++  if (endsWithNewline) lines.pop();
++
++  const splices: PlannedSplice[] = [];
++  for (const entry of identities) {
++    const regionId = entry.regionId!;
++    const region = findRegion(lines, regionId);
++    if (!region) {
++      return blocked(filePath, [entry.proposal.proposalId], 'compose-context-mismatch', `region '${regionId}' is not in the current ${filePath}; refusing to guess a new location`);
++    }
++    const planned = planProposalSplice(entry.proposal, region, lines);
++    if ('detail' in planned) {
++      return blocked(filePath, [entry.proposal.proposalId], planned.code, planned.detail);
++    }
++    splices.push(...planned);
++  }
++
++  const overlap = firstSpliceOverlap(splices);
++  if (overlap) {
++    const proposalIds = [overlap.left, overlap.right].sort((left, right) => left.localeCompare(right));
++    return blocked(filePath, proposalIds, 'steward-final-patch-required', `region rebases for '${proposalIds[0]}' and '${proposalIds[1]}' cover the same lines of ${filePath}`);
++  }
++
++  const next = [...lines];
++  for (const splice of [...splices].sort((left, right) => right.index - left.index)) {
++    next.splice(splice.index, splice.deleteCount, ...splice.insert);
++  }
++  const joined = next.join(lineEnding);
++  return {
++    ok: true,
++    content: endsWithNewline ? `${joined}${lineEnding}` : joined,
++    checkedPermutationCount: 1
++  };
++}
++
++function planProposalSplice(
++  proposal: PatchProposal,
++  region: RegionSpan,
++  lines: readonly string[]
++): PlannedSplice[] | { readonly code: StewardCompositionBlock['code']; readonly detail: string } {
++  const hunks = parseUnifiedPatchHunks(proposal.patch);
++  if (hunks.length === 0) {
++    return { code: 'compose-context-mismatch', detail: `proposal '${proposal.proposalId}' has no hunk to rebase onto region '${region.regionId}'` };
++  }
++  const planned: PlannedSplice[] = [];
++  for (const hunk of hunks) {
++    const oldLines = hunk.lines.filter((entry) => !entry.startsWith('+')).map((entry) => entry.slice(1));
++    const newLines = hunk.lines.filter((entry) => !entry.startsWith('-')).map((entry) => entry.slice(1));
++    if (oldLines.length === 0) {
++      return { code: 'compose-context-mismatch', detail: `proposal '${proposal.proposalId}' insert into region '${region.regionId}' has no anchor lines` };
++    }
++    const index = locateAnchor(lines, region, oldLines);
++    if (index === 'ambiguous') {
++      return { code: 'steward-final-patch-required', detail: `proposal '${proposal.proposalId}' anchor matches region '${region.regionId}' more than once in the current file` };
++    }
++    if (index === 'missing') {
++      return { code: 'steward-final-patch-required', detail: `proposal '${proposal.proposalId}' overlaps region '${region.regionId}', which changed after the proposal was anchored; refusing to overwrite` };
++    }
++    planned.push({
++      proposalId: proposal.proposalId,
++      regionId: region.regionId,
++      index,
++      deleteCount: oldLines.length,
++      insert: newLines
++    });
++  }
++  return planned;
++}
++
++function locateAnchor(lines: readonly string[], region: RegionSpan, needle: readonly string[]): number | 'ambiguous' | 'missing' {
++  const hits: number[] = [];
++  for (let index = 0; index <= lines.length - needle.length; index += 1) {
++    let matched = true;
++    for (let offset = 0; offset < needle.length; offset += 1) {
++      if (lines[index + offset] !== needle[offset]) {
++        matched = false;
++        break;
++      }
++    }
++    if (matched) hits.push(index);
++  }
++  const inside = hits.filter((index) => {
++    const end = index + needle.length - 1;
++    return end >= region.openIndex && index <= region.closeIndex;
++  });
++  if (inside.length === 1) return inside[0]!;
++  if (inside.length > 1) return 'ambiguous';
++  return 'missing';
++}
++
++function findRegion(lines: readonly string[], regionId: string): RegionSpan | null {
++  const openNeedle = `<region:${regionId}>`;
++  const closeNeedle = `</region:${regionId}>`;
++  let openIndex = -1;
++  for (let index = 0; index < lines.length; index += 1) {
++    const line = lines[index] ?? '';
++    if (openIndex < 0 && line.includes(openNeedle) && !line.includes(closeNeedle)) {
++      openIndex = index;
++      continue;
++    }
++    if (openIndex >= 0 && line.includes(closeNeedle)) {
++      return { regionId, openIndex, closeIndex: index };
++    }
++  }
++  return null;
++}
++
++function firstSpliceOverlap(splices: readonly PlannedSplice[]): { readonly left: string; readonly right: string } | null {
++  for (let left = 0; left < splices.length; left += 1) {
++    for (let right = left + 1; right < splices.length; right += 1) {
++      const a = splices[left]!;
++      const b = splices[right]!;
++      const aEnd = a.index + Math.max(a.deleteCount, 1) - 1;
++      const bEnd = b.index + Math.max(b.deleteCount, 1) - 1;
++      if (a.index <= bEnd && b.index <= aEnd) return { left: a.proposalId, right: b.proposalId };
++    }
++  }
++  return null;
++}
++
++function blocked(
++  filePath: string,
++  proposalIds: readonly string[],
++  code: StewardCompositionBlock['code'],
++  detail: string
++): BaseCompositionResult {
++  return { ok: false, block: { code, filePath, proposalIds, detail } };
++}
+diff -ruN atm-main-bea35380/AI-Atomic-Framework-bea35380d7f381f998c9930fa95f01b999c7f208/packages/core/src/broker/steward-transactional-apply.ts atm-main-2118bc66/AI-Atomic-Framework-2118bc66efb3ac3bc0ddaede6a2f7cb18526b030/packages/core/src/broker/steward-transactional-apply.ts
+--- atm-main-bea35380/AI-Atomic-Framework-bea35380d7f381f998c9930fa95f01b999c7f208/packages/core/src/broker/steward-transactional-apply.ts	2026-10-08 10:38:16.000000000 +0800
++++ atm-main-2118bc66/AI-Atomic-Framework-2118bc66efb3ac3bc0ddaede6a2f7cb18526b030/packages/core/src/broker/steward-transactional-apply.ts	2026-10-08 14:27:11.000000000 +0800
+@@ -276,14 +276,15 @@
+   readonly baseHead?: string | null;
+   readonly failAfterWrites?: number;
+   /**
+-   * Test observation seam. `afterPrecheck` runs after the unlocked stale check
+-   * and temp materialization, and before the canonical commit. It is not a CLI
+-   * option and must not be used to skip the commit guard.
++   * Test seam. `beforePrecheck` runs before the unlocked stale check.
++   * `afterPrecheck` runs after that check and temp materialization, before the
++   * commit lock. Neither seam skips the commit guard or is a CLI option.
+    */
+   readonly commitHooks?: {
++    readonly beforePrecheck?: () => void;
+     readonly afterPrecheck?: () => void;
+   };
+-  /** Directory for the cross-process commit locks. Defaults to the OS temp dir. */
++  /** Directory for the cross-process commit locks. Defaults to `<cwd>/.atm/runtime/steward-commit-locks`. */
+   readonly commitLockRoot?: string;
+   readonly commitLockWaitMs?: number;
+   readonly commitLockPollMs?: number;
+@@ -295,6 +296,7 @@
+   const scopeSet = new Set(input.scopeFiles.map(normalizePath));
+   const fileSlices = [...input.plan.fileSlices].sort((left, right) => left.filePath.localeCompare(right.filePath));
+   const blockedReasons: string[] = [];
++  const staleReasons: string[] = [];
+ 
+   if (input.writerRole !== 'neutral-steward') {
+     blockedReasons.push('canonical writes require the neutral-steward writer role');
+@@ -307,6 +309,8 @@
+     blockedReasons.push('semantic validation receipt does not authorize the exact composed candidate digest');
+   }
+ 
++  input.commitHooks?.beforePrecheck?.();
++
+   for (const slice of fileSlices) {
+     if (!scopeSet.has(normalizePath(slice.filePath))) {
+       blockedReasons.push(`declared output is outside steward scope: ${slice.filePath}`);
+@@ -329,8 +333,9 @@
+       continue;
+     }
+     const before = readFileSync(targetPath, 'utf8');
+-    if (hashContent(before) !== slice.baseHash) {
+-      blockedReasons.push(`canonical target base hash is stale: ${slice.filePath}`);
++    const observed = hashContent(before);
++    if (observed !== slice.baseHash) {
++      staleReasons.push(`re-compose: canonical target base hash is stale: ${slice.filePath} (expected ${slice.baseHash}, observed ${observed}). Re-read the file and compose again against the current bytes.`);
+     }
+   }
+ 
+@@ -346,6 +351,18 @@
+       })
+     };
+   }
++  if (staleReasons.length > 0) {
++    return {
++      ok: false,
++      receipt: buildReceipt(input, {
++        candidateDigest,
++        canonicalRoot: cwd,
++        files: [],
++        verdict: 're-compose',
++        blockedReasons: staleReasons
++      })
++    };
++  }
+ 
+   const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-steward-apply-'));
+   let materializeError: Error | null = null;
+@@ -394,7 +411,8 @@
+       content: outputByPath.get(normalizePath(slice.filePath))!.content,
+       outputHash: slice.outputHash
+     })),
+-    lockRoot: input.commitLockRoot ?? defaultStewardCommitLockRoot(),
++    cwd,
++    lockRoot: input.commitLockRoot ?? defaultStewardCommitLockRoot(cwd),
+     lockWaitMs: input.commitLockWaitMs,
+     lockPollMs: input.commitLockPollMs,
+     failAfterWrites: input.failAfterWrites,
+diff -ruN atm-main-bea35380/AI-Atomic-Framework-bea35380d7f381f998c9930fa95f01b999c7f208/packages/core/src/broker/steward.ts atm-main-2118bc66/AI-Atomic-Framework-2118bc66efb3ac3bc0ddaede6a2f7cb18526b030/packages/core/src/broker/steward.ts
+--- atm-main-bea35380/AI-Atomic-Framework-bea35380d7f381f998c9930fa95f01b999c7f208/packages/core/src/broker/steward.ts	2026-10-08 10:38:16.000000000 +0800
++++ atm-main-2118bc66/AI-Atomic-Framework-2118bc66efb3ac3bc0ddaede6a2f7cb18526b030/packages/core/src/broker/steward.ts	2026-10-08 14:27:11.000000000 +0800
+@@ -12,7 +12,7 @@
+   buildStewardSemanticValidationReceipt,
+   type TransactionalStewardApplyResult
+ } from './steward-transactional-apply.ts';
+-import { stewardCanonicalCommitPolicy } from './steward-commit-guard.ts';
++import { stewardCanonicalCommitPolicy, waitStewardRecomposeBackoff } from './steward-commit-guard.ts';
+ import type { VirtualAtomInUseRegistryDocument } from './registry.ts';
+ import type { TeamBrokerRuntimeActivationHandshakeEvidence } from './team-lane.ts';
+ import type {
+@@ -164,6 +164,12 @@
+   };
+   return { ok: plan.ok, plan };
+ }
++export interface StewardRecomposePolicy {
++  readonly maxRecomposeAttempts?: number;
++  readonly recomposeBackoffMs?: number;
++  readonly recomposeJitterMs?: number;
++}
++
+ export function applyStewardPlan(input: {
+   readonly cwd: string;
+   readonly stewardId: string;
+@@ -171,17 +177,29 @@
+   readonly proposals: readonly PatchProposal[];
+   readonly scopeFiles: readonly string[];
+   readonly evidenceOutPath?: string | null;
++  /** Defaults to `stewardCanonicalCommitPolicy`. Not a CLI flag. */
++  readonly recomposePolicy?: StewardRecomposePolicy;
++  /** Forwarded to the transactional apply. Not a CLI flag. */
++  readonly commitHooks?: {
++    readonly beforePrecheck?: () => void;
++    readonly afterPrecheck?: () => void;
++  };
+ }): StewardApplyResult {
+   const planResult = planStewardApply(input);
+   let transactional = planResult.ok
+     ? buildPatchProposalComposition({ cwd: input.cwd, mergePlan: input.mergePlan, proposals: input.proposals })
+     : null;
+   let apply: TransactionalStewardApplyResult | null = null;
++  const attemptBudget = (input.recomposePolicy?.maxRecomposeAttempts ?? stewardCanonicalCommitPolicy.maxRecomposeAttempts) + 1;
++  const backoffMs = input.recomposePolicy?.recomposeBackoffMs ?? stewardCanonicalCommitPolicy.recomposeBackoffMs;
++  const jitterMs = input.recomposePolicy?.recomposeJitterMs ?? stewardCanonicalCommitPolicy.recomposeJitterMs;
++  let attemptsUsed = 0;
+   if (planResult.ok && transactional && !transactional.blocked) {
+     const baseHead = readGitHeadCommit(input.cwd);
+-    const attempts = stewardCanonicalCommitPolicy.maxRecomposeAttempts + 1;
+-    for (let attempt = 0; attempt < attempts; attempt += 1) {
++    for (let attempt = 0; attempt < attemptBudget; attempt += 1) {
++      attemptsUsed = attempt + 1;
+       if (attempt > 0) {
++        waitStewardRecomposeBackoff(attempt, backoffMs, jitterMs);
+         transactional = buildPatchProposalComposition({ cwd: input.cwd, mergePlan: input.mergePlan, proposals: input.proposals });
+         if (transactional.blocked) break;
+       }
+@@ -197,7 +215,8 @@
+         outputFiles: transactional.outputFiles,
+         scopeFiles: input.scopeFiles,
+         semanticValidation,
+-        baseHead
++        baseHead,
++        commitHooks: input.commitHooks
+       });
+       if (apply.ok || apply.receipt.verdict !== 're-compose') break;
+     }
+@@ -246,7 +265,7 @@
+     fileBeforeHashes,
+     fileAfterHashes,
+     verdict: apply.ok ? 'applied' : 'blocked',
+-    blockedReasons: apply.ok ? undefined : apply.receipt.blockedReasons,
++    blockedReasons: apply.ok ? undefined : recomposeTerminalReasons(apply, attemptsUsed, attemptBudget),
+     brokerOperationRun
+   });
+   if (input.evidenceOutPath) writeEvidenceFile(input.evidenceOutPath, evidence);
+@@ -534,6 +553,14 @@
+ function stripShaPrefix(value: string): string {
+   return value.replace(/^sha256:/, '');
+ }
++function recomposeTerminalReasons(
++  apply: TransactionalStewardApplyResult,
++  attemptsUsed: number,
++  attemptBudget: number
++): readonly string[] {
++  if (apply.receipt.verdict !== 're-compose' || attemptsUsed < attemptBudget) return apply.receipt.blockedReasons;
++  return apply.receipt.blockedReasons.map((reason) => `re-compose attempts exhausted after ${attemptsUsed} of ${attemptBudget}: ${reason}`);
++}
+ export function readGitHeadCommit(cwd: string): string | null {
+   const result = spawnSync('git', ['-C', cwd, 'rev-parse', '--verify', 'HEAD'], { encoding: 'utf8' });
+   if (result.status !== 0) return null;

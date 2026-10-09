@@ -1,0 +1,16 @@
+# 8 concurrent node processes x 300 calls of withStewardApplyQueue (ATM 37847584, packages/core/src/broker/steward-apply-queue.ts),
+# fresh temp dir, waitMs 10000, pollMs 5, critical section ~1 ms. Node v24.21.0. Run 2026-10-08 ~18:22 CST (box idle).
+# Command: for i in 1..8: node --no-warnings queue_busy_repro.mjs <dir> 300 &   (import path replaced by the pin tree)
+{"pid":1238068,"ok":297,"errs":{"ERR_SQLITE_ERROR database is locked @L252:6)":3}}
+{"pid":1238072,"ok":299,"errs":{"ERR_SQLITE_ERROR database is locked @L252:6)":1}}
+{"pid":1238071,"ok":300,"errs":{}}
+{"pid":1238070,"ok":300,"errs":{}}
+{"pid":1238073,"ok":300,"errs":{}}
+{"pid":1238075,"ok":300,"errs":{}}
+{"pid":1238074,"ok":300,"errs":{}}
+{"pid":1238069,"ok":300,"errs":{}}
+# total: 4 / 2400 calls threw; line 252 = `db.exec('PRAGMA synchronous = OFF')` in openDatabase(queue.sqlite), first statement on the new
+# connection (reads schema -> SQLITE_BUSY while another process commits). openDatabase(queue.sqlite) is called in joinOne() outside its
+# try block, after the presence DB already holds BEGIN IMMEDIATE, so (a) the error escapes joinQueues -> withStewardApplyQueue, where
+# isQueueUnavailable() only accepts ENOTDIR/EACCES/EPERM/EROFS/ENOSPC/ENOENT and rethrows, so applyStewardPlan throws; (b) the presence
+# file/handle leaks (4 presence *.sqlite files left in the repro dir, one per error).

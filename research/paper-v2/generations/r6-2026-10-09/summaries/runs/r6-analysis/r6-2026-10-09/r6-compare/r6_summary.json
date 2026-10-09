@@ -1,0 +1,3102 @@
+{
+ "definitions": "r6 analysis-only comparison (derived from analysis/r5_compare.py; r5 file unchanged; same definitions/metrics). Adds: SQLITE busy/locked exception\ncount per arm, leaked queue presence files per run, stress repro and r6 fault/barrier summaries.\n(r5 docstring follows) r5 analysis-only comparison (derived from analysis/r4_compare.py; r4 file unchanged) (READ-ONLY on runs/*; writes only to --out).\nInputs: oracle v2 artifact-only rescore (rescore_cells.json), per-run meta/compose_batches/steward_applies/events,\nruns/r5-validation/barrier/*/barrier_result.json, runs/r5-validation/faults/*/fault_results.json, runs/r5-validation/e5/*.out.\nOutputs: r5_summary.json + r5_cells.json + R5_TABLES.md.\nDefinitions (same as r3 unless noted):\n  completed intent = ATM `applied` and oracle v2 finds the effect in the final bytes (v2 'correct').\n  lost effect      = v2 verdict 'lost' (ATM acked `applied`, effect absent from final bytes). Counted per effect, not per failure.\n  blocked intent   = intent whose batch ended `blocked` (incl. after re-compose); completed + lost + blocked = total intents.\n  failed run       = any op with a failing v2 verdict, or any file frame/structure violation, foreign write or extra file.\n  corrupted file   = file with frame or structure violation (incl. torn tails).\n  attempts (r5)    = per batch max(atm_tx_attempts, atm_commit_attempts, atm_commit_owner_writes); owner writes = lock acquisitions at\n                     every guarded pin (37847584 creates the lock dir recursively, so atm_commit_attempts stays 0 there).\n  Wilson 95% CI    = score interval (z=1.96) on intents (completed/total, lost/total) and on runs (failed/total). Intents within a run\n                     are not independent, so intent-level intervals are optimistic (too narrow); reported as descriptive only.\n  (r4 text) attempts = per batch max(atm_tx_attempts, atm_commit_attempts). atm_tx_attempts counts ATM's forwarded\n                     commitHooks.beforePrecheck calls (2118bc66+ only; = transactional apply attempts, incl. those that end at\n                     the unlocked early stale check); atm_commit_attempts counts commit-lock acquisitions (bea35380+). 5692474f: 0.\n  re-compose event = batch with attempts>=2, or attempts>=1 and final `blocked` (the first attempt returned re-compose).\n  re-compose success = batch `applied` with attempts>=2.\n  percentiles      = linear interpolation (numpy 'linear'); mean±sd is NOT a CI.\n",
+ "n_cells": 477,
+ "unscored": [],
+ "pin_mismatch": [],
+ "env_mismatch": [],
+ "replay": {
+  "q5": {
+   "all": {
+    "runs": 150,
+    "failed_runs": 0,
+    "lost_effects": 0,
+    "corrupted_files": 0,
+    "extra_files": 0,
+    "foreign_writes": 0,
+    "offered": 5220,
+    "correct": 3490,
+    "blocked_intents": 1730,
+    "identity_ok": true,
+    "v2_fail_ops": 0,
+    "completion_rate": 0.6686,
+    "mean_correct_per_run": 23.27,
+    "wilson_completed": [
+     0.6557,
+     0.6812
+    ],
+    "wilson_failed_runs": [
+     0.0,
+     0.025
+    ],
+    "wilson_lost": [
+     0.0,
+     0.0007
+    ],
+    "hash_drift_intents": 0,
+    "exception_blocked_intents": 1,
+    "wall_ms": {
+     "n": 150,
+     "mean": 704.56,
+     "p50": 687.96,
+     "p95": 928.35,
+     "p99": 985.6,
+     "sd": 117.63
+    },
+    "re_compose_events": 0,
+    "re_compose_success": 0,
+    "re_compose_extra_attempts": 0,
+    "lock_contention_polls": 0,
+    "sig_interleave": 153,
+    "sig_drift": 0,
+    "batches": 4390,
+    "batch_classes": {
+     "applied": 3223,
+     "blocked:steward-final-patch-required/same-region-in-batch": 90,
+     "blocked:steward-final-patch-required/region-changed": 837,
+     "blocked:steward-final-patch-required/declared-line-overlap": 239,
+     "blocked:ERR_SQLITE_ERROR": 1
+    },
+    "intent_classes": {
+     "applied": 3490,
+     "blocked:steward-final-patch-required/same-region-in-batch": 202,
+     "blocked:steward-final-patch-required/region-changed": 1003,
+     "blocked:steward-final-patch-required/declared-line-overlap": 524,
+     "blocked:ERR_SQLITE_ERROR": 1
+    },
+    "attempts_batches": {
+     "0": 1167,
+     "1": 3223
+    },
+    "attempts_intents": {
+     "0": 1730,
+     "1": 3490
+    },
+    "sqlite_exc_intents": 1,
+    "sqlite_exc_runs": 1,
+    "presence_left_files": 1,
+    "presence_left_runs": 1,
+    "stdout_sqlite_mentions": 0,
+    "intent_total_ms": {
+     "n": 5220,
+     "mean": 111.53,
+     "p50": 71.64,
+     "p95": 271.03,
+     "p99": 377.91,
+     "sd": 81.19
+    },
+    "intent_apply_ms": {
+     "n": 5220,
+     "mean": 57.86,
+     "p50": 22.85,
+     "p95": 173.63,
+     "p99": 275.74,
+     "sd": 61.68
+    }
+   },
+   "block1": {
+    "runs": 75,
+    "failed_runs": 0,
+    "lost_effects": 0,
+    "corrupted_files": 0,
+    "extra_files": 0,
+    "foreign_writes": 0,
+    "offered": 2610,
+    "correct": 1769,
+    "blocked_intents": 841,
+    "identity_ok": true,
+    "v2_fail_ops": 0,
+    "completion_rate": 0.6778,
+    "mean_correct_per_run": 23.59,
+    "wilson_completed": [
+     0.6596,
+     0.6954
+    ],
+    "wilson_failed_runs": [
+     0.0,
+     0.0487
+    ],
+    "wilson_lost": [
+     0.0,
+     0.0015
+    ],
+    "hash_drift_intents": 0,
+    "exception_blocked_intents": 1,
+    "wall_ms": {
+     "n": 75,
+     "mean": 743.64,
+     "p50": 729.94,
+     "p95": 952.02,
+     "p99": 1010.81,
+     "sd": 121.25
+    },
+    "re_compose_events": 0,
+    "re_compose_success": 0,
+    "re_compose_extra_attempts": 0,
+    "lock_contention_polls": 0,
+    "sig_interleave": 72,
+    "sig_drift": 0,
+    "batches": 2198,
+    "batch_classes": {
+     "applied": 1624,
+     "blocked:steward-final-patch-required/same-region-in-batch": 38,
+     "blocked:steward-final-patch-required/region-changed": 410,
+     "blocked:steward-final-patch-required/declared-line-overlap": 125,
+     "blocked:ERR_SQLITE_ERROR": 1
+    },
+    "intent_classes": {
+     "applied": 1769,
+     "blocked:steward-final-patch-required/same-region-in-batch": 86,
+     "blocked:steward-final-patch-required/region-changed": 481,
+     "blocked:steward-final-patch-required/declared-line-overlap": 273,
+     "blocked:ERR_SQLITE_ERROR": 1
+    },
+    "attempts_batches": {
+     "0": 574,
+     "1": 1624
+    },
+    "attempts_intents": {
+     "0": 841,
+     "1": 1769
+    },
+    "sqlite_exc_intents": 1,
+    "sqlite_exc_runs": 1,
+    "presence_left_files": 1,
+    "presence_left_runs": 1,
+    "stdout_sqlite_mentions": 0,
+    "intent_total_ms": {
+     "n": 2610,
+     "mean": 118.39,
+     "p50": 77.38,
+     "p95": 297.91,
+     "p99": 411.32,
+     "sd": 87.37
+    },
+    "intent_apply_ms": {
+     "n": 2610,
+     "mean": 60.27,
+     "p50": 24.45,
+     "p95": 187.78,
+     "p99": 294.05,
+     "sd": 64.48
+    }
+   },
+   "block2": {
+    "runs": 75,
+    "failed_runs": 0,
+    "lost_effects": 0,
+    "corrupted_files": 0,
+    "extra_files": 0,
+    "foreign_writes": 0,
+    "offered": 2610,
+    "correct": 1721,
+    "blocked_intents": 889,
+    "identity_ok": true,
+    "v2_fail_ops": 0,
+    "completion_rate": 0.6594,
+    "mean_correct_per_run": 22.95,
+    "wilson_completed": [
+     0.641,
+     0.6773
+    ],
+    "wilson_failed_runs": [
+     0.0,
+     0.0487
+    ],
+    "wilson_lost": [
+     0.0,
+     0.0015
+    ],
+    "hash_drift_intents": 0,
+    "exception_blocked_intents": 0,
+    "wall_ms": {
+     "n": 75,
+     "mean": 665.49,
+     "p50": 662.27,
+     "p95": 851.43,
+     "p99": 934.02,
+     "sd": 99.58
+    },
+    "re_compose_events": 0,
+    "re_compose_success": 0,
+    "re_compose_extra_attempts": 0,
+    "lock_contention_polls": 0,
+    "sig_interleave": 81,
+    "sig_drift": 0,
+    "batches": 2192,
+    "batch_classes": {
+     "applied": 1599,
+     "blocked:steward-final-patch-required/same-region-in-batch": 52,
+     "blocked:steward-final-patch-required/region-changed": 427,
+     "blocked:steward-final-patch-required/declared-line-overlap": 114
+    },
+    "intent_classes": {
+     "applied": 1721,
+     "blocked:steward-final-patch-required/same-region-in-batch": 116,
+     "blocked:steward-final-patch-required/region-changed": 522,
+     "blocked:steward-final-patch-required/declared-line-overlap": 251
+    },
+    "attempts_batches": {
+     "0": 593,
+     "1": 1599
+    },
+    "attempts_intents": {
+     "0": 889,
+     "1": 1721
+    },
+    "sqlite_exc_intents": 0,
+    "sqlite_exc_runs": 0,
+    "presence_left_files": 0,
+    "presence_left_runs": 0,
+    "stdout_sqlite_mentions": 0,
+    "intent_total_ms": {
+     "n": 2610,
+     "mean": 104.67,
+     "p50": 65.17,
+     "p95": 243.58,
+     "p99": 315.7,
+     "sd": 73.87
+    },
+    "intent_apply_ms": {
+     "n": 2610,
+     "mean": 55.45,
+     "p50": 20.87,
+     "p95": 165.5,
+     "p99": 254.51,
+     "sd": 58.64
+    }
+   },
+   "p2_s17_exact": {
+    "runs": 60,
+    "failed_runs": 0,
+    "lost_effects": 0,
+    "corrupted_files": 0,
+    "extra_files": 0,
+    "foreign_writes": 0,
+    "offered": 2040,
+    "correct": 1343,
+    "blocked_intents": 697,
+    "identity_ok": true,
+    "v2_fail_ops": 0,
+    "completion_rate": 0.6583,
+    "mean_correct_per_run": 22.38,
+    "wilson_completed": [
+     0.6375,
+     0.6786
+    ],
+    "wilson_failed_runs": [
+     0.0,
+     0.0602
+    ],
+    "wilson_lost": [
+     0.0,
+     0.0019
+    ],
+    "hash_drift_intents": 0,
+    "exception_blocked_intents": 0,
+    "wall_ms": {
+     "n": 60,
+     "mean": 648.09,
+     "p50": 622.01,
+     "p95": 821.83,
+     "p99": 973.33,
+     "sd": 106.85
+    },
+    "re_compose_events": 0,
+    "re_compose_success": 0,
+    "re_compose_extra_attempts": 0,
+    "lock_contention_polls": 0,
+    "sig_interleave": 14,
+    "sig_drift": 0,
+    "batches": 1579,
+    "batch_classes": {
+     "applied": 1177,
+     "blocked:steward-final-patch-required/declared-line-overlap": 106,
+     "blocked:steward-final-patch-required/region-changed": 248,
+     "blocked:steward-final-patch-required/same-region-in-batch": 48
+    },
+    "intent_classes": {
+     "applied": 1343,
+     "blocked:steward-final-patch-required/declared-line-overlap": 231,
+     "blocked:steward-final-patch-required/region-changed": 357,
+     "blocked:steward-final-patch-required/same-region-in-batch": 109
+    },
+    "attempts_batches": {
+     "0": 402,
+     "1": 1177
+    },
+    "attempts_intents": {
+     "0": 697,
+     "1": 1343
+    },
+    "sqlite_exc_intents": 0,
+    "sqlite_exc_runs": 0,
+    "presence_left_files": 0,
+    "presence_left_runs": 0,
+    "stdout_sqlite_mentions": 0,
+    "intent_total_ms": {
+     "n": 2040,
+     "mean": 100.28,
+     "p50": 63.44,
+     "p95": 215.53,
+     "p99": 304.63,
+     "sd": 69.95
+    },
+    "intent_apply_ms": {
+     "n": 2040,
+     "mean": 41.58,
+     "p50": 20.32,
+     "p95": 130.28,
+     "p99": 152.11,
+     "sd": 42.81
+    }
+   },
+   "grid_p2": {
+    "runs": 30,
+    "failed_runs": 0,
+    "lost_effects": 0,
+    "corrupted_files": 0,
+    "extra_files": 0,
+    "foreign_writes": 0,
+    "offered": 1060,
+    "correct": 680,
+    "blocked_intents": 380,
+    "identity_ok": true,
+    "v2_fail_ops": 0,
+    "completion_rate": 0.6415,
+    "mean_correct_per_run": 22.67,
+    "wilson_completed": [
+     0.6122,
+     0.6698
+    ],
+    "wilson_failed_runs": [
+     0.0,
+     0.1135
+    ],
+    "wilson_lost": [
+     0.0,
+     0.0036
+    ],
+    "hash_drift_intents": 0,
+    "exception_blocked_intents": 0,
+    "wall_ms": {
+     "n": 30,
+     "mean": 661.95,
+     "p50": 658.68,
+     "p95": 778.6,
+     "p99": 785.61,
+     "sd": 61.52
+    },
+    "re_compose_events": 0,
+    "re_compose_success": 0,
+    "re_compose_extra_attempts": 0,
+    "lock_contention_polls": 0,
+    "sig_interleave": 10,
+    "sig_drift": 0,
+    "batches": 811,
+    "batch_classes": {
+     "applied": 607,
+     "blocked:steward-final-patch-required/same-region-in-batch": 18,
+     "blocked:steward-final-patch-required/region-changed": 95,
+     "blocked:steward-final-patch-required/declared-line-overlap": 91
+    },
+    "intent_classes": {
+     "applied": 680,
+     "blocked:steward-final-patch-required/same-region-in-batch": 45,
+     "blocked:steward-final-patch-required/region-changed": 126,
+     "blocked:steward-final-patch-required/declared-line-overlap": 209
+    },
+    "attempts_batches": {
+     "0": 204,
+     "1": 607
+    },
+    "attempts_intents": {
+     "0": 380,
+     "1": 680
+    },
+    "sqlite_exc_intents": 0,
+    "sqlite_exc_runs": 0,
+    "presence_left_files": 0,
+    "presence_left_runs": 0,
+    "stdout_sqlite_mentions": 0,
+    "intent_total_ms": {
+     "n": 1060,
+     "mean": 99.44,
+     "p50": 66.35,
+     "p95": 208.15,
+     "p99": 242.37,
+     "sd": 62.76
+    },
+    "intent_apply_ms": {
+     "n": 1060,
+     "mean": 42.48,
+     "p50": 20.16,
+     "p95": 127.85,
+     "p99": 146.53,
+     "sd": 41.68
+    }
+   },
+   "grid_p4": {
+    "runs": 30,
+    "failed_runs": 0,
+    "lost_effects": 0,
+    "corrupted_files": 0,
+    "extra_files": 0,
+    "foreign_writes": 0,
+    "offered": 1060,
+    "correct": 727,
+    "blocked_intents": 333,
+    "identity_ok": true,
+    "v2_fail_ops": 0,
+    "completion_rate": 0.6858,
+    "mean_correct_per_run": 24.23,
+    "wilson_completed": [
+     0.6573,
+     0.7131
+    ],
+    "wilson_failed_runs": [
+     0.0,
+     0.1135
+    ],
+    "wilson_lost": [
+     0.0,
+     0.0036
+    ],
+    "hash_drift_intents": 0,
+    "exception_blocked_intents": 0,
+    "wall_ms": {
+     "n": 30,
+     "mean": 754.83,
+     "p50": 745.49,
+     "p95": 941.28,
+     "p99": 947.86,
+     "sd": 85.44
+    },
+    "re_compose_events": 0,
+    "re_compose_success": 0,
+    "re_compose_extra_attempts": 0,
+    "lock_contention_polls": 0,
+    "sig_interleave": 45,
+    "sig_drift": 0,
+    "batches": 940,
+    "batch_classes": {
+     "applied": 699,
+     "blocked:steward-final-patch-required/region-changed": 175,
+     "blocked:steward-final-patch-required/declared-line-overlap": 42,
+     "blocked:steward-final-patch-required/same-region-in-batch": 24
+    },
+    "intent_classes": {
+     "applied": 727,
+     "blocked:steward-final-patch-required/region-changed": 201,
+     "blocked:steward-final-patch-required/declared-line-overlap": 84,
+     "blocked:steward-final-patch-required/same-region-in-batch": 48
+    },
+    "attempts_batches": {
+     "0": 241,
+     "1": 699
+    },
+    "attempts_intents": {
+     "0": 333,
+     "1": 727
+    },
+    "sqlite_exc_intents": 0,
+    "sqlite_exc_runs": 0,
+    "presence_left_files": 0,
+    "presence_left_runs": 0,
+    "stdout_sqlite_mentions": 0,
+    "intent_total_ms": {
+     "n": 1060,
+     "mean": 116.77,
+     "p50": 80.31,
+     "p95": 276.4,
+     "p99": 323.42,
+     "sd": 80.9
+    },
+    "intent_apply_ms": {
+     "n": 1060,
+     "mean": 66.3,
+     "p50": 28.3,
+     "p95": 172.85,
+     "p99": 220.46,
+     "sd": 59.52
+    }
+   },
+   "grid_p8": {
+    "runs": 30,
+    "failed_runs": 0,
+    "lost_effects": 0,
+    "corrupted_files": 0,
+    "extra_files": 0,
+    "foreign_writes": 0,
+    "offered": 1060,
+    "correct": 740,
+    "blocked_intents": 320,
+    "identity_ok": true,
+    "v2_fail_ops": 0,
+    "completion_rate": 0.6981,
+    "mean_correct_per_run": 24.67,
+    "wilson_completed": [
+     0.6698,
+     0.725
+    ],
+    "wilson_failed_runs": [
+     0.0,
+     0.1135
+    ],
+    "wilson_lost": [
+     0.0,
+     0.0036
+    ],
+    "hash_drift_intents": 0,
+    "exception_blocked_intents": 1,
+    "wall_ms": {
+     "n": 30,
+     "mean": 809.86,
+     "p50": 844.33,
+     "p95": 965.33,
+     "p99": 990.98,
+     "sd": 116.0
+    },
+    "re_compose_events": 0,
+    "re_compose_success": 0,
+    "re_compose_extra_attempts": 0,
+    "lock_contention_polls": 0,
+    "sig_interleave": 84,
+    "sig_drift": 0,
+    "batches": 1060,
+    "batch_classes": {
+     "applied": 740,
+     "blocked:steward-final-patch-required/region-changed": 319,
+     "blocked:ERR_SQLITE_ERROR": 1
+    },
+    "intent_classes": {
+     "applied": 740,
+     "blocked:steward-final-patch-required/region-changed": 319,
+     "blocked:ERR_SQLITE_ERROR": 1
+    },
+    "attempts_batches": {
+     "0": 320,
+     "1": 740
+    },
+    "attempts_intents": {
+     "0": 320,
+     "1": 740
+    },
+    "sqlite_exc_intents": 1,
+    "sqlite_exc_runs": 1,
+    "presence_left_files": 1,
+    "presence_left_runs": 1,
+    "stdout_sqlite_mentions": 0,
+    "intent_total_ms": {
+     "n": 1060,
+     "mean": 140.02,
+     "p50": 130.35,
+     "p95": 364.32,
+     "p99": 428.14,
+     "sd": 106.47
+    },
+    "intent_apply_ms": {
+     "n": 1060,
+     "mean": 96.12,
+     "p50": 110.38,
+     "p95": 273.85,
+     "p99": 328.14,
+     "sd": 87.44
+    }
+   }
+  },
+  "q6": {
+   "all": {
+    "runs": 150,
+    "failed_runs": 0,
+    "lost_effects": 0,
+    "corrupted_files": 0,
+    "extra_files": 0,
+    "foreign_writes": 0,
+    "offered": 5220,
+    "correct": 3500,
+    "blocked_intents": 1720,
+    "identity_ok": true,
+    "v2_fail_ops": 0,
+    "completion_rate": 0.6705,
+    "mean_correct_per_run": 23.33,
+    "wilson_completed": [
+     0.6576,
+     0.6831
+    ],
+    "wilson_failed_runs": [
+     0.0,
+     0.025
+    ],
+    "wilson_lost": [
+     0.0,
+     0.0007
+    ],
+    "hash_drift_intents": 0,
+    "exception_blocked_intents": 0,
+    "wall_ms": {
+     "n": 150,
+     "mean": 691.66,
+     "p50": 676.55,
+     "p95": 891.32,
+     "p99": 942.79,
+     "sd": 118.35
+    },
+    "re_compose_events": 0,
+    "re_compose_success": 0,
+    "re_compose_extra_attempts": 0,
+    "lock_contention_polls": 0,
+    "sig_interleave": 168,
+    "sig_drift": 0,
+    "batches": 4375,
+    "batch_classes": {
+     "blocked:steward-final-patch-required/region-changed": 877,
+     "applied": 3203,
+     "blocked:steward-final-patch-required/same-region-in-batch": 92,
+     "blocked:steward-final-patch-required/declared-line-overlap": 203
+    },
+    "intent_classes": {
+     "blocked:steward-final-patch-required/region-changed": 1074,
+     "applied": 3500,
+     "blocked:steward-final-patch-required/same-region-in-batch": 207,
+     "blocked:steward-final-patch-required/declared-line-overlap": 439
+    },
+    "attempts_batches": {
+     "0": 1172,
+     "1": 3203
+    },
+    "attempts_intents": {
+     "0": 1720,
+     "1": 3500
+    },
+    "sqlite_exc_intents": 0,
+    "sqlite_exc_runs": 0,
+    "presence_left_files": 0,
+    "presence_left_runs": 0,
+    "stdout_sqlite_mentions": 0,
+    "intent_total_ms": {
+     "n": 5220,
+     "mean": 111.86,
+     "p50": 73.02,
+     "p95": 269.92,
+     "p99": 376.56,
+     "sd": 81.93
+    },
+    "intent_apply_ms": {
+     "n": 5220,
+     "mean": 57.76,
+     "p50": 23.41,
+     "p95": 178.12,
+     "p99": 276.22,
+     "sd": 61.46
+    }
+   },
+   "block1": {
+    "runs": 75,
+    "failed_runs": 0,
+    "lost_effects": 0,
+    "corrupted_files": 0,
+    "extra_files": 0,
+    "foreign_writes": 0,
+    "offered": 2610,
+    "correct": 1762,
+    "blocked_intents": 848,
+    "identity_ok": true,
+    "v2_fail_ops": 0,
+    "completion_rate": 0.6751,
+    "mean_correct_per_run": 23.49,
+    "wilson_completed": [
+     0.6569,
+     0.6928
+    ],
+    "wilson_failed_runs": [
+     0.0,
+     0.0487
+    ],
+    "wilson_lost": [
+     0.0,
+     0.0015
+    ],
+    "hash_drift_intents": 0,
+    "exception_blocked_intents": 0,
+    "wall_ms": {
+     "n": 75,
+     "mean": 733.83,
+     "p50": 732.08,
+     "p95": 913.05,
+     "p99": 947.07,
+     "sd": 114.45
+    },
+    "re_compose_events": 0,
+    "re_compose_success": 0,
+    "re_compose_extra_attempts": 0,
+    "lock_contention_polls": 0,
+    "sig_interleave": 88,
+    "sig_drift": 0,
+    "batches": 2196,
+    "batch_classes": {
+     "blocked:steward-final-patch-required/region-changed": 446,
+     "applied": 1605,
+     "blocked:steward-final-patch-required/same-region-in-batch": 47,
+     "blocked:steward-final-patch-required/declared-line-overlap": 98
+    },
+    "intent_classes": {
+     "blocked:steward-final-patch-required/region-changed": 530,
+     "applied": 1762,
+     "blocked:steward-final-patch-required/same-region-in-batch": 109,
+     "blocked:steward-final-patch-required/declared-line-overlap": 209
+    },
+    "attempts_batches": {
+     "0": 591,
+     "1": 1605
+    },
+    "attempts_intents": {
+     "0": 848,
+     "1": 1762
+    },
+    "sqlite_exc_intents": 0,
+    "sqlite_exc_runs": 0,
+    "presence_left_files": 0,
+    "presence_left_runs": 0,
+    "stdout_sqlite_mentions": 0,
+    "intent_total_ms": {
+     "n": 2610,
+     "mean": 119.27,
+     "p50": 77.97,
+     "p95": 293.44,
+     "p99": 403.86,
+     "sd": 87.67
+    },
+    "intent_apply_ms": {
+     "n": 2610,
+     "mean": 61.22,
+     "p50": 25.98,
+     "p95": 194.66,
+     "p99": 285.53,
+     "sd": 63.92
+    }
+   },
+   "block2": {
+    "runs": 75,
+    "failed_runs": 0,
+    "lost_effects": 0,
+    "corrupted_files": 0,
+    "extra_files": 0,
+    "foreign_writes": 0,
+    "offered": 2610,
+    "correct": 1738,
+    "blocked_intents": 872,
+    "identity_ok": true,
+    "v2_fail_ops": 0,
+    "completion_rate": 0.6659,
+    "mean_correct_per_run": 23.17,
+    "wilson_completed": [
+     0.6476,
+     0.6837
+    ],
+    "wilson_failed_runs": [
+     0.0,
+     0.0487
+    ],
+    "wilson_lost": [
+     0.0,
+     0.0015
+    ],
+    "hash_drift_intents": 0,
+    "exception_blocked_intents": 0,
+    "wall_ms": {
+     "n": 75,
+     "mean": 649.48,
+     "p50": 641.28,
+     "p95": 837.9,
+     "p99": 884.63,
+     "sd": 106.57
+    },
+    "re_compose_events": 0,
+    "re_compose_success": 0,
+    "re_compose_extra_attempts": 0,
+    "lock_contention_polls": 0,
+    "sig_interleave": 80,
+    "sig_drift": 0,
+    "batches": 2179,
+    "batch_classes": {
+     "blocked:steward-final-patch-required/region-changed": 431,
+     "applied": 1598,
+     "blocked:steward-final-patch-required/same-region-in-batch": 45,
+     "blocked:steward-final-patch-required/declared-line-overlap": 105
+    },
+    "intent_classes": {
+     "blocked:steward-final-patch-required/region-changed": 544,
+     "applied": 1738,
+     "blocked:steward-final-patch-required/same-region-in-batch": 98,
+     "blocked:steward-final-patch-required/declared-line-overlap": 230
+    },
+    "attempts_batches": {
+     "0": 581,
+     "1": 1598
+    },
+    "attempts_intents": {
+     "0": 872,
+     "1": 1738
+    },
+    "sqlite_exc_intents": 0,
+    "sqlite_exc_runs": 0,
+    "presence_left_files": 0,
+    "presence_left_runs": 0,
+    "stdout_sqlite_mentions": 0,
+    "intent_total_ms": {
+     "n": 2610,
+     "mean": 104.46,
+     "p50": 66.0,
+     "p95": 249.9,
+     "p99": 330.38,
+     "sd": 75.02
+    },
+    "intent_apply_ms": {
+     "n": 2610,
+     "mean": 54.3,
+     "p50": 21.09,
+     "p95": 170.1,
+     "p99": 256.25,
+     "sd": 58.69
+    }
+   },
+   "p2_s17_exact": {
+    "runs": 60,
+    "failed_runs": 0,
+    "lost_effects": 0,
+    "corrupted_files": 0,
+    "extra_files": 0,
+    "foreign_writes": 0,
+    "offered": 2040,
+    "correct": 1349,
+    "blocked_intents": 691,
+    "identity_ok": true,
+    "v2_fail_ops": 0,
+    "completion_rate": 0.6613,
+    "mean_correct_per_run": 22.48,
+    "wilson_completed": [
+     0.6405,
+     0.6815
+    ],
+    "wilson_failed_runs": [
+     0.0,
+     0.0602
+    ],
+    "wilson_lost": [
+     0.0,
+     0.0019
+    ],
+    "hash_drift_intents": 0,
+    "exception_blocked_intents": 0,
+    "wall_ms": {
+     "n": 60,
+     "mean": 650.61,
+     "p50": 619.92,
+     "p95": 848.31,
+     "p99": 917.18,
+     "sd": 116.37
+    },
+    "re_compose_events": 0,
+    "re_compose_success": 0,
+    "re_compose_extra_attempts": 0,
+    "lock_contention_polls": 0,
+    "sig_interleave": 15,
+    "sig_drift": 0,
+    "batches": 1569,
+    "batch_classes": {
+     "blocked:steward-final-patch-required/region-changed": 275,
+     "blocked:steward-final-patch-required/declared-line-overlap": 95,
+     "applied": 1159,
+     "blocked:steward-final-patch-required/same-region-in-batch": 40
+    },
+    "intent_classes": {
+     "blocked:steward-final-patch-required/region-changed": 405,
+     "blocked:steward-final-patch-required/declared-line-overlap": 200,
+     "applied": 1349,
+     "blocked:steward-final-patch-required/same-region-in-batch": 86
+    },
+    "attempts_batches": {
+     "0": 410,
+     "1": 1159
+    },
+    "attempts_intents": {
+     "0": 691,
+     "1": 1349
+    },
+    "sqlite_exc_intents": 0,
+    "sqlite_exc_runs": 0,
+    "presence_left_files": 0,
+    "presence_left_runs": 0,
+    "stdout_sqlite_mentions": 0,
+    "intent_total_ms": {
+     "n": 2040,
+     "mean": 100.61,
+     "p50": 65.0,
+     "p95": 217.26,
+     "p99": 294.07,
+     "sd": 69.78
+    },
+    "intent_apply_ms": {
+     "n": 2040,
+     "mean": 42.43,
+     "p50": 20.95,
+     "p95": 126.66,
+     "p99": 157.95,
+     "sd": 42.37
+    }
+   },
+   "grid_p2": {
+    "runs": 30,
+    "failed_runs": 0,
+    "lost_effects": 0,
+    "corrupted_files": 0,
+    "extra_files": 0,
+    "foreign_writes": 0,
+    "offered": 1060,
+    "correct": 659,
+    "blocked_intents": 401,
+    "identity_ok": true,
+    "v2_fail_ops": 0,
+    "completion_rate": 0.6217,
+    "mean_correct_per_run": 21.97,
+    "wilson_completed": [
+     0.5921,
+     0.6504
+    ],
+    "wilson_failed_runs": [
+     0.0,
+     0.1135
+    ],
+    "wilson_lost": [
+     0.0,
+     0.0036
+    ],
+    "hash_drift_intents": 0,
+    "exception_blocked_intents": 0,
+    "wall_ms": {
+     "n": 30,
+     "mean": 656.3,
+     "p50": 651.33,
+     "p95": 815.91,
+     "p99": 840.33,
+     "sd": 92.81
+    },
+    "re_compose_events": 0,
+    "re_compose_success": 0,
+    "re_compose_extra_attempts": 0,
+    "lock_contention_polls": 0,
+    "sig_interleave": 12,
+    "sig_drift": 0,
+    "batches": 795,
+    "batch_classes": {
+     "blocked:steward-final-patch-required/region-changed": 95,
+     "applied": 587,
+     "blocked:steward-final-patch-required/same-region-in-batch": 35,
+     "blocked:steward-final-patch-required/declared-line-overlap": 78
+    },
+    "intent_classes": {
+     "blocked:steward-final-patch-required/region-changed": 135,
+     "applied": 659,
+     "blocked:steward-final-patch-required/same-region-in-batch": 87,
+     "blocked:steward-final-patch-required/declared-line-overlap": 179
+    },
+    "attempts_batches": {
+     "0": 208,
+     "1": 587
+    },
+    "attempts_intents": {
+     "0": 401,
+     "1": 659
+    },
+    "sqlite_exc_intents": 0,
+    "sqlite_exc_runs": 0,
+    "presence_left_files": 0,
+    "presence_left_runs": 0,
+    "stdout_sqlite_mentions": 0,
+    "intent_total_ms": {
+     "n": 1060,
+     "mean": 101.01,
+     "p50": 67.75,
+     "p95": 219.6,
+     "p99": 276.04,
+     "sd": 67.49
+    },
+    "intent_apply_ms": {
+     "n": 1060,
+     "mean": 41.41,
+     "p50": 21.19,
+     "p95": 125.35,
+     "p99": 148.54,
+     "sd": 40.64
+    }
+   },
+   "grid_p4": {
+    "runs": 30,
+    "failed_runs": 0,
+    "lost_effects": 0,
+    "corrupted_files": 0,
+    "extra_files": 0,
+    "foreign_writes": 0,
+    "offered": 1060,
+    "correct": 742,
+    "blocked_intents": 318,
+    "identity_ok": true,
+    "v2_fail_ops": 0,
+    "completion_rate": 0.7,
+    "mean_correct_per_run": 24.73,
+    "wilson_completed": [
+     0.6717,
+     0.7268
+    ],
+    "wilson_failed_runs": [
+     0.0,
+     0.1135
+    ],
+    "wilson_lost": [
+     0.0,
+     0.0036
+    ],
+    "hash_drift_intents": 0,
+    "exception_blocked_intents": 0,
+    "wall_ms": {
+     "n": 30,
+     "mean": 712.59,
+     "p50": 699.69,
+     "p95": 890.77,
+     "p99": 930.99,
+     "sd": 97.53
+    },
+    "re_compose_events": 0,
+    "re_compose_success": 0,
+    "re_compose_extra_attempts": 0,
+    "lock_contention_polls": 0,
+    "sig_interleave": 48,
+    "sig_drift": 0,
+    "batches": 951,
+    "batch_classes": {
+     "applied": 707,
+     "blocked:steward-final-patch-required/region-changed": 197,
+     "blocked:steward-final-patch-required/declared-line-overlap": 30,
+     "blocked:steward-final-patch-required/same-region-in-batch": 17
+    },
+    "intent_classes": {
+     "applied": 742,
+     "blocked:steward-final-patch-required/region-changed": 224,
+     "blocked:steward-final-patch-required/declared-line-overlap": 60,
+     "blocked:steward-final-patch-required/same-region-in-batch": 34
+    },
+    "attempts_batches": {
+     "0": 244,
+     "1": 707
+    },
+    "attempts_intents": {
+     "0": 318,
+     "1": 742
+    },
+    "sqlite_exc_intents": 0,
+    "sqlite_exc_runs": 0,
+    "presence_left_files": 0,
+    "presence_left_runs": 0,
+    "stdout_sqlite_mentions": 0,
+    "intent_total_ms": {
+     "n": 1060,
+     "mean": 116.53,
+     "p50": 74.7,
+     "p95": 272.45,
+     "p99": 316.34,
+     "sd": 82.03
+    },
+    "intent_apply_ms": {
+     "n": 1060,
+     "mean": 65.53,
+     "p50": 26.61,
+     "p95": 175.14,
+     "p99": 219.8,
+     "sd": 60.17
+    }
+   },
+   "grid_p8": {
+    "runs": 30,
+    "failed_runs": 0,
+    "lost_effects": 0,
+    "corrupted_files": 0,
+    "extra_files": 0,
+    "foreign_writes": 0,
+    "offered": 1060,
+    "correct": 750,
+    "blocked_intents": 310,
+    "identity_ok": true,
+    "v2_fail_ops": 0,
+    "completion_rate": 0.7075,
+    "mean_correct_per_run": 25.0,
+    "wilson_completed": [
+     0.6795,
+     0.7341
+    ],
+    "wilson_failed_runs": [
+     0.0,
+     0.1135
+    ],
+    "wilson_lost": [
+     0.0,
+     0.0036
+    ],
+    "hash_drift_intents": 0,
+    "exception_blocked_intents": 0,
+    "wall_ms": {
+     "n": 30,
+     "mean": 788.18,
+     "p50": 813.05,
+     "p95": 922.8,
+     "p99": 942.7,
+     "sd": 102.23
+    },
+    "re_compose_events": 0,
+    "re_compose_success": 0,
+    "re_compose_extra_attempts": 0,
+    "lock_contention_polls": 0,
+    "sig_interleave": 93,
+    "sig_drift": 0,
+    "batches": 1060,
+    "batch_classes": {
+     "applied": 750,
+     "blocked:steward-final-patch-required/region-changed": 310
+    },
+    "intent_classes": {
+     "applied": 750,
+     "blocked:steward-final-patch-required/region-changed": 310
+    },
+    "attempts_batches": {
+     "0": 310,
+     "1": 750
+    },
+    "attempts_intents": {
+     "0": 310,
+     "1": 750
+    },
+    "sqlite_exc_intents": 0,
+    "sqlite_exc_runs": 0,
+    "presence_left_files": 0,
+    "presence_left_runs": 0,
+    "stdout_sqlite_mentions": 0,
+    "intent_total_ms": {
+     "n": 1060,
+     "mean": 139.68,
+     "p50": 128.57,
+     "p95": 362.71,
+     "p99": 429.25,
+     "sd": 106.03
+    },
+    "intent_apply_ms": {
+     "n": 1060,
+     "mean": 95.84,
+     "p50": 76.37,
+     "p95": 275.78,
+     "p99": 317.32,
+     "sd": 87.43
+    }
+   }
+  },
+  "nq6": {
+   "all": {
+    "runs": 150,
+    "failed_runs": 0,
+    "lost_effects": 0,
+    "corrupted_files": 0,
+    "extra_files": 0,
+    "foreign_writes": 0,
+    "offered": 5220,
+    "correct": 3458,
+    "blocked_intents": 1762,
+    "identity_ok": true,
+    "v2_fail_ops": 0,
+    "completion_rate": 0.6625,
+    "mean_correct_per_run": 23.05,
+    "wilson_completed": [
+     0.6495,
+     0.6752
+    ],
+    "wilson_failed_runs": [
+     0.0,
+     0.025
+    ],
+    "wilson_lost": [
+     0.0,
+     0.0007
+    ],
+    "hash_drift_intents": 0,
+    "exception_blocked_intents": 0,
+    "wall_ms": {
+     "n": 150,
+     "mean": 682.43,
+     "p50": 670.1,
+     "p95": 905.47,
+     "p99": 977.78,
+     "sd": 113.92
+    },
+    "re_compose_events": 217,
+    "re_compose_success": 58,
+    "re_compose_extra_attempts": 61,
+    "lock_contention_polls": 0,
+    "sig_interleave": 153,
+    "sig_drift": 0,
+    "batches": 4371,
+    "batch_classes": {
+     "blocked:steward-final-patch-required/region-changed": 718,
+     "applied": 3121,
+     "blocked:steward-final-patch-required/same-region-in-batch": 88,
+     "blocked:re-compose→steward-final-patch-required/region-changed": 159,
+     "blocked:steward-final-patch-required/declared-line-overlap": 227,
+     "applied_after_re-compose": 58
+    },
+    "intent_classes": {
+     "blocked:steward-final-patch-required/region-changed": 881,
+     "applied": 3399,
+     "blocked:steward-final-patch-required/same-region-in-batch": 199,
+     "blocked:re-compose→steward-final-patch-required/region-changed": 189,
+     "blocked:steward-final-patch-required/declared-line-overlap": 493,
+     "applied_after_re-compose": 59
+    },
+    "attempts_batches": {
+     "0": 1033,
+     "1": 3279,
+     "2": 57,
+     "3": 2
+    },
+    "attempts_intents": {
+     "0": 1573,
+     "1": 3587,
+     "2": 58,
+     "3": 2
+    },
+    "sqlite_exc_intents": 0,
+    "sqlite_exc_runs": 0,
+    "presence_left_files": 0,
+    "presence_left_runs": 0,
+    "stdout_sqlite_mentions": 0,
+    "intent_total_ms": {
+     "n": 5220,
+     "mean": 110.3,
+     "p50": 71.19,
+     "p95": 266.23,
+     "p99": 362.19,
+     "sd": 80.08
+    },
+    "intent_apply_ms": {
+     "n": 5220,
+     "mean": 56.88,
+     "p50": 22.22,
+     "p95": 175.64,
+     "p99": 269.72,
+     "sd": 60.74
+    }
+   },
+   "block1": {
+    "runs": 75,
+    "failed_runs": 0,
+    "lost_effects": 0,
+    "corrupted_files": 0,
+    "extra_files": 0,
+    "foreign_writes": 0,
+    "offered": 2610,
+    "correct": 1728,
+    "blocked_intents": 882,
+    "identity_ok": true,
+    "v2_fail_ops": 0,
+    "completion_rate": 0.6621,
+    "mean_correct_per_run": 23.04,
+    "wilson_completed": [
+     0.6437,
+     0.68
+    ],
+    "wilson_failed_runs": [
+     0.0,
+     0.0487
+    ],
+    "wilson_lost": [
+     0.0,
+     0.0015
+    ],
+    "hash_drift_intents": 0,
+    "exception_blocked_intents": 0,
+    "wall_ms": {
+     "n": 75,
+     "mean": 716.09,
+     "p50": 694.2,
+     "p95": 917.64,
+     "p99": 966.22,
+     "sd": 110.38
+    },
+    "re_compose_events": 115,
+    "re_compose_success": 31,
+    "re_compose_extra_attempts": 32,
+    "lock_contention_polls": 0,
+    "sig_interleave": 80,
+    "sig_drift": 0,
+    "batches": 2185,
+    "batch_classes": {
+     "blocked:steward-final-patch-required/region-changed": 357,
+     "applied": 1557,
+     "blocked:steward-final-patch-required/same-region-in-batch": 40,
+     "blocked:re-compose→steward-final-patch-required/region-changed": 84,
+     "blocked:steward-final-patch-required/declared-line-overlap": 116,
+     "applied_after_re-compose": 31
+    },
+    "intent_classes": {
+     "blocked:steward-final-patch-required/region-changed": 439,
+     "applied": 1696,
+     "blocked:steward-final-patch-required/same-region-in-batch": 93,
+     "blocked:re-compose→steward-final-patch-required/region-changed": 100,
+     "blocked:steward-final-patch-required/declared-line-overlap": 250,
+     "applied_after_re-compose": 32
+    },
+    "attempts_batches": {
+     "0": 513,
+     "1": 1640,
+     "2": 32
+    },
+    "attempts_intents": {
+     "0": 782,
+     "1": 1795,
+     "2": 33
+    },
+    "sqlite_exc_intents": 0,
+    "sqlite_exc_runs": 0,
+    "presence_left_files": 0,
+    "presence_left_runs": 0,
+    "stdout_sqlite_mentions": 0,
+    "intent_total_ms": {
+     "n": 2610,
+     "mean": 116.29,
+     "p50": 78.29,
+     "p95": 285.77,
+     "p99": 383.9,
+     "sd": 83.78
+    },
+    "intent_apply_ms": {
+     "n": 2610,
+     "mean": 59.7,
+     "p50": 23.98,
+     "p95": 190.87,
+     "p99": 288.04,
+     "sd": 63.29
+    }
+   },
+   "block2": {
+    "runs": 75,
+    "failed_runs": 0,
+    "lost_effects": 0,
+    "corrupted_files": 0,
+    "extra_files": 0,
+    "foreign_writes": 0,
+    "offered": 2610,
+    "correct": 1730,
+    "blocked_intents": 880,
+    "identity_ok": true,
+    "v2_fail_ops": 0,
+    "completion_rate": 0.6628,
+    "mean_correct_per_run": 23.07,
+    "wilson_completed": [
+     0.6445,
+     0.6807
+    ],
+    "wilson_failed_runs": [
+     0.0,
+     0.0487
+    ],
+    "wilson_lost": [
+     0.0,
+     0.0015
+    ],
+    "hash_drift_intents": 0,
+    "exception_blocked_intents": 0,
+    "wall_ms": {
+     "n": 75,
+     "mean": 648.77,
+     "p50": 649.74,
+     "p95": 802.62,
+     "p99": 983.32,
+     "sd": 107.27
+    },
+    "re_compose_events": 102,
+    "re_compose_success": 27,
+    "re_compose_extra_attempts": 29,
+    "lock_contention_polls": 0,
+    "sig_interleave": 73,
+    "sig_drift": 0,
+    "batches": 2186,
+    "batch_classes": {
+     "applied": 1564,
+     "blocked:steward-final-patch-required/same-region-in-batch": 48,
+     "blocked:steward-final-patch-required/declared-line-overlap": 111,
+     "blocked:re-compose→steward-final-patch-required/region-changed": 75,
+     "blocked:steward-final-patch-required/region-changed": 361,
+     "applied_after_re-compose": 27
+    },
+    "intent_classes": {
+     "applied": 1703,
+     "blocked:steward-final-patch-required/same-region-in-batch": 106,
+     "blocked:steward-final-patch-required/declared-line-overlap": 243,
+     "blocked:re-compose→steward-final-patch-required/region-changed": 89,
+     "blocked:steward-final-patch-required/region-changed": 442,
+     "applied_after_re-compose": 27
+    },
+    "attempts_batches": {
+     "0": 520,
+     "1": 1639,
+     "2": 25,
+     "3": 2
+    },
+    "attempts_intents": {
+     "0": 791,
+     "1": 1792,
+     "2": 25,
+     "3": 2
+    },
+    "sqlite_exc_intents": 0,
+    "sqlite_exc_runs": 0,
+    "presence_left_files": 0,
+    "presence_left_runs": 0,
+    "stdout_sqlite_mentions": 0,
+    "intent_total_ms": {
+     "n": 2610,
+     "mean": 104.31,
+     "p50": 63.85,
+     "p95": 248.28,
+     "p99": 332.35,
+     "sd": 75.72
+    },
+    "intent_apply_ms": {
+     "n": 2610,
+     "mean": 54.06,
+     "p50": 20.35,
+     "p95": 166.14,
+     "p99": 250.89,
+     "sd": 57.95
+    }
+   },
+   "p2_s17_exact": {
+    "runs": 60,
+    "failed_runs": 0,
+    "lost_effects": 0,
+    "corrupted_files": 0,
+    "extra_files": 0,
+    "foreign_writes": 0,
+    "offered": 2040,
+    "correct": 1357,
+    "blocked_intents": 683,
+    "identity_ok": true,
+    "v2_fail_ops": 0,
+    "completion_rate": 0.6652,
+    "mean_correct_per_run": 22.62,
+    "wilson_completed": [
+     0.6444,
+     0.6853
+    ],
+    "wilson_failed_runs": [
+     0.0,
+     0.0602
+    ],
+    "wilson_lost": [
+     0.0,
+     0.0019
+    ],
+    "hash_drift_intents": 0,
+    "exception_blocked_intents": 0,
+    "wall_ms": {
+     "n": 60,
+     "mean": 626.64,
+     "p50": 608.7,
+     "p95": 761.15,
+     "p99": 891.45,
+     "sd": 84.62
+    },
+    "re_compose_events": 68,
+    "re_compose_success": 3,
+    "re_compose_extra_attempts": 3,
+    "lock_contention_polls": 0,
+    "sig_interleave": 12,
+    "sig_drift": 0,
+    "batches": 1572,
+    "batch_classes": {
+     "applied": 1169,
+     "blocked:steward-final-patch-required/declared-line-overlap": 108,
+     "blocked:re-compose→steward-final-patch-required/region-changed": 65,
+     "blocked:steward-final-patch-required/region-changed": 196,
+     "blocked:steward-final-patch-required/same-region-in-batch": 31,
+     "applied_after_re-compose": 3
+    },
+    "intent_classes": {
+     "applied": 1354,
+     "blocked:steward-final-patch-required/declared-line-overlap": 234,
+     "blocked:re-compose→steward-final-patch-required/region-changed": 88,
+     "blocked:steward-final-patch-required/region-changed": 289,
+     "blocked:steward-final-patch-required/same-region-in-batch": 72,
+     "applied_after_re-compose": 3
+    },
+    "attempts_batches": {
+     "0": 335,
+     "1": 1234,
+     "2": 3
+    },
+    "attempts_intents": {
+     "0": 595,
+     "1": 1442,
+     "2": 3
+    },
+    "sqlite_exc_intents": 0,
+    "sqlite_exc_runs": 0,
+    "presence_left_files": 0,
+    "presence_left_runs": 0,
+    "stdout_sqlite_mentions": 0,
+    "intent_total_ms": {
+     "n": 2040,
+     "mean": 97.77,
+     "p50": 64.83,
+     "p95": 207.03,
+     "p99": 248.73,
+     "sd": 65.2
+    },
+    "intent_apply_ms": {
+     "n": 2040,
+     "mean": 40.83,
+     "p50": 19.46,
+     "p95": 127.35,
+     "p99": 151.74,
+     "sd": 41.61
+    }
+   },
+   "grid_p2": {
+    "runs": 30,
+    "failed_runs": 0,
+    "lost_effects": 0,
+    "corrupted_files": 0,
+    "extra_files": 0,
+    "foreign_writes": 0,
+    "offered": 1060,
+    "correct": 672,
+    "blocked_intents": 388,
+    "identity_ok": true,
+    "v2_fail_ops": 0,
+    "completion_rate": 0.634,
+    "mean_correct_per_run": 22.4,
+    "wilson_completed": [
+     0.6045,
+     0.6624
+    ],
+    "wilson_failed_runs": [
+     0.0,
+     0.1135
+    ],
+    "wilson_lost": [
+     0.0,
+     0.0036
+    ],
+    "hash_drift_intents": 0,
+    "exception_blocked_intents": 0,
+    "wall_ms": {
+     "n": 30,
+     "mean": 651.92,
+     "p50": 651.76,
+     "p95": 806.28,
+     "p99": 836.52,
+     "sd": 90.67
+    },
+    "re_compose_events": 32,
+    "re_compose_success": 9,
+    "re_compose_extra_attempts": 9,
+    "lock_contention_polls": 0,
+    "sig_interleave": 12,
+    "sig_drift": 0,
+    "batches": 809,
+    "batch_classes": {
+     "blocked:steward-final-patch-required/region-changed": 74,
+     "applied": 596,
+     "blocked:steward-final-patch-required/same-region-in-batch": 34,
+     "blocked:re-compose→steward-final-patch-required/region-changed": 23,
+     "blocked:steward-final-patch-required/declared-line-overlap": 73,
+     "applied_after_re-compose": 9
+    },
+    "intent_classes": {
+     "blocked:steward-final-patch-required/region-changed": 112,
+     "applied": 663,
+     "blocked:steward-final-patch-required/same-region-in-batch": 81,
+     "blocked:re-compose→steward-final-patch-required/region-changed": 28,
+     "blocked:steward-final-patch-required/declared-line-overlap": 167,
+     "applied_after_re-compose": 9
+    },
+    "attempts_batches": {
+     "0": 181,
+     "1": 619,
+     "2": 9
+    },
+    "attempts_intents": {
+     "0": 360,
+     "1": 691,
+     "2": 9
+    },
+    "sqlite_exc_intents": 0,
+    "sqlite_exc_runs": 0,
+    "presence_left_files": 0,
+    "presence_left_runs": 0,
+    "stdout_sqlite_mentions": 0,
+    "intent_total_ms": {
+     "n": 1060,
+     "mean": 99.55,
+     "p50": 63.45,
+     "p95": 211.02,
+     "p99": 255.13,
+     "sd": 64.69
+    },
+    "intent_apply_ms": {
+     "n": 1060,
+     "mean": 42.08,
+     "p50": 20.0,
+     "p95": 129.53,
+     "p99": 155.59,
+     "sd": 42.37
+    }
+   },
+   "grid_p4": {
+    "runs": 30,
+    "failed_runs": 0,
+    "lost_effects": 0,
+    "corrupted_files": 0,
+    "extra_files": 0,
+    "foreign_writes": 0,
+    "offered": 1060,
+    "correct": 708,
+    "blocked_intents": 352,
+    "identity_ok": true,
+    "v2_fail_ops": 0,
+    "completion_rate": 0.6679,
+    "mean_correct_per_run": 23.6,
+    "wilson_completed": [
+     0.639,
+     0.6956
+    ],
+    "wilson_failed_runs": [
+     0.0,
+     0.1135
+    ],
+    "wilson_lost": [
+     0.0,
+     0.0036
+    ],
+    "hash_drift_intents": 0,
+    "exception_blocked_intents": 0,
+    "wall_ms": {
+     "n": 30,
+     "mean": 724.13,
+     "p50": 703.18,
+     "p95": 900.15,
+     "p99": 1050.24,
+     "sd": 105.46
+    },
+    "re_compose_events": 44,
+    "re_compose_success": 17,
+    "re_compose_extra_attempts": 17,
+    "lock_contention_polls": 0,
+    "sig_interleave": 42,
+    "sig_drift": 0,
+    "batches": 930,
+    "batch_classes": {
+     "applied": 664,
+     "blocked:steward-final-patch-required/region-changed": 153,
+     "blocked:steward-final-patch-required/declared-line-overlap": 46,
+     "blocked:re-compose→steward-final-patch-required/region-changed": 27,
+     "blocked:steward-final-patch-required/same-region-in-batch": 23,
+     "applied_after_re-compose": 17
+    },
+    "intent_classes": {
+     "applied": 690,
+     "blocked:steward-final-patch-required/region-changed": 185,
+     "blocked:steward-final-patch-required/declared-line-overlap": 92,
+     "blocked:re-compose→steward-final-patch-required/region-changed": 29,
+     "blocked:steward-final-patch-required/same-region-in-batch": 46,
+     "applied_after_re-compose": 18
+    },
+    "attempts_batches": {
+     "0": 222,
+     "1": 691,
+     "2": 17
+    },
+    "attempts_intents": {
+     "0": 323,
+     "1": 719,
+     "2": 18
+    },
+    "sqlite_exc_intents": 0,
+    "sqlite_exc_runs": 0,
+    "presence_left_files": 0,
+    "presence_left_runs": 0,
+    "stdout_sqlite_mentions": 0,
+    "intent_total_ms": {
+     "n": 1060,
+     "mean": 116.82,
+     "p50": 77.72,
+     "p95": 286.84,
+     "p99": 356.28,
+     "sd": 85.06
+    },
+    "intent_apply_ms": {
+     "n": 1060,
+     "mean": 64.75,
+     "p50": 27.13,
+     "p95": 180.74,
+     "p99": 238.62,
+     "sd": 61.76
+    }
+   },
+   "grid_p8": {
+    "runs": 30,
+    "failed_runs": 0,
+    "lost_effects": 0,
+    "corrupted_files": 0,
+    "extra_files": 0,
+    "foreign_writes": 0,
+    "offered": 1060,
+    "correct": 721,
+    "blocked_intents": 339,
+    "identity_ok": true,
+    "v2_fail_ops": 0,
+    "completion_rate": 0.6802,
+    "mean_correct_per_run": 24.03,
+    "wilson_completed": [
+     0.6515,
+     0.7076
+    ],
+    "wilson_failed_runs": [
+     0.0,
+     0.1135
+    ],
+    "wilson_lost": [
+     0.0,
+     0.0036
+    ],
+    "hash_drift_intents": 0,
+    "exception_blocked_intents": 0,
+    "wall_ms": {
+     "n": 30,
+     "mean": 782.81,
+     "p50": 776.45,
+     "p95": 931.75,
+     "p99": 982.67,
+     "sd": 110.71
+    },
+    "re_compose_events": 73,
+    "re_compose_success": 29,
+    "re_compose_extra_attempts": 32,
+    "lock_contention_polls": 0,
+    "sig_interleave": 87,
+    "sig_drift": 0,
+    "batches": 1060,
+    "batch_classes": {
+     "blocked:steward-final-patch-required/region-changed": 295,
+     "applied": 692,
+     "blocked:re-compose→steward-final-patch-required/region-changed": 44,
+     "applied_after_re-compose": 29
+    },
+    "intent_classes": {
+     "blocked:steward-final-patch-required/region-changed": 295,
+     "applied": 692,
+     "blocked:re-compose→steward-final-patch-required/region-changed": 44,
+     "applied_after_re-compose": 29
+    },
+    "attempts_batches": {
+     "0": 295,
+     "1": 735,
+     "2": 28,
+     "3": 2
+    },
+    "attempts_intents": {
+     "0": 295,
+     "1": 735,
+     "2": 28,
+     "3": 2
+    },
+    "sqlite_exc_intents": 0,
+    "sqlite_exc_runs": 0,
+    "presence_left_files": 0,
+    "presence_left_runs": 0,
+    "stdout_sqlite_mentions": 0,
+    "intent_total_ms": {
+     "n": 1060,
+     "mean": 138.65,
+     "p50": 131.41,
+     "p95": 351.56,
+     "p99": 406.59,
+     "sd": 103.52
+    },
+    "intent_apply_ms": {
+     "n": 1060,
+     "mean": 94.71,
+     "p50": 110.44,
+     "p95": 264.81,
+     "p99": 310.54,
+     "sd": 83.8
+    }
+   }
+  }
+ },
+ "paired_completed": {
+  "q6_vs_q5": {
+   "pairs": 150,
+   "higher": 62,
+   "equal": 22,
+   "lower": 66,
+   "mean_diff_per_run": 0.07,
+   "sum_diff": 10
+  },
+  "nq6_vs_q6": {
+   "pairs": 150,
+   "higher": 63,
+   "equal": 18,
+   "lower": 69,
+   "mean_diff_per_run": -0.28,
+   "sum_diff": -42
+  },
+  "nq6_vs_q5": {
+   "pairs": 150,
+   "higher": 58,
+   "equal": 27,
+   "lower": 65,
+   "mean_diff_per_run": -0.21,
+   "sum_diff": -32
+  }
+ },
+ "replay_failures": [],
+ "matrix": {
+  "q5": {
+   "runs": 9,
+   "failed_runs": 0,
+   "lost_effects": 0,
+   "corrupted_files": 0,
+   "extra_files": 0,
+   "foreign_writes": 0,
+   "offered": 318,
+   "correct": 213,
+   "blocked_intents": 105,
+   "identity_ok": true,
+   "v2_fail_ops": 0,
+   "completion_rate": 0.6698,
+   "mean_correct_per_run": 23.67,
+   "wilson_completed": [
+    0.6164,
+    0.7192
+   ],
+   "wilson_failed_runs": [
+    0.0,
+    0.2992
+   ],
+   "wilson_lost": [
+    0.0,
+    0.0119
+   ],
+   "hash_drift_intents": 0,
+   "exception_blocked_intents": 0,
+   "wall_ms": {
+    "n": 9,
+    "mean": 631.74,
+    "p50": 633.1,
+    "p95": 694.48,
+    "p99": 711.44,
+    "sd": 40.06
+   },
+   "re_compose_events": 0,
+   "re_compose_success": 0,
+   "re_compose_extra_attempts": 0,
+   "lock_contention_polls": 0,
+   "sig_interleave": 12,
+   "sig_drift": 0,
+   "batches": 282,
+   "batch_classes": {
+    "blocked:steward-final-patch-required/region-changed": 58,
+    "applied": 207,
+    "blocked:steward-final-patch-required/same-region-in-batch": 4,
+    "blocked:steward-final-patch-required/declared-line-overlap": 13
+   },
+   "intent_classes": {
+    "blocked:steward-final-patch-required/region-changed": 65,
+    "applied": 213,
+    "blocked:steward-final-patch-required/same-region-in-batch": 11,
+    "blocked:steward-final-patch-required/declared-line-overlap": 29
+   },
+   "attempts_batches": {
+    "0": 75,
+    "1": 207
+   },
+   "attempts_intents": {
+    "0": 105,
+    "1": 213
+   },
+   "sqlite_exc_intents": 0,
+   "sqlite_exc_runs": 0,
+   "presence_left_files": 0,
+   "presence_left_runs": 0,
+   "stdout_sqlite_mentions": 0,
+   "intent_total_ms": {
+    "n": 318,
+    "mean": 101.81,
+    "p50": 59.14,
+    "p95": 229.82,
+    "p99": 299.79,
+    "sd": 70.18
+   },
+   "intent_apply_ms": {
+    "n": 318,
+    "mean": 59.77,
+    "p50": 19.36,
+    "p95": 170.76,
+    "p99": 241.52,
+    "sd": 60.95
+   }
+  },
+  "q6": {
+   "runs": 9,
+   "failed_runs": 0,
+   "lost_effects": 0,
+   "corrupted_files": 0,
+   "extra_files": 0,
+   "foreign_writes": 0,
+   "offered": 318,
+   "correct": 209,
+   "blocked_intents": 109,
+   "identity_ok": true,
+   "v2_fail_ops": 0,
+   "completion_rate": 0.6572,
+   "mean_correct_per_run": 23.22,
+   "wilson_completed": [
+    0.6035,
+    0.7072
+   ],
+   "wilson_failed_runs": [
+    0.0,
+    0.2992
+   ],
+   "wilson_lost": [
+    0.0,
+    0.0119
+   ],
+   "hash_drift_intents": 0,
+   "exception_blocked_intents": 0,
+   "wall_ms": {
+    "n": 9,
+    "mean": 620.38,
+    "p50": 602.6,
+    "p95": 754.94,
+    "p99": 791.05,
+    "sd": 85.86
+   },
+   "re_compose_events": 0,
+   "re_compose_success": 0,
+   "re_compose_extra_attempts": 0,
+   "lock_contention_polls": 0,
+   "sig_interleave": 12,
+   "sig_drift": 0,
+   "batches": 276,
+   "batch_classes": {
+    "applied": 201,
+    "blocked:steward-final-patch-required/same-region-in-batch": 8,
+    "blocked:steward-final-patch-required/region-changed": 54,
+    "blocked:steward-final-patch-required/declared-line-overlap": 13
+   },
+   "intent_classes": {
+    "applied": 209,
+    "blocked:steward-final-patch-required/same-region-in-batch": 16,
+    "blocked:steward-final-patch-required/region-changed": 65,
+    "blocked:steward-final-patch-required/declared-line-overlap": 28
+   },
+   "attempts_batches": {
+    "0": 75,
+    "1": 201
+   },
+   "attempts_intents": {
+    "0": 109,
+    "1": 209
+   },
+   "sqlite_exc_intents": 0,
+   "sqlite_exc_runs": 0,
+   "presence_left_files": 0,
+   "presence_left_runs": 0,
+   "stdout_sqlite_mentions": 0,
+   "intent_total_ms": {
+    "n": 318,
+    "mean": 98.82,
+    "p50": 59.22,
+    "p95": 221.15,
+    "p99": 304.72,
+    "sd": 69.24
+   },
+   "intent_apply_ms": {
+    "n": 318,
+    "mean": 57.07,
+    "p50": 19.31,
+    "p95": 164.84,
+    "p99": 255.57,
+    "sd": 60.25
+   }
+  },
+  "nq6": {
+   "runs": 9,
+   "failed_runs": 0,
+   "lost_effects": 0,
+   "corrupted_files": 0,
+   "extra_files": 0,
+   "foreign_writes": 0,
+   "offered": 318,
+   "correct": 210,
+   "blocked_intents": 108,
+   "identity_ok": true,
+   "v2_fail_ops": 0,
+   "completion_rate": 0.6604,
+   "mean_correct_per_run": 23.33,
+   "wilson_completed": [
+    0.6067,
+    0.7102
+   ],
+   "wilson_failed_runs": [
+    0.0,
+    0.2992
+   ],
+   "wilson_lost": [
+    0.0,
+    0.0119
+   ],
+   "hash_drift_intents": 0,
+   "exception_blocked_intents": 0,
+   "wall_ms": {
+    "n": 9,
+    "mean": 623.42,
+    "p50": 649.31,
+    "p95": 712.04,
+    "p99": 725.48,
+    "sd": 66.22
+   },
+   "re_compose_events": 13,
+   "re_compose_success": 3,
+   "re_compose_extra_attempts": 3,
+   "lock_contention_polls": 0,
+   "sig_interleave": 9,
+   "sig_drift": 0,
+   "batches": 283,
+   "batch_classes": {
+    "blocked:steward-final-patch-required/region-changed": 50,
+    "applied": 203,
+    "blocked:steward-final-patch-required/same-region-in-batch": 4,
+    "blocked:steward-final-patch-required/declared-line-overlap": 13,
+    "blocked:re-compose→steward-final-patch-required/region-changed": 10,
+    "applied_after_re-compose": 3
+   },
+   "intent_classes": {
+    "blocked:steward-final-patch-required/region-changed": 57,
+    "applied": 207,
+    "blocked:steward-final-patch-required/same-region-in-batch": 8,
+    "blocked:steward-final-patch-required/declared-line-overlap": 31,
+    "blocked:re-compose→steward-final-patch-required/region-changed": 12,
+    "applied_after_re-compose": 3
+   },
+   "attempts_batches": {
+    "0": 67,
+    "1": 213,
+    "2": 3
+   },
+   "attempts_intents": {
+    "0": 96,
+    "1": 219,
+    "2": 3
+   },
+   "sqlite_exc_intents": 0,
+   "sqlite_exc_runs": 0,
+   "presence_left_files": 0,
+   "presence_left_runs": 0,
+   "stdout_sqlite_mentions": 0,
+   "intent_total_ms": {
+    "n": 318,
+    "mean": 97.42,
+    "p50": 58.12,
+    "p95": 225.99,
+    "p99": 293.81,
+    "sd": 67.78
+   },
+   "intent_apply_ms": {
+    "n": 318,
+    "mean": 57.02,
+    "p50": 19.39,
+    "p95": 178.35,
+    "p99": 244.89,
+    "sd": 60.26
+   }
+  }
+ },
+ "matrix_failures": [],
+ "exception_blocked": {
+  "n_intents": 1,
+  "n_runs": 1,
+  "by_arm": {
+   "q5": 1
+  },
+  "cells": [
+   {
+    "cell": "r6v-e4-p8-s11-g-q5-r5",
+    "cls": "blocked:ERR_SQLITE_ERROR",
+    "intents": 1
+   }
+  ]
+ },
+ "sqlite_and_presence": {
+  "q5": {
+   "runs": 159,
+   "sqlite_exc_intents": 1,
+   "sqlite_exc_runs": 1,
+   "presence_left_files": 1,
+   "presence_left_runs": 1,
+   "stdout_sqlite_mentions": 0
+  },
+  "q6": {
+   "runs": 159,
+   "sqlite_exc_intents": 0,
+   "sqlite_exc_runs": 0,
+   "presence_left_files": 0,
+   "presence_left_runs": 0,
+   "stdout_sqlite_mentions": 0
+  },
+  "nq6": {
+   "runs": 159,
+   "sqlite_exc_intents": 0,
+   "sqlite_exc_runs": 0,
+   "presence_left_files": 0,
+   "presence_left_runs": 0,
+   "stdout_sqlite_mentions": 0
+  }
+ },
+ "presence_cells": [
+  {
+   "cell": "r6v-e4-p8-s11-g-q5-r5",
+   "files": [
+    "atm/worktree/.atm/runtime/broker-steward-apply-queue/d09129bcfe2ca680599cf4a6fb354d69ef71ab4c04153594e78fabfc9edbe85a/p/37582607a42f3bc5.sqlite"
+   ]
+  }
+ ],
+ "stress": {
+  "37847584": {
+   "rounds": 3,
+   "procs": 24,
+   "calls_ok": 7199,
+   "calls_threw": 1,
+   "presence_files_left": 1,
+   "errs": {
+    "ERR_SQLITE_ERROR database is locked @L252:6)": 1
+   }
+  },
+  "b35a6141": {
+   "rounds": 3,
+   "procs": 24,
+   "calls_ok": 7200,
+   "calls_threw": 0,
+   "presence_files_left": 0,
+   "errs": {}
+  }
+ },
+ "stress_posthoc_16x1000": {
+  "37847584": {
+   "rounds": 3,
+   "procs": 48,
+   "calls_ok": 47922,
+   "calls_threw": 78,
+   "presence_files_left": 78,
+   "errs": {
+    "ERR_SQLITE_ERROR database is locked @L252:6)": 78
+   }
+  },
+  "b35a6141": {
+   "rounds": 3,
+   "procs": 48,
+   "calls_ok": 48000,
+   "calls_threw": 0,
+   "presence_files_left": 0,
+   "errs": {}
+  }
+ },
+ "barrier": {
+  "seam-b35a6141-qoff-Lreducers-Freducers": {
+   "test": "r3-barrier-interleave-v1",
+   "mode": "seam",
+   "atm_env": {
+    "ATM_STEWARD_APPLY_QUEUE": "off"
+   },
+   "variant": "same-region(reducers)",
+   "atm_monorepo": "/workspace/atm-main-b35a6141/AI-Atomic-Framework-b35a6141bd5bfbaec654f1cd3079323581b04074",
+   "atm_pin": "b35a6141bd5bfbaec654f1cd3079323581b04074",
+   "node": "v24.21.0",
+   "reps": 10,
+   "window_hit": 10,
+   "runs_with_lost_effect": 0,
+   "lost_effects_total": 0,
+   "leader_applied": 10,
+   "follower_classes": {
+    "blocked_after_re-compose(steward-final-patch-required)": 10
+   },
+   "final_equals_leader_only": 10,
+   "final_equals_both_full_bytes": 0,
+   "leftover_files": 0,
+   "seam_ops": [
+    "mkdirSync"
+   ],
+   "follower_commit_guard_attempts": [
+    0
+   ],
+   "leader_commit_guard_attempts": [
+    0
+   ],
+   "follower_tx_attempts": [
+    1
+   ],
+   "follower_lock_owner_writes": [
+    1
+   ],
+   "first_follower_reason": "steward-final-patch-required: proposal 'p-follower' overlaps region 'reducers', which changed after the proposal was anchored; refusing to overwrite [proposals: p-follower]"
+  },
+  "seam-b35a6141-qoff-Lselectors-Freducers": {
+   "test": "r3-barrier-interleave-v1",
+   "mode": "seam",
+   "atm_env": {
+    "ATM_STEWARD_APPLY_QUEUE": "off"
+   },
+   "variant": "leader-selectors/follower-reducers",
+   "atm_monorepo": "/workspace/atm-main-b35a6141/AI-Atomic-Framework-b35a6141bd5bfbaec654f1cd3079323581b04074",
+   "atm_pin": "b35a6141bd5bfbaec654f1cd3079323581b04074",
+   "node": "v24.21.0",
+   "reps": 10,
+   "window_hit": 10,
+   "runs_with_lost_effect": 0,
+   "lost_effects_total": 0,
+   "leader_applied": 10,
+   "follower_classes": {
+    "applied_after_re-compose_both_present": 10
+   },
+   "final_equals_leader_only": 0,
+   "final_equals_both_full_bytes": 10,
+   "leftover_files": 0,
+   "seam_ops": [
+    "mkdirSync"
+   ],
+   "follower_commit_guard_attempts": [
+    0
+   ],
+   "leader_commit_guard_attempts": [
+    0
+   ],
+   "follower_tx_attempts": [
+    2
+   ],
+   "follower_lock_owner_writes": [
+    2
+   ],
+   "first_follower_reason": null
+  },
+  "stale-proposal-b35a6141-qoff-Lreducers-Freducers": {
+   "test": "r3-barrier-interleave-v1",
+   "mode": "stale-proposal",
+   "atm_env": {
+    "ATM_STEWARD_APPLY_QUEUE": "off"
+   },
+   "variant": "same-region(reducers)",
+   "atm_monorepo": "/workspace/atm-main-b35a6141/AI-Atomic-Framework-b35a6141bd5bfbaec654f1cd3079323581b04074",
+   "atm_pin": "b35a6141bd5bfbaec654f1cd3079323581b04074",
+   "node": "v24.21.0",
+   "reps": 10,
+   "window_hit": 10,
+   "runs_with_lost_effect": 0,
+   "lost_effects_total": 0,
+   "leader_applied": 10,
+   "follower_classes": {
+    "blocked_other": 10
+   },
+   "final_equals_leader_only": 10,
+   "final_equals_both_full_bytes": 0,
+   "leftover_files": 0,
+   "seam_ops": [
+    null
+   ],
+   "follower_commit_guard_attempts": [
+    0
+   ],
+   "leader_commit_guard_attempts": [
+    0
+   ],
+   "follower_tx_attempts": [
+    0
+   ],
+   "follower_lock_owner_writes": [
+    0
+   ],
+   "first_follower_reason": "steward-final-patch-required: proposal 'p-follower' overlaps region 'reducers', which changed after the proposal was anchored; refusing to overwrite [proposals: p-follower]"
+  },
+  "stale-proposal-b35a6141-qoff-Lselectors-Freducers": {
+   "test": "r3-barrier-interleave-v1",
+   "mode": "stale-proposal",
+   "atm_env": {
+    "ATM_STEWARD_APPLY_QUEUE": "off"
+   },
+   "variant": "leader-selectors/follower-reducers",
+   "atm_monorepo": "/workspace/atm-main-b35a6141/AI-Atomic-Framework-b35a6141bd5bfbaec654f1cd3079323581b04074",
+   "atm_pin": "b35a6141bd5bfbaec654f1cd3079323581b04074",
+   "node": "v24.21.0",
+   "reps": 10,
+   "window_hit": 10,
+   "runs_with_lost_effect": 0,
+   "lost_effects_total": 0,
+   "leader_applied": 10,
+   "follower_classes": {
+    "applied_both_present": 10
+   },
+   "final_equals_leader_only": 0,
+   "final_equals_both_full_bytes": 10,
+   "leftover_files": 0,
+   "seam_ops": [
+    null
+   ],
+   "follower_commit_guard_attempts": [
+    0
+   ],
+   "leader_commit_guard_attempts": [
+    0
+   ],
+   "follower_tx_attempts": [
+    1
+   ],
+   "follower_lock_owner_writes": [
+    1
+   ],
+   "first_follower_reason": null
+  },
+  "stale-proposal-b35a6141-qon-Lreducers-Freducers": {
+   "test": "r3-barrier-interleave-v1",
+   "mode": "stale-proposal",
+   "atm_env": {
+    "ATM_STEWARD_APPLY_QUEUE": "on"
+   },
+   "variant": "same-region(reducers)",
+   "atm_monorepo": "/workspace/atm-main-b35a6141/AI-Atomic-Framework-b35a6141bd5bfbaec654f1cd3079323581b04074",
+   "atm_pin": "b35a6141bd5bfbaec654f1cd3079323581b04074",
+   "node": "v24.21.0",
+   "reps": 10,
+   "window_hit": 10,
+   "runs_with_lost_effect": 0,
+   "lost_effects_total": 0,
+   "leader_applied": 10,
+   "follower_classes": {
+    "blocked_other": 10
+   },
+   "final_equals_leader_only": 10,
+   "final_equals_both_full_bytes": 0,
+   "leftover_files": 0,
+   "seam_ops": [
+    null
+   ],
+   "follower_commit_guard_attempts": [
+    0
+   ],
+   "leader_commit_guard_attempts": [
+    0
+   ],
+   "follower_tx_attempts": [
+    0
+   ],
+   "follower_lock_owner_writes": [
+    0
+   ],
+   "first_follower_reason": "steward-final-patch-required: proposal 'p-follower' overlaps region 'reducers', which changed after the proposal was anchored; refusing to overwrite [proposals: p-follower]"
+  },
+  "stale-proposal-b35a6141-qon-Lselectors-Freducers": {
+   "test": "r3-barrier-interleave-v1",
+   "mode": "stale-proposal",
+   "atm_env": {
+    "ATM_STEWARD_APPLY_QUEUE": "on"
+   },
+   "variant": "leader-selectors/follower-reducers",
+   "atm_monorepo": "/workspace/atm-main-b35a6141/AI-Atomic-Framework-b35a6141bd5bfbaec654f1cd3079323581b04074",
+   "atm_pin": "b35a6141bd5bfbaec654f1cd3079323581b04074",
+   "node": "v24.21.0",
+   "reps": 10,
+   "window_hit": 10,
+   "runs_with_lost_effect": 0,
+   "lost_effects_total": 0,
+   "leader_applied": 10,
+   "follower_classes": {
+    "applied_both_present": 10
+   },
+   "final_equals_leader_only": 0,
+   "final_equals_both_full_bytes": 10,
+   "leftover_files": 0,
+   "seam_ops": [
+    null
+   ],
+   "follower_commit_guard_attempts": [
+    0
+   ],
+   "leader_commit_guard_attempts": [
+    0
+   ],
+   "follower_tx_attempts": [
+    1
+   ],
+   "follower_lock_owner_writes": [
+    1
+   ],
+   "first_follower_reason": null
+  }
+ },
+ "faults": {
+  "F1-holder-sigkill | after-lock | b35a6141-qon": {
+   "n": 10,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "B:applied": 10
+   }
+  },
+  "F1-holder-sigkill | before-rename | b35a6141-qon": {
+   "n": 10,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "B:applied": 10
+   }
+  },
+  "F6-pid-namespace | holder-host/contender-pidns | b35a6141-qon": {
+   "n": 10,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied B:applied": 10
+   }
+  },
+  "F6-pid-namespace | holder-pidns/contender-host | b35a6141-qon": {
+   "n": 10,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied B:applied": 10
+   }
+  },
+  "O2-live-writer-temp | all-host | b35a6141-qon": {
+   "n": 10,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied B:blocked(recovery-required)": 10
+   }
+  },
+  "O2-live-writer-temp | writer-pidns/cleaner+B-host | b35a6141-qon": {
+   "n": 10,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied B:blocked(recovery-required)": 10
+   }
+  },
+  "O2-live-writer-temp | writer-host/cleaner+B-pidns | b35a6141-qon": {
+   "n": 10,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied B:blocked(recovery-required)": 10
+   }
+  },
+  "F1-holder-sigkill | after-lock | b35a6141-qoff": {
+   "n": 10,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "B:applied": 10
+   }
+  },
+  "F1-holder-sigkill | before-rename | b35a6141-qoff": {
+   "n": 10,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "B:applied": 10
+   }
+  },
+  "F6-pid-namespace | holder-host/contender-pidns | b35a6141-qoff": {
+   "n": 10,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied B:blocked(recovery-required)": 10
+   }
+  },
+  "F6-pid-namespace | holder-pidns/contender-host | b35a6141-qoff": {
+   "n": 10,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied B:blocked(recovery-required)": 10
+   }
+  },
+  "O2-live-writer-temp | all-host | b35a6141-qoff": {
+   "n": 10,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied B:blocked(recovery-required)": 10
+   }
+  },
+  "O2-live-writer-temp | writer-pidns/cleaner+B-host | b35a6141-qoff": {
+   "n": 10,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied B:blocked(recovery-required)": 10
+   }
+  },
+  "O2-live-writer-temp | writer-host/cleaner+B-pidns | b35a6141-qoff": {
+   "n": 10,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied B:blocked(recovery-required)": 10
+   }
+  },
+  "F2-crafted-owner | pidreuse-live-pid-wrong-starttoken | b35a6141-qon": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "B:applied": 3
+   }
+  },
+  "F2-crafted-owner | live-pid-correct-starttoken | b35a6141-qon": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "B:applied": 3
+   }
+  },
+  "F2-crafted-owner | dead-pid | b35a6141-qon": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "B:applied": 3
+   }
+  },
+  "F2-crafted-owner | legacy-v1-live-pid | b35a6141-qon": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "B:applied": 3
+   }
+  },
+  "F3-live-holder-timeout | hold3500ms | b35a6141-qon": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied B:applied": 3
+   }
+  },
+  "F4-tmpdir | same-tmpdir/B-same-region | b35a6141-qon": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied B:blocked(steward-final-patch-required)": 3
+   }
+  },
+  "F4-tmpdir | same-tmpdir/B-other-region | b35a6141-qon": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied B:applied": 3
+   }
+  },
+  "F4-tmpdir | different-tmpdir/B-same-region | b35a6141-qon": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied B:blocked(steward-final-patch-required)": 3
+   }
+  },
+  "F4-tmpdir | different-tmpdir/B-other-region | b35a6141-qon": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied B:applied": 3
+   }
+  },
+  "F2b-forged-owner-live-holder | forged-owner-dead-pid | b35a6141-qon": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied B:applied": 3
+   }
+  },
+  "F2b-forged-owner-live-holder | forged-owner-wrong-starttoken | b35a6141-qon": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied B:applied": 3
+   }
+  },
+  "F7-queue-wait-fallback | queue-wait300ms/A-hold3000ms | b35a6141-qon": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied B:blocked(recovery-required)": 3
+   }
+  },
+  "F7-queue-wait-fallback | queue-wait300ms/A-hold1200ms | b35a6141-qon": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied B:applied": 3
+   }
+  },
+  "F5-retry-exhaustion | default-policy/K=always | b35a6141-qon": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:blocked(re-compose attempts exhausted after 5 of 5)": 3
+   }
+  },
+  "F5-retry-exhaustion | default-policy/K=2 | b35a6141-qon": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied": 3
+   }
+  },
+  "F5-retry-exhaustion | default-policy/K=4 | b35a6141-qon": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied": 3
+   }
+  },
+  "F5-retry-exhaustion | maxRecompose=0/K=always | b35a6141-qon": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:blocked(re-compose attempts exhausted after 1 of 1)": 3
+   }
+  },
+  "F5-retry-exhaustion | maxRecompose=1,backoff0/K=1 | b35a6141-qon": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied": 3
+   }
+  },
+  "F5-retry-exhaustion | env:ATM_STEWARD_RECOMPOSE_POLICY maxRecompose=0/K=always | b35a6141-qon": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:blocked(re-compose attempts exhausted after 1 of 1)": 3
+   }
+  },
+  "F2-crafted-owner | pidreuse-live-pid-wrong-starttoken | b35a6141-qoff": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "B:applied": 3
+   }
+  },
+  "F2-crafted-owner | live-pid-correct-starttoken | b35a6141-qoff": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "B:applied": 3
+   }
+  },
+  "F2-crafted-owner | dead-pid | b35a6141-qoff": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "B:applied": 3
+   }
+  },
+  "F2-crafted-owner | legacy-v1-live-pid | b35a6141-qoff": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "B:applied": 3
+   }
+  },
+  "F3-live-holder-timeout | hold3500ms | b35a6141-qoff": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied B:blocked(recovery-required)": 3
+   }
+  },
+  "F4-tmpdir | same-tmpdir/B-same-region | b35a6141-qoff": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied B:blocked(steward-final-patch-required)": 3
+   }
+  },
+  "F4-tmpdir | same-tmpdir/B-other-region | b35a6141-qoff": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied B:applied": 3
+   }
+  },
+  "F4-tmpdir | different-tmpdir/B-same-region | b35a6141-qoff": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied B:blocked(steward-final-patch-required)": 3
+   }
+  },
+  "F4-tmpdir | different-tmpdir/B-other-region | b35a6141-qoff": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied B:applied": 3
+   }
+  },
+  "F2b-forged-owner-live-holder | forged-owner-dead-pid | b35a6141-qoff": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied B:blocked(recovery-required)": 3
+   }
+  },
+  "F2b-forged-owner-live-holder | forged-owner-wrong-starttoken | b35a6141-qoff": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied B:blocked(recovery-required)": 3
+   }
+  },
+  "F5-retry-exhaustion | default-policy/K=always | b35a6141-qoff": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:blocked(re-compose attempts exhausted after 5 of 5)": 3
+   }
+  },
+  "F5-retry-exhaustion | default-policy/K=2 | b35a6141-qoff": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied": 3
+   }
+  },
+  "F5-retry-exhaustion | default-policy/K=4 | b35a6141-qoff": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied": 3
+   }
+  },
+  "F5-retry-exhaustion | maxRecompose=0/K=always | b35a6141-qoff": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:blocked(re-compose attempts exhausted after 1 of 1)": 3
+   }
+  },
+  "F5-retry-exhaustion | maxRecompose=1,backoff0/K=1 | b35a6141-qoff": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:applied": 3
+   }
+  },
+  "F5-retry-exhaustion | env:ATM_STEWARD_RECOMPOSE_POLICY maxRecompose=0/K=always | b35a6141-qoff": {
+   "n": 3,
+   "lost_effects": 0,
+   "runs_with_lost": 0,
+   "frame_bad": 0,
+   "leftovers": 0,
+   "outcomes": {
+    "A:blocked(re-compose attempts exhausted after 1 of 1)": 3
+   }
+  }
+ },
+ "fault_checks": {
+  "F1-holder-sigkill | after-lock | b35a6141-qon": {
+   "orphan_after_kill": 0
+  },
+  "F1-holder-sigkill | before-rename | b35a6141-qon": {
+   "orphan_removed_by_B": 10,
+   "orphan_removed_after_lock": 10,
+   "orphan_after_kill": 10
+  },
+  "F6-pid-namespace | holder-host/contender-pidns | b35a6141-qon": {
+   "ns_split_confirmed": 10,
+   "ns_checked": 10,
+   "both_inside_lock": 0
+  },
+  "F6-pid-namespace | holder-pidns/contender-host | b35a6141-qon": {
+   "ns_split_confirmed": 10,
+   "ns_checked": 10,
+   "both_inside_lock": 0
+  },
+  "O2-live-writer-temp | all-host | b35a6141-qon": {
+   "live_temp_survived_cleaner": 10,
+   "cleaner_skipped_live_holder": 10,
+   "live_temp_survived_B": 10,
+   "live_temp_B_checked": 10
+  },
+  "O2-live-writer-temp | writer-pidns/cleaner+B-host | b35a6141-qon": {
+   "ns_split_confirmed": 10,
+   "ns_checked": 10,
+   "live_temp_survived_cleaner": 10,
+   "cleaner_skipped_live_holder": 10,
+   "live_temp_survived_B": 10,
+   "live_temp_B_checked": 10
+  },
+  "O2-live-writer-temp | writer-host/cleaner+B-pidns | b35a6141-qon": {
+   "ns_split_confirmed": 10,
+   "ns_checked": 10,
+   "live_temp_survived_cleaner": 10,
+   "cleaner_skipped_live_holder": 10,
+   "live_temp_survived_B": 10,
+   "live_temp_B_checked": 10
+  },
+  "F1-holder-sigkill | after-lock | b35a6141-qoff": {
+   "orphan_after_kill": 0
+  },
+  "F1-holder-sigkill | before-rename | b35a6141-qoff": {
+   "orphan_removed_by_B": 10,
+   "orphan_removed_after_lock": 10,
+   "orphan_after_kill": 10
+  },
+  "F6-pid-namespace | holder-host/contender-pidns | b35a6141-qoff": {
+   "ns_split_confirmed": 10,
+   "ns_checked": 10,
+   "both_inside_lock": 0
+  },
+  "F6-pid-namespace | holder-pidns/contender-host | b35a6141-qoff": {
+   "ns_split_confirmed": 10,
+   "ns_checked": 10,
+   "both_inside_lock": 0
+  },
+  "O2-live-writer-temp | all-host | b35a6141-qoff": {
+   "live_temp_survived_cleaner": 10,
+   "cleaner_skipped_live_holder": 10,
+   "live_temp_survived_B": 10,
+   "live_temp_B_checked": 10
+  },
+  "O2-live-writer-temp | writer-pidns/cleaner+B-host | b35a6141-qoff": {
+   "ns_split_confirmed": 10,
+   "ns_checked": 10,
+   "live_temp_survived_cleaner": 10,
+   "cleaner_skipped_live_holder": 10,
+   "live_temp_survived_B": 10,
+   "live_temp_B_checked": 10
+  },
+  "O2-live-writer-temp | writer-host/cleaner+B-pidns | b35a6141-qoff": {
+   "ns_split_confirmed": 10,
+   "ns_checked": 10,
+   "live_temp_survived_cleaner": 10,
+   "cleaner_skipped_live_holder": 10,
+   "live_temp_survived_B": 10,
+   "live_temp_B_checked": 10
+  },
+  "F2-crafted-owner | pidreuse-live-pid-wrong-starttoken | b35a6141-qon": {},
+  "F2-crafted-owner | live-pid-correct-starttoken | b35a6141-qon": {},
+  "F2-crafted-owner | dead-pid | b35a6141-qon": {},
+  "F2-crafted-owner | legacy-v1-live-pid | b35a6141-qon": {},
+  "F3-live-holder-timeout | hold3500ms | b35a6141-qon": {},
+  "F4-tmpdir | same-tmpdir/B-same-region | b35a6141-qon": {},
+  "F4-tmpdir | same-tmpdir/B-other-region | b35a6141-qon": {},
+  "F4-tmpdir | different-tmpdir/B-same-region | b35a6141-qon": {},
+  "F4-tmpdir | different-tmpdir/B-other-region | b35a6141-qon": {},
+  "F2b-forged-owner-live-holder | forged-owner-dead-pid | b35a6141-qon": {},
+  "F2b-forged-owner-live-holder | forged-owner-wrong-starttoken | b35a6141-qon": {},
+  "F7-queue-wait-fallback | queue-wait300ms/A-hold3000ms | b35a6141-qon": {},
+  "F7-queue-wait-fallback | queue-wait300ms/A-hold1200ms | b35a6141-qon": {},
+  "F5-retry-exhaustion | default-policy/K=always | b35a6141-qon": {},
+  "F5-retry-exhaustion | default-policy/K=2 | b35a6141-qon": {},
+  "F5-retry-exhaustion | default-policy/K=4 | b35a6141-qon": {},
+  "F5-retry-exhaustion | maxRecompose=0/K=always | b35a6141-qon": {},
+  "F5-retry-exhaustion | maxRecompose=1,backoff0/K=1 | b35a6141-qon": {},
+  "F5-retry-exhaustion | env:ATM_STEWARD_RECOMPOSE_POLICY maxRecompose=0/K=always | b35a6141-qon": {},
+  "F2-crafted-owner | pidreuse-live-pid-wrong-starttoken | b35a6141-qoff": {},
+  "F2-crafted-owner | live-pid-correct-starttoken | b35a6141-qoff": {},
+  "F2-crafted-owner | dead-pid | b35a6141-qoff": {},
+  "F2-crafted-owner | legacy-v1-live-pid | b35a6141-qoff": {},
+  "F3-live-holder-timeout | hold3500ms | b35a6141-qoff": {},
+  "F4-tmpdir | same-tmpdir/B-same-region | b35a6141-qoff": {},
+  "F4-tmpdir | same-tmpdir/B-other-region | b35a6141-qoff": {},
+  "F4-tmpdir | different-tmpdir/B-same-region | b35a6141-qoff": {},
+  "F4-tmpdir | different-tmpdir/B-other-region | b35a6141-qoff": {},
+  "F2b-forged-owner-live-holder | forged-owner-dead-pid | b35a6141-qoff": {},
+  "F2b-forged-owner-live-holder | forged-owner-wrong-starttoken | b35a6141-qoff": {},
+  "F5-retry-exhaustion | default-policy/K=always | b35a6141-qoff": {},
+  "F5-retry-exhaustion | default-policy/K=2 | b35a6141-qoff": {},
+  "F5-retry-exhaustion | default-policy/K=4 | b35a6141-qoff": {},
+  "F5-retry-exhaustion | maxRecompose=0/K=always | b35a6141-qoff": {},
+  "F5-retry-exhaustion | maxRecompose=1,backoff0/K=1 | b35a6141-qoff": {},
+  "F5-retry-exhaustion | env:ATM_STEWARD_RECOMPOSE_POLICY maxRecompose=0/K=always | b35a6141-qoff": {}
+ },
+ "fault_meta_f6-f1-o2": {
+  "test": "r5-fault-scenarios-v1",
+  "node": "v24.21.0",
+  "host_pidns": "pid:[4026532320]",
+  "unshare": "unshare from util-linux 2.41.5",
+  "pins": {
+   "b35a6141-qon": "/workspace/atm-main-b35a6141/AI-Atomic-Framework-b35a6141bd5bfbaec654f1cd3079323581b04074",
+   "b35a6141-qoff": "/workspace/atm-main-b35a6141/AI-Atomic-Framework-b35a6141bd5bfbaec654f1cd3079323581b04074"
+  },
+  "reps": 10
+ },
+ "fault_meta_rest": {
+  "test": "r5-fault-scenarios-v1",
+  "node": "v24.21.0",
+  "host_pidns": "pid:[4026532320]",
+  "unshare": "unshare from util-linux 2.41.5",
+  "pins": {
+   "b35a6141-qon": "/workspace/atm-main-b35a6141/AI-Atomic-Framework-b35a6141bd5bfbaec654f1cd3079323581b04074",
+   "b35a6141-qoff": "/workspace/atm-main-b35a6141/AI-Atomic-Framework-b35a6141bd5bfbaec654f1cd3079323581b04074"
+  },
+  "reps": 3
+ },
+ "counterexamples": {
+  "replay_lost": 0,
+  "replay_corrupted": 0,
+  "matrix_lost": 0,
+  "matrix_corrupted": 0,
+  "faults_lost": 0,
+  "faults_frame_bad": 0,
+  "barrier_lost": 0
+ }
+}

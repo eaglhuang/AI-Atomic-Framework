@@ -1,0 +1,995 @@
+start 2026-10-08 14:37:46 CST phases=[barrier replay matrix regression faults] arms=[old fix opt optlock optr0 optr1]
+phase barrier 14:37:46
+rep 1: window_hit=true leader=applied follower=applied/applied_overwrite lost=["leader"]
+rep 2: window_hit=true leader=applied follower=applied/applied_overwrite lost=["leader"]
+rep 3: window_hit=true leader=applied follower=applied/applied_overwrite lost=["leader"]
+rep 4: window_hit=true leader=applied follower=applied/applied_overwrite lost=["leader"]
+rep 5: window_hit=true leader=applied follower=applied/applied_overwrite lost=["leader"]
+rep 6: window_hit=true leader=applied follower=applied/applied_overwrite lost=["leader"]
+rep 7: window_hit=true leader=applied follower=applied/applied_overwrite lost=["leader"]
+rep 8: window_hit=true leader=applied follower=applied/applied_overwrite lost=["leader"]
+rep 9: window_hit=true leader=applied follower=applied/applied_overwrite lost=["leader"]
+rep 10: window_hit=true leader=applied follower=applied/applied_overwrite lost=["leader"]
+rep 11: window_hit=true leader=applied follower=applied/applied_overwrite lost=["leader"]
+rep 12: window_hit=true leader=applied follower=applied/applied_overwrite lost=["leader"]
+rep 13: window_hit=true leader=applied follower=applied/applied_overwrite lost=["leader"]
+rep 14: window_hit=true leader=applied follower=applied/applied_overwrite lost=["leader"]
+rep 15: window_hit=true leader=applied follower=applied/applied_overwrite lost=["leader"]
+rep 16: window_hit=true leader=applied follower=applied/applied_overwrite lost=["leader"]
+rep 17: window_hit=true leader=applied follower=applied/applied_overwrite lost=["leader"]
+rep 18: window_hit=true leader=applied follower=applied/applied_overwrite lost=["leader"]
+rep 19: window_hit=true leader=applied follower=applied/applied_overwrite lost=["leader"]
+rep 20: window_hit=true leader=applied follower=applied/applied_overwrite lost=["leader"]
+{"test":"r3-barrier-interleave-v1","mode":"seam","variant":"same-region(reducers)","atm_monorepo":"/workspace/atm-main-5692474f/AI-Atomic-Framework-5692474f7db70ab52a7a71c8af4867609e7e4b43","atm_pin":"5692474f7db70ab52a7a71c8af4867609e7e4b43","node":"v24.21.0","reps":20,"window_hit":20,"runs_with_lost_effect":20,"lost_effects_total":20,"leader_applied":20,"follower_classes":{"applied_overwrite":20},"final_equals_leader_only":0,"final_equals_both_full_bytes":0,"leftover_files":0,"seam_ops":["writeFileSync"],"follower_commit_guard_attempts":[0],"leader_commit_guard_attempts":[0],"follower_tx_attempts":[0],"first_follower_reason":null}
+rep 1: window_hit=true leader=applied follower=applied/applied_overwrite lost=["leader"]
+rep 2: window_hit=true leader=applied follower=applied/applied_overwrite lost=["leader"]
+rep 3: window_hit=true leader=applied follower=applied/applied_overwrite lost=["leader"]
+rep 4: window_hit=true leader=applied follower=applied/applied_overwrite lost=["leader"]
+rep 5: window_hit=true leader=applied follower=applied/applied_overwrite lost=["leader"]
+rep 6: window_hit=true leader=applied follower=applied/applied_overwrite lost=["leader"]
+rep 7: window_hit=true leader=applied follower=applied/applied_overwrite lost=["leader"]
+rep 8: window_hit=true leader=applied follower=applied/applied_overwrite lost=["leader"]
+rep 9: window_hit=true leader=applied follower=applied/applied_overwrite lost=["leader"]
+rep 10: window_hit=true leader=applied follower=applied/applied_overwrite lost=["leader"]
+rep 11: window_hit=true leader=applied follower=applied/applied_overwrite lost=["leader"]
+rep 12: window_hit=true leader=applied follower=applied/applied_overwrite lost=["leader"]
+rep 13: window_hit=true leader=applied follower=applied/applied_overwrite lost=["leader"]
+rep 14: window_hit=true leader=applied follower=applied/applied_overwrite lost=["leader"]
+rep 15: window_hit=true leader=applied follower=applied/applied_overwrite lost=["leader"]
+rep 16: window_hit=true leader=applied follower=applied/applied_overwrite lost=["leader"]
+rep 17: window_hit=true leader=applied follower=applied/applied_overwrite lost=["leader"]
+rep 18: window_hit=true leader=applied follower=applied/applied_overwrite lost=["leader"]
+rep 19: window_hit=true leader=applied follower=applied/applied_overwrite lost=["leader"]
+rep 20: window_hit=true leader=applied follower=applied/applied_overwrite lost=["leader"]
+{"test":"r3-barrier-interleave-v1","mode":"seam","variant":"leader-selectors/follower-reducers","atm_monorepo":"/workspace/atm-main-5692474f/AI-Atomic-Framework-5692474f7db70ab52a7a71c8af4867609e7e4b43","atm_pin":"5692474f7db70ab52a7a71c8af4867609e7e4b43","node":"v24.21.0","reps":20,"window_hit":20,"runs_with_lost_effect":20,"lost_effects_total":20,"leader_applied":20,"follower_classes":{"applied_overwrite":20},"final_equals_leader_only":0,"final_equals_both_full_bytes":0,"leftover_files":0,"seam_ops":["writeFileSync"],"follower_commit_guard_attempts":[0],"leader_commit_guard_attempts":[0],"follower_tx_attempts":[0],"first_follower_reason":null}
+rep 1: window_hit=true leader=applied follower=blocked/blocked_after_re-compose(compose-context-mismatch) lost=[]
+rep 2: window_hit=true leader=applied follower=blocked/blocked_after_re-compose(compose-context-mismatch) lost=[]
+rep 3: window_hit=true leader=applied follower=blocked/blocked_after_re-compose(compose-context-mismatch) lost=[]
+rep 4: window_hit=true leader=applied follower=blocked/blocked_after_re-compose(compose-context-mismatch) lost=[]
+rep 5: window_hit=true leader=applied follower=blocked/blocked_after_re-compose(compose-context-mismatch) lost=[]
+rep 6: window_hit=true leader=applied follower=blocked/blocked_after_re-compose(compose-context-mismatch) lost=[]
+rep 7: window_hit=true leader=applied follower=blocked/blocked_after_re-compose(compose-context-mismatch) lost=[]
+rep 8: window_hit=true leader=applied follower=blocked/blocked_after_re-compose(compose-context-mismatch) lost=[]
+rep 9: window_hit=true leader=applied follower=blocked/blocked_after_re-compose(compose-context-mismatch) lost=[]
+rep 10: window_hit=true leader=applied follower=blocked/blocked_after_re-compose(compose-context-mismatch) lost=[]
+rep 11: window_hit=true leader=applied follower=blocked/blocked_after_re-compose(compose-context-mismatch) lost=[]
+rep 12: window_hit=true leader=applied follower=blocked/blocked_after_re-compose(compose-context-mismatch) lost=[]
+rep 13: window_hit=true leader=applied follower=blocked/blocked_after_re-compose(compose-context-mismatch) lost=[]
+rep 14: window_hit=true leader=applied follower=blocked/blocked_after_re-compose(compose-context-mismatch) lost=[]
+rep 15: window_hit=true leader=applied follower=blocked/blocked_after_re-compose(compose-context-mismatch) lost=[]
+rep 16: window_hit=true leader=applied follower=blocked/blocked_after_re-compose(compose-context-mismatch) lost=[]
+rep 17: window_hit=true leader=applied follower=blocked/blocked_after_re-compose(compose-context-mismatch) lost=[]
+rep 18: window_hit=true leader=applied follower=blocked/blocked_after_re-compose(compose-context-mismatch) lost=[]
+rep 19: window_hit=true leader=applied follower=blocked/blocked_after_re-compose(compose-context-mismatch) lost=[]
+rep 20: window_hit=true leader=applied follower=blocked/blocked_after_re-compose(compose-context-mismatch) lost=[]
+{"test":"r3-barrier-interleave-v1","mode":"seam","variant":"same-region(reducers)","atm_monorepo":"/workspace/atm-main-bea35380/AI-Atomic-Framework-bea35380d7f381f998c9930fa95f01b999c7f208","atm_pin":"bea35380d7f381f998c9930fa95f01b999c7f208","node":"v24.21.0","reps":20,"window_hit":20,"runs_with_lost_effect":0,"lost_effects_total":0,"leader_applied":20,"follower_classes":{"blocked_after_re-compose(compose-context-mismatch)":20},"final_equals_leader_only":20,"final_equals_both_full_bytes":0,"leftover_files":0,"seam_ops":["mkdirSync"],"follower_commit_guard_attempts":[1],"leader_commit_guard_attempts":[1],"follower_tx_attempts":[0],"first_follower_reason":"compose-context-mismatch: proposal 'p-follower' context mismatch at base line 5: expected \"// </region:reducers>\", found \"// atm-edit barrier-leader by agent-leader\" [proposals: p-follower]"}
+rep 1: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 2: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 3: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 4: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 5: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 6: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 7: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 8: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 9: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 10: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 11: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 12: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 13: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 14: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 15: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 16: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 17: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 18: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 19: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 20: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+{"test":"r3-barrier-interleave-v1","mode":"seam","variant":"leader-selectors/follower-reducers","atm_monorepo":"/workspace/atm-main-bea35380/AI-Atomic-Framework-bea35380d7f381f998c9930fa95f01b999c7f208","atm_pin":"bea35380d7f381f998c9930fa95f01b999c7f208","node":"v24.21.0","reps":20,"window_hit":20,"runs_with_lost_effect":0,"lost_effects_total":0,"leader_applied":20,"follower_classes":{"applied_after_re-compose_both_present":20},"final_equals_leader_only":0,"final_equals_both_full_bytes":20,"leftover_files":0,"seam_ops":["mkdirSync"],"follower_commit_guard_attempts":[2],"leader_commit_guard_attempts":[1],"follower_tx_attempts":[0],"first_follower_reason":null}
+rep 1: window_hit=true leader=applied follower=blocked/blocked_after_re-compose(steward-final-patch-required) lost=[]
+rep 2: window_hit=true leader=applied follower=blocked/blocked_after_re-compose(steward-final-patch-required) lost=[]
+rep 3: window_hit=true leader=applied follower=blocked/blocked_after_re-compose(steward-final-patch-required) lost=[]
+rep 4: window_hit=true leader=applied follower=blocked/blocked_after_re-compose(steward-final-patch-required) lost=[]
+rep 5: window_hit=true leader=applied follower=blocked/blocked_after_re-compose(steward-final-patch-required) lost=[]
+rep 6: window_hit=true leader=applied follower=blocked/blocked_after_re-compose(steward-final-patch-required) lost=[]
+rep 7: window_hit=true leader=applied follower=blocked/blocked_after_re-compose(steward-final-patch-required) lost=[]
+rep 8: window_hit=true leader=applied follower=blocked/blocked_after_re-compose(steward-final-patch-required) lost=[]
+rep 9: window_hit=true leader=applied follower=blocked/blocked_after_re-compose(steward-final-patch-required) lost=[]
+rep 10: window_hit=true leader=applied follower=blocked/blocked_after_re-compose(steward-final-patch-required) lost=[]
+rep 11: window_hit=true leader=applied follower=blocked/blocked_after_re-compose(steward-final-patch-required) lost=[]
+rep 12: window_hit=true leader=applied follower=blocked/blocked_after_re-compose(steward-final-patch-required) lost=[]
+rep 13: window_hit=true leader=applied follower=blocked/blocked_after_re-compose(steward-final-patch-required) lost=[]
+rep 14: window_hit=true leader=applied follower=blocked/blocked_after_re-compose(steward-final-patch-required) lost=[]
+rep 15: window_hit=true leader=applied follower=blocked/blocked_after_re-compose(steward-final-patch-required) lost=[]
+rep 16: window_hit=true leader=applied follower=blocked/blocked_after_re-compose(steward-final-patch-required) lost=[]
+rep 17: window_hit=true leader=applied follower=blocked/blocked_after_re-compose(steward-final-patch-required) lost=[]
+rep 18: window_hit=true leader=applied follower=blocked/blocked_after_re-compose(steward-final-patch-required) lost=[]
+rep 19: window_hit=true leader=applied follower=blocked/blocked_after_re-compose(steward-final-patch-required) lost=[]
+rep 20: window_hit=true leader=applied follower=blocked/blocked_after_re-compose(steward-final-patch-required) lost=[]
+{"test":"r3-barrier-interleave-v1","mode":"seam","variant":"same-region(reducers)","atm_monorepo":"/workspace/atm-main-2118bc66/AI-Atomic-Framework-2118bc66efb3ac3bc0ddaede6a2f7cb18526b030","atm_pin":"2118bc66efb3ac3bc0ddaede6a2f7cb18526b030","node":"v24.21.0","reps":20,"window_hit":20,"runs_with_lost_effect":0,"lost_effects_total":0,"leader_applied":20,"follower_classes":{"blocked_after_re-compose(steward-final-patch-required)":20},"final_equals_leader_only":20,"final_equals_both_full_bytes":0,"leftover_files":0,"seam_ops":["mkdirSync"],"follower_commit_guard_attempts":[1],"leader_commit_guard_attempts":[1],"follower_tx_attempts":[1],"first_follower_reason":"steward-final-patch-required: proposal 'p-follower' overlaps region 'reducers', which changed after the proposal was anchored; refusing to overwrite [proposals: p-follower]"}
+rep 1: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 2: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 3: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 4: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 5: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 6: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 7: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 8: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 9: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 10: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 11: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 12: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 13: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 14: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 15: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 16: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 17: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 18: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 19: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 20: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+{"test":"r3-barrier-interleave-v1","mode":"seam","variant":"leader-selectors/follower-reducers","atm_monorepo":"/workspace/atm-main-2118bc66/AI-Atomic-Framework-2118bc66efb3ac3bc0ddaede6a2f7cb18526b030","atm_pin":"2118bc66efb3ac3bc0ddaede6a2f7cb18526b030","node":"v24.21.0","reps":20,"window_hit":20,"runs_with_lost_effect":0,"lost_effects_total":0,"leader_applied":20,"follower_classes":{"applied_after_re-compose_both_present":20},"final_equals_leader_only":0,"final_equals_both_full_bytes":20,"leftover_files":0,"seam_ops":["mkdirSync"],"follower_commit_guard_attempts":[2],"leader_commit_guard_attempts":[1],"follower_tx_attempts":[2],"first_follower_reason":null}
+rep 1: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 2: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 3: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 4: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 5: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 6: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 7: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 8: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 9: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 10: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 11: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 12: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 13: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 14: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 15: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 16: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 17: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 18: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 19: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 20: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+{"test":"r3-barrier-interleave-v1","mode":"stale-proposal","variant":"same-region(reducers)","atm_monorepo":"/workspace/atm-main-bea35380/AI-Atomic-Framework-bea35380d7f381f998c9930fa95f01b999c7f208","atm_pin":"bea35380d7f381f998c9930fa95f01b999c7f208","node":"v24.21.0","reps":20,"window_hit":20,"runs_with_lost_effect":0,"lost_effects_total":0,"leader_applied":20,"follower_classes":{"blocked_other":20},"final_equals_leader_only":20,"final_equals_both_full_bytes":0,"leftover_files":0,"seam_ops":[null],"follower_commit_guard_attempts":[0],"leader_commit_guard_attempts":[1],"follower_tx_attempts":[0],"first_follower_reason":"file-hash-drift: Target file hash sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55 does not match proposal fileBeforeHash sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22."}
+rep 1: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 2: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 3: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 4: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 5: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 6: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 7: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 8: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 9: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 10: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 11: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 12: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 13: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 14: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 15: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 16: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 17: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 18: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 19: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 20: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+{"test":"r3-barrier-interleave-v1","mode":"stale-proposal","variant":"leader-selectors/follower-reducers","atm_monorepo":"/workspace/atm-main-bea35380/AI-Atomic-Framework-bea35380d7f381f998c9930fa95f01b999c7f208","atm_pin":"bea35380d7f381f998c9930fa95f01b999c7f208","node":"v24.21.0","reps":20,"window_hit":20,"runs_with_lost_effect":0,"lost_effects_total":0,"leader_applied":20,"follower_classes":{"blocked_other":20},"final_equals_leader_only":20,"final_equals_both_full_bytes":0,"leftover_files":0,"seam_ops":[null],"follower_commit_guard_attempts":[0],"leader_commit_guard_attempts":[1],"follower_tx_attempts":[0],"first_follower_reason":"file-hash-drift: Target file hash sha256:3228395bc7ca610e707a72d6765f2f40afb7cdb34bc3c0c01a28ce0efed7a7c6 does not match proposal fileBeforeHash sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22."}
+rep 1: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 2: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 3: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 4: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 5: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 6: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 7: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 8: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 9: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 10: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 11: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 12: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 13: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 14: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 15: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 16: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 17: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 18: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 19: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 20: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+{"test":"r3-barrier-interleave-v1","mode":"stale-proposal","variant":"same-region(reducers)","atm_monorepo":"/workspace/atm-main-2118bc66/AI-Atomic-Framework-2118bc66efb3ac3bc0ddaede6a2f7cb18526b030","atm_pin":"2118bc66efb3ac3bc0ddaede6a2f7cb18526b030","node":"v24.21.0","reps":20,"window_hit":20,"runs_with_lost_effect":0,"lost_effects_total":0,"leader_applied":20,"follower_classes":{"blocked_other":20},"final_equals_leader_only":20,"final_equals_both_full_bytes":0,"leftover_files":0,"seam_ops":[null],"follower_commit_guard_attempts":[0],"leader_commit_guard_attempts":[1],"follower_tx_attempts":[0],"first_follower_reason":"steward-final-patch-required: proposal 'p-follower' overlaps region 'reducers', which changed after the proposal was anchored; refusing to overwrite [proposals: p-follower]"}
+rep 1: window_hit=true leader=applied follower=applied/applied_both_present lost=[]
+rep 2: window_hit=true leader=applied follower=applied/applied_both_present lost=[]
+rep 3: window_hit=true leader=applied follower=applied/applied_both_present lost=[]
+rep 4: window_hit=true leader=applied follower=applied/applied_both_present lost=[]
+rep 5: window_hit=true leader=applied follower=applied/applied_both_present lost=[]
+rep 6: window_hit=true leader=applied follower=applied/applied_both_present lost=[]
+rep 7: window_hit=true leader=applied follower=applied/applied_both_present lost=[]
+rep 8: window_hit=true leader=applied follower=applied/applied_both_present lost=[]
+rep 9: window_hit=true leader=applied follower=applied/applied_both_present lost=[]
+rep 10: window_hit=true leader=applied follower=applied/applied_both_present lost=[]
+rep 11: window_hit=true leader=applied follower=applied/applied_both_present lost=[]
+rep 12: window_hit=true leader=applied follower=applied/applied_both_present lost=[]
+rep 13: window_hit=true leader=applied follower=applied/applied_both_present lost=[]
+rep 14: window_hit=true leader=applied follower=applied/applied_both_present lost=[]
+rep 15: window_hit=true leader=applied follower=applied/applied_both_present lost=[]
+rep 16: window_hit=true leader=applied follower=applied/applied_both_present lost=[]
+rep 17: window_hit=true leader=applied follower=applied/applied_both_present lost=[]
+rep 18: window_hit=true leader=applied follower=applied/applied_both_present lost=[]
+rep 19: window_hit=true leader=applied follower=applied/applied_both_present lost=[]
+rep 20: window_hit=true leader=applied follower=applied/applied_both_present lost=[]
+{"test":"r3-barrier-interleave-v1","mode":"stale-proposal","variant":"leader-selectors/follower-reducers","atm_monorepo":"/workspace/atm-main-2118bc66/AI-Atomic-Framework-2118bc66efb3ac3bc0ddaede6a2f7cb18526b030","atm_pin":"2118bc66efb3ac3bc0ddaede6a2f7cb18526b030","node":"v24.21.0","reps":20,"window_hit":20,"runs_with_lost_effect":0,"lost_effects_total":0,"leader_applied":20,"follower_classes":{"applied_both_present":20},"final_equals_leader_only":0,"final_equals_both_full_bytes":20,"leftover_files":0,"seam_ops":[null],"follower_commit_guard_attempts":[1],"leader_commit_guard_attempts":[1],"follower_tx_attempts":[1],"first_follower_reason":null}
+rep 1: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 2: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 3: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 4: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 5: window_hit=false leader=applied follower=blocked/blocked_other lost=[]
+rep 6: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 7: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 8: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 9: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 10: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 11: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 12: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 13: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 14: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 15: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 16: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 17: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 18: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 19: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 20: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+{"test":"r3-barrier-interleave-v1","mode":"before-precheck","variant":"same-region(reducers)","atm_monorepo":"/workspace/atm-main-2118bc66/AI-Atomic-Framework-2118bc66efb3ac3bc0ddaede6a2f7cb18526b030","atm_pin":"2118bc66efb3ac3bc0ddaede6a2f7cb18526b030","node":"v24.21.0","reps":20,"window_hit":19,"runs_with_lost_effect":0,"lost_effects_total":0,"leader_applied":20,"follower_classes":{"blocked_other":20},"final_equals_leader_only":20,"final_equals_both_full_bytes":0,"leftover_files":0,"seam_ops":[null],"follower_commit_guard_attempts":[0],"leader_commit_guard_attempts":[1],"follower_tx_attempts":[1,0],"first_follower_reason":"steward-final-patch-required: proposal 'p-follower' overlaps region 'reducers', which changed after the proposal was anchored; refusing to overwrite [proposals: p-follower]"}
+rep 1: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 2: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 3: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 4: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 5: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 6: window_hit=true leader=applied follower=applied/applied_both_present lost=[]
+rep 7: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 8: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 9: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 10: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 11: window_hit=true leader=applied follower=applied/applied_both_present lost=[]
+rep 12: window_hit=true leader=applied follower=applied/applied_both_present lost=[]
+rep 13: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 14: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 15: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 16: window_hit=true leader=applied follower=applied/applied_both_present lost=[]
+rep 17: window_hit=true leader=applied follower=applied/applied_both_present lost=[]
+rep 18: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 19: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 20: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+{"test":"r3-barrier-interleave-v1","mode":"before-precheck","variant":"leader-selectors/follower-reducers","atm_monorepo":"/workspace/atm-main-2118bc66/AI-Atomic-Framework-2118bc66efb3ac3bc0ddaede6a2f7cb18526b030","atm_pin":"2118bc66efb3ac3bc0ddaede6a2f7cb18526b030","node":"v24.21.0","reps":20,"window_hit":20,"runs_with_lost_effect":0,"lost_effects_total":0,"leader_applied":20,"follower_classes":{"applied_after_re-compose_both_present":15,"applied_both_present":5},"final_equals_leader_only":0,"final_equals_both_full_bytes":20,"leftover_files":0,"seam_ops":[null],"follower_commit_guard_attempts":[1],"leader_commit_guard_attempts":[1],"follower_tx_attempts":[2,1],"first_follower_reason":null}
+phase replay 14:38:55
+r4v-e4-p2-s17-old-r01 rc=0 policy=default
+r4v-e4-p2-s17-fix-r01 rc=0 policy=default
+r4v-e4-p2-s17-opt-r01 rc=0 policy=default
+r4v-e4-p2-s17-optlock-r01 rc=0 policy=default
+r4v-e4-p2-s17-optr0-r01 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p2-s17-optr1-r01 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p2-s17-old-r02 rc=0 policy=default
+r4v-e4-p2-s17-fix-r02 rc=0 policy=default
+r4v-e4-p2-s17-opt-r02 rc=0 policy=default
+r4v-e4-p2-s17-optlock-r02 rc=0 policy=default
+r4v-e4-p2-s17-optr0-r02 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p2-s17-optr1-r02 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p2-s17-old-r03 rc=0 policy=default
+r4v-e4-p2-s17-fix-r03 rc=0 policy=default
+r4v-e4-p2-s17-opt-r03 rc=0 policy=default
+r4v-e4-p2-s17-optlock-r03 rc=0 policy=default
+r4v-e4-p2-s17-optr0-r03 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p2-s17-optr1-r03 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p2-s17-old-r04 rc=0 policy=default
+r4v-e4-p2-s17-fix-r04 rc=0 policy=default
+r4v-e4-p2-s17-opt-r04 rc=0 policy=default
+r4v-e4-p2-s17-optlock-r04 rc=0 policy=default
+r4v-e4-p2-s17-optr0-r04 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p2-s17-optr1-r04 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p2-s17-old-r05 rc=0 policy=default
+r4v-e4-p2-s17-fix-r05 rc=0 policy=default
+r4v-e4-p2-s17-opt-r05 rc=0 policy=default
+r4v-e4-p2-s17-optlock-r05 rc=0 policy=default
+r4v-e4-p2-s17-optr0-r05 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p2-s17-optr1-r05 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p2-s17-old-r06 rc=0 policy=default
+r4v-e4-p2-s17-fix-r06 rc=0 policy=default
+r4v-e4-p2-s17-opt-r06 rc=0 policy=default
+r4v-e4-p2-s17-optlock-r06 rc=0 policy=default
+r4v-e4-p2-s17-optr0-r06 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p2-s17-optr1-r06 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p2-s17-old-r07 rc=0 policy=default
+r4v-e4-p2-s17-fix-r07 rc=0 policy=default
+r4v-e4-p2-s17-opt-r07 rc=0 policy=default
+r4v-e4-p2-s17-optlock-r07 rc=0 policy=default
+r4v-e4-p2-s17-optr0-r07 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p2-s17-optr1-r07 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p2-s17-old-r08 rc=0 policy=default
+r4v-e4-p2-s17-fix-r08 rc=0 policy=default
+r4v-e4-p2-s17-opt-r08 rc=0 policy=default
+r4v-e4-p2-s17-optlock-r08 rc=0 policy=default
+r4v-e4-p2-s17-optr0-r08 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p2-s17-optr1-r08 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p2-s17-old-r09 rc=0 policy=default
+r4v-e4-p2-s17-fix-r09 rc=0 policy=default
+r4v-e4-p2-s17-opt-r09 rc=0 policy=default
+r4v-e4-p2-s17-optlock-r09 rc=0 policy=default
+r4v-e4-p2-s17-optr0-r09 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p2-s17-optr1-r09 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p2-s17-old-r10 rc=0 policy=default
+r4v-e4-p2-s17-fix-r10 rc=0 policy=default
+r4v-e4-p2-s17-opt-r10 rc=0 policy=default
+r4v-e4-p2-s17-optlock-r10 rc=0 policy=default
+r4v-e4-p2-s17-optr0-r10 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p2-s17-optr1-r10 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p2-s17-old-r11 rc=0 policy=default
+r4v-e4-p2-s17-fix-r11 rc=0 policy=default
+r4v-e4-p2-s17-opt-r11 rc=0 policy=default
+r4v-e4-p2-s17-optlock-r11 rc=0 policy=default
+r4v-e4-p2-s17-optr0-r11 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p2-s17-optr1-r11 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p2-s17-old-r12 rc=0 policy=default
+r4v-e4-p2-s17-fix-r12 rc=0 policy=default
+r4v-e4-p2-s17-opt-r12 rc=0 policy=default
+r4v-e4-p2-s17-optlock-r12 rc=0 policy=default
+r4v-e4-p2-s17-optr0-r12 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p2-s17-optr1-r12 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p2-s17-old-r13 rc=0 policy=default
+r4v-e4-p2-s17-fix-r13 rc=0 policy=default
+r4v-e4-p2-s17-opt-r13 rc=0 policy=default
+r4v-e4-p2-s17-optlock-r13 rc=0 policy=default
+r4v-e4-p2-s17-optr0-r13 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p2-s17-optr1-r13 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p2-s17-old-r14 rc=0 policy=default
+r4v-e4-p2-s17-fix-r14 rc=0 policy=default
+r4v-e4-p2-s17-opt-r14 rc=0 policy=default
+r4v-e4-p2-s17-optlock-r14 rc=0 policy=default
+r4v-e4-p2-s17-optr0-r14 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p2-s17-optr1-r14 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p2-s17-old-r15 rc=0 policy=default
+r4v-e4-p2-s17-fix-r15 rc=0 policy=default
+r4v-e4-p2-s17-opt-r15 rc=0 policy=default
+r4v-e4-p2-s17-optlock-r15 rc=0 policy=default
+r4v-e4-p2-s17-optr0-r15 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p2-s17-optr1-r15 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p2-s17-old-r16 rc=0 policy=default
+r4v-e4-p2-s17-fix-r16 rc=0 policy=default
+r4v-e4-p2-s17-opt-r16 rc=0 policy=default
+r4v-e4-p2-s17-optlock-r16 rc=0 policy=default
+r4v-e4-p2-s17-optr0-r16 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p2-s17-optr1-r16 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p2-s17-old-r17 rc=0 policy=default
+r4v-e4-p2-s17-fix-r17 rc=0 policy=default
+r4v-e4-p2-s17-opt-r17 rc=0 policy=default
+r4v-e4-p2-s17-optlock-r17 rc=0 policy=default
+r4v-e4-p2-s17-optr0-r17 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p2-s17-optr1-r17 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p2-s17-old-r18 rc=0 policy=default
+r4v-e4-p2-s17-fix-r18 rc=0 policy=default
+r4v-e4-p2-s17-opt-r18 rc=0 policy=default
+r4v-e4-p2-s17-optlock-r18 rc=0 policy=default
+r4v-e4-p2-s17-optr0-r18 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p2-s17-optr1-r18 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p2-s17-old-r19 rc=0 policy=default
+r4v-e4-p2-s17-fix-r19 rc=0 policy=default
+r4v-e4-p2-s17-opt-r19 rc=0 policy=default
+r4v-e4-p2-s17-optlock-r19 rc=0 policy=default
+r4v-e4-p2-s17-optr0-r19 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p2-s17-optr1-r19 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p2-s17-old-r20 rc=0 policy=default
+r4v-e4-p2-s17-fix-r20 rc=0 policy=default
+r4v-e4-p2-s17-opt-r20 rc=0 policy=default
+r4v-e4-p2-s17-optlock-r20 rc=0 policy=default
+r4v-e4-p2-s17-optr0-r20 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p2-s17-optr1-r20 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p2-s17-old-r21 rc=0 policy=default
+r4v-e4-p2-s17-fix-r21 rc=0 policy=default
+r4v-e4-p2-s17-opt-r21 rc=0 policy=default
+r4v-e4-p2-s17-optlock-r21 rc=0 policy=default
+r4v-e4-p2-s17-optr0-r21 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p2-s17-optr1-r21 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p2-s17-old-r22 rc=0 policy=default
+r4v-e4-p2-s17-fix-r22 rc=0 policy=default
+r4v-e4-p2-s17-opt-r22 rc=0 policy=default
+r4v-e4-p2-s17-optlock-r22 rc=0 policy=default
+r4v-e4-p2-s17-optr0-r22 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p2-s17-optr1-r22 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p2-s17-old-r23 rc=0 policy=default
+r4v-e4-p2-s17-fix-r23 rc=0 policy=default
+r4v-e4-p2-s17-opt-r23 rc=0 policy=default
+r4v-e4-p2-s17-optlock-r23 rc=0 policy=default
+r4v-e4-p2-s17-optr0-r23 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p2-s17-optr1-r23 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p2-s17-old-r24 rc=0 policy=default
+r4v-e4-p2-s17-fix-r24 rc=0 policy=default
+r4v-e4-p2-s17-opt-r24 rc=0 policy=default
+r4v-e4-p2-s17-optlock-r24 rc=0 policy=default
+r4v-e4-p2-s17-optr0-r24 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p2-s17-optr1-r24 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p2-s17-old-r25 rc=0 policy=default
+r4v-e4-p2-s17-fix-r25 rc=0 policy=default
+r4v-e4-p2-s17-opt-r25 rc=0 policy=default
+r4v-e4-p2-s17-optlock-r25 rc=0 policy=default
+r4v-e4-p2-s17-optr0-r25 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p2-s17-optr1-r25 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p2-s17-old-r26 rc=0 policy=default
+r4v-e4-p2-s17-fix-r26 rc=0 policy=default
+r4v-e4-p2-s17-opt-r26 rc=0 policy=default
+r4v-e4-p2-s17-optlock-r26 rc=0 policy=default
+r4v-e4-p2-s17-optr0-r26 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p2-s17-optr1-r26 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p2-s17-old-r27 rc=0 policy=default
+r4v-e4-p2-s17-fix-r27 rc=0 policy=default
+r4v-e4-p2-s17-opt-r27 rc=0 policy=default
+r4v-e4-p2-s17-optlock-r27 rc=0 policy=default
+r4v-e4-p2-s17-optr0-r27 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p2-s17-optr1-r27 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p2-s17-old-r28 rc=0 policy=default
+r4v-e4-p2-s17-fix-r28 rc=0 policy=default
+r4v-e4-p2-s17-opt-r28 rc=0 policy=default
+r4v-e4-p2-s17-optlock-r28 rc=0 policy=default
+r4v-e4-p2-s17-optr0-r28 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p2-s17-optr1-r28 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p2-s17-old-r29 rc=0 policy=default
+r4v-e4-p2-s17-fix-r29 rc=0 policy=default
+r4v-e4-p2-s17-opt-r29 rc=0 policy=default
+r4v-e4-p2-s17-optlock-r29 rc=0 policy=default
+r4v-e4-p2-s17-optr0-r29 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p2-s17-optr1-r29 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p2-s17-old-r30 rc=0 policy=default
+r4v-e4-p2-s17-fix-r30 rc=0 policy=default
+r4v-e4-p2-s17-opt-r30 rc=0 policy=default
+r4v-e4-p2-s17-optlock-r30 rc=0 policy=default
+r4v-e4-p2-s17-optr0-r30 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p2-s17-optr1-r30 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p2-s11-g-old-r1 rc=0 policy=default
+r4v-e4-p2-s11-g-fix-r1 rc=0 policy=default
+r4v-e4-p2-s11-g-opt-r1 rc=0 policy=default
+r4v-e4-p2-s11-g-optlock-r1 rc=0 policy=default
+r4v-e4-p2-s11-g-optr0-r1 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p2-s11-g-optr1-r1 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p2-s11-g-old-r2 rc=0 policy=default
+r4v-e4-p2-s11-g-fix-r2 rc=0 policy=default
+r4v-e4-p2-s11-g-opt-r2 rc=0 policy=default
+r4v-e4-p2-s11-g-optlock-r2 rc=0 policy=default
+r4v-e4-p2-s11-g-optr0-r2 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p2-s11-g-optr1-r2 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p2-s11-g-old-r3 rc=0 policy=default
+r4v-e4-p2-s11-g-fix-r3 rc=0 policy=default
+r4v-e4-p2-s11-g-opt-r3 rc=0 policy=default
+r4v-e4-p2-s11-g-optlock-r3 rc=0 policy=default
+r4v-e4-p2-s11-g-optr0-r3 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p2-s11-g-optr1-r3 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p2-s11-g-old-r4 rc=0 policy=default
+r4v-e4-p2-s11-g-fix-r4 rc=0 policy=default
+r4v-e4-p2-s11-g-opt-r4 rc=0 policy=default
+r4v-e4-p2-s11-g-optlock-r4 rc=0 policy=default
+r4v-e4-p2-s11-g-optr0-r4 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p2-s11-g-optr1-r4 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p2-s11-g-old-r5 rc=0 policy=default
+r4v-e4-p2-s11-g-fix-r5 rc=0 policy=default
+r4v-e4-p2-s11-g-opt-r5 rc=0 policy=default
+r4v-e4-p2-s11-g-optlock-r5 rc=0 policy=default
+r4v-e4-p2-s11-g-optr0-r5 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p2-s11-g-optr1-r5 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p2-s17-g-old-r1 rc=0 policy=default
+r4v-e4-p2-s17-g-fix-r1 rc=0 policy=default
+r4v-e4-p2-s17-g-opt-r1 rc=0 policy=default
+r4v-e4-p2-s17-g-optlock-r1 rc=0 policy=default
+r4v-e4-p2-s17-g-optr0-r1 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p2-s17-g-optr1-r1 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p2-s17-g-old-r2 rc=0 policy=default
+r4v-e4-p2-s17-g-fix-r2 rc=0 policy=default
+r4v-e4-p2-s17-g-opt-r2 rc=0 policy=default
+r4v-e4-p2-s17-g-optlock-r2 rc=0 policy=default
+r4v-e4-p2-s17-g-optr0-r2 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p2-s17-g-optr1-r2 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p2-s17-g-old-r3 rc=0 policy=default
+r4v-e4-p2-s17-g-fix-r3 rc=0 policy=default
+r4v-e4-p2-s17-g-opt-r3 rc=0 policy=default
+r4v-e4-p2-s17-g-optlock-r3 rc=0 policy=default
+r4v-e4-p2-s17-g-optr0-r3 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p2-s17-g-optr1-r3 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p2-s17-g-old-r4 rc=0 policy=default
+r4v-e4-p2-s17-g-fix-r4 rc=0 policy=default
+r4v-e4-p2-s17-g-opt-r4 rc=0 policy=default
+r4v-e4-p2-s17-g-optlock-r4 rc=0 policy=default
+r4v-e4-p2-s17-g-optr0-r4 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p2-s17-g-optr1-r4 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p2-s17-g-old-r5 rc=0 policy=default
+r4v-e4-p2-s17-g-fix-r5 rc=0 policy=default
+r4v-e4-p2-s17-g-opt-r5 rc=0 policy=default
+r4v-e4-p2-s17-g-optlock-r5 rc=0 policy=default
+r4v-e4-p2-s17-g-optr0-r5 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p2-s17-g-optr1-r5 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p2-s23-g-old-r1 rc=0 policy=default
+r4v-e4-p2-s23-g-fix-r1 rc=0 policy=default
+r4v-e4-p2-s23-g-opt-r1 rc=0 policy=default
+r4v-e4-p2-s23-g-optlock-r1 rc=0 policy=default
+r4v-e4-p2-s23-g-optr0-r1 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p2-s23-g-optr1-r1 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p2-s23-g-old-r2 rc=0 policy=default
+r4v-e4-p2-s23-g-fix-r2 rc=0 policy=default
+r4v-e4-p2-s23-g-opt-r2 rc=0 policy=default
+r4v-e4-p2-s23-g-optlock-r2 rc=0 policy=default
+r4v-e4-p2-s23-g-optr0-r2 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p2-s23-g-optr1-r2 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p2-s23-g-old-r3 rc=0 policy=default
+r4v-e4-p2-s23-g-fix-r3 rc=0 policy=default
+r4v-e4-p2-s23-g-opt-r3 rc=0 policy=default
+r4v-e4-p2-s23-g-optlock-r3 rc=0 policy=default
+r4v-e4-p2-s23-g-optr0-r3 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p2-s23-g-optr1-r3 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p2-s23-g-old-r4 rc=0 policy=default
+r4v-e4-p2-s23-g-fix-r4 rc=0 policy=default
+r4v-e4-p2-s23-g-opt-r4 rc=0 policy=default
+r4v-e4-p2-s23-g-optlock-r4 rc=0 policy=default
+r4v-e4-p2-s23-g-optr0-r4 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p2-s23-g-optr1-r4 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p2-s23-g-old-r5 rc=0 policy=default
+r4v-e4-p2-s23-g-fix-r5 rc=0 policy=default
+r4v-e4-p2-s23-g-opt-r5 rc=0 policy=default
+r4v-e4-p2-s23-g-optlock-r5 rc=0 policy=default
+r4v-e4-p2-s23-g-optr0-r5 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p2-s23-g-optr1-r5 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p4-s11-g-old-r1 rc=0 policy=default
+r4v-e4-p4-s11-g-fix-r1 rc=0 policy=default
+r4v-e4-p4-s11-g-opt-r1 rc=0 policy=default
+r4v-e4-p4-s11-g-optlock-r1 rc=0 policy=default
+r4v-e4-p4-s11-g-optr0-r1 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p4-s11-g-optr1-r1 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p4-s11-g-old-r2 rc=0 policy=default
+r4v-e4-p4-s11-g-fix-r2 rc=0 policy=default
+r4v-e4-p4-s11-g-opt-r2 rc=0 policy=default
+r4v-e4-p4-s11-g-optlock-r2 rc=0 policy=default
+r4v-e4-p4-s11-g-optr0-r2 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p4-s11-g-optr1-r2 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p4-s11-g-old-r3 rc=0 policy=default
+r4v-e4-p4-s11-g-fix-r3 rc=0 policy=default
+r4v-e4-p4-s11-g-opt-r3 rc=0 policy=default
+r4v-e4-p4-s11-g-optlock-r3 rc=0 policy=default
+r4v-e4-p4-s11-g-optr0-r3 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p4-s11-g-optr1-r3 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p4-s11-g-old-r4 rc=0 policy=default
+r4v-e4-p4-s11-g-fix-r4 rc=0 policy=default
+r4v-e4-p4-s11-g-opt-r4 rc=0 policy=default
+r4v-e4-p4-s11-g-optlock-r4 rc=0 policy=default
+r4v-e4-p4-s11-g-optr0-r4 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p4-s11-g-optr1-r4 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p4-s11-g-old-r5 rc=0 policy=default
+r4v-e4-p4-s11-g-fix-r5 rc=0 policy=default
+r4v-e4-p4-s11-g-opt-r5 rc=0 policy=default
+r4v-e4-p4-s11-g-optlock-r5 rc=0 policy=default
+r4v-e4-p4-s11-g-optr0-r5 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p4-s11-g-optr1-r5 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p4-s17-g-old-r1 rc=0 policy=default
+r4v-e4-p4-s17-g-fix-r1 rc=0 policy=default
+r4v-e4-p4-s17-g-opt-r1 rc=0 policy=default
+r4v-e4-p4-s17-g-optlock-r1 rc=0 policy=default
+r4v-e4-p4-s17-g-optr0-r1 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p4-s17-g-optr1-r1 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p4-s17-g-old-r2 rc=0 policy=default
+r4v-e4-p4-s17-g-fix-r2 rc=0 policy=default
+r4v-e4-p4-s17-g-opt-r2 rc=0 policy=default
+r4v-e4-p4-s17-g-optlock-r2 rc=0 policy=default
+r4v-e4-p4-s17-g-optr0-r2 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p4-s17-g-optr1-r2 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p4-s17-g-old-r3 rc=0 policy=default
+r4v-e4-p4-s17-g-fix-r3 rc=0 policy=default
+r4v-e4-p4-s17-g-opt-r3 rc=0 policy=default
+r4v-e4-p4-s17-g-optlock-r3 rc=0 policy=default
+r4v-e4-p4-s17-g-optr0-r3 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p4-s17-g-optr1-r3 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p4-s17-g-old-r4 rc=0 policy=default
+r4v-e4-p4-s17-g-fix-r4 rc=0 policy=default
+r4v-e4-p4-s17-g-opt-r4 rc=0 policy=default
+r4v-e4-p4-s17-g-optlock-r4 rc=0 policy=default
+r4v-e4-p4-s17-g-optr0-r4 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p4-s17-g-optr1-r4 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p4-s17-g-old-r5 rc=0 policy=default
+r4v-e4-p4-s17-g-fix-r5 rc=0 policy=default
+r4v-e4-p4-s17-g-opt-r5 rc=0 policy=default
+r4v-e4-p4-s17-g-optlock-r5 rc=0 policy=default
+r4v-e4-p4-s17-g-optr0-r5 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p4-s17-g-optr1-r5 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p4-s23-g-old-r1 rc=0 policy=default
+r4v-e4-p4-s23-g-fix-r1 rc=0 policy=default
+r4v-e4-p4-s23-g-opt-r1 rc=0 policy=default
+r4v-e4-p4-s23-g-optlock-r1 rc=0 policy=default
+r4v-e4-p4-s23-g-optr0-r1 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p4-s23-g-optr1-r1 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p4-s23-g-old-r2 rc=0 policy=default
+r4v-e4-p4-s23-g-fix-r2 rc=0 policy=default
+r4v-e4-p4-s23-g-opt-r2 rc=0 policy=default
+r4v-e4-p4-s23-g-optlock-r2 rc=0 policy=default
+r4v-e4-p4-s23-g-optr0-r2 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p4-s23-g-optr1-r2 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p4-s23-g-old-r3 rc=0 policy=default
+r4v-e4-p4-s23-g-fix-r3 rc=0 policy=default
+r4v-e4-p4-s23-g-opt-r3 rc=0 policy=default
+r4v-e4-p4-s23-g-optlock-r3 rc=0 policy=default
+r4v-e4-p4-s23-g-optr0-r3 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p4-s23-g-optr1-r3 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p4-s23-g-old-r4 rc=0 policy=default
+r4v-e4-p4-s23-g-fix-r4 rc=0 policy=default
+r4v-e4-p4-s23-g-opt-r4 rc=0 policy=default
+r4v-e4-p4-s23-g-optlock-r4 rc=0 policy=default
+r4v-e4-p4-s23-g-optr0-r4 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p4-s23-g-optr1-r4 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p4-s23-g-old-r5 rc=0 policy=default
+r4v-e4-p4-s23-g-fix-r5 rc=0 policy=default
+r4v-e4-p4-s23-g-opt-r5 rc=0 policy=default
+r4v-e4-p4-s23-g-optlock-r5 rc=0 policy=default
+r4v-e4-p4-s23-g-optr0-r5 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p4-s23-g-optr1-r5 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p8-s11-g-old-r1 rc=0 policy=default
+r4v-e4-p8-s11-g-fix-r1 rc=0 policy=default
+r4v-e4-p8-s11-g-opt-r1 rc=0 policy=default
+r4v-e4-p8-s11-g-optlock-r1 rc=0 policy=default
+r4v-e4-p8-s11-g-optr0-r1 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p8-s11-g-optr1-r1 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p8-s11-g-old-r2 rc=0 policy=default
+r4v-e4-p8-s11-g-fix-r2 rc=0 policy=default
+r4v-e4-p8-s11-g-opt-r2 rc=0 policy=default
+r4v-e4-p8-s11-g-optlock-r2 rc=0 policy=default
+r4v-e4-p8-s11-g-optr0-r2 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p8-s11-g-optr1-r2 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p8-s11-g-old-r3 rc=0 policy=default
+r4v-e4-p8-s11-g-fix-r3 rc=0 policy=default
+r4v-e4-p8-s11-g-opt-r3 rc=0 policy=default
+r4v-e4-p8-s11-g-optlock-r3 rc=0 policy=default
+r4v-e4-p8-s11-g-optr0-r3 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p8-s11-g-optr1-r3 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p8-s11-g-old-r4 rc=0 policy=default
+r4v-e4-p8-s11-g-fix-r4 rc=0 policy=default
+r4v-e4-p8-s11-g-opt-r4 rc=0 policy=default
+r4v-e4-p8-s11-g-optlock-r4 rc=0 policy=default
+r4v-e4-p8-s11-g-optr0-r4 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p8-s11-g-optr1-r4 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p8-s11-g-old-r5 rc=0 policy=default
+r4v-e4-p8-s11-g-fix-r5 rc=0 policy=default
+r4v-e4-p8-s11-g-opt-r5 rc=0 policy=default
+r4v-e4-p8-s11-g-optlock-r5 rc=0 policy=default
+r4v-e4-p8-s11-g-optr0-r5 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p8-s11-g-optr1-r5 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p8-s17-g-old-r1 rc=0 policy=default
+r4v-e4-p8-s17-g-fix-r1 rc=0 policy=default
+r4v-e4-p8-s17-g-opt-r1 rc=0 policy=default
+r4v-e4-p8-s17-g-optlock-r1 rc=0 policy=default
+r4v-e4-p8-s17-g-optr0-r1 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p8-s17-g-optr1-r1 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p8-s17-g-old-r2 rc=0 policy=default
+r4v-e4-p8-s17-g-fix-r2 rc=0 policy=default
+r4v-e4-p8-s17-g-opt-r2 rc=0 policy=default
+r4v-e4-p8-s17-g-optlock-r2 rc=0 policy=default
+r4v-e4-p8-s17-g-optr0-r2 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p8-s17-g-optr1-r2 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p8-s17-g-old-r3 rc=0 policy=default
+r4v-e4-p8-s17-g-fix-r3 rc=0 policy=default
+r4v-e4-p8-s17-g-opt-r3 rc=0 policy=default
+r4v-e4-p8-s17-g-optlock-r3 rc=0 policy=default
+r4v-e4-p8-s17-g-optr0-r3 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p8-s17-g-optr1-r3 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p8-s17-g-old-r4 rc=0 policy=default
+r4v-e4-p8-s17-g-fix-r4 rc=0 policy=default
+r4v-e4-p8-s17-g-opt-r4 rc=0 policy=default
+r4v-e4-p8-s17-g-optlock-r4 rc=0 policy=default
+r4v-e4-p8-s17-g-optr0-r4 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p8-s17-g-optr1-r4 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p8-s17-g-old-r5 rc=0 policy=default
+r4v-e4-p8-s17-g-fix-r5 rc=0 policy=default
+r4v-e4-p8-s17-g-opt-r5 rc=0 policy=default
+r4v-e4-p8-s17-g-optlock-r5 rc=0 policy=default
+r4v-e4-p8-s17-g-optr0-r5 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p8-s17-g-optr1-r5 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p8-s23-g-old-r1 rc=0 policy=default
+r4v-e4-p8-s23-g-fix-r1 rc=0 policy=default
+r4v-e4-p8-s23-g-opt-r1 rc=0 policy=default
+r4v-e4-p8-s23-g-optlock-r1 rc=0 policy=default
+r4v-e4-p8-s23-g-optr0-r1 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p8-s23-g-optr1-r1 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p8-s23-g-old-r2 rc=0 policy=default
+r4v-e4-p8-s23-g-fix-r2 rc=0 policy=default
+r4v-e4-p8-s23-g-opt-r2 rc=0 policy=default
+r4v-e4-p8-s23-g-optlock-r2 rc=0 policy=default
+r4v-e4-p8-s23-g-optr0-r2 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p8-s23-g-optr1-r2 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p8-s23-g-old-r3 rc=0 policy=default
+r4v-e4-p8-s23-g-fix-r3 rc=0 policy=default
+r4v-e4-p8-s23-g-opt-r3 rc=0 policy=default
+r4v-e4-p8-s23-g-optlock-r3 rc=0 policy=default
+r4v-e4-p8-s23-g-optr0-r3 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p8-s23-g-optr1-r3 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p8-s23-g-old-r4 rc=0 policy=default
+r4v-e4-p8-s23-g-fix-r4 rc=0 policy=default
+r4v-e4-p8-s23-g-opt-r4 rc=0 policy=default
+r4v-e4-p8-s23-g-optlock-r4 rc=0 policy=default
+r4v-e4-p8-s23-g-optr0-r4 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p8-s23-g-optr1-r4 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+r4v-e4-p8-s23-g-old-r5 rc=0 policy=default
+r4v-e4-p8-s23-g-fix-r5 rc=0 policy=default
+r4v-e4-p8-s23-g-opt-r5 rc=0 policy=default
+r4v-e4-p8-s23-g-optlock-r5 rc=0 policy=default
+r4v-e4-p8-s23-g-optr0-r5 rc=0 policy={"maxRecomposeAttempts":0}
+r4v-e4-p8-s23-g-optr1-r5 rc=0 policy={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+phase matrix 14:47:19
+r4m-e4-hot_conflict-steward-p2-s11-old rc=0 policy=default
+r4m-e4-hot_conflict-steward-p2-s17-old rc=0 policy=default
+r4m-e4-hot_conflict-steward-p2-s23-old rc=0 policy=default
+r4m-e4-hot_conflict-steward-p4-s11-old rc=0 policy=default
+r4m-e4-hot_conflict-steward-p4-s17-old rc=0 policy=default
+r4m-e4-hot_conflict-steward-p4-s23-old rc=0 policy=default
+r4m-e4-hot_conflict-steward-p8-s11-old rc=0 policy=default
+r4m-e4-hot_conflict-steward-p8-s17-old rc=0 policy=default
+r4m-e4-hot_conflict-steward-p8-s23-old rc=0 policy=default
+r4m-e4-hot_conflict-steward-sp-s11-old rc=0
+r4m-e4-hot_conflict-fault_naive-p8-s11-old rc=0 policy=default
+r4m-e4-hot_conflict-fault_nolock-p8-s11-old rc=0 policy=default
+r4m-e4-hot_conflict-steward-sp-s17-old rc=0
+r4m-e4-hot_conflict-fault_naive-p8-s17-old rc=0 policy=default
+r4m-e4-hot_conflict-fault_nolock-p8-s17-old rc=0 policy=default
+r4m-e4-hot_conflict-steward-sp-s23-old rc=0
+r4m-e4-hot_conflict-fault_naive-p8-s23-old rc=0 policy=default
+r4m-e4-hot_conflict-fault_nolock-p8-s23-old rc=0 policy=default
+r4m-e4-hot_conflict-steward-p2-s11-fix rc=0 policy=default
+r4m-e4-hot_conflict-steward-p2-s17-fix rc=0 policy=default
+r4m-e4-hot_conflict-steward-p2-s23-fix rc=0 policy=default
+r4m-e4-hot_conflict-steward-p4-s11-fix rc=0 policy=default
+r4m-e4-hot_conflict-steward-p4-s17-fix rc=0 policy=default
+r4m-e4-hot_conflict-steward-p4-s23-fix rc=0 policy=default
+r4m-e4-hot_conflict-steward-p8-s11-fix rc=0 policy=default
+r4m-e4-hot_conflict-steward-p8-s17-fix rc=0 policy=default
+r4m-e4-hot_conflict-steward-p8-s23-fix rc=0 policy=default
+r4m-e4-hot_conflict-steward-sp-s11-fix rc=0
+r4m-e4-hot_conflict-fault_naive-p8-s11-fix rc=0 policy=default
+r4m-e4-hot_conflict-fault_nolock-p8-s11-fix rc=0 policy=default
+r4m-e4-hot_conflict-steward-sp-s17-fix rc=0
+r4m-e4-hot_conflict-fault_naive-p8-s17-fix rc=0 policy=default
+r4m-e4-hot_conflict-fault_nolock-p8-s17-fix rc=0 policy=default
+r4m-e4-hot_conflict-steward-sp-s23-fix rc=0
+r4m-e4-hot_conflict-fault_naive-p8-s23-fix rc=0 policy=default
+r4m-e4-hot_conflict-fault_nolock-p8-s23-fix rc=0 policy=default
+r4m-e4-hot_conflict-steward-p2-s11-opt rc=0 policy=default
+r4m-e4-hot_conflict-steward-p2-s17-opt rc=0 policy=default
+r4m-e4-hot_conflict-steward-p2-s23-opt rc=0 policy=default
+r4m-e4-hot_conflict-steward-p4-s11-opt rc=0 policy=default
+r4m-e4-hot_conflict-steward-p4-s17-opt rc=0 policy=default
+r4m-e4-hot_conflict-steward-p4-s23-opt rc=0 policy=default
+r4m-e4-hot_conflict-steward-p8-s11-opt rc=0 policy=default
+r4m-e4-hot_conflict-steward-p8-s17-opt rc=0 policy=default
+r4m-e4-hot_conflict-steward-p8-s23-opt rc=0 policy=default
+r4m-e4-hot_conflict-steward-sp-s11-opt rc=0
+r4m-e4-hot_conflict-fault_naive-p8-s11-opt rc=0 policy=default
+r4m-e4-hot_conflict-fault_nolock-p8-s11-opt rc=0 policy=default
+r4m-e4-hot_conflict-steward-sp-s17-opt rc=0
+r4m-e4-hot_conflict-fault_naive-p8-s17-opt rc=0 policy=default
+r4m-e4-hot_conflict-fault_nolock-p8-s17-opt rc=0 policy=default
+r4m-e4-hot_conflict-steward-sp-s23-opt rc=0
+r4m-e4-hot_conflict-fault_naive-p8-s23-opt rc=0 policy=default
+r4m-e4-hot_conflict-fault_nolock-p8-s23-opt rc=0 policy=default
+r4m-e4-hot_conflict-steward-p2-s11-optlock rc=0 policy=default
+r4m-e4-hot_conflict-steward-p2-s17-optlock rc=0 policy=default
+r4m-e4-hot_conflict-steward-p2-s23-optlock rc=0 policy=default
+r4m-e4-hot_conflict-steward-p4-s11-optlock rc=0 policy=default
+r4m-e4-hot_conflict-steward-p4-s17-optlock rc=0 policy=default
+r4m-e4-hot_conflict-steward-p4-s23-optlock rc=0 policy=default
+r4m-e4-hot_conflict-steward-p8-s11-optlock rc=0 policy=default
+r4m-e4-hot_conflict-steward-p8-s17-optlock rc=0 policy=default
+r4m-e4-hot_conflict-steward-p8-s23-optlock rc=0 policy=default
+phase regression 14:48:32
+r4r-e2-hot_conflict-steward-s11-r1-fix rc=0
+r4r-e2-hot_conflict-steward-s11-r1-opt rc=0
+r4r-e2-hot_conflict-steward-s11-r2-fix rc=0
+r4r-e2-hot_conflict-steward-s11-r2-opt rc=0
+r4r-e2-hot_conflict-steward-s17-r1-fix rc=0
+r4r-e2-hot_conflict-steward-s17-r1-opt rc=0
+r4r-e2-hot_conflict-steward-s17-r2-fix rc=0
+r4r-e2-hot_conflict-steward-s17-r2-opt rc=0
+r4r-e2-hot_conflict-steward-s23-r1-fix rc=0
+r4r-e2-hot_conflict-steward-s23-r1-opt rc=0
+r4r-e2-hot_conflict-steward-s23-r2-fix rc=0
+r4r-e2-hot_conflict-steward-s23-r2-opt rc=0
+r4r-e2-hot_conflict-file_lock-s11-r1-fix rc=0
+r4r-e2-hot_conflict-file_lock-s11-r1-opt rc=0
+r4r-e2-hot_conflict-file_lock-s11-r2-fix rc=0
+r4r-e2-hot_conflict-file_lock-s11-r2-opt rc=0
+r4r-e2-hot_conflict-file_lock-s17-r1-fix rc=0
+r4r-e2-hot_conflict-file_lock-s17-r1-opt rc=0
+r4r-e2-hot_conflict-file_lock-s17-r2-fix rc=0
+r4r-e2-hot_conflict-file_lock-s17-r2-opt rc=0
+r4r-e2-hot_conflict-file_lock-s23-r1-fix rc=0
+r4r-e2-hot_conflict-file_lock-s23-r1-opt rc=0
+r4r-e2-hot_conflict-file_lock-s23-r2-fix rc=0
+r4r-e2-hot_conflict-file_lock-s23-r2-opt rc=0
+r4r-e2-hot_conflict-occ-s11-r1-fix rc=0
+r4r-e2-hot_conflict-occ-s11-r1-opt rc=0
+r4r-e2-hot_conflict-occ-s11-r2-fix rc=0
+r4r-e2-hot_conflict-occ-s11-r2-opt rc=0
+r4r-e2-hot_conflict-occ-s17-r1-fix rc=0
+r4r-e2-hot_conflict-occ-s17-r1-opt rc=0
+r4r-e2-hot_conflict-occ-s17-r2-fix rc=0
+r4r-e2-hot_conflict-occ-s17-r2-opt rc=0
+r4r-e2-hot_conflict-occ-s23-r1-fix rc=0
+r4r-e2-hot_conflict-occ-s23-r1-opt rc=0
+r4r-e2-hot_conflict-occ-s23-r2-fix rc=0
+r4r-e2-hot_conflict-occ-s23-r2-opt rc=0
+r4r-e2-hot_conflict-git_three_way-s11-r1-fix rc=0
+r4r-e2-hot_conflict-git_three_way-s11-r1-opt rc=0
+r4r-e2-hot_conflict-git_three_way-s11-r2-fix rc=0
+r4r-e2-hot_conflict-git_three_way-s11-r2-opt rc=0
+r4r-e2-hot_conflict-git_three_way-s17-r1-fix rc=0
+r4r-e2-hot_conflict-git_three_way-s17-r1-opt rc=0
+r4r-e2-hot_conflict-git_three_way-s17-r2-fix rc=0
+r4r-e2-hot_conflict-git_three_way-s17-r2-opt rc=0
+r4r-e2-hot_conflict-git_three_way-s23-r1-fix rc=0
+r4r-e2-hot_conflict-git_three_way-s23-r1-opt rc=0
+r4r-e2-hot_conflict-git_three_way-s23-r2-fix rc=0
+r4r-e2-hot_conflict-git_three_way-s23-r2-opt rc=0
+r4r-e2-hot_conflict-bare_composer-s11-r1-fix rc=0
+r4r-e2-hot_conflict-bare_composer-s11-r1-opt rc=0
+r4r-e2-hot_conflict-bare_composer-s11-r2-fix rc=0
+r4r-e2-hot_conflict-bare_composer-s11-r2-opt rc=0
+r4r-e2-hot_conflict-bare_composer-s17-r1-fix rc=0
+r4r-e2-hot_conflict-bare_composer-s17-r1-opt rc=0
+r4r-e2-hot_conflict-bare_composer-s17-r2-fix rc=0
+r4r-e2-hot_conflict-bare_composer-s17-r2-opt rc=0
+r4r-e2-hot_conflict-bare_composer-s23-r1-fix rc=0
+r4r-e2-hot_conflict-bare_composer-s23-r1-opt rc=0
+r4r-e2-hot_conflict-bare_composer-s23-r2-fix rc=0
+r4r-e2-hot_conflict-bare_composer-s23-r2-opt rc=0
+r4r-e2-hot_disjoint-steward-s11-r1-fix rc=0
+r4r-e2-hot_disjoint-steward-s11-r1-opt rc=0
+r4r-e2-hot_disjoint-steward-s11-r2-fix rc=0
+r4r-e2-hot_disjoint-steward-s11-r2-opt rc=0
+r4r-e2-hot_disjoint-steward-s17-r1-fix rc=0
+r4r-e2-hot_disjoint-steward-s17-r1-opt rc=0
+r4r-e2-hot_disjoint-steward-s17-r2-fix rc=0
+r4r-e2-hot_disjoint-steward-s17-r2-opt rc=0
+r4r-e2-hot_disjoint-steward-s23-r1-fix rc=0
+r4r-e2-hot_disjoint-steward-s23-r1-opt rc=0
+r4r-e2-hot_disjoint-steward-s23-r2-fix rc=0
+r4r-e2-hot_disjoint-steward-s23-r2-opt rc=0
+r4r-e2-hot_disjoint-file_lock-s11-r1-fix rc=0
+r4r-e2-hot_disjoint-file_lock-s11-r1-opt rc=0
+r4r-e2-hot_disjoint-file_lock-s11-r2-fix rc=0
+r4r-e2-hot_disjoint-file_lock-s11-r2-opt rc=0
+r4r-e2-hot_disjoint-file_lock-s17-r1-fix rc=0
+r4r-e2-hot_disjoint-file_lock-s17-r1-opt rc=0
+r4r-e2-hot_disjoint-file_lock-s17-r2-fix rc=0
+r4r-e2-hot_disjoint-file_lock-s17-r2-opt rc=0
+r4r-e2-hot_disjoint-file_lock-s23-r1-fix rc=0
+r4r-e2-hot_disjoint-file_lock-s23-r1-opt rc=0
+r4r-e2-hot_disjoint-file_lock-s23-r2-fix rc=0
+r4r-e2-hot_disjoint-file_lock-s23-r2-opt rc=0
+r4r-e2-hot_disjoint-occ-s11-r1-fix rc=0
+r4r-e2-hot_disjoint-occ-s11-r1-opt rc=0
+r4r-e2-hot_disjoint-occ-s11-r2-fix rc=0
+r4r-e2-hot_disjoint-occ-s11-r2-opt rc=0
+r4r-e2-hot_disjoint-occ-s17-r1-fix rc=0
+r4r-e2-hot_disjoint-occ-s17-r1-opt rc=0
+r4r-e2-hot_disjoint-occ-s17-r2-fix rc=0
+r4r-e2-hot_disjoint-occ-s17-r2-opt rc=0
+r4r-e2-hot_disjoint-occ-s23-r1-fix rc=0
+r4r-e2-hot_disjoint-occ-s23-r1-opt rc=0
+r4r-e2-hot_disjoint-occ-s23-r2-fix rc=0
+r4r-e2-hot_disjoint-occ-s23-r2-opt rc=0
+r4r-e2-hot_disjoint-git_three_way-s11-r1-fix rc=0
+r4r-e2-hot_disjoint-git_three_way-s11-r1-opt rc=0
+r4r-e2-hot_disjoint-git_three_way-s11-r2-fix rc=0
+r4r-e2-hot_disjoint-git_three_way-s11-r2-opt rc=0
+r4r-e2-hot_disjoint-git_three_way-s17-r1-fix rc=0
+r4r-e2-hot_disjoint-git_three_way-s17-r1-opt rc=0
+r4r-e2-hot_disjoint-git_three_way-s17-r2-fix rc=0
+r4r-e2-hot_disjoint-git_three_way-s17-r2-opt rc=0
+r4r-e2-hot_disjoint-git_three_way-s23-r1-fix rc=0
+r4r-e2-hot_disjoint-git_three_way-s23-r1-opt rc=0
+r4r-e2-hot_disjoint-git_three_way-s23-r2-fix rc=0
+r4r-e2-hot_disjoint-git_three_way-s23-r2-opt rc=0
+r4r-e2-hot_disjoint-bare_composer-s11-r1-fix rc=0
+r4r-e2-hot_disjoint-bare_composer-s11-r1-opt rc=0
+r4r-e2-hot_disjoint-bare_composer-s11-r2-fix rc=0
+r4r-e2-hot_disjoint-bare_composer-s11-r2-opt rc=0
+r4r-e2-hot_disjoint-bare_composer-s17-r1-fix rc=0
+r4r-e2-hot_disjoint-bare_composer-s17-r1-opt rc=0
+r4r-e2-hot_disjoint-bare_composer-s17-r2-fix rc=0
+r4r-e2-hot_disjoint-bare_composer-s17-r2-opt rc=0
+r4r-e2-hot_disjoint-bare_composer-s23-r1-fix rc=0
+r4r-e2-hot_disjoint-bare_composer-s23-r1-opt rc=0
+r4r-e2-hot_disjoint-bare_composer-s23-r2-fix rc=0
+r4r-e2-hot_disjoint-bare_composer-s23-r2-opt rc=0
+r4r-e2-cold-steward-s11-r1-fix rc=0
+r4r-e2-cold-steward-s11-r1-opt rc=0
+r4r-e2-cold-steward-s11-r2-fix rc=0
+r4r-e2-cold-steward-s11-r2-opt rc=0
+r4r-e2-cold-steward-s17-r1-fix rc=0
+r4r-e2-cold-steward-s17-r1-opt rc=0
+r4r-e2-cold-steward-s17-r2-fix rc=0
+r4r-e2-cold-steward-s17-r2-opt rc=0
+r4r-e2-cold-steward-s23-r1-fix rc=0
+r4r-e2-cold-steward-s23-r1-opt rc=0
+r4r-e2-cold-steward-s23-r2-fix rc=0
+r4r-e2-cold-steward-s23-r2-opt rc=0
+r4r-e2-cold-file_lock-s11-r1-fix rc=0
+r4r-e2-cold-file_lock-s11-r1-opt rc=0
+r4r-e2-cold-file_lock-s11-r2-fix rc=0
+r4r-e2-cold-file_lock-s11-r2-opt rc=0
+r4r-e2-cold-file_lock-s17-r1-fix rc=0
+r4r-e2-cold-file_lock-s17-r1-opt rc=0
+r4r-e2-cold-file_lock-s17-r2-fix rc=0
+r4r-e2-cold-file_lock-s17-r2-opt rc=0
+r4r-e2-cold-file_lock-s23-r1-fix rc=0
+r4r-e2-cold-file_lock-s23-r1-opt rc=0
+r4r-e2-cold-file_lock-s23-r2-fix rc=0
+r4r-e2-cold-file_lock-s23-r2-opt rc=0
+r4r-e2-cold-occ-s11-r1-fix rc=0
+r4r-e2-cold-occ-s11-r1-opt rc=0
+r4r-e2-cold-occ-s11-r2-fix rc=0
+r4r-e2-cold-occ-s11-r2-opt rc=0
+r4r-e2-cold-occ-s17-r1-fix rc=0
+r4r-e2-cold-occ-s17-r1-opt rc=0
+r4r-e2-cold-occ-s17-r2-fix rc=0
+r4r-e2-cold-occ-s17-r2-opt rc=0
+r4r-e2-cold-occ-s23-r1-fix rc=0
+r4r-e2-cold-occ-s23-r1-opt rc=0
+r4r-e2-cold-occ-s23-r2-fix rc=0
+r4r-e2-cold-occ-s23-r2-opt rc=0
+r4r-e2-cold-git_three_way-s11-r1-fix rc=0
+r4r-e2-cold-git_three_way-s11-r1-opt rc=0
+r4r-e2-cold-git_three_way-s11-r2-fix rc=0
+r4r-e2-cold-git_three_way-s11-r2-opt rc=0
+r4r-e2-cold-git_three_way-s17-r1-fix rc=0
+r4r-e2-cold-git_three_way-s17-r1-opt rc=0
+r4r-e2-cold-git_three_way-s17-r2-fix rc=0
+r4r-e2-cold-git_three_way-s17-r2-opt rc=0
+r4r-e2-cold-git_three_way-s23-r1-fix rc=0
+r4r-e2-cold-git_three_way-s23-r1-opt rc=0
+r4r-e2-cold-git_three_way-s23-r2-fix rc=0
+r4r-e2-cold-git_three_way-s23-r2-opt rc=0
+r4r-e2-cold-bare_composer-s11-r1-fix rc=0
+r4r-e2-cold-bare_composer-s11-r1-opt rc=0
+r4r-e2-cold-bare_composer-s11-r2-fix rc=0
+r4r-e2-cold-bare_composer-s11-r2-opt rc=0
+r4r-e2-cold-bare_composer-s17-r1-fix rc=0
+r4r-e2-cold-bare_composer-s17-r1-opt rc=0
+r4r-e2-cold-bare_composer-s17-r2-fix rc=0
+r4r-e2-cold-bare_composer-s17-r2-opt rc=0
+r4r-e2-cold-bare_composer-s23-r1-fix rc=0
+r4r-e2-cold-bare_composer-s23-r1-opt rc=0
+r4r-e2-cold-bare_composer-s23-r2-fix rc=0
+r4r-e2-cold-bare_composer-s23-r2-opt rc=0
+phase faults 14:50:23
+faults rc=0
+end 2026-10-08 14:54:55 CST
+phase barrier-beforeprecheck-v2 14:58:07 (v1 superseded: leader was not gated on the follower pause)
+rep 1: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 2: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 3: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 4: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 5: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 6: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 7: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 8: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 9: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 10: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 11: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 12: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 13: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 14: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 15: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 16: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 17: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 18: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 19: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 20: window_hit=true leader=applied follower=blocked/blocked_other lost=[]
+rep 1: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 2: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 3: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 4: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 5: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 6: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 7: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 8: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 9: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 10: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 11: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 12: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 13: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 14: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 15: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 16: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 17: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 18: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 19: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+rep 20: window_hit=true leader=applied follower=applied/applied_after_re-compose_both_present lost=[]
+end barrier-beforeprecheck-v2 14:58:22

@@ -1,0 +1,91 @@
+status 0
+stderr 
+stdout {
+  "ok": true,
+  "command": "doctor",
+  "mode": "standalone",
+  "cwd": "/tmp/atm-da-EnfhR4",
+  "messages": [
+    {
+      "level": "info",
+      "code": "ATM_DOCTOR_OK",
+      "text": "ATM engineering and runtime signals are ready.",
+      "data": {}
+    }
+  ],
+  "evidence": {
+    "runtimeBuildIdentity": {
+      "schemaId": "atm.runtimeIdentity.v1",
+      "packageName": "@ai-atomic-framework/cli",
+      "status": "source-unsealed",
+      "executionMode": "source",
+      "version": "0.1.2",
+      "sourceCommit": null,
+      "sourceDigest": null,
+      "buildId": null
+    },
+    "checks": [
+      {
+        "name": "package-manager",
+        "ok": true,
+        "details": {
+          "official": "npm",
+          "packageLock": false,
+          "packageManagerField": null,
+          "pnpmWorkspace": false
+        }
+      },
+      {
+        "name": "public-script-contract",
+        "ok": true,
+        "details": {
+          "build": null,
+          "typecheck": null,
+          "lint": null,
+          "test": null,
+          "validateQuick": null,
+          "validateStandard": null,
+          "validateFull": null
+        }
+      },
+      {
+        "name": "typescript-build-config",
+        "ok": true,
+        "details": {
+          "tsconfig": false,
+          "buildConfig": false,
+          "buildScript": null
+        }
+      },
+      {
+        "name": "eslint-lint-config",
+        "ok": true,
+        "details": {
+          "eslintConfig": false,
+          "lintScript": null
+        }
+      },
+      {
+        "name": "package-surface",
+        "ok": true,
+        "details": {
+          "behaviorPack": false,
+          "legacyPackages": []
+        }
+      },
+      {
+        "name": "repo-hygiene",
+        "ok": true,
+        "details": {
+          "forbiddenFiles": [
+            "temp.txt",
+            "tmp_get_git.ps1"
+          ],
+          "presentRootFiles": [],
+          "pnpmWorkspace": false
+        }
+      },
+      {
+        "name": "typescript-escape-hatches",
+  
+error undefined

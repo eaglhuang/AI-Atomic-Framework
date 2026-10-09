@@ -1,0 +1,30 @@
+[
+  {
+    "arm": "file_lock",
+    "arm_role": "baseline_serial",
+    "diagnostic": false,
+    "correctness_competitor": true,
+    "offered": 15,
+    "committed": 15,
+    "correct": 15,
+    "lost": 0,
+    "wall_clock_ms": 232.56,
+    "mean_lock_wait_ms": 6.82,
+    "mean_overhead_ms": 21.51,
+    "label": "BASELINE serial — per-file async mutex + RMW (no composer)"
+  },
+  {
+    "arm": "steward",
+    "arm_role": "main_method",
+    "diagnostic": false,
+    "correctness_competitor": true,
+    "offered": 15,
+    "committed": 15,
+    "correct": 15,
+    "lost": 0,
+    "wall_clock_ms": 549.6,
+    "mean_lock_wait_ms": 0,
+    "mean_overhead_ms": 57.94,
+    "label": "MAIN — ATM composer + neutral steward apply"
+  }
+]

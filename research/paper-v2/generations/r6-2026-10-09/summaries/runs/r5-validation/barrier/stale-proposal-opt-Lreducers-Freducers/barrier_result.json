@@ -1,0 +1,1400 @@
+{
+ "summary": {
+  "test": "r3-barrier-interleave-v1",
+  "mode": "stale-proposal",
+  "atm_env": {},
+  "variant": "same-region(reducers)",
+  "atm_monorepo": "/workspace/atm-main-2118bc66/AI-Atomic-Framework-2118bc66efb3ac3bc0ddaede6a2f7cb18526b030",
+  "atm_pin": "2118bc66efb3ac3bc0ddaede6a2f7cb18526b030",
+  "node": "v24.21.0",
+  "reps": 20,
+  "window_hit": 20,
+  "runs_with_lost_effect": 0,
+  "lost_effects_total": 0,
+  "leader_applied": 20,
+  "follower_classes": {
+   "blocked_other": 20
+  },
+  "final_equals_leader_only": 20,
+  "final_equals_both_full_bytes": 0,
+  "leftover_files": 0,
+  "seam_ops": [
+   null
+  ],
+  "follower_commit_guard_attempts": [
+   0
+  ],
+  "leader_commit_guard_attempts": [
+   1
+  ],
+  "follower_tx_attempts": [
+   0
+  ],
+  "follower_lock_owner_writes": [
+   0
+  ],
+  "first_follower_reason": "steward-final-patch-required: proposal 'p-follower' overlaps region 'reducers', which changed after the proposal was anchored; refusing to overwrite [proposals: p-follower]"
+ },
+ "runs": [
+  {
+   "rep": 1,
+   "leader": {
+    "role": "leader",
+    "pid": 1102127,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 84,
+     "apply_return": 191
+    },
+    "commit_guard_lock_acquires": 1,
+    "tx_attempts": 1,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "lock_owner_writes": 1,
+    "ok": true,
+    "verdict": "applied",
+    "blockedReasons": [],
+    "receipt_before": "8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "receipt_after": "f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+    "marker": "// atm-edit barrier-leader by agent-leader"
+   },
+   "follower": {
+    "role": "follower",
+    "pid": 1102128,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 79,
+     "follower_release": 187,
+     "apply_return": 276
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "paused": true,
+    "leader_done_seen": true,
+    "disk_hash_at_resume": "sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+    "ok": false,
+    "verdict": "blocked",
+    "blockedReasons": [
+     "steward-final-patch-required: proposal 'p-follower' overlaps region 'reducers', which changed after the proposal was anchored; refusing to overwrite [proposals: p-follower]"
+    ],
+    "receipt_before": null,
+    "receipt_after": null,
+    "marker": "// atm-edit barrier-follower by agent-follower"
+   },
+   "leader_exit": 0,
+   "follower_exit": 0,
+   "stderr": {
+    "leader": "",
+    "follower": ""
+   },
+   "window_hit": true,
+   "final_hash": "sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+   "final_bytes": 230,
+   "leftover_files": [],
+   "leader_marker_present": true,
+   "follower_marker_present": false,
+   "final_equals_leader_only": true,
+   "final_equals_both_full_bytes": false,
+   "lost_effects": [],
+   "follower_class": "blocked_other"
+  },
+  {
+   "rep": 2,
+   "leader": {
+    "role": "leader",
+    "pid": 1102156,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 80,
+     "apply_return": 172
+    },
+    "commit_guard_lock_acquires": 1,
+    "tx_attempts": 1,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "lock_owner_writes": 1,
+    "ok": true,
+    "verdict": "applied",
+    "blockedReasons": [],
+    "receipt_before": "8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "receipt_after": "f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+    "marker": "// atm-edit barrier-leader by agent-leader"
+   },
+   "follower": {
+    "role": "follower",
+    "pid": 1102157,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 79,
+     "follower_release": 173,
+     "apply_return": 260
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "paused": true,
+    "leader_done_seen": true,
+    "disk_hash_at_resume": "sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+    "ok": false,
+    "verdict": "blocked",
+    "blockedReasons": [
+     "steward-final-patch-required: proposal 'p-follower' overlaps region 'reducers', which changed after the proposal was anchored; refusing to overwrite [proposals: p-follower]"
+    ],
+    "receipt_before": null,
+    "receipt_after": null,
+    "marker": "// atm-edit barrier-follower by agent-follower"
+   },
+   "leader_exit": 0,
+   "follower_exit": 0,
+   "stderr": {
+    "leader": "",
+    "follower": ""
+   },
+   "window_hit": true,
+   "final_hash": "sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+   "final_bytes": 230,
+   "leftover_files": [],
+   "leader_marker_present": true,
+   "follower_marker_present": false,
+   "final_equals_leader_only": true,
+   "final_equals_both_full_bytes": false,
+   "lost_effects": [],
+   "follower_class": "blocked_other"
+  },
+  {
+   "rep": 3,
+   "leader": {
+    "role": "leader",
+    "pid": 1102185,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 76,
+     "apply_return": 181
+    },
+    "commit_guard_lock_acquires": 1,
+    "tx_attempts": 1,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "lock_owner_writes": 1,
+    "ok": true,
+    "verdict": "applied",
+    "blockedReasons": [],
+    "receipt_before": "8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "receipt_after": "f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+    "marker": "// atm-edit barrier-leader by agent-leader"
+   },
+   "follower": {
+    "role": "follower",
+    "pid": 1102186,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 76,
+     "follower_release": 185,
+     "apply_return": 280
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "paused": true,
+    "leader_done_seen": true,
+    "disk_hash_at_resume": "sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+    "ok": false,
+    "verdict": "blocked",
+    "blockedReasons": [
+     "steward-final-patch-required: proposal 'p-follower' overlaps region 'reducers', which changed after the proposal was anchored; refusing to overwrite [proposals: p-follower]"
+    ],
+    "receipt_before": null,
+    "receipt_after": null,
+    "marker": "// atm-edit barrier-follower by agent-follower"
+   },
+   "leader_exit": 0,
+   "follower_exit": 0,
+   "stderr": {
+    "leader": "",
+    "follower": ""
+   },
+   "window_hit": true,
+   "final_hash": "sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+   "final_bytes": 230,
+   "leftover_files": [],
+   "leader_marker_present": true,
+   "follower_marker_present": false,
+   "final_equals_leader_only": true,
+   "final_equals_both_full_bytes": false,
+   "lost_effects": [],
+   "follower_class": "blocked_other"
+  },
+  {
+   "rep": 4,
+   "leader": {
+    "role": "leader",
+    "pid": 1102214,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 89,
+     "apply_return": 182
+    },
+    "commit_guard_lock_acquires": 1,
+    "tx_attempts": 1,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "lock_owner_writes": 1,
+    "ok": true,
+    "verdict": "applied",
+    "blockedReasons": [],
+    "receipt_before": "8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "receipt_after": "f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+    "marker": "// atm-edit barrier-leader by agent-leader"
+   },
+   "follower": {
+    "role": "follower",
+    "pid": 1102215,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 91,
+     "follower_release": 184,
+     "apply_return": 273
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "paused": true,
+    "leader_done_seen": true,
+    "disk_hash_at_resume": "sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+    "ok": false,
+    "verdict": "blocked",
+    "blockedReasons": [
+     "steward-final-patch-required: proposal 'p-follower' overlaps region 'reducers', which changed after the proposal was anchored; refusing to overwrite [proposals: p-follower]"
+    ],
+    "receipt_before": null,
+    "receipt_after": null,
+    "marker": "// atm-edit barrier-follower by agent-follower"
+   },
+   "leader_exit": 0,
+   "follower_exit": 0,
+   "stderr": {
+    "leader": "",
+    "follower": ""
+   },
+   "window_hit": true,
+   "final_hash": "sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+   "final_bytes": 230,
+   "leftover_files": [],
+   "leader_marker_present": true,
+   "follower_marker_present": false,
+   "final_equals_leader_only": true,
+   "final_equals_both_full_bytes": false,
+   "lost_effects": [],
+   "follower_class": "blocked_other"
+  },
+  {
+   "rep": 5,
+   "leader": {
+    "role": "leader",
+    "pid": 1102249,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 80,
+     "apply_return": 176
+    },
+    "commit_guard_lock_acquires": 1,
+    "tx_attempts": 1,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "lock_owner_writes": 1,
+    "ok": true,
+    "verdict": "applied",
+    "blockedReasons": [],
+    "receipt_before": "8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "receipt_after": "f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+    "marker": "// atm-edit barrier-leader by agent-leader"
+   },
+   "follower": {
+    "role": "follower",
+    "pid": 1102250,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 82,
+     "follower_release": 179,
+     "apply_return": 274
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "paused": true,
+    "leader_done_seen": true,
+    "disk_hash_at_resume": "sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+    "ok": false,
+    "verdict": "blocked",
+    "blockedReasons": [
+     "steward-final-patch-required: proposal 'p-follower' overlaps region 'reducers', which changed after the proposal was anchored; refusing to overwrite [proposals: p-follower]"
+    ],
+    "receipt_before": null,
+    "receipt_after": null,
+    "marker": "// atm-edit barrier-follower by agent-follower"
+   },
+   "leader_exit": 0,
+   "follower_exit": 0,
+   "stderr": {
+    "leader": "",
+    "follower": ""
+   },
+   "window_hit": true,
+   "final_hash": "sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+   "final_bytes": 230,
+   "leftover_files": [],
+   "leader_marker_present": true,
+   "follower_marker_present": false,
+   "final_equals_leader_only": true,
+   "final_equals_both_full_bytes": false,
+   "lost_effects": [],
+   "follower_class": "blocked_other"
+  },
+  {
+   "rep": 6,
+   "leader": {
+    "role": "leader",
+    "pid": 1102278,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 80,
+     "apply_return": 172
+    },
+    "commit_guard_lock_acquires": 1,
+    "tx_attempts": 1,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "lock_owner_writes": 1,
+    "ok": true,
+    "verdict": "applied",
+    "blockedReasons": [],
+    "receipt_before": "8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "receipt_after": "f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+    "marker": "// atm-edit barrier-leader by agent-leader"
+   },
+   "follower": {
+    "role": "follower",
+    "pid": 1102279,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 77,
+     "follower_release": 170,
+     "apply_return": 255
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "paused": true,
+    "leader_done_seen": true,
+    "disk_hash_at_resume": "sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+    "ok": false,
+    "verdict": "blocked",
+    "blockedReasons": [
+     "steward-final-patch-required: proposal 'p-follower' overlaps region 'reducers', which changed after the proposal was anchored; refusing to overwrite [proposals: p-follower]"
+    ],
+    "receipt_before": null,
+    "receipt_after": null,
+    "marker": "// atm-edit barrier-follower by agent-follower"
+   },
+   "leader_exit": 0,
+   "follower_exit": 0,
+   "stderr": {
+    "leader": "",
+    "follower": ""
+   },
+   "window_hit": true,
+   "final_hash": "sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+   "final_bytes": 230,
+   "leftover_files": [],
+   "leader_marker_present": true,
+   "follower_marker_present": false,
+   "final_equals_leader_only": true,
+   "final_equals_both_full_bytes": false,
+   "lost_effects": [],
+   "follower_class": "blocked_other"
+  },
+  {
+   "rep": 7,
+   "leader": {
+    "role": "leader",
+    "pid": 1102307,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 81,
+     "apply_return": 171
+    },
+    "commit_guard_lock_acquires": 1,
+    "tx_attempts": 1,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "lock_owner_writes": 1,
+    "ok": true,
+    "verdict": "applied",
+    "blockedReasons": [],
+    "receipt_before": "8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "receipt_after": "f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+    "marker": "// atm-edit barrier-leader by agent-leader"
+   },
+   "follower": {
+    "role": "follower",
+    "pid": 1102308,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 83,
+     "follower_release": 174,
+     "apply_return": 261
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "paused": true,
+    "leader_done_seen": true,
+    "disk_hash_at_resume": "sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+    "ok": false,
+    "verdict": "blocked",
+    "blockedReasons": [
+     "steward-final-patch-required: proposal 'p-follower' overlaps region 'reducers', which changed after the proposal was anchored; refusing to overwrite [proposals: p-follower]"
+    ],
+    "receipt_before": null,
+    "receipt_after": null,
+    "marker": "// atm-edit barrier-follower by agent-follower"
+   },
+   "leader_exit": 0,
+   "follower_exit": 0,
+   "stderr": {
+    "leader": "",
+    "follower": ""
+   },
+   "window_hit": true,
+   "final_hash": "sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+   "final_bytes": 230,
+   "leftover_files": [],
+   "leader_marker_present": true,
+   "follower_marker_present": false,
+   "final_equals_leader_only": true,
+   "final_equals_both_full_bytes": false,
+   "lost_effects": [],
+   "follower_class": "blocked_other"
+  },
+  {
+   "rep": 8,
+   "leader": {
+    "role": "leader",
+    "pid": 1102340,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 82,
+     "apply_return": 182
+    },
+    "commit_guard_lock_acquires": 1,
+    "tx_attempts": 1,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "lock_owner_writes": 1,
+    "ok": true,
+    "verdict": "applied",
+    "blockedReasons": [],
+    "receipt_before": "8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "receipt_after": "f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+    "marker": "// atm-edit barrier-leader by agent-leader"
+   },
+   "follower": {
+    "role": "follower",
+    "pid": 1102341,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 82,
+     "follower_release": 183,
+     "apply_return": 284
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "paused": true,
+    "leader_done_seen": true,
+    "disk_hash_at_resume": "sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+    "ok": false,
+    "verdict": "blocked",
+    "blockedReasons": [
+     "steward-final-patch-required: proposal 'p-follower' overlaps region 'reducers', which changed after the proposal was anchored; refusing to overwrite [proposals: p-follower]"
+    ],
+    "receipt_before": null,
+    "receipt_after": null,
+    "marker": "// atm-edit barrier-follower by agent-follower"
+   },
+   "leader_exit": 0,
+   "follower_exit": 0,
+   "stderr": {
+    "leader": "",
+    "follower": ""
+   },
+   "window_hit": true,
+   "final_hash": "sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+   "final_bytes": 230,
+   "leftover_files": [],
+   "leader_marker_present": true,
+   "follower_marker_present": false,
+   "final_equals_leader_only": true,
+   "final_equals_both_full_bytes": false,
+   "lost_effects": [],
+   "follower_class": "blocked_other"
+  },
+  {
+   "rep": 9,
+   "leader": {
+    "role": "leader",
+    "pid": 1102369,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 81,
+     "apply_return": 175
+    },
+    "commit_guard_lock_acquires": 1,
+    "tx_attempts": 1,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "lock_owner_writes": 1,
+    "ok": true,
+    "verdict": "applied",
+    "blockedReasons": [],
+    "receipt_before": "8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "receipt_after": "f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+    "marker": "// atm-edit barrier-leader by agent-leader"
+   },
+   "follower": {
+    "role": "follower",
+    "pid": 1102370,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 81,
+     "follower_release": 176,
+     "apply_return": 261
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "paused": true,
+    "leader_done_seen": true,
+    "disk_hash_at_resume": "sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+    "ok": false,
+    "verdict": "blocked",
+    "blockedReasons": [
+     "steward-final-patch-required: proposal 'p-follower' overlaps region 'reducers', which changed after the proposal was anchored; refusing to overwrite [proposals: p-follower]"
+    ],
+    "receipt_before": null,
+    "receipt_after": null,
+    "marker": "// atm-edit barrier-follower by agent-follower"
+   },
+   "leader_exit": 0,
+   "follower_exit": 0,
+   "stderr": {
+    "leader": "",
+    "follower": ""
+   },
+   "window_hit": true,
+   "final_hash": "sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+   "final_bytes": 230,
+   "leftover_files": [],
+   "leader_marker_present": true,
+   "follower_marker_present": false,
+   "final_equals_leader_only": true,
+   "final_equals_both_full_bytes": false,
+   "lost_effects": [],
+   "follower_class": "blocked_other"
+  },
+  {
+   "rep": 10,
+   "leader": {
+    "role": "leader",
+    "pid": 1102399,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 80,
+     "apply_return": 173
+    },
+    "commit_guard_lock_acquires": 1,
+    "tx_attempts": 1,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "lock_owner_writes": 1,
+    "ok": true,
+    "verdict": "applied",
+    "blockedReasons": [],
+    "receipt_before": "8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "receipt_after": "f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+    "marker": "// atm-edit barrier-leader by agent-leader"
+   },
+   "follower": {
+    "role": "follower",
+    "pid": 1102400,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 79,
+     "follower_release": 172,
+     "apply_return": 269
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "paused": true,
+    "leader_done_seen": true,
+    "disk_hash_at_resume": "sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+    "ok": false,
+    "verdict": "blocked",
+    "blockedReasons": [
+     "steward-final-patch-required: proposal 'p-follower' overlaps region 'reducers', which changed after the proposal was anchored; refusing to overwrite [proposals: p-follower]"
+    ],
+    "receipt_before": null,
+    "receipt_after": null,
+    "marker": "// atm-edit barrier-follower by agent-follower"
+   },
+   "leader_exit": 0,
+   "follower_exit": 0,
+   "stderr": {
+    "leader": "",
+    "follower": ""
+   },
+   "window_hit": true,
+   "final_hash": "sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+   "final_bytes": 230,
+   "leftover_files": [],
+   "leader_marker_present": true,
+   "follower_marker_present": false,
+   "final_equals_leader_only": true,
+   "final_equals_both_full_bytes": false,
+   "lost_effects": [],
+   "follower_class": "blocked_other"
+  },
+  {
+   "rep": 11,
+   "leader": {
+    "role": "leader",
+    "pid": 1102434,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 79,
+     "apply_return": 170
+    },
+    "commit_guard_lock_acquires": 1,
+    "tx_attempts": 1,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "lock_owner_writes": 1,
+    "ok": true,
+    "verdict": "applied",
+    "blockedReasons": [],
+    "receipt_before": "8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "receipt_after": "f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+    "marker": "// atm-edit barrier-leader by agent-leader"
+   },
+   "follower": {
+    "role": "follower",
+    "pid": 1102435,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 80,
+     "follower_release": 172,
+     "apply_return": 258
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "paused": true,
+    "leader_done_seen": true,
+    "disk_hash_at_resume": "sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+    "ok": false,
+    "verdict": "blocked",
+    "blockedReasons": [
+     "steward-final-patch-required: proposal 'p-follower' overlaps region 'reducers', which changed after the proposal was anchored; refusing to overwrite [proposals: p-follower]"
+    ],
+    "receipt_before": null,
+    "receipt_after": null,
+    "marker": "// atm-edit barrier-follower by agent-follower"
+   },
+   "leader_exit": 0,
+   "follower_exit": 0,
+   "stderr": {
+    "leader": "",
+    "follower": ""
+   },
+   "window_hit": true,
+   "final_hash": "sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+   "final_bytes": 230,
+   "leftover_files": [],
+   "leader_marker_present": true,
+   "follower_marker_present": false,
+   "final_equals_leader_only": true,
+   "final_equals_both_full_bytes": false,
+   "lost_effects": [],
+   "follower_class": "blocked_other"
+  },
+  {
+   "rep": 12,
+   "leader": {
+    "role": "leader",
+    "pid": 1102463,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 79,
+     "apply_return": 174
+    },
+    "commit_guard_lock_acquires": 1,
+    "tx_attempts": 1,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "lock_owner_writes": 1,
+    "ok": true,
+    "verdict": "applied",
+    "blockedReasons": [],
+    "receipt_before": "8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "receipt_after": "f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+    "marker": "// atm-edit barrier-leader by agent-leader"
+   },
+   "follower": {
+    "role": "follower",
+    "pid": 1102464,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 76,
+     "follower_release": 175,
+     "apply_return": 263
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "paused": true,
+    "leader_done_seen": true,
+    "disk_hash_at_resume": "sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+    "ok": false,
+    "verdict": "blocked",
+    "blockedReasons": [
+     "steward-final-patch-required: proposal 'p-follower' overlaps region 'reducers', which changed after the proposal was anchored; refusing to overwrite [proposals: p-follower]"
+    ],
+    "receipt_before": null,
+    "receipt_after": null,
+    "marker": "// atm-edit barrier-follower by agent-follower"
+   },
+   "leader_exit": 0,
+   "follower_exit": 0,
+   "stderr": {
+    "leader": "",
+    "follower": ""
+   },
+   "window_hit": true,
+   "final_hash": "sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+   "final_bytes": 230,
+   "leftover_files": [],
+   "leader_marker_present": true,
+   "follower_marker_present": false,
+   "final_equals_leader_only": true,
+   "final_equals_both_full_bytes": false,
+   "lost_effects": [],
+   "follower_class": "blocked_other"
+  },
+  {
+   "rep": 13,
+   "leader": {
+    "role": "leader",
+    "pid": 1102492,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 90,
+     "apply_return": 191
+    },
+    "commit_guard_lock_acquires": 1,
+    "tx_attempts": 1,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "lock_owner_writes": 1,
+    "ok": true,
+    "verdict": "applied",
+    "blockedReasons": [],
+    "receipt_before": "8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "receipt_after": "f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+    "marker": "// atm-edit barrier-leader by agent-leader"
+   },
+   "follower": {
+    "role": "follower",
+    "pid": 1102493,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 87,
+     "follower_release": 191,
+     "apply_return": 280
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "paused": true,
+    "leader_done_seen": true,
+    "disk_hash_at_resume": "sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+    "ok": false,
+    "verdict": "blocked",
+    "blockedReasons": [
+     "steward-final-patch-required: proposal 'p-follower' overlaps region 'reducers', which changed after the proposal was anchored; refusing to overwrite [proposals: p-follower]"
+    ],
+    "receipt_before": null,
+    "receipt_after": null,
+    "marker": "// atm-edit barrier-follower by agent-follower"
+   },
+   "leader_exit": 0,
+   "follower_exit": 0,
+   "stderr": {
+    "leader": "",
+    "follower": ""
+   },
+   "window_hit": true,
+   "final_hash": "sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+   "final_bytes": 230,
+   "leftover_files": [],
+   "leader_marker_present": true,
+   "follower_marker_present": false,
+   "final_equals_leader_only": true,
+   "final_equals_both_full_bytes": false,
+   "lost_effects": [],
+   "follower_class": "blocked_other"
+  },
+  {
+   "rep": 14,
+   "leader": {
+    "role": "leader",
+    "pid": 1102521,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 79,
+     "apply_return": 172
+    },
+    "commit_guard_lock_acquires": 1,
+    "tx_attempts": 1,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "lock_owner_writes": 1,
+    "ok": true,
+    "verdict": "applied",
+    "blockedReasons": [],
+    "receipt_before": "8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "receipt_after": "f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+    "marker": "// atm-edit barrier-leader by agent-leader"
+   },
+   "follower": {
+    "role": "follower",
+    "pid": 1102522,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 79,
+     "follower_release": 173,
+     "apply_return": 261
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "paused": true,
+    "leader_done_seen": true,
+    "disk_hash_at_resume": "sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+    "ok": false,
+    "verdict": "blocked",
+    "blockedReasons": [
+     "steward-final-patch-required: proposal 'p-follower' overlaps region 'reducers', which changed after the proposal was anchored; refusing to overwrite [proposals: p-follower]"
+    ],
+    "receipt_before": null,
+    "receipt_after": null,
+    "marker": "// atm-edit barrier-follower by agent-follower"
+   },
+   "leader_exit": 0,
+   "follower_exit": 0,
+   "stderr": {
+    "leader": "",
+    "follower": ""
+   },
+   "window_hit": true,
+   "final_hash": "sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+   "final_bytes": 230,
+   "leftover_files": [],
+   "leader_marker_present": true,
+   "follower_marker_present": false,
+   "final_equals_leader_only": true,
+   "final_equals_both_full_bytes": false,
+   "lost_effects": [],
+   "follower_class": "blocked_other"
+  },
+  {
+   "rep": 15,
+   "leader": {
+    "role": "leader",
+    "pid": 1102550,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 86,
+     "apply_return": 183
+    },
+    "commit_guard_lock_acquires": 1,
+    "tx_attempts": 1,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "lock_owner_writes": 1,
+    "ok": true,
+    "verdict": "applied",
+    "blockedReasons": [],
+    "receipt_before": "8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "receipt_after": "f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+    "marker": "// atm-edit barrier-leader by agent-leader"
+   },
+   "follower": {
+    "role": "follower",
+    "pid": 1102551,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 80,
+     "follower_release": 178,
+     "apply_return": 258
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "paused": true,
+    "leader_done_seen": true,
+    "disk_hash_at_resume": "sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+    "ok": false,
+    "verdict": "blocked",
+    "blockedReasons": [
+     "steward-final-patch-required: proposal 'p-follower' overlaps region 'reducers', which changed after the proposal was anchored; refusing to overwrite [proposals: p-follower]"
+    ],
+    "receipt_before": null,
+    "receipt_after": null,
+    "marker": "// atm-edit barrier-follower by agent-follower"
+   },
+   "leader_exit": 0,
+   "follower_exit": 0,
+   "stderr": {
+    "leader": "",
+    "follower": ""
+   },
+   "window_hit": true,
+   "final_hash": "sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+   "final_bytes": 230,
+   "leftover_files": [],
+   "leader_marker_present": true,
+   "follower_marker_present": false,
+   "final_equals_leader_only": true,
+   "final_equals_both_full_bytes": false,
+   "lost_effects": [],
+   "follower_class": "blocked_other"
+  },
+  {
+   "rep": 16,
+   "leader": {
+    "role": "leader",
+    "pid": 1102581,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 84,
+     "apply_return": 179
+    },
+    "commit_guard_lock_acquires": 1,
+    "tx_attempts": 1,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "lock_owner_writes": 1,
+    "ok": true,
+    "verdict": "applied",
+    "blockedReasons": [],
+    "receipt_before": "8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "receipt_after": "f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+    "marker": "// atm-edit barrier-leader by agent-leader"
+   },
+   "follower": {
+    "role": "follower",
+    "pid": 1102583,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 85,
+     "follower_release": 182,
+     "apply_return": 272
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "paused": true,
+    "leader_done_seen": true,
+    "disk_hash_at_resume": "sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+    "ok": false,
+    "verdict": "blocked",
+    "blockedReasons": [
+     "steward-final-patch-required: proposal 'p-follower' overlaps region 'reducers', which changed after the proposal was anchored; refusing to overwrite [proposals: p-follower]"
+    ],
+    "receipt_before": null,
+    "receipt_after": null,
+    "marker": "// atm-edit barrier-follower by agent-follower"
+   },
+   "leader_exit": 0,
+   "follower_exit": 0,
+   "stderr": {
+    "leader": "",
+    "follower": ""
+   },
+   "window_hit": true,
+   "final_hash": "sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+   "final_bytes": 230,
+   "leftover_files": [],
+   "leader_marker_present": true,
+   "follower_marker_present": false,
+   "final_equals_leader_only": true,
+   "final_equals_both_full_bytes": false,
+   "lost_effects": [],
+   "follower_class": "blocked_other"
+  },
+  {
+   "rep": 17,
+   "leader": {
+    "role": "leader",
+    "pid": 1102614,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 96,
+     "apply_return": 193
+    },
+    "commit_guard_lock_acquires": 1,
+    "tx_attempts": 1,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "lock_owner_writes": 1,
+    "ok": true,
+    "verdict": "applied",
+    "blockedReasons": [],
+    "receipt_before": "8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "receipt_after": "f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+    "marker": "// atm-edit barrier-leader by agent-leader"
+   },
+   "follower": {
+    "role": "follower",
+    "pid": 1102615,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 89,
+     "follower_release": 190,
+     "apply_return": 287
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "paused": true,
+    "leader_done_seen": true,
+    "disk_hash_at_resume": "sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+    "ok": false,
+    "verdict": "blocked",
+    "blockedReasons": [
+     "steward-final-patch-required: proposal 'p-follower' overlaps region 'reducers', which changed after the proposal was anchored; refusing to overwrite [proposals: p-follower]"
+    ],
+    "receipt_before": null,
+    "receipt_after": null,
+    "marker": "// atm-edit barrier-follower by agent-follower"
+   },
+   "leader_exit": 0,
+   "follower_exit": 0,
+   "stderr": {
+    "leader": "",
+    "follower": ""
+   },
+   "window_hit": true,
+   "final_hash": "sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+   "final_bytes": 230,
+   "leftover_files": [],
+   "leader_marker_present": true,
+   "follower_marker_present": false,
+   "final_equals_leader_only": true,
+   "final_equals_both_full_bytes": false,
+   "lost_effects": [],
+   "follower_class": "blocked_other"
+  },
+  {
+   "rep": 18,
+   "leader": {
+    "role": "leader",
+    "pid": 1102643,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 80,
+     "apply_return": 174
+    },
+    "commit_guard_lock_acquires": 1,
+    "tx_attempts": 1,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "lock_owner_writes": 1,
+    "ok": true,
+    "verdict": "applied",
+    "blockedReasons": [],
+    "receipt_before": "8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "receipt_after": "f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+    "marker": "// atm-edit barrier-leader by agent-leader"
+   },
+   "follower": {
+    "role": "follower",
+    "pid": 1102644,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 82,
+     "follower_release": 175,
+     "apply_return": 262
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "paused": true,
+    "leader_done_seen": true,
+    "disk_hash_at_resume": "sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+    "ok": false,
+    "verdict": "blocked",
+    "blockedReasons": [
+     "steward-final-patch-required: proposal 'p-follower' overlaps region 'reducers', which changed after the proposal was anchored; refusing to overwrite [proposals: p-follower]"
+    ],
+    "receipt_before": null,
+    "receipt_after": null,
+    "marker": "// atm-edit barrier-follower by agent-follower"
+   },
+   "leader_exit": 0,
+   "follower_exit": 0,
+   "stderr": {
+    "leader": "",
+    "follower": ""
+   },
+   "window_hit": true,
+   "final_hash": "sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+   "final_bytes": 230,
+   "leftover_files": [],
+   "leader_marker_present": true,
+   "follower_marker_present": false,
+   "final_equals_leader_only": true,
+   "final_equals_both_full_bytes": false,
+   "lost_effects": [],
+   "follower_class": "blocked_other"
+  },
+  {
+   "rep": 19,
+   "leader": {
+    "role": "leader",
+    "pid": 1102672,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 80,
+     "apply_return": 171
+    },
+    "commit_guard_lock_acquires": 1,
+    "tx_attempts": 1,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "lock_owner_writes": 1,
+    "ok": true,
+    "verdict": "applied",
+    "blockedReasons": [],
+    "receipt_before": "8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "receipt_after": "f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+    "marker": "// atm-edit barrier-leader by agent-leader"
+   },
+   "follower": {
+    "role": "follower",
+    "pid": 1102673,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 80,
+     "follower_release": 173,
+     "apply_return": 271
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "paused": true,
+    "leader_done_seen": true,
+    "disk_hash_at_resume": "sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+    "ok": false,
+    "verdict": "blocked",
+    "blockedReasons": [
+     "steward-final-patch-required: proposal 'p-follower' overlaps region 'reducers', which changed after the proposal was anchored; refusing to overwrite [proposals: p-follower]"
+    ],
+    "receipt_before": null,
+    "receipt_after": null,
+    "marker": "// atm-edit barrier-follower by agent-follower"
+   },
+   "leader_exit": 0,
+   "follower_exit": 0,
+   "stderr": {
+    "leader": "",
+    "follower": ""
+   },
+   "window_hit": true,
+   "final_hash": "sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+   "final_bytes": 230,
+   "leftover_files": [],
+   "leader_marker_present": true,
+   "follower_marker_present": false,
+   "final_equals_leader_only": true,
+   "final_equals_both_full_bytes": false,
+   "lost_effects": [],
+   "follower_class": "blocked_other"
+  },
+  {
+   "rep": 20,
+   "leader": {
+    "role": "leader",
+    "pid": 1102710,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 78,
+     "apply_return": 172
+    },
+    "commit_guard_lock_acquires": 1,
+    "tx_attempts": 1,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "lock_owner_writes": 1,
+    "ok": true,
+    "verdict": "applied",
+    "blockedReasons": [],
+    "receipt_before": "8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "receipt_after": "f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+    "marker": "// atm-edit barrier-leader by agent-leader"
+   },
+   "follower": {
+    "role": "follower",
+    "pid": 1102711,
+    "seam_fired": false,
+    "seam_op": null,
+    "seam_path": null,
+    "t": {
+     "both_ready": 79,
+     "follower_release": 175,
+     "apply_return": 262
+    },
+    "commit_guard_lock_acquires": 0,
+    "tx_attempts": 0,
+    "compose_base_hash": "sha256:8453cf75a82b8ecc722779d29fdf5336a9987c45a41b5bfddd6edc062e360e22",
+    "both_ready": true,
+    "paused": true,
+    "leader_done_seen": true,
+    "disk_hash_at_resume": "sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+    "ok": false,
+    "verdict": "blocked",
+    "blockedReasons": [
+     "steward-final-patch-required: proposal 'p-follower' overlaps region 'reducers', which changed after the proposal was anchored; refusing to overwrite [proposals: p-follower]"
+    ],
+    "receipt_before": null,
+    "receipt_after": null,
+    "marker": "// atm-edit barrier-follower by agent-follower"
+   },
+   "leader_exit": 0,
+   "follower_exit": 0,
+   "stderr": {
+    "leader": "",
+    "follower": ""
+   },
+   "window_hit": true,
+   "final_hash": "sha256:f71d2e4f847dcaa8afc2b38dc01f2446fbd0f22948ec00f64f89d94bdc85be55",
+   "final_bytes": 230,
+   "leftover_files": [],
+   "leader_marker_present": true,
+   "follower_marker_present": false,
+   "final_equals_leader_only": true,
+   "final_equals_both_full_bytes": false,
+   "lost_effects": [],
+   "follower_class": "blocked_other"
+  }
+ ]
+}
