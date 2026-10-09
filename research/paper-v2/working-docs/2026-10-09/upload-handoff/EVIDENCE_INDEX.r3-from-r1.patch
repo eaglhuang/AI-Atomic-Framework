@@ -1,0 +1,72 @@
+--- a/research/paper-v2/EVIDENCE_INDEX.md
++++ b/research/paper-v2/EVIDENCE_INDEX.md
+@@ -7,9 +7,11 @@
+ 
+ | Generation | 狀態 | ATM pin | SHA256SUMS sha256 | 檔案數 | 說明 |
+ |------------|------|---------|-------------------|------:|------|
+-| `generations/r1-reviewed-2026-10-07/` | **reviewed — NOT final**（外審 3×P0） | `5692474f7db70ab52a7a71c8af4867609e7e4b43` | `30d663c28f6c5a200988bb1e61a3c765408a43a668c5c575ee9aef8f0ced033f` | 274（不含 SHA256SUMS） | [GENERATION.md](./generations/r1-reviewed-2026-10-07/GENERATION.md) |
++| `generations/r1-reviewed-2026-10-07/` | **superseded by r2（保留、不可變）**（外審 3×P0） | `5692474f7db70ab52a7a71c8af4867609e7e4b43` | `30d663c28f6c5a200988bb1e61a3c765408a43a668c5c575ee9aef8f0ced033f` | 274（不含 SHA256SUMS） | [GENERATION.md](./generations/r1-reviewed-2026-10-07/GENERATION.md) |
++| `generations/r2-2026-10-08/` | **DRAFT — 回應 P0（未再外審）；r3 起為歷史（保留、不可變）** | `5692474f7db70ab52a7a71c8af4867609e7e4b43` | `25d4a2936b52623665f8351138d6c65c7393f8793b67bac46b84c3a272ac87fe` | 309（不含 SHA256SUMS） | [GENERATION.md](./generations/r2-2026-10-08/GENERATION.md) |
++| `generations/r3-2026-10-08/` | **DRAFT — ATM PR #213 修正驗證（未再外審）** | 驗證 pin `bea35380d7f381f998c9930fa95f01b999c7f208`；對照 `5692474f7db70ab52a7a71c8af4867609e7e4b43` | `7a8c0cb4e27960b9477f58323c46566bbbb4591009da9da9ebd919243cd869ed` | 329（不含 SHA256SUMS） | [GENERATION.md](./generations/r3-2026-10-08/GENERATION.md) |
+ 
+-r1 簡寫：`R1=generations/r1-reviewed-2026-10-07`。
++r1 簡寫：`R1=generations/r1-reviewed-2026-10-07`。 r2 簡寫：`R2=generations/r2-2026-10-08`。r3 簡寫：`R3=generations/r3-2026-10-08`。驗證（唯讀）：r1 目錄執行 `bash verify.sh`（r1 腳本需 bash）；r2、r3 目錄執行 `sh verify.sh` 或 `bash verify.sh`。
+ 
+ ## 2. 審核紀錄（r1）
+ 
+@@ -66,7 +68,54 @@
+ | 分析／執行腳本 | `R1/harness/runs/{cold-queue,hot-file,multiprocess,scale,v017,v017-q180,probe-cold}/*` | 已上傳 |
+ | raw（246 dirs） | **raw kept on box only, not uploaded**：`/workspace/upload/box-only/support-raw-r1.tgz`（30,974,334 B） | sha256 `6c47948671bdbe8842c1ee58db83ad2864ef8b980f6b2b1f4929840ec8073470`；理由：加上 r1 約 14 MB 會超過約 40 MB 預算／46 MB 分割上限；非論文 2.0 主結果 |
+ 
++## 7. r2 回應外審 P0（2026-10-08）
++
++> 完整對照與狀態見 `R2/GENERATION.md` §4。§3 中 r1 列的「P0」註記於 r2 的處置如下；r1 檔案本身未改。
++
++| 項目 | r2 位置 | 狀態 | 結論／數字 |
++|------|---------|------|-----------|
++| P0-1 E4 p2 s17 lost=1 | `R2/summaries/runs/r2-e4-forensics/E4_FORENSICS.md`、`R2/raw/r2-e4-forensics.tgz` | 鑑識完成 → **反例** | 真實多 process lost update（s17-t000-i0 被另一 process 的 s17-t000-i6 覆蓋，同 base 3c1ad38d）；主因 harness 未把 steward apply 納入 apply lock，促成因素 ATM pin steward apply 為 check-then-write／非原子寫入。replay r1cfg 75 run：4 失敗、6 lost、1 torn write；slock 75 run：0。slock 僅為 mitigation candidate |
++| P0-2 oracle presence-based | `R2/harness/src/oracle_v2.mjs`、`R2/harness/test/oracle_v2_contract.mjs`、`R2/summaries/runs/r2-analysis/r2-2026-10-08/oracle-rescore/` | 已修正 | full-bytes＋frame＋structure；10 個 contract 案例通過；r1 全部 stage 重評分 0 判定改變；r2 replay 1 cell 10 判定 correct→frame_violation（3164→3154） |
++| P0-3 reproduce／checksum | `R2/harness/reproduce.sh`、`R2/harness/tools/{verify,analyze,rerun,seal}.sh`、`R2/SHA256SUMS`、`R2/MANIFEST.json` | 已修正 | verify 嚴格唯讀（`sha256sum -c --strict`）；原始路徑、無 flattened seed 碰撞；r1 舊 `checksums.sha256`／`artifact_manifest.json` 不再攜帶 |
++| Phase 1 E 重建 | `R2/summaries/runs/r2-analysis/r2-2026-10-08/{tables,r1-extractors,cell-index}/` | 已完成 | E1 45/45、E2 150/150、E3 120/120、E4 18/18 cell 全欄一致；r1 E3/E4 extractor 輸出 IDENTICAL；547 cell index |
++| logical_id stub（E1/E2） | `…/logical-id-audit/` | 部分（稽核通過） | 200/200 cell：1 submit／1 terminal／≤1 correct；129 op 有多次 attempt（CAS retry） |
++| 草稿／F2 | `R2/paper/ATM_PAPER_V2_DRAFT_zh.md`、`R2/tables/F2_CORRECTNESS_TABLES.md` | 已更新（DRAFT） | 版本錨點更正；E4 改為反例表（p2/p4/p8/SP＝63/106、60/106、56/106、94/106，p2 lost=1） |
++| 未解決 | — | open | ATM 端 guard／部署契約、barrier 控制的 2-process 契約測試、真 logical_id／re-propose、process-local window、CI／統計、Phase 2–3、正文逐節同步 |
++
++r2 raw（deterministic tar＋`gzip -n`）：
++
++| 檔案 | bytes | sha256 |
++|------|------:|--------|
++| `R2/raw/r2-e4-forensics.tgz` | 8,181,088 | `dcabd78b8136622deea92e27de9ac2063bd8f9c7fd8d306e5f786fed358bab62` |
++| `R2/raw/r2-smoke.tgz` | 108,716 | `06f54986b642a4cba1f3d01bd7f4ce2bbb6a4596af77761498f1f8bcfeb4399b` |
++
++r2 不重複打包 r1 raw；r2 分析所讀之 r1 raw 即 §4 所列（亦見 `R2/R1_REFERENCES.md`）。
++
++## 8. r3：ATM PR #213（merge `bea35380`）steward 跨 process 修正驗證（2026-10-08）
++
++> 完整對照見 `R3/GENERATION.md`。r1／r2 檔案與 §7 內容不變；r2 的 E4 反例保留為歷史。
++
++| 項目 | r3 位置 | 狀態 | 結論／數字 |
++|------|---------|------|-----------|
++| r3 pin | `R3/summaries/runs/r3-validation/PINS.json`、`…/ATM_CORE_DIFF_5692474f..bea35380.patch` | 已記錄 | commit tarball 內嵌 commit 相符；harness 載入的 `packages/core` 只差 3 個 steward 檔 |
++| 確定性 barrier 交錯 | `R3/harness/test/barrier_interleave.mjs`、`R3/summaries/runs/r3-validation/barrier/` | 已完成 | 5692474f：40/40 lost；bea35380：0/40（同 region→follower blocked、只留 leader；上下分離→re-compose 後兩者皆在） |
++| E4 重播（r2 同配置，每臂 75） | `R3/summaries/runs/r3-analysis/r3-2026-10-08/r3-compare/R3_TABLES.md`、`R3/raw/r3-replay.tgz` | 觀察（非證明） | 5692474f：8 失敗 runs／12 lost；bea35380（harness 鎖 off）：0／0、損壞 0、18 re-compose（計入非完成）；bea35380＋harness 鎖：0／0 |
++| r1 E4 18 cells 重跑 | `R3/raw/r3-matrix.tgz` | 觀察 | 5692474f：1 lost（fault_naive p8 s23）；bea35380：0 |
++| 單 process 回歸 | `R3/raw/r3-regression.tgz` | 觀察 | 15 組正確性計數相同；steward 延遲差在雜訊內；bare composer mean +1.8%／p95 +9.5 ms |
++| 草稿／F2 | `R3/paper/ATM_PAPER_V2_DRAFT_zh.md` 表 R3b、`R3/tables/F2_CORRECTNESS_TABLES.md` | 已更新（DRAFT） | 不主張勝出；MP 正確性結論依 §5.7 不自動恢復 |
++| 未解決 | — | open | recovery-required 路徑、tmpdir 鎖範圍、鎖內 crash、fsync、外部寫入者、re-propose stub、CI／統計、Phase 2 其餘、Phase 3 |
++
++r3 raw（deterministic tar＋`gzip -n`；r1／r2 raw 不重包，見 `R3/PRIOR_REFERENCES.md`）：
++
++| 檔案 | bytes | sha256 |
++|------|------:|--------|
++| `R3/raw/r3-matrix.tgz` | 2,538,593 | `47ca242c4a7ec230499383ff970c5c7f74048a96431d201079da732e84f6357d` |
++| `R3/raw/r3-regression.tgz` | 4,590,821 | `1d8da8253fd80cad465acc7ce5b301fb3e2b022931773c0a22af3fc2ad39637e` |
++| `R3/raw/r3-replay.tgz` | 12,384,664 | `02e4ea1e18ed5415a7ef7551a4f55200bf9ba971f55cb36b52bd4f5b5e85332a` |
++| `R3/raw/r3-sp-noise-and-smoke.tgz` | 1,831,095 | `12c45bf9f6f94f0a7fb6b39c859b32f4dc7ff697e0379297e6605b60996b5bd9` |
++| `R3/raw/r3-stdout.tgz` | 32,075 | `0d9e606c4b25cbdb206ce254640accdbabc2dae1223b609326c998380178a096` |
++
+ ## 6. 不在 repo 的參照
+-- ATM pin 原始碼：GitHub `eaglhuang/AI-Atomic-Framework` commit `5692474f7db70ab52a7a71c8af4867609e7e4b43`；box tarball `/workspace/atm-main-5692474f/atm-main.tar.gz` sha256 `1d498a397e6a5db119d40b8f539dc165cb0028fbfe9577f953023f8ec8d45795`。
++- ATM pin 原始碼：GitHub `eaglhuang/AI-Atomic-Framework` commit `5692474f7db70ab52a7a71c8af4867609e7e4b43`（r3 另加 `bea35380d7f381f998c9930fa95f01b999c7f208`，box tarball `/workspace/atm-main-bea35380/atm-main.tar.gz` sha256 `9346e5b175b176618f435aeb4b41ab93ef7575f9bf77d77c47a5aeac87ad34b5`）；box tarball `/workspace/atm-main-5692474f/atm-main.tar.gz` sha256 `1d498a397e6a5db119d40b8f539dc165cb0028fbfe9577f953023f8ec8d45795`。
+ - 論文 v1：arXiv:2607.00041（box `refs/` 有副本，未上傳）。
+ - `node_modules/`：依 `R1/harness/package.json` 安裝；實際版本見 `R1/harness/installed-deps.package-lock.json`（不是正式 lockfile，原 harness 無 `package-lock.json`）。

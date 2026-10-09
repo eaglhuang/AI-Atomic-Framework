@@ -1,0 +1,98 @@
+#!/usr/bin/env bash
+# r5 validation of ATM PR #216 (merge 37847584: kernel advisory commit lock via node:sqlite, orphan-temp cleanup under that lock,
+# per-target broker apply queue) — harness-only; all ATM pins read-only. Same E4 config and pre-registered seeds as r3/r4.
+# Arms (interleaved per run, same session/machine; harness --steward-apply-lock off everywhere):
+#   old = ATM 5692474f | fix = ATM bea35380 | opt = ATM 2118bc66
+#   q   = ATM 37847584, ATM_STEWARD_APPLY_QUEUE=on  (MAIN r5 arm = ATM defaults, set explicitly)
+#   nq  = ATM 37847584, ATM_STEWARD_APPLY_QUEUE=off (queue ablation)
+#   qr0 = ATM 37847584, queue on, ATM_STEWARD_RECOMPOSE_POLICY={"maxRecomposeAttempts":0}                      (recompose ablation)
+#   qr1 = ATM 37847584, queue on, ATM_STEWARD_RECOMPOSE_POLICY={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}
+# Barrier seam / before-precheck modes pause a process inside ATM; with the queue on that process holds the queue head, so the
+# other waits ATM_STEWARD_APPLY_QUEUE_WAIT_MS (10 s) and falls back to file-lock-only. Per PR #216 those modes run with
+# ATM_STEWARD_APPLY_QUEUE=off at 37847584 (recorded in each barrier_result.json `atm_env`); a small queue-on seam run is kept as exploratory.
+# DRAFT evidence, not a win claim.
+set -euo pipefail
+ROOT="$(cd "$(dirname "$0")/../.." && pwd)"; cd "$ROOT"
+export PATH=/workspace/.nvm/versions/node/v24.21.0/bin:${PATH:-}
+unset ATM_STEWARD_APPLY_QUEUE ATM_STEWARD_RECOMPOSE_POLICY ATM_STEWARD_APPLY_QUEUE_WAIT_MS ATM_STEWARD_COMMIT_LOCK_ROOT ATM_STEWARD_APPLY_QUEUE_ROOT ATM_BENCH_RECOMPOSE_POLICY
+OLD=/workspace/atm-main-5692474f/AI-Atomic-Framework-5692474f7db70ab52a7a71c8af4867609e7e4b43
+FIX=/workspace/atm-main-bea35380/AI-Atomic-Framework-bea35380d7f381f998c9930fa95f01b999c7f208
+OPT=/workspace/atm-main-2118bc66/AI-Atomic-Framework-2118bc66efb3ac3bc0ddaede6a2f7cb18526b030
+NEW=/workspace/atm-main-37847584/AI-Atomic-Framework-37847584e24afc08ea58cfe380bb5b1220fbe335
+D="$ROOT/runs/r5-validation"; LOG="$D/r5.log"
+PHASES=${PHASES:-"barrier replay matrix regression e5 faults"}
+REPS_CELL=${REPS_CELL:-30}; REPS_GRID=${REPS_GRID:-5}; BARRIER_REPS=${BARRIER_REPS:-20}; FAULT_REPS=${FAULT_REPS:-10}
+ARMS=${ARMS:-"old fix opt q nq qr0 qr1"}
+MP=(--atm-backend real --arm steward --compose-window-ms 100 --agents 8 --trials 5 --hot-ratio 1 --overlap high
+  --hold-ms-min 8 --hold-ms-max 25 --tick-interval-ms 15 --jitter-ms 6 --force)
+pin(){ case "$1" in old) echo "$OLD";; fix) echo "$FIX";; opt) echo "$OPT";; *) echo "$NEW";; esac; }
+aenv(){ case "$1" in
+  q) echo "ATM_STEWARD_APPLY_QUEUE=on";; nq) echo "ATM_STEWARD_APPLY_QUEUE=off";;
+  qr0) echo 'ATM_STEWARD_APPLY_QUEUE=on ATM_STEWARD_RECOMPOSE_POLICY={"maxRecomposeAttempts":0}';;
+  qr1) echo 'ATM_STEWARD_APPLY_QUEUE=on ATM_STEWARD_RECOMPOSE_POLICY={"maxRecomposeAttempts":1,"recomposeBackoffMs":0,"recomposeJitterMs":0}';;
+  *) echo "";; esac; }
+guard(){ [ -e "runs/$1" ] && { echo "REFUSE: runs/$1 exists" | tee -a "$LOG"; exit 3; } || true; }
+mp(){ # rid arm procs seed registry applylock
+  guard "$1"; local E; read -r -a E <<< "$(aenv "$2")"
+  env "${E[@]}" ATM_MONOREPO=$(pin "$2") node src/cli.mjs run-mp --run-id "$1" --mode atm --seed "$4" --scheduler-seed $(( $4 + 1000 )) --procs "$3" \
+    --registry-sync "$5" --apply-lock "$6" --steward-apply-lock off "${MP[@]}" > "$D/stdout/$1.log" 2>&1 && rc=0 || rc=$?
+  echo "$1 rc=$rc env=[${E[*]}]" >> "$LOG"
+}
+sp(){ # rid arm cli-arm seed hot overlap agents
+  guard "$1"; local E; read -r -a E <<< "$(aenv "$2")"
+  env "${E[@]}" ATM_MONOREPO=$(pin "$2") node src/cli.mjs start --run-id "$1" --arm "$3" --seed "$4" --scheduler-seed $(( $4 + 1000 )) \
+    --hot-ratio "$5" --overlap "$6" --atm-backend real --compose-window-ms 100 --agents "$7" --trials 5 \
+    --hold-ms-min 8 --hold-ms-max 25 --tick-interval-ms 15 --jitter-ms 6 --force > "$D/stdout/$1.log" 2>&1 && rc=0 || rc=$?
+  echo "$1 rc=$rc env=[${E[*]}]" >> "$LOG"
+}
+bar(){ # mode pinname atm out-suffix extra-env...
+  local mode=$1 name=$2 atm=$3; shift 3
+  for v in "reducers reducers" "selectors reducers"; do set -- $v "$@"; local L=$1 F=$2; shift 2
+    env "$@" node test/barrier_interleave.mjs --mode "$mode" --atm "$atm" --out "$D/barrier/$mode-$name-L$L-F$F" --reps "${BREPS:-$BARRIER_REPS}" --lregion "$L" --fregion "$F" >> "$LOG" 2>&1
+  done
+}
+mkdir -p "$D/stdout" "$D/barrier" "$D/faults" "$D/e5"; echo "start $(date '+%F %T %Z') phases=[$PHASES] arms=[$ARMS]" >> "$LOG"
+for ph in $PHASES; do echo "phase $ph $(date '+%T')" >> "$LOG"; case $ph in
+barrier)
+  bar seam old "$OLD"; bar seam fix "$FIX"; bar seam opt "$OPT"; bar seam new-qoff "$NEW" ATM_STEWARD_APPLY_QUEUE=off
+  bar stale-proposal fix "$FIX"; bar stale-proposal opt "$OPT"; bar stale-proposal new-qon "$NEW" ATM_STEWARD_APPLY_QUEUE=on; bar stale-proposal new-qoff "$NEW" ATM_STEWARD_APPLY_QUEUE=off
+  bar before-precheck opt "$OPT"; bar before-precheck new-qoff "$NEW" ATM_STEWARD_APPLY_QUEUE=off
+  BREPS=5 bar seam new-qon-exploratory "$NEW" ATM_STEWARD_APPLY_QUEUE=on;;
+replay)  # = r3/r4 replay config: 30 exact p2/s17 + grid p{2,4,8} x s{11,17,23} x 5 => 75 runs per arm
+  for r in $(seq -w 1 $REPS_CELL); do for a in $ARMS; do mp "r5v-e4-p2-s17-$a-r$r" $a 2 17 cas on; done; done
+  for procs in 2 4 8; do for seed in 11 17 23; do for r in $(seq -w 1 $REPS_GRID); do for a in $ARMS; do
+    mp "r5v-e4-p${procs}-s${seed}-g-$a-r$r" $a $procs $seed cas on; done; done; done; done;;
+matrix)  # = r1 E4 18 cells at old/fix/opt/q; nq without the single-process cells
+  for a in old fix opt q nq; do
+    for procs in 2 4 8; do for seed in 11 17 23; do mp "r5m-e4-hot_conflict-steward-p${procs}-s${seed}-$a" $a $procs $seed cas on; done; done
+    for seed in 11 17 23; do
+      if [ $a != nq ]; then
+        guard "r5m-e4-hot_conflict-steward-sp-s${seed}-$a"; read -r -a E <<< "$(aenv $a)"
+        env "${E[@]}" ATM_MONOREPO=$(pin $a) node src/cli.mjs start --run-id "r5m-e4-hot_conflict-steward-sp-s${seed}-$a" --seed $seed --scheduler-seed $((seed+1000)) "${MP[@]}" \
+          > "$D/stdout/r5m-e4-hot_conflict-steward-sp-s${seed}-$a.log" 2>&1 && rc=0 || rc=$?; echo "r5m-e4-hot_conflict-steward-sp-s${seed}-$a rc=$rc" >> "$LOG"
+      fi
+      mp "r5m-e4-hot_conflict-fault_naive-p8-s${seed}-$a" $a 8 $seed naive on
+      mp "r5m-e4-hot_conflict-fault_nolock-p8-s${seed}-$a" $a 8 $seed cas off
+    done
+  done;;
+regression)  # single-process E2 subset (= r3/r4): 3 workloads x 5 arms x seeds x 2 reps; 2118bc66 (opt) vs 37847584 queue on (q); steward also at nq
+  for wl in hot_conflict:1:high hot_disjoint:1:low cold:0:low; do IFS=: read -r wid hot ov <<< "$wl"
+    for arm in steward file_lock occ git_three_way bare_composer; do for seed in 11 17 23; do for r in 1 2; do for a in opt q; do
+      sp "r5r-e2-${wid}-${arm}-s${seed}-r${r}-$a" $a $arm $seed $hot $ov 3; done
+      [ $arm = steward ] && sp "r5r-e2-${wid}-${arm}-s${seed}-r${r}-nq" nq $arm $seed $hot $ov 3; done; done; done; done;;
+e5)  # prior E5 faults (r1 harness, unchanged): 6 injections x 2 reps + OCC-exhaust x3 + clean steward x3, per arm
+  for a in old fix opt q nq; do read -r -a E <<< "$(aenv $a)"
+    for rep in 1 2; do (cd runs/e5-fault && env "${E[@]}" ATM_MONOREPO=$(pin $a) node inject.mts --rep $rep > "$D/e5/inject-$a-r$rep.out" 2> "$D/e5/inject-$a-r$rep.stderr") && rc=0 || rc=$?; echo "e5 inject $a r$rep rc=$rc" >> "$LOG"; done
+    for seed in 11 17 23; do
+      for cell in "occ_exhaust:occ:--occ-max-retries 0" "clean_steward:steward:"; do IFS=: read -r cname carm cextra <<< "$cell"; rid="r5e-${cname}-s${seed}-$a"; guard "$rid"
+        env "${E[@]}" ATM_MONOREPO=$(pin $a) node src/cli.mjs start --run-id "$rid" --arm $carm $cextra --seed $seed --scheduler-seed $((seed+1000)) \
+          --atm-backend real --compose-window-ms 100 --agents 3 --trials 5 --hot-ratio 1 --overlap high --hold-ms-min 8 --hold-ms-max 25 \
+          --tick-interval-ms 15 --jitter-ms 6 --force > "$D/stdout/$rid.log" 2>&1 && rc=0 || rc=$?; echo "$rid rc=$rc env=[${E[*]}]" >> "$LOG"
+      done; done; done;;
+faults)  # harness-level fault scenarios: 37847584 queue on/off (main) + 2118bc66 same-session contrast for F1/F2b/F6
+  node test/r5_fault_scenarios.mjs --pins "37847584-qon=$NEW,37847584-qoff=$NEW" --out "$D/faults/main" --reps "$FAULT_REPS" > "$D/faults/main.summary.json" 2> "$D/faults/main.progress.log" && rc=0 || rc=$?
+  echo "faults main rc=$rc" >> "$LOG"
+  node test/r5_fault_scenarios.mjs --pins "2118bc66=$OPT" --only F1,F2b,F6 --out "$D/faults/contrast-2118bc66" --reps "$FAULT_REPS" > "$D/faults/contrast.summary.json" 2> "$D/faults/contrast.progress.log" && rc=0 || rc=$?
+  echo "faults contrast rc=$rc" >> "$LOG";;
+esac; done
+echo "end $(date '+%F %T %Z')" >> "$LOG"
