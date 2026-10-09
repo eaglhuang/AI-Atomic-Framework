@@ -3,6 +3,9 @@ import { mkdtempSync, readdirSync, rmSync, writeFileSync, readFileSync } from 'n
 import os from 'node:os';
 import path from 'node:path';
 import { runTeamVendorLocalSecretsValidatorCase } from '../../scripts/validators/team-agents/team-vendor-local-secrets.ts';
+import { runBrokerOverrideGateParityValidatorCase } from '../../scripts/validators/team-agents/broker-override-gate-parity.ts';
+import { runDirectProviderExecuteAdmissionValidatorCase } from '../../scripts/validators/team-agents/direct-provider-execute-admission.ts';
+import { runIntegrationCapabilityWiringValidatorCase } from '../../scripts/validators/team-agents/integration-capability-wiring.ts';
 
 const ownedRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-vendor-cleanup-test-'));
 const previous = process.env.ATM_TEMP_ROOT;
@@ -25,6 +28,14 @@ try {
   }
   assert.deepEqual(readdirSync(ownedRoot), ['foreign.txt'], 'failed validator must clean its own workspace');
   assert.equal(readFileSync(sentinel, 'utf8'), 'preserve foreign bytes');
+  for (const [name, run] of [
+    ['broker-override-gate-parity', runBrokerOverrideGateParityValidatorCase],
+    ['direct-provider-execute-admission', runDirectProviderExecuteAdmissionValidatorCase],
+    ['integration-capability-wiring', runIntegrationCapabilityWiringValidatorCase]
+  ] as const) {
+    assert.equal(await run(name), true);
+    assert.deepEqual(readdirSync(ownedRoot), ['foreign.txt'], `${name} must clean its own workspace`);
+  }
 } finally {
   if (previous === undefined) delete process.env.ATM_TEMP_ROOT;
   else process.env.ATM_TEMP_ROOT = previous;
