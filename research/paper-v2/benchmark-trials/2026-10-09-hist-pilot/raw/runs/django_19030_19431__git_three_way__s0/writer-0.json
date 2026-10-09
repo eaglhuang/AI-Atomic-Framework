@@ -1,0 +1,140 @@
+{
+ "writer": 0,
+ "pr": 19030,
+ "pid": 1506260,
+ "init_ms": 66.019733,
+ "start_offset_ms": 7,
+ "file_order": [
+  "django/db/backends/base/features.py",
+  "django/db/backends/base/operations.py",
+  "django/db/backends/mysql/features.py",
+  "django/db/models/fields/json.py",
+  "django/db/backends/sqlite3/operations.py",
+  "django/db/backends/oracle/features.py"
+ ],
+ "holds": {
+  "django/db/backends/base/features.py": 5,
+  "django/db/backends/base/operations.py": 0,
+  "django/db/backends/mysql/features.py": 13,
+  "django/db/models/fields/json.py": 2,
+  "django/db/backends/sqlite3/operations.py": 13,
+  "django/db/backends/oracle/features.py": 24
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 19030,
+   "path": "django/db/backends/base/features.py",
+   "intents": [
+    "log:django:19030_19431:19030:django/db/backends/base/features.py:h0"
+   ],
+   "hold_ms": 5,
+   "t_submit_epoch": 1791538395775,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 14,
+   "outcome": "commit",
+   "total_ms": 39.87,
+   "t_done_epoch": 1791538395815
+  },
+  {
+   "writer": 0,
+   "pr": 19030,
+   "path": "django/db/backends/base/operations.py",
+   "intents": [
+    "log:django:19030_19431:19030:django/db/backends/base/operations.py:h1"
+   ],
+   "hold_ms": 0,
+   "t_submit_epoch": 1791538395815,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 6,
+   "outcome": "commit",
+   "total_ms": 21.13,
+   "t_done_epoch": 1791538395836
+  },
+  {
+   "writer": 0,
+   "pr": 19030,
+   "path": "django/db/backends/mysql/features.py",
+   "intents": [
+    "log:django:19030_19431:19030:django/db/backends/mysql/features.py:h2"
+   ],
+   "hold_ms": 13,
+   "t_submit_epoch": 1791538395836,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "outcome": "commit",
+   "total_ms": 35.74,
+   "t_done_epoch": 1791538395872
+  },
+  {
+   "writer": 0,
+   "pr": 19030,
+   "path": "django/db/models/fields/json.py",
+   "intents": [
+    "log:django:19030_19431:19030:django/db/models/fields/json.py:h5",
+    "log:django:19030_19431:19030:django/db/models/fields/json.py:h6",
+    "log:django:19030_19431:19030:django/db/models/fields/json.py:h7",
+    "log:django:19030_19431:19030:django/db/models/fields/json.py:h8",
+    "log:django:19030_19431:19030:django/db/models/fields/json.py:h9",
+    "log:django:19030_19431:19030:django/db/models/fields/json.py:h10",
+    "log:django:19030_19431:19030:django/db/models/fields/json.py:h11",
+    "log:django:19030_19431:19030:django/db/models/fields/json.py:h12",
+    "log:django:19030_19431:19030:django/db/models/fields/json.py:h13"
+   ],
+   "hold_ms": 2,
+   "t_submit_epoch": 1791538395872,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "total_ms": 13.3,
+   "t_done_epoch": 1791538395885
+  },
+  {
+   "writer": 0,
+   "pr": 19030,
+   "path": "django/db/backends/sqlite3/operations.py",
+   "intents": [
+    "log:django:19030_19431:19030:django/db/backends/sqlite3/operations.py:h4"
+   ],
+   "hold_ms": 13,
+   "t_submit_epoch": 1791538395885,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "outcome": "commit",
+   "total_ms": 28.33,
+   "t_done_epoch": 1791538395913
+  },
+  {
+   "writer": 0,
+   "pr": 19030,
+   "path": "django/db/backends/oracle/features.py",
+   "intents": [
+    "log:django:19030_19431:19030:django/db/backends/oracle/features.py:h3"
+   ],
+   "hold_ms": 24,
+   "t_submit_epoch": 1791538395913,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 7,
+   "outcome": "commit",
+   "total_ms": 36.72,
+   "t_done_epoch": 1791538395950
+  }
+ ],
+ "admit_stats": {
+  "txns": 12,
+  "cas_conflicts": 20
+ },
+ "steward_batches": null
+}

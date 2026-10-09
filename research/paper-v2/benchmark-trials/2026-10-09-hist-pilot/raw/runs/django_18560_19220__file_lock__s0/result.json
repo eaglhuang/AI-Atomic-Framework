@@ -1,0 +1,84 @@
+{
+ "pair_id": "django:18560_19220",
+ "stratum": "O3",
+ "arm": "file_lock",
+ "plant": null,
+ "seed_k": 0,
+ "seed": 4243906785,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b35a6141/AI-Atomic-Framework-b35a6141bd5bfbaec654f1cd3079323581b04074",
+ "wall_ms": 434,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 8,
+  "by_verdict": {
+   "correct": 8
+  },
+  "completed": 8,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 1,
+  "files_full_bytes_exact": 1,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "django/core/management/commands/shell.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "django/core/management/commands/shell.py": true
+ },
+ "final_exists": {
+  "django/core/management/commands/shell.py": true
+ },
+ "files": [
+  {
+   "path": "django/core/management/commands/shell.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:44d0b18993284f4d5b135f955e4092599ccc28fe3cbe5736a6b3977640efead9",
+   "final_digest": "sha256:9e1a8d01140b2e658e76b4a7c03956abadcbd3101b129a306fdcc069b2d9e106",
+   "expected_digests": [
+    "sha256:9e1a8d01140b2e658e76b4a7c03956abadcbd3101b129a306fdcc069b2d9e106"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "django/core/management/commands/shell.py": "sha256:9e1a8d01140b2e658e76b4a7c03956abadcbd3101b129a306fdcc069b2d9e106"
+ }
+}

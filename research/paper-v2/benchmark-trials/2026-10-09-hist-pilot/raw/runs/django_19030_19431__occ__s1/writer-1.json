@@ -1,0 +1,140 @@
+{
+ "writer": 1,
+ "pr": 19431,
+ "pid": 1506566,
+ "init_ms": 77.314495,
+ "start_offset_ms": 1,
+ "file_order": [
+  "django/db/backends/oracle/features.py",
+  "django/db/backends/sqlite3/features.py",
+  "django/db/backends/mysql/features.py",
+  "django/db/backends/sqlite3/introspection.py",
+  "django/db/backends/base/features.py",
+  "django/db/backends/postgresql/features.py"
+ ],
+ "holds": {
+  "django/db/backends/oracle/features.py": 29,
+  "django/db/backends/sqlite3/features.py": 22,
+  "django/db/backends/mysql/features.py": 5,
+  "django/db/backends/sqlite3/introspection.py": 9,
+  "django/db/backends/base/features.py": 9,
+  "django/db/backends/postgresql/features.py": 17
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 19431,
+   "path": "django/db/backends/oracle/features.py",
+   "intents": [
+    "log:django:19030_19431:19431:django/db/backends/oracle/features.py:h2"
+   ],
+   "hold_ms": 29,
+   "t_submit_epoch": 1791538397139,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 21,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 68.29,
+   "t_done_epoch": 1791538397207
+  },
+  {
+   "writer": 1,
+   "pr": 19431,
+   "path": "django/db/backends/sqlite3/features.py",
+   "intents": [
+    "log:django:19030_19431:19431:django/db/backends/sqlite3/features.py:h4"
+   ],
+   "hold_ms": 22,
+   "t_submit_epoch": 1791538397208,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 32.45,
+   "t_done_epoch": 1791538397240
+  },
+  {
+   "writer": 1,
+   "pr": 19431,
+   "path": "django/db/backends/mysql/features.py",
+   "intents": [
+    "log:django:19030_19431:19431:django/db/backends/mysql/features.py:h1"
+   ],
+   "hold_ms": 5,
+   "t_submit_epoch": 1791538397240,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 15.4,
+   "t_done_epoch": 1791538397255
+  },
+  {
+   "writer": 1,
+   "pr": 19431,
+   "path": "django/db/backends/sqlite3/introspection.py",
+   "intents": [
+    "log:django:19030_19431:19431:django/db/backends/sqlite3/introspection.py:h5",
+    "log:django:19030_19431:19431:django/db/backends/sqlite3/introspection.py:h6",
+    "log:django:19030_19431:19431:django/db/backends/sqlite3/introspection.py:h7"
+   ],
+   "hold_ms": 9,
+   "t_submit_epoch": 1791538397255,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 15.86,
+   "t_done_epoch": 1791538397271
+  },
+  {
+   "writer": 1,
+   "pr": 19431,
+   "path": "django/db/backends/base/features.py",
+   "intents": [
+    "log:django:19030_19431:19431:django/db/backends/base/features.py:h0"
+   ],
+   "hold_ms": 9,
+   "t_submit_epoch": 1791538397271,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 23.9,
+   "t_done_epoch": 1791538397295
+  },
+  {
+   "writer": 1,
+   "pr": 19431,
+   "path": "django/db/backends/postgresql/features.py",
+   "intents": [
+    "log:django:19030_19431:19431:django/db/backends/postgresql/features.py:h3"
+   ],
+   "hold_ms": 17,
+   "t_submit_epoch": 1791538397295,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 5,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 28.21,
+   "t_done_epoch": 1791538397323
+  }
+ ],
+ "admit_stats": {
+  "txns": 12,
+  "cas_conflicts": 18
+ },
+ "steward_batches": null
+}

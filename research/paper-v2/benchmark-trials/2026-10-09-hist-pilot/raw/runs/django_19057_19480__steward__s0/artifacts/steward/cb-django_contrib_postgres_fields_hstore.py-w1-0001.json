@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-ab2e0e84f2a9ef96",
+  "proposalIds": [
+    "prop-hist-w1-django_contrib_postgres_fields_hstore_py"
+  ],
+  "targetFiles": [
+    "django/contrib/postgres/fields/hstore.py"
+  ],
+  "appliedFiles": [
+    "django/contrib/postgres/fields/hstore.py"
+  ],
+  "fileBeforeHashes": {
+    "django/contrib/postgres/fields/hstore.py": "c51dfe956f8de79f14de541f4159246bde50b4ccee338e72de4e16449b191546"
+  },
+  "fileAfterHashes": {
+    "django/contrib/postgres/fields/hstore.py": "b2c359c8afd8592ebe52d106a4e909b55aa05be654ec018ac775275965eff5af"
+  },
+  "permissions": {
+    "fileWrite": [
+      "django/contrib/postgres/fields/hstore.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-ab2e0e84f2a9ef96",
+    "planId": "merge-ab2e0e84f2a9ef96",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-ab2e0e84f2a9ef96",
+        "planId": "merge-ab2e0e84f2a9ef96",
+        "request_identity": [
+          "prop-hist-w1-django_contrib_postgres_fields_hstore_py"
+        ],
+        "actor_ids": [
+          "writer-19480"
+        ],
+        "request_files": [
+          "django/contrib/postgres/fields/hstore.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "django/contrib/postgres/fields/hstore.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-bench/trial-pilot-2026-10-09/runs/django_19057_19480__steward__s0/artifacts/steward/cb-django_contrib_postgres_fields_hstore.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-DJANGO_CONTRIB_POSTGRES_FIELDS_HSTORE_PY"
+        ],
+        "commit_sha": "a2f650d6e92fd4372d184be3a64f57b40c7d8008"
+      }
+    ]
+  }
+}

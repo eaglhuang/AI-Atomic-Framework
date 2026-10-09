@@ -1,0 +1,39 @@
+{
+ "writer": 0,
+ "pr": 17723,
+ "pid": 1497154,
+ "init_ms": 95.227563,
+ "start_offset_ms": 4,
+ "file_order": [
+  "django/db/models/constraints.py"
+ ],
+ "holds": {
+  "django/db/models/constraints.py": 16
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 17723,
+   "path": "django/db/models/constraints.py",
+   "intents": [
+    "log:django:17723_18450:17723:django/db/models/constraints.py:h0",
+    "log:django:17723_18450:17723:django/db/models/constraints.py:h1"
+   ],
+   "hold_ms": 16,
+   "t_submit_epoch": 1791538361255,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 25,
+   "outcome": "blocked",
+   "blocked_reason": "git-base-drift",
+   "total_ms": 61.35,
+   "t_done_epoch": 1791538361316
+  }
+ ],
+ "admit_stats": {
+  "txns": 2,
+  "cas_conflicts": 8
+ },
+ "steward_batches": null
+}

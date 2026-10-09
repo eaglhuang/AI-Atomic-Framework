@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-d41f083155af374b",
+  "proposalIds": [
+    "prop-hist-w1-django_contrib_postgres_apps_py"
+  ],
+  "targetFiles": [
+    "django/contrib/postgres/apps.py"
+  ],
+  "appliedFiles": [
+    "django/contrib/postgres/apps.py"
+  ],
+  "fileBeforeHashes": {
+    "django/contrib/postgres/apps.py": "b1f8e82fed9526b173aefd020b74b85865996e5cd1ff80701439bd6c41ecf01d"
+  },
+  "fileAfterHashes": {
+    "django/contrib/postgres/apps.py": "960e125b214f5af9ff3d622c5628b96ba4b0d7ee21b134d2841da95f75fa5707"
+  },
+  "permissions": {
+    "fileWrite": [
+      "django/contrib/postgres/apps.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-d41f083155af374b",
+    "planId": "merge-d41f083155af374b",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-d41f083155af374b",
+        "planId": "merge-d41f083155af374b",
+        "request_identity": [
+          "prop-hist-w1-django_contrib_postgres_apps_py"
+        ],
+        "actor_ids": [
+          "writer-20063"
+        ],
+        "request_files": [
+          "django/contrib/postgres/apps.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "django/contrib/postgres/apps.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-bench/trial-pilot-2026-10-09/runs/django_20055_20063__bare_composer__s1/artifacts/steward/cb-django_contrib_postgres_apps.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-DJANGO_CONTRIB_POSTGRES_APPS_PY"
+        ],
+        "commit_sha": "36bf2f1fa90698bc81b07f911ef63e52f24bd25c"
+      }
+    ]
+  }
+}

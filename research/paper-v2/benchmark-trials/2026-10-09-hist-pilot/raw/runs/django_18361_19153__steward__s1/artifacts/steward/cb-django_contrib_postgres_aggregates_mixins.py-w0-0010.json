@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-a71145913e976e1d",
+  "proposalIds": [
+    "prop-hist-w0-django_contrib_postgres_aggregates_mixins_py"
+  ],
+  "targetFiles": [
+    "django/contrib/postgres/aggregates/mixins.py"
+  ],
+  "appliedFiles": [
+    "django/contrib/postgres/aggregates/mixins.py"
+  ],
+  "fileBeforeHashes": {
+    "django/contrib/postgres/aggregates/mixins.py": "946e7652abfb45900eabe5a130276c3e2acbcec1f149bd7040f4e1026fabd5ec"
+  },
+  "fileAfterHashes": {
+    "django/contrib/postgres/aggregates/mixins.py": "c11b8241fe0292c60811eacffb70ffa63bb3e49624f338115978b7c4dc495b40"
+  },
+  "permissions": {
+    "fileWrite": [
+      "django/contrib/postgres/aggregates/mixins.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-a71145913e976e1d",
+    "planId": "merge-a71145913e976e1d",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-a71145913e976e1d",
+        "planId": "merge-a71145913e976e1d",
+        "request_identity": [
+          "prop-hist-w0-django_contrib_postgres_aggregates_mixins_py"
+        ],
+        "actor_ids": [
+          "writer-18361"
+        ],
+        "request_files": [
+          "django/contrib/postgres/aggregates/mixins.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "django/contrib/postgres/aggregates/mixins.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-bench/trial-pilot-2026-10-09/runs/django_18361_19153__steward__s1/artifacts/steward/cb-django_contrib_postgres_aggregates_mixins.py-w0-0010.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-DJANGO_CONTRIB_POSTGRES_AGGREGATES_MIXINS_PY"
+        ],
+        "commit_sha": "30af1b54c5b2a3bc69364c2ba8e505d6ee7e43ac"
+      }
+    ]
+  }
+}

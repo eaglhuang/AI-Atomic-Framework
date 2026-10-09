@@ -1,0 +1,128 @@
+{
+ "writer": 1,
+ "pr": 19078,
+ "pid": 1504538,
+ "init_ms": 93.469862,
+ "start_offset_ms": 19,
+ "file_order": [
+  "django/contrib/admin/templatetags/admin_list.py"
+ ],
+ "holds": {
+  "django/contrib/admin/templatetags/admin_list.py": 13
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 19078,
+   "path": "django/contrib/admin/templatetags/admin_list.py",
+   "intents": [
+    "log:django:18958_19078:19078:django/contrib/admin/templatetags/admin_list.py:h0"
+   ],
+   "hold_ms": 13,
+   "t_submit_epoch": 1791538389189,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 21,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-django_contrib_admin_templatetags_admin_list.py-w1-0001",
+   "total_ms": 150.24,
+   "t_done_epoch": 1791538389340
+  }
+ ],
+ "admit_stats": {
+  "txns": 2,
+  "cas_conflicts": 1
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-django_contrib_admin_templatetags_admin_list.py-w1-0001",
+   "path": "django/contrib/admin/templatetags/admin_list.py",
+   "pid": 1504538,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-django_contrib_admin_templatetags_admin_list_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-django_contrib_admin_templatetags_admin_list_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:daf3d640559bd78e36902d6f0f38a263f2465f212d2623a7c1525aa2b9661726"
+   ],
+   "lock_wait_ms": 0.11,
+   "t_start_epoch_ms": 1791538389226.15,
+   "pre_apply_hash": "sha256:daf3d640559bd78e36902d6f0f38a263f2465f212d2623a7c1525aa2b9661726",
+   "receipt_before_hash": "sha256:bc0bf4832a115cd5098912da154a09be13ae9cc7ec24f707a58620bfbb3e8d1d",
+   "receipt_after_hash": "sha256:f5156f861cccf5d7fbc07af84323590f00d1fd941d9bf0c91941e0bc0d31547e",
+   "post_apply_hash": "sha256:f5156f861cccf5d7fbc07af84323590f00d1fd941d9bf0c91941e0bc0d31547e",
+   "t_end_epoch_ms": 1791538389336.55,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": true,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-09T17:33:09.336+08:00",
+   "batch_id": "cb-django_contrib_admin_templatetags_admin_list.py-w1-0001",
+   "path": "django/contrib/admin/templatetags/admin_list.py",
+   "proposalIds": [
+    "prop-hist-w1-django_contrib_admin_templatetags_admin_list_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-django_contrib_admin_templatetags_admin_list_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-django_contrib_admin_templatetags_admin_list_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-django_contrib_admin_templatetags_admin_list_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-django_contrib_admin_templatetags_admin_list_py",
+     "logical_id": "prop-hist-w1-django_contrib_admin_templatetags_admin_list_py",
+     "attempt_id": "att-prop-hist-w1-django_contrib_admin_templatetags_admin_list_py-r0",
+     "proposal_id": "prop-hist-w1-django_contrib_admin_templatetags_admin_list_py",
+     "actorId": "writer-19078"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.21,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:daf3d640559bd78e36902d6f0f38a263f2465f212d2623a7c1525aa2b9661726",
+   "written": true,
+   "output_digest": "sha256:f5156f861cccf5d7fbc07af84323590f00d1fd941d9bf0c91941e0bc0d31547e",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

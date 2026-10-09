@@ -1,0 +1,106 @@
+{
+ "pair_id": "django:19366_19570",
+ "stratum": "O3",
+ "arm": "file_lock",
+ "plant": null,
+ "seed_k": 1,
+ "seed": 1320440865,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b35a6141/AI-Atomic-Framework-b35a6141bd5bfbaec654f1cd3079323581b04074",
+ "wall_ms": 335,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 9,
+  "by_verdict": {
+   "correct": 9
+  },
+  "completed": 9,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 2,
+  "files_full_bytes_exact": 2,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "django/core/handlers/asgi.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "django/core/handlers/wsgi.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "django/core/handlers/asgi.py": true,
+  "django/core/handlers/wsgi.py": true
+ },
+ "final_exists": {
+  "django/core/handlers/asgi.py": true,
+  "django/core/handlers/wsgi.py": true
+ },
+ "files": [
+  {
+   "path": "django/core/handlers/asgi.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:00de9d9f12d089ba248c1772f6ec872494cd2beebc04128316cd4f7ead9062aa",
+   "final_digest": "sha256:bc5fecde52f675b47ecc7b6351c041a0ba95bc96227bfea767f8c5a7f1eb1357",
+   "expected_digests": [
+    "sha256:bc5fecde52f675b47ecc7b6351c041a0ba95bc96227bfea767f8c5a7f1eb1357"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "django/core/handlers/wsgi.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:f350c4ae0cc701a65cc36522beb2aac12ebd429a1117cb66d00484738bf7b90e",
+   "final_digest": "sha256:8144f80e791b032cb83e64c408cf8188d5596df6ccecbdf5d5151d3e5d68edfe",
+   "expected_digests": [
+    "sha256:8144f80e791b032cb83e64c408cf8188d5596df6ccecbdf5d5151d3e5d68edfe"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "django/core/handlers/asgi.py": "sha256:bc5fecde52f675b47ecc7b6351c041a0ba95bc96227bfea767f8c5a7f1eb1357",
+  "django/core/handlers/wsgi.py": "sha256:8144f80e791b032cb83e64c408cf8188d5596df6ccecbdf5d5151d3e5d68edfe"
+ }
+}

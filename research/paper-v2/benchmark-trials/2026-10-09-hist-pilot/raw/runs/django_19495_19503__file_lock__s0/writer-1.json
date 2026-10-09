@@ -1,0 +1,39 @@
+{
+ "writer": 1,
+ "pr": 19503,
+ "pid": 1509029,
+ "init_ms": 100.397221,
+ "start_offset_ms": 19,
+ "file_order": [
+  "django/db/models/expressions.py"
+ ],
+ "holds": {
+  "django/db/models/expressions.py": 14
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 19503,
+   "path": "django/db/models/expressions.py",
+   "intents": [
+    "log:django:19495_19503:19503:django/db/models/expressions.py:h0"
+   ],
+   "hold_ms": 14,
+   "t_submit_epoch": 1791538406326,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 20,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 39.31,
+   "t_done_epoch": 1791538406365
+  }
+ ],
+ "admit_stats": {
+  "txns": 2,
+  "cas_conflicts": 1
+ },
+ "steward_batches": null
+}

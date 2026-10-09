@@ -1,0 +1,151 @@
+{
+ "writer": 0,
+ "pr": 18572,
+ "pid": 1502068,
+ "init_ms": 99.22888,
+ "start_offset_ms": 18,
+ "file_order": [
+  "django/db/models/fields/tuple_lookups.py"
+ ],
+ "holds": {
+  "django/db/models/fields/tuple_lookups.py": 16
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 18572,
+   "path": "django/db/models/fields/tuple_lookups.py",
+   "intents": [
+    "log:django:18572_18605:18572:django/db/models/fields/tuple_lookups.py:h0",
+    "log:django:18572_18605:18572:django/db/models/fields/tuple_lookups.py:h1",
+    "log:django:18572_18605:18572:django/db/models/fields/tuple_lookups.py:h2",
+    "log:django:18572_18605:18572:django/db/models/fields/tuple_lookups.py:h3",
+    "log:django:18572_18605:18572:django/db/models/fields/tuple_lookups.py:h4",
+    "log:django:18572_18605:18572:django/db/models/fields/tuple_lookups.py:h5",
+    "log:django:18572_18605:18572:django/db/models/fields/tuple_lookups.py:h6",
+    "log:django:18572_18605:18572:django/db/models/fields/tuple_lookups.py:h7",
+    "log:django:18572_18605:18572:django/db/models/fields/tuple_lookups.py:h8",
+    "log:django:18572_18605:18572:django/db/models/fields/tuple_lookups.py:h9",
+    "log:django:18572_18605:18572:django/db/models/fields/tuple_lookups.py:h10",
+    "log:django:18572_18605:18572:django/db/models/fields/tuple_lookups.py:h11",
+    "log:django:18572_18605:18572:django/db/models/fields/tuple_lookups.py:h12",
+    "log:django:18572_18605:18572:django/db/models/fields/tuple_lookups.py:h13",
+    "log:django:18572_18605:18572:django/db/models/fields/tuple_lookups.py:h14",
+    "log:django:18572_18605:18572:django/db/models/fields/tuple_lookups.py:h15",
+    "log:django:18572_18605:18572:django/db/models/fields/tuple_lookups.py:h16",
+    "log:django:18572_18605:18572:django/db/models/fields/tuple_lookups.py:h17",
+    "log:django:18572_18605:18572:django/db/models/fields/tuple_lookups.py:h18",
+    "log:django:18572_18605:18572:django/db/models/fields/tuple_lookups.py:h19",
+    "log:django:18572_18605:18572:django/db/models/fields/tuple_lookups.py:h20",
+    "log:django:18572_18605:18572:django/db/models/fields/tuple_lookups.py:h21",
+    "log:django:18572_18605:18572:django/db/models/fields/tuple_lookups.py:h22",
+    "log:django:18572_18605:18572:django/db/models/fields/tuple_lookups.py:h23"
+   ],
+   "hold_ms": 16,
+   "t_submit_epoch": 1791538380083,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 152,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-django_db_models_fields_tuple_lookups.py-w0-0001",
+   "total_ms": 294.49,
+   "t_done_epoch": 1791538380377
+  }
+ ],
+ "admit_stats": {
+  "txns": 3,
+  "cas_conflicts": 1
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-django_db_models_fields_tuple_lookups.py-w0-0001",
+   "path": "django/db/models/fields/tuple_lookups.py",
+   "pid": 1502068,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-django_db_models_fields_tuple_lookups_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-django_db_models_fields_tuple_lookups_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:c2d697a0df0b63465b8c02949dec3c7ce1559829686548bdfb4144a8c3923c3b"
+   ],
+   "lock_wait_ms": 0.15,
+   "t_start_epoch_ms": 1791538380255.3,
+   "pre_apply_hash": "sha256:c2d697a0df0b63465b8c02949dec3c7ce1559829686548bdfb4144a8c3923c3b",
+   "receipt_before_hash": "sha256:c2d697a0df0b63465b8c02949dec3c7ce1559829686548bdfb4144a8c3923c3b",
+   "receipt_after_hash": "sha256:b09ff9d219ec0d8cf7b41171a8113d3e3c52683ece0f4e5d8475dbc108a62fd4",
+   "post_apply_hash": "sha256:b09ff9d219ec0d8cf7b41171a8113d3e3c52683ece0f4e5d8475dbc108a62fd4",
+   "t_end_epoch_ms": 1791538380374.7,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-09T17:33:00.374+08:00",
+   "batch_id": "cb-django_db_models_fields_tuple_lookups.py-w0-0001",
+   "path": "django/db/models/fields/tuple_lookups.py",
+   "proposalIds": [
+    "prop-hist-w0-django_db_models_fields_tuple_lookups_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-django_db_models_fields_tuple_lookups_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-django_db_models_fields_tuple_lookups_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-django_db_models_fields_tuple_lookups_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-django_db_models_fields_tuple_lookups_py",
+     "logical_id": "prop-hist-w0-django_db_models_fields_tuple_lookups_py",
+     "attempt_id": "att-prop-hist-w0-django_db_models_fields_tuple_lookups_py-r0",
+     "proposal_id": "prop-hist-w0-django_db_models_fields_tuple_lookups_py",
+     "actorId": "writer-18572"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.34,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:c2d697a0df0b63465b8c02949dec3c7ce1559829686548bdfb4144a8c3923c3b",
+   "written": true,
+   "output_digest": "sha256:b09ff9d219ec0d8cf7b41171a8113d3e3c52683ece0f4e5d8475dbc108a62fd4",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

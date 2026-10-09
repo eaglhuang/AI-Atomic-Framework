@@ -1,0 +1,87 @@
+{
+ "pair_id": "django:18314_18384",
+ "stratum": "O3",
+ "arm": "bare_composer",
+ "plant": null,
+ "seed_k": 0,
+ "seed": 9644277,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b35a6141/AI-Atomic-Framework-b35a6141bd5bfbaec654f1cd3079323581b04074",
+ "wall_ms": 408,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 9,
+  "by_verdict": {
+   "correct": 5,
+   "blocked_absent": 4
+  },
+  "completed": 5,
+  "lost_effects": 0,
+  "blocked": 4,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 1,
+  "files_full_bytes_exact": 1,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {
+  "file-hash-drift: Target file hash sha256": 4
+ },
+ "structure": {
+  "django/db/models/sql/compiler.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "django/db/models/sql/compiler.py": true
+ },
+ "final_exists": {
+  "django/db/models/sql/compiler.py": true
+ },
+ "files": [
+  {
+   "path": "django/db/models/sql/compiler.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:91d0b5fb95050e05891f76f6ceffe024fe680c492cdbf4ef2ebf3f4920dc0edc",
+   "final_digest": "sha256:d6c986dfd184a4c75ef3d60ae026533160a1f49c0b8c4a2988b494175d7392a6",
+   "expected_digests": [
+    "sha256:d6c986dfd184a4c75ef3d60ae026533160a1f49c0b8c4a2988b494175d7392a6"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "django/db/models/sql/compiler.py": "sha256:d6c986dfd184a4c75ef3d60ae026533160a1f49c0b8c4a2988b494175d7392a6"
+ }
+}

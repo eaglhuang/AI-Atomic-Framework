@@ -1,0 +1,58 @@
+{
+ "writer": 1,
+ "pr": 19570,
+ "pid": 1507564,
+ "init_ms": 95.98973799999999,
+ "start_offset_ms": 15,
+ "file_order": [
+  "django/core/handlers/asgi.py",
+  "django/core/handlers/wsgi.py"
+ ],
+ "holds": {
+  "django/core/handlers/asgi.py": 10,
+  "django/core/handlers/wsgi.py": 26
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 19570,
+   "path": "django/core/handlers/asgi.py",
+   "intents": [
+    "log:django:19366_19570:19570:django/core/handlers/asgi.py:h0"
+   ],
+   "hold_ms": 10,
+   "t_submit_epoch": 1791538401317,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 14,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 39.2,
+   "t_done_epoch": 1791538401356
+  },
+  {
+   "writer": 1,
+   "pr": 19570,
+   "path": "django/core/handlers/wsgi.py",
+   "intents": [
+    "log:django:19366_19570:19570:django/core/handlers/wsgi.py:h1"
+   ],
+   "hold_ms": 26,
+   "t_submit_epoch": 1791538401356,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 6,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 36.88,
+   "t_done_epoch": 1791538401393
+  }
+ ],
+ "admit_stats": {
+  "txns": 4,
+  "cas_conflicts": 2
+ },
+ "steward_batches": null
+}

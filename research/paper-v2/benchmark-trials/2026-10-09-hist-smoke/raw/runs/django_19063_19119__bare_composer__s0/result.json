@@ -1,0 +1,160 @@
+{
+ "pair_id": "django:19063_19119",
+ "stratum": "O3",
+ "arm": "bare_composer",
+ "plant": null,
+ "seed_k": 0,
+ "seed": 1109397171,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b35a6141/AI-Atomic-Framework-b35a6141bd5bfbaec654f1cd3079323581b04074",
+ "wall_ms": 429,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 17,
+  "by_verdict": {
+   "correct": 16,
+   "blocked_absent": 1
+  },
+  "completed": 16,
+  "lost_effects": 0,
+  "blocked": 1,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 4,
+  "files_full_bytes_exact": 4,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {
+  "file-hash-drift: Target file does not exist": 1
+ },
+ "structure": {
+  "django/contrib/admin/helpers.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "django/contrib/admin/utils.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "django/contrib/auth/forms.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "django/contrib/auth/templatetags/__init__.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "django/contrib/auth/templatetags/auth.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "django/contrib/admin/helpers.py": true,
+  "django/contrib/admin/utils.py": true,
+  "django/contrib/auth/forms.py": true,
+  "django/contrib/auth/templatetags/__init__.py": false,
+  "django/contrib/auth/templatetags/auth.py": false
+ },
+ "final_exists": {
+  "django/contrib/admin/helpers.py": true,
+  "django/contrib/admin/utils.py": true,
+  "django/contrib/auth/forms.py": true,
+  "django/contrib/auth/templatetags/__init__.py": false,
+  "django/contrib/auth/templatetags/auth.py": false
+ },
+ "files": [
+  {
+   "path": "django/contrib/admin/helpers.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:f52b69a048d3647df420fd2145564926319ffa72967e73300f77a742e3cd8482",
+   "final_digest": "sha256:a4e4ecd44b65d6b8a92253397fee5f94e096df01fe019a78ebc3abefefd79ea8",
+   "expected_digests": [
+    "sha256:a4e4ecd44b65d6b8a92253397fee5f94e096df01fe019a78ebc3abefefd79ea8"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "django/contrib/admin/utils.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:73fb855ac3d07d705f49d3db69aac07ce69b835fe6523a4e073a8897c2ce7510",
+   "final_digest": "sha256:324a054f8b48e4074c4d2c90a36eebf658f8c3265bd0c3669d3634281edd169b",
+   "expected_digests": [
+    "sha256:324a054f8b48e4074c4d2c90a36eebf658f8c3265bd0c3669d3634281edd169b"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "django/contrib/auth/forms.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:d8a65eb178f2c6e39bcfdc54fce6c025561167d90e2d42103cd62f4509e66a5f",
+   "final_digest": "sha256:763bbb05af8b08cb203096e72c6dccfa4d86d413136dfdd95fe89477e0cdbf30",
+   "expected_digests": [
+    "sha256:763bbb05af8b08cb203096e72c6dccfa4d86d413136dfdd95fe89477e0cdbf30"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "django/contrib/auth/templatetags/auth.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "final_digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "expected_digests": [
+    "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "django/contrib/admin/helpers.py": "sha256:a4e4ecd44b65d6b8a92253397fee5f94e096df01fe019a78ebc3abefefd79ea8",
+  "django/contrib/admin/utils.py": "sha256:324a054f8b48e4074c4d2c90a36eebf658f8c3265bd0c3669d3634281edd169b",
+  "django/contrib/auth/forms.py": "sha256:763bbb05af8b08cb203096e72c6dccfa4d86d413136dfdd95fe89477e0cdbf30",
+  "django/contrib/auth/templatetags/__init__.py": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "django/contrib/auth/templatetags/auth.py": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+ }
+}

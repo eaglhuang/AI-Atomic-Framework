@@ -1,0 +1,84 @@
+{
+ "pair_id": "django:19732_19744",
+ "stratum": "O2",
+ "arm": "git_three_way",
+ "plant": null,
+ "seed_k": 0,
+ "seed": 2444700573,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-b35a6141/AI-Atomic-Framework-b35a6141bd5bfbaec654f1cd3079323581b04074",
+ "wall_ms": 330,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 2,
+  "by_verdict": {
+   "correct": 2
+  },
+  "completed": 2,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 1,
+  "files_full_bytes_exact": 1,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "django/forms/models.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "django/forms/models.py": true
+ },
+ "final_exists": {
+  "django/forms/models.py": true
+ },
+ "files": [
+  {
+   "path": "django/forms/models.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:c565a46c3af495ddc0ada728ada08f52249b67eb2e7a6d7d59ca1200b95a87bb",
+   "final_digest": "sha256:ab1ff8d9b328f334c6e9f42c5b2d4f4472e3f739429f4c3aefb1d79de7a78803",
+   "expected_digests": [
+    "sha256:ab1ff8d9b328f334c6e9f42c5b2d4f4472e3f739429f4c3aefb1d79de7a78803"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "django/forms/models.py": "sha256:ab1ff8d9b328f334c6e9f42c5b2d4f4472e3f739429f4c3aefb1d79de7a78803"
+ }
+}
