@@ -27,7 +27,7 @@ function isolatedEnv(): NodeJS.ProcessEnv {
     if (key.startsWith('ATM_') || key === 'AGENT_IDENTITY' || key.startsWith('GIT_')) delete env[key];
   }
   env.GIT_CONFIG_NOSYSTEM = '1';
-  env.GIT_CONFIG_GLOBAL = os.devNull;
+  env.GIT_CONFIG_GLOBAL = process.platform === 'win32' ? 'NUL' : os.devNull;
   return env;
 }
 
@@ -57,8 +57,7 @@ function runAtm(cwd: string, args: string[]) {
   return { status: run.status, result };
 }
 
-function fixture() {
-  const cwd = mkdtempSync(path.join(os.tmpdir(), 'atm-claim-adoption-'));
+function fixture(cwd: string) {
   git(cwd, ['init', '-q']);
   git(cwd, ['config', 'user.name', 'Adoption Fixture']);
   git(cwd, ['config', 'user.email', 'adoption-fixture@example.invalid']);
@@ -110,10 +109,22 @@ function claim(cwd: string, extra: string[] = []) {
   return runAtm(cwd, ['next', '--claim', '--task', taskId, '--actor', actor, '--auto-intent', ...extra]);
 }
 
-function withFixture(fn: (cwd: string) => void) {
-  const cwd = fixture();
-  try { fn(cwd); } finally { rmSync(cwd, { recursive: true, force: true }); }
+function withFixture(fn: (cwd: string) => void, initialize = fixture) {
+  const cwd = mkdtempSync(path.join(os.tmpdir(), 'atm-claim-adoption-'));
+  try { initialize(cwd); fn(cwd); } finally { rmSync(cwd, { recursive: true, force: true }); }
 }
+
+test('fixture initialization failure removes its own temporary directory', () => {
+  let created = '';
+  const failure = new Error('fixture initialization failed');
+  assert.throws(() => withFixture(() => assert.fail('body must not run'), cwd => {
+    created = cwd;
+    write(cwd, 'partial.txt', 'partially initialized fixture');
+    throw failure;
+  }), error => error === failure);
+  assert.ok(created);
+  assert.equal(existsSync(created), false);
+});
 
 test('backend parser keeps adoption explicit and disabled by default', () => {
   const args = ['--task', taskId, '--actor', actor, '--files', tracked];
