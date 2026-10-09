@@ -1,0 +1,219 @@
+{
+ "pair_id": "xarray:8750_8758",
+ "stratum": "O1",
+ "arm": "steward",
+ "plant": "plant_torn_tail",
+ "seed_k": 0,
+ "seed": 2696157325,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-20effd45/AI-Atomic-Framework-20effd45a0c3a09c293caaea6a34face0df1c5f4",
+ "wall_ms": 652,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 18,
+  "by_verdict": {
+   "blocked_absent": 10,
+   "blocked_leak": 3,
+   "correct": 5
+  },
+  "completed": 5,
+  "lost_effects": 0,
+  "blocked": 10,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 3,
+  "unresolved": 0,
+  "files_scored": 2,
+  "files_full_bytes_exact": 1,
+  "corrupted_files": 1,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": true,
+  "structure_violations": 1
+ },
+ "blocked_reasons": {
+  "harness-relocate-context-not-found": 13
+ },
+ "structure": {
+  "xarray/core/indexing.py": {
+   "applicable": true,
+   "final_parses": false
+  },
+  "xarray/core/variable.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [
+  "xarray/core/indexing.py"
+ ],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [
+  {
+   "plant": "plant_torn_tail",
+   "path": "xarray/core/indexing.py",
+   "kept_bytes": 40063
+  }
+ ],
+ "base_exists": {
+  "xarray/core/indexing.py": true,
+  "xarray/core/variable.py": true
+ },
+ "final_exists": {
+  "xarray/core/indexing.py": true,
+  "xarray/core/variable.py": true
+ },
+ "files": [
+  {
+   "path": "xarray/core/indexing.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:e0c976bbdc9820cdc90a0699bea594f1663022b450a82c569fd90ece49f97012",
+   "final_digest": "sha256:107c5c6addfb68f723dbb1b6c1a833d46682a6160be7f7842dd4163148762b83",
+   "expected_digests": [
+    "sha256:7d0066d15cd7d9738d6bde0d466a0c638fbc9c7e144d44e34aec31d60b30f0f2"
+   ],
+   "full_bytes_exact": false,
+   "judged_by": "myers-fallback",
+   "frame_ok": false,
+   "frame_violations": [
+    {
+     "kind": "frame_line_removed_or_changed",
+     "base_line": 1138,
+     "expected": "    for v, size in zip(indexer.tuple, shape):\n"
+    },
+    {
+     "kind": "frame_line_removed_or_changed",
+     "base_line": 1139,
+     "expected": "        if isinstance(v, np.ndarray):\n"
+    },
+    {
+     "kind": "frame_line_removed_or_changed",
+     "base_line": 1140,
+     "expected": "            new_key.append(np.reshape(v, v.shape + (1,) * len(slices)))\n"
+    },
+    {
+     "kind": "frame_line_removed_or_changed",
+     "base_line": 1141,
+     "expected": "        else:  # slice\n"
+    },
+    {
+     "kind": "frame_line_removed_or_changed",
+     "base_line": 1142,
+     "expected": "            shape = (1,) * (n_dim + i_dim) + (-1,) + (1,) * (len(slices) - i_dim - 1)\n"
+    },
+    {
+     "kind": "frame_line_removed_or_changed",
+     "base_line": 1143,
+     "expected": "            new_key.append(np.arange(*v.indices(size)).reshape(shape))\n"
+    },
+    {
+     "kind": "frame_line_removed_or_changed",
+     "base_line": 1144,
+     "expected": "            i_dim += 1\n"
+    },
+    {
+     "kind": "frame_line_removed_or_changed",
+     "base_line": 1145,
+     "expected": "    return VectorizedIndexer(tuple(new_key))\n"
+    },
+    {
+     "kind": "frame_line_removed_or_changed",
+     "base_line": 1146,
+     "expected": "\n"
+    },
+    {
+     "kind": "frame_line_removed_or_changed",
+     "base_line": 1147,
+     "expected": "\n"
+    },
+    {
+     "kind": "frame_line_removed_or_changed",
+     "base_line": 1148,
+     "expected": "def _chunked_array_with_chunks_hint(array, chunks, chunkmanager):\n"
+    },
+    {
+     "kind": "frame_line_removed_or_changed",
+     "base_line": 1149,
+     "expected": "    \"\"\"Create a chunked array using the chunks hint for dimensions of size > 1.\"\"\"\n"
+    },
+    {
+     "kind": "frame_line_removed_or_changed",
+     "base_line": 1150,
+     "expected": "\n"
+    },
+    {
+     "kind": "frame_line_removed_or_changed",
+     "base_line": 1151,
+     "expected": "    if len(chunks) < array.ndim:\n"
+    },
+    {
+     "kind": "frame_line_removed_or_changed",
+     "base_line": 1152,
+     "expected": "        raise ValueError(\"not enough chunks in hint\")\n"
+    },
+    {
+     "kind": "frame_line_removed_or_changed",
+     "base_line": 1153,
+     "expected": "    new_chunks = []\n"
+    },
+    {
+     "kind": "frame_line_removed_or_changed",
+     "base_line": 1154,
+     "expected": "    for chunk, size in zip(chunks, array.shape):\n"
+    },
+    {
+     "kind": "frame_line_removed_or_changed",
+     "base_line": 1155,
+     "expected": "        new_chunks.append(chunk if size > 1 else (1,))\n"
+    },
+    {
+     "kind": "frame_line_removed_or_changed",
+     "base_line": 1156,
+     "expected": "    return chunkmanager.from_array(array, new_chunks)\n"
+    },
+    {
+     "kind": "frame_line_removed_or_changed",
+     "base_line": 1157,
+     "expected": "\n"
+    }
+   ],
+   "n_frame_violations": 481,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "xarray/core/variable.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:187224edb518749800c1d9d1741f5db0268dbcb926ad8124df219a223553b500",
+   "final_digest": "sha256:5e7376907cccdf19d6d07ab759862ed181fdf4c4fb9fae9c817f5b1926ed1287",
+   "expected_digests": [
+    "sha256:5e7376907cccdf19d6d07ab759862ed181fdf4c4fb9fae9c817f5b1926ed1287"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "xarray/core/indexing.py": "sha256:107c5c6addfb68f723dbb1b6c1a833d46682a6160be7f7842dd4163148762b83",
+  "xarray/core/variable.py": "sha256:5e7376907cccdf19d6d07ab759862ed181fdf4c4fb9fae9c817f5b1926ed1287"
+ }
+}

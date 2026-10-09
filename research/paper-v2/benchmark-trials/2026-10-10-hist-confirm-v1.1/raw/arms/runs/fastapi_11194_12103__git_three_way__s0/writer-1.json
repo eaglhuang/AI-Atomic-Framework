@@ -1,0 +1,82 @@
+{
+ "writer": 1,
+ "pr": 12103,
+ "pid": 2036013,
+ "init_ms": 93.29253200000001,
+ "start_offset_ms": 14,
+ "file_order": [
+  "fastapi/dependencies/utils.py",
+  "fastapi/routing.py",
+  "fastapi/utils.py"
+ ],
+ "holds": {
+  "fastapi/dependencies/utils.py": 12,
+  "fastapi/routing.py": 29,
+  "fastapi/utils.py": 25
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 12103,
+   "path": "fastapi/dependencies/utils.py",
+   "intents": [
+    "log:fastapi:11194_12103:12103:fastapi/dependencies/utils.py:h0",
+    "log:fastapi:11194_12103:12103:fastapi/dependencies/utils.py:h1",
+    "log:fastapi:11194_12103:12103:fastapi/dependencies/utils.py:h2"
+   ],
+   "hold_ms": 12,
+   "t_submit_epoch": 1791562426041,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 34,
+   "outcome": "commit",
+   "total_ms": 57.15,
+   "t_done_epoch": 1791562426099
+  },
+  {
+   "writer": 1,
+   "pr": 12103,
+   "path": "fastapi/routing.py",
+   "intents": [
+    "log:fastapi:11194_12103:12103:fastapi/routing.py:h3",
+    "log:fastapi:11194_12103:12103:fastapi/routing.py:h4",
+    "log:fastapi:11194_12103:12103:fastapi/routing.py:h5"
+   ],
+   "hold_ms": 29,
+   "t_submit_epoch": 1791562426099,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "commit",
+   "total_ms": 47.91,
+   "t_done_epoch": 1791562426147
+  },
+  {
+   "writer": 1,
+   "pr": 12103,
+   "path": "fastapi/utils.py",
+   "intents": [
+    "log:fastapi:11194_12103:12103:fastapi/utils.py:h6",
+    "log:fastapi:11194_12103:12103:fastapi/utils.py:h7",
+    "log:fastapi:11194_12103:12103:fastapi/utils.py:h8",
+    "log:fastapi:11194_12103:12103:fastapi/utils.py:h9"
+   ],
+   "hold_ms": 25,
+   "t_submit_epoch": 1791562426147,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "commit",
+   "total_ms": 34.27,
+   "t_done_epoch": 1791562426181
+  }
+ ],
+ "admit_stats": {
+  "txns": 7,
+  "cas_conflicts": 5
+ },
+ "steward_batches": null
+}
