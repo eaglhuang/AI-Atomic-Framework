@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "date": "2026-10-09",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Repair pushed in PR 229; remote CI pending",
+  "id": "ATM-BUG-2026-10-09-002",
+  "area": "Encoding wrapper working-directory binding",
+  "finding": "PR 229 Dogfood job 113615955087 failed validate-script-parity because check-encoding-touched passed relative probe filenames to the frozen runner without explicit cwd. The nested fixture resolved the outer Git root and failed ENOENT for encoding-first.ts.",
+  "expectedBehavior": "The wrapper must bind the guard to its actual working directory, and its argument budget must include that explicit cwd. Fixture checks must not silently inspect another repository.",
+  "evidenceOrRepro": "GitHub run 37866990307 retains the failure. Commit 67447ee0f891ce296e871174eed1ba19e2b889c0 adds --cwd to the child invocation and fixed argument budget. Full validate-script-parity, check-encoding-staged-deletion and encoding-guard-argv-budget passed locally. The latest PR SHA must independently pass remote CI.",
+  "followUp": "Keep the existing nested-fixture regression and fail-closed encoding behavior. The local parity validator also rebuilt 167 canonical dist paths; those owned outputs were restored after the test. Isolating that validator's build is a separate improvement, not accomplished by this cwd repair."
+}

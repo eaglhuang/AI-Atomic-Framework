@@ -78,9 +78,9 @@ const flattened = plan.batches.flat();
 assert.deepEqual(
   flattened,
   [...new Set(releaseBundle)].sort(),
-  'concatenating the batches must reproduce the normalized path list exactly, in order'
+  'concatenating the batches must reproduce the original path bytes exactly, in order'
 );
-assert.deepEqual(plan.paths, flattened, 'the plan must report the same normalized list it batched');
+assert.deepEqual(plan.paths, flattened, 'the plan must report the same lossless list it batched');
 
 const duplicated = planPathspecBatches({
   paths: ['b.txt', 'a.txt', './a.txt', 'b.txt', '  ', 'c\\d.txt'],
@@ -88,8 +88,8 @@ const duplicated = planPathspecBatches({
 });
 assert.deepEqual(
   duplicated.paths,
-  ['a.txt', 'b.txt', 'c/d.txt'],
-  'the planner must normalize separators, drop blanks, dedupe, and sort before batching'
+  ['  ', './a.txt', 'a.txt', 'b.txt', 'c\\d.txt'],
+  'deduplication and sorting must not trim valid names or rewrite Git path bytes'
 );
 
 // An empty list plans no invocations at all, so callers can skip the spawn.
