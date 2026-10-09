@@ -1,0 +1,99 @@
+{
+ "writer": 0,
+ "pr": 18979,
+ "pid": 2085904,
+ "init_ms": 88.155077,
+ "start_offset_ms": 17,
+ "file_order": [
+  "django/db/models/expressions.py",
+  "django/db/models/aggregates.py",
+  "django/db/models/fields/tuple_lookups.py",
+  "django/db/models/lookups.py"
+ ],
+ "holds": {
+  "django/db/models/expressions.py": 22,
+  "django/db/models/aggregates.py": 24,
+  "django/db/models/fields/tuple_lookups.py": 19,
+  "django/db/models/lookups.py": 8
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 18979,
+   "path": "django/db/models/expressions.py",
+   "intents": [
+    "log:django:18979_19007:18979:django/db/models/expressions.py:h1",
+    "log:django:18979_19007:18979:django/db/models/expressions.py:h2",
+    "log:django:18979_19007:18979:django/db/models/expressions.py:h3",
+    "log:django:18979_19007:18979:django/db/models/expressions.py:h4"
+   ],
+   "hold_ms": 22,
+   "t_submit_epoch": 1791563924668,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 22,
+   "outcome": "commit",
+   "total_ms": 56.31,
+   "t_done_epoch": 1791563924724
+  },
+  {
+   "writer": 0,
+   "pr": 18979,
+   "path": "django/db/models/aggregates.py",
+   "intents": [
+    "log:django:18979_19007:18979:django/db/models/aggregates.py:h0"
+   ],
+   "hold_ms": 24,
+   "t_submit_epoch": 1791563924725,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 6,
+   "outcome": "commit",
+   "total_ms": 39.82,
+   "t_done_epoch": 1791563924764
+  },
+  {
+   "writer": 0,
+   "pr": 18979,
+   "path": "django/db/models/fields/tuple_lookups.py",
+   "intents": [
+    "log:django:18979_19007:18979:django/db/models/fields/tuple_lookups.py:h5",
+    "log:django:18979_19007:18979:django/db/models/fields/tuple_lookups.py:h6"
+   ],
+   "hold_ms": 19,
+   "t_submit_epoch": 1791563924764,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 5,
+   "outcome": "commit",
+   "total_ms": 34.15,
+   "t_done_epoch": 1791563924799
+  },
+  {
+   "writer": 0,
+   "pr": 18979,
+   "path": "django/db/models/lookups.py",
+   "intents": [
+    "log:django:18979_19007:18979:django/db/models/lookups.py:h7",
+    "log:django:18979_19007:18979:django/db/models/lookups.py:h8"
+   ],
+   "hold_ms": 8,
+   "t_submit_epoch": 1791563924799,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "total_ms": 19.79,
+   "t_done_epoch": 1791563924818
+  }
+ ],
+ "admit_stats": {
+  "txns": 8,
+  "cas_conflicts": 1
+ },
+ "steward_batches": null
+}

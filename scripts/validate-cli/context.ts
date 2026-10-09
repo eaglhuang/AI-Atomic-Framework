@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawn, spawnSync } from 'node:child_process';
+import { spawnCliCapture } from '../lib/cli-json-spawn.ts';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import { quoteForShell, detectAutoLinkedValidator } from '../../packages/cli/src/commands/evidence.ts';
@@ -162,10 +163,10 @@ export async function runAtm(args: any, cwd = root, env: Record<string, string> 
 
 export async function runAtmSpawned(args: any, cwd = root, env: Record<string, string> = {}) {
   const fixture = readJson('tests/cli-fixtures/cli-mvp.fixture.json');
-  const result = spawnSync(process.execPath, [path.join(root, fixture.entrypoint), ...args], {
+  const result = spawnCliCapture(process.execPath, [path.join(root, fixture.entrypoint), ...args], {
     cwd,
-    encoding: 'utf8',
-    env: { ...process.env, ...env }
+    env: { ...process.env, ...env },
+    label: `atm ${args.join(' ')}`
   });
   if ((result.error as NodeJS.ErrnoException | undefined)?.code === 'EPERM') {
     return runAtm(args, cwd, env);

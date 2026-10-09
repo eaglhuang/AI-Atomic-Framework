@@ -9,7 +9,7 @@ import { inspectCurrentBranchCommitQueueStatus } from './branch-commit-window.js
 import { laneSessionIdFromRecord } from './command-router.js';
 import { inspectCloseCommitWindowStagedArtifacts } from './git-index-transaction.js';
 import { inspectStdinPathspecGitAddProcesses, readGitCommitAttemptStatus } from './git-process-port.js';
-import { readGitConfig, writeGitConfig } from './git-config-port.js';
+import { readEffectiveGitConfig, readGitConfig, writeGitConfig } from './git-config-port.js';
 import { readHeadCommitMessage } from './push-command.js';
 import { inspectHistoricalLedgerRestoreStagedArtifacts, inspectMirrorSyncOnlyStagedArtifacts } from './record-bundle-inspection.js';
 export function resolveActorGitIdentityForCommit(cwd, actorId) {
@@ -311,7 +311,12 @@ export function resolveGitIdentityProfile(cwd, actorId, actorRecord, overrides =
             gitEmail: defaultIdentity.gitEmail ?? null,
         };
     }
-    return { gitName: null, gitEmail: null };
+    // Last resort: the user's own git identity, so the first governed commit
+    // does not demand a separate `identity set` step.
+    return {
+        gitName: readEffectiveGitConfig(cwd, "user.name"),
+        gitEmail: readEffectiveGitConfig(cwd, "user.email"),
+    };
 }
 export function writePreparedRuntimeIdentity(cwd, actorId, gitName, gitEmail, actorRecord) {
     const defaultIdentity = readRuntimeIdentityDefault(cwd);

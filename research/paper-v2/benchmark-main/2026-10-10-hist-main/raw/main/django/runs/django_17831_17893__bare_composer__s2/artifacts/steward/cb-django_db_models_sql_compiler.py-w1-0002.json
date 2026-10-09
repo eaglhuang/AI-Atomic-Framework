@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-c5307b71c89e945d",
+  "proposalIds": [
+    "prop-hist-w1-django_db_models_sql_compiler_py"
+  ],
+  "targetFiles": [
+    "django/db/models/sql/compiler.py"
+  ],
+  "appliedFiles": [
+    "django/db/models/sql/compiler.py"
+  ],
+  "fileBeforeHashes": {
+    "django/db/models/sql/compiler.py": "4b234622c6bdd0a004066add1050819e52af7c6e48c09d9b16b2e5832102e544"
+  },
+  "fileAfterHashes": {
+    "django/db/models/sql/compiler.py": "12f264b69e3bd1c81851cf4f422a0effd070f7bbd68a07b5f0446ca0d5045dc9"
+  },
+  "permissions": {
+    "fileWrite": [
+      "django/db/models/sql/compiler.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-c5307b71c89e945d",
+    "planId": "merge-c5307b71c89e945d",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-c5307b71c89e945d",
+        "planId": "merge-c5307b71c89e945d",
+        "request_identity": [
+          "prop-hist-w1-django_db_models_sql_compiler_py"
+        ],
+        "actor_ids": [
+          "writer-17893"
+        ],
+        "request_files": [
+          "django/db/models/sql/compiler.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "django/db/models/sql/compiler.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/django/runs/django_17831_17893__bare_composer__s2/artifacts/steward/cb-django_db_models_sql_compiler.py-w1-0002.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-DJANGO_DB_MODELS_SQL_COMPILER_PY"
+        ],
+        "commit_sha": "a96e9f3aac575bc0656bae483634f5b2b7d028e6"
+      }
+    ]
+  }
+}

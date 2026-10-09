@@ -1,5 +1,6 @@
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
+import { existsSync } from 'node:fs';
 
 import { planPathspecBatches } from '../packages/cli/src/commands/git-governance/implementation/pathspec-argv-batching.ts';
 
@@ -23,7 +24,7 @@ if (files.length === 0) {
 // gate whose "found a problem" and "never ran" outcomes are indistinguishable is
 // not a gate, so the invocation is batched against the same platform argv budget
 // the Git pathspec callers already share, and a spawn that never ran is named.
-const GUARD_FIXED_ARGS = ['atm.mjs', 'guard', 'encoding', '--files', '--json'];
+const GUARD_FIXED_ARGS = ['atm.mjs', 'guard', 'encoding', '--cwd', cwd, '--files', '--json'];
 
 process.exit(runGuardInBatches(files));
 
@@ -36,7 +37,7 @@ function runGuardInBatches(guardFiles: string[]): number {
   for (const batch of batches) {
     const result = spawnSync(
       process.execPath,
-      ['atm.mjs', 'guard', 'encoding', '--files', batch.join(','), '--json'],
+      ['atm.mjs', 'guard', 'encoding', '--cwd', cwd, '--files', batch.join(','), '--json'],
       { cwd, encoding: 'utf8', stdio: ['ignore', 'inherit', 'inherit'] }
     );
     if (typeof result.status !== 'number') {
@@ -72,7 +73,19 @@ function planGuardBatches(guardFiles: string[]): readonly (readonly string[])[] 
 function resolveFiles(explicitFileArgs: string[], currentMode: Mode): string[] {
   const hasExplicitFiles = explicitFileArgs.length > 0;
   const candidates = hasExplicitFiles ? explicitFileArgs : gitChangedFiles(currentMode);
-  return uniqueStrings(candidates.map(normalizePath).filter(isTextFile));
+  const textFiles = uniqueStrings(candidates.map(normalizePath).filter(isTextFile));
+  const missing = textFiles.filter((file) => !existsSync(path.resolve(cwd, file)));
+  if (missing.length === 0) return textFiles;
+  const deleted = new Set(runGit([
+    'diff', ...(currentMode === 'staged' ? ['--cached'] : []),
+    '--name-only', '-z', '--diff-filter=D'
+  ]).map((file) => path.resolve(cwd, file)));
+  for (const file of missing) {
+    if (!deleted.has(path.resolve(cwd, file))) {
+      throw new Error(`Missing text file is not a Git deletion: ${file}`);
+    }
+  }
+  return textFiles.filter((file) => existsSync(path.resolve(cwd, file)));
 }
 
 function readFilesOption(argv: string[]): string[] {
@@ -105,8 +118,8 @@ function readOption(flag: string): string | null {
 
 function gitChangedFiles(currentMode: Mode): string[] {
   const gitArgs = currentMode === 'staged'
-    ? ['diff', '--cached', '--name-only', '--diff-filter=ACMRT']
-    : ['diff', '--name-only', '--diff-filter=ACMRT'];
+    ? ['diff', '--cached', '--name-only', '-z', '--diff-filter=ACMRTD']
+    : ['diff', '--name-only', '-z', '--diff-filter=ACMRTD'];
   const tracked = runGit(gitArgs);
   if (currentMode === 'staged') return tracked;
   return uniqueStrings([
@@ -121,7 +134,9 @@ function runGit(gitArgs: string[]): string[] {
     const stderr = String(result.stderr ?? '').trim();
     throw new Error(`git ${gitArgs.join(' ')} failed${stderr ? `: ${stderr}` : ''}`);
   }
-  return splitFileList(result.stdout);
+  return gitArgs.includes('-z')
+    ? String(result.stdout).split('\0').filter(Boolean)
+    : splitFileList(result.stdout);
 }
 
 function splitFileList(value: string): string[] {

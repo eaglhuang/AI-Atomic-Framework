@@ -1,0 +1,55 @@
+{
+ "method": "STALE union-test-set, new failures only",
+ "python": "/workspace/scratch/hist/envs/sympy/bin/python",
+ "results": {
+  "sympy:28653_28662": {
+   "arm_runs": {},
+   "base_valid": false,
+   "conditions": {
+    "A": [
+     {
+      "failed": [
+       "sympy/combinatorics/tests/test_homomorphisms.py::test_fpgroup_isomorphism"
+      ],
+      "n": 7,
+      "rc": 1,
+      "secs": 5.9,
+      "stderr_tail": "",
+      "tag": "A#0"
+     }
+    ],
+    "B": [
+     {
+      "failed": [],
+      "n": 7,
+      "rc": 0,
+      "secs": 7.8,
+      "stderr_tail": "",
+      "tag": "B#0"
+     }
+    ],
+    "b": {
+     "failed": [
+      "sympy/combinatorics/tests/test_homomorphisms.py::test_fpgroup_isomorphism"
+     ],
+     "n": 7,
+     "rc": 1,
+     "secs": 6.3,
+     "stderr_tail": "",
+     "tag": "b"
+    }
+   },
+   "f2p_A": [],
+   "f2p_B": [
+    "sympy/combinatorics/tests/test_homomorphisms.py::test_fpgroup_isomorphism"
+   ],
+   "flaky": [],
+   "labels": [
+    "sympy/combinatorics/tests/test_coset_table.py",
+    "sympy/combinatorics/tests/test_homomorphisms.py"
+   ],
+   "pair_id": "sympy:28653_28662",
+   "status": "evaluated-base-invalid (semantic endpoint excluded per prereg)"
+  }
+ }
+}

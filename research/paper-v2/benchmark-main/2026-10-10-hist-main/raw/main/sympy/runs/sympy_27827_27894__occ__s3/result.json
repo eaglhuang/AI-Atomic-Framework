@@ -1,0 +1,87 @@
+{
+ "pair_id": "sympy:27827_27894",
+ "stratum": "O1",
+ "arm": "occ",
+ "plant": null,
+ "seed_k": 3,
+ "seed": 3503130812,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-20effd45/AI-Atomic-Framework-20effd45a0c3a09c293caaea6a34face0df1c5f4",
+ "wall_ms": 407,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 9,
+  "by_verdict": {
+   "blocked_absent": 6,
+   "correct": 3
+  },
+  "completed": 3,
+  "lost_effects": 0,
+  "blocked": 6,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 1,
+  "files_full_bytes_exact": 1,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {
+  "occ-relocate-context-not-found": 6
+ },
+ "structure": {
+  "sympy/concrete/summations.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "sympy/concrete/summations.py": true
+ },
+ "final_exists": {
+  "sympy/concrete/summations.py": true
+ },
+ "files": [
+  {
+   "path": "sympy/concrete/summations.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:01047e810f43af8fe6fd841746a0a22254d8ebe6619a8328bbfbda64a7b15952",
+   "final_digest": "sha256:4b8d63819c25dd99a6681dfa7c07f0bd6fc72cc7681c454c017ea21422f8e474",
+   "expected_digests": [
+    "sha256:4b8d63819c25dd99a6681dfa7c07f0bd6fc72cc7681c454c017ea21422f8e474"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "sympy/concrete/summations.py": "sha256:4b8d63819c25dd99a6681dfa7c07f0bd6fc72cc7681c454c017ea21422f8e474"
+ }
+}

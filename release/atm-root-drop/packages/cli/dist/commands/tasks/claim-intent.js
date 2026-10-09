@@ -31,7 +31,12 @@ export function resolveTaskClaimIntent(input) {
             planningRelativePath: planPath || null
         })
         : { ref: null, commitSha: null, source: null };
-    const hasScopedDeliveryEvidence = Boolean(deliveryEvidence.commitSha);
+    // Only evidence bound to this task (the card's delivery commit or a commit
+    // carrying its task trailer) means the work already landed. Any recent
+    // commit that happened to touch the same files (git-log-scope) does not: a
+    // new card that edits an existing file would otherwise be claimed
+    // closeout-only and every delivery commit refused.
+    const hasScopedDeliveryEvidence = Boolean(deliveryEvidence.commitSha) && deliveryEvidence.source !== 'git-log-scope';
     if (!input.autoIntent) {
         return {
             requestedClaimIntent: input.requestedClaimIntent,

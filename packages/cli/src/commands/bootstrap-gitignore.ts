@@ -68,3 +68,33 @@ function isFrameworkRepository(cwd: string) {
     return false;
   }
 }
+
+const attributesStartMarker = '# ATM generated files (managed by ATM bootstrap):start';
+const attributesEndMarker = '# ATM generated files (managed by ATM bootstrap):end';
+
+// ATM writes LF files. On Windows with core.autocrlf the first `git add -A`
+// otherwise prints one "LF will be replaced by CRLF" warning per generated file.
+export const adopterEolAttributePatterns = [
+  '.atm/** text eol=lf',
+  '.claude/** text eol=lf',
+  '.agents/** text eol=lf',
+  '.cursor/** text eol=lf',
+  '.github/instructions/** text eol=lf',
+  '.gemini/** text eol=lf',
+  'AGENTS.md text eol=lf',
+  'GEMINI.md text eol=lf',
+  'atm.mjs text eol=lf',
+  'taskflow.profile.json text eol=lf'
+] as const;
+
+export function ensureAdopterGitattributes(cwd: string) {
+  if (isFrameworkRepository(cwd)) return { status: 'framework-repository' as const };
+  const attributesPath = path.join(cwd, '.gitattributes');
+  const current = existsSync(attributesPath) ? readFileSync(attributesPath, 'utf8') : '';
+  if (current.includes(attributesStartMarker)) return { status: 'existing' as const, path: '.gitattributes' };
+  const eol = current.includes('\r\n') ? '\r\n' : '\n';
+  const block = [attributesStartMarker, ...adopterEolAttributePatterns, attributesEndMarker].join(eol);
+  const separator = current.length === 0 ? '' : current.endsWith('\n') ? eol : eol + eol;
+  writeFileSync(attributesPath, `${current}${separator}${block}${eol}`, 'utf8');
+  return { status: current.length === 0 ? 'created' as const : 'appended' as const, path: '.gitattributes' };
+}

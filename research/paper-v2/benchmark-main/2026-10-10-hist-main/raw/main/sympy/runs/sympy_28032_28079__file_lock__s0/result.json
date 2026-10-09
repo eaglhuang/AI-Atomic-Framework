@@ -1,0 +1,131 @@
+{
+ "pair_id": "sympy:28032_28079",
+ "stratum": "O1",
+ "arm": "file_lock",
+ "plant": null,
+ "seed_k": 0,
+ "seed": 3422409989,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-20effd45/AI-Atomic-Framework-20effd45a0c3a09c293caaea6a34face0df1c5f4",
+ "wall_ms": 352,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 14,
+  "by_verdict": {
+   "correct": 3,
+   "blocked_absent": 11
+  },
+  "completed": 3,
+  "lost_effects": 0,
+  "blocked": 11,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 3,
+  "files_full_bytes_exact": 3,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {
+  "harness-relocate-context-not-found": 11
+ },
+ "structure": {
+  "sympy/printing/numpy.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/printing/pytorch.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/utilities/lambdify.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "sympy/printing/numpy.py": true,
+  "sympy/printing/pytorch.py": true,
+  "sympy/utilities/lambdify.py": true
+ },
+ "final_exists": {
+  "sympy/printing/numpy.py": true,
+  "sympy/printing/pytorch.py": true,
+  "sympy/utilities/lambdify.py": true
+ },
+ "files": [
+  {
+   "path": "sympy/printing/numpy.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:2a9abec929104912980b1b60419122ff8963dc498aec582f6c3253cef07bed37",
+   "final_digest": "sha256:bc507c6c54fa4140b468972c3cf13595701f41a2bc208e85629c2a2bc644950c",
+   "expected_digests": [
+    "sha256:bc507c6c54fa4140b468972c3cf13595701f41a2bc208e85629c2a2bc644950c"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/printing/pytorch.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:1d7100a0b6e06ee13e4988f486f0c7789d338333950c190ae6a584acb08984da",
+   "final_digest": "sha256:0a7b16579661029a91436daf868491ecac7bec454b390cfdc7c9a49e52af4b25",
+   "expected_digests": [
+    "sha256:0a7b16579661029a91436daf868491ecac7bec454b390cfdc7c9a49e52af4b25"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/utilities/lambdify.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:95ea62784c48d7d42f6583eb1a5fd665a170b5af18641a3a020c439f0ab4d68c",
+   "final_digest": "sha256:ed021599a61756f51361425b1192b6891cc07432953c77f51a4bcfaeb25cdb1d",
+   "expected_digests": [
+    "sha256:ed021599a61756f51361425b1192b6891cc07432953c77f51a4bcfaeb25cdb1d"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "sympy/printing/numpy.py": "sha256:bc507c6c54fa4140b468972c3cf13595701f41a2bc208e85629c2a2bc644950c",
+  "sympy/printing/pytorch.py": "sha256:0a7b16579661029a91436daf868491ecac7bec454b390cfdc7c9a49e52af4b25",
+  "sympy/utilities/lambdify.py": "sha256:ed021599a61756f51361425b1192b6891cc07432953c77f51a4bcfaeb25cdb1d"
+ }
+}

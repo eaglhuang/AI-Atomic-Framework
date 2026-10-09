@@ -1,0 +1,95 @@
+{
+ "writer": 1,
+ "pr": 20369,
+ "pid": 2075794,
+ "init_ms": 74.542205,
+ "start_offset_ms": 18,
+ "file_order": [
+  "django/db/backends/postgresql/features.py",
+  "django/db/backends/base/features.py",
+  "django/db/backends/postgresql/compiler.py",
+  "django/db/models/sql/compiler.py"
+ ],
+ "holds": {
+  "django/db/backends/postgresql/features.py": 9,
+  "django/db/backends/base/features.py": 4,
+  "django/db/backends/postgresql/compiler.py": 28,
+  "django/db/models/sql/compiler.py": 5
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 20369,
+   "path": "django/db/backends/postgresql/features.py",
+   "intents": [
+    "log:django:20362_20369:20369:django/db/backends/postgresql/features.py:h3"
+   ],
+   "hold_ms": 9,
+   "t_submit_epoch": 1791563842586,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 15,
+   "outcome": "commit",
+   "total_ms": 33.74,
+   "t_done_epoch": 1791563842620
+  },
+  {
+   "writer": 1,
+   "pr": 20369,
+   "path": "django/db/backends/base/features.py",
+   "intents": [
+    "log:django:20362_20369:20369:django/db/backends/base/features.py:h0"
+   ],
+   "hold_ms": 4,
+   "t_submit_epoch": 1791563842620,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "commit",
+   "total_ms": 13.03,
+   "t_done_epoch": 1791563842633
+  },
+  {
+   "writer": 1,
+   "pr": 20369,
+   "path": "django/db/backends/postgresql/compiler.py",
+   "intents": [
+    "log:django:20362_20369:20369:django/db/backends/postgresql/compiler.py:h1",
+    "log:django:20362_20369:20369:django/db/backends/postgresql/compiler.py:h2"
+   ],
+   "hold_ms": 28,
+   "t_submit_epoch": 1791563842633,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 8,
+   "outcome": "commit",
+   "total_ms": 42.22,
+   "t_done_epoch": 1791563842675
+  },
+  {
+   "writer": 1,
+   "pr": 20369,
+   "path": "django/db/models/sql/compiler.py",
+   "intents": [
+    "log:django:20362_20369:20369:django/db/models/sql/compiler.py:h4"
+   ],
+   "hold_ms": 5,
+   "t_submit_epoch": 1791563842675,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "commit",
+   "total_ms": 16.59,
+   "t_done_epoch": 1791563842692
+  }
+ ],
+ "admit_stats": {
+  "txns": 8,
+  "cas_conflicts": 3
+ },
+ "steward_batches": null
+}

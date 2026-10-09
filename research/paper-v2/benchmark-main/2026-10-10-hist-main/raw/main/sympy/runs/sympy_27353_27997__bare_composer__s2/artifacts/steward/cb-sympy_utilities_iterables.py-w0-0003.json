@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-3e9fc820ae841c1b",
+  "proposalIds": [
+    "prop-hist-w0-sympy_utilities_iterables_py"
+  ],
+  "targetFiles": [
+    "sympy/utilities/iterables.py"
+  ],
+  "appliedFiles": [
+    "sympy/utilities/iterables.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/utilities/iterables.py": "9e820c45099d48f7db8352e8ad13c7adea334b6eb9bb82075260e43af301da9a"
+  },
+  "fileAfterHashes": {
+    "sympy/utilities/iterables.py": "83494e664875399d8fef679d51bedc7bc7a6b8c724d8aa39070441d4319d49ca"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/utilities/iterables.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-3e9fc820ae841c1b",
+    "planId": "merge-3e9fc820ae841c1b",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-3e9fc820ae841c1b",
+        "planId": "merge-3e9fc820ae841c1b",
+        "request_identity": [
+          "prop-hist-w0-sympy_utilities_iterables_py"
+        ],
+        "actor_ids": [
+          "writer-27353"
+        ],
+        "request_files": [
+          "sympy/utilities/iterables.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/utilities/iterables.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/sympy/runs/sympy_27353_27997__bare_composer__s2/artifacts/steward/cb-sympy_utilities_iterables.py-w0-0003.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SYMPY_UTILITIES_ITERABLES_PY"
+        ],
+        "commit_sha": "b9a71e7e1a891adcedc11fbff8ce0a6505d2acfe"
+      }
+    ]
+  }
+}

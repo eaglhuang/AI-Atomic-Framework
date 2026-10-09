@@ -1,0 +1,83 @@
+{
+ "writer": 0,
+ "pr": 18127,
+ "pid": 2065847,
+ "init_ms": 82.69439600000001,
+ "start_offset_ms": 11,
+ "file_order": [
+  "django/utils/deprecation.py",
+  "django/contrib/auth/hashers.py",
+  "django/__init__.py"
+ ],
+ "holds": {
+  "django/utils/deprecation.py": 14,
+  "django/contrib/auth/hashers.py": 2,
+  "django/__init__.py": 30
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 18127,
+   "path": "django/utils/deprecation.py",
+   "intents": [
+    "log:django:18127_18157:18127:django/utils/deprecation.py:h2",
+    "log:django:18127_18157:18127:django/utils/deprecation.py:h3",
+    "log:django:18127_18157:18127:django/utils/deprecation.py:h4"
+   ],
+   "hold_ms": 14,
+   "t_submit_epoch": 1791563761508,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 19,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 39.95,
+   "t_done_epoch": 1791563761548
+  },
+  {
+   "writer": 0,
+   "pr": 18127,
+   "path": "django/contrib/auth/hashers.py",
+   "intents": [
+    "log:django:18127_18157:18127:django/contrib/auth/hashers.py:h1"
+   ],
+   "hold_ms": 2,
+   "t_submit_epoch": 1791563761548,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 7.53,
+   "t_done_epoch": 1791563761556
+  },
+  {
+   "writer": 0,
+   "pr": 18127,
+   "path": "django/__init__.py",
+   "intents": [
+    "log:django:18127_18157:18127:django/__init__.py:h0"
+   ],
+   "hold_ms": 30,
+   "t_submit_epoch": 1791563761556,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 39.95,
+   "t_done_epoch": 1791563761596
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 7
+ },
+ "steward_batches": null
+}

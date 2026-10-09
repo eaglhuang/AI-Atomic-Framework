@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-fb942845a4b19248",
+  "proposalIds": [
+    "prop-hist-w1-sympy_printing_pycode_py"
+  ],
+  "targetFiles": [
+    "sympy/printing/pycode.py"
+  ],
+  "appliedFiles": [
+    "sympy/printing/pycode.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/printing/pycode.py": "c90bc1cc61e54064773f2ade01fa24c3aef97284e62e27ac28e6cd9ac590a4b1"
+  },
+  "fileAfterHashes": {
+    "sympy/printing/pycode.py": "033f3d4dd2bdf06d21cc05fa29eca63fb74c9796b0dc51e7951ad3824083cdb2"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/printing/pycode.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-fb942845a4b19248",
+    "planId": "merge-fb942845a4b19248",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-fb942845a4b19248",
+        "planId": "merge-fb942845a4b19248",
+        "request_identity": [
+          "prop-hist-w1-sympy_printing_pycode_py"
+        ],
+        "actor_ids": [
+          "writer-26794"
+        ],
+        "request_files": [
+          "sympy/printing/pycode.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/printing/pycode.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/sympy/runs/sympy_26678_26794__bare_composer__s1/artifacts/steward/cb-sympy_printing_pycode.py-w1-0002.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_PRINTING_PYCODE_PY"
+        ],
+        "commit_sha": "75860a6f89f548ee86ca5d60aeb7fcfbd7eb607b"
+      }
+    ]
+  }
+}

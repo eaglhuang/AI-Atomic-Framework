@@ -4,6 +4,13 @@
   "shard": "cli-team",
   "mappings": [
     {
+      "path_pattern": "packages/cli/src/commands/broker/registry-actions.ts",
+      "atom_id": "atm.broker-command-map",
+      "capability": "Native serial register/status/release transport with explicit queue resume, live HEAD verification and separate write authorization.",
+      "coverage_status": "active",
+      "source_task": "ATM-GOV-0421"
+    },
+    {
       "path_pattern": "packages/cli/src/commands/batch.ts",
       "atom_id": "atm.batch-checkpoint-map",
       "capability": "batch lifecycle, checkpoint delivery windows, and status: checkpoint can formally close scoped framework critical deliveries before the required single commit. TASK-AAO-0013: checkpoint failure returns structured category+requiredCommand (ATM_BATCH_CHECKPOINT_CLOSE_FAILED); partial completion uses ATM_BATCH_CHECKPOINT_PARTIAL_OK to prevent AI misreading partial-ok as batch-complete.",

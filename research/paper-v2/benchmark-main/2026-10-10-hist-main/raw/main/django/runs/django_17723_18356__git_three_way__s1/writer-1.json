@@ -1,0 +1,80 @@
+{
+ "writer": 1,
+ "pr": 18356,
+ "pid": 2053246,
+ "init_ms": 83.890466,
+ "start_offset_ms": 3,
+ "file_order": [
+  "django/db/models/constraints.py",
+  "django/contrib/postgres/constraints.py",
+  "django/db/models/base.py"
+ ],
+ "holds": {
+  "django/db/models/constraints.py": 29,
+  "django/contrib/postgres/constraints.py": 21,
+  "django/db/models/base.py": 4
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 18356,
+   "path": "django/db/models/constraints.py",
+   "intents": [
+    "log:django:17723_18356:18356:django/db/models/constraints.py:h4",
+    "log:django:17723_18356:18356:django/db/models/constraints.py:h5",
+    "log:django:17723_18356:18356:django/db/models/constraints.py:h6",
+    "log:django:17723_18356:18356:django/db/models/constraints.py:h7"
+   ],
+   "hold_ms": 29,
+   "t_submit_epoch": 1791563663723,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 50,
+   "outcome": "commit",
+   "total_ms": 386.99,
+   "t_done_epoch": 1791563664110
+  },
+  {
+   "writer": 1,
+   "pr": 18356,
+   "path": "django/contrib/postgres/constraints.py",
+   "intents": [
+    "log:django:17723_18356:18356:django/contrib/postgres/constraints.py:h0",
+    "log:django:17723_18356:18356:django/contrib/postgres/constraints.py:h1"
+   ],
+   "hold_ms": 21,
+   "t_submit_epoch": 1791563664110,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "total_ms": 33.17,
+   "t_done_epoch": 1791563664143
+  },
+  {
+   "writer": 1,
+   "pr": 18356,
+   "path": "django/db/models/base.py",
+   "intents": [
+    "log:django:17723_18356:18356:django/db/models/base.py:h2",
+    "log:django:17723_18356:18356:django/db/models/base.py:h3"
+   ],
+   "hold_ms": 4,
+   "t_submit_epoch": 1791563664143,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "commit",
+   "total_ms": 19.69,
+   "t_done_epoch": 1791563664163
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 5
+ },
+ "steward_batches": null
+}

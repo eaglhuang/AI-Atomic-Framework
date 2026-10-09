@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-4f0021b5aa1477f4",
+  "proposalIds": [
+    "prop-hist-w0-sympy_solvers_ode_single_py"
+  ],
+  "targetFiles": [
+    "sympy/solvers/ode/single.py"
+  ],
+  "appliedFiles": [
+    "sympy/solvers/ode/single.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/solvers/ode/single.py": "faa07130ff2c3230aa2bd944c35573d2635dbfcf3da10bf2388d36fa4abc34ab"
+  },
+  "fileAfterHashes": {
+    "sympy/solvers/ode/single.py": "fad0bfa25d1e7105f3b5f29e5a197b7592d57bb14fb2246bd6d792c7856e4628"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/solvers/ode/single.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-4f0021b5aa1477f4",
+    "planId": "merge-4f0021b5aa1477f4",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-4f0021b5aa1477f4",
+        "planId": "merge-4f0021b5aa1477f4",
+        "request_identity": [
+          "prop-hist-w0-sympy_solvers_ode_single_py"
+        ],
+        "actor_ids": [
+          "writer-27686"
+        ],
+        "request_files": [
+          "sympy/solvers/ode/single.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/solvers/ode/single.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/sympy/runs/sympy_27686_27930__steward__s3/artifacts/steward/cb-sympy_solvers_ode_single.py-w0-0002.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SYMPY_SOLVERS_ODE_SINGLE_PY"
+        ],
+        "commit_sha": "e851423f39b49382aa43907e8388064edc4fd72d"
+      }
+    ]
+  }
+}

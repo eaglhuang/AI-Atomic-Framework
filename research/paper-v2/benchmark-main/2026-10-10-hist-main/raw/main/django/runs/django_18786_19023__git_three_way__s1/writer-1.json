@@ -1,0 +1,76 @@
+{
+ "writer": 1,
+ "pr": 19023,
+ "pid": 2060610,
+ "init_ms": 67.954957,
+ "start_offset_ms": 9,
+ "file_order": [
+  "django/contrib/gis/geos/prototypes/predicates.py",
+  "django/contrib/gis/geos/prototypes/__init__.py",
+  "django/contrib/gis/geos/geometry.py"
+ ],
+ "holds": {
+  "django/contrib/gis/geos/prototypes/predicates.py": 18,
+  "django/contrib/gis/geos/prototypes/__init__.py": 22,
+  "django/contrib/gis/geos/geometry.py": 14
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 19023,
+   "path": "django/contrib/gis/geos/prototypes/predicates.py",
+   "intents": [
+    "log:django:18786_19023:19023:django/contrib/gis/geos/prototypes/predicates.py:h3"
+   ],
+   "hold_ms": 18,
+   "t_submit_epoch": 1791563724880,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 16,
+   "outcome": "commit",
+   "total_ms": 43.81,
+   "t_done_epoch": 1791563724924
+  },
+  {
+   "writer": 1,
+   "pr": 19023,
+   "path": "django/contrib/gis/geos/prototypes/__init__.py",
+   "intents": [
+    "log:django:18786_19023:19023:django/contrib/gis/geos/prototypes/__init__.py:h2"
+   ],
+   "hold_ms": 22,
+   "t_submit_epoch": 1791563724924,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 8,
+   "outcome": "commit",
+   "total_ms": 39.47,
+   "t_done_epoch": 1791563724964
+  },
+  {
+   "writer": 1,
+   "pr": 19023,
+   "path": "django/contrib/gis/geos/geometry.py",
+   "intents": [
+    "log:django:18786_19023:19023:django/contrib/gis/geos/geometry.py:h0",
+    "log:django:18786_19023:19023:django/contrib/gis/geos/geometry.py:h1"
+   ],
+   "hold_ms": 14,
+   "t_submit_epoch": 1791563724964,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 5,
+   "outcome": "commit",
+   "total_ms": 38.92,
+   "t_done_epoch": 1791563725003
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 16
+ },
+ "steward_batches": null
+}

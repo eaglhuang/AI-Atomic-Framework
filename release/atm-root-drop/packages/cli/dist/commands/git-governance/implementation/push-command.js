@@ -7,6 +7,9 @@ import { evaluateGitAdmission } from "../../../_vendor/core/dist/git/admission.j
 import { buildGitBoundaryEvidenceEnvelope } from "../../../_vendor/core/dist/evidence/index.js";
 import { CliError, makeResult, message, quoteCliValue, } from "../../shared.js";
 import { buildPostPushRecoveryRecommendation, classifyPostPushRecoveryKind, } from './push-recovery.js';
+function gitPushResult(input) {
+    return makeResult(input);
+}
 export function gitPushAttemptStatusRelativePath(actorId, branch, remote) {
     const safeActor = actorId.replace(/[^a-zA-Z0-9_.-]/g, "_");
     const safeTarget = `${remote}__${branch}`.replace(/[^a-zA-Z0-9_.-]/g, "_");
@@ -78,7 +81,7 @@ export function runGitPush(options) {
             retryCommand: `node atm.mjs git push --actor ${quoteCliValue(options.actorId)} --branch ${quoteCliValue(branch)} --remote ${quoteCliValue(remote)} --json`,
             recoveryCommand: `node atm.mjs git recover-push-fail --actor ${quoteCliValue(options.actorId)} --branch ${quoteCliValue(branch)} --remote ${quoteCliValue(remote)} --json`,
         });
-        return makeResult({
+        return gitPushResult({
             ok: false,
             command: "git",
             cwd: options.cwd,
@@ -106,7 +109,7 @@ export function runGitPush(options) {
             },
         });
     }
-    if (options.dryRun || admission.outcome === "no-op") {
+    if (options.dryRun || (admission.outcome === "no-op" && admission.topology.remoteBranchExists !== false)) {
         const updatedAt = new Date().toISOString();
         const status = options.dryRun ? "dry-run" : "no-op";
         writeGitPushAttemptStatus(options.cwd, statusPath, {
@@ -124,7 +127,7 @@ export function runGitPush(options) {
             headShaAfterAttempt: readHeadCommitSha(options.cwd),
             admissionOutcome: admission.outcome,
         });
-        return makeResult({
+        return gitPushResult({
             ok: true,
             command: "git",
             cwd: options.cwd,
@@ -167,7 +170,7 @@ export function runGitPush(options) {
             admissionOutcome: admission.outcome,
             remoteShaAfterPush,
         });
-        return makeResult({
+        return gitPushResult({
             ok: true,
             command: "git",
             cwd: options.cwd,
@@ -214,7 +217,7 @@ export function runGitPush(options) {
             errorSummary: stderr.slice(0, 4000),
             recoveryCommand: `node atm.mjs git recover-push-fail --actor ${quoteCliValue(options.actorId)} --branch ${quoteCliValue(branch)} --remote ${quoteCliValue(remote)} --json`,
         });
-        return makeResult({
+        return gitPushResult({
             ok: false,
             command: "git",
             cwd: options.cwd,

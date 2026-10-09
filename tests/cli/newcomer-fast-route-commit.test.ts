@@ -6,7 +6,7 @@ import path from 'node:path';
 import { runPublicCli } from '../../packages/cli/src/atm-public.ts';
 
 // A new adopter following only the published runtime's own guidance must be
-// able to land a fast-route quickfix: claim, identity remediation, commit.
+// able to land a fast-route quickfix: claim, commit with the existing git identity.
 async function atm(cwd: string, args: string[]) {
   let out = '';
   const io = { stdout: { write(value: string) { out += value; } }, stderr: { write(value: string) { out += value; } } } as Parameters<typeof runPublicCli>[1];
@@ -33,13 +33,7 @@ try {
   writeFileSync(path.join(cwd, 'scripts', 'hello.mjs'), "console.log('hello');\n", 'utf8');
   const commitArgs = ['git', 'commit', '--actor', 'newcomer', '--message', 'feat: add hello script', '--auto-stage'];
 
-  // The identity remediation the commit returns must be runnable in the published runtime.
-  const missing = await atm(cwd, commitArgs);
-  const identityMessage = missing.json.messages.find((entry: { code: string }) => entry.code === 'ATM_GIT_COMMIT_IDENTITY_MISSING');
-  assert.ok(identityMessage, `first commit asks for identity: ${JSON.stringify(missing.json.messages)}`);
-  const identity = await atm(cwd, ['identity', 'set', '--actor', 'newcomer', '--git-name', 'Newcomer', '--git-email', 'newcomer@example.com']);
-  assert.equal(identity.exitCode, 0, `identity set is published: ${JSON.stringify(identity.json.messages)}`);
-
+  // The newcomer's existing git identity is reused; no separate `identity set` step.
   // The actor's quickfix lock is the commit authority; no framework claim is required.
   const commit = await atm(cwd, commitArgs);
   assert.equal(commit.exitCode, 0, `fast-route commit lands: ${JSON.stringify(commit.json.messages)}`);

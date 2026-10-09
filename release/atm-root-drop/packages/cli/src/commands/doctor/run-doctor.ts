@@ -1,3 +1,4 @@
+import { readRuntimeBuildIdentity } from '../shared/runtime-build-identity.ts';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { runHashPlaceholderAudit } from '../hash-placeholder-audit.ts';
@@ -21,6 +22,7 @@ import { checkOnboardingLifecycle, createVersionSummaryMessages } from './lifecy
 import { createBacklogSyncCheck, createGovernanceEntryReadinessCheck, hasRequiredScripts, isFrameworkContractExpected } from './readiness.ts';
 import { checkCharterIntegrityV2, listFiles, listPackageDirs, packageDirLabel, readJsonIfExists, createCheck, createIntegrationDriftRemediation } from './utilities.ts';
 import { inspectHistoricalCommitScopePatrol } from './commit-scope-patrol.ts';
+import { inspectFormalAtomDrift } from '../shared/derived-atom-occupancy.ts';
 
 function hasTsNoCheckPragma(source: string): boolean {
   const withoutBom = source.replace(/^\uFEFF/, '');
@@ -235,6 +237,7 @@ export async function runDoctor(argv: readonly string[]) {
     : runtime.layoutVersion !== atmLayoutVersion || runtime.migrationNeeded
       ? 'node atm.mjs bootstrap --cwd . --force --task "Bootstrap ATM in this repository"'
       : 'npm run validate:full';
+  const formalAtomDrift = safeInspectFormalAtomDrift(root);
   const messages = [
     ...versionWarnings,
     ...(runnerSourceDrift.syncRequired
@@ -293,6 +296,12 @@ export async function runDoctor(argv: readonly string[]) {
       : []),
     ...(!governanceEntryReadiness.ok
       ? [message('warning', 'ATM_DOCTOR_GOVERNANCE_ENTRY_NOT_READY', 'ATM detected a governance readiness blocker that should be resolved before a protected push or governed framework commit.', governanceEntryReadiness.details)]
+      : []),
+    ...(formalAtomDrift.staleAtoms.length > 0
+      ? [message('warning', 'ATM_ATOM_FORMAL_STALE', `${formalAtomDrift.staleAtoms.length} formal atom(s) point at code paths that no longer exist. Claims and commits treat their files as file-level until the registry location is repaired.`, {
+        staleAtoms: formalAtomDrift.staleAtoms,
+        recommendedAction: 'Update the atom location through the governed registry flow (atm create / behavior proposal + review); ATM never rewrites formal atoms automatically.'
+      })]
       : []),
     ...(!backlogSyncCheck.ok
       ? [message('warning', 'ATM_DOCTOR_BACKLOG_SYNC_DRIFT', 'ATM found backlog rows whose status may lag behind current source or validator reality.', backlogSyncCheck.details)]
@@ -362,6 +371,7 @@ export async function runDoctor(argv: readonly string[]) {
     cwd: root,
     messages,
     evidence: {
+      runtimeBuildIdentity: readRuntimeBuildIdentity(import.meta.url),
       checks,
       packageManager: 'npm',
       packageCount: packageDirs.length,
@@ -394,4 +404,12 @@ export async function runDoctor(argv: readonly string[]) {
       ...(staleLocks.length > 0 ? { staleLocks } : {})
     }
   });
+}
+
+function safeInspectFormalAtomDrift(cwd: string) {
+  try {
+    return inspectFormalAtomDrift(cwd);
+  } catch {
+    return { staleAtoms: [], staleFiles: new Set<string>(), ownersByFile: new Map<string, readonly string[]>() };
+  }
 }

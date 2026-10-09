@@ -1,0 +1,172 @@
+{
+ "pair_id": "sympy:26678_26794",
+ "stratum": "O3",
+ "arm": "bare_composer",
+ "plant": null,
+ "seed_k": 2,
+ "seed": 3851224937,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-20effd45/AI-Atomic-Framework-20effd45a0c3a09c293caaea6a34face0df1c5f4",
+ "wall_ms": 553,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 19,
+  "by_verdict": {
+   "correct": 19
+  },
+  "completed": 19,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 5,
+  "files_full_bytes_exact": 5,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "sympy/codegen/cfunctions.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/printing/codeprinter.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/printing/numpy.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/printing/pycode.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "sympy/utilities/lambdify.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "sympy/codegen/cfunctions.py": true,
+  "sympy/printing/codeprinter.py": true,
+  "sympy/printing/numpy.py": true,
+  "sympy/printing/pycode.py": true,
+  "sympy/utilities/lambdify.py": true
+ },
+ "final_exists": {
+  "sympy/codegen/cfunctions.py": true,
+  "sympy/printing/codeprinter.py": true,
+  "sympy/printing/numpy.py": true,
+  "sympy/printing/pycode.py": true,
+  "sympy/utilities/lambdify.py": true
+ },
+ "files": [
+  {
+   "path": "sympy/codegen/cfunctions.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:1fc6eb008d5077ee69f3f2d77bd247369c49594f8d25d72ef3ce5f1a3876c41e",
+   "final_digest": "sha256:8eb1566918eb427a47ceeebe9b016d77a711b292bc268ec1dd10e8d403a84cba",
+   "expected_digests": [
+    "sha256:8eb1566918eb427a47ceeebe9b016d77a711b292bc268ec1dd10e8d403a84cba"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/printing/codeprinter.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:246fa6b7491961a5a8dcc4390db9424df00a6966c36a08a7f719167c84d784f9",
+   "final_digest": "sha256:57db3b69f5bb0840aeeb641070a4b2051f7e430b1ea8ea68f5c15649d7ddede2",
+   "expected_digests": [
+    "sha256:57db3b69f5bb0840aeeb641070a4b2051f7e430b1ea8ea68f5c15649d7ddede2"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/printing/numpy.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:5b0ebc5cc6a1046a2234c9c85124b11ba6fa75112753f2a19d6043bda4368995",
+   "final_digest": "sha256:ce352ecca3e3c91435d4488d6486f26e16f0c55ff94ab8ac11af434845d2e160",
+   "expected_digests": [
+    "sha256:ce352ecca3e3c91435d4488d6486f26e16f0c55ff94ab8ac11af434845d2e160"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/printing/pycode.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:fc3deeee3b4f797cf01a09fe6932b307cd490e2f10cf2f6ee2fa804d8f8349d1",
+   "final_digest": "sha256:033f3d4dd2bdf06d21cc05fa29eca63fb74c9796b0dc51e7951ad3824083cdb2",
+   "expected_digests": [
+    "sha256:033f3d4dd2bdf06d21cc05fa29eca63fb74c9796b0dc51e7951ad3824083cdb2"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "sympy/utilities/lambdify.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:fbd40b90d8e4bd318fe49f78e9a9f74816f7589326118c6309a0faeee623b65e",
+   "final_digest": "sha256:a218076620b0e4f68c59f8acd063a1608056eb06537dd8f3065476bf12522795",
+   "expected_digests": [
+    "sha256:a218076620b0e4f68c59f8acd063a1608056eb06537dd8f3065476bf12522795"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "sympy/codegen/cfunctions.py": "sha256:8eb1566918eb427a47ceeebe9b016d77a711b292bc268ec1dd10e8d403a84cba",
+  "sympy/printing/codeprinter.py": "sha256:57db3b69f5bb0840aeeb641070a4b2051f7e430b1ea8ea68f5c15649d7ddede2",
+  "sympy/printing/numpy.py": "sha256:ce352ecca3e3c91435d4488d6486f26e16f0c55ff94ab8ac11af434845d2e160",
+  "sympy/printing/pycode.py": "sha256:033f3d4dd2bdf06d21cc05fa29eca63fb74c9796b0dc51e7951ad3824083cdb2",
+  "sympy/utilities/lambdify.py": "sha256:a218076620b0e4f68c59f8acd063a1608056eb06537dd8f3065476bf12522795"
+ }
+}

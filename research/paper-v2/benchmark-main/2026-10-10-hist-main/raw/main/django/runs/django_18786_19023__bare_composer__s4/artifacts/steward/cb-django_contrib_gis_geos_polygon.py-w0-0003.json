@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-b2ffaea12dbccf5e",
+  "proposalIds": [
+    "prop-hist-w0-django_contrib_gis_geos_polygon_py"
+  ],
+  "targetFiles": [
+    "django/contrib/gis/geos/polygon.py"
+  ],
+  "appliedFiles": [
+    "django/contrib/gis/geos/polygon.py"
+  ],
+  "fileBeforeHashes": {
+    "django/contrib/gis/geos/polygon.py": "0d9aba11df5b240dccaa1a4343dbbddba847c5c9f10639db292a691e06d2871c"
+  },
+  "fileAfterHashes": {
+    "django/contrib/gis/geos/polygon.py": "3ae784a9c1d5b635e222950d9020fe66349578c458658021b59aa7d372871d76"
+  },
+  "permissions": {
+    "fileWrite": [
+      "django/contrib/gis/geos/polygon.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-b2ffaea12dbccf5e",
+    "planId": "merge-b2ffaea12dbccf5e",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-b2ffaea12dbccf5e",
+        "planId": "merge-b2ffaea12dbccf5e",
+        "request_identity": [
+          "prop-hist-w0-django_contrib_gis_geos_polygon_py"
+        ],
+        "actor_ids": [
+          "writer-18786"
+        ],
+        "request_files": [
+          "django/contrib/gis/geos/polygon.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "django/contrib/gis/geos/polygon.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/django/runs/django_18786_19023__bare_composer__s4/artifacts/steward/cb-django_contrib_gis_geos_polygon.py-w0-0003.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-DJANGO_CONTRIB_GIS_GEOS_POLYGON_PY"
+        ],
+        "commit_sha": "58596b4375d8c1c81e25493c90ef82b6dd4050e6"
+      }
+    ]
+  }
+}

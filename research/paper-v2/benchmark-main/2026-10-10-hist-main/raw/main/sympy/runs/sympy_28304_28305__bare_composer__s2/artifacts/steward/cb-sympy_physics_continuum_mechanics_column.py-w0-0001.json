@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-7e3492416875ae0c",
+  "proposalIds": [
+    "prop-hist-w0-sympy_physics_continuum_mechanics_column_py"
+  ],
+  "targetFiles": [
+    "sympy/physics/continuum_mechanics/column.py"
+  ],
+  "appliedFiles": [],
+  "fileBeforeHashes": {},
+  "fileAfterHashes": {},
+  "permissions": {
+    "fileWrite": [
+      "sympy/physics/continuum_mechanics/column.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "blocked",
+  "blockedReasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w0-sympy_physics_continuum_mechanics_column_py' context mismatch at base line 66: expected \"    >>> c.deflection()\", found \"    >>> c.extension()\" [proposals: prop-hist-w0-sympy_physics_continuum_mechanics_column_py]"
+  ],
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-7e3492416875ae0c",
+    "planId": "merge-7e3492416875ae0c",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-7e3492416875ae0c",
+        "planId": "merge-7e3492416875ae0c",
+        "request_identity": [
+          "prop-hist-w0-sympy_physics_continuum_mechanics_column_py"
+        ],
+        "actor_ids": [
+          "writer-28304"
+        ],
+        "request_files": [
+          "sympy/physics/continuum_mechanics/column.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/sympy/runs/sympy_28304_28305__bare_composer__s2/artifacts/steward/cb-sympy_physics_continuum_mechanics_column.py-w0-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SYMPY_PHYSICS_CONTINUUM_MECHANICS_COLUMN_PY"
+        ],
+        "commit_sha": "95b99d7d31e01f60ae8bfc6a60532231dc1ec95d"
+      }
+    ]
+  }
+}

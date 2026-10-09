@@ -1,0 +1,86 @@
+{
+ "writer": 1,
+ "pr": 18356,
+ "pid": 2053350,
+ "init_ms": 91.119795,
+ "start_offset_ms": 1,
+ "file_order": [
+  "django/contrib/postgres/constraints.py",
+  "django/db/models/constraints.py",
+  "django/db/models/base.py"
+ ],
+ "holds": {
+  "django/contrib/postgres/constraints.py": 4,
+  "django/db/models/constraints.py": 8,
+  "django/db/models/base.py": 24
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 18356,
+   "path": "django/contrib/postgres/constraints.py",
+   "intents": [
+    "log:django:17723_18356:18356:django/contrib/postgres/constraints.py:h0",
+    "log:django:17723_18356:18356:django/contrib/postgres/constraints.py:h1"
+   ],
+   "hold_ms": 4,
+   "t_submit_epoch": 1791563664650,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 28,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 45.43,
+   "t_done_epoch": 1791563664695
+  },
+  {
+   "writer": 1,
+   "pr": 18356,
+   "path": "django/db/models/constraints.py",
+   "intents": [
+    "log:django:17723_18356:18356:django/db/models/constraints.py:h4",
+    "log:django:17723_18356:18356:django/db/models/constraints.py:h5",
+    "log:django:17723_18356:18356:django/db/models/constraints.py:h6",
+    "log:django:17723_18356:18356:django/db/models/constraints.py:h7"
+   ],
+   "hold_ms": 8,
+   "t_submit_epoch": 1791563664695,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 11,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 22.55,
+   "t_done_epoch": 1791563664717
+  },
+  {
+   "writer": 1,
+   "pr": 18356,
+   "path": "django/db/models/base.py",
+   "intents": [
+    "log:django:17723_18356:18356:django/db/models/base.py:h2",
+    "log:django:17723_18356:18356:django/db/models/base.py:h3"
+   ],
+   "hold_ms": 24,
+   "t_submit_epoch": 1791563664718,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 1,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 30.01,
+   "t_done_epoch": 1791563664748
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 3
+ },
+ "steward_batches": null
+}

@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-f21b942c667dd82e",
+  "proposalIds": [
+    "prop-hist-w1-sympy_physics_quantum_state_py"
+  ],
+  "targetFiles": [
+    "sympy/physics/quantum/state.py"
+  ],
+  "appliedFiles": [
+    "sympy/physics/quantum/state.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/physics/quantum/state.py": "eb5f18683180b6951eb9609562cea50ee3b7983f3bfdff0a2141945da37d2f8b"
+  },
+  "fileAfterHashes": {
+    "sympy/physics/quantum/state.py": "f10899fe8f91a157f4d862b13b080d7d0e689586186e2929073fb013ec0e66c2"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/physics/quantum/state.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-f21b942c667dd82e",
+    "planId": "merge-f21b942c667dd82e",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-f21b942c667dd82e",
+        "planId": "merge-f21b942c667dd82e",
+        "request_identity": [
+          "prop-hist-w1-sympy_physics_quantum_state_py"
+        ],
+        "actor_ids": [
+          "writer-28036"
+        ],
+        "request_files": [
+          "sympy/physics/quantum/state.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/physics/quantum/state.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/sympy/runs/sympy_28032_28036__bare_composer__s3/artifacts/steward/cb-sympy_physics_quantum_state.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_PHYSICS_QUANTUM_STATE_PY"
+        ],
+        "commit_sha": "e582c9a74fdebbb2ce03dbcb259bb89f5d5249e8"
+      }
+    ]
+  }
+}

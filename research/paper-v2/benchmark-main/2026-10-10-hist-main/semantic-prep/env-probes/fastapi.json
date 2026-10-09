@@ -1,0 +1,91 @@
+{
+ "method": "STALE union-test-set, new failures only",
+ "python": "/workspace/scratch/hist/envs/fastapi-st0.49.3/bin/python",
+ "results": {
+  "fastapi:5624_14262": {
+   "arm_runs": {},
+   "base_valid": true,
+   "conditions": {
+    "A": [
+     {
+      "failed": [
+       "tests/test_tutorial/test_dependencies/test_tutorial008e.py::test_get_users_me[tutorial008e]",
+       "tests/test_tutorial/test_dependencies/test_tutorial008e.py::test_get_users_me[tutorial008e_an]",
+       "tests/test_tutorial/test_dependencies/test_tutorial008e.py::test_get_users_me[tutorial008e_an_py39]"
+      ],
+      "n": 4,
+      "rc": 1,
+      "secs": 1.6,
+      "stderr_tail": "",
+      "tag": "A#0"
+     }
+    ],
+    "B": [
+     {
+      "failed": [
+       "tests/test_security_scopes_dont_propagate.py::test_security_scopes_dont_propagate"
+      ],
+      "n": 18,
+      "rc": 1,
+      "secs": 1.9,
+      "stderr_tail": "",
+      "tag": "B#0"
+     }
+    ],
+    "b": {
+     "failed": [
+      "tests/test_security_scopes_dont_propagate.py::test_security_scopes_dont_propagate",
+      "tests/test_tutorial/test_dependencies/test_tutorial008e.py::test_get_users_me[tutorial008e]",
+      "tests/test_tutorial/test_dependencies/test_tutorial008e.py::test_get_users_me[tutorial008e_an]",
+      "tests/test_tutorial/test_dependencies/test_tutorial008e.py::test_get_users_me[tutorial008e_an_py39]"
+     ],
+     "n": 4,
+     "rc": 1,
+     "secs": 1.5,
+     "stderr_tail": "",
+     "tag": "b"
+    },
+    "gold": {
+     "failed": [],
+     "n": 18,
+     "rc": 0,
+     "secs": 1.6,
+     "stderr_tail": "",
+     "tag": "gold"
+    }
+   },
+   "f2p_A": [
+    "tests/test_security_scopes_dont_propagate.py::test_security_scopes_dont_propagate"
+   ],
+   "f2p_B": [
+    "tests/test_dependency_yield_scope.py::test_broken_scope",
+    "tests/test_dependency_yield_scope.py::test_function_scope",
+    "tests/test_dependency_yield_scope.py::test_named_function_scope",
+    "tests/test_dependency_yield_scope.py::test_regular_function_scope",
+    "tests/test_dependency_yield_scope.py::test_request_scope",
+    "tests/test_dependency_yield_scope.py::test_sub",
+    "tests/test_dependency_yield_scope.py::test_two_scopes",
+    "tests/test_dependency_yield_scope_websockets.py::test_broken_scope",
+    "tests/test_dependency_yield_scope_websockets.py::test_function_scope",
+    "tests/test_dependency_yield_scope_websockets.py::test_named_function_scope",
+    "tests/test_dependency_yield_scope_websockets.py::test_regular_function_scope",
+    "tests/test_dependency_yield_scope_websockets.py::test_request_scope",
+    "tests/test_dependency_yield_scope_websockets.py::test_sub",
+    "tests/test_dependency_yield_scope_websockets.py::test_two_scopes",
+    "tests/test_tutorial/test_dependencies/test_tutorial008e.py::test_get_users_me[tutorial008e]",
+    "tests/test_tutorial/test_dependencies/test_tutorial008e.py::test_get_users_me[tutorial008e_an]",
+    "tests/test_tutorial/test_dependencies/test_tutorial008e.py::test_get_users_me[tutorial008e_an_py39]"
+   ],
+   "flaky": [],
+   "historical_interference": [],
+   "labels": [
+    "tests/test_dependency_yield_scope.py",
+    "tests/test_dependency_yield_scope_websockets.py",
+    "tests/test_security_scopes_dont_propagate.py",
+    "tests/test_tutorial/test_dependencies/test_tutorial008e.py"
+   ],
+   "pair_id": "fastapi:5624_14262",
+   "status": "evaluated"
+  }
+ }
+}

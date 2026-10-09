@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-cc3ced3d7f25469e",
+  "proposalIds": [
+    "prop-hist-w0-django_db_backends_postgresql_introspection_py"
+  ],
+  "targetFiles": [
+    "django/db/backends/postgresql/introspection.py"
+  ],
+  "appliedFiles": [
+    "django/db/backends/postgresql/introspection.py"
+  ],
+  "fileBeforeHashes": {
+    "django/db/backends/postgresql/introspection.py": "ad87b362a85fd2e8fb95047f8233a211044aba3b3a63ece6ead619f5dd4eef51"
+  },
+  "fileAfterHashes": {
+    "django/db/backends/postgresql/introspection.py": "bd430b962da6c5dbcdb8f6874d0bf84b3a8e2be0c9d65c6bbbb10233c6b34615"
+  },
+  "permissions": {
+    "fileWrite": [
+      "django/db/backends/postgresql/introspection.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-cc3ced3d7f25469e",
+    "planId": "merge-cc3ced3d7f25469e",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-cc3ced3d7f25469e",
+        "planId": "merge-cc3ced3d7f25469e",
+        "request_identity": [
+          "prop-hist-w0-django_db_backends_postgresql_introspection_py"
+        ],
+        "actor_ids": [
+          "writer-20055"
+        ],
+        "request_files": [
+          "django/db/backends/postgresql/introspection.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "django/db/backends/postgresql/introspection.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/django/runs/django_20055_20070__steward__s2/artifacts/steward/cb-django_db_backends_postgresql_introspection.py-w0-0003.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-DJANGO_DB_BACKENDS_POSTGRESQL_INTROSPECTION_PY"
+        ],
+        "commit_sha": "1d5cc0f18699e10dd7e448b0ba87e07c013c2af9"
+      }
+    ]
+  }
+}

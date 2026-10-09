@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-e873ea4590b76160",
+  "proposalIds": [
+    "prop-hist-w1-sympy_polys_domains_finitefield_py"
+  ],
+  "targetFiles": [
+    "sympy/polys/domains/finitefield.py"
+  ],
+  "appliedFiles": [
+    "sympy/polys/domains/finitefield.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/polys/domains/finitefield.py": "22313010299b1baf04a29b82b12f157d4f3df3fcd9befc409deb0e1298f78fd0"
+  },
+  "fileAfterHashes": {
+    "sympy/polys/domains/finitefield.py": "9d69fc0666cf3611aed1d6600e5acb41011160c9468116d2d007d7f6f60b5771"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/polys/domains/finitefield.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-e873ea4590b76160",
+    "planId": "merge-e873ea4590b76160",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-e873ea4590b76160",
+        "planId": "merge-e873ea4590b76160",
+        "request_identity": [
+          "prop-hist-w1-sympy_polys_domains_finitefield_py"
+        ],
+        "actor_ids": [
+          "writer-26312"
+        ],
+        "request_files": [
+          "sympy/polys/domains/finitefield.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/polys/domains/finitefield.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/sympy/runs/sympy_25940_26312__steward__s4/artifacts/steward/cb-sympy_polys_domains_finitefield.py-w1-0008.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_POLYS_DOMAINS_FINITEFIELD_PY"
+        ],
+        "commit_sha": "f377520056bea9252de22dee716324d3b0b11cc0"
+      }
+    ]
+  }
+}

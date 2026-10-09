@@ -2,18 +2,18 @@ import assert from 'node:assert/strict';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { spawnCliCapture } from './lib/cli-json-spawn.ts';
 import { loadValidatorFixture, materializeValidatorFixture } from './lib/validator-fixture.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const fixture = loadValidatorFixture(root, 'fixtures/validators/framework-governance-repairs.fixture.json');
 
 function run(command: string, args: readonly string[], cwd: string, options: { allowFailure?: boolean } = {}) {
-  const result = spawnSync(command, [...args], {
+  const result = spawnCliCapture(command, args, {
     cwd,
-    encoding: 'utf8',
-    env: process.env
+    env: process.env,
+    label: `${command} ${args.join(' ')}`
   });
   if (!options.allowFailure && (result.error || result.status !== 0)) {
     throw new Error(`${command} ${args.join(' ')} failed\nstdout:\n${result.stdout || ''}\nstderr:\n${result.stderr || ''}`);

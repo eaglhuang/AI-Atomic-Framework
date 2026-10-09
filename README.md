@@ -30,6 +30,24 @@ ATM is not just an atom runner. It is the route, scope, evidence, close, and han
 
 Captain/dispatch entry gate: if the user asks for Captain, Coordinator, dispatch, task cards, sidecars, subagents, delegation, condition review, or closeout work, route the request through `ai-role-router` when available, then through `atm-dispatch` before drafting instructions, delegating work, or reviewing another agent. State `Skill used: atm-dispatch` and the chosen `Delegation mode`. Internal sidecar is the default; External dispatch is opt-in; external write is forbidden unless the user explicitly grants write authority and scope.
 
+## Quick Start
+
+Three commands, from inside the project you want ATM to govern (Node 20+):
+
+```bash
+npm install --prefix ~/atm-runner @ai-atomic-framework/cli@latest
+cd /path/to/your/project
+node ~/atm-runner/node_modules/@ai-atomic-framework/cli/dist/npm-runtime/atm.mjs setup --agents none
+```
+
+`setup` uses the current directory when it is a project root (a git repository or one with a `package.json`). Replace `none` with your editor (`claude-code`, `codex`, `copilot`, `cursor`, `gemini`, `antigravity`), then open the project in that editor and say:
+
+```text
+Use ATM governance to inspect this repo and suggest the next safe improvement.
+```
+
+Starting a brand-new project instead? Run `npx create-atm my-app --agent <editor-id>`. Everything below is optional detail.
+
 ## Why ATM Exists
 
 AI-assisted engineering breaks down when agents work from loose conversation instead of a shared production path:
@@ -68,7 +86,7 @@ npm install --prefix ~/atm-runner @ai-atomic-framework/cli@latest
 
 The runner entry is then `~/atm-runner/node_modules/@ai-atomic-framework/cli/dist/npm-runtime/atm.mjs`.
 
-In an interactive terminal, run:
+In an interactive terminal, or from inside the project directory, run:
 
 ```bash
 node /absolute/path/to/atm.mjs setup

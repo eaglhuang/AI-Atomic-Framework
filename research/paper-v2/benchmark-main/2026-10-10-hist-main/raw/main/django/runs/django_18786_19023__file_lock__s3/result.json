@@ -1,0 +1,194 @@
+{
+ "pair_id": "django:18786_19023",
+ "stratum": "O3",
+ "arm": "file_lock",
+ "plant": null,
+ "seed_k": 3,
+ "seed": 1410820396,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-20effd45/AI-Atomic-Framework-20effd45a0c3a09c293caaea6a34face0df1c5f4",
+ "wall_ms": 745,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 11,
+  "by_verdict": {
+   "correct": 11
+  },
+  "completed": 11,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 6,
+  "files_full_bytes_exact": 6,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "django/contrib/gis/geos/coordseq.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "django/contrib/gis/geos/geometry.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "django/contrib/gis/geos/polygon.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "django/contrib/gis/geos/prototypes/__init__.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "django/contrib/gis/geos/prototypes/io.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "django/contrib/gis/geos/prototypes/predicates.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "django/contrib/gis/geos/coordseq.py": true,
+  "django/contrib/gis/geos/geometry.py": true,
+  "django/contrib/gis/geos/polygon.py": true,
+  "django/contrib/gis/geos/prototypes/__init__.py": true,
+  "django/contrib/gis/geos/prototypes/io.py": true,
+  "django/contrib/gis/geos/prototypes/predicates.py": true
+ },
+ "final_exists": {
+  "django/contrib/gis/geos/coordseq.py": true,
+  "django/contrib/gis/geos/geometry.py": true,
+  "django/contrib/gis/geos/polygon.py": true,
+  "django/contrib/gis/geos/prototypes/__init__.py": true,
+  "django/contrib/gis/geos/prototypes/io.py": true,
+  "django/contrib/gis/geos/prototypes/predicates.py": true
+ },
+ "files": [
+  {
+   "path": "django/contrib/gis/geos/coordseq.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:bab0adaac720bdb91139ba569c593ddaa00b05de6797850f108b51a75931ecde",
+   "final_digest": "sha256:7faa19bd6b978180b5ba2438351b0fd14b4a3c4f29c34b2278117d0d727ff05e",
+   "expected_digests": [
+    "sha256:7faa19bd6b978180b5ba2438351b0fd14b4a3c4f29c34b2278117d0d727ff05e"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "django/contrib/gis/geos/geometry.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:b267f5225f29f998ed50828d9ceeb4faedbe1b6f055fb6a6c668cbab053c510d",
+   "final_digest": "sha256:6ce34b1048a3c46ffc1631cdb98aa6e45f02bea7acae138ae3ad8873dbc8bbc6",
+   "expected_digests": [
+    "sha256:6ce34b1048a3c46ffc1631cdb98aa6e45f02bea7acae138ae3ad8873dbc8bbc6"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "django/contrib/gis/geos/polygon.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:0d9aba11df5b240dccaa1a4343dbbddba847c5c9f10639db292a691e06d2871c",
+   "final_digest": "sha256:3ae784a9c1d5b635e222950d9020fe66349578c458658021b59aa7d372871d76",
+   "expected_digests": [
+    "sha256:3ae784a9c1d5b635e222950d9020fe66349578c458658021b59aa7d372871d76"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "django/contrib/gis/geos/prototypes/__init__.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:8809ec0f46e0f2eec0be8ec599eb78964028f659eccb27d915aee4dc843a4f5c",
+   "final_digest": "sha256:e38192d2ec3883756683a4154671fe7de7770a61274f8b918fb37e5ec7cb6b9b",
+   "expected_digests": [
+    "sha256:e38192d2ec3883756683a4154671fe7de7770a61274f8b918fb37e5ec7cb6b9b"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "django/contrib/gis/geos/prototypes/io.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:8f9dfbf526feb8b8d6ed2a7142239e0ef7098eb6f56426bd6ce6ba2210fab162",
+   "final_digest": "sha256:2988598f5af47595e97c3de093822effd240bef8963a0339aa57c1b393b71471",
+   "expected_digests": [
+    "sha256:2988598f5af47595e97c3de093822effd240bef8963a0339aa57c1b393b71471"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "django/contrib/gis/geos/prototypes/predicates.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:f8d78d7a669893396f1f3712d6f5e204a3c7b978fe581e3013fc51092b563e83",
+   "final_digest": "sha256:07ac2a00217ef30f76e334592792dd1bc1c8b78add0e3082c3cfad4ae30b9b91",
+   "expected_digests": [
+    "sha256:07ac2a00217ef30f76e334592792dd1bc1c8b78add0e3082c3cfad4ae30b9b91"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "django/contrib/gis/geos/coordseq.py": "sha256:7faa19bd6b978180b5ba2438351b0fd14b4a3c4f29c34b2278117d0d727ff05e",
+  "django/contrib/gis/geos/geometry.py": "sha256:6ce34b1048a3c46ffc1631cdb98aa6e45f02bea7acae138ae3ad8873dbc8bbc6",
+  "django/contrib/gis/geos/polygon.py": "sha256:3ae784a9c1d5b635e222950d9020fe66349578c458658021b59aa7d372871d76",
+  "django/contrib/gis/geos/prototypes/__init__.py": "sha256:e38192d2ec3883756683a4154671fe7de7770a61274f8b918fb37e5ec7cb6b9b",
+  "django/contrib/gis/geos/prototypes/io.py": "sha256:2988598f5af47595e97c3de093822effd240bef8963a0339aa57c1b393b71471",
+  "django/contrib/gis/geos/prototypes/predicates.py": "sha256:07ac2a00217ef30f76e334592792dd1bc1c8b78add0e3082c3cfad4ae30b9b91"
+ }
+}

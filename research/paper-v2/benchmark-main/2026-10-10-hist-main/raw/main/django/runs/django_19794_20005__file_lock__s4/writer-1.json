@@ -1,0 +1,105 @@
+{
+ "writer": 1,
+ "pr": 20005,
+ "pid": 2046993,
+ "init_ms": 67.129749,
+ "start_offset_ms": 3,
+ "file_order": [
+  "django/db/models/lookups.py",
+  "django/db/models/sql/compiler.py",
+  "django/db/models/fields/json.py",
+  "django/contrib/gis/db/models/lookups.py"
+ ],
+ "holds": {
+  "django/db/models/lookups.py": 27,
+  "django/db/models/sql/compiler.py": 5,
+  "django/db/models/fields/json.py": 3,
+  "django/contrib/gis/db/models/lookups.py": 14
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 20005,
+   "path": "django/db/models/lookups.py",
+   "intents": [
+    "log:django:19794_20005:20005:django/db/models/lookups.py:h3",
+    "log:django:19794_20005:20005:django/db/models/lookups.py:h4",
+    "log:django:19794_20005:20005:django/db/models/lookups.py:h5"
+   ],
+   "hold_ms": 27,
+   "t_submit_epoch": 1791563617266,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 24,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 56.39,
+   "t_done_epoch": 1791563617322
+  },
+  {
+   "writer": 1,
+   "pr": 20005,
+   "path": "django/db/models/sql/compiler.py",
+   "intents": [
+    "log:django:19794_20005:20005:django/db/models/sql/compiler.py:h6"
+   ],
+   "hold_ms": 5,
+   "t_submit_epoch": 1791563617322,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 12.92,
+   "t_done_epoch": 1791563617335
+  },
+  {
+   "writer": 1,
+   "pr": 20005,
+   "path": "django/db/models/fields/json.py",
+   "intents": [
+    "log:django:19794_20005:20005:django/db/models/fields/json.py:h1",
+    "log:django:19794_20005:20005:django/db/models/fields/json.py:h2"
+   ],
+   "hold_ms": 3,
+   "t_submit_epoch": 1791563617335,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "lock_spins": 0,
+   "outcome": "blocked",
+   "blocked_reason": "harness-relocate-context-not-found",
+   "total_ms": 7.94,
+   "t_done_epoch": 1791563617343
+  },
+  {
+   "writer": 1,
+   "pr": 20005,
+   "path": "django/contrib/gis/db/models/lookups.py",
+   "intents": [
+    "log:django:19794_20005:20005:django/contrib/gis/db/models/lookups.py:h0"
+   ],
+   "hold_ms": 14,
+   "t_submit_epoch": 1791563617343,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 6,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 22.54,
+   "t_done_epoch": 1791563617366
+  }
+ ],
+ "admit_stats": {
+  "txns": 8,
+  "cas_conflicts": 3
+ },
+ "steward_batches": null
+}

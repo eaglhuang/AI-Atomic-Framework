@@ -1,0 +1,83 @@
+{
+ "writer": 1,
+ "pr": 18356,
+ "pid": 2053012,
+ "init_ms": 110.329701,
+ "start_offset_ms": 7,
+ "file_order": [
+  "django/db/models/base.py",
+  "django/db/models/constraints.py",
+  "django/contrib/postgres/constraints.py"
+ ],
+ "holds": {
+  "django/db/models/base.py": 13,
+  "django/db/models/constraints.py": 24,
+  "django/contrib/postgres/constraints.py": 30
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 18356,
+   "path": "django/db/models/base.py",
+   "intents": [
+    "log:django:17723_18356:18356:django/db/models/base.py:h2",
+    "log:django:17723_18356:18356:django/db/models/base.py:h3"
+   ],
+   "hold_ms": 13,
+   "t_submit_epoch": 1791563662196,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 58,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 87.17,
+   "t_done_epoch": 1791563662283
+  },
+  {
+   "writer": 1,
+   "pr": 18356,
+   "path": "django/db/models/constraints.py",
+   "intents": [
+    "log:django:17723_18356:18356:django/db/models/constraints.py:h4",
+    "log:django:17723_18356:18356:django/db/models/constraints.py:h5",
+    "log:django:17723_18356:18356:django/db/models/constraints.py:h6",
+    "log:django:17723_18356:18356:django/db/models/constraints.py:h7"
+   ],
+   "hold_ms": 24,
+   "t_submit_epoch": 1791563662283,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 33.09,
+   "t_done_epoch": 1791563662316
+  },
+  {
+   "writer": 1,
+   "pr": 18356,
+   "path": "django/contrib/postgres/constraints.py",
+   "intents": [
+    "log:django:17723_18356:18356:django/contrib/postgres/constraints.py:h0",
+    "log:django:17723_18356:18356:django/contrib/postgres/constraints.py:h1"
+   ],
+   "hold_ms": 30,
+   "t_submit_epoch": 1791563662316,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 40.39,
+   "t_done_epoch": 1791563662356
+  }
+ ],
+ "admit_stats": {
+  "txns": 6,
+  "cas_conflicts": 14
+ },
+ "steward_batches": null
+}

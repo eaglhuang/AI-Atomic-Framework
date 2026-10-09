@@ -1,0 +1,56 @@
+{
+ "method": "STALE union-test-set, new failures only",
+ "python": "/workspace/scratch/hist/envs/sphinx/bin/python",
+ "results": {
+  "sphinx:14126_14127": {
+   "arm_runs": {},
+   "base_valid": false,
+   "conditions": {
+    "A": [
+     {
+      "failed": [
+       "tests/test_ext_napoleon/test_ext_napoleon_docstring.py::TestGoogleDocstring::test_no_index"
+      ],
+      "n": 90,
+      "rc": 1,
+      "secs": 2.8,
+      "stderr_tail": "",
+      "tag": "A#0"
+     }
+    ],
+    "B": [
+     {
+      "failed": [],
+      "n": 90,
+      "rc": 0,
+      "secs": 2.5,
+      "stderr_tail": "",
+      "tag": "B#0"
+     }
+    ],
+    "b": {
+     "failed": [
+      "tests/test_ext_napoleon/test_ext_napoleon_docstring.py::TestGoogleDocstring::test_no_index"
+     ],
+     "n": 90,
+     "rc": 1,
+     "secs": 2.9,
+     "stderr_tail": "",
+     "tag": "b"
+    }
+   },
+   "f2p_A": [],
+   "f2p_B": [
+    "tests/test_ext_napoleon/test_ext_napoleon_docstring.py::TestGoogleDocstring::test_no_index"
+   ],
+   "flaky": [],
+   "labels": [
+    "tests/test_ext_autodoc/test_ext_autodoc_autoclass.py",
+    "tests/test_ext_napoleon/test_ext_napoleon.py",
+    "tests/test_ext_napoleon/test_ext_napoleon_docstring.py"
+   ],
+   "pair_id": "sphinx:14126_14127",
+   "status": "evaluated-base-invalid (semantic endpoint excluded per prereg)"
+  }
+ }
+}

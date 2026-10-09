@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-e600c08e062072e1",
+  "proposalIds": [
+    "prop-hist-w1-sympy_utilities_timeutils_py"
+  ],
+  "targetFiles": [
+    "sympy/utilities/timeutils.py"
+  ],
+  "appliedFiles": [
+    "sympy/utilities/timeutils.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/utilities/timeutils.py": "0d4b5060e3642675a353616f01bbf1b913241a65e92cc79a88e707ed1f4eb3da"
+  },
+  "fileAfterHashes": {
+    "sympy/utilities/timeutils.py": "3cd1f2bee10ceba5045cb17cc9ee8f32295c1032bbe41f7069bdda8bc6bd732a"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/utilities/timeutils.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-e600c08e062072e1",
+    "planId": "merge-e600c08e062072e1",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-e600c08e062072e1",
+        "planId": "merge-e600c08e062072e1",
+        "request_identity": [
+          "prop-hist-w1-sympy_utilities_timeutils_py"
+        ],
+        "actor_ids": [
+          "writer-27863"
+        ],
+        "request_files": [
+          "sympy/utilities/timeutils.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/utilities/timeutils.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/sympy/runs/sympy_27839_27863__bare_composer__s1/artifacts/steward/cb-sympy_utilities_timeutils.py-w1-0005.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_UTILITIES_TIMEUTILS_PY"
+        ],
+        "commit_sha": "8823153e45f6c108d3313d15c37f1f3d9a8c278b"
+      }
+    ]
+  }
+}

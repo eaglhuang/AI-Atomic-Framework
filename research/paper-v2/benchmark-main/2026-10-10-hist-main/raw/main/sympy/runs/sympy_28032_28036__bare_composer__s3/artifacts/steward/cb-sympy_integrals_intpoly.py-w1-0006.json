@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-9bed4373513acd4f",
+  "proposalIds": [
+    "prop-hist-w1-sympy_integrals_intpoly_py"
+  ],
+  "targetFiles": [
+    "sympy/integrals/intpoly.py"
+  ],
+  "appliedFiles": [
+    "sympy/integrals/intpoly.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/integrals/intpoly.py": "4978ddfdfdbde58ad8b2fa10a73136110339c5a4279e3d33bc77585b9284767d"
+  },
+  "fileAfterHashes": {
+    "sympy/integrals/intpoly.py": "db23340eab3f4b0e22cce2814241fc06e6b0012af34d82f1f849a93cfa731b86"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/integrals/intpoly.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-9bed4373513acd4f",
+    "planId": "merge-9bed4373513acd4f",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-9bed4373513acd4f",
+        "planId": "merge-9bed4373513acd4f",
+        "request_identity": [
+          "prop-hist-w1-sympy_integrals_intpoly_py"
+        ],
+        "actor_ids": [
+          "writer-28036"
+        ],
+        "request_files": [
+          "sympy/integrals/intpoly.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/integrals/intpoly.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/sympy/runs/sympy_28032_28036__bare_composer__s3/artifacts/steward/cb-sympy_integrals_intpoly.py-w1-0006.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_INTEGRALS_INTPOLY_PY"
+        ],
+        "commit_sha": "e582c9a74fdebbb2ce03dbcb259bb89f5d5249e8"
+      }
+    ]
+  }
+}

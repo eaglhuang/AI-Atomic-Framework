@@ -1,0 +1,62 @@
+{
+ "writer": 1,
+ "pr": 27067,
+ "pid": 2092979,
+ "init_ms": 77.664863,
+ "start_offset_ms": 6,
+ "file_order": [
+  "sympy/physics/control/control_plots.py",
+  "sympy/physics/control/__init__.py"
+ ],
+ "holds": {
+  "sympy/physics/control/control_plots.py": 30,
+  "sympy/physics/control/__init__.py": 25
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 27067,
+   "path": "sympy/physics/control/control_plots.py",
+   "intents": [
+    "log:sympy:27052_27067:27067:sympy/physics/control/control_plots.py:h2",
+    "log:sympy:27052_27067:27067:sympy/physics/control/control_plots.py:h3",
+    "log:sympy:27052_27067:27067:sympy/physics/control/control_plots.py:h4",
+    "log:sympy:27052_27067:27067:sympy/physics/control/control_plots.py:h5"
+   ],
+   "hold_ms": 30,
+   "t_submit_epoch": 1791563977409,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 36,
+   "outcome": "blocked",
+   "blocked_reason": "git-merge-conflict",
+   "total_ms": 76.58,
+   "t_done_epoch": 1791563977486
+  },
+  {
+   "writer": 1,
+   "pr": 27067,
+   "path": "sympy/physics/control/__init__.py",
+   "intents": [
+    "log:sympy:27052_27067:27067:sympy/physics/control/__init__.py:h0",
+    "log:sympy:27052_27067:27067:sympy/physics/control/__init__.py:h1"
+   ],
+   "hold_ms": 25,
+   "t_submit_epoch": 1791563977486,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 2,
+   "outcome": "blocked",
+   "blocked_reason": "git-merge-conflict",
+   "total_ms": 35.9,
+   "t_done_epoch": 1791563977522
+  }
+ ],
+ "admit_stats": {
+  "txns": 5,
+  "cas_conflicts": 1
+ },
+ "steward_batches": null
+}

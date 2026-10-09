@@ -1,0 +1,101 @@
+{
+ "writer": 0,
+ "pr": 18786,
+ "pid": 2060744,
+ "init_ms": 76.907226,
+ "start_offset_ms": 9,
+ "file_order": [
+  "django/contrib/gis/geos/coordseq.py",
+  "django/contrib/gis/geos/polygon.py",
+  "django/contrib/gis/geos/geometry.py",
+  "django/contrib/gis/geos/prototypes/io.py"
+ ],
+ "holds": {
+  "django/contrib/gis/geos/coordseq.py": 22,
+  "django/contrib/gis/geos/polygon.py": 24,
+  "django/contrib/gis/geos/geometry.py": 29,
+  "django/contrib/gis/geos/prototypes/io.py": 19
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 18786,
+   "path": "django/contrib/gis/geos/coordseq.py",
+   "intents": [
+    "log:django:18786_19023:18786:django/contrib/gis/geos/coordseq.py:h0",
+    "log:django:18786_19023:18786:django/contrib/gis/geos/coordseq.py:h1"
+   ],
+   "hold_ms": 22,
+   "t_submit_epoch": 1791563725680,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 17,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 46.67,
+   "t_done_epoch": 1791563725727
+  },
+  {
+   "writer": 0,
+   "pr": 18786,
+   "path": "django/contrib/gis/geos/polygon.py",
+   "intents": [
+    "log:django:18786_19023:18786:django/contrib/gis/geos/polygon.py:h4"
+   ],
+   "hold_ms": 24,
+   "t_submit_epoch": 1791563725727,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 6,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 33.93,
+   "t_done_epoch": 1791563725761
+  },
+  {
+   "writer": 0,
+   "pr": 18786,
+   "path": "django/contrib/gis/geos/geometry.py",
+   "intents": [
+    "log:django:18786_19023:18786:django/contrib/gis/geos/geometry.py:h2",
+    "log:django:18786_19023:18786:django/contrib/gis/geos/geometry.py:h3"
+   ],
+   "hold_ms": 29,
+   "t_submit_epoch": 1791563725761,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 4,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 40.13,
+   "t_done_epoch": 1791563725801
+  },
+  {
+   "writer": 0,
+   "pr": 18786,
+   "path": "django/contrib/gis/geos/prototypes/io.py",
+   "intents": [
+    "log:django:18786_19023:18786:django/contrib/gis/geos/prototypes/io.py:h5",
+    "log:django:18786_19023:18786:django/contrib/gis/geos/prototypes/io.py:h6"
+   ],
+   "hold_ms": 19,
+   "t_submit_epoch": 1791563725801,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 6,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 34.24,
+   "t_done_epoch": 1791563725835
+  }
+ ],
+ "admit_stats": {
+  "txns": 8,
+  "cas_conflicts": 1
+ },
+ "steward_batches": null
+}

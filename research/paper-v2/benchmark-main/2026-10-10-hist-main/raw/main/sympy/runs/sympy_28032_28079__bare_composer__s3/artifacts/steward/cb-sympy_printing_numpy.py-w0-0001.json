@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-74eceb09cb0171e5",
+  "proposalIds": [
+    "prop-hist-w0-sympy_printing_numpy_py"
+  ],
+  "targetFiles": [
+    "sympy/printing/numpy.py"
+  ],
+  "appliedFiles": [
+    "sympy/printing/numpy.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/printing/numpy.py": "2a9abec929104912980b1b60419122ff8963dc498aec582f6c3253cef07bed37"
+  },
+  "fileAfterHashes": {
+    "sympy/printing/numpy.py": "bc507c6c54fa4140b468972c3cf13595701f41a2bc208e85629c2a2bc644950c"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/printing/numpy.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-74eceb09cb0171e5",
+    "planId": "merge-74eceb09cb0171e5",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-74eceb09cb0171e5",
+        "planId": "merge-74eceb09cb0171e5",
+        "request_identity": [
+          "prop-hist-w0-sympy_printing_numpy_py"
+        ],
+        "actor_ids": [
+          "writer-28032"
+        ],
+        "request_files": [
+          "sympy/printing/numpy.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/printing/numpy.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/sympy/runs/sympy_28032_28079__bare_composer__s3/artifacts/steward/cb-sympy_printing_numpy.py-w0-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SYMPY_PRINTING_NUMPY_PY"
+        ],
+        "commit_sha": "0dfb56c5c52250c99e6bbfdb338e3b2d07c4ef50"
+      }
+    ]
+  }
+}

@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
+import { spawnCliCapture } from './lib/cli-json-spawn.ts';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(readArg('--root') ?? path.join(path.dirname(fileURLToPath(import.meta.url)), '..'));
@@ -250,9 +251,9 @@ function runCheck(name: string, args: string[]) {
 }
 
 function runDoctorCheck() {
-  const result = spawnSync(process.execPath, ['--strip-types', path.join(root, 'atm.mjs'), 'doctor', '--json'], {
+  const result = spawnCliCapture(process.execPath, ['--strip-types', path.join(root, 'atm.mjs'), 'doctor', '--json'], {
     cwd: root,
-    encoding: 'utf8'
+    label: 'atm doctor --json'
   });
   const payload = (result.stdout || result.stderr || '').trim();
   let parsed: any = null;

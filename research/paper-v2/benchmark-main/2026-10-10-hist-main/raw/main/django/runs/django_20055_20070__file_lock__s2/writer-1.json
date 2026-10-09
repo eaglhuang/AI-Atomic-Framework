@@ -1,0 +1,61 @@
+{
+ "writer": 1,
+ "pr": 20070,
+ "pid": 2049524,
+ "init_ms": 69.165836,
+ "start_offset_ms": 5,
+ "file_order": [
+  "django/db/backends/oracle/operations.py",
+  "django/db/backends/oracle/features.py"
+ ],
+ "holds": {
+  "django/db/backends/oracle/operations.py": 24,
+  "django/db/backends/oracle/features.py": 5
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 20070,
+   "path": "django/db/backends/oracle/operations.py",
+   "intents": [
+    "log:django:20055_20070:20070:django/db/backends/oracle/operations.py:h2"
+   ],
+   "hold_ms": 24,
+   "t_submit_epoch": 1791563637115,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 21,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 56.14,
+   "t_done_epoch": 1791563637171
+  },
+  {
+   "writer": 1,
+   "pr": 20070,
+   "path": "django/db/backends/oracle/features.py",
+   "intents": [
+    "log:django:20055_20070:20070:django/db/backends/oracle/features.py:h0",
+    "log:django:20055_20070:20070:django/db/backends/oracle/features.py:h1"
+   ],
+   "hold_ms": 5,
+   "t_submit_epoch": 1791563637171,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 5,
+   "lock_spins": 0,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "total_ms": 12.07,
+   "t_done_epoch": 1791563637183
+  }
+ ],
+ "admit_stats": {
+  "txns": 4,
+  "cas_conflicts": 11
+ },
+ "steward_batches": null
+}

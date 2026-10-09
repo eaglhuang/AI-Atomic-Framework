@@ -1,0 +1,340 @@
+{
+ "writer": 0,
+ "pr": 19919,
+ "pid": 2083543,
+ "init_ms": 91.33228399999999,
+ "start_offset_ms": 4,
+ "file_order": [
+  "django/core/serializers/base.py",
+  "django/core/serializers/python.py",
+  "django/core/serializers/xml_serializer.py"
+ ],
+ "holds": {
+  "django/core/serializers/base.py": 25,
+  "django/core/serializers/python.py": 20,
+  "django/core/serializers/xml_serializer.py": 19
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 19919,
+   "path": "django/core/serializers/base.py",
+   "intents": [
+    "log:django:19919_20067:19919:django/core/serializers/base.py:h0"
+   ],
+   "hold_ms": 25,
+   "t_submit_epoch": 1791563906898,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-django_core_serializers_base.py-w0-0001",
+   "total_ms": 144.6,
+   "t_done_epoch": 1791563907042
+  },
+  {
+   "writer": 0,
+   "pr": 19919,
+   "path": "django/core/serializers/python.py",
+   "intents": [
+    "log:django:19919_20067:19919:django/core/serializers/python.py:h1",
+    "log:django:19919_20067:19919:django/core/serializers/python.py:h2",
+    "log:django:19919_20067:19919:django/core/serializers/python.py:h3",
+    "log:django:19919_20067:19919:django/core/serializers/python.py:h4",
+    "log:django:19919_20067:19919:django/core/serializers/python.py:h5"
+   ],
+   "hold_ms": 20,
+   "t_submit_epoch": 1791563907042,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-django_core_serializers_python.py-w0-0002",
+   "total_ms": 30.5,
+   "t_done_epoch": 1791563907073
+  },
+  {
+   "writer": 0,
+   "pr": 19919,
+   "path": "django/core/serializers/xml_serializer.py",
+   "intents": [
+    "log:django:19919_20067:19919:django/core/serializers/xml_serializer.py:h6",
+    "log:django:19919_20067:19919:django/core/serializers/xml_serializer.py:h7",
+    "log:django:19919_20067:19919:django/core/serializers/xml_serializer.py:h8",
+    "log:django:19919_20067:19919:django/core/serializers/xml_serializer.py:h9",
+    "log:django:19919_20067:19919:django/core/serializers/xml_serializer.py:h10",
+    "log:django:19919_20067:19919:django/core/serializers/xml_serializer.py:h11"
+   ],
+   "hold_ms": 19,
+   "t_submit_epoch": 1791563907073,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-django_core_serializers_xml_serializer.py-w0-0003",
+   "total_ms": 28.58,
+   "t_done_epoch": 1791563907102
+  }
+ ],
+ "admit_stats": null,
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-django_core_serializers_base.py-w0-0001",
+   "path": "django/core/serializers/base.py",
+   "pid": 2083543,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-django_core_serializers_base_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-django_core_serializers_base_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:88ea9d04944aa140550fa5095ff4390bc7155e11d70f2d3ea0304e0944aec156"
+   ],
+   "lock_wait_ms": 0.14,
+   "t_start_epoch_ms": 1791563906925.98,
+   "pre_apply_hash": "sha256:88ea9d04944aa140550fa5095ff4390bc7155e11d70f2d3ea0304e0944aec156",
+   "receipt_before_hash": "sha256:88ea9d04944aa140550fa5095ff4390bc7155e11d70f2d3ea0304e0944aec156",
+   "receipt_after_hash": "sha256:9fd0635a8b6aa724cac4390cb243856ca0a30b55cac02583b8ac6c9d8c58f574",
+   "post_apply_hash": "sha256:9fd0635a8b6aa724cac4390cb243856ca0a30b55cac02583b8ac6c9d8c58f574",
+   "t_end_epoch_ms": 1791563907042.23,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T00:38:27.042+08:00",
+   "batch_id": "cb-django_core_serializers_base.py-w0-0001",
+   "path": "django/core/serializers/base.py",
+   "proposalIds": [
+    "prop-hist-w0-django_core_serializers_base_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-django_core_serializers_base_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-django_core_serializers_base_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-django_core_serializers_base_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-django_core_serializers_base_py",
+     "logical_id": "prop-hist-w0-django_core_serializers_base_py",
+     "attempt_id": "att-prop-hist-w0-django_core_serializers_base_py-r0",
+     "proposal_id": "prop-hist-w0-django_core_serializers_base_py",
+     "actorId": "writer-19919"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.28,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:88ea9d04944aa140550fa5095ff4390bc7155e11d70f2d3ea0304e0944aec156",
+   "written": true,
+   "output_digest": "sha256:9fd0635a8b6aa724cac4390cb243856ca0a30b55cac02583b8ac6c9d8c58f574",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  },
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-django_core_serializers_python.py-w0-0002",
+   "path": "django/core/serializers/python.py",
+   "pid": 2083543,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-django_core_serializers_python_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-django_core_serializers_python_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:d4507f5bc09c7388c06aff2d801d5685035ac8bc7da0d7993cb8821c115dcf51"
+   ],
+   "lock_wait_ms": 0,
+   "t_start_epoch_ms": 1791563907063.26,
+   "pre_apply_hash": "sha256:d4507f5bc09c7388c06aff2d801d5685035ac8bc7da0d7993cb8821c115dcf51",
+   "receipt_before_hash": "sha256:d4507f5bc09c7388c06aff2d801d5685035ac8bc7da0d7993cb8821c115dcf51",
+   "receipt_after_hash": "sha256:cd295c5b9bd311ca1e9f5fef0ed188ab9ad08c56471e5def89c01afbbe17969b",
+   "post_apply_hash": "sha256:cd295c5b9bd311ca1e9f5fef0ed188ab9ad08c56471e5def89c01afbbe17969b",
+   "t_end_epoch_ms": 1791563907073.39,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T00:38:27.073+08:00",
+   "batch_id": "cb-django_core_serializers_python.py-w0-0002",
+   "path": "django/core/serializers/python.py",
+   "proposalIds": [
+    "prop-hist-w0-django_core_serializers_python_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-django_core_serializers_python_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-django_core_serializers_python_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-django_core_serializers_python_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-django_core_serializers_python_py",
+     "logical_id": "prop-hist-w0-django_core_serializers_python_py",
+     "attempt_id": "att-prop-hist-w0-django_core_serializers_python_py-r0",
+     "proposal_id": "prop-hist-w0-django_core_serializers_python_py",
+     "actorId": "writer-19919"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.01,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:d4507f5bc09c7388c06aff2d801d5685035ac8bc7da0d7993cb8821c115dcf51",
+   "written": true,
+   "output_digest": "sha256:cd295c5b9bd311ca1e9f5fef0ed188ab9ad08c56471e5def89c01afbbe17969b",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  },
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-django_core_serializers_xml_serializer.py-w0-0003",
+   "path": "django/core/serializers/xml_serializer.py",
+   "pid": 2083543,
+   "evidence_tag": "w0",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w0-django_core_serializers_xml_serializer_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-django_core_serializers_xml_serializer_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:0970c870530e9d942ac8f9796e78ec7ab98e327bc31ddd9deaefc78490b9c3c9"
+   ],
+   "lock_wait_ms": 0,
+   "t_start_epoch_ms": 1791563907093.23,
+   "pre_apply_hash": "sha256:0970c870530e9d942ac8f9796e78ec7ab98e327bc31ddd9deaefc78490b9c3c9",
+   "receipt_before_hash": "sha256:0970c870530e9d942ac8f9796e78ec7ab98e327bc31ddd9deaefc78490b9c3c9",
+   "receipt_after_hash": "sha256:5a7419bb8b6590ce4560df48f0ae722d94830d7d6b9c97d4bff78821f623f261",
+   "post_apply_hash": "sha256:5a7419bb8b6590ce4560df48f0ae722d94830d7d6b9c97d4bff78821f623f261",
+   "t_end_epoch_ms": 1791563907101.99,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T00:38:27.102+08:00",
+   "batch_id": "cb-django_core_serializers_xml_serializer.py-w0-0003",
+   "path": "django/core/serializers/xml_serializer.py",
+   "proposalIds": [
+    "prop-hist-w0-django_core_serializers_xml_serializer_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w0-django_core_serializers_xml_serializer_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w0-django_core_serializers_xml_serializer_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w0-django_core_serializers_xml_serializer_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w0-django_core_serializers_xml_serializer_py",
+     "logical_id": "prop-hist-w0-django_core_serializers_xml_serializer_py",
+     "attempt_id": "att-prop-hist-w0-django_core_serializers_xml_serializer_py-r0",
+     "proposal_id": "prop-hist-w0-django_core_serializers_xml_serializer_py",
+     "actorId": "writer-19919"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.01,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:0970c870530e9d942ac8f9796e78ec7ab98e327bc31ddd9deaefc78490b9c3c9",
+   "written": true,
+   "output_digest": "sha256:5a7419bb8b6590ce4560df48f0ae722d94830d7d6b9c97d4bff78821f623f261",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

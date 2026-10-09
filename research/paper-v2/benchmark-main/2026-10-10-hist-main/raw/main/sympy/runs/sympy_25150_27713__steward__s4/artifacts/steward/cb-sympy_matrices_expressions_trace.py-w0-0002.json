@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-caa45b3c62c84111",
+  "proposalIds": [
+    "prop-hist-w0-sympy_matrices_expressions_trace_py"
+  ],
+  "targetFiles": [
+    "sympy/matrices/expressions/trace.py"
+  ],
+  "appliedFiles": [
+    "sympy/matrices/expressions/trace.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/matrices/expressions/trace.py": "b24af9dcbbecb4b579620f6191a45bd325ab4ddc42f6ef791be63321cf34693b"
+  },
+  "fileAfterHashes": {
+    "sympy/matrices/expressions/trace.py": "8dd28046eaf0799fc8450d5747d7b528a466850b239439c1e765730a1a115d81"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/matrices/expressions/trace.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-caa45b3c62c84111",
+    "planId": "merge-caa45b3c62c84111",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-caa45b3c62c84111",
+        "planId": "merge-caa45b3c62c84111",
+        "request_identity": [
+          "prop-hist-w0-sympy_matrices_expressions_trace_py"
+        ],
+        "actor_ids": [
+          "writer-25150"
+        ],
+        "request_files": [
+          "sympy/matrices/expressions/trace.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/matrices/expressions/trace.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/sympy/runs/sympy_25150_27713__steward__s4/artifacts/steward/cb-sympy_matrices_expressions_trace.py-w0-0002.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SYMPY_MATRICES_EXPRESSIONS_TRACE_PY"
+        ],
+        "commit_sha": "0ee47c5af3f71e55297544c4bc4c049b29f49fea"
+      }
+    ]
+  }
+}

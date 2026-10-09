@@ -1,0 +1,172 @@
+{
+ "pair_id": "django:19602_19685",
+ "stratum": "O3",
+ "arm": "steward",
+ "plant": null,
+ "seed_k": 4,
+ "seed": 3254579596,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-20effd45/AI-Atomic-Framework-20effd45a0c3a09c293caaea6a34face0df1c5f4",
+ "wall_ms": 729,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 11,
+  "by_verdict": {
+   "correct": 11
+  },
+  "completed": 11,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 5,
+  "files_full_bytes_exact": 5,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "django/db/backends/base/schema.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "django/db/backends/sqlite3/schema.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "django/db/models/fields/related.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "django/db/models/query.py": {
+   "applicable": true,
+   "final_parses": true
+  },
+  "django/db/models/sql/subqueries.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "django/db/backends/base/schema.py": true,
+  "django/db/backends/sqlite3/schema.py": true,
+  "django/db/models/fields/related.py": true,
+  "django/db/models/query.py": true,
+  "django/db/models/sql/subqueries.py": true
+ },
+ "final_exists": {
+  "django/db/backends/base/schema.py": true,
+  "django/db/backends/sqlite3/schema.py": true,
+  "django/db/models/fields/related.py": true,
+  "django/db/models/query.py": true,
+  "django/db/models/sql/subqueries.py": true
+ },
+ "files": [
+  {
+   "path": "django/db/backends/base/schema.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:bbb3823c4ff50089a231a892a367f85ed7d619a819443c5ef3819a5dbb0de748",
+   "final_digest": "sha256:7fc27a34c2d47faa1a71790dec1ef9f9656beba79198852897806fc63e355383",
+   "expected_digests": [
+    "sha256:7fc27a34c2d47faa1a71790dec1ef9f9656beba79198852897806fc63e355383"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "django/db/backends/sqlite3/schema.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:e2fc70b8f3dc588fdd266ae2f3eee4ce65cc53ef6f09bb0ede4b6736aaf85f5e",
+   "final_digest": "sha256:202ac0a5a3c82415635d42440e6fa8f6e7b7acc0405cdf34f0aecc60e6c07030",
+   "expected_digests": [
+    "sha256:202ac0a5a3c82415635d42440e6fa8f6e7b7acc0405cdf34f0aecc60e6c07030"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "django/db/models/fields/related.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:1c7c244475abb423ad4e5b38d884a3cd0ee1debc030be009913e95d62b1d68c0",
+   "final_digest": "sha256:1cf8e2e1a8ba60c5349e4477dae0bed76e0cc3008612666b5d7498cd65b6be78",
+   "expected_digests": [
+    "sha256:1cf8e2e1a8ba60c5349e4477dae0bed76e0cc3008612666b5d7498cd65b6be78"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "django/db/models/query.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:bc067c7e3433d25bfbf84feca2e19d4c9df162bd983b5e3d7b4636b6702011ee",
+   "final_digest": "sha256:7280bfae469e141acc59c435ca34505bf99567338f99984d0de7d2d12bc8d7c7",
+   "expected_digests": [
+    "sha256:7280bfae469e141acc59c435ca34505bf99567338f99984d0de7d2d12bc8d7c7"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  },
+  {
+   "path": "django/db/models/sql/subqueries.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:953995820ab325608c3405fab3e906fd0bc1e7f9cc4e522d4c2110fc5ce8e433",
+   "final_digest": "sha256:bf3416518f396f6745dc0476cb1720695bd0f9ade7e30a24ab425ff3dcad09f5",
+   "expected_digests": [
+    "sha256:bf3416518f396f6745dc0476cb1720695bd0f9ade7e30a24ab425ff3dcad09f5"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "django/db/backends/base/schema.py": "sha256:7fc27a34c2d47faa1a71790dec1ef9f9656beba79198852897806fc63e355383",
+  "django/db/backends/sqlite3/schema.py": "sha256:202ac0a5a3c82415635d42440e6fa8f6e7b7acc0405cdf34f0aecc60e6c07030",
+  "django/db/models/fields/related.py": "sha256:1cf8e2e1a8ba60c5349e4477dae0bed76e0cc3008612666b5d7498cd65b6be78",
+  "django/db/models/query.py": "sha256:7280bfae469e141acc59c435ca34505bf99567338f99984d0de7d2d12bc8d7c7",
+  "django/db/models/sql/subqueries.py": "sha256:bf3416518f396f6745dc0476cb1720695bd0f9ade7e30a24ab425ff3dcad09f5"
+ }
+}

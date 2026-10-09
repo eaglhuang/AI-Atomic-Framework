@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-e8901c507096fea8",
+  "proposalIds": [
+    "prop-hist-w1-sympy_combinatorics_permutations_py"
+  ],
+  "targetFiles": [
+    "sympy/combinatorics/permutations.py"
+  ],
+  "appliedFiles": [
+    "sympy/combinatorics/permutations.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/combinatorics/permutations.py": "2543a71561fa7f49e4cb984728284af3898d0ba5f09a878beb9e40999d3b017b"
+  },
+  "fileAfterHashes": {
+    "sympy/combinatorics/permutations.py": "9d0a1ce188137a84fcd1e1e4a9eb53054c70010416e34512d809d1daee3e13f9"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/combinatorics/permutations.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-e8901c507096fea8",
+    "planId": "merge-e8901c507096fea8",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-e8901c507096fea8",
+        "planId": "merge-e8901c507096fea8",
+        "request_identity": [
+          "prop-hist-w1-sympy_combinatorics_permutations_py"
+        ],
+        "actor_ids": [
+          "writer-27930"
+        ],
+        "request_files": [
+          "sympy/combinatorics/permutations.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/combinatorics/permutations.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/sympy/runs/sympy_27686_27930__bare_composer__s3/artifacts/steward/cb-sympy_combinatorics_permutations.py-w1-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_COMBINATORICS_PERMUTATIONS_PY"
+        ],
+        "commit_sha": "36a8402df2a2a6ffb436bb31096d4dd2aba879a1"
+      }
+    ]
+  }
+}

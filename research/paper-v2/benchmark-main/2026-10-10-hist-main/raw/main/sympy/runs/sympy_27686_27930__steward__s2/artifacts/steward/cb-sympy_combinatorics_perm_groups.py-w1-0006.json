@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-2faa538a68782187",
+  "proposalIds": [
+    "prop-hist-w1-sympy_combinatorics_perm_groups_py"
+  ],
+  "targetFiles": [
+    "sympy/combinatorics/perm_groups.py"
+  ],
+  "appliedFiles": [
+    "sympy/combinatorics/perm_groups.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/combinatorics/perm_groups.py": "2e1ae327236784fe0154fec2e869cb111da51bfe5cd442cd4875206275ebfd52"
+  },
+  "fileAfterHashes": {
+    "sympy/combinatorics/perm_groups.py": "b1fd057f1989e6e582c25bf3443e66e471ddb86e6aa87ce1dd8d27d436b1e58a"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/combinatorics/perm_groups.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-2faa538a68782187",
+    "planId": "merge-2faa538a68782187",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-2faa538a68782187",
+        "planId": "merge-2faa538a68782187",
+        "request_identity": [
+          "prop-hist-w1-sympy_combinatorics_perm_groups_py"
+        ],
+        "actor_ids": [
+          "writer-27930"
+        ],
+        "request_files": [
+          "sympy/combinatorics/perm_groups.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/combinatorics/perm_groups.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/sympy/runs/sympy_27686_27930__steward__s2/artifacts/steward/cb-sympy_combinatorics_perm_groups.py-w1-0006.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_COMBINATORICS_PERM_GROUPS_PY"
+        ],
+        "commit_sha": "32b1c870bfc064d3369c9b71b624e6e8f0408009"
+      }
+    ]
+  }
+}

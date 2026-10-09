@@ -1,0 +1,67 @@
+{
+ "writer": 0,
+ "pr": 28032,
+ "pid": 2091547,
+ "init_ms": 63.589129,
+ "start_offset_ms": 0,
+ "file_order": [
+  "sympy/printing/numpy.py",
+  "sympy/utilities/lambdify.py"
+ ],
+ "holds": {
+  "sympy/printing/numpy.py": 17,
+  "sympy/utilities/lambdify.py": 16
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 28032,
+   "path": "sympy/printing/numpy.py",
+   "intents": [
+    "log:sympy:28032_28079:28032:sympy/printing/numpy.py:h0"
+   ],
+   "hold_ms": 17,
+   "t_submit_epoch": 1791563968925,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 16,
+   "outcome": "commit",
+   "total_ms": 43.98,
+   "t_done_epoch": 1791563968969
+  },
+  {
+   "writer": 0,
+   "pr": 28032,
+   "path": "sympy/utilities/lambdify.py",
+   "intents": [
+    "log:sympy:28032_28079:28032:sympy/utilities/lambdify.py:h1",
+    "log:sympy:28032_28079:28032:sympy/utilities/lambdify.py:h2",
+    "log:sympy:28032_28079:28032:sympy/utilities/lambdify.py:h3",
+    "log:sympy:28032_28079:28032:sympy/utilities/lambdify.py:h4",
+    "log:sympy:28032_28079:28032:sympy/utilities/lambdify.py:h5",
+    "log:sympy:28032_28079:28032:sympy/utilities/lambdify.py:h6",
+    "log:sympy:28032_28079:28032:sympy/utilities/lambdify.py:h7",
+    "log:sympy:28032_28079:28032:sympy/utilities/lambdify.py:h8",
+    "log:sympy:28032_28079:28032:sympy/utilities/lambdify.py:h9",
+    "log:sympy:28032_28079:28032:sympy/utilities/lambdify.py:h10",
+    "log:sympy:28032_28079:28032:sympy/utilities/lambdify.py:h11"
+   ],
+   "hold_ms": 16,
+   "t_submit_epoch": 1791563968969,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 5,
+   "outcome": "blocked",
+   "blocked_reason": "git-merge-conflict",
+   "total_ms": 31.35,
+   "t_done_epoch": 1791563969000
+  }
+ ],
+ "admit_stats": {
+  "txns": 4,
+  "cas_conflicts": 1
+ },
+ "steward_batches": null
+}

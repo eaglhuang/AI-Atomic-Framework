@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-c3379e798a5163e2",
+  "proposalIds": [
+    "prop-hist-w0-sympy_ntheory_residue_ntheory_py"
+  ],
+  "targetFiles": [
+    "sympy/ntheory/residue_ntheory.py"
+  ],
+  "appliedFiles": [
+    "sympy/ntheory/residue_ntheory.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/ntheory/residue_ntheory.py": "80752aa7249289f128b62a9194f31a89a6069d237925d6ea032084d7b00654a5"
+  },
+  "fileAfterHashes": {
+    "sympy/ntheory/residue_ntheory.py": "6dcb5ed64549b1ae77a35671ffa74b0560f125d42111c084d2ca21e64339495b"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/ntheory/residue_ntheory.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-c3379e798a5163e2",
+    "planId": "merge-c3379e798a5163e2",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-c3379e798a5163e2",
+        "planId": "merge-c3379e798a5163e2",
+        "request_identity": [
+          "prop-hist-w0-sympy_ntheory_residue_ntheory_py"
+        ],
+        "actor_ids": [
+          "writer-26487"
+        ],
+        "request_files": [
+          "sympy/ntheory/residue_ntheory.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/ntheory/residue_ntheory.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/sympy/runs/sympy_26487_26488__bare_composer__s1/artifacts/steward/cb-sympy_ntheory_residue_ntheory.py-w0-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SYMPY_NTHEORY_RESIDUE_NTHEORY_PY"
+        ],
+        "commit_sha": "b7ef5644516508d917025282396e922583886bd4"
+      }
+    ]
+  }
+}

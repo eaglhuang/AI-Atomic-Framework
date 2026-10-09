@@ -1,0 +1,84 @@
+{
+ "pair_id": "django:18293_18353",
+ "stratum": "O3",
+ "arm": "file_lock",
+ "plant": null,
+ "seed_k": 0,
+ "seed": 2307063137,
+ "oracle_version": "oracle_v2-hist-1",
+ "patchkit_version": "hist-patchkit-v1",
+ "atm_monorepo": "/workspace/atm-main-20effd45/AI-Atomic-Framework-20effd45a0c3a09c293caaea6a34face0df1c5f4",
+ "wall_ms": 553,
+ "timed_out": false,
+ "worker_exit": [
+  {
+   "code": 0,
+   "sig": null
+  },
+  {
+   "code": 0,
+   "sig": null
+  }
+ ],
+ "ready_error": null,
+ "writers_ok": true,
+ "summary": {
+  "oracle_version": "oracle_v2-hist-1",
+  "n_intents": 6,
+  "by_verdict": {
+   "correct": 6
+  },
+  "completed": 6,
+  "lost_effects": 0,
+  "blocked": 0,
+  "misplaced": 0,
+  "duplicate": 0,
+  "blocked_leak": 0,
+  "unresolved": 0,
+  "files_scored": 1,
+  "files_full_bytes_exact": 1,
+  "corrupted_files": 0,
+  "foreign_writes": 0,
+  "extra_files": 0,
+  "identity_ok": true,
+  "run_failed": false,
+  "structure_violations": 0
+ },
+ "blocked_reasons": {},
+ "structure": {
+  "django/db/models/sql/query.py": {
+   "applicable": true,
+   "final_parses": true
+  }
+ },
+ "structure_violations": [],
+ "foreign_writes": [],
+ "extra_files": [],
+ "plants": [],
+ "base_exists": {
+  "django/db/models/sql/query.py": true
+ },
+ "final_exists": {
+  "django/db/models/sql/query.py": true
+ },
+ "files": [
+  {
+   "path": "django/db/models/sql/query.py",
+   "oracle_version": "oracle_v2-hist-1",
+   "base_digest": "sha256:7721b12bbd2ad4d6f53b742d63bf22a72b50f591c46e95af06273b6fd9535eef",
+   "final_digest": "sha256:69643d0207ecc451ab86581055b3742439e04ebe1cde5b83da9e56dcc9362428",
+   "expected_digests": [
+    "sha256:69643d0207ecc451ab86581055b3742439e04ebe1cde5b83da9e56dcc9362428"
+   ],
+   "full_bytes_exact": true,
+   "judged_by": "exact",
+   "frame_ok": true,
+   "frame_violations": [],
+   "n_frame_violations": 0,
+   "overlap_both_applied": false
+  }
+ ],
+ "final_digests": {
+  "django/db/models/sql/query.py": "sha256:69643d0207ecc451ab86581055b3742439e04ebe1cde5b83da9e56dcc9362428"
+ }
+}

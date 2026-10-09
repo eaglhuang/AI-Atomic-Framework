@@ -5,11 +5,13 @@ import path from 'node:path';
 import { getCommandSpec } from '../command-specs.js';
 import { buildResidueDiagnosisEvidence, generateTaskCard, loadTaskDocumentOrThrow, runTasks, runTasksRosterUpdate } from '../tasks/public-surface.js';
 import { authorizeLaneCapability } from '../lane-session/capability-authority.js';
+import { describeMissingGitBase } from '../shared/git-base-remediation.js';
+import { buildTaskflowOpenCommand } from './open-command.js';
 import { assertClosebackPlanningPathReady, buildCloseBackendArgv, buildClosebackPlan, buildCloseWriteRollbackSnapshot, buildTaskflowCloseDiagnostics, executeCloseWriteCommitPhase, inspectObservedTaskEvidence, resolveClosebackPlanningPath, resolveCloseWriteSupport, capturePlanningCardSnapshot, applyPlanningCardCloseback, resolvePlanningRosterPaths } from './closeback-orchestration.js';
 import { buildAutoEvidencePlan, executeAutoEvidencePlan } from '../evidence.js';
 import { mapAutoEvidenceCommand } from './auto-evidence-mapper.js';
 import { CliError, makeResult, message, parseArgsForCommand, quoteCliValue, relativePathFrom } from '../shared.js';
-import { buildDelegationContract, buildTaskflowOpenDiagnostics, loadProfile, resolveOpenerMode, resolveWriteSupport } from './profile-loader.js';
+import { buildDelegationContract, buildTaskflowOpenDiagnostics, loadProfile, resolveOpenerMode, resolveWriteSupport, BUILTIN_TASKFLOW_OPENER } from './profile-loader.js';
 import { canResolveHostOpenerPolicy, resolveHostOpenerPolicyDecision } from './host-opener-policy.js';
 import { buildTaskflowClosePreflight, inspectPlanningAuthorityDelivery, preflightBlockersToWriteReadinessBlockers } from './close-preflight.js';
 import { withTaskflowOperatorLane } from '../emergency/context.js';
@@ -131,6 +133,11 @@ function buildOrchestrationPlan(input) {
 }
 function uniqueTaskIds(values) { return [...new Set(values.map((value) => value.trim()).filter(Boolean))]; }
 function buildWriteReadinessHint(input) {
+    if (input.openerMode === 'delegated-governed' && !input.writeRequested) {
+        const hint = buildTaskflowOpenCommand(input.openArgv);
+        return { schemaId: 'atm.taskflowOpenWriteReadinessHint.v1', status: hint.command ? 'ready' : 'incomplete',
+            summary: hint.command ? 'POSIX sh write hint preserves supplied open options; existing write prerequisites still apply.' : 'Cannot safely display the write command; inspect missingPrerequisites before continuing.', missingPrerequisites: hint.reason ? [`Cannot render POSIX sh command: ${hint.reason}. Supply safe literal arguments and rerun dry-run.`] : [], nextCommand: hint.command, nextCommandShell: hint.shell, operatorLane: 'taskflow open', fallbackSurface: null };
+    }
     if (input.openerMode === 'delegated-governed') {
         return { schemaId: 'atm.taskflowOpenWriteReadinessHint.v1', status: 'ready',
             summary: 'taskflow open --write is ready to orchestrate the governed opener lane.', missingPrerequisites: [], nextCommand: 'node atm.mjs taskflow open --write --json', operatorLane: 'taskflow open', fallbackSurface: null };
@@ -370,6 +377,11 @@ function resolveTaskflowOpenOutputRoot(input) {
         return input.cwd;
     return resolveProfileRepoRoot(input.profilePath, input.cwd);
 }
+function csvOption(value) { return String(value ?? '').split(',').map((entry) => entry.trim()).filter(Boolean); } /** ATM's built-in opener writes a repository-neutral adopter card owned by the opening actor; the AI must declare the card's scope and validators because the card is the delivery contract. */
+function builtinOpenerCardFields(input) { const options = input.parsed.options; if (input.delegationContract.openerPath !== BUILTIN_TASKFLOW_OPENER)
+    return { templateKey: input.template }; const scopePaths = csvOption(options.scopePath).map((entry) => entry.replace(/\\/g, '/').replace(/^\.\//, '')); const validators = csvOption(options.validator); const owner = String(options.actor ?? process.env.ATM_ACTOR_ID ?? '').trim(); /* Name only the flags actually missing: the old text always listed --scope-path and --validator, even when only --actor was absent. */ /* Name only the flags actually missing: the old text always listed --scope-path and --validator, even when only --actor was absent. */ const missingFlags = [...(!owner ? ['--actor <id>'] : []), ...(scopePaths.length === 0 ? ['--scope-path <csv>'] : []), ...(validators.length === 0 ? ['--validator <csv>'] : [])]; if (missingFlags.length > 0) {
+    throw new CliError('ATM_CLI_USAGE', `taskflow open --write with the built-in opener is missing ${missingFlags.join(', ')}. The task card is the delivery contract: --actor names its owner, --scope-path the files it may change, and --validator the commands that prove it.`, { exitCode: 2, details: { missingFlags: missingFlags.map((flag) => flag.split(' ')[0]), requiredFlags: ['--actor', '--scope-path', '--validator'], optionalFlags: ['--goal'] } });
+} return { templateKey: options.template ? input.template : 'adopter-task', owner, repoName: path.basename(input.openOutputRoot), scopePaths, validators, goal: options.goal ? String(options.goal) : undefined }; }
 function resolveOutputAbsolute(root, outputPath) { return path.isAbsolute(outputPath) ? path.resolve(outputPath) : path.resolve(root, outputPath); }
 function runGitOrThrow(cwd, args) {
     execFileSync('git', [...args], { cwd, encoding: 'utf8',
@@ -615,11 +627,15 @@ export async function runTaskflow(argv = []) {
     if (action === 'pre-close') {
         return runTaskflowClose(parsed, cwd, 'pre-close');
     }
+    if (action === 'abandon') {
+        return (await import('./abandon.js')).runTaskflowAbandon(parsed, cwd);
+    }
     if (action !== 'open') {
-        throw new CliError('ATM_CLI_USAGE', `Unknown taskflow action: ${action}. Supported actions: open, close, pre-close.`, { exitCode: 2 });
+        throw new CliError('ATM_CLI_USAGE', `Unknown taskflow action: ${action}. Supported actions: open, close, pre-close, abandon, status.`, { exitCode: 2 });
     }
     const writeRequested = !!parsed.options.write;
-    const profilePath = parsed.options.profile ? String(parsed.options.profile) : null;
+    const defaultProfilePath = path.join(cwd, 'taskflow.profile.json');
+    const profilePath = parsed.options.profile ? String(parsed.options.profile) : existsSync(defaultProfilePath) ? defaultProfilePath : null;
     const taskId = parsed.options.taskId ? String(parsed.options.taskId) : null;
     const outputPath = parsed.options.output ? String(parsed.options.output) : null;
     const rosterIndexPath = parsed.options.rosterIndex ? String(parsed.options.rosterIndex) : null;
@@ -649,7 +665,13 @@ export async function runTaskflow(argv = []) {
     }
     const orchestrationPlan = buildOrchestrationPlan({ profile: profileData, openerMode, delegationContract,
         outputRoot: openOutputRoot, taskId: hostPolicyDecision?.taskId ?? taskId, outputPath: hostPolicyDecision?.outputPath ?? outputPath, template, title, rosterIndexPath, hostPolicyDecision, profilePath });
-    const writeReadinessHint = buildWriteReadinessHint({ openerMode, delegationContract, hostPolicyDecision, taskId, outputPath, profileLoaded: profileData != null });
+    const writeReadinessHint = buildWriteReadinessHint({ openerMode, delegationContract, hostPolicyDecision, taskId, outputPath, profileLoaded: profileData != null, openArgv: argv, writeRequested });
+    if (writeRequested) {
+        const gitBase = describeMissingGitBase(openOutputRoot);
+        if (!gitBase.hasHead) {
+            throw new CliError('ATM_TASKFLOW_OPEN_GIT_BASE_MISSING', 'taskflow open --write needs a first commit: a card opened without one records no repository identity and cannot be claimed after git is set up.', { exitCode: 2, details: gitBase.details });
+        }
+    }
     if (writeRequested && !writeSupport.allowed) {
         throw new CliError('ATM_TASKFLOW_TEMPLATE_ONLY_FALLBACK', openerMode === 'template-only-fallback' ? 'taskflow open --write is not available in template-only-fallback mode. Load an invocable host opener profile or use tasks new (low-level generator surface) for explicit template generation.'
             : 'taskflow open --write prerequisites are incomplete. Supply --task-id/--output or configure host-opener numbering and output-path policy.', { exitCode: 1, details: { openerMode, writeSupport, writeReadinessHint, delegationContract, diagnostics, orchestrationPlan, recommendedCommand: buildTasksNewCommand({ taskId: hostPolicyDecision?.taskId ?? taskId, outputPath: hostPolicyDecision?.outputPath ?? outputPath,
@@ -664,7 +686,7 @@ export async function runTaskflow(argv = []) {
         const hadExistingTarget = existsSync(targetAbsolute);
         let generated = null;
         if (!hadExistingTarget) {
-            generated = await generateTaskCard({ cwd: openOutputRoot, templateKey: template, taskId: resolved.taskId, title, outputPath: resolved.outputPath });
+            generated = await generateTaskCard({ cwd: openOutputRoot, taskId: resolved.taskId, title, outputPath: resolved.outputPath, ...builtinOpenerCardFields({ parsed, delegationContract, template, openOutputRoot }) });
             mkdirSync(path.dirname(targetAbsolute), { recursive: true });
             writeFileSync(targetAbsolute, generated.content, 'utf8');
         }
@@ -679,9 +701,11 @@ export async function runTaskflow(argv = []) {
             }
             throw error;
         }
+        const openedTaskId = generated?.taskId ?? resolved.taskId; /* The opened card is the delivery contract: claim it next instead of opening it again. */
+        const claimCommand = `node atm.mjs next --claim --actor ${quoteCliValue(parsed.options.actor ? String(parsed.options.actor) : '<id>')} --task ${openedTaskId} --json`;
         const effectiveRosterIndex = rosterIndexPath ?? delegationContract.policy.rosterSync.indexPath;
         let rosterSync = null;
-        const writeMessages = [message('info', 'ATM_TASKFLOW_OPEN_WRITE_ORCHESTRATED', `taskflow open orchestrated tasks new generation at ${resolved.outputPath}.`, { openerMode, generationSurface: 'tasks-new', runtimeImported: true })];
+        const writeMessages = [message('info', 'ATM_TASKFLOW_OPEN_WRITE_ORCHESTRATED', `taskflow open orchestrated tasks new generation at ${resolved.outputPath}.`, { openerMode, generationSurface: 'tasks-new', runtimeImported: true, requiredCommand: claimCommand })];
         if (delegationContract.policy.rosterSyncPolicy === 'inline' && effectiveRosterIndex) {
             const rosterResult = await runTasksRosterUpdate(['--cwd', cwd, '--index', effectiveRosterIndex, '--from', resolved.outputPath]);
             rosterSync = { mode: 'inline',
@@ -692,7 +716,7 @@ export async function runTaskflow(argv = []) {
             rosterSync = await runRosterSyncFollowUp({ command, cwd,
                 indexPath: effectiveRosterIndex, fromPath: resolved.outputPath, messages: writeMessages });
         }
-        return { ...makeResult({ ok: true, command: 'taskflow open', cwd, mode: 'write', messages: writeMessages, evidence: { openerMode, writeSupport, writeReadinessHint, delegationContract, diagnostics, orchestrationPlan, hostPolicyDecision: resolved, generation: { surface: 'tasks-new',
+        return { ...makeResult({ ok: true, command: 'taskflow open', cwd, mode: 'write', messages: writeMessages, evidence: { nextAction: { status: 'task-opened', command: claimCommand, reason: `opened ${openedTaskId}; claim it before editing its scope paths` }, openerMode, writeSupport, writeReadinessHint: { ...writeReadinessHint, nextCommand: claimCommand }, delegationContract, diagnostics, orchestrationPlan, hostPolicyDecision: resolved, generation: { surface: 'tasks-new',
                         taskId: generated?.taskId ?? resolved.taskId, sourcePath: generated?.sourcePath ?? resolved.outputPath, templateUsed: generated?.templateUsed ?? template, reusedExistingCard: hadExistingTarget, outputRepoRoot: openOutputRoot }, runtimeImport, rosterSync, ...(profileData ? { profile: profileData } : {}) } }), schemaId: 'atm.taskflowOpenResult.v1', writeEnabled: true, writeReadinessHint };
     }
     const result = makeResult({

@@ -1,0 +1,131 @@
+{
+ "writer": 1,
+ "pr": 26300,
+ "pid": 2109164,
+ "init_ms": 113.59841,
+ "start_offset_ms": 13,
+ "file_order": [
+  "sympy/solvers/diophantine/diophantine.py"
+ ],
+ "holds": {
+  "sympy/solvers/diophantine/diophantine.py": 3
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 26300,
+   "path": "sympy/solvers/diophantine/diophantine.py",
+   "intents": [
+    "log:sympy:26297_26300:26300:sympy/solvers/diophantine/diophantine.py:h0",
+    "log:sympy:26297_26300:26300:sympy/solvers/diophantine/diophantine.py:h1",
+    "log:sympy:26297_26300:26300:sympy/solvers/diophantine/diophantine.py:h2",
+    "log:sympy:26297_26300:26300:sympy/solvers/diophantine/diophantine.py:h3"
+   ],
+   "hold_ms": 3,
+   "t_submit_epoch": 1791564130344,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 14,
+   "outcome": "commit",
+   "blocked_reason": null,
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "compose_verdict": "parallel-safe",
+   "batch_id": "cb-sympy_solvers_diophantine_diophantine.py-w1-0001",
+   "total_ms": 155.06,
+   "t_done_epoch": 1791564130499
+  }
+ ],
+ "admit_stats": {
+  "txns": 2,
+  "cas_conflicts": 0
+ },
+ "steward_batches": [
+  {
+   "event": "steward_apply",
+   "batch_id": "cb-sympy_solvers_diophantine_diophantine.py-w1-0001",
+   "path": "sympy/solvers/diophantine/diophantine.py",
+   "pid": 2109164,
+   "evidence_tag": "w1",
+   "apply_lock": false,
+   "proposalIds": [
+    "prop-hist-w1-sympy_solvers_diophantine_diophantine_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sympy_solvers_diophantine_diophantine_py"
+   ],
+   "proposal_base_hashes": [
+    "sha256:cbb94216630ee7341214c1e0a34ecee08e4d8625e0b1b7d4ab93bf40744fa66a"
+   ],
+   "lock_wait_ms": 0.18,
+   "t_start_epoch_ms": 1791564130368.05,
+   "pre_apply_hash": "sha256:cbb94216630ee7341214c1e0a34ecee08e4d8625e0b1b7d4ab93bf40744fa66a",
+   "receipt_before_hash": "sha256:cbb94216630ee7341214c1e0a34ecee08e4d8625e0b1b7d4ab93bf40744fa66a",
+   "receipt_after_hash": "sha256:b3fa5d910e41df79f7fe36a0f590ec3b4991e31536ddbe7422b9a01bbb77b7ea",
+   "post_apply_hash": "sha256:b3fa5d910e41df79f7fe36a0f590ec3b4991e31536ddbe7422b9a01bbb77b7ea",
+   "t_end_epoch_ms": 1791564130495.68,
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_commit_observer": true,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "steward_verdict": "applied",
+   "written": true,
+   "interleave_suspect": false,
+   "post_write_drift": false
+  },
+  {
+   "event": "compose_batch",
+   "ts": "2026-10-10T00:42:10.495+08:00",
+   "batch_id": "cb-sympy_solvers_diophantine_diophantine.py-w1-0001",
+   "path": "sympy/solvers/diophantine/diophantine.py",
+   "proposalIds": [
+    "prop-hist-w1-sympy_solvers_diophantine_diophantine_py"
+   ],
+   "intent_ids": [
+    "prop-hist-w1-sympy_solvers_diophantine_diophantine_py"
+   ],
+   "attempt_ids": [
+    "att-prop-hist-w1-sympy_solvers_diophantine_diophantine_py-r0"
+   ],
+   "logical_ids": [
+    "prop-hist-w1-sympy_solvers_diophantine_diophantine_py"
+   ],
+   "members": [
+    {
+     "intent_id": "prop-hist-w1-sympy_solvers_diophantine_diophantine_py",
+     "logical_id": "prop-hist-w1-sympy_solvers_diophantine_diophantine_py",
+     "attempt_id": "att-prop-hist-w1-sympy_solvers_diophantine_diophantine_py-r0",
+     "proposal_id": "prop-hist-w1-sympy_solvers_diophantine_diophantine_py",
+     "actorId": "writer-26300"
+    }
+   ],
+   "compose_verdict": "parallel-safe",
+   "steward_verdict": "applied",
+   "blocked_reasons": [],
+   "blocked_reason": null,
+   "window_wait_ms": 0.39,
+   "compose_window_ms": 100,
+   "compose_batch_size": 1,
+   "close_reason": "immediate",
+   "expected_source": "hist_single_writer_per_process",
+   "expected_count": 1,
+   "proposer_direct_writes": 0,
+   "repropose_rounds": 0,
+   "steward_id": "neutral-write-steward",
+   "base_digest": "sha256:cbb94216630ee7341214c1e0a34ecee08e4d8625e0b1b7d4ab93bf40744fa66a",
+   "written": true,
+   "output_digest": "sha256:b3fa5d910e41df79f7fe36a0f590ec3b4991e31536ddbe7422b9a01bbb77b7ea",
+   "atm_commit_attempts": 0,
+   "atm_commit_lock_contention_polls": 0,
+   "atm_tx_attempts": 1,
+   "recompose_policy": null,
+   "atm_commit_owner_writes": 1,
+   "atm_env": {},
+   "reason": "steward_applied"
+  }
+ ]
+}

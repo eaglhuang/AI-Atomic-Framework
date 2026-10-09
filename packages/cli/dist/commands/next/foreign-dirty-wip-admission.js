@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { closeSync, constants, existsSync, fstatSync, lstatSync, openSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { resolveActorWorkSession } from '../actor-session.js';
@@ -13,8 +13,11 @@ export function inspectClaimDirtyWipAdmission(input) {
     const intersectingFiles = dirtyFiles
         .map((dirty) => dirty.file)
         .filter((file) => candidateFiles.some((scope) => pathMatchesTaskScope(file, scope) || pathMatchesTaskScope(scope, file)));
+    // Explicit adoption needs an authoritative readable snapshot, not absence inferred from a parse failure.
+    const ownershipTasks = input.allowUnownedTaskScopedRecovery === true && intersectingFiles.length > 0
+        ? readOwnershipTasks(input.cwd, true) : null;
     const blockers = uniqueSorted(intersectingFiles).flatMap((file) => {
-        const owner = findDirtyPathOwner(input.cwd, file);
+        const owner = findDirtyPathOwner(input.cwd, file, ownershipTasks);
         if (isOwnedByRequestingClaim(owner, input.task.workItemId, input.actorId, input.laneSessionId)
             || (!owner && input.allowUnownedTaskScopedRecovery === true))
             return [];
@@ -94,15 +97,97 @@ function readGitNames(cwd, args) {
         return [];
     return uniqueSorted(String(result.stdout ?? '').split(/\r?\n/).map(normalizeWorkPath).filter(Boolean));
 }
-function findDirtyPathOwner(cwd, file) {
+function ownershipUnknown(cwd, recordPath) {
+    throw new CliError('ATM_CLAIM_FOREIGN_UNSTAGED_WIP', 'Cannot adopt WIP while task ownership records are unreadable or malformed.', {
+        exitCode: 1,
+        details: { ownership: 'unknown', taskRecord: path.relative(cwd, recordPath).replace(/\\/g, '/'),
+            requiredAction: 'Inspect the task ledger through ATM and repair the ownership record before retrying adoption.' }
+    });
+}
+function record(value) {
+    return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+function nonempty(value) { return typeof value === 'string' && value.trim().length > 0; }
+function paths(value) {
+    return Array.isArray(value) && value.length > 0 && value.every(entry => nonempty(entry) && normalizeWorkPath(entry).length > 0);
+}
+function assertOwnershipShape(task, taskId) {
+    if (!taskId)
+        throw new Error('Missing task identity');
+    const claim = task.claim;
+    if (claim !== undefined && claim !== null) {
+        if (!record(claim) || typeof claim.state !== 'string'
+            || !['active', 'released', 'handoff', 'taken_over'].includes(claim.state))
+            throw new Error('Invalid claim state');
+        if (claim.state === 'active' && (!nonempty(claim.actorId) || !paths(claim.files)
+            || (claim.laneSession !== undefined && claim.laneSession !== null
+                && (!record(claim.laneSession) || !nonempty(claim.laneSession.laneSessionId)))))
+            throw new Error('Incomplete active ownership');
+    }
+    // Existing terminal-retention semantics remain unchanged: these are no longer live owners.
+    if (task.status === 'done' || task.status === 'abandoned')
+        return;
+    const retained = task.wipOwnership;
+    if (retained !== undefined && retained !== null && (!record(retained)
+        || retained.schemaId !== 'atm.retainedWipOwnership.v1' || retained.taskId !== taskId
+        || !nonempty(retained.actorId) || !nonempty(retained.laneSessionId) || !paths(retained.dirtyPaths))) {
+        throw new Error('Incomplete retained ownership');
+    }
+}
+function readOwnershipTasks(cwd, strict) {
     const taskDir = path.join(cwd, '.atm', 'history', 'tasks');
-    if (!existsSync(taskDir))
-        return null;
-    for (const entry of readdirSync(taskDir).filter((name) => name.endsWith('.json')).sort()) {
+    if (!strict && !existsSync(taskDir))
+        return [];
+    let entries;
+    try {
+        if (strict && !lstatSync(taskDir).isDirectory())
+            throw new Error('Invalid task directory');
+        entries = readdirSync(taskDir).filter(name => name.endsWith('.json')).sort();
+    }
+    catch (error) {
+        if (strict)
+            ownershipUnknown(cwd, taskDir);
+        throw error;
+    }
+    const tasks = [];
+    for (const entry of entries) {
+        const recordPath = path.join(taskDir, entry);
+        let fd;
         try {
-            const task = parseJsonText(readFileSync(path.join(taskDir, entry), 'utf8'));
-            const claim = task.claim && typeof task.claim === 'object' && !Array.isArray(task.claim) ? task.claim : null;
+            let text;
+            if (strict) {
+                if (!lstatSync(recordPath).isFile())
+                    throw new Error('Invalid task record type');
+                fd = openSync(recordPath, constants.O_RDONLY | (constants.O_NOFOLLOW ?? 0) | (constants.O_NONBLOCK ?? 0));
+                if (!fstatSync(fd).isFile())
+                    throw new Error('Invalid opened task record type');
+                text = readFileSync(fd, 'utf8');
+            }
+            else
+                text = readFileSync(recordPath, 'utf8');
+            const task = parseJsonText(text);
+            if (!record(task))
+                throw new Error('Invalid task record');
             const taskId = String(task.workItemId ?? task.id ?? entry.replace(/\.json$/i, '')).trim();
+            if (strict)
+                assertOwnershipShape(task, taskId);
+            tasks.push({ task, taskId, recordPath });
+        }
+        catch {
+            if (strict)
+                ownershipUnknown(cwd, recordPath);
+        }
+        finally {
+            if (fd !== undefined)
+                closeSync(fd);
+        }
+    }
+    return tasks;
+}
+function findDirtyPathOwner(cwd, file, ownershipTasks) {
+    for (const { task, taskId, recordPath } of ownershipTasks ?? readOwnershipTasks(cwd, false)) {
+        try {
+            const claim = task.claim && typeof task.claim === 'object' && !Array.isArray(task.claim) ? task.claim : null;
             const activeOwner = readActiveClaimOwner(cwd, taskId, claim, file);
             if (activeOwner)
                 return activeOwner;
@@ -110,7 +195,10 @@ function findDirtyPathOwner(cwd, file) {
             if (retainedOwner)
                 return retainedOwner;
         }
-        catch { }
+        catch {
+            if (ownershipTasks)
+                ownershipUnknown(cwd, recordPath);
+        }
     }
     return null;
 }

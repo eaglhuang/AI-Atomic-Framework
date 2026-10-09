@@ -4,7 +4,7 @@
   "positional": [
     {
       "name": "action",
-      "summary": "register | decision | status | release | cleanup | proposal | compose | steward | runtime | runner-sync | projection | plan-batch | schedule | batch | parallel-admission | replay | post-compose-semantic-validation",
+      "summary": "register | decision | status | release | cleanup | proposal | compose | steward | runtime | runner-sync | projection | plan-batch | schedule | batch | parallel-admission | replay | heat-status | heat-reset | post-compose-semantic-validation",
       "required": true
     },
     {
@@ -60,6 +60,11 @@
       "summary": "Path to WriteIntent JSON payload."
     },
     {
+      "flag": "--queue-ticket",
+      "value": "id",
+      "summary": "Explicitly revalidate an eligible native serial ticket using the unchanged scope and current repository HEAD."
+    },
+    {
       "flag": "--ttl-seconds",
       "value": "number",
       "summary": "TTL lease duration in seconds for registering write intent."
@@ -72,7 +77,7 @@
     {
       "flag": "--surface",
       "value": "path",
-      "summary": "Release surface path for broker runner-sync enqueue. Repeatable."
+      "summary": "Release surface path for broker runner-sync enqueue, or file path for broker heat-reset. Repeatable."
     },
     {
       "flag": "--steward-work-id",
@@ -281,6 +286,8 @@
     "node atm.mjs broker parallel-admission reset --actor worker-1 --receipt-digest sha256:<digest> --json",
     "node atm.mjs broker replay status --json",
     "node atm.mjs broker replay run --json",
-    "node atm.mjs broker replay dogfood --surface docs/governance/atm-3-replay-evidence.md --json"
+    "node atm.mjs broker replay dogfood --surface docs/governance/atm-3-replay-evidence.md --json",
+    "node atm.mjs broker heat-status --json",
+    "node atm.mjs broker heat-reset --actor worker-1 --surface packages/core/src/broker/team-lane.ts --json"
   ]
 }

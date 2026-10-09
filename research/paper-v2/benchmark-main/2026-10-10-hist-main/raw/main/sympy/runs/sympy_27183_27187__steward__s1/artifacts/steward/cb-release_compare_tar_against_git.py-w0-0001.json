@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-03502aa5c55196e9",
+  "proposalIds": [
+    "prop-hist-w0-release_compare_tar_against_git_py"
+  ],
+  "targetFiles": [
+    "release/compare_tar_against_git.py"
+  ],
+  "appliedFiles": [
+    "release/compare_tar_against_git.py"
+  ],
+  "fileBeforeHashes": {
+    "release/compare_tar_against_git.py": "912a5cf7766ba5b58d70b22adf599e661afde951a613c340bf0b7bc95a13d400"
+  },
+  "fileAfterHashes": {
+    "release/compare_tar_against_git.py": "9b1b715ae0d2e345df7a95283433fdd9538fc78dc327c913049fb07e7ae6486f"
+  },
+  "permissions": {
+    "fileWrite": [
+      "release/compare_tar_against_git.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-03502aa5c55196e9",
+    "planId": "merge-03502aa5c55196e9",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-03502aa5c55196e9",
+        "planId": "merge-03502aa5c55196e9",
+        "request_identity": [
+          "prop-hist-w0-release_compare_tar_against_git_py"
+        ],
+        "actor_ids": [
+          "writer-27183"
+        ],
+        "request_files": [
+          "release/compare_tar_against_git.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "release/compare_tar_against_git.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/sympy/runs/sympy_27183_27187__steward__s1/artifacts/steward/cb-release_compare_tar_against_git.py-w0-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-RELEASE_COMPARE_TAR_AGAINST_GIT_PY"
+        ],
+        "commit_sha": "679dc40efe3c2199409bad90642b6556e8df60ec"
+      }
+    ]
+  }
+}

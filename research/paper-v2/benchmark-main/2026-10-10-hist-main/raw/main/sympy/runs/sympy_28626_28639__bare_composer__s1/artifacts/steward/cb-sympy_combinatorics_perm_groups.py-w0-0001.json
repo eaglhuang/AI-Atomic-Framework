@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-0683d4bb992b6db8",
+  "proposalIds": [
+    "prop-hist-w0-sympy_combinatorics_perm_groups_py"
+  ],
+  "targetFiles": [
+    "sympy/combinatorics/perm_groups.py"
+  ],
+  "appliedFiles": [],
+  "fileBeforeHashes": {},
+  "fileAfterHashes": {},
+  "permissions": {
+    "fileWrite": [
+      "sympy/combinatorics/perm_groups.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "blocked",
+  "blockedReasons": [
+    "compose-context-mismatch: proposal 'prop-hist-w0-sympy_combinatorics_perm_groups_py' context mismatch at base line 5028: expected \"\", found \"                    pc_series.insert(0, H)\" [proposals: prop-hist-w0-sympy_combinatorics_perm_groups_py]"
+  ],
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-0683d4bb992b6db8",
+    "planId": "merge-0683d4bb992b6db8",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-0683d4bb992b6db8",
+        "planId": "merge-0683d4bb992b6db8",
+        "request_identity": [
+          "prop-hist-w0-sympy_combinatorics_perm_groups_py"
+        ],
+        "actor_ids": [
+          "writer-28626"
+        ],
+        "request_files": [
+          "sympy/combinatorics/perm_groups.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/sympy/runs/sympy_28626_28639__bare_composer__s1/artifacts/steward/cb-sympy_combinatorics_perm_groups.py-w0-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SYMPY_COMBINATORICS_PERM_GROUPS_PY"
+        ],
+        "commit_sha": "9b6a4b5721dc375c7496df843e6d233412197523"
+      }
+    ]
+  }
+}

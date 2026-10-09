@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-44cdedc41e6df4fd",
+  "proposalIds": [
+    "prop-hist-w1-sympy_series_gruntz_py"
+  ],
+  "targetFiles": [
+    "sympy/series/gruntz.py"
+  ],
+  "appliedFiles": [
+    "sympy/series/gruntz.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/series/gruntz.py": "f8a643aa85a9bab51d13a6cccba4a762b65cb88a1b1c076d3f373975fae25742"
+  },
+  "fileAfterHashes": {
+    "sympy/series/gruntz.py": "7e11ebf30f1278c77ee862a31e69706a37781549b3798a3dec00370bfab494a8"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/series/gruntz.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-44cdedc41e6df4fd",
+    "planId": "merge-44cdedc41e6df4fd",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-44cdedc41e6df4fd",
+        "planId": "merge-44cdedc41e6df4fd",
+        "request_identity": [
+          "prop-hist-w1-sympy_series_gruntz_py"
+        ],
+        "actor_ids": [
+          "writer-27567"
+        ],
+        "request_files": [
+          "sympy/series/gruntz.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/series/gruntz.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/sympy/runs/sympy_27369_27567__steward__s0/artifacts/steward/cb-sympy_series_gruntz.py-w1-0002.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_SERIES_GRUNTZ_PY"
+        ],
+        "commit_sha": "559eefc427aea99ef793e30714540891644612a9"
+      }
+    ]
+  }
+}

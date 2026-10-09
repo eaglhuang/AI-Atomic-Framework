@@ -1,9 +1,11 @@
 import { strict as assert } from 'node:assert';
 import {
   existsSync,
+  lstatSync,
   mkdirSync,
   mkdtempSync,
   readFileSync,
+  unlinkSync,
   symlinkSync,
   writeFileSync
 } from 'node:fs';
@@ -16,6 +18,7 @@ import {
 } from '../../scripts/run-sealed-runner-build.ts';
 
 const fixtureRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-sealed-junction-'));
+const danglingLink = path.join(fixtureRoot, 'dangling-link');
 try {
 const hostRoot = path.join(fixtureRoot, 'host-repo');
 const worktreeRoot = path.join(fixtureRoot, 'sealed-worktree');
@@ -65,6 +68,14 @@ writeFileSync(path.join(plainTree, 'nested', 'file.txt'), 'gone\n', 'utf8');
 removeTreeWithoutFollowingLinks(plainTree);
 assert.equal(existsSync(plainTree), false, 'plain directory trees must still be removed');
 
+// existsSync follows the target: a dangling link still owns a directory entry.
+symlinkSync(path.join(fixtureRoot, 'missing-target'), danglingLink,
+  process.platform === 'win32' ? 'junction' : 'dir');
+assert.equal(existsSync(danglingLink), false);
+assert.equal(lstatSync(danglingLink).isSymbolicLink(), true);
+removeTreeWithoutFollowingLinks(danglingLink);
+assert.throws(() => lstatSync(danglingLink), { code: 'ENOENT' }, 'dangling link must be removed');
+
 console.log(JSON.stringify({
   ok: true,
   case: 'sealed-runner-build-junction-cleanup',
@@ -74,6 +85,9 @@ console.log(JSON.stringify({
   unlinkBeforeRemove: true
 }, null, 2));
 } finally {
+  try { unlinkSync(danglingLink); } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
+  }
   // This fixture owns its root. Never follow its junctions into external data.
   removeTreeWithoutFollowingLinks(fixtureRoot);
 }

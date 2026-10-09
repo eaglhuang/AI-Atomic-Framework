@@ -1,0 +1,37 @@
+{
+ "writer": 1,
+ "pr": 19844,
+ "pid": 2060262,
+ "init_ms": 89.031754,
+ "start_offset_ms": 20,
+ "file_order": [
+  "django/db/models/query.py"
+ ],
+ "holds": {
+  "django/db/models/query.py": 14
+ },
+ "decisions": [
+  {
+   "writer": 1,
+   "pr": 19844,
+   "path": "django/db/models/query.py",
+   "intents": [
+    "log:django:17554_19844:19844:django/db/models/query.py:h0"
+   ],
+   "hold_ms": 14,
+   "t_submit_epoch": 1791563721947,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "queue",
+   "admit_wait_ms": 21,
+   "outcome": "commit",
+   "total_ms": 48.67,
+   "t_done_epoch": 1791563721995
+  }
+ ],
+ "admit_stats": {
+  "txns": 3,
+  "cas_conflicts": 3
+ },
+ "steward_batches": null
+}

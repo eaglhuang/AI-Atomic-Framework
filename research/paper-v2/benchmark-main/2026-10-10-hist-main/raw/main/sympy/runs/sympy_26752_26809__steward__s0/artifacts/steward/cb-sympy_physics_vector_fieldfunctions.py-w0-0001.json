@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-d7eac43642fd7bf4",
+  "proposalIds": [
+    "prop-hist-w0-sympy_physics_vector_fieldfunctions_py"
+  ],
+  "targetFiles": [
+    "sympy/physics/vector/fieldfunctions.py"
+  ],
+  "appliedFiles": [
+    "sympy/physics/vector/fieldfunctions.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/physics/vector/fieldfunctions.py": "d6dcf2576887ebe5083c9e96e148603991d31b101b9d6866753c5bcf5d99e76f"
+  },
+  "fileAfterHashes": {
+    "sympy/physics/vector/fieldfunctions.py": "1f74bba1e2c76889d99ecf64a34e013ce71248e2b63398412bbd6307cd771316"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/physics/vector/fieldfunctions.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-d7eac43642fd7bf4",
+    "planId": "merge-d7eac43642fd7bf4",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-d7eac43642fd7bf4",
+        "planId": "merge-d7eac43642fd7bf4",
+        "request_identity": [
+          "prop-hist-w0-sympy_physics_vector_fieldfunctions_py"
+        ],
+        "actor_ids": [
+          "writer-26752"
+        ],
+        "request_files": [
+          "sympy/physics/vector/fieldfunctions.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/physics/vector/fieldfunctions.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/sympy/runs/sympy_26752_26809__steward__s0/artifacts/steward/cb-sympy_physics_vector_fieldfunctions.py-w0-0001.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W0-SYMPY_PHYSICS_VECTOR_FIELDFUNCTIONS_PY"
+        ],
+        "commit_sha": "9067e3d90461652bfa9e6570cd8d5bac8803139f"
+      }
+    ]
+  }
+}

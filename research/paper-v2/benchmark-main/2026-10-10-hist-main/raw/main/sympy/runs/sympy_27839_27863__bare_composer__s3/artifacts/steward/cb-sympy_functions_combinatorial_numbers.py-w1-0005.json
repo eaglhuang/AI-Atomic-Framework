@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.stewardApplyEvidence.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "neutral write steward apply"
+  },
+  "stewardId": "neutral-write-steward",
+  "mergePlanId": "merge-d53384bfb9ce3662",
+  "proposalIds": [
+    "prop-hist-w1-sympy_functions_combinatorial_numbers_py"
+  ],
+  "targetFiles": [
+    "sympy/functions/combinatorial/numbers.py"
+  ],
+  "appliedFiles": [
+    "sympy/functions/combinatorial/numbers.py"
+  ],
+  "fileBeforeHashes": {
+    "sympy/functions/combinatorial/numbers.py": "7ecc7f3bb386c781e276fca78c6e56ce410bdf75b10d2092e3108c21b7aa4d3f"
+  },
+  "fileAfterHashes": {
+    "sympy/functions/combinatorial/numbers.py": "0e0cc69d65e004ff49f84cbd3e5c00152b4f7e7c8bf71395b1b793d40c3ed4a0"
+  },
+  "permissions": {
+    "fileWrite": [
+      "sympy/functions/combinatorial/numbers.py"
+    ],
+    "gitWrite": false,
+    "taskLifecycle": false,
+    "selfClose": false
+  },
+  "applyMethod": "patch-apply",
+  "verdict": "applied",
+  "brokerOperationRun": {
+    "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "deterministic compose"
+    },
+    "runId": "steward-merge-d53384bfb9ce3662",
+    "planId": "merge-d53384bfb9ce3662",
+    "records": [
+      {
+        "schemaId": "atm.brokerOperationRunRecord.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "deterministic compose"
+        },
+        "runId": "steward-merge-d53384bfb9ce3662",
+        "planId": "merge-d53384bfb9ce3662",
+        "request_identity": [
+          "prop-hist-w1-sympy_functions_combinatorial_numbers_py"
+        ],
+        "actor_ids": [
+          "writer-27863"
+        ],
+        "request_files": [
+          "sympy/functions/combinatorial/numbers.py"
+        ],
+        "adapter_choice": "steward.patch-apply",
+        "applied_files": [
+          "sympy/functions/combinatorial/numbers.py"
+        ],
+        "lane_decision": "neutral-steward",
+        "merge_verdict": "mergeable",
+        "evidence_path": "/workspace/reports/hist-main/main-2026-10-10/main/sympy/runs/sympy_27839_27863__bare_composer__s3/artifacts/steward/cb-sympy_functions_combinatorial_numbers.py-w1-0005.json",
+        "task_ids": [
+          "TASK-PROP-HIST-W1-SYMPY_FUNCTIONS_COMBINATORIAL_NUMBERS_PY"
+        ],
+        "commit_sha": "992d2c713f7b783971fb468f227ce1ab2803632d"
+      }
+    ]
+  }
+}

@@ -4,7 +4,8 @@ import path from 'node:path';
 import ts from 'typescript';
 
 // Execute the actual subprocess wrapper without triggering the full release
-// build or modifying shared outputs. Only spawnSync is replaced by a fixture.
+// build or modifying shared outputs. The wrapper calls spawnCliCapture;
+// the fixture replaces that helper so exit-code mapping stays under test.
 for (const [file, name, args] of [
   ['validate-onefile-release.ts', 'runOnefile', ['atm.mjs', '.', []]],
   ['validate-root-drop-release.ts', 'runAtm', ['.', []]]
@@ -25,7 +26,7 @@ for (const [file, name, args] of [
     ['missing-status', null, null, undefined, 1]
   ] as const) {
     const mockSpawn = () => ({ status, signal, error, stdout: '{"ok":true}', stderr: '' });
-    const wrapper = new Function('spawnSync', 'path', 'process', `${javascript}; return ${name};`)(mockSpawn, path, process);
+    const wrapper = new Function('spawnCliCapture', 'path', 'process', `${javascript}; return ${name};`)(mockSpawn, path, process);
     const result = wrapper(...args);
     assert.equal(result.exitCode, expected, `${file}: ${label} must not become a false pass`);
     assert.deepEqual(result.parsed, { ok: true }, 'valid output alone cannot prove process success');
