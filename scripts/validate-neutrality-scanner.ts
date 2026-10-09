@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { spawnCliCapture } from './lib/cli-json-spawn.ts';
 import { parseAtomicSpecFile } from '../packages/core/src/spec/parse-spec.ts';
 import { defaultNeutralityPolicyRelativePath, loadNeutralityPolicy, scanNeutralityRepository, scanNeutralityText } from '../packages/plugin-rule-guard/src/neutrality-scanner.ts';
 
@@ -31,9 +31,9 @@ function readText(relativePath: any) {
 }
 
 function runAtm(args: any, cwd = root) {
-  const result = spawnSync(process.execPath, [path.join(root, 'atm.mjs'), ...args], {
+  const result = spawnCliCapture(process.execPath, [path.join(root, 'atm.mjs'), ...args], {
     cwd,
-    encoding: 'utf8'
+    label: `atm ${args.join(' ')}`
   });
   const payload = (result.stdout || result.stderr || '').trim();
   let parsed;

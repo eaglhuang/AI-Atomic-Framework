@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
-import { execFileSync, spawnSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
+import { spawnCliCapture } from './lib/cli-json-spawn.ts';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { buildGateTelemetryRegistryCoverageReport, commandGateCheckId } from '../packages/core/src/telemetry/index.ts';
@@ -68,10 +69,10 @@ if (mode === 'command-matrix') {
   const runnerPath = path.join(root, 'packages', 'cli', 'src', 'atm.ts');
   const samples = inventory.map((entry, index) => {
     const started = process.hrtime.bigint();
-    const result = spawnSync(process.execPath, ['--strip-types', runnerPath, entry.command, ...workload.args], {
+    const result = spawnCliCapture(process.execPath, ['--strip-types', runnerPath, entry.command, ...workload.args], {
       cwd: root,
-      encoding: 'utf8',
-      windowsHide: true
+      windowsHide: true,
+      label: `atm ${entry.command} --help --json`
     });
     const durationMs = Number(process.hrtime.bigint() - started) / 1_000_000;
     const outcome: CommandGateLatencyOutcome = result.error

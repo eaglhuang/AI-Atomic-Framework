@@ -17,10 +17,10 @@
  */
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
+import { CliOutputTruncatedError, spawnCliCapture } from './cli-json-spawn.ts';
 
 export type ValidatorMode = 'test' | 'validate' | 'lint' | 'typecheck' | string;
 export type PortableCliExecution = 'frozen-first' | 'source-in-process';
@@ -140,12 +140,18 @@ export function createValidator(name: string, options: {
     const commandArgs = launcher === 'atm.mjs'
       ? [repoPath('atm.mjs'), ...args]
       : ['--strip-types', repoPath('packages', 'cli', 'src', 'atm.ts'), ...args];
-    const result = spawnSync(process.execPath, commandArgs, {
-      cwd,
-      encoding: 'utf8'
-    });
+    let result;
+    try {
+      result = spawnCliCapture(process.execPath, commandArgs, {
+        cwd,
+        label: `${launcher} ${args.join(' ')}`
+      });
+    } catch (error) {
+      if (error instanceof CliOutputTruncatedError) fail(error.message);
+      throw error;
+    }
     const errorPayload = result.error
-      ? `${result.error.name}: ${result.error.message}${'code' in result.error && result.error.code ? ` (${String(result.error.code)})` : ''}`
+      ? `${result.error.name}: ${result.error.message}${result.error.code ? ` (${String(result.error.code)})` : ''}`
       : '';
     return {
       exitCode: result.status ?? (result.error ? 1 : 0),

@@ -1,6 +1,7 @@
 import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import os from 'node:os';
+import { spawnCliCapture } from './lib/cli-json-spawn.ts';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Ajv2020 from 'ajv/dist/2020.js';
@@ -105,14 +106,14 @@ if (!process.exitCode) {
 function renderChartFixture() {
   const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-meta-schema-'));
   try {
-    const bootstrap = spawnSync(process.execPath, [path.join(root, 'atm.mjs'), 'bootstrap', '--cwd', tempRoot, '--json'], {
+    const bootstrap = spawnCliCapture(process.execPath, [path.join(root, 'atm.mjs'), 'bootstrap', '--cwd', tempRoot, '--json'], {
       cwd: root,
-      encoding: 'utf8'
+      label: 'atm bootstrap --json'
     });
     assert(bootstrap.status === 0, 'META_SCHEMA_BOOTSTRAP_FAILED', `bootstrap fixture failed: ${bootstrap.stdout}${bootstrap.stderr}`);
-    const render = spawnSync(process.execPath, [path.join(root, 'atm.mjs'), 'atm-chart', 'render', '--cwd', tempRoot, '--json'], {
+    const render = spawnCliCapture(process.execPath, [path.join(root, 'atm.mjs'), 'atm-chart', 'render', '--cwd', tempRoot, '--json'], {
       cwd: root,
-      encoding: 'utf8'
+      label: 'atm-chart render --json'
     });
     assert(render.status === 0, 'META_SCHEMA_ATM_CHART_RENDER_FAILED', `atm-chart render fixture failed: ${render.stdout}${render.stderr}`);
     return readFileSync(path.join(tempRoot, '.atm', 'memory', 'atm-chart.md'), 'utf8');

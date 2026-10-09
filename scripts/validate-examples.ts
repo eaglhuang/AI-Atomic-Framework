@@ -1,7 +1,7 @@
 import { existsSync, readFileSync, rmSync } from 'node:fs';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { spawnCliCapture } from './lib/cli-json-spawn.ts';
 import { createTempWorkspace } from './temp-root.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -71,10 +71,12 @@ function assert(condition: any, message: any) {
 }
 
 function run(command: any, args: any, options: any = {}) {
-  const result = spawnSync(command, args, {
-    cwd: root,
-    encoding: 'utf8',
-    ...options
+  const result = spawnCliCapture(command, args, {
+    cwd: options.cwd ?? root,
+    env: options.env,
+    timeout: options.timeout,
+    maxBuffer: options.maxBuffer,
+    label: `${command} ${(args ?? []).join(' ')}`
   });
   if (result.error || result.status !== 0) {
     fail(`${command} ${args.join(' ')} failed\nerror:\n${result.error?.message || ''}\nstdout:\n${result.stdout || ''}\nstderr:\n${result.stderr || ''}`);
