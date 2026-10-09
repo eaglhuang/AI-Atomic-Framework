@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "date": "2026-10-09",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Local fixture repair; remote validation pending",
+  "id": "ATM-BUG-2026-10-09-003",
+  "area": "Claim adoption regression fixture portability and cleanup",
+  "finding": "On Windows, isolatedEnv passed Node os.devNull (\\\\.\\nul) as GIT_CONFIG_GLOBAL; Git init rejected it with exit 128. fixture() allocated its directory before withFixture entered try/finally, leaving 32 empty directories on initialization failure.",
+  "expectedBehavior": "Use a Git-compatible empty global configuration path on each platform. Fixture allocation and every initialization step must be owned by the same finally cleanup boundary, including partially written setup failures.",
+  "evidenceOrRepro": "Before repair, the Windows test failed during Git init; failed-run duration 1434 ms is not a performance baseline. After the minimal repair, all original 34 tests passed with no skips (176051.2102 ms, one local sample). An injected initialization failure regression verifies partial files and their directory are removed. Remote CI remains required.",
+  "followUp": "Retain all ownership, stale-runner and index-preimage checks. Do not infer speed improvement from a failed baseline or compare local Windows timing directly with Linux CI. No new gate, public command, resource registry or bundle-size claim. Other fixture families are not covered by this bounded repair."
+}
