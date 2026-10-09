@@ -1,0 +1,99 @@
+E5 harness start 2026-10-07 23:29:37 CST
+BANNER: DRAFT — not a win claim; fault arms non-competitors
+[1] FAULT_OCC e5-occ_exhaust-s11
+[atm] arm=occ role=baseline_occ diagnostic=false backend=real intents=15 committed=9 blocked=6 oracle_correct=9 oracle_lost=0 duration_ms=235 wall_clock_ms=229.12
+[
+  {
+    "run_id": "e5-occ_exhaust-s11",
+    "mode": "atm",
+    "status": "done",
+    "atm_backend": "real",
+    "agents": [
+      "cursor:mock-s0",
+      "claude:mock-s1",
+      "codex:mock-s2"
+    ],
+    "next_hint": "atm-bench export --run-id e5-occ_exhaust-s11"
+  }
+]
+[2] FAULT_OCC e5-occ_exhaust-s17
+[atm] arm=occ role=baseline_occ diagnostic=false backend=real intents=13 committed=9 blocked=4 oracle_correct=9 oracle_lost=0 duration_ms=200 wall_clock_ms=197.63
+[
+  {
+    "run_id": "e5-occ_exhaust-s17",
+    "mode": "atm",
+    "status": "done",
+    "atm_backend": "real",
+    "agents": [
+      "cursor:mock-s0",
+      "claude:mock-s1",
+      "codex:mock-s2"
+    ],
+    "next_hint": "atm-bench export --run-id e5-occ_exhaust-s17"
+  }
+]
+[3] FAULT_OCC e5-occ_exhaust-s23
+[atm] arm=occ role=baseline_occ diagnostic=false backend=real intents=13 committed=8 blocked=5 oracle_correct=8 oracle_lost=0 duration_ms=216 wall_clock_ms=208.97
+[
+  {
+    "run_id": "e5-occ_exhaust-s23",
+    "mode": "atm",
+    "status": "done",
+    "atm_backend": "real",
+    "agents": [
+      "cursor:mock-s0",
+      "claude:mock-s1",
+      "codex:mock-s2"
+    ],
+    "next_hint": "atm-bench export --run-id e5-occ_exhaust-s23"
+  }
+]
+[4] CONTROL e5-clean_steward-s11
+[atm] arm=steward role=main_method diagnostic=false backend=real intents=15 committed=15 blocked=0 oracle_correct=15 oracle_lost=0 duration_ms=749 wall_clock_ms=740.96
+[
+  {
+    "run_id": "e5-clean_steward-s11",
+    "mode": "atm",
+    "status": "done",
+    "atm_backend": "real",
+    "agents": [
+      "cursor:mock-s0",
+      "claude:mock-s1",
+      "codex:mock-s2"
+    ],
+    "next_hint": "atm-bench export --run-id e5-clean_steward-s11"
+  }
+]
+[5] CONTROL e5-clean_steward-s17
+[atm] arm=steward role=main_method diagnostic=false backend=real intents=13 committed=13 blocked=0 oracle_correct=13 oracle_lost=0 duration_ms=588 wall_clock_ms=585.43
+[
+  {
+    "run_id": "e5-clean_steward-s17",
+    "mode": "atm",
+    "status": "done",
+    "atm_backend": "real",
+    "agents": [
+      "cursor:mock-s0",
+      "claude:mock-s1",
+      "codex:mock-s2"
+    ],
+    "next_hint": "atm-bench export --run-id e5-clean_steward-s17"
+  }
+]
+[6] CONTROL e5-clean_steward-s23
+[atm] arm=steward role=main_method diagnostic=false backend=real intents=13 committed=13 blocked=0 oracle_correct=13 oracle_lost=0 duration_ms=512 wall_clock_ms=506.08
+[
+  {
+    "run_id": "e5-clean_steward-s23",
+    "mode": "atm",
+    "status": "done",
+    "atm_backend": "real",
+    "agents": [
+      "cursor:mock-s0",
+      "claude:mock-s1",
+      "codex:mock-s2"
+    ],
+    "next_hint": "atm-bench export --run-id e5-clean_steward-s23"
+  }
+]
+E5 harness end 2026-10-07 23:29:41 CST harness_cells=6 (+12 probe)

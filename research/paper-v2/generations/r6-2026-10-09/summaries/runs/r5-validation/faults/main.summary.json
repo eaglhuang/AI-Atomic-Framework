@@ -1,0 +1,502 @@
+{
+ "F1-holder-sigkill | after-lock | 37847584-qon": {
+  "n": 10,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "B:applied": 10
+  }
+ },
+ "F1-holder-sigkill | before-rename | 37847584-qon": {
+  "n": 10,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "B:applied": 10
+  }
+ },
+ "F2-crafted-owner | pidreuse-live-pid-wrong-starttoken | 37847584-qon": {
+  "n": 5,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "B:applied": 5
+  }
+ },
+ "F2-crafted-owner | live-pid-correct-starttoken | 37847584-qon": {
+  "n": 5,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "B:applied": 5
+  }
+ },
+ "F2-crafted-owner | dead-pid | 37847584-qon": {
+  "n": 5,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "B:applied": 5
+  }
+ },
+ "F2-crafted-owner | legacy-v1-live-pid | 37847584-qon": {
+  "n": 5,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "B:applied": 5
+  }
+ },
+ "F3-live-holder-timeout | hold3500ms | 37847584-qon": {
+  "n": 10,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:applied": 10
+  }
+ },
+ "F4-tmpdir | same-tmpdir/B-same-region | 37847584-qon": {
+  "n": 10,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:blocked(steward-final-patch-required)": 10
+  }
+ },
+ "F4-tmpdir | same-tmpdir/B-other-region | 37847584-qon": {
+  "n": 10,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:applied": 10
+  }
+ },
+ "F4-tmpdir | different-tmpdir/B-same-region | 37847584-qon": {
+  "n": 10,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:blocked(steward-final-patch-required)": 10
+  }
+ },
+ "F4-tmpdir | different-tmpdir/B-other-region | 37847584-qon": {
+  "n": 10,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:applied": 10
+  }
+ },
+ "F6-pid-namespace | holder-host/contender-pidns | 37847584-qon": {
+  "n": 10,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:applied": 10
+  }
+ },
+ "F6-pid-namespace | holder-pidns/contender-host | 37847584-qon": {
+  "n": 10,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:applied": 10
+  }
+ },
+ "F2b-forged-owner-live-holder | forged-owner-dead-pid | 37847584-qon": {
+  "n": 5,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:applied": 5
+  }
+ },
+ "F2b-forged-owner-live-holder | forged-owner-wrong-starttoken | 37847584-qon": {
+  "n": 5,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:applied": 5
+  }
+ },
+ "O2-live-writer-temp | all-host | 37847584-qon": {
+  "n": 10,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:blocked(recovery-required)": 10
+  }
+ },
+ "O2-live-writer-temp | writer-pidns/cleaner+B-host | 37847584-qon": {
+  "n": 10,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:blocked(recovery-required)": 10
+  }
+ },
+ "O2-live-writer-temp | writer-host/cleaner+B-pidns | 37847584-qon": {
+  "n": 10,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:blocked(recovery-required)": 10
+  }
+ },
+ "F7-queue-wait-fallback | queue-wait300ms/A-hold3000ms | 37847584-qon": {
+  "n": 10,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:blocked(recovery-required)": 10
+  }
+ },
+ "F7-queue-wait-fallback | queue-wait300ms/A-hold1200ms | 37847584-qon": {
+  "n": 10,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:applied": 10
+  }
+ },
+ "F5-retry-exhaustion | default-policy/K=always | 37847584-qon": {
+  "n": 5,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:blocked(re-compose attempts exhausted after 5 of 5)": 5
+  }
+ },
+ "F5-retry-exhaustion | default-policy/K=2 | 37847584-qon": {
+  "n": 5,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied": 5
+  }
+ },
+ "F5-retry-exhaustion | default-policy/K=4 | 37847584-qon": {
+  "n": 5,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied": 5
+  }
+ },
+ "F5-retry-exhaustion | maxRecompose=0/K=always | 37847584-qon": {
+  "n": 5,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:blocked(re-compose attempts exhausted after 1 of 1)": 5
+  }
+ },
+ "F5-retry-exhaustion | maxRecompose=1,backoff0/K=1 | 37847584-qon": {
+  "n": 5,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied": 5
+  }
+ },
+ "F5-retry-exhaustion | env:ATM_STEWARD_RECOMPOSE_POLICY maxRecompose=0/K=always | 37847584-qon": {
+  "n": 5,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:blocked(re-compose attempts exhausted after 1 of 1)": 5
+  }
+ },
+ "F1-holder-sigkill | after-lock | 37847584-qoff": {
+  "n": 10,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "B:applied": 10
+  }
+ },
+ "F1-holder-sigkill | before-rename | 37847584-qoff": {
+  "n": 10,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "B:applied": 10
+  }
+ },
+ "F2-crafted-owner | pidreuse-live-pid-wrong-starttoken | 37847584-qoff": {
+  "n": 5,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "B:applied": 5
+  }
+ },
+ "F2-crafted-owner | live-pid-correct-starttoken | 37847584-qoff": {
+  "n": 5,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "B:applied": 5
+  }
+ },
+ "F2-crafted-owner | dead-pid | 37847584-qoff": {
+  "n": 5,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "B:applied": 5
+  }
+ },
+ "F2-crafted-owner | legacy-v1-live-pid | 37847584-qoff": {
+  "n": 5,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "B:applied": 5
+  }
+ },
+ "F3-live-holder-timeout | hold3500ms | 37847584-qoff": {
+  "n": 10,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:blocked(recovery-required)": 10
+  }
+ },
+ "F4-tmpdir | same-tmpdir/B-same-region | 37847584-qoff": {
+  "n": 10,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:blocked(steward-final-patch-required)": 10
+  }
+ },
+ "F4-tmpdir | same-tmpdir/B-other-region | 37847584-qoff": {
+  "n": 10,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:applied": 10
+  }
+ },
+ "F4-tmpdir | different-tmpdir/B-same-region | 37847584-qoff": {
+  "n": 10,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:blocked(steward-final-patch-required)": 10
+  }
+ },
+ "F4-tmpdir | different-tmpdir/B-other-region | 37847584-qoff": {
+  "n": 10,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:applied": 10
+  }
+ },
+ "F6-pid-namespace | holder-host/contender-pidns | 37847584-qoff": {
+  "n": 10,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:blocked(recovery-required)": 10
+  }
+ },
+ "F6-pid-namespace | holder-pidns/contender-host | 37847584-qoff": {
+  "n": 10,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:blocked(recovery-required)": 10
+  }
+ },
+ "F2b-forged-owner-live-holder | forged-owner-dead-pid | 37847584-qoff": {
+  "n": 5,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:blocked(recovery-required)": 5
+  }
+ },
+ "F2b-forged-owner-live-holder | forged-owner-wrong-starttoken | 37847584-qoff": {
+  "n": 5,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:blocked(recovery-required)": 5
+  }
+ },
+ "O2-live-writer-temp | all-host | 37847584-qoff": {
+  "n": 10,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:blocked(recovery-required)": 10
+  }
+ },
+ "O2-live-writer-temp | writer-pidns/cleaner+B-host | 37847584-qoff": {
+  "n": 10,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:blocked(recovery-required)": 10
+  }
+ },
+ "O2-live-writer-temp | writer-host/cleaner+B-pidns | 37847584-qoff": {
+  "n": 10,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied B:blocked(recovery-required)": 10
+  }
+ },
+ "F5-retry-exhaustion | default-policy/K=always | 37847584-qoff": {
+  "n": 5,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:blocked(re-compose attempts exhausted after 5 of 5)": 5
+  }
+ },
+ "F5-retry-exhaustion | default-policy/K=2 | 37847584-qoff": {
+  "n": 5,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied": 5
+  }
+ },
+ "F5-retry-exhaustion | default-policy/K=4 | 37847584-qoff": {
+  "n": 5,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied": 5
+  }
+ },
+ "F5-retry-exhaustion | maxRecompose=0/K=always | 37847584-qoff": {
+  "n": 5,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:blocked(re-compose attempts exhausted after 1 of 1)": 5
+  }
+ },
+ "F5-retry-exhaustion | maxRecompose=1,backoff0/K=1 | 37847584-qoff": {
+  "n": 5,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:applied": 5
+  }
+ },
+ "F5-retry-exhaustion | env:ATM_STEWARD_RECOMPOSE_POLICY maxRecompose=0/K=always | 37847584-qoff": {
+  "n": 5,
+  "lost_effects": 0,
+  "runs_with_lost": 0,
+  "frame_bad": 0,
+  "leftovers": 0,
+  "outcomes": {
+   "A:blocked(re-compose attempts exhausted after 1 of 1)": 5
+  }
+ }
+}

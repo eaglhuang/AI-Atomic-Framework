@@ -11,9 +11,10 @@
 | `generations/r2-2026-10-08/` | **DRAFT — 回應 P0（未再外審）；r3 起為歷史（保留、不可變）** | `5692474f7db70ab52a7a71c8af4867609e7e4b43` | `25d4a2936b52623665f8351138d6c65c7393f8793b67bac46b84c3a272ac87fe` | 309（不含 SHA256SUMS） | [GENERATION.md](./generations/r2-2026-10-08/GENERATION.md) |
 | `generations/r3-2026-10-08/` | **DRAFT — ATM PR #213 修正驗證（未再外審）；r4 起為歷史（保留、不可變）** | 驗證 pin `bea35380d7f381f998c9930fa95f01b999c7f208`；對照 `5692474f7db70ab52a7a71c8af4867609e7e4b43` | `7a8c0cb4e27960b9477f58323c46566bbbb4591009da9da9ebd919243cd869ed` | 329（不含 SHA256SUMS） | [GENERATION.md](./generations/r3-2026-10-08/GENERATION.md) |
 | `generations/r4-2026-10-08/` | **DRAFT — ATM PR #214 完成率最佳化驗證（未再外審）；r5 起為歷史（保留、不可變）** | 驗證 pin `2118bc66efb3ac3bc0ddaede6a2f7cb18526b030`；對照 `bea35380d7f381f998c9930fa95f01b999c7f208`、`5692474f7db70ab52a7a71c8af4867609e7e4b43` | `6aa0d178a32ee2b9df74679b2da4aa2575fd4bb10e8e4571418a18fffe81a7e7` | 363（不含 SHA256SUMS） | [GENERATION.md](./generations/r4-2026-10-08/GENERATION.md) |
-| `generations/r5-2026-10-08/` | **DRAFT — ATM PR #216 核心層鎖／孤兒 temp 清理／apply 佇列驗證＋四版同場重跑（未再外審；作者自行執行、未獨立重現）** | 驗證 pin `37847584e24afc08ea58cfe380bb5b1220fbe335`（queue on／off 兩臂）；對照 `2118bc66efb3ac3bc0ddaede6a2f7cb18526b030`、`bea35380d7f381f998c9930fa95f01b999c7f208`、`5692474f7db70ab52a7a71c8af4867609e7e4b43` | `2a4bfb184debaeb85a7283d990b92ba270732c344052497052761844f42a257a` | 431 | [GENERATION.md](./generations/r5-2026-10-08/GENERATION.md) |
+| `generations/r5-2026-10-08/` | **DRAFT — ATM PR #216 核心層鎖／孤兒 temp 清理／apply 佇列驗證＋四版同場重跑（未再外審；作者自行執行、未獨立重現）；r6 起為歷史（保留、不可變）** | 驗證 pin `37847584e24afc08ea58cfe380bb5b1220fbe335`（queue on／off 兩臂）；對照 `2118bc66efb3ac3bc0ddaede6a2f7cb18526b030`、`bea35380d7f381f998c9930fa95f01b999c7f208`、`5692474f7db70ab52a7a71c8af4867609e7e4b43` | `2a4bfb184debaeb85a7283d990b92ba270732c344052497052761844f42a257a` | 431 | [GENERATION.md](./generations/r5-2026-10-08/GENERATION.md) |
+| `generations/r6-2026-10-09/` | **DRAFT — ATM PR #238 apply 佇列 SQLITE_BUSY 修正小型驗證（未再外審；作者自行執行、未獨立重現）** | 驗證 pin `b35a6141bd5bfbaec654f1cd3079323581b04074`（queue on／off 兩臂）；對照 `37847584e24afc08ea58cfe380bb5b1220fbe335`（queue on） | `56cda563e8423d391ff4f85ad19a6a9ee1feb3ae5a188f4cad5d4b63cbc3dd3f` | 486 | [GENERATION.md](./generations/r6-2026-10-09/GENERATION.md) |
 
-r1 簡寫：`R1=generations/r1-reviewed-2026-10-07`。 r2 簡寫：`R2=generations/r2-2026-10-08`。r3 簡寫：`R3=generations/r3-2026-10-08`。r4 簡寫：`R4=generations/r4-2026-10-08`。r5 簡寫：`R5=generations/r5-2026-10-08`。驗證（唯讀）：r1 目錄執行 `bash verify.sh`（r1 腳本需 bash）；r2–r5 目錄執行 `sh verify.sh` 或 `bash verify.sh`。
+r1 簡寫：`R1=generations/r1-reviewed-2026-10-07`。 r2 簡寫：`R2=generations/r2-2026-10-08`。r3 簡寫：`R3=generations/r3-2026-10-08`。r4 簡寫：`R4=generations/r4-2026-10-08`。r5 簡寫：`R5=generations/r5-2026-10-08`。r6 簡寫：`R6=generations/r6-2026-10-09`。驗證（唯讀）：r1 目錄執行 `bash verify.sh`（r1 腳本需 bash）；r2–r6 目錄執行 `sh verify.sh` 或 `bash verify.sh`。
 
 ## 2. 審核紀錄（r1）
 
@@ -186,7 +187,7 @@ r5 上傳包拆成三個獨立 tarball（各 < 25 MB），都解到同一個 `ge
 
 ## 11. 工作稿快照（working docs snapshots；非 generation）
 
-> **DRAFT 工作稿，不是封存的證據 generation，不主張任何結論。** 目的：論文 2.0 的所有產出都進 repo，不只留在 box 上。每個快照目錄建立後即不可變；之後的工作稿另開新日期目錄。r1–r5 generation 不受影響。論文數字只引用 generation，不引用工作稿快照。
+> **DRAFT 工作稿，不是封存的證據 generation，不主張任何結論。** 目的：論文 2.0 的所有產出都進 repo，不只留在 box 上。每個快照目錄建立後即不可變；之後的工作稿另開新日期目錄。r1–r6 generation 不受影響。論文數字只引用 generation，不引用工作稿快照。
 
 | 快照 | 狀態 | 比對基準 | SHA256SUMS sha256 | 檔案數 | 說明 |
 |---|---|---|---|---:|---|
@@ -194,7 +195,36 @@ r5 上傳包拆成三個獨立 tarball（各 < 25 MB），都解到同一個 `ge
 
 內容：`benchmark-survey/`（公開 benchmark 調查、歷史 commit/PR benchmark 預先註冊計畫草稿，尚未執行任何 run）；r5 v1 分析（superseded）與 r2 早期 rescore 輸出中與 main 不同者；r2／r4／r5 封存前中間版與論文 checkpoint；2026-10-06 harness 原始碼早期備份；先前交接用 EVIDENCE_INDEX／README 提案、patch 與 build 腳本。論文 v1 arXiv 副本仍依 §6 不上傳。
 
-## 12. 歷史真實 PR benchmark 試跑（HIST-PAIRS，STALE 方法）：冒煙測試＋Django pilot（2026-10-09，試跑，不列入正式結果）
+## 12. r6：ATM PR #238（merge `b35a6141`）apply 佇列 SQLITE_BUSY 修正驗證（2026-10-09）
+
+> 完整對照見 `R6/GENERATION.md`；偏離與事件見 `R6/DEVIATIONS.md`。r1–r5 檔案與 §7–§11 內容不變。r6 是小型驗證（每臂 150 runs），全部數字為作者自行執行、**未獨立重現**；完成與遺失分開報告；Wilson 區間為描述性。CI 另列：PR #238 feature head `2712c024` 與 merge `b35a6141` 的 Product CI、ATM Dogfood、neutrality-scan、sandbox-gate 皆 green。Phase 3（450-run 主矩陣）**未執行**。
+
+| 項目 | r6 位置 | 狀態 | 結論／數字 |
+|---|---|---|---|
+| 預先登錄 | `R6/PREREG_R6.md` | 執行前固定（sha256 `c5f42235…`） | 臂 q5（37847584 queue on）、q6（b35a6141 queue on）、nq6（b35a6141 queue off）；r5 seeds |
+| r6 pin | `R6/PINS.json`、`R6/summaries/runs/r6-validation/ATM_CORE_DIFF_37847584..b35a6141.patch` | 已記錄 | tarball 內嵌 commit 相符；兩 pin 前後 core tree hash 不變；diff 含 #238 以外的 `sqlite-runtime.ts`（D5） |
+| E4 重播（r5 同配置，每臂 2×75） | `R6/summaries/runs/r6-analysis/r6-2026-10-09/r6-compare/R6_TABLES.md`、`R6/raw/r6-replay-*.tgz` | 觀察（非證明） | 完成 q5／q6／nq6：3,490／3,500／3,458（/5,220）；0/150 失敗、0 遺失；SQLITE 例外 1（q5，1 run）／0／0；presence 殘留 1／0／0 |
+| E4 完整 cells | `R6/raw/r6-matrix.tgz` | 觀察 | 213／209／210（/318）；0 遺失、0 例外 |
+| 佇列壓力重現 | `R6/summaries/runs/r6-validation/forensics/sqlite-busy/` | 預先登錄＋† 探索性 | 8×300×3：37847584 1／7,200、b35a6141 0；† 16×1,000×3：78／48,000、0（presence 殘留 78／0） |
+| 故障情境（b35a6141 qon／qoff；含 F6 真實 `unshare`） | `R6/summaries/runs/r6-validation/faults/` | 已完成 | 0 遺失、0 frame 壞；F6 namespace 分離 40/40、both_inside_lock 0；孤兒 temp 取鎖後刪除 20/20；活 temp 60/60 未刪 |
+| 確定性 barrier | `R6/summaries/runs/r6-validation/barrier/` | 已完成 | 6 案例 × 10，0 遺失 |
+| r5 已知限制 D6 | 論文 §7.1、附錄 G | **已於 #238 修正** | b35a6141 0 例外、0 presence 殘留；退回檔案鎖次數不可觀察（D6） |
+| 反例（§5.7） | `R6_TABLES.md` §6 | 無 | 遺失、損壞、frame 壞全為 0 |
+| 草稿／F2 | `R6/paper/ATM_PAPER_V2_DRAFT_zh.md` §4.11、§6 表 R3／R6、§7.1、附錄 G、參考文獻 [23]；`R6/tables/F2_CORRECTNESS_TABLES.md` 表 A-r6 | 已更新（DRAFT） | 正文只列結果；過程在附錄 G；不主張勝出 |
+
+r6 raw（deterministic tar＋`gzip -n -9`；r1–r5 raw 不重包，見 `R6/PRIOR_REFERENCES.md`）：
+
+| 檔案 | bytes | sha256 |
+|---|---:|---|
+| `R6/raw/r6-matrix.tgz` | 1,552,057 | `b8509e88e954bb343d58d0845e7abc75140a20233f4e006d7821252f2ce68be2` |
+| `R6/raw/r6-replay-nq6.tgz` | 8,372,349 | `a474dfc3cb7123a9a5e9fe7466dc0b60607eb01c7392cbc6da13671e6a85c813` |
+| `R6/raw/r6-replay-q5.tgz` | 8,514,969 | `10871c47d8c94566e4afdb30e46c02ccb7a0665983de1fe62987761130c32d10` |
+| `R6/raw/r6-replay-q6.tgz` | 8,497,808 | `5761d9ff336caeef8c5f423741aac828d660bdf0c24a637a8e960cc0fedd75c8` |
+| `R6/raw/r6-stdout.tgz` | 44,283 | `b2dbd4d0f6160270717133725611121946d882c4ffddc1b49d94ca24923d8648` |
+
+r6 上傳包拆成多個獨立 tarball，都解到同一個 `generations/r6-2026-10-09/` 路徑，全部解開後才能執行 `verify.sh`（解壓順序不限）。
+
+## 13. 歷史真實 PR benchmark 試跑（HIST-PAIRS，STALE 方法）：冒煙測試＋Django pilot（2026-10-09，試跑，不列入正式結果）
 
 > 作者執行，尚未獨立重現。CI 只驗證檔案與 SHA256SUMS 一致，不重跑實驗。450-run 矩陣仍未完成；主跑（約 9,750 runs）尚未開始，需作者確認。
 
@@ -209,6 +239,6 @@ r5 上傳包拆成三個獨立 tarball（各 < 25 MB），都解到同一個 `ge
 - 限制：Django 2024–2025 在凍結規則下 O1（同一 hunk）層為 0 對，本試跑未涵蓋同 hunk 情境；偏離紀錄見各 generation 的 DEVIATIONS.md。
 
 ## 6. 不在 repo 的參照
-- ATM pin 原始碼：GitHub `eaglhuang/AI-Atomic-Framework` commit `5692474f7db70ab52a7a71c8af4867609e7e4b43`（r3 另加 `bea35380d7f381f998c9930fa95f01b999c7f208`，box tarball `/workspace/atm-main-bea35380/atm-main.tar.gz` sha256 `9346e5b175b176618f435aeb4b41ab93ef7575f9bf77d77c47a5aeac87ad34b5`；r4 另加 `2118bc66efb3ac3bc0ddaede6a2f7cb18526b030`，box tarball `/workspace/atm-main-2118bc66/atm-main.tar.gz` sha256 `aa959607c35c51b7fc3c4e3d81b3d9e979ee62f4d9361ef9e9f5ee72e78abd88`；r5 另加 `37847584e24afc08ea58cfe380bb5b1220fbe335`，box tarball `/workspace/atm-main-37847584/atm-main.tar.gz` sha256 `e17a90ddceaf3c70d580c96e31f14cf8251d5a664985c1eb494f0d8db8045e3d`）；box tarball `/workspace/atm-main-5692474f/atm-main.tar.gz` sha256 `1d498a397e6a5db119d40b8f539dc165cb0028fbfe9577f953023f8ec8d45795`。
+- ATM pin 原始碼：GitHub `eaglhuang/AI-Atomic-Framework` commit `5692474f7db70ab52a7a71c8af4867609e7e4b43`（r3 另加 `bea35380d7f381f998c9930fa95f01b999c7f208`，box tarball `/workspace/atm-main-bea35380/atm-main.tar.gz` sha256 `9346e5b175b176618f435aeb4b41ab93ef7575f9bf77d77c47a5aeac87ad34b5`；r4 另加 `2118bc66efb3ac3bc0ddaede6a2f7cb18526b030`，box tarball `/workspace/atm-main-2118bc66/atm-main.tar.gz` sha256 `aa959607c35c51b7fc3c4e3d81b3d9e979ee62f4d9361ef9e9f5ee72e78abd88`；r5 另加 `37847584e24afc08ea58cfe380bb5b1220fbe335`，box tarball `/workspace/atm-main-37847584/atm-main.tar.gz` sha256 `e17a90ddceaf3c70d580c96e31f14cf8251d5a664985c1eb494f0d8db8045e3d`；r6 另加 `b35a6141bd5bfbaec654f1cd3079323581b04074`，box tarball `/workspace/atm-main-b35a6141/atm-main.tar.gz` sha256 `93fa7839d8e0fee51e5ad224833df2b57397fead3e77e0528117f21f5d5e59ef`）；box tarball `/workspace/atm-main-5692474f/atm-main.tar.gz` sha256 `1d498a397e6a5db119d40b8f539dc165cb0028fbfe9577f953023f8ec8d45795`。
 - 論文 v1：arXiv:2607.00041（box `refs/` 有副本，未上傳）。
 - `node_modules/`：依 `R1/harness/package.json` 安裝；實際版本見 `R1/harness/installed-deps.package-lock.json`（不是正式 lockfile，原 harness 無 `package-lock.json`）。
