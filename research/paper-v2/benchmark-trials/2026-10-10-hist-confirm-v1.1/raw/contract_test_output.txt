@@ -1,0 +1,20 @@
+ok myers random LCS sanity
+ok correct: final == expected
+ok PLANTED lost update (B acked, absent)
+ok PLANTED lost replace (pre-image restored)
+ok PLANTED lost delete
+ok PLANTED corruption: neighbouring frame line changed
+ok PLANTED corruption: torn tail (truncated file)
+ok PLANTED foreign line injected
+ok blocked intent absent => blocked_absent; leaked => blocked_leak
+ok same-point inserts: either order accepted
+ok identical hunks from both writers: applied once, both credited
+ok overlap both applied never passes
+ok PLANTED duplicate post-image
+ok foreign write to untouched file + extra file fail the run
+ok relocate: applies on shifted content; fails when context changed
+ok unifiedPatch is accepted by git apply and yields expected bytes
+ok PLANTED lost delete of moved code: no false corruption (tiling, alignment-free)
+ok PLANTED partial hunk application => corruption
+ok overlap: only A present => B lost (never pass)
+hist oracle contract: 19 passed

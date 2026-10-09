@@ -1,0 +1,73 @@
+{
+ "writer": 0,
+ "pr": 8750,
+ "pid": 2035495,
+ "init_ms": 133.198913,
+ "start_offset_ms": 7,
+ "file_order": [
+  "xarray/core/indexing.py",
+  "xarray/core/variable.py"
+ ],
+ "holds": {
+  "xarray/core/indexing.py": 12,
+  "xarray/core/variable.py": 3
+ },
+ "decisions": [
+  {
+   "writer": 0,
+   "pr": 8750,
+   "path": "xarray/core/indexing.py",
+   "intents": [
+    "log:xarray:8750_8758:8750:xarray/core/indexing.py:h0",
+    "log:xarray:8750_8758:8750:xarray/core/indexing.py:h1",
+    "log:xarray:8750_8758:8750:xarray/core/indexing.py:h2",
+    "log:xarray:8750_8758:8750:xarray/core/indexing.py:h3",
+    "log:xarray:8750_8758:8750:xarray/core/indexing.py:h4",
+    "log:xarray:8750_8758:8750:xarray/core/indexing.py:h5",
+    "log:xarray:8750_8758:8750:xarray/core/indexing.py:h6",
+    "log:xarray:8750_8758:8750:xarray/core/indexing.py:h7",
+    "log:xarray:8750_8758:8750:xarray/core/indexing.py:h8",
+    "log:xarray:8750_8758:8750:xarray/core/indexing.py:h9",
+    "log:xarray:8750_8758:8750:xarray/core/indexing.py:h10",
+    "log:xarray:8750_8758:8750:xarray/core/indexing.py:h11",
+    "log:xarray:8750_8758:8750:xarray/core/indexing.py:h12"
+   ],
+   "hold_ms": 12,
+   "t_submit_epoch": 1791562420623,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 35,
+   "outcome": "blocked",
+   "blocked_reason": "occ-relocate-context-not-found",
+   "occ_retries": 0,
+   "total_ms": 54.05,
+   "t_done_epoch": 1791562420677
+  },
+  {
+   "writer": 0,
+   "pr": 8750,
+   "path": "xarray/core/variable.py",
+   "intents": [
+    "log:xarray:8750_8758:8750:xarray/core/variable.py:h13",
+    "log:xarray:8750_8758:8750:xarray/core/variable.py:h14",
+    "log:xarray:8750_8758:8750:xarray/core/variable.py:h15"
+   ],
+   "hold_ms": 3,
+   "t_submit_epoch": 1791562420677,
+   "atm_decision": "admit",
+   "atm_disposition": "direct",
+   "atm_first_disposition": "direct",
+   "admit_wait_ms": 3,
+   "outcome": "commit",
+   "occ_retries": 0,
+   "total_ms": 14.58,
+   "t_done_epoch": 1791562420691
+  }
+ ],
+ "admit_stats": {
+  "txns": 5,
+  "cas_conflicts": 1
+ },
+ "steward_batches": null
+}
