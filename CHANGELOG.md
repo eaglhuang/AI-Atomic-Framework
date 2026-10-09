@@ -54,6 +54,14 @@ bridge after the paper-aligned public release.
   `ATM_STEWARD_COMMIT_LOCK_ROOT` to move the lock directory, and
   `ATM_STEWARD_RECOMPOSE_POLICY` to a JSON object to change retry bounds.
   Public CLI flags and the `applied` / `blocked` evidence enum are unchanged.
+- **SQLITE_BUSY or SQLITE_LOCKED while opening the apply queue falls back to the file lock.**
+  `PRAGMA synchronous = OFF` on `queue.sqlite` can throw `SQLITE_BUSY` while
+  another process commits. That error used to escape the apply and leave the
+  queue presence file behind. The queue connection now sets `busy_timeout`
+  from `ATM_STEWARD_APPLY_QUEUE_WAIT_MS` before the other pragmas. If the
+  database is still busy or locked, the apply continues on the per-target
+  exclusive lock, and the presence file and queue membership are removed.
+  The queue remains ordering only.
 
 ### Fixed - steward region re-compose
 

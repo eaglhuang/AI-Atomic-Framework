@@ -1,7 +1,8 @@
 /**
  * 每個目標檔一條 broker apply 佇列。
  * 佇列只決定先後，正確性仍靠 canonical commit 的核心層建議鎖與 base-hash CAS。
- * 佇列目錄建不起來、或等不到隊伍頭，就改走只有檔案鎖的路徑，不中止寫入。
+ * 佇列目錄建不起來、等不到隊伍頭，或開啟、pragma、加入隊伍時遇到
+ * SQLITE_BUSY / SQLITE_LOCKED，就改走只有檔案鎖的路徑，不中止寫入。
  * 隊伍頭若已死（建議鎖可取得），才會把它移出；看不出死活就繼續等，不搶位。
  */
 import { createHash, randomBytes } from 'node:crypto';
@@ -12,8 +13,27 @@ import { loadDatabaseSync } from './sqlite-runtime.ts';
 import { defaultStewardCommitLockRoot, stewardCanonicalCommitPolicy } from './steward-commit-guard.ts';
 import { kernelAdvisoryLockIsFree } from './steward-kernel-lock.ts';
 
+const SQLITE_BUSY = 5;
+const SQLITE_LOCKED = 6;
+/** SQLite `busy_timeout` 是 32 位元毫秒整數。這是型別上限，不是等待政策。 */
+const SQLITE_BUSY_TIMEOUT_LIMIT_MS = 2_147_483_647;
+
+/**
+ * 測試專用。在 `queue.sqlite` 設完 busy_timeout、寫其他 pragma 之前丟出這個錯誤。
+ * 正式路徑保持未設定。
+ */
+let queueOpenFault: unknown | undefined;
+
 export function defaultStewardApplyQueueRoot(cwd: string = process.cwd()): string {
   return path.join(path.resolve(cwd), '.atm', 'runtime', 'broker-steward-apply-queue');
+}
+
+export function stewardApplyQueueDirectory(queueRoot: string, targetPath: string): string {
+  return path.join(queueRoot, queueKey(targetPath));
+}
+
+export function setStewardApplyQueueOpenFaultForTests(error: unknown | null): void {
+  queueOpenFault = error === null ? undefined : error;
 }
 
 export interface StewardCommitControls {
@@ -74,18 +94,16 @@ export function withStewardApplyQueue<T>(input: {
 }, fn: () => T): T {
   if (!input.enabled || input.targetPaths.length === 0) return fn();
   const queueRoot = input.queueRoot ?? defaultStewardApplyQueueRoot(input.cwd);
-  let session: QueueSession;
+  let session: QueueSession | null = null;
   try {
-    session = joinQueues(queueRoot, input.targetPaths, input.waitMs, input.pollMs);
-  } catch (error) {
-    if (!isQueueUnavailable(error)) throw error;
-    return fn();
-  }
-  if (session.fallback) return fn();
-  try {
+    try {
+      session = joinQueues(queueRoot, input.targetPaths, input.waitMs, input.pollMs);
+    } catch (error) {
+      if (!isQueueUnavailable(error)) throw error;
+    }
     return fn();
   } finally {
-    session.release();
+    session?.release();
   }
 }
 
@@ -129,33 +147,26 @@ function joinOne(queueDir: string, waitMs: number, pollMs: number): HeldTicket |
   mkdirSync(path.join(queueDir, 'p'), { recursive: true });
   const nonce = randomBytes(8).toString('hex');
   const presencePath = path.join(queueDir, 'p', `${nonce}.sqlite`);
-  const presence = openDatabase(presencePath);
-  presence.exec('BEGIN IMMEDIATE');
-  const db = openDatabase(path.join(queueDir, 'queue.sqlite'));
   const deadline = Date.now() + Math.max(0, waitMs);
+  let presence: DatabaseSync | null = null;
+  let db: DatabaseSync | null = null;
   let id: number | null = null;
+  let held = false;
   try {
+    presence = openDatabase(presencePath, remainingBusyTimeout(deadline));
+    presence.exec('BEGIN IMMEDIATE');
+    db = openDatabase(path.join(queueDir, 'queue.sqlite'), remainingBusyTimeout(deadline));
     id = insertWaiter(db, nonce, deadline, pollMs);
-    if (id === null) {
-      releasePresence(presence, presencePath);
-      closeQuiet(db);
-      return 'fallback';
+    if (id !== null && presence && db && waitUntilHead(db, queueDir, id, deadline, pollMs)) {
+      held = true;
+      return { queueDir, id, nonce, presencePath, presence, db };
     }
-    const ready = waitUntilHead(db, queueDir, id, deadline, pollMs);
-    if (!ready) {
-      deleteWaiter(db, id);
-      releasePresence(presence, presencePath);
-      closeQuiet(db);
-      return 'fallback';
-    }
-    return { queueDir, id, nonce, presencePath, presence, db };
+    return 'fallback';
   } catch (error) {
-    if (id !== null) {
-      try { deleteWaiter(db, id); } catch { /* 盡力移出，避免卡住後面的人 */ }
-    }
-    releasePresence(presence, presencePath);
-    closeQuiet(db);
+    if (isSqliteContention(error)) return 'fallback';
     throw error;
+  } finally {
+    if (!held) releaseJoinResidue(db, id, presence, presencePath);
   }
 }
 
@@ -173,7 +184,7 @@ function insertWaiter(db: DatabaseSync, nonce: string, deadline: number, pollMs:
         throw error;
       }
     } catch (error) {
-      if (!isSqliteBusy(error)) throw error;
+      if (!isSqliteContention(error)) throw error;
       if (Date.now() >= deadline) return null;
       sleepMs(pollMs);
     }
@@ -203,7 +214,7 @@ function readHead(db: DatabaseSync): { id: number | bigint; nonce: string } | nu
     const row = db.prepare('SELECT id, nonce FROM waiter ORDER BY id ASC LIMIT 1').get() as { id: number | bigint; nonce: string } | undefined;
     return row ?? null;
   } catch (error) {
-    if (isSqliteBusy(error)) return null;
+    if (isSqliteContention(error)) return null;
     throw error;
   }
 }
@@ -212,7 +223,7 @@ function deleteWaiter(db: DatabaseSync, id: number): void {
   try {
     db.exec('BEGIN IMMEDIATE');
   } catch (error) {
-    if (isSqliteBusy(error)) return;
+    if (isSqliteContention(error)) return;
     throw error;
   }
   try {
@@ -220,7 +231,7 @@ function deleteWaiter(db: DatabaseSync, id: number): void {
     db.exec('COMMIT');
   } catch (error) {
     try { db.exec('ROLLBACK'); } catch { /* 交易未開始 */ }
-    if (isSqliteBusy(error)) return;
+    if (isSqliteContention(error)) return;
     throw error;
   }
 }
@@ -246,13 +257,47 @@ function queueKey(targetPath: string): string {
   return createHash('sha256').update(physical).digest('hex');
 }
 
-function openDatabase(dbPath: string): DatabaseSync {
-  const db = new (loadDatabaseSync())(dbPath, { timeout: 0 });
-  db.exec('PRAGMA busy_timeout = 0');
-  // 佇列不是正確性後盾。關掉 fsync，讓沒有競爭的 apply 不必為隊伍票刷盤。
-  db.exec('PRAGMA synchronous = OFF');
-  db.exec('PRAGMA journal_mode = MEMORY');
-  return db;
+function openDatabase(dbPath: string, busyTimeoutMs: number): DatabaseSync {
+  const timeout = boundedBusyTimeoutMs(busyTimeoutMs);
+  const db = new (loadDatabaseSync())(dbPath, { timeout });
+  try {
+    db.exec(`PRAGMA busy_timeout = ${timeout}`);
+    if (queueOpenFault !== undefined && dbPath.endsWith(`${path.sep}queue.sqlite`)) throw queueOpenFault;
+    // 佇列不是正確性後盾。關掉 fsync，讓沒有競爭的 apply 不必為隊伍票刷盤。
+    db.exec('PRAGMA synchronous = OFF');
+    db.exec('PRAGMA journal_mode = MEMORY');
+    return db;
+  } catch (error) {
+    closeQuiet(db);
+    throw error;
+  }
+}
+
+function releaseJoinResidue(db: DatabaseSync | null, id: number | null, presence: DatabaseSync | null, presencePath: string): void {
+  if (db && id !== null) {
+    try { deleteWaiter(db, id); } catch { /* 隊伍列盡力刪除；presence 拔掉後，下一個等待者會收屍 */ }
+  }
+  closeQuiet(db);
+  if (!presence) {
+    try { rmSync(presencePath, { force: true }); } catch { /* 尚未建立 */ }
+    return;
+  }
+  try {
+    releasePresence(presence, presencePath);
+  } catch {
+    closeQuiet(presence);
+    try { rmSync(presencePath, { force: true }); } catch { /* 已刪除 */ }
+  }
+}
+
+function remainingBusyTimeout(deadline: number): number {
+  return boundedBusyTimeoutMs(deadline - Date.now());
+}
+
+function boundedBusyTimeoutMs(waitMs: number): number {
+  if (!Number.isFinite(waitMs) || waitMs <= 0) return 0;
+  const ms = Math.floor(waitMs);
+  return ms > SQLITE_BUSY_TIMEOUT_LIMIT_MS ? SQLITE_BUSY_TIMEOUT_LIMIT_MS : ms;
 }
 
 function closeQuiet(db: DatabaseSync | null): void {
@@ -260,13 +305,17 @@ function closeQuiet(db: DatabaseSync | null): void {
   try { db.close(); } catch { /* 已關閉 */ }
 }
 
-function isSqliteBusy(error: unknown): boolean {
+function isSqliteContention(error: unknown): boolean {
   if (!error || typeof error !== 'object') return false;
-  const candidate = error as { errcode?: unknown; message?: unknown };
-  return candidate.errcode === 5 || (typeof candidate.message === 'string' && candidate.message.includes('database is locked'));
+  const candidate = error as { errcode?: unknown; code?: unknown; message?: unknown };
+  if (candidate.errcode === SQLITE_BUSY || candidate.errcode === SQLITE_LOCKED) return true;
+  if (candidate.code === 'SQLITE_BUSY' || candidate.code === 'SQLITE_LOCKED') return true;
+  if (typeof candidate.message !== 'string') return false;
+  return candidate.message.includes('database is locked') || candidate.message.includes('database table is locked');
 }
 
 function isQueueUnavailable(error: unknown): boolean {
+  if (isSqliteContention(error)) return true;
   if (!error || typeof error !== 'object') return false;
   const code = (error as { code?: unknown }).code;
   return code === 'ENOTDIR' || code === 'EACCES' || code === 'EPERM' || code === 'EROFS' || code === 'ENOSPC' || code === 'ENOENT';
