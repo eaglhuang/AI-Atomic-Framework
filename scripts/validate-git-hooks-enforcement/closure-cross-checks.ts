@@ -3,6 +3,7 @@ import path from 'node:path';
 import { assert, createCommandRun, fixture, parsePayload, root, runCli, runGit, tempRoot, writeHistoricalRestorePacket, writeReadyFixtureTask } from './context.ts';
 import { materializeValidatorFixture } from '../lib/validator-fixture.ts';
 import { spawnSync } from 'node:child_process';
+import { spawnCliCapture } from '../lib/cli-json-spawn.ts';
 
 export function runClosureCrossChecks(noHooksDir: string) {
 const closureRepo = path.join(tempRoot, 'closure-cross-check');
@@ -115,7 +116,11 @@ const closureValidations = [
 ];
 for (const { gate, command } of closureValidations) {
   console.log(`[git-hooks-enforcement] recording real closure validation: ${gate}`);
-  const validation = spawnSync(process.execPath, ['atm.dev.mjs', 'evidence', 'run', '--cwd', closureRepo, '--task', reconcileHookTaskId, '--actor', 'fixture-agent', '--command', command, '--validators', gate, '--runner-kind', 'dev-source', '--json'], { cwd: closureRepo, encoding: 'utf8', timeout: 120000 });
+  const validation = spawnCliCapture(process.execPath, ['atm.dev.mjs', 'evidence', 'run', '--cwd', closureRepo, '--task', reconcileHookTaskId, '--actor', 'fixture-agent', '--command', command, '--validators', gate, '--runner-kind', 'dev-source', '--json'], {
+    cwd: closureRepo,
+    timeout: 120000,
+    label: `atm.dev evidence run ${gate}`
+  });
   assert(!validation.error && validation.status === 0, `closure validation ${gate} must pass: ${validation.stdout}\n${validation.stderr}`);
   assert(parsePayload(validation).ok === true, `closure validation ${gate} must record real evidence`);
 }
