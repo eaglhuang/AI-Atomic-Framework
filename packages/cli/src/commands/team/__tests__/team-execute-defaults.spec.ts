@@ -81,6 +81,8 @@ function testRoleProviderOverrideStillWinsOverGlobalDefault() {
 }
 
 async function testProviderExecutionUsesGlobalDefaultsForAllRoles() {
+  const cwd = createTempWorkspace('atm-team-provider-execution-defaults-');
+  try {
   const selectionConfig = mergeTeamProviderSelectionConfig({
     cliGlobalDefault: {
       providerId: 'openai',
@@ -94,7 +96,7 @@ async function testProviderExecutionUsesGlobalDefaultsForAllRoles() {
     selectionConfig
   });
   const execution = await runTeamProviderExecution({
-    cwd: process.cwd(),
+    cwd,
     taskId: 'TASK-TEAM-EXEC-DEFAULTS',
     teamRunId: 'team-exec-defaults',
     recipe: l1Recipe,
@@ -134,6 +136,9 @@ async function testProviderExecutionUsesGlobalDefaultsForAllRoles() {
   });
   assert.equal(execution.blockedReason, null);
   assert.equal(execution.results.length, 4, 'top-level defaults must execute every active roster role');
+  } finally {
+    rmSync(cwd, { recursive: true, force: true });
+  }
 }
 
 function testEmptyExecutionSetFailsClosed() {
