@@ -1,0 +1,29 @@
+[
+ [
+  "§1.5（r3、r4 項）",
+  [
+   "- **跨 process steward 修正驗證（r3，作者自行執行 483 runs，未獨立重現）**：PR #213（`bea35380`）後，E4 重播 75 runs 失敗 0／75、遺失效果 0（修正前 5692474f：失敗 8／75、合計遺失 12 個效果）；完成 1,524／2,610 對修正前 1,519／2,610，兩者約 58%，不可解讀為全部成功或已證明不劣；故障情境與 Phase 3 未做（§6 表 R3b）。完成率最佳化見 §4.11 與表 R4（r4）。",
+   "- **steward 完成率最佳化驗證（r4，作者自行執行 693 runs＋barrier／故障情境，未獨立重現）**：PR #214（`2118bc66`）在 r3 同配置 E4 重播中失敗 0／75、遺失效果 0、損壞 0；完成 1,748／2,610（67.0%），同時段 bea35380 1,553／2,610（59.5%）、5692474f 1,580／2,610（60.5%；失敗 5／75、合計遺失 6 個效果）。完成數在此次觀察中較高，但仍約 33% 以 `blocked` 結束：不可寫成全部成功，亦未做顯著性或非劣性檢定。**反例**：持鎖者與競爭者位於不同 PID namespace（同一工作樹，模擬跨容器）時，2118bc66 會回收存活持鎖者的鎖並遺失已 ack 效果（兩個方向各 10／10）；依 §5.7 不得主張 (d) 支援跨容器。broker 序列化 apply 佇列未實作。Phase 3 450-run 未做（§4.11、§6 表 R4）。"
+  ]
+ ],
+ [
+  "表 V1（r3、r4 列）",
+  [
+   "| steward 跨 process 修正（r3） | PR #213 merge `bea35380d7f381f998c9930fa95f01b999c7f208`（feature `4d7c9ed6287173f6f704e8d0a0d8a99683776bff`；base main `53e6fdb0`；merged 2026-10-08 10:38 Asia/Taipei）；未 tag、未 publish | r3 驗證 pin（§6 表 R3b）。harness 載入的 `packages/core` 相對 5692474f 只差 3 檔（`steward.ts`、`steward-transactional-apply.ts`、新增 `steward-commit-guard.ts`）；其餘差異在 cli／tests／docs，harness 不載入。仍**不是** final frozen artifact |",
+   "| steward 完成率最佳化（r4） | PR #214 merge `2118bc66efb3ac3bc0ddaede6a2f7cb18526b030`（feature `b5729456bc14d9bf4c8acfce7be320fec691fee2`；base main `8b3622b7`；merged 2026-10-08 14:27 Asia/Taipei）；未 tag、未 publish | r4 驗證 pin（§4.11、§6 表 R4）。harness 載入的 `packages/core` 相對 bea35380 改 5 檔（`steward.ts`、`steward-transactional-apply.ts`、`steward-commit-guard.ts`、`steward-base-composer.ts`、`steward-input-validation.ts`）並新增 `steward-region-rebase.ts`；其餘差異（`research/`、docs、CHANGELOG、scripts、tests）harness 不載入。仍**不是** final frozen artifact |"
+  ]
+ ],
+ [
+  "§7.1（r3、r4 強度上限）",
+  [
+   "- **r3 驗證的強度上限**（§6 表 R3b）：483 runs 全為作者自行執行、未獨立重現；PR #213 後 E4 重播失敗 0／75、遺失效果 0（修正前 8／75、合計遺失 12 個效果）只是觀察；完成 1,524／2,610 與修正前 1,519／2,610 皆約 58%，不是全部成功，也未做非劣性檢定。CI（框架測試）不重跑本文實驗。Phase 3 450-run 主矩陣與故障情境（lock timeout、持鎖者被 kill、跨容器、`recovery-required`）**未做**。",
+   "- **r4 驗證的強度上限**（§4.11、§6 表 R4）：693 runs 與 barrier／故障情境全為作者自行執行、未獨立重現。2118bc66 在 E4 重播失敗 0／75、遺失效果 0，完成 1,748／2,610（67.0%）對同時段 bea35380 1,553／2,610：只是一次觀察，未做顯著性或非劣性檢定，且 harness 提案格式恰好帶區域身分，(a) 的效果不能外推到無區域身分的提案。故障情境 F6（不同 PID namespace）出現遺失（兩個方向各 10／10）：跨容器部署下 (d) 的過期持鎖者回收**不安全**。broker 序列化 apply 佇列未實作。Phase 3 450-run 主矩陣仍**未做**。"
+  ]
+ ],
+ [
+  "§7.3 第 0 項",
+  [
+   "0. **（paper 2.0 必含，非延後項）** §4.11 steward 完成率最佳化：r4 驗證已完成（2026-10-08，表 R4；DRAFT）。仍待：跨 PID namespace／跨容器的持鎖者存活判斷（F6 反例；例如不以 pid 存活推斷過期、改用 lease 續約或 broker 序列化 apply）、broker 序列化 apply 佇列（(d3) 未實作）、孤兒 temp 檔清理、CID 錨定 re-compose、獨立重現；之後才是 Phase 3 450-run 主矩陣。"
+  ]
+ ]
+]
