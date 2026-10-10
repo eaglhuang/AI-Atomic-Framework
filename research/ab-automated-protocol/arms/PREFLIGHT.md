@@ -28,3 +28,20 @@
 - `broker steward plan`／`apply` 能把兩個衝突 proposal 整合到 integration worktree，並通過 oracle。
 
 `arms/make-proposal.mjs` 會從 writer 分支的 diff 產生 `atm.patchProposal.v1`，供上述流程使用。
+
+## 第二次嘗試：使用 PR #263 的 onefile（commit 859721f）
+
+onefile 來源：`origin/claude/project-thread-dbtbbj` 的 `release/atm-onefile/atm.mjs`，暫存 repo 為全新 `git init`，未另外安裝 ajv。
+
+| 步驟 | 結果 |
+|---|---|
+| `setup --agents none` | 通過 |
+| `atomize inventory --cwd .` | 通過（`ATM_ATOMIZE_INVENTORY_SUCCESS`），但回報 `production_source_count: 0`，`src/*.js` 落在 `uncategorized` |
+| `atomize backfill --cwd . --dry-run` | 通過（dry-run），`total_atom_proposals: 0`，沒有產生任何 atom |
+| `broker proposal validate --proposal-file p-mul.json` | 失敗：仍是 `missing-atom-refs`，唯一的 issue |
+
+**阻塞點**：proposal 需要 atom 參照（`atomId` + `atomCid`），而新 repo 的 atom registry 沒有任何 atom。PR #263 自己的描述也承認：「a repo-created atom has no atomCid in the registry, so a fresh project still needs a cid source before its first real proposal」。這個缺口還在，preflight 因此仍未通過。
+
+**未做的事**：不手寫 registry 或偽造 atomCid。那會跳過 ATM 的身分驗證，產生的「通過」沒有意義。`compose` 與 `steward plan/apply` 在這次嘗試中沒有執行。
+
+**解除條件**：需要 ATM 提供正式的 atomCid 來源（例如 atom 建立／註冊流程能產出 cid），然後 proposal validate 才能通過。通過後再依序跑 compose、steward plan、steward apply，並用 oracle 判定結果。
