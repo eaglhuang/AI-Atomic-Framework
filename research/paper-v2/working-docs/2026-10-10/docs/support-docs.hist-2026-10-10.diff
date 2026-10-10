@@ -1,0 +1,64 @@
+--- docs/checkpoints/VERSION_ANCHORS.pre-hist-2026-10-10.md	2026-10-09 17:58:29.319627457 +0800
++++ docs/VERSION_ANCHORS.md	2026-10-10 11:11:10.274263282 +0800
+@@ -229,3 +229,16 @@
+ | tarball | b35a6141：197,301,078 bytes，sha256 `93fa7839d8e0fee51e5ad224833df2b57397fead3e77e0528117f21f5d5e59ef`，內嵌 commit 相符 |
+ | packages/core/src tree sha256 | b35a6141 `455f4b693746dbb37581b9af2c42ffab702b9693e6ab348cc3f39544c4591316`（438 檔）；37847584 同 r5 |
+ | CI（另列） | feature head 與 merge 的 Product CI、ATM Dogfood、neutrality-scan、sandbox-gate 皆 green |
++
++## HIST 更新（2026-10-10 CST；外部真實 PR 工作負載）
++
++| 項目 | 內容 |
++|---|---|
++| 預先登記 pin | `20effd45a0c3a09c293caaea6a34face0df1c5f4`（PR #242 merge；凍結當下的 main）；`packages/core` 與 `b35a6141` 逐位元相同，只差 `packages/cli`（PR #241 `--files-from`）；codeload tarball sha256 `2f2805755ecf863f46efaeb662fb62a782f01bebeccf643c1292e7c5994ab71f`；主跑 2026-10-10 00:33–00:45 因 §5.7 反例停止（`benchmark-main/2026-10-10-hist-main/`） |
++| PR #252 | 「fix(broker): honor unified diff no-newline-at-eof markers」；created 2026-10-10 01:16、merged 03:03 CST by cursor[bot]；merge `b1fd9d224ff2d6db7abe49b0c7348515667f13e8`（base `62913443`）；head `592c03cf39fddc1890ffb53f2e340ef0939a8b36`；未 tag、未 publish |
++| HIST 結果 pin | `b1fd9d22`：codeload tarball sha256 `3bff0d4f029a2a9a6dec03630030b05429eba8820657acc765a6bd6d02332440`，解壓至 `/workspace/atm-main-b1fd9d22/`；`node_modules` 與 `20effd45` 相同（5 個 symlink）；`packages/core/src` 相對 `20effd45` 只差 `unified-patch.ts`、`steward-base-composer.ts`、`steward-region-rebase.ts`、`steward.ts` |
++| 舊 pin（次要集合） | `5692474f`（同 r1–r5 安裝），只跑 steward |
++| harness | `benchmark-trials/2026-10-09-hist-pilot/harness`（38 檔，hash 記於各 generation 的 `PINS.json`；預先登記後未改） |
++| CI 修正（非 ATM 核心） | PR #241 merge `c8ef8c3e`（2026-10-09 19:12）；PR #254 merge `15b2e5a1`（2026-10-10 02:15） |
++| 證據 PR | #239 `e1ab50e4`、#242 `20effd45`、#243 `d2542646`、#246 `cc1ec5e1`、#250 `62913443`、#255 `139cc745`（皆 main 上的 merge commit） |
++| 角色 | `b1fd9d22`＝論文 §6.1 HIST 結果版本（**不是** final frozen artifact）；Phase 3 450-run 主矩陣仍未執行 |
+--- docs/checkpoints/EXPERIMENT_CHECKLIST.pre-hist-2026-10-10.md	2026-10-09 17:58:29.327627457 +0800
++++ docs/EXPERIMENT_CHECKLIST.md	2026-10-10 11:11:10.278263282 +0800
+@@ -190,3 +190,21 @@
+ | r6 壓力重現 | 17:40–17:41；† 17:50–17:56 | `runs/r6-validation/forensics/sqlite-busy/` | 預先登錄 37847584 1／7,200、b35a6141 0／7,200；† 加重 78／48,000 對 0／48,000 |
+ | r6 故障情境／barrier | 17:41–17:50 | `runs/r6-validation/faults/`、`barrier/` | b35a6141 on／off 全部 0 遺失、0 損壞；F6 namespace 分離 40／40 |
+ | r6 分析 | 17:57 後 | `runs/r6-analysis/r6-2026-10-09/` | raw 唯讀檢查通過；r1–r5 重評分不變 |
++
++## HIST 完成紀錄（2026-10-09／10 CST；外部真實 PR 工作負載）
++
++所有 run 為作者自行執行、未獨立重現；試跑不列入結果。
++
++| 項目 | 時間 | 產物 | 結果 |
++|---|---|---|---|
++| 冒煙測試（試跑） | 2026-10-09 | `benchmark-trials/2026-10-09-hist-smoke/`（#239） | Django 3 對×5 臂×1 seed；植入故障 15／15 抓到；steward 69／71、0 遺失 |
++| Django pilot（試跑） | 2026-10-09 | `benchmark-trials/2026-10-09-hist-pilot/`（#239） | 300 runs；steward 933／964、0 遺失；git_three_way 2 runs 遺失 5；無 O1 |
++| 重新挖掘 | 2026-10-09／10 | `benchmark-trials/2026-10-09-hist-mining/`（#242） | 6 專案皆可湊 50 對；O1 7 組（6 相同）；drift 排除 1,164／1,205 為 rebase |
++| 預先登記 v1.1＋抽樣 | 00:05 決定；00:13:09 凍結 | `benchmark-main/2026-10-10-hist-prereg-v1.1/`（#243） | 選項 P；主樣本 300（O1 72／O2 51／O3 177）＋O0 30；9,750 runs seed 表 |
++| 確認試跑 | 00:14–00:16 | `benchmark-trials/2026-10-10-hist-confirm-v1.1/`（#246） | 36 runs；steward 0 遺失；植入 5／5 抓到 |
++| 主跑（停止） | 00:33–00:45 | `benchmark-main/2026-10-10-hist-main/`（#250） | 2,500／9,750 runs；§5.7 反例 `sympy:26412_26438`（結尾換行，4／5 seeds） |
++| ATM 修正 | 03:03 合併 | PR #252（`b1fd9d22`） | 遵守 `\ No newline at end of file`；與 `git apply` 逐位元測試 |
++| 主跑 v2 | 03:05–03:51；語意 03:51–06:03 | `benchmark-main/2026-10-10-hist-main-v2/`（#255） | 9,750／9,750；steward 29,077／34,300（84.8%）、0／1,500 失敗、0 遺失、0 損壞；基線遺失 git 36、occ 32；bare_composer 損壞 3；舊 pin 25 runs／57 遺失／5 損壞；語意 52 對 0 回歸 |
++| HIST 論文 | 2026-10-10 | 論文摘要、§1.5、表 V1、§4.2、§4.11 (e)、§5.8、§6.1 表 R7–R12、§7.1–§7.3、§8、附錄 C／H、參考文獻 [24]–[29] | 正文只列結果；過程移至附錄 H |
++| 3–4 寫入者延伸、JS 附錄 | **未做** | — | 預先登記第三階段 |
++| Phase 3（450 runs） | **未做** | — | 仍未執行 |
+--- docs/checkpoints/METRIC_DEFINITIONS.pre-hist-2026-10-10.md	2026-10-09 17:58:29.327627457 +0800
++++ docs/METRIC_DEFINITIONS.md	2026-10-10 11:11:17.618263282 +0800
+@@ -239,3 +239,18 @@
+ | presence 殘留 | run 結束後 `atm/worktree/.atm/runtime/broker-steward-apply-queue/*/p/` 下的檔案數 | `analysis/r6_compare.py` |
+ | 壓力重現拋出次數 | `queue_busy_repro.mjs` 每個 process 回報的例外次數加總；presence 殘留＝暫存 repo 中 `p/` 下檔案數 | `runs/r6-validation/forensics/sqlite-busy/` |
+ | block | E4 重播 block1＝r5 原 rep 編號（exact r01–r30、grid r1–r5）；block2＝同配置續編（exact r31–r60、grid r6–r10） | `analysis/r6_compare.py` |
++
++## 10. HIST 新增口徑（2026-10-10 CST；外部真實 PR 工作負載）
++
++| 指標 | 定義 | 來源 |
++|---|---|---|
++| intent（HIST） | `git diff --unified=0 --diff-algorithm=histogram` 的每個 hunk；`logical_id = log:{pair_id}:{pr}:{path}:h{k}` | 預先登記 v1.0 §3.4 |
++| 完成／總 intents | 已提交且 oracle 判定效果正確存在的 intents ÷ 總 intents（ratio of sums）；恆等式 完成＋遺失＋blocked（＋misplaced＋duplicate＋leak）＝總 intents 逐 run 驗證 | `analysis/analyze_main.py` |
++| 失敗 run | oracle_v2-hist 對該 run 回報 `run_failed`（例如有遺失效果或損壞檔）；harness 錯誤的 run 不計入（HIST 主跑 v2 為 0） | 同上 |
++| 損壞檔 | 最終 bytes 違反 frame 規則（base 上不屬於任何已提交操作的行未逐位元保留或順序改變）的檔 | oracle_v2-hist |
++| blocked 最終理由分類 | harness_relocation（共用 harness 精確重新定位失敗，未呼叫 ATM；含 12 個重疊或重排停止）、atm_hash_drift、atm_recompose_mismatch、new_file（ATM steward 不能建立新檔）、git_merge_conflict、git_base_drift | 同上 |
++| 分層 | O1 hunk 範圍相交或相鄰；O2 最小距離 1–3 行；O3 >3 行；O0 無共同原始碼檔 | 預先登記 v1.0 §3.3 |
++| writer_version | final（最終合併版本）／pre-rebase（v1.1 選項 P：對方合併前、rebase 前的最後 head） | 預先登記 v1.1 §1 |
++| 完成率 CI | 以配對為單位的 bootstrap 95% 區間；失敗 runs 與失敗配對另列 Wilson 95% 區間，0 時加 Clopper–Pearson 上界 | `analysis/analyze_main.py` |
++| 語意終點 | STALE 方法：每個條件跑同一組聯集測試；歸因於臂的回歸＝臂最終樹失敗、但 b+A、b+B、gold 合成皆通過的測試；只用於兩寫入者皆 final 且 base valid 的配對；含 blocked intent 的 run 不可評估；pre-rebase 配對標「不可評估」不計 0 | `semantic/semantic_multi.py` |
++| 修正前後 | 同配對、同 seed、同 harness 的重疊 runs 逐 run 對比（Django＋SymPy 2,500 runs）；描述性 | `analysis/before_after.py` |
