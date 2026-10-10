@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { spawnCliCapture } from './lib/cli-json-spawn.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mode = process.argv.includes('--mode')
@@ -33,9 +33,9 @@ function assert(condition: any, message: any) {
 }
 
 function runAtm(args: any) {
-  const result = spawnSync(process.execPath, [path.join(root, 'atm.mjs'), ...args], {
+  const result = spawnCliCapture(process.execPath, [path.join(root, 'atm.mjs'), ...args], {
     cwd: root,
-    encoding: 'utf8'
+    label: `atm ${args.join(' ')}`
   });
   const payload = (result.stdout || result.stderr || '').trim();
   let parsed;

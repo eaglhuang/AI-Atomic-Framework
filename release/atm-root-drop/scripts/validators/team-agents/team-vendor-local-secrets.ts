@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
 import { loadTeamVendorLocalSecrets } from '../../../packages/cli/src/commands/team.ts';
@@ -11,6 +11,7 @@ export async function runTeamVendorLocalSecretsValidatorCase(taskCase: string): 
   if (taskCase !== 'team-vendor-local-secrets') return false;
 
   const workspace = createTempWorkspace('team-vendor-local-secrets');
+  try {
   const secretDir = path.join(workspace, 'agent-integrations', 'vendors');
   mkdirSync(secretDir, { recursive: true });
   writeFileSync(path.join(secretDir, 'team-secrets.local.json'), JSON.stringify({
@@ -79,4 +80,7 @@ export async function runTeamVendorLocalSecretsValidatorCase(taskCase: string): 
   assert.equal(observedEnv?.OPENAI_API_KEY, 'local-openai-test-token');
   console.log('[validate-team-agents] ok (team-vendor-local-secrets)');
   return true;
+  } finally {
+    rmSync(workspace, { recursive: true, force: true });
+  }
 }

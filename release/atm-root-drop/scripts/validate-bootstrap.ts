@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { spawnCliCapture } from './lib/cli-json-spawn.ts';
 import { createTempWorkspace } from './temp-root.ts';
 import { buildOnefileRelease } from './build-onefile-release.ts';
 
@@ -67,12 +67,12 @@ function readText(absolutePath: string) {
 }
 
 function runAtm(args: any, cwd: any) {
-  const result = spawnSync(process.execPath, [path.join(root, 'atm.dev.mjs'), ...args], {
+  const result = spawnCliCapture(process.execPath, [path.join(root, 'atm.dev.mjs'), ...args], {
     cwd,
-    encoding: 'utf8',
     env: pinnedRunnerSource
       ? { ...process.env, ATM_PINNED_RUNNER_SOURCE: pinnedRunnerSource }
-      : process.env
+      : process.env,
+    label: `atm.dev ${args.join(' ')}`
   });
   const payload = (result.stdout || result.stderr || '').trim();
   let parsed;
@@ -111,13 +111,13 @@ function assertPinnedRunner(hostRepo: string) {
   assert(metadata.sha256 && metadata.sha256.length === 64, 'pinned runner metadata must include runner sha256');
   assert(metadata.command === 'node atm.mjs next --prompt "<current user prompt>" --json', 'pinned runner metadata must preserve prompt-scoped first command');
 
-  const result = spawnSync(process.execPath, [runnerPath, 'next', '--cwd', hostRepo, '--json'], {
+  const result = spawnCliCapture(process.execPath, [runnerPath, 'next', '--cwd', hostRepo, '--json'], {
     cwd: hostRepo,
-    encoding: 'utf8',
     env: {
       ...process.env,
       ATM_ONEFILE_CACHE_ROOT: onefileCacheRoot
-    }
+    },
+    label: 'installed pinned runner next --json'
   });
   const payload = (result.stdout || result.stderr || '').trim();
   let parsed: any = {};

@@ -23,6 +23,7 @@ import type {
   MergeVerdict,
   PatchProposal
 } from './types.ts';
+export { applyUnifiedPatch } from './unified-patch.ts';
 // Steward arbitration verdict ??the four possible outcomes per implementation
 // contract (TASK-MAO-0009).
 export type StewardArbitrationVerdict =
@@ -460,48 +461,6 @@ export function arbitrateStewardRequest(input: {
     applyEvidence: applyResult.evidence,
     issues: applyResult.ok ? [] : (applyResult.evidence.blockedReasons ?? []).map((reason) => ({ code: 'blocked-merge-plan' as StewardValidationCode, detail: reason }))
   };
-}
-export function applyUnifiedPatch(content: string, patch: string): string {
-  const lines = content.split(/\r?\n/);
-  const patchLines = patch.split(/\r?\n/);
-  let lineIndex = 0;
-  let output: string[] = [];
-  let hunkIndex = 0;
-  while (hunkIndex < patchLines.length) {
-    const header = patchLines[hunkIndex];
-    const match = /^@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@/.exec(header.trim());
-    if (!match) {
-      hunkIndex += 1;
-      continue;
-    }
-    const oldStart = Number.parseInt(match[1], 10) - 1;
-    output.push(...lines.slice(lineIndex, oldStart));
-    lineIndex = oldStart;
-    hunkIndex += 1;
-    while (hunkIndex < patchLines.length && !patchLines[hunkIndex].startsWith('@@')) {
-      const patchLine = patchLines[hunkIndex];
-      if (patchLine.startsWith('--- ') || patchLine.startsWith('+++ ')) {
-        hunkIndex += 1;
-        continue;
-      }
-      if (patchLine.startsWith('-')) {
-        lineIndex += 1;
-      } else if (patchLine.startsWith('+')) {
-        output.push(patchLine.slice(1));
-      } else if (patchLine.startsWith(' ')) {
-        output.push(lines[lineIndex] ?? '');
-        lineIndex += 1;
-      } else if (patchLine.length === 0) {
-        // skip blank separator lines inside patch text
-      } else {
-        output.push(patchLine);
-        lineIndex += 1;
-      }
-      hunkIndex += 1;
-    }
-  }
-  output.push(...lines.slice(lineIndex));
-  return output.join('\n');
 }
 function writeEvidenceFile(filePath: string, evidence: StewardApplyEvidence): void {
   mkdirSync(path.dirname(path.resolve(filePath)), { recursive: true });

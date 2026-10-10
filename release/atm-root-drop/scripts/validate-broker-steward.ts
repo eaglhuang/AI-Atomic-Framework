@@ -371,6 +371,12 @@ try {
   });
   check(regionRecompose.status === 0, `region re-compose regression must pass:\n${regionRecompose.stdout}\n${regionRecompose.stderr}`);
 
+  const eofNewline = spawnSync(process.execPath, ['--strip-types', path.join(root, 'tests/cli/unified-patch-eof-newline.test.ts')], {
+    cwd: root,
+    encoding: 'utf8'
+  });
+  check(eofNewline.status === 0, `end-of-file newline regression must pass:\n${eofNewline.stdout}\n${eofNewline.stderr}`);
+
   const kernelLock = spawnSync(process.execPath, ['--strip-types', path.join(root, 'tests/core/steward-kernel-lock.test.ts')], {
     cwd: root,
     encoding: 'utf8'

@@ -413,12 +413,15 @@ function buildMarkdownReport(score, inventory) {
   ];
   return lines.join('\n');
 }
+const frameworkTaxonomyPath = fileURLToPath(new URL('../../docs/ATOMIZATION_COVERAGE_TAXONOMY.md', import.meta.url));
+
 export async function atomizeScore(options) {
   const repoPath = options.repo || options.cwd || '.';
   const fullPath = resolve(repoPath);
   const pathMapPath = resolve(fullPath, 'atomic_workbench', 'atomization-coverage', 'path-to-atom-map.json');
   const exclusionPath = resolve(fullPath, 'atomic_workbench', 'atomization-coverage', 'exclusion-inventory.json');
-  const taxonomyPath = resolve(fullPath, 'docs', 'ATOMIZATION_COVERAGE_TAXONOMY.md');
+  // The taxonomy is a framework-owned contract, not a file the scanned repo must carry.
+  const taxonomyPath = frameworkTaxonomyPath;
   const registryPath = resolve(fullPath, 'atomic-registry.json');
   if (!existsSync(taxonomyPath)) {
     return {
