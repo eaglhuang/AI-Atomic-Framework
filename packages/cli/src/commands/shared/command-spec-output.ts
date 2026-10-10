@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { normalizeCommandHelpMetadata } from '../help.ts';
 import { projectFields, projectSummary } from '../output-projection.ts';
+import { formatSetupPretty } from '../setup/pretty.ts';
 import { carryLaneSessionIntoPrintedCommands } from './lane-session-flag.ts';
 import { CliError, type CommandMessage, type CommandResult, type EnrichedCommandResult, enrichCommandResult, getOutputProjectionState, makeResult, message, setFieldsProjection, setOutputJsonPath, setSummaryProjection } from './result-core.ts';
 
@@ -352,6 +353,7 @@ export function writeResult(
 }
 
 export function formatPrettyResult(result: CommandResult) {
+  if (result.command === 'setup') return formatSetupPretty(result);
   const statusText = result.ok ? 'OK' : 'FAIL';
   const lines = [`[${statusText}] ${result.command} (${result.cwd})`];
   for (const entry of result.messages ?? []) {
