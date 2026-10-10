@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "hist-v2-excluded/1",
+  "title": "HIST-v2 technical exclusion",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "project",
+    "set",
+    "base",
+    "target_file",
+    "prs",
+    "reason",
+    "message",
+    "rules_sha256",
+    "candidate_index"
+  ],
+  "properties": {
+    "schema_version": {"const": "hist-v2-excluded/1"},
+    "id": {"type": "string"},
+    "project": {"type": "string"},
+    "set": {"type": "string"},
+    "base": {"type": ["string", "null"]},
+    "target_file": {"type": ["string", "null"]},
+    "prs": {"type": "array", "items": {"type": "integer"}},
+    "reason": {
+      "enum": [
+        "head-unavailable",
+        "checkout-failed",
+        "binary-or-non-utf8",
+        "unapplicable-to-common-base"
+      ]
+    },
+    "message": {"type": "string"},
+    "rules_sha256": {"type": "string"},
+    "candidate_index": {"type": "integer"}
+  }
+}
