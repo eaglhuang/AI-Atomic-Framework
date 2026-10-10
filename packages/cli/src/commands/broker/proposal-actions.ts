@@ -17,6 +17,7 @@ import { composeBrokerProposals } from '../../../../core/src/broker/compose.ts';
 import { applyStewardPlan, executeBrokerScopedWrite, planStewardApply } from '../../../../core/src/broker/steward.ts';
 import { buildTeamBrokerRuntimeActivationHandshake, buildTeamBrokerRunRecord, buildTeamBrokerRunRecordEnvelope, projectTeamBrokerRearbitrationSnapshot } from '../../../../core/src/broker/team-lane.ts';
 import { defaultBrokerProposalStoreRelativePath, findBrokerProposal, listBrokerProposalSummaries, loadBrokerProposalStore, readBrokerProposalFile, saveBrokerProposalStore, upsertBrokerProposalStore, validateBrokerProposal } from '../../../../core/src/broker/proposal.ts';
+import { fillProposalAtomCids } from '../../../../core/src/broker/proposal-atom-cid.ts';
 import { defaultAdapterRegistry, resolveAdapter } from '../../../../core/src/broker/adapters/registry.ts';
 import { planMutationBatch } from '../../../../core/src/broker/adapters/batch-planner.ts';
 import { computeCasResult, hashContent } from '../../../../core/src/broker/adapters/cas.ts';
@@ -62,7 +63,7 @@ export function handleBrokerProposalActions(options: ParsedBrokerOptions) {
         throw new CliError('ATM_CLI_USAGE', 'broker proposal create requires exactly one --proposal-file <path>.', { exitCode: 2 });
       }
 
-      const proposal = readBrokerProposalFile(path.resolve(options.cwd, options.proposalFiles[0]));
+      const proposal = fillProposalAtomCids(readBrokerProposalFile(path.resolve(options.cwd, options.proposalFiles[0])), options.cwd);
       const validation = validateBrokerProposal(proposal, { cwd: options.cwd });
       if (!validation.ok) {
         throw new CliError('ATM_BROKER_PROPOSAL_INVALID', 'Broker proposal failed validation.', {
