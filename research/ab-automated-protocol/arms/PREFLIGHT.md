@@ -56,3 +56,23 @@ onefile 來源：`origin/claude/project-thread-dbtbbj` 的 `release/atm-onefile/
 | `broker proposal validate` | 失敗：仍是 `missing-atom-refs` |
 
 atomCid 來源不在 #263 內，preflight 仍未通過。ATM 臂維持 `unverified`。
+
+## 第四次嘗試：main = 97bcce7e7（含 #260、#263、#265、#273），使用源碼 runner `atm.dev.mjs`
+
+依使用者決定，源碼 runner 用於本次 preflight，結果中已註明；onefile 未重建。
+
+Repo 採 `packages/app/src/*` 版面（atomize 的 production 偵測需要此結構；`src/*.js` 會被歸為 `uncategorized`，`production_source_count: 0`）。
+
+| 步驟 | 結果 |
+|---|---|
+| `atomize backfill --apply` | 通過，產生 1 個 generatedDraft atom（`atom-math`），附 `atomCid` 與 `atomRefs` |
+| `broker proposal create`（P-F1-mul、P-F1-div） | 兩者皆通過 |
+| `broker proposal validate`（P-F1-mul，帶 backfill atomRefs） | 通過 |
+| `broker compose` | **阻擋**：`blocked-cid-conflict`，兩個 proposal 指向同一個 `atomCid` 與 `atomId` |
+| `steward plan` / `steward apply` | 未執行（compose 未通過） |
+
+**判讀**：`blocked-cid-conflict` 是 ATM 的設計結果，不是 preflight 腳本錯誤。同一 atom 的兩個並行 writer 會被 compose 擋下。ATM 臂要通過，需要 `integrateCmd` 具備序列化策略：第二個 writer 在已整合的 HEAD 上 rebase、重新提交 proposal，之後才走 steward plan/apply。這個策略尚未實作，也尚未驗證。
+
+**狀態**：ATM 臂維持 `unverified`。兩臂 preflight 尚未都通過，因此第一批正式 run 不執行，也沒有花費。
+
+**本次改動**：`arms/make-proposal.mjs` 新增可選第 8 個參數 `backfillFile`，從 atomize backfill 結果複製 `atomRefs`。
