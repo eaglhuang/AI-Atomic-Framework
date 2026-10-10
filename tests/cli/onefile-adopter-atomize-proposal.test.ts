@@ -28,7 +28,7 @@ try {
   git(['-c', 'user.email=smoke@example.invalid', '-c', 'user.name=smoke', 'commit', '-q', '-m', 'app']);
 
   const run = (args: string[]) => {
-    const result = spawnSync(process.execPath, [onefile, ...args, '--cwd', adopter, '--json'], { encoding: 'utf8', timeout: 120_000 });
+    const result = spawnSync(process.execPath, [onefile, ...args, '--cwd', adopter, '--json'], { cwd: adopter, encoding: 'utf8', timeout: 120_000 });
     const stdout = result.stdout.trim();
     assert.ok(stdout.startsWith('{'), `onefile ${args.join(' ')} must emit JSON, got stderr: ${result.stderr}`);
     return JSON.parse(stdout) as { ok: boolean; messages: { code: string; text: string }[] };

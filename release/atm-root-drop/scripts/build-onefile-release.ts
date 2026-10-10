@@ -9,6 +9,7 @@ import { finalizeBuildReleaseHygiene } from './build-release-hygiene.ts';
 import { assertPayloadLauncherIsNotNested } from './launcher-entrypoint-guards.ts';
 import { renderOnefileFastVersionRuntime } from './onefile-fast-version-runtime.ts';
 import { renderCacheIntegrityRuntime } from './onefile-cache-integrity-runtime.ts';
+import { collectRuntimeDependencyPayloadFiles, isOnefileAtomizeClosurePath } from './onefile-runtime-closure.ts';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const rootDropReleaseRoot = path.join(repoRoot, 'release', 'atm-root-drop');
@@ -29,10 +30,7 @@ export function buildOnefileRelease(options: any = {}) {
   buildRootDropRelease({ repositoryRoot, releaseRoot: rootDropRoot, packageDistReady: true });
   assertPayloadLauncherIsNotNested(path.join(rootDropRoot, 'atm.mjs'));
 
-  const payloadFiles = [
-    ...collectPayloadFiles(rootDropRoot),
-    ...collectRuntimeDependencyPayloadFiles(repositoryRoot)
-  ];
+  const payloadFiles = [...collectPayloadFiles(rootDropRoot), ...collectRuntimeDependencyPayloadFiles(repositoryRoot)];
   const payloadInputManifestHash = digestJson({ launcherTemplate: renderOnefileRuntime.toString(), cacheTemplate: renderCacheIntegrityRuntime.toString(), fastVersionTemplate: renderOnefileFastVersionRuntime(), files: payloadFiles.map((file: any) => ({
     path: file.path,
     mode: file.mode,
@@ -191,78 +189,11 @@ const onefilePayloadFrameworkMarkers = new Set([
 
 // These records are read by shipped CLI diagnostics. Governance projections
 // and backlog shards belong to the host repository, not the embedded runtime.
-// Atomize subcommands load these helper modules from the framework root. A
-// onefile launcher runs from its extraction cache, so they must be embedded
-// explicitly; otherwise `atomize inventory|backfill` cannot start in adopter
-// repositories (ERR_MODULE_NOT_FOUND on scripts/src/atomize-*.js).
-const onefilePayloadAtomizeHelperFiles = new Set([
-  'docs/ATOMIZATION_COVERAGE_TAXONOMY.md',
-  'scripts/src/atomization-register-receipt.js',
-  'scripts/src/atomize-backfill.js',
-  'scripts/src/atomize-inventory.js',
-  'scripts/src/atomize-score.js'
-]);
-const onefilePayloadAtomizeDataPrefixes = [
-  'atomic_workbench/atomization-coverage/path-to-atom-map-shards/'
-];
-
-// Runtime npm packages imported by bare specifier from the embedded CLI and
-// core (for example ajv in broker proposal validation). The onefile has no
-// node_modules of its own, so these packages are carried from the host
-// install. Without them, broker proposal create fails in any adopter repo
-// that does not happen to install ajv itself.
-export const onefilePayloadRuntimeDependencies = [
-  'ajv',
-  'ajv-formats',
-  'fast-deep-equal',
-  'fast-uri',
-  'json-schema-traverse',
-  'require-from-string'
-] as const;
-
 const onefilePayloadGovernanceFiles = new Set([
   'docs/governance/docs-neutrality-policy.json',
   'docs/governance/error-code-registry.json',
   'docs/governance/tasks-audit-warning-baseline.json'
 ]);
-
-function collectRuntimeDependencyPayloadFiles(repositoryRoot: string) {
-  const nodeModulesRoot = path.join(repositoryRoot, 'node_modules');
-  const files: any[] = [];
-  for (const packageName of onefilePayloadRuntimeDependencies) {
-    const packageRoot = path.join(nodeModulesRoot, packageName);
-    if (!existsSync(path.join(packageRoot, 'package.json'))) {
-      // Fail closed: a onefile without these packages is a broken runner.
-      throw new Error(`Onefile runtime dependency ${packageName} is missing from ${nodeModulesRoot}; run npm ci before building the onefile release.`);
-    }
-    for (const absolutePath of walkFiles(packageRoot)) {
-      const relativePath = path.relative(repositoryRoot, absolutePath).replace(/\\/g, '/');
-      if (!isOnefileRuntimeDependencyPath(relativePath)) {
-        continue;
-      }
-      const stats = statSync(absolutePath);
-      files.push({
-        path: relativePath,
-        mode: stats.mode & 0o777,
-        dataBase64: readFileSync(absolutePath).toString('base64')
-      });
-    }
-  }
-  return files;
-}
-
-export function isOnefileRuntimeDependencyPath(relativePath: string) {
-  const normalized = String(relativePath || '').replace(/\\/g, '/');
-  const match = /^node_modules\/((?:@[^/]+\/)?[^/]+)\/(.+)$/.exec(normalized);
-  if (!match || !(onefilePayloadRuntimeDependencies as readonly string[]).includes(match[1]!)) {
-    return false;
-  }
-  const inPackage = match[2]!;
-  if (/(^|\/)(test|tests|benchmark|docs)\//.test(inPackage)) {
-    return false;
-  }
-  return inPackage === 'package.json' || /\.(js|json)$/.test(inPackage);
-}
 
 function collectPayloadFiles(root: any) {
   const files: any[] = [];
@@ -289,10 +220,7 @@ export function isOnefilePayloadPath(relativePath: string) {
   if (onefilePayloadFrameworkMarkers.has(normalized)) {
     return true;
   }
-  if (onefilePayloadAtomizeHelperFiles.has(normalized)) {
-    return true;
-  }
-  if (onefilePayloadAtomizeDataPrefixes.some((prefix) => normalized.startsWith(prefix))) {
+  if (isOnefileAtomizeClosurePath(normalized)) {
     return true;
   }
   if (!onefilePayloadPrefixes.some((prefix) => normalized.startsWith(prefix))) {

@@ -5617,6 +5617,7 @@
     "release/atm-root-drop/scripts/module-boundaries.config.json",
     "release/atm-root-drop/scripts/onefile-cache-integrity-runtime.ts",
     "release/atm-root-drop/scripts/onefile-fast-version-runtime.ts",
+    "release/atm-root-drop/scripts/onefile-runtime-closure.ts",
     "release/atm-root-drop/scripts/osv-severity-gate.ts",
     "release/atm-root-drop/scripts/paired-ab-v4-cell-workload.ts",
     "release/atm-root-drop/scripts/plan-performance-report-v3.ts",
@@ -6477,6 +6478,7 @@
     "release/atm-root-drop/tests/cli/npm-first-use-environment.test.ts",
     "release/atm-root-drop/tests/cli/numeric-scalar-order-safety.test.ts",
     "release/atm-root-drop/tests/cli/observed-evidence-production-callers.test.ts",
+    "release/atm-root-drop/tests/cli/onefile-adopter-atomize-proposal.test.ts",
     "release/atm-root-drop/tests/cli/onefile-cache-integrity.test.ts",
     "release/atm-root-drop/tests/cli/onefile-fast-version-identity.test.ts",
     "release/atm-root-drop/tests/cli/onefile-root-drop-build-coordination.test.ts",
@@ -7208,8 +7210,8 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 7,
-    "unchanged": 7166,
+    "copied": 10,
+    "unchanged": 7165,
     "removed": 0
   },
   "buildMode": "full",
@@ -26233,7 +26235,7 @@
       },
       {
         "path": "packages/cli/dist/build-identity.json",
-        "digest": "496ed2c056bd617c09b0763929cb44e87907a1e8a615fea0c75b680afec71175",
+        "digest": "661648c01a342133ee892d6413516b8eb01b3b078c1bd59bc04b0d7369726614",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/build-identity.json"
@@ -26359,7 +26361,7 @@
       },
       {
         "path": "packages/cli/dist/commands/atomize.js",
-        "digest": "db1c517ecbdf2365bd6ba97376bbf598a5614be107b42daa60b137204d42e53e",
+        "digest": "e6ba84a404fa1b0e9a9ecca2343d9ed02ed6bbb516c2960d2babee588ae15e10",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/atomize.js"
@@ -32290,7 +32292,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/build-identity.json",
-        "digest": "ef1892db67a152b353477e7b0ce1e36a866d1920afd613d9e012ff7932ece01c",
+        "digest": "888a89fdaae88214b034bc53b8a860cdb26becdd304333bb45c2d9d2b7548e7a",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/build-identity.json"
@@ -33019,7 +33021,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/manifest.json",
-        "digest": "02a635b6c67d6b866926f198326c098948b7f8133129baa95c707e9d8dd92d44",
+        "digest": "51a8461d66ae0209f0a0320ebfa93758f3b7d7e7abda393091e4b01b276de8ee",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/manifest.json"
@@ -33658,7 +33660,7 @@
       },
       {
         "path": "packages/cli/src/commands/atomize.ts",
-        "digest": "c6060dce1c6f2ad7726c3dcc3906edbaa025e76cc11dd5db7c8372e610f8c4a6",
+        "digest": "0548da5bf2450b935b08fded2b8d5279b533b53def92209779d5bad9c79a3bd4",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/atomize.ts"
@@ -50524,7 +50526,7 @@
       },
       {
         "path": "packages/create-atm/dist/build-identity.json",
-        "digest": "e970537f12d97ca5f796f5dcac635fde0032770ba3e0038ec2f5e20dab1bcbdb",
+        "digest": "a1a5380c80885b3729c0235395389d55af53928d0a6b10a1f86d41b082abf805",
         "origin": "source",
         "inputPaths": [
           "packages/create-atm/dist/build-identity.json"
@@ -55717,7 +55719,7 @@
       },
       {
         "path": "scripts/build-onefile-release.ts",
-        "digest": "e9430cbf421f579147b2676a6db7fce6d4f659da214bc1cdd4b81775dce74ee7",
+        "digest": "b84bc0c9be12a3833ae1c279e2cb3824c189bb960a57b9ad479da9d34cd919fe",
         "origin": "source",
         "inputPaths": [
           "scripts/build-onefile-release.ts"
@@ -57476,6 +57478,15 @@
         "origin": "source",
         "inputPaths": [
           "scripts/onefile-fast-version-runtime.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "scripts/onefile-runtime-closure.ts",
+        "digest": "f72b64d93b26c23b2ea23e420ffd4bdaa9854396a4d3d80edf861c3fefb3f82a",
+        "origin": "source",
+        "inputPaths": [
+          "scripts/onefile-runtime-closure.ts"
         ],
         "replaceable": true
       },
@@ -65220,6 +65231,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/cli/onefile-adopter-atomize-proposal.test.ts",
+        "digest": "7508611394a0b48761670ed5476c1e7fc2a39004a2f58c89e7750ca6999f90cd",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/onefile-adopter-atomize-proposal.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/cli/onefile-cache-integrity.test.ts",
         "digest": "9f42d271bb0f40bf18fad21865b1bc1de4d91e5b298749e8beebca02974e6124",
         "origin": "source",
@@ -65248,7 +65268,7 @@
       },
       {
         "path": "tests/cli/onefile-runtime-closure.test.ts",
-        "digest": "0a00338424fe97abe870df8e590d96eca571f5be57b760035340a90f1a65a4e5",
+        "digest": "f5e3781be539fc994c21e12266747feae9647183dc5fa60e91dce4cfedf246c1",
         "origin": "source",
         "inputPaths": [
           "tests/cli/onefile-runtime-closure.test.ts"
@@ -71772,7 +71792,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:7e986a796a275d37544ee3df096a9ec227d54e23c5775b884ca3ef059b4beaf8"
+    "treeDigest": "sha256:dc9de51383c4c6337e0bd451df46310c62eb4a24e1e5da5252904a70b3d4f33f"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -73381,7 +73401,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:ecc707b9dd803e8ec8f53340515b4d9436a80b344e15db48680b1281be2bbea4"
+    "digest": "sha256:44411d47c8fe6ffae219633c37afc765562c314fc82574838f90447a7abf2738"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -78972,6 +78992,7 @@
       "release/atm-root-drop/scripts/module-boundaries.config.json",
       "release/atm-root-drop/scripts/onefile-cache-integrity-runtime.ts",
       "release/atm-root-drop/scripts/onefile-fast-version-runtime.ts",
+      "release/atm-root-drop/scripts/onefile-runtime-closure.ts",
       "release/atm-root-drop/scripts/osv-severity-gate.ts",
       "release/atm-root-drop/scripts/paired-ab-v4-cell-workload.ts",
       "release/atm-root-drop/scripts/plan-performance-report-v3.ts",
@@ -79832,6 +79853,7 @@
       "release/atm-root-drop/tests/cli/npm-first-use-environment.test.ts",
       "release/atm-root-drop/tests/cli/numeric-scalar-order-safety.test.ts",
       "release/atm-root-drop/tests/cli/observed-evidence-production-callers.test.ts",
+      "release/atm-root-drop/tests/cli/onefile-adopter-atomize-proposal.test.ts",
       "release/atm-root-drop/tests/cli/onefile-cache-integrity.test.ts",
       "release/atm-root-drop/tests/cli/onefile-fast-version-identity.test.ts",
       "release/atm-root-drop/tests/cli/onefile-root-drop-build-coordination.test.ts",

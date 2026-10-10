@@ -3,7 +3,8 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { isOnefilePayloadPath, isOnefileRuntimeDependencyPath } from '../../scripts/build-onefile-release.ts';
+import { isOnefilePayloadPath } from '../../scripts/build-onefile-release.ts';
+import { isOnefileRuntimeDependencyPath } from '../../scripts/onefile-runtime-closure.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const builder = readFileSync(path.join(root, 'scripts', 'build-onefile-release.ts'), 'utf8');
