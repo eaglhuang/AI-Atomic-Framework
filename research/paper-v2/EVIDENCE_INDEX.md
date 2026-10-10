@@ -348,6 +348,20 @@ DRAFT HIST-v2 prereg（非 generation、尚未凍結、沒有 run）：[`working
 
 六專案全量候選尚未分類。沒有 run、沒有勝出宣告。
 
+## 22. HIST-v2 設計稿修訂 r2（2026-10-10；DRAFT，非 generation，沒有任何 run）
+
+> **DRAFT，不是封存，不主張任何結論、不宣稱勝出。** 不修改 §20 的上一稿，也不凍結預先登記。PR #268 的凍結嘗試未合併，不是本節的權威文本。
+
+| 項目 | 值 |
+|---|---|
+| 路徑 | [`benchmark-design/2026-10-10-hist-bench-v2-r2/`](./benchmark-design/2026-10-10-hist-bench-v2-r2/README.md) |
+| 上一稿 | [`benchmark-design/2026-10-10-hist-bench-v2/`](./benchmark-design/2026-10-10-hist-bench-v2/README.md)（仍不可變） |
+| 分類器 v2 | PR #270，規則雜湊 `51cf1fa839e8ade8f07313c170c532eee084d695701be6a38702750a84161e4c`。v1 雜湊不變 |
+| 要點 | C1 限定在寫明的檔案與故障模型，零次觀察不是保證；C2 改成「相容 proposal 可以同一批提交」，等待與吞吐分開，不再寫「不必排隊」；C3 用合法子集，假接受與不必要拒絕分開。期限從第一次送出起 30 秒且重試不歸零；「8」定義成 8 次重試。後期歷史留出集一旦為調參而檢視就不再是未見資料。舊主矩陣的 450-run 稱呼與 900＋270 算式在正文裡對過。兩份 proposal 是短猝發，不是持續負載 |
+
+沒有 `SHA256SUMS`，因為這份修訂還不是凍結世代。冒煙、pilot、主跑、留出集都還沒有使用者同意，也沒有 run。
+
+
 ## 6. 不在 repo 的參照
 - ATM pin 原始碼：GitHub `eaglhuang/AI-Atomic-Framework` commit `5692474f7db70ab52a7a71c8af4867609e7e4b43`（r3 另加 `bea35380d7f381f998c9930fa95f01b999c7f208`，box tarball `/workspace/atm-main-bea35380/atm-main.tar.gz` sha256 `9346e5b175b176618f435aeb4b41ab93ef7575f9bf77d77c47a5aeac87ad34b5`；r4 另加 `2118bc66efb3ac3bc0ddaede6a2f7cb18526b030`，box tarball `/workspace/atm-main-2118bc66/atm-main.tar.gz` sha256 `aa959607c35c51b7fc3c4e3d81b3d9e979ee62f4d9361ef9e9f5ee72e78abd88`；r5 另加 `37847584e24afc08ea58cfe380bb5b1220fbe335`，box tarball `/workspace/atm-main-37847584/atm-main.tar.gz` sha256 `e17a90ddceaf3c70d580c96e31f14cf8251d5a664985c1eb494f0d8db8045e3d`；r6 另加 `b35a6141bd5bfbaec654f1cd3079323581b04074`，box tarball `/workspace/atm-main-b35a6141/atm-main.tar.gz` sha256 `93fa7839d8e0fee51e5ad224833df2b57397fead3e77e0528117f21f5d5e59ef`）；box tarball `/workspace/atm-main-5692474f/atm-main.tar.gz` sha256 `1d498a397e6a5db119d40b8f539dc165cb0028fbfe9577f953023f8ec8d45795`。
 - 論文 v1：arXiv:2607.00041（box `refs/` 有副本，未上傳）。
