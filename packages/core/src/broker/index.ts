@@ -9,6 +9,7 @@ export { observeSerialTicket } from './serial-queue/queue.ts';
 export * from './proposal.ts';
 export * from './merge-plan.ts';
 export * from './compose.ts';
+export * from './shared-compose-inbox.ts';
 export * from './apply-evidence.ts';
 export * from './steward.ts';
 export * from './steward-transactional-apply.ts';
