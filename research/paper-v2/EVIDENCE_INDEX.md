@@ -320,6 +320,17 @@ r6 上傳包拆成多個獨立 tarball，都解到同一個 `generations/r6-2026
 
 內容：論文 2.0 草稿（新增 §5.8 HIST 設計、§6.1 表 R7–R12：主樣本寫入安全、區間、blocked 理由、分層、結尾換行反例修正前後、HIST 版本演進、語意終點；§7.1 HIST 強度上限、§7.2 STALE、附錄 H 過程紀錄、參考文獻 [24]–[29]）；VERSION_ANCHORS、EXPERIMENT_CHECKLIST、METRIC_DEFINITIONS 各加一節 HIST；修改前備份與 diff。數字全部抄自 §13–§18 的封存分析輸出。Phase 3 450-run 主矩陣仍未執行。
 
+## 20. 外部審閱後的論文修正（工作稿快照 2026-10-10b）與 HIST-v2 重新設計稿（2026-10-10；全部候選都測、只分類；DRAFT，非 generation，沒有任何 run）
+
+> **DRAFT，不是封存的證據 generation，不主張任何結論、不宣稱勝出。** 兩個目錄建立後不可變；先前所有 generation 與 `working-docs/2026-10-09/`、`working-docs/2026-10-10/` 不受影響。
+
+| 目錄 | 狀態 | SHA256SUMS sha256 | 檔案數 | 說明 |
+|---|---|---|---:|---|
+| `working-docs/2026-10-10b/` | DRAFT 工作稿快照（不可變；非 generation） | `47e52eaf7e765088ee887a1be98d047eb7f52df68a54032de6deb026a5381af2` | 5（不含 SHA256SUMS） | [SNAPSHOT.md](./working-docs/2026-10-10b/SNAPSHOT.md)：§2.2／§8「main 尚未含修正」加歷史版本限定；[24] STALE 作者全名並移除待核註記；「尚未呼叫 ATM」更正為「已過准入、尚未進入 composer／steward apply」；§7.1 新增四項 HIST 揭露；§7.3 指向 HIST-v2。修改前備份與 `working-docs/2026-10-10/` 論文逐位元相同 |
+| `benchmark-design/2026-10-10-hist-bench-v2/` | DRAFT 設計稿（不可變；**不是**凍結的預先登記） | `1574254c54ea5b83cb23ffc38eaeb1d2f6c19e050558ac86ca38044082ceefb6` | 3（不含 SHA256SUMS） | [README.md](./benchmark-design/2026-10-10-hist-bench-v2/README.md)；`HIST_BENCH_V2_PREREG_zh.md`：分類工具（全部候選都測，A 不相交／B 同區可合併／C 真衝突／N 無可跑測試，事先標答案，只排除技術上跑不起來的）、多程序 agent 模擬與共用批次協調器、間隔掃描、公平基線、語意評分器負控制、混淆矩陣、群集統計、held-out；待決 D1–D9 |
+
+驗證：`sh working-docs/2026-10-10b/verify.sh working-docs/2026-10-10b`、`sh benchmark-design/2026-10-10-hist-bench-v2/verify.sh benchmark-design/2026-10-10-hist-bench-v2`。Phase 3 450-run 主矩陣仍未執行。
+
 DRAFT HIST-v2 prereg（非 generation、尚未凍結、沒有 run）：[`working-docs/2026-10-10-hist-v2-prereg/`](./working-docs/2026-10-10-hist-v2-prereg/README.md)，prereg SHA256 `ddb24018597ca8e485a4f42c0bc0972d2795e06e799efb4dabf63cb29839ad65`；〔待決 Dx〕未決前不得凍結。
 
 ## 6. 不在 repo 的參照
