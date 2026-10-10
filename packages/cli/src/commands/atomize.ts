@@ -18,7 +18,7 @@ type AtomizeOptions = {
 // (scripts/src, docs, atomic_workbench shards), so adopters can run atomize.
 export function resolveAtomizeHelperRoot(moduleUrl = import.meta.url): string {
   const frameworkRoot = resolveFrameworkRoot(moduleUrl);
-  if (existsSync(path.join(frameworkRoot, 'scripts', 'src', 'atomize-inventory.js'))) return frameworkRoot;
+  if (existsSync(path.join(frameworkRoot, 'scripts', 'src'))) return frameworkRoot;
   return path.join(frameworkRoot, 'dist', 'npm-runtime', 'atomize-helpers');
 }
 
