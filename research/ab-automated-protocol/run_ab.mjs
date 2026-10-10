@@ -45,6 +45,11 @@ function sha256Dir(dir) {
   return h.digest('hex');
 }
 
+// The oracle may live outside the repo (AB_HIDDEN_DIR). Only its hash is committed in protocol.json.
+function hiddenDirOf(bank, bankDir) {
+  return process.env.AB_HIDDEN_DIR ? path.resolve(process.env.AB_HIDDEN_DIR) : path.resolve(bankDir, bank.hiddenDir);
+}
+
 function sha256File(file) {
   return crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
 }
@@ -83,7 +88,7 @@ function shuffle(list, rand) {
 function loadProtocol() {
   const file = path.resolve(opt.protocol || path.join(HERE, 'protocol.json'));
   const protocolDir = path.dirname(file);
-  process.env.AB_PROTOCOL_DIR = protocolDir;
+  process.env.AB_PROTOCOL_DIR = HERE; // where agents/, arms/ and selftest/ live
   const protocol = JSON.parse(fs.readFileSync(file, 'utf8'));
   const taskFile = path.resolve(protocolDir, protocol.tasks);
   const bank = JSON.parse(fs.readFileSync(taskFile, 'utf8'));
@@ -96,7 +101,7 @@ function cmdPin() {
   console.log(JSON.stringify({
     tasksSha256: sha256File(path.resolve(protocolDir, protocol.tasks)),
     seedSha256: sha256Dir(path.resolve(bankDir, bank.seedDir)),
-    hiddenSha256: sha256Dir(path.resolve(bankDir, bank.hiddenDir)),
+    hiddenSha256: sha256Dir(hiddenDirOf(bank, bankDir)),
   }, null, 2));
 }
 
@@ -105,7 +110,7 @@ function verifyPins(protocol, bank, bankDir, protocolDir) {
   const actual = {
     tasksSha256: sha256File(path.resolve(protocolDir, protocol.tasks)),
     seedSha256: sha256Dir(path.resolve(bankDir, bank.seedDir)),
-    hiddenSha256: sha256Dir(path.resolve(bankDir, bank.hiddenDir)),
+    hiddenSha256: sha256Dir(hiddenDirOf(bank, bankDir)),
   };
   for (const k of Object.keys(actual)) {
     if (pins[k] !== actual[k]) {
@@ -121,7 +126,7 @@ function runAgent(arm, cwd, promptFile, usageFile, timeoutSec) {
   const t0 = Date.now();
   const r = spawnSync(command, {
     cwd, shell: true, encoding: 'utf8', timeout: timeoutSec * 1000,
-    env: { ...process.env, AB_ARM: arm.name },
+    env: { ...process.env, AB_ARM: arm.name, AB_PROMPT_PREFIX: arm.promptPrefix || '' },
   });
   let usage = null;
   try { usage = JSON.parse(fs.readFileSync(usageFile, 'utf8')); } catch { /* agent wrote no usage: stays null */ }
@@ -193,7 +198,7 @@ function runOne({ protocol, bank, bankDir, task, arm, seed, workRoot }) {
 
   // Hidden oracle: copied in only now, after every agent has finished.
   const hiddenInto = path.join(integ, '__ab_hidden__');
-  fs.cpSync(path.resolve(bankDir, bank.hiddenDir), hiddenInto, { recursive: true });
+  fs.cpSync(hiddenDirOf(bank, bankDir), hiddenInto, { recursive: true });
   const features = task.features.join(' ');
   const check = spawnSync(bank.checkCmd.replace('{features}', features), {
     cwd: hiddenInto, shell: true, encoding: 'utf8', timeout: 120000,
@@ -228,6 +233,11 @@ function sumCost(writers) {
   return writers.reduce((s, w) => s + (w.usage.costUsd || 0), 0);
 }
 
+function rows(file) {
+  if (!fs.existsSync(file)) return [];
+  return fs.readFileSync(file, 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l));
+}
+
 function cmdRun() {
   const { protocol, bank, bankDir, protocolDir } = loadProtocol();
   verifyPins(protocol, bank, bankDir, protocolDir);
@@ -244,12 +254,27 @@ function cmdRun() {
   const workRoot = path.join(out, 'work');
   fs.mkdirSync(workRoot, { recursive: true });
   const arms = Object.entries(protocol.arms).map(([name, a]) => ({ name, ...a }));
+  for (const arm of arms) {
+    if (arm.status === 'unverified' && !process.env.AB_ALLOW_UNVERIFIED) {
+      throw new Error(`arm "${arm.name}" is unverified (${arm.note || 'no note'}); run its preflight first or set AB_ALLOW_UNVERIFIED=1`);
+    }
+  }
+  const budget = process.env.AB_BUDGET_USD ? Number(process.env.AB_BUDGET_USD) : null;
+  if (budget === null) throw new Error('set AB_BUDGET_USD (hard cap on API spend) before a run');
+  let spent = 0;
+  for (const r of rows(rowsFile)) spent += r.costUsd || 0;
   for (const task of bank.tasks) {
     for (const arm of arms) {
       for (const seed of protocol.seeds) {
         if (done.has(`${task.id}|${arm.name}|${seed}`)) continue;
+        // Budget is checked between runs, so overshoot is at most one run's cost.
+        if (spent >= budget) {
+          console.log(`budget reached: spent $${spent.toFixed(4)} >= cap $${budget}; stopping (resumable)`);
+          return;
+        }
         const row = runOne({ protocol, bank, bankDir, task, arm, seed, workRoot });
         fs.appendFileSync(rowsFile, JSON.stringify(row) + '\n');
+        spent += row.costUsd || 0;
         console.log(`${row.task} ${row.arm} s${seed} green=${row.mainGreen} conflicts=${row.conflicts}`);
       }
     }
@@ -268,6 +293,19 @@ function bootstrapDiff(pairs, iters, rand) {
   }
   diffs.sort((a, b) => a - b);
   return [diffs[Math.floor(0.025 * iters)], diffs[Math.floor(0.975 * iters)]];
+}
+
+// costUsdPerGreen(arm) / costUsdPerGreen(baseline); null when either side has no cost data or no green run.
+function costRatio(armRows, baseRows) {
+  const perGreen = (rs) => {
+    if (rs.some((r) => r.costUsd === null)) return null;
+    const green = rs.filter((r) => r.mainGreen).length;
+    if (!green) return null;
+    return rs.reduce((a, r) => a + r.costUsd, 0) / green;
+  };
+  const a = perGreen(armRows);
+  const b = perGreen(baseRows);
+  return a === null || b === null || b === 0 ? null : a / b;
 }
 
 function cmdReport() {
@@ -310,10 +348,16 @@ function cmdReport() {
     const [lo, hi] = bootstrapDiff(pairs, 10000, rand);
     const th = protocol.thresholds;
     let verdict = 'inconclusive';
-    if (diff * 100 >= th.minDiffPP && lo > 0) verdict = `${arm} supported`;
+    const cost = costRatio(byArm[arm], byArm[base]);
+    if (diff * 100 >= th.minDiffPP && lo > 0) {
+      // Pre-registered cost gate: a quality win only counts if cost per green stays within costRatioMax.
+      if (cost === null) verdict = 'inconclusive (cost unavailable)';
+      else if (cost <= th.costRatioMax) verdict = `${arm} supported`;
+      else verdict = `${arm} quality-supported, cost gate failed (ratio ${cost.toFixed(2)} > ${th.costRatioMax})`;
+    }
     else if (diff * 100 <= -th.minDiffPP && hi < 0) verdict = `${arm} refuted (worse)`;
     else if (Math.abs(diff * 100) < th.minDiffPP && lo <= 0 && hi >= 0) verdict = 'no difference';
-    decision.comparisons[arm] = { pairedUnits: pairs.length, diffPP: +(diff * 100).toFixed(2), ci95PP: [+(lo * 100).toFixed(2), +(hi * 100).toFixed(2)], verdict };
+    decision.comparisons[arm] = { pairedUnits: pairs.length, diffPP: +(diff * 100).toFixed(2), ci95PP: [+(lo * 100).toFixed(2), +(hi * 100).toFixed(2)], costPerGreenRatio: cost === null ? null : +cost.toFixed(3), verdict };
   }
   const report = { protocol: protocol.id, summary, decision, generatedAt: new Date().toISOString() };
   fs.writeFileSync(path.join(out, 'summary.json'), JSON.stringify(report, null, 2));

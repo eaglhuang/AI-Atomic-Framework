@@ -17,7 +17,7 @@
 
 | 原角色 | 自動化替代 | 為何可信 |
 |---|---|---|
-| 隱藏題庫負責人 | 題庫與隱藏 oracle 事先 commit，記 sha256（`protocol.json` 的 `pins`） | runner 每次啟動都驗證 hash，改題即拒跑 |
+| 隱藏題庫負責人 | 題庫事先 commit；隱藏 oracle 放在 repo 外（`AB_HIDDEN_DIR`），只 commit 其 sha256（`pins`） | runner 每次啟動都驗證，改題或改 oracle 即拒跑 |
 | 裁判 | 隱藏 oracle（`hidden/check.mjs`）以程式判定，exit code 為準 | 不用 LLM judge，結果可由任何人重算 |
 | baseline 操作者 | runner 固定流程：worktree → agent → commit → `git merge` | 每個 run 的步驟由程式決定，無人手動介入 |
 | ATM 操作者 | arm 的 `agentCmd` / `integrateCmd` 固定指令 | 同樣以指令字串記錄在 protocol 中 |
@@ -50,7 +50,7 @@
 - **無差異**：差的絕對值 < 10 pp，且 CI 包含 0。
 - 其餘為 **inconclusive**，不得解讀為支持。
 
-注意：`costUsdPerGreen` 目前只列出，尚未進決策規則。正式跑之前必須把「成本效益門檻」（例如 ATM 的每綠成本不得高於基準 1.5 倍）加進 `thresholds` 並重新 pin，否則只能宣稱品質差異，不能宣稱成本優勢。
+**成本門檻（已預註冊）**：`costRatioMax = 1.5`。品質優勢成立時，還要求 ATM 的「每綠成本」（總 API 成本 ÷ 主線綠的次數）不高於基準的 1.5 倍；超過則判為「品質支持、成本門檻未過」，不能宣稱 ATM 更划算。任一臂缺成本資料即為 inconclusive。
 
 ## 5. 已知限制（誠實清單）
 
@@ -58,8 +58,9 @@
 2. **題庫小**：目前 selftest 只有 2 題。結論只能外推到題庫覆蓋的行為。
 3. **oracle 只測題庫覆蓋到的功能**：通過不等於沒有語意破壞，需要題庫設計者補測項。
 4. **成本依賴 agent 回報**：若 agent 不回報 usage，成本欄位為 null，報告會標示 `tokenNullRuns`。
-5. **隱藏 oracle 的存放位置**：selftest 的 oracle 放在本 repo 內，只適合自我測試。正式比較時，題庫與 oracle 必須放在 agent 看不到的地方（另一個 repo 或私有儲存），否則 agent 可以讀到它。
-6. **selftest 的 fake agent 是確定性腳本**，只用來檢查 runner 的正確性，數字沒有外部意義。
+5. **oracle 的可審查性**：正式 oracle 不在 repo 內，外人只能驗證 hash 相符，無法直接審查測試內容。若要公開審查，須在正式跑完後公開 oracle 本體（hash 已先 commit，可證明未被事後改動）。
+6. **ATM 臂尚未驗證**：`atm` 臂的 `status` 為 `unverified`，`arms/atm-integrate.sh` 目前是拒跑的佔位腳本。正式跑之前必須在 bootstrap 過的暫存 repo 完成 preflight（broker proposal → compose → steward apply 跑通），才能把 status 改掉。在這之前，只有基準臂能跑。
+7. **selftest 的 fake agent 是確定性腳本**，只用來檢查 runner 的正確性，數字沒有外部意義。
 
 ## 6. 已知的前車之鑑
 
@@ -68,6 +69,25 @@
 這說明兩件事：獨立 oracle 能抓到 ATM 的真實缺陷；而「停止規則寫在前面、反例不隱藏」是這類比較可信的前提。本協定沿用同一原則。
 
 ## 7. 重跑
+
+### 正式跑（需要使用者核准預算）
+
+```bash
+AB_BUDGET_USD=<核准上限> AB_HIDDEN_DIR=<oracle 目錄，不在本 repo> ./run-formal.sh ./out-formal
+```
+
+- 沒設 `AB_BUDGET_USD` 或 `AB_HIDDEN_DIR` 就拒跑。
+- 預算在每個 run 之間檢查，超出上限會停止並保留已完成的結果，可續跑。
+- `atm` 臂未驗證前會拒跑，除非設 `AB_ALLOW_UNVERIFIED=1`（只用於 preflight 或測試，不得用於正式結論）。
+- 正式 protocol 為 3 seeds × 8 題 × 2 臂 × 2 writer，共 96 次 agent 呼叫（模型由 `AB_MODEL` 在執行時指定，並寫入每次呼叫的 usage 紀錄；成本由 CLI 的 usage 欄位記錄）。
+
+### 自我測試（不耗 API）
+
+```bash
+./run-selftest.sh      # 用 fake agent 驗證 runner；identity 對照組應判為 no difference
+```
+
+### 手動步驟
 
 ```bash
 cd research/ab-automated-protocol
@@ -90,4 +110,8 @@ selftest 已驗證：T1（兩人改同一檔尾端）在基準臂發生衝突、
 - `README.md`：本文件（方法論）
 - `protocol.json`：預註冊參數、臂定義、門檻、pins
 - `run_ab.mjs`：runner（`pin` / `run` / `report`，僅使用 Node 內建模組）
-- `selftest/`：題庫、seed repo、hidden oracle、fake agent（僅供自我測試）
+- `formal/`：正式題庫（8 題）、seed repo、`protocol.json`（3 seeds、門檻、pins）
+- `agents/claude_headless.mjs`：真實 agent 轉接器（呼叫 `claude -p --model $AB_MODEL`，寫入 usage）
+- `arms/atm-integrate.sh`：ATM 臂整合腳本（未驗證佔位）
+- `run-formal.sh` / `run-selftest.sh`：一鍵執行
+- `selftest/`：小題庫、fake agent、`claude` stub（僅供自我測試）
