@@ -15,6 +15,7 @@ ATM（AI-Atomic-Framework）論文 2.0（composer＋中立 steward，RQ2 主臂 
 | r5 generation | [`generations/r5-2026-10-08/`](./generations/r5-2026-10-08/GENERATION.md)（PR #216 驗證＋四版同場重跑；r6 起為歷史，**保留且不可變**） |
 | r6 generation | [`generations/r6-2026-10-09/`](./generations/r6-2026-10-09/GENERATION.md)（PR #238 SQLITE_BUSY 修正小型驗證；**DRAFT，未再外審**；Phase 3 未做） |
 | 工作稿快照 | [`working-docs/2026-10-09/`](./working-docs/2026-10-09/SNAPSHOT.md)（DRAFT 工作稿；**不是 generation**、不主張結論；不可變。內含早期 backup 與中間版，為「所有產出都進 repo」而收錄，不適用 Generation 政策第 5 條） |
+| 工作稿快照 2026-10-10 | [`working-docs/2026-10-10/`](./working-docs/2026-10-10/SNAPSHOT.md)（DRAFT 工作稿；**不是 generation**、不主張結論；不可變。論文 2.0 草稿寫入 HIST 結果＋三份追蹤文件，含修改前備份與 diff） |
 | 校驗 | `generations/<gen>/verify.sh`（唯讀；`sha256sum -c SHA256SUMS`） |
 | benchmark-trials/2026-10-09-hist-smoke, benchmark-trials/2026-10-09-hist-pilot | 試跑（trial runs, not formal results）：歷史真實 PR benchmark 冒煙＋Django pilot，ATM pin b35a6141（2026-10-09） |
 | benchmark-trials/2026-10-09-hist-mining | 只挖掘、沒有 run（不列入正式結果）：六專案合併 commit base 重新挖掘、可行性 dry-run、prereg v1.1 提案草稿（未套用）（2026-10-09） |
@@ -56,5 +57,7 @@ sh research/paper-v2/benchmark-main/2026-10-10-hist-prereg-v1.1/verify.sh resear
 sh research/paper-v2/benchmark-trials/2026-10-10-hist-confirm-v1.1/verify.sh research/paper-v2/benchmark-trials/2026-10-10-hist-confirm-v1.1
 sh research/paper-v2/benchmark-main/2026-10-10-hist-main/verify.sh research/paper-v2/benchmark-main/2026-10-10-hist-main
 sh research/paper-v2/benchmark-main/2026-10-10-hist-main-v2/verify.sh research/paper-v2/benchmark-main/2026-10-10-hist-main-v2
+sh research/paper-v2/working-docs/2026-10-10/verify.sh research/paper-v2/working-docs/2026-10-10
+# 預期：OK: 13 files verified (read-only) in research/paper-v2/working-docs/2026-10-10
 ```
 **注意：** `harness/reproduce.sh`（r1 版）的 verify 模式會重寫 manifest／checksums，**不可**用來驗證 r1（外審 P0-3）。r2–r6 已把 reproduce 拆成 verify／analyze／rerun／seal；驗證只用各代 `verify.sh`。
