@@ -43,7 +43,11 @@ try {
   const run = (args: string[]) => {
     const result = spawnSync(process.execPath, [entry, ...args, '--cwd', adopter, '--json'], { cwd: adopter, encoding: 'utf8', timeout: 120_000 });
     const stdout = result.stdout.trim();
-    assert.ok(stdout.startsWith('{'), `npm runtime ${args.join(' ')} must emit JSON, got stderr: ${result.stderr}`);
+    if (!stdout.startsWith('{')) {
+      // One short line that survives the CI report's stderr tail: exit code and both output heads.
+      process.stderr.write(`DIAG ${args.join(' ')} exit=${result.status} stdout=${JSON.stringify(stdout.slice(0, 240))} stderr=${JSON.stringify(result.stderr.slice(0, 480))}\n`);
+      process.exit(1);
+    }
     return JSON.parse(stdout) as { ok: boolean; messages: { code: string; text: string }[] };
   };
 
