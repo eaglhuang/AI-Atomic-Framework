@@ -358,6 +358,7 @@ DRAFT HIST-v2 prereg（非 generation、尚未凍結、沒有 run）：[`working
 | 上一稿 | [`benchmark-design/2026-10-10-hist-bench-v2/`](./benchmark-design/2026-10-10-hist-bench-v2/README.md)（仍不可變） |
 | 分類器 v2 | PR #270，規則雜湊 `51cf1fa839e8ade8f07313c170c532eee084d695701be6a38702750a84161e4c`。v1 雜湊不變 |
 | 要點 | C1 限定在寫明的檔案與故障模型，零次觀察不是保證；C2 改成「相容 proposal 可以同一批提交」，等待與吞吐分開，不再寫「不必排隊」；C3 用合法子集，假接受與不必要拒絕分開。期限從第一次送出起 30 秒且重試不歸零；「8」定義成 8 次重試。後期歷史留出集一旦為調參而檢視就不再是未見資料。舊主矩陣的 450-run 稱呼與 900＋270 算式在正文裡對過。兩份 proposal 是短猝發，不是持續負載 |
+| 已決定 | [`DECISIONS.md`](./benchmark-design/2026-10-10-hist-bench-v2-r2/DECISIONS.md)：R2-D1 多個最佳 base 維持技術排除並封存 SHA；R2-D2「8」＝第一次送出後 8 次重試（最多 9 次嘗試）；R2-D3 變成另一次提交嘗試的內部重新合成計入那 8 次；R2-D4 留出集加上 flask 與 requests，主跑 2 個 seed（有限重播）。仍是 DRAFT，先送外部審閱，不凍結 v2.0 |
 
 沒有 `SHA256SUMS`，因為這份修訂還不是凍結世代。冒煙、pilot、主跑、留出集都還沒有使用者同意，也沒有 run。
 
