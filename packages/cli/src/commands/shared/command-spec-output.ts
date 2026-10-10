@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { normalizeCommandHelpMetadata } from '../help.ts';
 import { projectFields, projectSummary } from '../output-projection.ts';
+import { formatSetupPretty } from '../setup/pretty.ts';
 import { carryLaneSessionIntoPrintedCommands } from './lane-session-flag.ts';
 import { CliError, type CommandMessage, type CommandResult, type EnrichedCommandResult, enrichCommandResult, getOutputProjectionState, makeResult, message, setFieldsProjection, setOutputJsonPath, setSummaryProjection } from './result-core.ts';
 
@@ -352,6 +353,8 @@ export function writeResult(
 }
 
 export function formatPrettyResult(result: CommandResult) {
+  if (result.command === 'setup') return formatSetupPretty(result);
+  if (result.command === 'help' && Array.isArray(result.evidence.commands)) return formatHelpPretty(result);
   const statusText = result.ok ? 'OK' : 'FAIL';
   const lines = [`[${statusText}] ${result.command} (${result.cwd})`];
   for (const entry of result.messages ?? []) {
@@ -361,6 +364,18 @@ export function formatPrettyResult(result: CommandResult) {
     lines.push('evidence:');
     lines.push(JSON.stringify(result.evidence, null, 2));
   }
+  return `${lines.join('\n')}\n`;
+}
+
+/** Command list for terminals; the full firstRun and output-mode evidence stays in --json. */
+function formatHelpPretty(result: CommandResult) {
+  const commands = result.evidence.commands as { command: string; summary?: string }[];
+  const width = Math.max(...commands.map(entry => entry.command.length));
+  const lines = [`[${result.ok ? 'OK' : 'FAIL'}] help`];
+  for (const entry of result.messages ?? []) lines.push(entry.text);
+  lines.push('commands:');
+  for (const entry of commands) lines.push(`  ${entry.command.padEnd(width)}  ${entry.summary ?? ''}`.trimEnd());
+  lines.push('Run with --json for the full evidence.');
   return `${lines.join('\n')}\n`;
 }
 
