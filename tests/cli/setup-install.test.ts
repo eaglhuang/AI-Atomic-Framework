@@ -73,6 +73,15 @@ test('pretty setup output is a step summary and keeps the full evidence in --jso
   assert.ok(pretty.split('\n').length < 15);
 });
 
+test('pretty help lists commands instead of dumping firstRun evidence', () => {
+  const pretty = formatPrettyResult({
+    ok: true, command: 'help', mode: 'standalone', cwd: '/x', messages: [],
+    evidence: { firstRun: { schemaId: 'atm.firstRun.v1' }, commands: [{ command: 'setup', summary: 'Set up ATM.' }, { command: 'next', summary: 'Route work.' }] }
+  } as unknown as Parameters<typeof formatPrettyResult>[0]);
+  assert.match(pretty, /commands:\n {2}setup {2}Set up ATM\.\n {2}next {3}Route work\./);
+  assert.doesNotMatch(pretty, /firstRun|schemaId/);
+});
+
 test('unsafe home, filesystem root and symlink targets are rejected', t => {
   const f = fixture(t);
   assert.throws(() => validateSetupTarget(f.homeDir, f.homeDir, {}), /project directory/);
