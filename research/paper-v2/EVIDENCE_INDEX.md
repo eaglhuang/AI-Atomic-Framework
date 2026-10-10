@@ -331,6 +331,8 @@ r6 上傳包拆成多個獨立 tarball，都解到同一個 `generations/r6-2026
 
 驗證：`sh working-docs/2026-10-10b/verify.sh working-docs/2026-10-10b`、`sh benchmark-design/2026-10-10-hist-bench-v2/verify.sh benchmark-design/2026-10-10-hist-bench-v2`。Phase 3 450-run 主矩陣仍未執行。
 
+DRAFT HIST-v2 prereg（非 generation、尚未凍結、沒有 run）：[`working-docs/2026-10-10-hist-v2-prereg/`](./working-docs/2026-10-10-hist-v2-prereg/README.md)，prereg SHA256 `ddb24018597ca8e485a4f42c0bc0972d2795e06e799efb4dabf63cb29839ad65`；〔待決 Dx〕未決前不得凍結。
+
 ## 6. 不在 repo 的參照
 - ATM pin 原始碼：GitHub `eaglhuang/AI-Atomic-Framework` commit `5692474f7db70ab52a7a71c8af4867609e7e4b43`（r3 另加 `bea35380d7f381f998c9930fa95f01b999c7f208`，box tarball `/workspace/atm-main-bea35380/atm-main.tar.gz` sha256 `9346e5b175b176618f435aeb4b41ab93ef7575f9bf77d77c47a5aeac87ad34b5`；r4 另加 `2118bc66efb3ac3bc0ddaede6a2f7cb18526b030`，box tarball `/workspace/atm-main-2118bc66/atm-main.tar.gz` sha256 `aa959607c35c51b7fc3c4e3d81b3d9e979ee62f4d9361ef9e9f5ee72e78abd88`；r5 另加 `37847584e24afc08ea58cfe380bb5b1220fbe335`，box tarball `/workspace/atm-main-37847584/atm-main.tar.gz` sha256 `e17a90ddceaf3c70d580c96e31f14cf8251d5a664985c1eb494f0d8db8045e3d`；r6 另加 `b35a6141bd5bfbaec654f1cd3079323581b04074`，box tarball `/workspace/atm-main-b35a6141/atm-main.tar.gz` sha256 `93fa7839d8e0fee51e5ad224833df2b57397fead3e77e0528117f21f5d5e59ef`）；box tarball `/workspace/atm-main-5692474f/atm-main.tar.gz` sha256 `1d498a397e6a5db119d40b8f539dc165cb0028fbfe9577f953023f8ec8d45795`。
 - 論文 v1：arXiv:2607.00041（box `refs/` 有副本，未上傳）。
