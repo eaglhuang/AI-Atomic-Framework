@@ -344,9 +344,21 @@ DRAFT HIST-v2 prereg（非 generation、尚未凍結、沒有 run）：[`working
 | RULES SHA-256 | `cae1a7fa9f0a90f46d4abaf9eac0a694b9172918cd190cc244b27e0ecd19e487`（`RULES.sha256`） |
 | 落地 | PR #266，merge commit `c40d4ec35128e7a047930af9ee0c5de30b97ab7a`（`c40d4ec35`） |
 | 驗證 | 於該目錄：`sha256sum -c RULES.sha256`；`PYTHONPATH=src python3 -m unittest discover -s tests -v` |
-| 範圍 | 工具 only。不是 sealed candidate generation。prereg 仍為 DRAFT（§20）。 |
+| 範圍 | 工具 only。不是 sealed candidate generation。本節記錄分類器落地當下 prereg 仍為 DRAFT；正式凍結見 §22。 |
 
-六專案全量候選尚未分類。沒有 run、沒有勝出宣告。
+六專案全量候選的分類不在本節。沒有 run、沒有勝出宣告。
+
+## 22. HIST-v2 預先登記 v2.0（已凍結；沒有 run）
+
+> 正式預先登記 generation。D1–D9 已填入正文。**沒有任何 run**，不宣稱勝出。設計稿 `benchmark-design/2026-10-10-hist-bench-v2/`、`working-docs/2026-10-10-hist-v2-prereg/` 與先前所有 generation 均未修改。不打 tag，不發 npm。
+
+| generation | 路徑 | 內容 | SHA256SUMS sha256 | 檔案數 | 驗證 |
+|---|---|---|---|---:|---|
+| prereg v2.0 | `benchmark-prereg/2026-10-10-hist-v2.0/` | 凍結正文（D1 flask＋requests 與六專案 2026-01..09；D4 主跑 2 seeds；D5 收件匣在 ATM core、另開 PR；D8 每份 proposal 30 秒、最多 8 次、不依大小縮放、所有臂；D9 論文寫明 HIST-v2 取代 450-run 矩陣；D2／D3／D6／D7 依設計稿建議）、`GENERATION.md`、唯讀 `verify.sh` | `dc809e49d70c16f10db9ad7dd7e943a3b04b80a253d1d820097242eaffe4c166` | 4（不含 SHA256SUMS） | `sh benchmark-prereg/2026-10-10-hist-v2.0/verify.sh benchmark-prereg/2026-10-10-hist-v2.0` |
+
+- 來源設計稿正文 sha256 `ddb24018597ca8e485a4f42c0bc0972d2795e06e799efb4dabf63cb29839ad65`。分類規則 `RULES.md` sha256 `cae1a7fa9f0a90f46d4abaf9eac0a694b9172918cd190cc244b27e0ecd19e487`。
+- 凍結正文 sha256 `1daea2f90e5d5eb3731640ac640c4eef4f0a8f23dd0864653ac4d5fce1ac3572`。
+- 候選分類與 held-out 挖掘是下一個 generation，不在本目錄。
 
 ## 6. 不在 repo 的參照
 - ATM pin 原始碼：GitHub `eaglhuang/AI-Atomic-Framework` commit `5692474f7db70ab52a7a71c8af4867609e7e4b43`（r3 另加 `bea35380d7f381f998c9930fa95f01b999c7f208`，box tarball `/workspace/atm-main-bea35380/atm-main.tar.gz` sha256 `9346e5b175b176618f435aeb4b41ab93ef7575f9bf77d77c47a5aeac87ad34b5`；r4 另加 `2118bc66efb3ac3bc0ddaede6a2f7cb18526b030`，box tarball `/workspace/atm-main-2118bc66/atm-main.tar.gz` sha256 `aa959607c35c51b7fc3c4e3d81b3d9e979ee62f4d9361ef9e9f5ee72e78abd88`；r5 另加 `37847584e24afc08ea58cfe380bb5b1220fbe335`，box tarball `/workspace/atm-main-37847584/atm-main.tar.gz` sha256 `e17a90ddceaf3c70d580c96e31f14cf8251d5a664985c1eb494f0d8db8045e3d`；r6 另加 `b35a6141bd5bfbaec654f1cd3079323581b04074`，box tarball `/workspace/atm-main-b35a6141/atm-main.tar.gz` sha256 `93fa7839d8e0fee51e5ad224833df2b57397fead3e77e0528117f21f5d5e59ef`）；box tarball `/workspace/atm-main-5692474f/atm-main.tar.gz` sha256 `1d498a397e6a5db119d40b8f539dc165cb0028fbfe9577f953023f8ec8d45795`。
