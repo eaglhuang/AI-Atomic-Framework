@@ -1,0 +1,32 @@
+{
+  "schema": "ab-task-bank.v1",
+  "seedDir": "seed",
+  "hiddenDir": "hidden-outside-repo",
+  "checkCmd": "node check.mjs {features}",
+  "tasks": [
+    { "id": "F1-math-same-file", "features": ["mul", "div"], "writers": [
+      { "id": "mul", "prompt": { "text": "In src/math.js only, add `export function mul(a, b)` that returns a * b. Do not touch other files." } },
+      { "id": "div", "prompt": { "text": "In src/math.js only, add `export function div(a, b)` that returns a / b. Do not touch other files." } } ] },
+    { "id": "F2-math-util", "features": ["mul", "neg"], "writers": [
+      { "id": "mul", "prompt": { "text": "In src/math.js only, add `export function mul(a, b)` that returns a * b. Do not touch other files." } },
+      { "id": "neg", "prompt": { "text": "In src/util.js only, add `export function neg(a)` that returns -a. Do not touch other files." } } ] },
+    { "id": "F3-str-same-file", "features": ["cap", "rev"], "writers": [
+      { "id": "cap", "prompt": { "text": "In src/str.js only, add `export function cap(s)` that uppercases only the first character of s and leaves the rest unchanged. Do not touch other files." } },
+      { "id": "rev", "prompt": { "text": "In src/str.js only, add `export function rev(s)` that returns s reversed as a string. Do not touch other files." } } ] },
+    { "id": "F4-list-same-file", "features": ["chunk", "sum"], "writers": [
+      { "id": "chunk", "prompt": { "text": "In src/list.js only, add `export function chunk(a, n)` that splits array a into arrays of length n (last may be shorter). Do not touch other files." } },
+      { "id": "sum", "prompt": { "text": "In src/list.js only, add `export function sum(a)` that returns the sum of numbers in a. Do not touch other files." } } ] },
+    { "id": "F5-list-str", "features": ["chunk", "cap"], "writers": [
+      { "id": "chunk", "prompt": { "text": "In src/list.js only, add `export function chunk(a, n)` that splits array a into arrays of length n (last may be shorter). Do not touch other files." } },
+      { "id": "cap", "prompt": { "text": "In src/str.js only, add `export function cap(s)` that uppercases only the first character of s and leaves the rest unchanged. Do not touch other files." } } ] },
+    { "id": "F6-math-same-file-pow", "features": ["pow", "sq"], "writers": [
+      { "id": "pow", "prompt": { "text": "In src/math.js only, add `export function pow(a, b)` that returns a raised to b. Do not touch other files." } },
+      { "id": "sq", "prompt": { "text": "In src/math.js only, add `export function sq(a)` that returns a squared. Do not touch other files." } } ] },
+    { "id": "F7-util-str", "features": ["isEven", "rev"], "writers": [
+      { "id": "isEven", "prompt": { "text": "In src/util.js only, add `export function isEven(n)` that returns true when integer n is even. Do not touch other files." } },
+      { "id": "rev", "prompt": { "text": "In src/str.js only, add `export function rev(s)` that returns s reversed as a string. Do not touch other files." } } ] },
+    { "id": "F8-math-list", "features": ["mod", "last"], "writers": [
+      { "id": "mod", "prompt": { "text": "In src/math.js only, add `export function mod(a, b)` that returns the remainder of a divided by b. Do not touch other files." } },
+      { "id": "last", "prompt": { "text": "In src/list.js only, add `export function last(a)` that returns the final element of array a. Do not touch other files." } } ] }
+  ]
+}

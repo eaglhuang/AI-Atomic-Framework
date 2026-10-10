@@ -1,0 +1,34 @@
+{
+  "id": "ab-formal-v1",
+  "status": "pre-registered; runs require AB_BUDGET_USD; ATM arm unverified until preflight passes",
+  "tasks": "tasks.json",
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "timeoutSec": 900,
+  "baselineArm": "baseline",
+  "arms": {
+    "baseline": {
+      "agentCmd": "node \"$AB_PROTOCOL_DIR/agents/claude_headless.mjs\" {prompt} {usage}",
+      "note": "one writer per worktree, plain git merge in integration"
+    },
+    "atm": {
+      "status": "unverified",
+      "note": "ATM broker integration not yet proven; see arms/atm-integrate.sh",
+      "agentCmd": "node \"$AB_PROTOCOL_DIR/agents/claude_headless.mjs\" {prompt} {usage}",
+      "promptPrefix": "Before editing, run `node atm.mjs next --prompt \"<the task below>\" --json` in this repository and follow the returned playbook.",
+      "integrateCmd": "sh \"$AB_PROTOCOL_DIR/arms/atm-integrate.sh\" {report}"
+    }
+  },
+  "thresholds": {
+    "minDiffPP": 10,
+    "costRatioMax": 1.5
+  },
+  "pins": {
+    "tasksSha256": "aad1d3da198056d151f66bf1127b1b587d5f7ded196a6f2c2cc4b153ffa9eb49",
+    "seedSha256": "5a6a9ec93fe0dd9a35198ab1312b9d0dbe8bdb5f9085404e849aac7794bae98c",
+    "hiddenSha256": "4264208e9c15452bc41232fa3c06bb6c7d6e0bb8eaf427159b4f57aaf46292cb"
+  }
+}

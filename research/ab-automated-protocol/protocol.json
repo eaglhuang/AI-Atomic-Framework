@@ -1,0 +1,31 @@
+{
+  "id": "ab-selftest-v0",
+  "status": "selftest-only: fake agent, not a measurement of ATM",
+  "tasks": "selftest/tasks.json",
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "timeoutSec": 120,
+  "baselineArm": "baseline",
+  "arms": {
+    "baseline": {
+      "agentCmd": "node \"$AB_PROTOCOL_DIR/selftest/fake_agent.mjs\" {prompt} {usage}"
+    },
+    "identity": {
+      "agentCmd": "node \"$AB_PROTOCOL_DIR/selftest/fake_agent.mjs\" {prompt} {usage}"
+    }
+  },
+  "thresholds": {
+    "minDiffPP": 10,
+    "costRatioMax": 1.5
+  },
+  "pins": {
+    "tasksSha256": "1a9881f426fd21699c1a9006d702b35a593f59c89068448a4c7923ce2a4497e2",
+    "seedSha256": "af91f36705103ef37ee4e299a385bd3cc80afaa01a20b5f1a039e428ceeb2781",
+    "hiddenSha256": "fdfa3877dc226dcc023c1753ab705660128f8d2c6fe44eebc015c466282c6c43"
+  }
+}

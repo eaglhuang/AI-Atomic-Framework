@@ -1,0 +1,5 @@
+#!/bin/sh
+# Stub of `claude -p ... --output-format json` for testing the adapter without API calls.
+# Logs its argv to $AB_STUB_LOG when set (never writes into the worktree, so the harness commit stays clean).
+[ -n "$AB_STUB_LOG" ] && echo "$@" >> "$AB_STUB_LOG"
+printf '%s\n' '{"type":"result","is_error":false,"result":"ok","total_cost_usd":0.0042,"usage":{"input_tokens":900,"cache_creation_input_tokens":100,"cache_read_input_tokens":300,"output_tokens":210}}'
