@@ -33,7 +33,7 @@ test('public version reuses one source observation and preserves drift warnings'
 });
 
 test('public help advertises exactly the executable command registry', async () => {
-  assert.equal(publicCliCommandNames.length, 23, 'preserve the existing public surface plus project setup');
+  assert.equal(publicCliCommandNames.length, 24, 'preserve the existing public surface plus project setup and atomize');
   assert.deepEqual([...publicCliCommandNames].sort(), Object.keys(publicCliCommandRunners).sort());
   const { exitCode, result } = await invoke(['--help']);
   assert.equal(exitCode, 0);

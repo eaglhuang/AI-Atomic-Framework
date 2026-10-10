@@ -67,6 +67,7 @@ export async function buildCliNpmRuntime(options: { repositoryRoot?: string; sou
     writeFileSync(path.join(runtimeRoot, 'index.d.ts'), declaration, 'utf8');
 
     copyRuntimeAssets(sourceDistRoot, path.join(runtimeRoot, RUNTIME_LAYOUT_ROOT), defaultRuntimeRoot);
+    copyAtomizeHelperClosure(root, runtimeRoot);
     if (JSON.stringify(sourceIdentity(root)) !== buildSourceSnapshot) throw new Error('Source inputs changed during npm runtime build');
     const packageVersion = JSON.parse(readFileSync(path.join(packageRoot, 'package.json'), 'utf8')).version as string;
     writeBuildIdentity(root, runtimeRoot, '@ai-atomic-framework/cli', packageVersion, treeFiles(runtimeRoot));
@@ -95,7 +96,7 @@ export async function buildCliNpmRuntime(options: { repositoryRoot?: string; sou
       publicCommands: [
         'next', 'doctor', 'guide', 'init', 'create', 'taskflow', 'welcome',
         'status', 'verify', 'orient', 'evidence', 'lock', 'broker', 'git',
-        'integration', 'plan', 'actor', 'identity', 'bootstrap', 'setup', 'start', 'tasks', 'atm-chart'
+        'integration', 'plan', 'actor', 'identity', 'bootstrap', 'setup', 'start', 'tasks', 'atm-chart', 'atomize'
       ],
       omittedPublicAssets: OMITTED_PUBLIC_ASSETS.map((pattern) => pattern.source),
       embeddedRuntimeAssets: Object.entries(embeddedATMChartSchemaAssets)
@@ -177,6 +178,30 @@ function rewriteImportMetaUrls(source: string, sourcePath: string, virtualModule
   return ranges
     .sort((left, right) => right.start - left.start)
     .reduce((content, range) => `${content.slice(0, range.start)}${replacement}${content.slice(range.end)}`, source);
+}
+
+// atomize inventory/score/backfill run framework helper modules and read a
+// framework-owned taxonomy. The npm package must carry them, or adopters fail
+// before any scan starts. Layout mirrors the repository so relative imports hold.
+// merge.js is the only shard module the helpers import; inventory and score read
+// the adopter's own path map, so the framework shard data is not shipped.
+const ATOMIZE_HELPER_FILES = [
+  'atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js',
+  'docs/ATOMIZATION_COVERAGE_TAXONOMY.md',
+  'scripts/src/atomization-register-receipt.js',
+  'scripts/src/atomize-backfill.js',
+  'scripts/src/atomize-inventory.js',
+  'scripts/src/atomize-score.js'
+] as const;
+
+function copyAtomizeHelperClosure(repositoryRoot: string, runtimeRoot: string): void {
+  const helperRoot = path.join(runtimeRoot, 'atomize-helpers');
+  const copyRelative = (relativePath: string) => {
+    const targetPath = path.join(helperRoot, relativePath);
+    mkdirSync(path.dirname(targetPath), { recursive: true });
+    copyFileSync(path.join(repositoryRoot, relativePath), targetPath);
+  };
+  for (const file of ATOMIZE_HELPER_FILES) copyRelative(file);
 }
 
 function copyRuntimeAssets(sourceRoot: string, targetRoot: string, excludedRoot: string): void {

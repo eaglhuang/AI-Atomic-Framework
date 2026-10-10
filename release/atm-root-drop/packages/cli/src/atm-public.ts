@@ -34,6 +34,7 @@ import { runSetup } from './commands/setup.ts';
 import { runStart } from './commands/start.ts';
 import { runTasks } from './commands/tasks.ts';
 import { runATMChart } from './commands/atm-chart.ts';
+import { runAtomize } from './commands/atomize.ts';
 import { applyProjectRootRedirect } from './commands/shared/project-root.ts';
 
 type CliRunner = (argv: string[]) => Promise<CommandResult | object> | CommandResult | object;
@@ -67,7 +68,9 @@ export const publicCliCommandRunners: Record<string, CliRunner> = {
   setup: runSetup,
   start: runStart,
   tasks: runTasks,
-  'atm-chart': runATMChart
+  'atm-chart': runATMChart,
+  // Adopters produce atom references through atomize before broker proposals.
+  atomize: runAtomize
 };
 
 export const publicCliCommandNames = Object.keys(publicCliCommandRunners);

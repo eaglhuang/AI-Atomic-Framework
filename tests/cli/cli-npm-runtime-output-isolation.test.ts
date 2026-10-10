@@ -46,6 +46,19 @@ try {
   mkdirSync(path.join(fixture, 'schemas'), { recursive: true });
   writeFileSync(path.join(fixture, 'schemas/fixture.schema.json'), '{"fresh":true}\n');
   writeFileSync(path.join(cli, 'src/schema-path.ts'), "export const schema = 'schemas/fixture.schema.json';\n");
+  // Atomize helper closure the npm build copies from the repository root.
+  for (const helper of [
+    'atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js',
+    'scripts/src/atomization-register-receipt.js',
+    'scripts/src/atomize-backfill.js',
+    'scripts/src/atomize-inventory.js',
+    'scripts/src/atomize-score.js'
+  ]) {
+    mkdirSync(path.dirname(path.join(fixture, helper)), { recursive: true });
+    writeFileSync(path.join(fixture, helper), 'export const fixture = true;\n');
+  }
+  mkdirSync(path.join(fixture, 'docs'), { recursive: true });
+  writeFileSync(path.join(fixture, 'docs/ATOMIZATION_COVERAGE_TAXONOMY.md'), '# fixture taxonomy\n');
   mkdirSync(path.join(dist, 'npm-runtime'), { recursive: true });
   writeFileSync(path.join(dist, 'npm-runtime/runtime.mjs'), 'existing canonical output\n');
   writeFileSync(path.join(dist, 'npm-runtime/manifest.json'), '{"old":true}\n');

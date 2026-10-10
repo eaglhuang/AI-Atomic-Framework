@@ -34,6 +34,7 @@ import { runSetup } from './commands/setup.js';
 import { runStart } from './commands/start.js';
 import { runTasks } from './commands/tasks.js';
 import { runATMChart } from './commands/atm-chart.js';
+import { runAtomize } from './commands/atomize.js';
 import { applyProjectRootRedirect } from './commands/shared/project-root.js';
 /**
  * The npm package is an adopter-facing facade. The framework runner keeps the
@@ -64,7 +65,9 @@ export const publicCliCommandRunners = {
     setup: runSetup,
     start: runStart,
     tasks: runTasks,
-    'atm-chart': runATMChart
+    'atm-chart': runATMChart,
+    // Adopters produce atom references through atomize before broker proposals.
+    atomize: runAtomize
 };
 export const publicCliCommandNames = Object.keys(publicCliCommandRunners);
 export async function runPublicCli(argv = process.argv.slice(2), io = { stdout: process.stdout, stderr: process.stderr }) {
