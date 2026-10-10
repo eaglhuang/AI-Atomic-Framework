@@ -1,6 +1,7 @@
 import { copyFileSync, cpSync, existsSync, mkdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawn, spawnSync } from 'node:child_process';
+import { spawnCliCapture } from './lib/cli-json-spawn.ts';
 import { gunzipSync } from 'node:zlib';
 import { fileURLToPath } from 'node:url';
 import { buildRootDropRelease } from './build-root-drop-release.ts';
@@ -26,13 +27,13 @@ function assert(condition: any, message: any) {
 }
 
 function runOnefile(entrypointPath: any, cwd: any, args: any, extraEnv: Record<string, string> = {}) {
-  const result = spawnSync(process.execPath, [entrypointPath, ...args], {
+  const result = spawnCliCapture(process.execPath, [entrypointPath, ...args], {
     cwd,
-    encoding: 'utf8',
     env: {
       ...process.env,
       ...extraEnv
-    }
+    },
+    label: `onefile ${args.join(' ')}`
   });
   const payload = (result.stdout || result.stderr || '').trim();
   return {

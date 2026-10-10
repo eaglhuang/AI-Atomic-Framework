@@ -310,6 +310,59 @@ r6 上傳包拆成多個獨立 tarball，都解到同一個 `generations/r6-2026
 - **Semantic endpoint:** 52 base-valid pairs, 0 arm regressions in every arm.
 - **Before/after** (Django+SymPy, 2,500 runs), steward: lost 4 → 0, corrupted 4 → 0, failed runs 4 → 0.
 
+## 19. 工作稿快照 2026-10-10：論文 2.0 草稿寫入 HIST 結果（DRAFT；非 generation）
+
+> **DRAFT 工作稿，不是封存的證據 generation，不主張任何結論、不宣稱勝出。** 論文數字只引用 generation（r1–r6、§13–§18 的 HIST generation），不引用工作稿快照。快照建立後不可變；先前所有 generation 與 `working-docs/2026-10-09/` 不受影響。
+
+| 快照 | 狀態 | 比對基準 | SHA256SUMS sha256 | 檔案數 | 說明 |
+|---|---|---|---|---:|---|
+| `working-docs/2026-10-10/` | DRAFT 工作稿快照（不可變；非 generation） | 修改前備份與 `generations/r6-2026-10-09/{paper,docs}/` 逐位元相同 | `9d269e2ec55f3afcc9977ea91fdcac70aa4ae218e8a37a8fc7167be632fb15bb` | 13（不含 SHA256SUMS） | [SNAPSHOT.md](./working-docs/2026-10-10/SNAPSHOT.md)；驗證：`sh working-docs/2026-10-10/verify.sh working-docs/2026-10-10` |
+
+內容：論文 2.0 草稿（新增 §5.8 HIST 設計、§6.1 表 R7–R12：主樣本寫入安全、區間、blocked 理由、分層、結尾換行反例修正前後、HIST 版本演進、語意終點；§7.1 HIST 強度上限、§7.2 STALE、附錄 H 過程紀錄、參考文獻 [24]–[29]）；VERSION_ANCHORS、EXPERIMENT_CHECKLIST、METRIC_DEFINITIONS 各加一節 HIST；修改前備份與 diff。數字全部抄自 §13–§18 的封存分析輸出。Phase 3 450-run 主矩陣仍未執行。
+
+## 20. 外部審閱後的論文修正（工作稿快照 2026-10-10b）與 HIST-v2 重新設計稿（2026-10-10；全部候選都測、只分類；DRAFT，非 generation，沒有任何 run）
+
+> **DRAFT，不是封存的證據 generation，不主張任何結論、不宣稱勝出。** 兩個目錄建立後不可變；先前所有 generation 與 `working-docs/2026-10-09/`、`working-docs/2026-10-10/` 不受影響。
+
+| 目錄 | 狀態 | SHA256SUMS sha256 | 檔案數 | 說明 |
+|---|---|---|---:|---|
+| `working-docs/2026-10-10b/` | DRAFT 工作稿快照（不可變；非 generation） | `47e52eaf7e765088ee887a1be98d047eb7f52df68a54032de6deb026a5381af2` | 5（不含 SHA256SUMS） | [SNAPSHOT.md](./working-docs/2026-10-10b/SNAPSHOT.md)：§2.2／§8「main 尚未含修正」加歷史版本限定；[24] STALE 作者全名並移除待核註記；「尚未呼叫 ATM」更正為「已過准入、尚未進入 composer／steward apply」；§7.1 新增四項 HIST 揭露；§7.3 指向 HIST-v2。修改前備份與 `working-docs/2026-10-10/` 論文逐位元相同 |
+| `benchmark-design/2026-10-10-hist-bench-v2/` | DRAFT 設計稿（不可變；**不是**凍結的預先登記） | `1574254c54ea5b83cb23ffc38eaeb1d2f6c19e050558ac86ca38044082ceefb6` | 3（不含 SHA256SUMS） | [README.md](./benchmark-design/2026-10-10-hist-bench-v2/README.md)；`HIST_BENCH_V2_PREREG_zh.md`：分類工具（全部候選都測，A 不相交／B 同區可合併／C 真衝突／N 無可跑測試，事先標答案，只排除技術上跑不起來的）、多程序 agent 模擬與共用批次協調器、間隔掃描、公平基線、語意評分器負控制、混淆矩陣、群集統計、held-out；待決 D1–D9 |
+
+驗證：`sh working-docs/2026-10-10b/verify.sh working-docs/2026-10-10b`、`sh benchmark-design/2026-10-10-hist-bench-v2/verify.sh benchmark-design/2026-10-10-hist-bench-v2`。Phase 3 450-run 主矩陣仍未執行。
+
+DRAFT HIST-v2 prereg（非 generation、尚未凍結、沒有 run）：[`working-docs/2026-10-10-hist-v2-prereg/`](./working-docs/2026-10-10-hist-v2-prereg/README.md)，prereg SHA256 `ddb24018597ca8e485a4f42c0bc0972d2795e06e799efb4dabf63cb29839ad65`；〔待決 Dx〕未決前不得凍結。`HIST_BENCH_V2_PREREG_zh.md` 與權威設計 [`benchmark-design/2026-10-10-hist-bench-v2/`](./benchmark-design/2026-10-10-hist-bench-v2/README.md) 內同名檔位元組相同；權威仍是後者。working-docs 副本保留、不刪除。兩目錄的 README 與 SHA256SUMS 不同（各自說明檔）；相同的是預先登記正文與 `verify.sh`。
+
+## 21. HIST-v2 配對分類器（Stage 0 工具；PR #266；非 generation、未封存候選、prereg 仍為 DRAFT）
+
+> **工具 only。** 不是封存的候選 generation，沒有 `items.jsonl` 封存產出，沒有對六專案候選池分類，不凍結 prereg，不主張任何結論、不宣稱勝出。既有 sealed generations 不改。
+
+| 項目 | 值 |
+|---|---|
+| 路徑 | [`benchmark-design/hist-v2-classifier/`](./benchmark-design/hist-v2-classifier/README.md)（18 個檔） |
+| 是什麼 | Stage 0 配對分類／預先標答案工具。只凍結工具規則 `RULES.md`，不凍結預先登記。 |
+| RULES SHA-256 | `cae1a7fa9f0a90f46d4abaf9eac0a694b9172918cd190cc244b27e0ecd19e487`（`RULES.sha256`） |
+| 落地 | PR #266，merge commit `c40d4ec35128e7a047930af9ee0c5de30b97ab7a`（`c40d4ec35`） |
+| 驗證 | 於該目錄：`sha256sum -c RULES.sha256`；`PYTHONPATH=src python3 -m unittest discover -s tests -v` |
+| 範圍 | 工具 only。不是 sealed candidate generation。prereg 仍為 DRAFT（§20）。 |
+
+六專案全量候選尚未分類。沒有 run、沒有勝出宣告。
+
+## 22. HIST-v2 設計稿修訂 r2（2026-10-10；DRAFT，非 generation，沒有任何 run）
+
+> **DRAFT，不是封存，不主張任何結論、不宣稱勝出。** 不修改 §20 的上一稿，也不凍結預先登記。PR #268 的凍結嘗試未合併，不是本節的權威文本。
+
+| 項目 | 值 |
+|---|---|
+| 路徑 | [`benchmark-design/2026-10-10-hist-bench-v2-r2/`](./benchmark-design/2026-10-10-hist-bench-v2-r2/README.md) |
+| 上一稿 | [`benchmark-design/2026-10-10-hist-bench-v2/`](./benchmark-design/2026-10-10-hist-bench-v2/README.md)（仍不可變） |
+| 分類器 v2 | PR #270，規則雜湊 `51cf1fa839e8ade8f07313c170c532eee084d695701be6a38702750a84161e4c`。v1 雜湊不變 |
+| 要點 | C1 限定在寫明的檔案與故障模型，零次觀察不是保證；C2 改成「相容 proposal 可以同一批提交」，等待與吞吐分開，不再寫「不必排隊」；C3 用合法子集，假接受與不必要拒絕分開。期限從第一次送出起 30 秒且重試不歸零；「8」定義成 8 次重試。後期歷史留出集一旦為調參而檢視就不再是未見資料。舊主矩陣的 450-run 稱呼與 900＋270 算式在正文裡對過。兩份 proposal 是短猝發，不是持續負載 |
+| 已決定 | [`DECISIONS.md`](./benchmark-design/2026-10-10-hist-bench-v2-r2/DECISIONS.md)：R2-D1 多個最佳 base 維持技術排除並封存 SHA；R2-D2「8」＝第一次送出後 8 次重試（最多 9 次嘗試）；R2-D3 變成另一次提交嘗試的內部重新合成計入那 8 次；R2-D4 留出集加上 flask 與 requests，主跑 2 個 seed（有限重播）。仍是 DRAFT，先送外部審閱，不凍結 v2.0 |
+
+沒有 `SHA256SUMS`，因為這份修訂還不是凍結世代。冒煙、pilot、主跑、留出集都還沒有使用者同意，也沒有 run。
+
+
 ## 6. 不在 repo 的參照
 - ATM pin 原始碼：GitHub `eaglhuang/AI-Atomic-Framework` commit `5692474f7db70ab52a7a71c8af4867609e7e4b43`（r3 另加 `bea35380d7f381f998c9930fa95f01b999c7f208`，box tarball `/workspace/atm-main-bea35380/atm-main.tar.gz` sha256 `9346e5b175b176618f435aeb4b41ab93ef7575f9bf77d77c47a5aeac87ad34b5`；r4 另加 `2118bc66efb3ac3bc0ddaede6a2f7cb18526b030`，box tarball `/workspace/atm-main-2118bc66/atm-main.tar.gz` sha256 `aa959607c35c51b7fc3c4e3d81b3d9e979ee62f4d9361ef9e9f5ee72e78abd88`；r5 另加 `37847584e24afc08ea58cfe380bb5b1220fbe335`，box tarball `/workspace/atm-main-37847584/atm-main.tar.gz` sha256 `e17a90ddceaf3c70d580c96e31f14cf8251d5a664985c1eb494f0d8db8045e3d`；r6 另加 `b35a6141bd5bfbaec654f1cd3079323581b04074`，box tarball `/workspace/atm-main-b35a6141/atm-main.tar.gz` sha256 `93fa7839d8e0fee51e5ad224833df2b57397fead3e77e0528117f21f5d5e59ef`）；box tarball `/workspace/atm-main-5692474f/atm-main.tar.gz` sha256 `1d498a397e6a5db119d40b8f539dc165cb0028fbfe9577f953023f8ec8d45795`。
 - 論文 v1：arXiv:2607.00041（box `refs/` 有副本，未上傳）。

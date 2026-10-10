@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { spawnCliCapture } from './lib/cli-json-spawn.ts';
 import os from 'node:os';
 import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
@@ -30,10 +30,10 @@ function readJson(relativePath: string) {
 }
 
 function runAtm(args: readonly string[], cwd = root, env: Record<string, string> = {}) {
-  const result = spawnSync(process.execPath, [path.join(root, 'atm.mjs'), ...args], {
+  const result = spawnCliCapture(process.execPath, [path.join(root, 'atm.mjs'), ...args], {
     cwd,
     env: { ...process.env, ...env },
-    encoding: 'utf8'
+    label: `atm ${args.join(' ')}`
   });
   const payload = (result.stdout || result.stderr || '').trim();
   let parsed: any = {};

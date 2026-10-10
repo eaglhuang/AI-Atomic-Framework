@@ -2,6 +2,7 @@ import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } fr
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { spawnCliCapture } from './lib/cli-json-spawn.ts';
 import { buildRootDropRelease } from './build-root-drop-release.ts';
 import { createTempWorkspace } from './temp-root.ts';
 
@@ -52,9 +53,9 @@ function assert(condition: unknown, message: string) {
 }
 
 function run(command: string, args: readonly string[], cwd: string, options: { readonly allowFailure?: boolean } = {}) {
-  const result = spawnSync(command, [...args], {
+  const result = spawnCliCapture(command, args, {
     cwd,
-    encoding: 'utf8'
+    label: `${command} ${args.join(' ')}`
   });
   if (!options.allowFailure && (result.error || result.status !== 0)) {
     fail(`${command} ${args.join(' ')} failed\nerror:\n${result.error?.message || ''}\nstdout:\n${result.stdout || ''}\nstderr:\n${result.stderr || ''}`);

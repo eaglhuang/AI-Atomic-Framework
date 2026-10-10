@@ -8,6 +8,17 @@ This section records adopter-visible behavior, release-surface fixes,
 new benchmark/evidence tracks, and the first shipped ATM skill growth
 bridge after the paper-aligned public release.
 
+### Fixed - unified diff end-of-file newline
+
+- **Steward apply keeps the `\ No newline at end of file` byte.**
+  `applyUnifiedPatch`, the same-file base composer, and region re-compose
+  used to drop that unified-diff marker and keep the base file's trailing
+  newline. Adding a final newline was lost, removing one left an extra
+  newline, and a file that already lacked a trailing newline could be
+  rewritten with one. Old and new sides now follow `git apply`, including
+  CRLF files and disjoint edits of one file that does not end in a newline.
+  The public steward `applyUnifiedPatch` export uses that same applier.
+
 ### Added - skill/tool bridge and benchmark tracks
 
 - **Tool bridge result contract v1** plus follow-up operator bridge

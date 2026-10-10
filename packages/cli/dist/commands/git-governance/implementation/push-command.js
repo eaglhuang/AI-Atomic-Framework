@@ -1,6 +1,7 @@
 import { createSanitizedGitEnv, resolveGitExecutable, runGitCommandWithTimeout, } from './git-process-port.js';
 import { execFileSync } from "node:child_process";
-import { mkdirSync, writeFileSync, } from "node:fs";
+import { randomUUID } from 'node:crypto';
+import { mkdirSync, rmSync, writeFileSync, } from "node:fs";
 import path from "node:path";
 import { actorIdEnvVar, } from "../../actor-registry.js";
 import { evaluateGitAdmission } from "../../../_vendor/core/dist/git/admission.js";
@@ -29,7 +30,7 @@ export function runGitPush(options) {
     }
     const branch = options.branch?.trim() || resolveCurrentBranchName(options.cwd);
     const remote = options.remote?.trim() || "origin";
-    const statusPath = gitPushAttemptStatusRelativePath(options.actorId, branch, remote);
+    const statusPath = gitPushAttemptStatusRelativePath(options.actorId, branch, remote).replace(/\.json$/, `__${randomUUID()}.json`);
     const startedAt = new Date().toISOString();
     const headShaBeforePush = readHeadCommitSha(options.cwd);
     writeGitPushAttemptStatus(options.cwd, statusPath, {
@@ -127,6 +128,12 @@ export function runGitPush(options) {
             headShaAfterAttempt: readHeadCommitSha(options.cwd),
             admissionOutcome: admission.outcome,
         });
+        // The operation owns a unique path, so finishing it cannot delete another
+        // attempt's in-progress or recovery bytes. Failed cleanup remains classifiable.
+        try {
+            rmSync(path.join(options.cwd, statusPath));
+        }
+        catch { }
         return gitPushResult({
             ok: true,
             command: "git",
@@ -170,6 +177,10 @@ export function runGitPush(options) {
             admissionOutcome: admission.outcome,
             remoteShaAfterPush,
         });
+        try {
+            rmSync(path.join(options.cwd, statusPath));
+        }
+        catch { }
         return gitPushResult({
             ok: true,
             command: "git",

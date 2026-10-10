@@ -1,5 +1,5 @@
 import { rebaseProposalsByRegionIdentity } from './steward-region-rebase.js';
-import { parseUnifiedPatchHunks } from './unified-patch.js';
+import { eofMarkerViolation, eofNewlineDecision, hunkOldLineIndex, joinSourceText, oldSideNewlineAgrees, parseUnifiedPatchHunks, resolveEofNewline, splitSourceText } from './unified-patch.js';
 /** Exhaustive permutation checks stay cheap up to this many proposals per file. */
 const MAX_EXHAUSTIVE_PERMUTATION_PROPOSALS = 4;
 export function composeTextPatchesAgainstBase(filePath, before, proposals) {
@@ -9,14 +9,11 @@ export function composeTextPatchesAgainstBase(filePath, before, proposals) {
     return rebaseProposalsByRegionIdentity(filePath, before, proposals) ?? declared;
 }
 function composeTextPatchesAtDeclaredLines(filePath, before, proposals) {
-    const lineEnding = /\r\n/.test(before) ? '\r\n' : '\n';
-    const endsWithNewline = before.endsWith('\n');
-    const baseLines = before.split(/\r?\n/);
-    if (endsWithNewline)
-        baseLines.pop();
+    const source = splitSourceText(before);
+    const baseLines = source.lines;
     const edits = [];
     for (const proposal of proposals) {
-        const edit = resolveProposalEdit(proposal, baseLines);
+        const edit = resolveProposalEdit(proposal, baseLines, source.endsWithNewline);
         if ('detail' in edit) {
             return { ok: false, block: { code: 'compose-context-mismatch', filePath, proposalIds: [proposal.proposalId], detail: edit.detail } };
         }
@@ -39,8 +36,22 @@ function composeTextPatchesAtDeclaredLines(filePath, before, proposals) {
             }
         }
     }
+    const eof = mergedEofNewline(edits);
+    if (eof === 'conflict') {
+        const proposalIds = edits.map((edit) => edit.proposalId).sort((left, right) => left.localeCompare(right));
+        return {
+            ok: false,
+            block: {
+                code: 'steward-final-patch-required',
+                filePath,
+                proposalIds,
+                detail: `proposals ${proposalIds.map((id) => `'${id}'`).join(' and ')} disagree on the end-of-file newline of ${filePath}; a steward-authored final patch is required`
+            }
+        };
+    }
+    const endsWithNewline = resolveEofNewline(eof, source.endsWithNewline);
     const orders = permutationsToCheck(edits);
-    const outputs = new Set(orders.map((order) => renderComposition(baseLines, order, lineEnding, endsWithNewline)));
+    const outputs = new Set(orders.map((order) => renderComposition(baseLines, order, source.lineEnding, endsWithNewline)));
     if (outputs.size !== 1) {
         return {
             ok: false,
@@ -53,37 +64,57 @@ function composeTextPatchesAtDeclaredLines(filePath, before, proposals) {
 export function formatStewardCompositionBlock(block) {
     return `${block.code}: ${block.detail} [proposals: ${block.proposalIds.join(', ')}]`;
 }
-function resolveProposalEdit(proposal, baseLines) {
+function resolveProposalEdit(proposal, baseLines, fileEndsWithNewline) {
     const span = new Set();
     const deleted = new Set();
     const inserts = new Map();
+    const hunks = parseUnifiedPatchHunks(proposal.patch);
+    const markerError = eofMarkerViolation(hunks, baseLines.length);
+    if (markerError)
+        return { detail: `proposal '${proposal.proposalId}' ${markerError}` };
     let cursor = 0;
-    for (const hunk of parseUnifiedPatchHunks(proposal.patch)) {
-        const start = hunk.oldStart - 1;
+    for (const hunk of hunks) {
+        const start = hunkOldLineIndex(hunk.oldStart);
         if (start < cursor)
             return { detail: `proposal '${proposal.proposalId}' hunk at old line ${hunk.oldStart} overlaps an earlier hunk` };
         if (start > baseLines.length)
             return { detail: `proposal '${proposal.proposalId}' hunk at old line ${hunk.oldStart} starts past the end of a ${baseLines.length}-line base` };
         cursor = start;
         for (const entry of hunk.lines) {
-            const marker = entry[0];
-            const content = entry.slice(1);
-            if (marker === '+') {
+            if (entry.marker === '+') {
                 const gap = inserts.get(cursor) ?? [];
-                gap.push(content);
+                gap.push(entry.text);
                 inserts.set(cursor, gap);
                 continue;
             }
-            if (baseLines[cursor] !== content) {
-                return { detail: `proposal '${proposal.proposalId}' context mismatch at base line ${cursor + 1}: expected ${JSON.stringify(content)}, found ${JSON.stringify(baseLines[cursor] ?? null)}` };
+            if (baseLines[cursor] !== entry.text) {
+                return { detail: `proposal '${proposal.proposalId}' context mismatch at base line ${cursor + 1}: expected ${JSON.stringify(entry.text)}, found ${JSON.stringify(baseLines[cursor] ?? null)}` };
+            }
+            if (!oldSideNewlineAgrees({
+                noNewline: entry.noNewline,
+                lineIndex: cursor,
+                lineCount: baseLines.length,
+                fileEndsWithNewline
+            })) {
+                return { detail: `proposal '${proposal.proposalId}' newline mismatch at base line ${cursor + 1}: the ${entry.noNewline ? 'old side omits' : 'old side keeps'} the end-of-file newline` };
             }
             span.add(cursor);
-            if (marker === '-')
+            if (entry.marker === '-')
                 deleted.add(cursor);
             cursor += 1;
         }
     }
-    return { proposalId: proposal.proposalId, span, deleted, inserts };
+    return { proposalId: proposal.proposalId, span, deleted, inserts, eofNewline: eofNewlineDecision(hunks, baseLines.length) };
+}
+function mergedEofNewline(edits) {
+    const declared = new Set(edits.map((edit) => edit.eofNewline).filter((decision) => decision !== 'preserve'));
+    if (declared.size > 1)
+        return 'conflict';
+    if (declared.has('absent'))
+        return 'absent';
+    if (declared.has('present'))
+        return 'present';
+    return 'preserve';
 }
 function describeOverlap(left, right) {
     const changedCovered = firstShared(left.deleted, right.span) ?? firstShared(right.deleted, left.span);
@@ -112,8 +143,7 @@ function renderComposition(baseLines, edits, lineEnding, endsWithNewline) {
         if (gap < baseLines.length && !edits.some((edit) => edit.deleted.has(gap)))
             output.push(baseLines[gap]);
     }
-    const joined = output.join(lineEnding);
-    return endsWithNewline ? `${joined}${lineEnding}` : joined;
+    return joinSourceText(output, lineEnding, endsWithNewline);
 }
 function permutationsToCheck(edits) {
     if (edits.length <= 1)

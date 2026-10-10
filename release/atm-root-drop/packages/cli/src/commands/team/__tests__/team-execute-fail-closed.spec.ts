@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { createTempWorkspace, initializeGitRepository } from '../../../temp-workspace.ts';
 import { enrichCommandResult, makeResult, message } from '../../shared.ts';
@@ -82,6 +82,7 @@ function testBlockedResultContractIsNonSuccess() {
 
 async function testTeamStartExecuteWithZeroProvidersFailsClosed() {
   const cwd = createTempWorkspace('atm-team-execute-fail-closed-');
+  try {
   initializeGitRepository(cwd);
   const taskId = 'TASK-TEAM-EXECUTE-FAIL-CLOSED';
   mkdirSync(path.join(cwd, '.atm', 'history', 'tasks'), { recursive: true });
@@ -112,10 +113,14 @@ async function testTeamStartExecuteWithZeroProvidersFailsClosed() {
   assert.equal(enriched.exitCode, 1);
   assert.equal(enriched.blocking, true);
   assert.notEqual(enriched.severity, 'success');
+  } finally {
+    rmSync(cwd, { recursive: true, force: true });
+  }
 }
 
 async function testTeamStartWithoutExecuteRemainsOk() {
   const cwd = createTempWorkspace('atm-team-state-only-start-');
+  try {
   initializeGitRepository(cwd);
   const taskId = 'TASK-TEAM-STATE-ONLY-START';
   mkdirSync(path.join(cwd, '.atm', 'history', 'tasks'), { recursive: true });
@@ -144,6 +149,9 @@ async function testTeamStartWithoutExecuteRemainsOk() {
   assert.equal(enriched.exitCode, 0);
   assert.equal(enriched.blocking, false);
   assert.equal(enriched.severity, 'success');
+  } finally {
+    rmSync(cwd, { recursive: true, force: true });
+  }
 }
 
 testExecutionLaneZeroExecuteIsBlocked();

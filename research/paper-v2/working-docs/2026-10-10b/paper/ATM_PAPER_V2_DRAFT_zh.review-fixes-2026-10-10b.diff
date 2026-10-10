@@ -1,0 +1,81 @@
+--- checkpoints/ATM_PAPER_V2_DRAFT_zh.pre-review-fixes-2026-10-10b.md	2026-10-10 11:41:45.715931470 +0800
++++ ATM_PAPER_V2_DRAFT_zh.md	2026-10-10 11:44:28.519931470 +0800
+@@ -36,7 +36,7 @@
+ 
+ 我們提出一個具明確 proposal、batch、base、steward 與 commit 語意的**受治理合成提交協定**，並在單一檔案、合作式 writer 與無歧義 patch 子集合的限制下，給出**合成決定性**與**編輯保留性**的證明義務。評估設計以 per-file lock 序列化、樂觀 CAS 重試與 Git 三方合併為正確強基線，另含移除准入的 bare composer 消融，同時量測正確完成率、可處理範圍（eligible coverage）、拒絕、尾端延遲、重提成本與多 process 故障。主要結果須在凍結版本與可重現事件紀錄完成後填入〔待 M2/M4〕；在此之前，本文不主張實驗已證明零遺失更新或任意語意正確。
+ 
+-作為外部工作負載，我們沿用 STALE［24］以真實 PR 配對建構 benchmark 的方法並加以延伸：自 Django、SymPy、xarray、pytest、Sphinx 與 FastAPI 的已合併 PR 歷史，抽出開啟期間重疊、改到同一原始碼檔的 300 對（每專案 50 對；另 30 對無共同檔的對照），以 gold patch 決定性重播，每個 PR 一個 OS process，對 ATM steward 與四個比較臂各跑 5 個 seed。ATM `b1fd9d22` 的 steward 完成 29,077／34,300 個 intents（84.8%），失敗 0／1,500 runs，遺失 0 個效果、損壞 0 個檔；file_lock 臂完成 86.6%、0 遺失；git 三方合併臂完成最多（91.0%），但在 16 runs 遺失 36 個效果；occ 臂在 10 runs 遺失 32 個效果。同一工作負載先在 ATM 找到一個反例：patch 帶 `\ No newline at end of file` 時 steward 多寫一個結尾換行，SymPy 一組配對 5 個 seed 中 4 個各遺失 1 個效果並損壞 1 個檔；修正後同配置 0 遺失、0 損壞。steward 被擋下的 intents 有 85.8% 停在 harness 自己的重新定位步驟（尚未呼叫 ATM）。以上皆為作者自行執行、未獨立重現的描述性觀察，不宣稱勝出。
++作為外部工作負載，我們沿用 STALE［24］以真實 PR 配對建構 benchmark 的方法並加以延伸：自 Django、SymPy、xarray、pytest、Sphinx 與 FastAPI 的已合併 PR 歷史，抽出開啟期間重疊、改到同一原始碼檔的 300 對（每專案 50 對；另 30 對無共同檔的對照），以 gold patch 決定性重播，每個 PR 一個 OS process，對 ATM steward 與四個比較臂各跑 5 個 seed。ATM `b1fd9d22` 的 steward 完成 29,077／34,300 個 intents（84.8%），失敗 0／1,500 runs，遺失 0 個效果、損壞 0 個檔；file_lock 臂完成 86.6%、0 遺失；git 三方合併臂完成最多（91.0%），但在 16 runs 遺失 36 個效果；occ 臂在 10 runs 遺失 32 個效果。同一工作負載先在 ATM 找到一個反例：patch 帶 `\ No newline at end of file` 時 steward 多寫一個結尾換行，SymPy 一組配對 5 個 seed 中 4 個各遺失 1 個效果並損壞 1 個檔；修正後同配置 0 遺失、0 損壞。steward 被擋下的 intents 有 85.8% 停在 harness 自己的重新定位步驟（此時已呼叫 ATM 准入，但尚未進入 ATM composer／steward apply）。以上皆為作者自行執行、未獨立重現的描述性觀察，不宣稱勝出。
+ 
+ **關鍵詞**：多代理程式生成、遺失更新、確定性合成、受治理提交、中立 steward、寫入前准入、可重現基準、真實 PR 歷史
+ 
+@@ -125,7 +125,7 @@
+ 
+ 兩條版本號（v0.9.0-alpha.1 與 v0.1.x）的對應關係來源未提供〔待核對〕。
+ 
+-**狀態一句話**：歷史基準有已知缺口，main 尚未含修正，候選契約待核定，主結果仍待測。
++**狀態一句話**：歷史基準 v0.1.17 有已知缺口；「main 尚未含修正」只描述審閱核對時的 main 快照 `3b0f7660`（2026-10-07），不是目前 main 的狀態——其後 #198 已合併為 `5692474f`，提交層與 HIST 修正也陸續合併（表 V1、附錄 E–H）。候選契約仍待核定，最終 frozen commit 上的主結果仍待測。
+ 
+ ### 2.3 動機：故障注入負面對照（作者報告值）
+ 
+@@ -567,7 +567,7 @@
+ | 分層 | O1 同一 hunk（兩邊有 hunk 範圍相交或相鄰）；O2 鄰近（最小距離 1–3 行，落在 git 預設 context 內）；O3 同檔不同區域（所有 hunk 距離 >3 行）；O0 對照（開啟期間重疊但沒有共同原始碼檔） |
+ | intent | `git diff --unified=0 --diff-algorithm=histogram` 拆出的每個 hunk；同一寫入者對同一檔的 hunks 在同一個 compose 窗內一起送出；恆等式「完成＋遺失＋blocked＝總 intents」逐 run 驗證 |
+ | 臂 | steward（完整 ATM：admit→compose window→`composeBrokerProposals`→`applyStewardPlan`）；file_lock（跨 process 檔案鎖內讀改寫）；occ（版本比對＋最多 8 次重試與重建）；git_three_way（`git merge-file` 左折疊，衝突即 blocked）；bare_composer（同樣的合成與 steward apply，繞過准入） |
+-| 重新定位 | steward、file_lock、occ、bare_composer 送出前，由共用 harness 以 context＋pre-image **精確**定位 hunk（不做 fuzz）；找不到就 blocked，此時**尚未呼叫 ATM**。這類 blocked 是 harness 的設計限制，與 ATM 自己的判斷分開列 |
++| 重新定位 | steward、file_lock、occ、bare_composer 送出前，由共用 harness 以 context＋pre-image **精確**定位 hunk（不做 fuzz）；找不到就 blocked。此時已呼叫 ATM 准入（bare_composer 不經准入），但**尚未進入 ATM composer／steward apply**。這類 blocked 是 harness 的設計限制，與 ATM 自己的判斷分開列 |
+ | 樣本 | 主樣本 300 對＝6 專案×50（O1 72／O2 51／O3 177；規則 v1.0 189 對、v1.1-P 111 對）；O0 30 對（每專案 5 對）；抽樣種子與配額在抽樣前凍結；試跑用過的配對不進主樣本 |
+ | seeds 與 runs | 每對 5 個 seed（只由配對與 k 決定，與臂無關，可逐 run 配對）；主矩陣 300×5 臂×5＝7,500、O0 30×5×5＝750、舊 pin `5692474f` 只跑 steward 300×5＝1,500，合計 9,750 |
+ | 終點 | 寫入安全（全部配對）：完成／總 intents、失敗／總 runs、遺失效果、blocked intents（依最終理由，hash drift 另列）、損壞檔、structure 違規、多餘檔。語意（STALE 方法）：只用於兩個寫入者皆為最終合併版本、且通過 base validity 的配對 |
+@@ -723,7 +723,7 @@
+ 
+ **表 R8　blocked intents 依最終理由（主樣本）**
+ 
+-| 臂 | harness 重新定位（未呼叫 ATM） | ATM hash drift | ATM re-compose 不符 | 新建檔（ATM steward 不能建立新檔） | git 合併衝突 | git base 漂移 |
++| 臂 | harness 重新定位（已過 ATM 准入；未進入 composer／steward apply） | ATM hash drift | ATM re-compose 不符 | 新建檔（ATM steward 不能建立新檔） | git 合併衝突 | git base 漂移 |
+ |---|---:|---:|---:|---:|---:|---:|
+ | steward | 4,480 | 483 | 140 | 120 | 0 | 0 |
+ | file_lock | 4,609 | 0 | 0 | 0 | 0 | 0 |
+@@ -815,10 +815,14 @@
+ - **外部真實 PR 工作負載（HIST）的強度上限**（§5.8、§6.1 表 R7–R12）：
+   - 全部 9,750 runs 都是作者在單一 Linux 主機上自行執行，未獨立重現；「0 遺失」是 1,650 個 steward runs 的有限觀察，不是證明。完成率區間以配對 bootstrap 估計；run 層級的 Wilson 區間把同一配對的 seeds 當成獨立，偏窄。
+   - **自然合併歷史幾乎沒有同一 hunk 的配對**：v1.0 規則下六個專案只有 7 組 O1，改法不同的只有 1 組，因為合併前多已有一方 rebase。O1 因此主要由選項 P 的 pre-rebase head 構成（62 組）；這些不是最終合併的程式碼，只評寫入安全終點。
+-  - **harness 重新定位上限**：O1 上 steward、file_lock、occ 都在共用 harness 的精確重新定位步驟就停下（steward 3,587 個 intents），尚未呼叫 ATM；O1 約 68% 的完成率反映 harness 設計，ATM 合成器在同一 hunk 上的能力沒有被量到。
++  - **harness 重新定位上限**：O1 上 steward、file_lock、occ 都在共用 harness 的精確重新定位步驟就停下（steward 3,587 個 intents），此時已呼叫 ATM 准入，但尚未進入 ATM composer／steward apply；O1 約 68% 的完成率反映 harness 設計，ATM 合成器在同一 hunk 上的能力沒有被量到。
+   - **ATM steward 不能建立新檔**：PR 新建的檔案一律 blocked（主樣本每臂 120 個、O0 20 個），fail-closed、不遺失，但拉低 steward 與 bare_composer 的完成率。
+   - **基線實作**：occ 與 git_three_way 沿用 r1–r5 的定義，比對與寫入之間沒有跨 process 的受保護區間，不符合 §5.2 的公平性要求；它們的遺失不能當成 OCC 或 Git 合併的一般性質。
+   - **語意終點覆蓋小**：219 對中只有 52 對 base valid；pre-rebase 的 111 對不可評估；steward 只有 168／260 個 runs 可評估（含 blocked intent 的 run 不評），偏向容易的配對。
++  - **沒有量到跨寫入者的批次合成**：harness 每個寫入者程序各自建立 compose 窗管理器，送出時 `expectedCount` 固定為 1，收到一份 proposal 就封批，100 ms 的 compose 窗並沒有把兩個寫入者的 proposal 集中到同一批。因此 HIST 量到的是「單一 proposal 的受保護套用＋跨程序並行提交」，**不能**支持「同一 immutable base 上多份 proposal 合成」這項核心能力；後者由重新設計的 HIST-v2（共用收件與批次協調器，記錄實際 batch size，`benchmark-design/2026-10-10-hist-bench-v2/`，設計稿、尚未執行）回答。
++  - **語意評分器的觀測狀態**：外部審閱（2026-10-10）靜態閱讀 `semantic_multi.py` 指出：Django skip／expected failure 與 pytest XFAIL 被歸為通過；無測試或 collection error 可能得到空的失敗集合；新增失敗的計算只扣除各參照的失敗集合，沒有要求 A、B、gold 三方都確實觀察到通過。作者尚未證明表 R12 的 0 因此有誤，但在加入負控制並分開 pass／fail／skip／xfail／缺測試／收集失敗之前，表 R12 只能當弱證據。steward 可評估的 168 個 runs 最終 bytes 都等於 gold，評分時重用 gold 的測試結果，不是 168 次獨立的新測試執行。
++  - **配對不獨立、修正與驗證用同一樣本**：主樣本 300 對的 600 個 PR 位置只有 483 個不同 PR，117 個 PR 各出現兩次，依共用 PR 連成 183 個群（最大的群含 7 對）；只按配對做 bootstrap 仍低估相依。結尾換行反例由這批樣本找到，修正後又在同一批樣本重跑，這證明修復與回歸，不是未見資料上的泛化驗證。
++  - **9,750 的口徑**：9,750 是所有組別合計（主樣本 7,500＝300 對×5 臂×5 seeds、O0 750、舊 pin 1,500），不是 9,750 次 ATM 測試，也不是 9,750 個獨立案例。
+   - **環境偏離**：語意終點用每專案一個 Python 3.13 環境，比許多 2024 年的 base 新；pytest 的版本檔以 99.0.0+hist 取代；FastAPI 依 base 的 pyproject 選 7 個 Starlette 環境之一；xarray 限制 numpy／pandas／scipy 版本（附錄 H.3）。
+   - **並行與時段**：runs 以 3 路並行執行，排程變動會改變計數（修正前後重疊的 2,500 runs 中 234 個計數改變，各臂都有）；舊 pin 集合在主跑之後的另一時段執行，與現行 pin 不是逐 run 交錯。
+   - **pin 偏離**：預先登記的 pin 是 `20effd45`；§5.7 停止後依作者決定改用修正版 `b1fd9d22` 重跑全部 9,750 runs，其餘設計不變（附錄 H.3）。
+@@ -862,7 +866,7 @@
+ 
+ ### 7.3 未來工作（依影響排序）
+ 
+-0. **（paper 2.0 必含，非延後項）** §4.11 提交層：r5 已驗證核心層建議鎖、持鎖下的孤兒 temp 清理與 apply 佇列（表 R3–R5）；apply 佇列 SQLITE_BUSY 例外已由 PR #238 修正並於 r6 驗證（表 R6）。仍待：佇列退回檔案鎖次數的可觀察性；跨主機／網路檔案系統的鎖語意；以 CID 而非 region 標記錨定的 re-compose；無區域身分提案的完成率；佇列 on 時 seam／before-precheck barrier 的 10 s 等待；Phase 3 450-run 主矩陣與強基線。 HIST 後續：讓同一 hunk 的配對真正交給 ATM 合成（改寫 harness 重新定位，v1.2，須另行預先登記）；steward 建立新檔；occ／git_three_way 基線加上跨 process 受保護提交區間後重測；預先登記的 3–4 個寫入者延伸組與 JS 專案附錄；獨立重現。
++0. **（paper 2.0 必含，非延後項）** §4.11 提交層：r5 已驗證核心層建議鎖、持鎖下的孤兒 temp 清理與 apply 佇列（表 R3–R5）；apply 佇列 SQLITE_BUSY 例外已由 PR #238 修正並於 r6 驗證（表 R6）。仍待：佇列退回檔案鎖次數的可觀察性；跨主機／網路檔案系統的鎖語意；以 CID 而非 region 標記錨定的 re-compose；無區域身分提案的完成率；佇列 on 時 seam／before-precheck barrier 的 10 s 等待；Phase 3 450-run 主矩陣與強基線。 HIST 後續：已改為重新設計的 HIST-v2（`benchmark-design/2026-10-10-hist-bench-v2/HIST_BENCH_V2_PREREG_zh.md`，設計稿、待作者核定）：全部候選都測、分類工具只依 PR 本身特徵把每題分成不相交／同區可合併／真衝突（另標無可跑測試）並事先寫好正確答案、結果依類別分開報、共用收件與批次協調器使同批真有多份 proposal、公平的原子提交基線與 file_lock 成本、修正後的語意評分器與負控制、依共用 PR 群的統計與未見資料測試集；讓同一 hunk 的配對真正交給 ATM 合成；steward 建立新檔；occ／git_three_way 基線加上跨 process 受保護提交區間後重測；預先登記的 3–4 個寫入者延伸組與 JS 專案附錄；獨立重現。
+ 1. 完成 M0–M1：選定契約、完成 §4.4 證明與 S1–S5 擴充測試；核定是否採 #198 契約。
+ 2. M2–M4：真接線、強基線臂、配對 pilot 與最小主結果。
+ 3. Batch closure 與重提協定的正式定義與成本量測（P1-2、P1-3），以及與 native hot parking（PR #199）的整合。
+@@ -881,7 +885,7 @@
+ 
+ ATM v1 把寫入前准入立為一級治理問題，並把准入之後的同檔整合交給確定性 composer 與中立 steward。本文把這一半寫成一個受治理的合成提交協定（C1）與一份可檢驗的保留性契約（C2）：proposal 可平行準備，合成以批次對同一 immutable base 進行，canonical commit 經單一受控路徑完成，不可合成或過期的提案以描述真實終態的收據退回。
+ 
+-既有證據只足以支撐動機與歷史診斷：故障注入負面對照顯示，省略該層時遺失率與無協調同量級〔作者報告值〕；歷史基準 v0.1.17 的唯讀探針揭露循序套用造成的順序依賴、例外中斷與角色未比對。這些是對 v1 承諾的端到端驗證缺口，而不是新演算法。提交層的多 process 正確性另有同場重跑結果（§6 表 R3–R6）：在 E4 重播、barrier 與故障情境配置下，現行提交層（`37847584`）未觀察到遺失或損壞，包括前一版會遺失的跨 PID namespace 與偽造 owner 情境；完成率約 65–67%，剩餘多為同區域衝突的 fail-closed；`37847584` apply 佇列的偶發例外（fail-closed）已由 `b35a6141` 修正，r6 同配置未再觀察到。外部真實 PR 工作負載（§6.1）上，ATM `b1fd9d22` 的 steward 在 1,650 runs 中未觀察到遺失或損壞，該工作負載找到的結尾換行反例已修正並在同配置未再出現；steward 完成 84.8%，低於 file_lock（86.6%）與 git_three_way（91.0%，但遺失 36 個效果），被擋下的 intents 多數停在 harness 的重新定位步驟。這些是作者自行執行、未獨立重現的有限觀察。歷史基準有已知缺口，main 尚未含修正，候選契約待核定，主結果仍待測。
++既有證據只足以支撐動機與歷史診斷：故障注入負面對照顯示，省略該層時遺失率與無協調同量級〔作者報告值〕；歷史基準 v0.1.17 的唯讀探針揭露循序套用造成的順序依賴、例外中斷與角色未比對。這些是對 v1 承諾的端到端驗證缺口，而不是新演算法。提交層的多 process 正確性另有同場重跑結果（§6 表 R3–R6）：在 E4 重播、barrier 與故障情境配置下，現行提交層（`37847584`）未觀察到遺失或損壞，包括前一版會遺失的跨 PID namespace 與偽造 owner 情境；完成率約 65–67%，剩餘多為同區域衝突的 fail-closed；`37847584` apply 佇列的偶發例外（fail-closed）已由 `b35a6141` 修正，r6 同配置未再觀察到。外部真實 PR 工作負載（§6.1）上，ATM `b1fd9d22` 的 steward 在 1,650 runs 中未觀察到遺失或損壞，該工作負載找到的結尾換行反例已修正並在同配置未再出現；steward 完成 84.8%，低於 file_lock（86.6%）與 git_three_way（91.0%，但遺失 36 個效果），被擋下的 intents 多數停在 harness 的重新定位步驟。這些是作者自行執行、未獨立重現的有限觀察。歷史基準 v0.1.17 有已知缺口；本稿較早版本所寫的「main 尚未含修正」只適用於審閱核對時的 main 快照 `3b0f7660`（2026-10-07），其後 #198（`5692474f`）、提交層修正（`bea35380`–`b35a6141`）與結尾換行修正（`b1fd9d22`）已合併到 main。候選契約仍待核定；在最終 frozen commit 上重跑全部臂的主結果（含 Phase 3 450-run 主矩陣）仍待測。
+ 
+ 本文的實證貢獻（C3）——相對 lock、CAS retry 與 Git 三方合併，完整 ATM 能安全完成多少工作、付出多少延遲與重試成本——在本稿中仍是預先登記的設計〔待 M2/M4〕。若最終結果顯示同等安全但成本較高，論文仍可呈現治理收據與責任分離的價值；若相對強基線無實務差異，則應改為修正說明或經驗報告。
+ 
+@@ -1317,7 +1321,7 @@
+ [21] AI-Atomic-Framework PR #214「fix(steward): rebase disjoint region edits after hash drift」：merge `2118bc66efb3ac3bc0ddaede6a2f7cb18526b030`、feature `b5729456bc14d9bf4c8acfce7be320fec691fee2`，2026-10-08 14:27 Asia/Taipei 合併（r4 驗證 pin，唯讀；未 tag、未 publish）。https://github.com/eaglhuang/AI-Atomic-Framework/pull/214
+ [22] AI-Atomic-Framework PR #216「fix(steward): keep live cross-namespace lock holders and queue applies」：merge `37847584e24afc08ea58cfe380bb5b1220fbe335`（parents `44a9ee19`、`5e39ee12`）、feature `5e39ee1244ed47b3fd3f44f9553fcd690f003894`；created 2026-10-08 17:14、merged 17:30 CST by cursor[bot]；未 tag、未 publish。https://github.com/eaglhuang/AI-Atomic-Framework/pull/216
+ [23] AI-Atomic-Framework PR #238「fix(broker): fall back when the steward apply queue is busy」：merge `b35a6141bd5bfbaec654f1cd3079323581b04074`（base `3878cde9`）、feature `2712c0243aa2dcc30983ef10d8947ff7d4978721`；created 2026-10-09 17:00、merged 17:27 CST by cursor[bot]；未 tag、未 publish（r6 驗證 pin）。https://github.com/eaglhuang/AI-Atomic-Framework/pull/238
+-[24] Xia, Wu, Park. Passes Alone, Fails Together: Benchmarking Semantic Coordination in Parallel LLM-Agent Development（STALE）. EXPRESS '26. arXiv:2609.25396，DOI 10.1145/3842650.3843171；repo https://github.com/illinoisdata/STALE-bench（2026-10-08 查詢時無授權檔；本文只引用方法，不使用其資料）。〔作者名依調查轉錄，待核對原文〕
++[24] Haocheng Xia, Eugene Wu, Yongjoo Park. Passes Alone, Fails Together: Benchmarking Semantic Coordination in Parallel LLM-Agent Development（STALE）. EXPRESS '26. arXiv:2609.25396，DOI 10.1145/3842650.3843171；repo https://github.com/illinoisdata/STALE-bench（2026-10-08 查詢時無授權檔；本文只引用方法，不使用其資料）。作者名已於 2026-10-10 對照 arXiv:2609.25396v1 原文核對。
+ [25] AI-Atomic-Framework PR #252「fix(broker): honor unified diff no-newline-at-eof markers」：merge `b1fd9d224ff2d6db7abe49b0c7348515667f13e8`（base `62913443`）、head `592c03cf39fddc1890ffb53f2e340ef0939a8b36`；created 2026-10-10 01:16、merged 03:03 CST by cursor[bot]；未 tag、未 publish（HIST 結果 pin）。https://github.com/eaglhuang/AI-Atomic-Framework/pull/252
+ [26] AI-Atomic-Framework PR #241「fix(ci): read framework claim file lists from a newline file」：merge `c8ef8c3eb35624ddd6f3194dd940edc128afaeb4`，2026-10-09 19:12 CST（CI 修正，非 ATM 核心）。https://github.com/eaglhuang/AI-Atomic-Framework/pull/241
+ [27] AI-Atomic-Framework PR #254「fix(validators): accept large CLI JSON without truncating stdout」：merge `15b2e5a10f761c18dbba77e29a1e64237cea225c`，2026-10-10 02:15 CST（CI 修正，非 ATM 核心）。https://github.com/eaglhuang/AI-Atomic-Framework/pull/254

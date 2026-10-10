@@ -7,6 +7,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { spawnCliCapture } from './lib/cli-json-spawn.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 type PackageSpec = {
@@ -128,10 +129,9 @@ function installedCliEntrypoint(installRoot: string): string {
 }
 
 function runInstalledCli(packageInstallRoot: string, cwd: string, args: string[]) {
-  return spawnSync(process.execPath, [installedCliEntrypoint(packageInstallRoot), ...args], {
+  return spawnCliCapture(process.execPath, [installedCliEntrypoint(packageInstallRoot), ...args], {
     cwd,
-    encoding: 'utf8',
-    maxBuffer: 64 * 1024 * 1024
+    label: `installed-cli ${args.join(' ')}`
   });
 }
 
@@ -148,7 +148,10 @@ function runEmittedNpmCommand(command: string, expectedArgs: string[], packageIn
   const runtime = installedCliEntrypoint(packageInstallRoot);
   const expectedCommand = `${governanceCommandPrefix(runtime)} ${expectedArgs.map(arg => /\s/.test(arg) ? JSON.stringify(arg) : arg).join(' ')}`;
   if (command !== expectedCommand) fail(`${label} emitted ${JSON.stringify(command)} instead of ${JSON.stringify(expectedCommand)}`);
-  const result = spawnSync(process.execPath, [runtime, ...expectedArgs], { cwd, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+  const result = spawnCliCapture(process.execPath, [runtime, ...expectedArgs], {
+    cwd,
+    label: `installed-cli ${expectedArgs.join(' ')}`
+  });
   const output = `${result.stdout ?? ''}${result.stderr ?? ''}`;
   if (result.status !== 0) fail(`${label} failed with exit ${result.status}: ${output.split('\n').slice(0, 8).join(' ')}`);
   if (/ERR_MODULE_NOT_FOUND|Cannot find (module|package)/.test(output)) {
@@ -341,8 +344,8 @@ writeFileSync('package.json', JSON.stringify(manifest));
 writeFileSync('package-lock.json', JSON.stringify(lock));
 `);
     const starter = path.join(installRoot, 'node_modules/create-atm/dist/index.js');
-    const result = spawnSync(process.execPath, [starter, 'project', '--agent', 'codex', '--tag', resolveNpmDistTag(version).distTag, '--cli-version', version, '--cwd', hostRoot, '--json'], {
-      encoding: 'utf8', timeout: 180_000, env: {
+    const result = spawnCliCapture(process.execPath, [starter, 'project', '--agent', 'codex', '--tag', resolveNpmDistTag(version).distTag, '--cli-version', version, '--cwd', hostRoot, '--json'], {
+      timeout: 180_000, label: 'create-atm project --json', env: {
         ...process.env,
         npm_execpath: installer,
         // The generated project is disposable test data. Supply deterministic
@@ -365,7 +368,11 @@ writeFileSync('package-lock.json', JSON.stringify(lock));
       if (!existsSync(path.join(target, '.agents/skills/atm-governance-router', relative))) fail(`starter omitted native skill ${relative}`);
     }
     rmSync(installRoot, { recursive: true, force: true });
-    const independent = spawnSync(process.execPath, [path.join(target, 'atm.mjs'), 'next', '--json'], { cwd: target, encoding: 'utf8', timeout: 30_000 });
+    const independent = spawnCliCapture(process.execPath, [path.join(target, 'atm.mjs'), 'next', '--json'], {
+      cwd: target,
+      timeout: 30_000,
+      label: 'target atm next --json'
+    });
     if (independent.status !== 0 || JSON.parse(independent.stdout).ok !== true) fail(`target failed after consumer removal: ${independent.stdout}${independent.stderr}`);
   } finally {
     rmSync(hostRoot, { recursive: true, force: true });
@@ -463,11 +470,11 @@ try {
         fail(`atm --version must report the installed tarball version ${installedManifest.version}: ${versionText.split('\n').slice(0, 8).join(' ')}`);
       }
       const beforeCreate = snapshotTree(installRoot);
-      const create = spawnSync(process.execPath, [installedCliEntrypoint(installRoot),
+      const create = spawnCliCapture(process.execPath, [installedCliEntrypoint(installRoot),
         'create', '--bucket', 'CORE', '--title', 'SmokeAtom',
         '--description', 'Installed runtime smoke',
         '--logical-name', 'atom.smoke.installed', '--dry-run', '--json'
-      ], { cwd: installRoot, encoding: 'utf8' });
+      ], { cwd: installRoot, label: 'installed atm create --dry-run --json' });
       const createText = `${create.stdout ?? ''}${create.stderr ?? ''}`;
       if (create.status !== 0) {
         fail(`installed atm create --dry-run failed: ${createText}`);
