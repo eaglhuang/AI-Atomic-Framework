@@ -1,0 +1,24 @@
+{
+  "schema": "ab-task-bank.v1",
+  "seedDir": "seed",
+  "hiddenDir": "hidden",
+  "checkCmd": "node check.mjs {features}",
+  "tasks": [
+    {
+      "id": "T1-same-file",
+      "writers": [
+        { "id": "mul", "prompt": { "edits": [ { "file": "src/math.js", "append": "export function mul(a, b) {\n  return a * b;\n}\n" } ] } },
+        { "id": "div", "prompt": { "edits": [ { "file": "src/math.js", "append": "export function div(a, b) {\n  return a / b;\n}\n" } ] } }
+      ],
+      "features": ["mul", "div"]
+    },
+    {
+      "id": "T2-different-files",
+      "writers": [
+        { "id": "mul", "prompt": { "edits": [ { "file": "src/math.js", "append": "export function mul(a, b) {\n  return a * b;\n}\n" } ] } },
+        { "id": "neg", "prompt": { "edits": [ { "file": "src/util.js", "append": "export function neg(a) {\n  return -a;\n}\n" } ] } }
+      ],
+      "features": ["mul", "neg"]
+    }
+  ]
+}
