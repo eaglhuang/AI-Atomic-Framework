@@ -7,8 +7,8 @@ import {
 } from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { spawnCliCapture } from "./lib/cli-json-spawn.ts";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const mode = process.argv.includes("--mode")
   ? process.argv[process.argv.indexOf("--mode") + 1]
@@ -23,10 +23,10 @@ function check(condition: any, message: any) {
   }
 }
 function runFacade(args: any) {
-  const result = spawnSync(
+  const result = spawnCliCapture(
     process.execPath,
     [path.join(root, "scripts/run-validators.ts"), ...args, "--json"],
-    { cwd: root, encoding: "utf8" },
+    { cwd: root, label: `run-validators ${args.join(" ")} --json` },
   );
   const payload = (result.stdout || result.stderr || "").trim();
   let parsed;

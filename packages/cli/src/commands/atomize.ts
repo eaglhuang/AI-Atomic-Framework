@@ -18,6 +18,8 @@ export function resolveAtomizeHelperPath(moduleUrl = import.meta.url): string {
 
 export async function runAtomize(argv: string[]) {
   const options = parseAtomizeArgs(argv);
+  // --cwd names the repository to operate on; --repo only overrides it.
+  if (!options.repo) options.repo = options.cwd;
 
   if (!options.subcommand) {
     return makeResult({
@@ -311,7 +313,7 @@ function parseAtomizeArgs(argv: string[]) {
   const state: AtomizeOptions = {
     cwd: process.cwd(),
     subcommand: null,
-    repo: '.',
+    repo: '',
     apply: false,
     dryRun: false,
     passthroughArgs: []

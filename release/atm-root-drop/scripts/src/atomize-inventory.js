@@ -15,6 +15,7 @@
 import { execSync } from 'child_process';
 import { resolve, posix } from 'path';
 import { existsSync, readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
 import { loadPathToAtomMap } from '../../atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js';
 
 const PRODUCTION_GLOBS = [
@@ -115,11 +116,14 @@ function riskLevel(filePath) {
   return 'P2';
 }
 
+const frameworkTaxonomyPath = fileURLToPath(new URL('../../docs/ATOMIZATION_COVERAGE_TAXONOMY.md', import.meta.url));
+
 export async function atomizeInventory(options) {
   const repoPath = options.repo || options.cwd || '.';
   const fullPath = resolve(repoPath);
 
-  const taxonomyPath = resolve(fullPath, 'docs', 'ATOMIZATION_COVERAGE_TAXONOMY.md');
+  // The taxonomy is a framework-owned contract, not a file the scanned repo must carry.
+  const taxonomyPath = frameworkTaxonomyPath;
   const exclusionPath = resolve(fullPath, 'atomic_workbench', 'atomization-coverage', 'exclusion-inventory.json');
   const registryPath = resolve(fullPath, 'atomic-registry.json');
 

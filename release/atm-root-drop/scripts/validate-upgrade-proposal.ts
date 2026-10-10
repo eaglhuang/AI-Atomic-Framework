@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { spawnCliCapture } from './lib/cli-json-spawn.ts';
 import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 import { detectEvidencePatterns } from '../packages/plugin-sdk/src/detector/evidence-pattern-detector.ts';
@@ -123,9 +123,9 @@ function runCliUpgrade(qualityPath: any, options: any = {}) {
     '--input', resolveInputPath(options.inputBase ?? root, qualityPath),
     '--input', resolveInputPath(options.inputBase ?? root, inputPaths.registryCandidate)
   ];
-  const result = spawnSync(process.execPath, args, {
+  const result = spawnCliCapture(process.execPath, args, {
     cwd,
-    encoding: 'utf8'
+    label: args.join(' ')
   });
   check(result.status === 0, `CLI upgrade exited ${result.status}: ${result.stderr || result.stdout}`);
   return JSON.parse(result.stdout.trim());

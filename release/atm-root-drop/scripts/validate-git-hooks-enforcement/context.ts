@@ -1,7 +1,7 @@
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { spawnCliCapture } from '../lib/cli-json-spawn.ts';
 import { loadValidatorFixture } from '../lib/validator-fixture.ts';
 
 export const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -78,15 +78,15 @@ export function run(command: string, args: readonly string[], cwd: string, optio
   const label = `${command} ${args.join(' ')}`;
   const startedAt = Date.now();
   console.log(`[git-hooks-enforcement:${mode}] step ${sequence} start (${Math.round((startedAt - validatorStartedAt) / 1000)}s): ${label}`);
-  const result = spawnSync(command, [...args], {
+  const result = spawnCliCapture(command, args, {
     cwd,
-    encoding: 'utf8',
     input: options.input,
     timeout: childTimeoutMs,
     env: {
       ...process.env,
       ...(options.env ?? {})
-    }
+    },
+    label
   });
   const elapsedMs = Date.now() - startedAt;
   if (result.error?.message?.toLowerCase().includes('timed out') || result.signal === 'SIGTERM') {

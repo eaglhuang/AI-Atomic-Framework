@@ -4,6 +4,7 @@ import {
   runGitCommandWithTimeout,
 } from './git-process-port.ts';
 import { execFileSync } from "node:child_process";
+import { randomUUID } from 'node:crypto';
 import {
   appendFileSync,
   existsSync,
@@ -101,7 +102,7 @@ export function runGitPush(options: LegacyValue): GitPushResult {
     options.actorId,
     branch,
     remote,
-  );
+  ).replace(/\.json$/, `__${randomUUID()}.json`);
   const startedAt = new Date().toISOString();
   const headShaBeforePush = readHeadCommitSha(options.cwd);
   writeGitPushAttemptStatus(options.cwd, statusPath, {
@@ -205,6 +206,9 @@ export function runGitPush(options: LegacyValue): GitPushResult {
       headShaAfterAttempt: readHeadCommitSha(options.cwd),
       admissionOutcome: admission.outcome,
     });
+    // The operation owns a unique path, so finishing it cannot delete another
+    // attempt's in-progress or recovery bytes. Failed cleanup remains classifiable.
+    try { rmSync(path.join(options.cwd, statusPath)); } catch {}
     return gitPushResult({
       ok: true,
       command: "git",
@@ -261,6 +265,7 @@ export function runGitPush(options: LegacyValue): GitPushResult {
       admissionOutcome: admission.outcome,
       remoteShaAfterPush,
     });
+    try { rmSync(path.join(options.cwd, statusPath)); } catch {}
     return gitPushResult({
       ok: true,
       command: "git",

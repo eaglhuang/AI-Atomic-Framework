@@ -2,6 +2,7 @@ import { cpSync, existsSync, mkdirSync, readFileSync, rmSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { spawnCliCapture } from './lib/cli-json-spawn.ts';
 import { buildRootDropRelease } from './build-root-drop-release.ts';
 import { createTempWorkspace, initializeGitRepository } from './temp-root.ts';
 
@@ -23,11 +24,9 @@ function assert(condition: any, message: any) {
 }
 
 function runAtm(cwd: any, args: any) {
-  const result = spawnSync(process.execPath, [path.join(cwd, 'atm.mjs'), ...args], {
+  const result = spawnCliCapture(process.execPath, [path.join(cwd, 'atm.mjs'), ...args], {
     cwd,
-    encoding: 'utf8',
-    // Some golden payloads exceed spawnSync's 1 MiB default and were truncated.
-    maxBuffer: 64 * 1024 * 1024
+    label: `atm ${args.join(' ')}`
   });
   const payload = (result.stdout || result.stderr || '').trim();
   return {

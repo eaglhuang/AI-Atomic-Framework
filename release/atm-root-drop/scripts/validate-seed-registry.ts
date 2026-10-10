@@ -1,8 +1,8 @@
 import { createHash } from 'node:crypto';
 import { copyFileSync, existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { spawnCliCapture } from './lib/cli-json-spawn.ts';
 import { computeSeedRegistrySnapshot, evaluateSeedSelfVerification, validateRegistryDocumentAgainstSchema } from '../packages/cli/src/commands/registry-shared.ts';
 import { createTempWorkspace } from './temp-root.ts';
 
@@ -26,9 +26,9 @@ function assert(condition: any, message: any) {
 }
 
 function runAtm(args: any) {
-  const result = spawnSync(process.execPath, [path.join(root, 'atm.mjs'), ...args], {
+  const result = spawnCliCapture(process.execPath, [path.join(root, 'atm.mjs'), ...args], {
     cwd: root,
-    encoding: 'utf8'
+    label: `atm ${args.join(' ')}`
   });
   const payload = (result.stdout || result.stderr || '').trim();
   let parsed;

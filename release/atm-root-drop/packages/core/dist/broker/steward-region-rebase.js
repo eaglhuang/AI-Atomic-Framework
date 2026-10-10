@@ -1,4 +1,4 @@
-import { parseUnifiedPatchHunks } from './unified-patch.js';
+import { joinSourceText, oldSideNewlineAgrees, parseUnifiedPatchHunks, splitSourceText } from './unified-patch.js';
 const REGION_HINT = /^L\d+:([A-Za-z0-9_.-]+)$/;
 const REGION_TAG = /<\/region:([A-Za-z0-9_.-]+)>/g;
 /** 錨點、符號或補丁裡唯一的 region 結尾標籤。沒有就不重定。 */
@@ -36,11 +36,8 @@ export function rebaseProposalsByRegionIdentity(filePath, before, proposals) {
         }
         seen.add(regionId);
     }
-    const lineEnding = /\r\n/.test(before) ? '\r\n' : '\n';
-    const endsWithNewline = before.endsWith('\n');
-    const lines = before.split(/\r?\n/);
-    if (endsWithNewline)
-        lines.pop();
+    const source = splitSourceText(before);
+    const lines = source.lines;
     const splices = [];
     for (const entry of identities) {
         const regionId = entry.regionId;
@@ -48,7 +45,7 @@ export function rebaseProposalsByRegionIdentity(filePath, before, proposals) {
         if (!region) {
             return blocked(filePath, [entry.proposal.proposalId], 'compose-context-mismatch', `region '${regionId}' is not in the current ${filePath}; refusing to guess a new location`);
         }
-        const planned = planProposalSplice(entry.proposal, region, lines);
+        const planned = planProposalSplice(entry.proposal, region, lines, source.endsWithNewline);
         if ('detail' in planned) {
             return blocked(filePath, [entry.proposal.proposalId], planned.code, planned.detail);
         }
@@ -59,26 +56,32 @@ export function rebaseProposalsByRegionIdentity(filePath, before, proposals) {
         const proposalIds = [overlap.left, overlap.right].sort((left, right) => left.localeCompare(right));
         return blocked(filePath, proposalIds, 'steward-final-patch-required', `region rebases for '${proposalIds[0]}' and '${proposalIds[1]}' cover the same lines of ${filePath}`);
     }
+    const eof = mergedSpliceEof(splices, source.endsWithNewline);
+    if (eof === 'conflict') {
+        const proposalIds = splices.map((splice) => splice.proposalId).sort((left, right) => left.localeCompare(right));
+        return blocked(filePath, proposalIds, 'steward-final-patch-required', `region rebases disagree on the end-of-file newline of ${filePath}`);
+    }
     const next = [...lines];
     for (const splice of [...splices].sort((left, right) => right.index - left.index)) {
         next.splice(splice.index, splice.deleteCount, ...splice.insert);
     }
-    const joined = next.join(lineEnding);
     return {
         ok: true,
-        content: endsWithNewline ? `${joined}${lineEnding}` : joined,
+        content: joinSourceText(next, source.lineEnding, eof),
         checkedPermutationCount: 1
     };
 }
-function planProposalSplice(proposal, region, lines) {
+function planProposalSplice(proposal, region, lines, fileEndsWithNewline) {
     const hunks = parseUnifiedPatchHunks(proposal.patch);
     if (hunks.length === 0) {
         return { code: 'compose-context-mismatch', detail: `proposal '${proposal.proposalId}' has no hunk to rebase onto region '${region.regionId}'` };
     }
     const planned = [];
     for (const hunk of hunks) {
-        const oldLines = hunk.lines.filter((entry) => !entry.startsWith('+')).map((entry) => entry.slice(1));
-        const newLines = hunk.lines.filter((entry) => !entry.startsWith('-')).map((entry) => entry.slice(1));
+        const oldEntries = hunk.lines.filter((entry) => entry.marker !== '+');
+        const newEntries = hunk.lines.filter((entry) => entry.marker !== '-');
+        const oldLines = oldEntries.map((entry) => entry.text);
+        const newLines = newEntries.map((entry) => entry.text);
         if (oldLines.length === 0) {
             return { code: 'compose-context-mismatch', detail: `proposal '${proposal.proposalId}' insert into region '${region.regionId}' has no anchor lines` };
         }
@@ -89,15 +92,52 @@ function planProposalSplice(proposal, region, lines) {
         if (index === 'missing') {
             return { code: 'steward-final-patch-required', detail: `proposal '${proposal.proposalId}' overlaps region '${region.regionId}', which changed after the proposal was anchored; refusing to overwrite` };
         }
+        for (let offset = 0; offset < oldEntries.length; offset += 1) {
+            const entry = oldEntries[offset];
+            if (!oldSideNewlineAgrees({
+                noNewline: entry.noNewline,
+                lineIndex: index + offset,
+                lineCount: lines.length,
+                fileEndsWithNewline
+            })) {
+                return {
+                    code: 'compose-context-mismatch',
+                    detail: `proposal '${proposal.proposalId}' newline mismatch at base line ${index + offset + 1}: the ${entry.noNewline ? 'old side omits' : 'old side keeps'} the end-of-file newline`
+                };
+            }
+        }
+        const reachesOriginalEof = index + oldLines.length >= lines.length;
+        if (newEntries.some((entry) => entry.noNewline) && !reachesOriginalEof) {
+            return { code: 'compose-context-mismatch', detail: `proposal '${proposal.proposalId}' no-newline marker is not at end of file` };
+        }
         planned.push({
             proposalId: proposal.proposalId,
             regionId: region.regionId,
             index,
             deleteCount: oldLines.length,
-            insert: newLines
+            insert: newLines,
+            newMissingNewline: newEntries.some((entry) => entry.noNewline),
+            reachesOriginalEof
         });
     }
     return planned;
+}
+function mergedSpliceEof(splices, fileEndsWithNewline) {
+    let absent = false;
+    let present = false;
+    for (const splice of splices) {
+        if (splice.newMissingNewline)
+            absent = true;
+        else if (splice.reachesOriginalEof)
+            present = true;
+    }
+    if (absent && present)
+        return 'conflict';
+    if (absent)
+        return false;
+    if (present)
+        return true;
+    return fileEndsWithNewline;
 }
 function locateAnchor(lines, region, needle) {
     const hits = [];

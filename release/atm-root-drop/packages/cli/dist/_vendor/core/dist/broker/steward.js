@@ -9,6 +9,7 @@ import { formatStewardCompositionBlock } from './steward-base-composer.js';
 import { applyTransactionalStewardPlan, buildPatchProposalComposition, buildStewardSemanticValidationReceipt } from './steward-transactional-apply.js';
 import { waitStewardRecomposeBackoff } from './steward-commit-guard.js';
 import { resolveStewardCommitControls, withStewardApplyQueue } from './steward-apply-queue.js';
+export { applyUnifiedPatch } from './unified-patch.js';
 /**
  * Validates that a steward identity is well-formed and authorised.
  * Derived-artifact writers must declare a route or task authorisation.
@@ -303,52 +304,6 @@ export function arbitrateStewardRequest(input) {
         applyEvidence: applyResult.evidence,
         issues: applyResult.ok ? [] : (applyResult.evidence.blockedReasons ?? []).map((reason) => ({ code: 'blocked-merge-plan', detail: reason }))
     };
-}
-export function applyUnifiedPatch(content, patch) {
-    const lines = content.split(/\r?\n/);
-    const patchLines = patch.split(/\r?\n/);
-    let lineIndex = 0;
-    let output = [];
-    let hunkIndex = 0;
-    while (hunkIndex < patchLines.length) {
-        const header = patchLines[hunkIndex];
-        const match = /^@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@/.exec(header.trim());
-        if (!match) {
-            hunkIndex += 1;
-            continue;
-        }
-        const oldStart = Number.parseInt(match[1], 10) - 1;
-        output.push(...lines.slice(lineIndex, oldStart));
-        lineIndex = oldStart;
-        hunkIndex += 1;
-        while (hunkIndex < patchLines.length && !patchLines[hunkIndex].startsWith('@@')) {
-            const patchLine = patchLines[hunkIndex];
-            if (patchLine.startsWith('--- ') || patchLine.startsWith('+++ ')) {
-                hunkIndex += 1;
-                continue;
-            }
-            if (patchLine.startsWith('-')) {
-                lineIndex += 1;
-            }
-            else if (patchLine.startsWith('+')) {
-                output.push(patchLine.slice(1));
-            }
-            else if (patchLine.startsWith(' ')) {
-                output.push(lines[lineIndex] ?? '');
-                lineIndex += 1;
-            }
-            else if (patchLine.length === 0) {
-                // skip blank separator lines inside patch text
-            }
-            else {
-                output.push(patchLine);
-                lineIndex += 1;
-            }
-            hunkIndex += 1;
-        }
-    }
-    output.push(...lines.slice(lineIndex));
-    return output.join('\n');
 }
 function writeEvidenceFile(filePath, evidence) {
     mkdirSync(path.dirname(path.resolve(filePath)), { recursive: true });

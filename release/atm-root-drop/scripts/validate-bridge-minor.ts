@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
+import { spawnCliCapture } from './lib/cli-json-spawn.ts';
 import { fileURLToPath } from 'node:url';
 import { locateWorkflowStepByCommand } from './lib/validator-contract-subject.ts';
 
@@ -142,9 +143,9 @@ function parseSemver(value: string) {
 }
 
 function runAtm(args: readonly string[]) {
-  const result = spawnSync(process.execPath, [path.join(root, 'atm.mjs'), ...args], {
+  const result = spawnCliCapture(process.execPath, [path.join(root, 'atm.mjs'), ...args], {
     cwd: root,
-    encoding: 'utf8'
+    label: `atm ${args.join(' ')}`
   });
   const output = (result.stdout || result.stderr || '').trim();
   let parsed: any = null;

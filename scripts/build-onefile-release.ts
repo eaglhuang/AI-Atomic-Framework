@@ -9,6 +9,7 @@ import { finalizeBuildReleaseHygiene } from './build-release-hygiene.ts';
 import { assertPayloadLauncherIsNotNested } from './launcher-entrypoint-guards.ts';
 import { renderOnefileFastVersionRuntime } from './onefile-fast-version-runtime.ts';
 import { renderCacheIntegrityRuntime } from './onefile-cache-integrity-runtime.ts';
+import { collectRuntimeDependencyPayloadFiles, isOnefileAtomizeClosurePath } from './onefile-runtime-closure.ts';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const rootDropReleaseRoot = path.join(repoRoot, 'release', 'atm-root-drop');
@@ -29,7 +30,7 @@ export function buildOnefileRelease(options: any = {}) {
   buildRootDropRelease({ repositoryRoot, releaseRoot: rootDropRoot, packageDistReady: true });
   assertPayloadLauncherIsNotNested(path.join(rootDropRoot, 'atm.mjs'));
 
-  const payloadFiles = collectPayloadFiles(rootDropRoot);
+  const payloadFiles = [...collectPayloadFiles(rootDropRoot), ...collectRuntimeDependencyPayloadFiles(repositoryRoot)];
   const payloadInputManifestHash = digestJson({ launcherTemplate: renderOnefileRuntime.toString(), cacheTemplate: renderCacheIntegrityRuntime.toString(), fastVersionTemplate: renderOnefileFastVersionRuntime(), files: payloadFiles.map((file: any) => ({
     path: file.path,
     mode: file.mode,
@@ -217,6 +218,9 @@ export function isOnefilePayloadPath(relativePath: string) {
     return true;
   }
   if (onefilePayloadFrameworkMarkers.has(normalized)) {
+    return true;
+  }
+  if (isOnefileAtomizeClosurePath(normalized)) {
     return true;
   }
   if (!onefilePayloadPrefixes.some((prefix) => normalized.startsWith(prefix))) {

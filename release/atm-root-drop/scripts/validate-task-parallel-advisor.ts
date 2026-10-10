@@ -1,6 +1,6 @@
-import { execFileSync } from 'node:child_process';
 import { writeFileSync, unlinkSync } from 'node:fs';
 import path from 'node:path';
+import { spawnCliCapture } from './lib/cli-json-spawn.ts';
 
 const mockTasks = {
   'TASK-AAO-0130': {
@@ -41,12 +41,14 @@ for (const [id, payload] of Object.entries(mockTasks)) {
 }
 
 function runJson(args: readonly string[]) {
-  const output = execFileSync('node', ['atm.dev.mjs', ...args, '--json'], {
+  const captured = spawnCliCapture(process.execPath, ['atm.dev.mjs', ...args, '--json'], {
     cwd: process.cwd(),
-    encoding: 'utf8',
-    stdio: ['ignore', 'pipe', 'pipe']
+    label: `atm.dev ${args.join(' ')} --json`
   });
-  return JSON.parse(output) as { ok?: boolean; evidence?: Record<string, unknown> };
+  if (captured.error || captured.status !== 0) {
+    throw new Error(`atm.dev ${args.join(' ')} --json failed with status ${captured.status ?? 'null'}: ${captured.stderr || captured.error?.message || ''}`);
+  }
+  return JSON.parse(captured.stdout) as { ok?: boolean; evidence?: Record<string, unknown> };
 }
 
 function assert(condition: unknown, message: string): asserts condition {
