@@ -1,9 +1,19 @@
+import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { CliError, makeResult, message, resolveFrameworkRoot } from './shared.js';
+// Helper modules live in the framework checkout. An installed npm package ships
+// a copy under dist/npm-runtime/atomize-helpers that mirrors the same layout
+// (scripts/src, docs, atomic_workbench shards), so adopters can run atomize.
+export function resolveAtomizeHelperRoot(moduleUrl = import.meta.url) {
+    const frameworkRoot = resolveFrameworkRoot(moduleUrl);
+    if (existsSync(path.join(frameworkRoot, 'scripts', 'src', 'atomize-inventory.js')))
+        return frameworkRoot;
+    return path.join(frameworkRoot, 'dist', 'npm-runtime', 'atomize-helpers');
+}
 export function resolveAtomizeHelperPath(moduleUrl = import.meta.url) {
-    return path.join(resolveFrameworkRoot(moduleUrl), 'scripts', 'src', 'atomization-register-receipt.js');
+    return path.join(resolveAtomizeHelperRoot(moduleUrl), 'scripts', 'src', 'atomization-register-receipt.js');
 }
 export async function runAtomize(argv) {
     const options = parseAtomizeArgs(argv);
@@ -93,7 +103,7 @@ async function runAtomizeInventory(options) {
     try {
         // 解析到 atomize-inventory.js 的正確路徑
         // 從 packages/cli/src/commands/atomize.ts 相對於 repo root
-        const repoRoot = resolveFrameworkRoot();
+        const repoRoot = resolveAtomizeHelperRoot();
         const inventoryScriptPath = path.join(repoRoot, 'scripts', 'src', 'atomize-inventory.js');
         // 動態導入 atomize-inventory 模組
         const { atomizeInventory } = await import(pathToFileURL(inventoryScriptPath).href);
@@ -154,7 +164,7 @@ async function runAtomizeInventory(options) {
 async function runAtomizeScore(options) {
     try {
         // 解析到 atomize-score.js 的正確路徑
-        const repoRoot = resolveFrameworkRoot();
+        const repoRoot = resolveAtomizeHelperRoot();
         const scoreScriptPath = path.join(repoRoot, 'scripts', 'src', 'atomize-score.js');
         // 動態導入 atomize-score 模組
         const { atomizeScore } = await import(pathToFileURL(scoreScriptPath).href);
@@ -225,7 +235,7 @@ async function runAtomizeScore(options) {
 }
 async function runAtomizeBackfill(options) {
     try {
-        const repoRoot = resolveFrameworkRoot();
+        const repoRoot = resolveAtomizeHelperRoot();
         const scriptPath = path.join(repoRoot, 'scripts', 'src', 'atomize-backfill.js');
         const { atomizeBackfill } = await import(pathToFileURL(scriptPath).href);
         const result = await atomizeBackfill({

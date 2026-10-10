@@ -2817,6 +2817,12 @@
     "release/atm-root-drop/packages/cli/dist/migration/codemod-registry.js",
     "release/atm-root-drop/packages/cli/dist/migration/migration-index.json",
     "release/atm-root-drop/packages/cli/dist/npm-runtime/atm.mjs",
+    "release/atm-root-drop/packages/cli/dist/npm-runtime/atomize-helpers/atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js",
+    "release/atm-root-drop/packages/cli/dist/npm-runtime/atomize-helpers/docs/ATOMIZATION_COVERAGE_TAXONOMY.md",
+    "release/atm-root-drop/packages/cli/dist/npm-runtime/atomize-helpers/scripts/src/atomization-register-receipt.js",
+    "release/atm-root-drop/packages/cli/dist/npm-runtime/atomize-helpers/scripts/src/atomize-backfill.js",
+    "release/atm-root-drop/packages/cli/dist/npm-runtime/atomize-helpers/scripts/src/atomize-inventory.js",
+    "release/atm-root-drop/packages/cli/dist/npm-runtime/atomize-helpers/scripts/src/atomize-score.js",
     "release/atm-root-drop/packages/cli/dist/npm-runtime/build-identity.json",
     "release/atm-root-drop/packages/cli/dist/npm-runtime/data/_vendor/atm-markdown-task-source/templates/aao-l2-split-template.md",
     "release/atm-root-drop/packages/cli/dist/npm-runtime/data/_vendor/atm-markdown-task-source/templates/adopter-task-template.md",
@@ -6476,6 +6482,7 @@
     "release/atm-root-drop/tests/cli/normal-close-operator-convergence.test.ts",
     "release/atm-root-drop/tests/cli/npm-clean-install.test.ts",
     "release/atm-root-drop/tests/cli/npm-first-use-environment.test.ts",
+    "release/atm-root-drop/tests/cli/npm-runtime-adopter-atomize-proposal.test.ts",
     "release/atm-root-drop/tests/cli/numeric-scalar-order-safety.test.ts",
     "release/atm-root-drop/tests/cli/observed-evidence-production-callers.test.ts",
     "release/atm-root-drop/tests/cli/onefile-adopter-atomize-proposal.test.ts",
@@ -7210,7 +7217,7 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 10,
+    "copied": 17,
     "unchanged": 7165,
     "removed": 0
   },
@@ -26208,7 +26215,7 @@
       },
       {
         "path": "packages/cli/dist/atm-public.js",
-        "digest": "66d67d368502f6eccce246ad89d16064183a86c8f5efb56a73d01be423fcd5f1",
+        "digest": "a9d26501f208478c2e3152502df5804eeee875614a1279d8e3a0803688c9ba69",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/atm-public.js"
@@ -26235,7 +26242,7 @@
       },
       {
         "path": "packages/cli/dist/build-identity.json",
-        "digest": "661648c01a342133ee892d6413516b8eb01b3b078c1bd59bc04b0d7369726614",
+        "digest": "cec4952fdc0fb923b490c753cc6d1474aee8bd1094b5abba6eb1a44da4ae68d5",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/build-identity.json"
@@ -26361,7 +26368,7 @@
       },
       {
         "path": "packages/cli/dist/commands/atomize.js",
-        "digest": "e6ba84a404fa1b0e9a9ecca2343d9ed02ed6bbb516c2960d2babee588ae15e10",
+        "digest": "a254b09ff3c76e52e581b2f1c0c6d86c714b333f0f2b23bbdd9f0c519fd2567a",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/atomize.js"
@@ -32291,8 +32298,62 @@
         "replaceable": true
       },
       {
+        "path": "packages/cli/dist/npm-runtime/atomize-helpers/atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js",
+        "digest": "dc9ef50f4a61d8cc0abaef2bdaf193c5a85f4712076da5fab560dad7b4490f9b",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/npm-runtime/atomize-helpers/atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/npm-runtime/atomize-helpers/docs/ATOMIZATION_COVERAGE_TAXONOMY.md",
+        "digest": "73d52581dcdf275ab4af34aa61162e0d4c9ed4362dd36c5811e85efb800bf081",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/npm-runtime/atomize-helpers/docs/ATOMIZATION_COVERAGE_TAXONOMY.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/npm-runtime/atomize-helpers/scripts/src/atomization-register-receipt.js",
+        "digest": "4f41ba08ecb31b8f9a8f99b53726e6a61c49f21fece552f74fe91d0c91e76e0b",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/npm-runtime/atomize-helpers/scripts/src/atomization-register-receipt.js"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/npm-runtime/atomize-helpers/scripts/src/atomize-backfill.js",
+        "digest": "f60edaac8ae326bbb7d7be0211e4ed469e72c957a07db4a5a5d7ca42b9b0e58e",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/npm-runtime/atomize-helpers/scripts/src/atomize-backfill.js"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/npm-runtime/atomize-helpers/scripts/src/atomize-inventory.js",
+        "digest": "2df8f0caf2453e22c104a47721e4e18c4e42954970557f55e6b8dce976d8d437",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/npm-runtime/atomize-helpers/scripts/src/atomize-inventory.js"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/npm-runtime/atomize-helpers/scripts/src/atomize-score.js",
+        "digest": "8b79fe0d6ebd15633a9347f4f5b405f3542b61cf21fab0e2ce7b921000db75f7",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/npm-runtime/atomize-helpers/scripts/src/atomize-score.js"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/cli/dist/npm-runtime/build-identity.json",
-        "digest": "888a89fdaae88214b034bc53b8a860cdb26becdd304333bb45c2d9d2b7548e7a",
+        "digest": "722ec659d391b0692e4c2c882f59e4fab6c0e9e6274885be1d85a7be27eed18d",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/build-identity.json"
@@ -33021,7 +33082,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/manifest.json",
-        "digest": "51a8461d66ae0209f0a0320ebfa93758f3b7d7e7abda393091e4b01b276de8ee",
+        "digest": "487a47e8a0efe217357aab3bf496ca17295233b774c12a615c5300a620516bc0",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/manifest.json"
@@ -33030,7 +33091,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/runtime.mjs",
-        "digest": "2558a9d62fc16a3f1eadbcea4ef469ef84a22017a1d039566b65051886099230",
+        "digest": "4bd5244cc6aa37866ba00a1e4a72a1b52146cce4f4813adc3ca1b968d75b87d0",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/runtime.mjs"
@@ -33426,7 +33487,7 @@
       },
       {
         "path": "packages/cli/src/atm-public.ts",
-        "digest": "f2073251a676ee481970447cbe92df2d115c9f8376979f5df528dd2904f5fd16",
+        "digest": "53c6d9906cf200b4402e9096ed99d96a58132b86d6f1e35fa093d42e0728557c",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/atm-public.ts"
@@ -33660,7 +33721,7 @@
       },
       {
         "path": "packages/cli/src/commands/atomize.ts",
-        "digest": "0548da5bf2450b935b08fded2b8d5279b533b53def92209779d5bad9c79a3bd4",
+        "digest": "b2d61ae6244107e08057c6b62389f5965e861d1ab4c0dd9256f3d83386c9587b",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/atomize.ts"
@@ -50526,7 +50587,7 @@
       },
       {
         "path": "packages/create-atm/dist/build-identity.json",
-        "digest": "a1a5380c80885b3729c0235395389d55af53928d0a6b10a1f86d41b082abf805",
+        "digest": "54e5ad6d60e8b645fc655a7780e743f5766b824be6b0a67cc5b4a1823433cb8a",
         "origin": "source",
         "inputPaths": [
           "packages/create-atm/dist/build-identity.json"
@@ -55710,7 +55771,7 @@
       },
       {
         "path": "scripts/build-cli-npm-runtime.ts",
-        "digest": "fb30afd783fd8a805a19f303d2e775b7785951b0eadd5df201354f427b4e0f39",
+        "digest": "80647af5af9e157870cdf5440f5ecb25092dd3d7b61ea2b79958356310609555",
         "origin": "source",
         "inputPaths": [
           "scripts/build-cli-npm-runtime.ts"
@@ -65213,6 +65274,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/cli/npm-runtime-adopter-atomize-proposal.test.ts",
+        "digest": "c1e62fbc4c9913cfffd94884aab0a126e4c2683efdf2a9fb65647643f83a255c",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/npm-runtime-adopter-atomize-proposal.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/cli/numeric-scalar-order-safety.test.ts",
         "digest": "c02d488c6d9d1043829fd1da938ca9273daf14c7a93dd4848026d1a1689fe75b",
         "origin": "source",
@@ -71792,7 +71862,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:dc9de51383c4c6337e0bd451df46310c62eb4a24e1e5da5252904a70b3d4f33f"
+    "treeDigest": "sha256:589ba144fd533e55cdcc60e8f8cd66f00706185fb76a2ae348f03fe035d43b2b"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -73401,7 +73471,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:44411d47c8fe6ffae219633c37afc765562c314fc82574838f90447a7abf2738"
+    "digest": "sha256:19d9feb90ecbd10c49e44bd3de57698cd6a9e38d123684334a18dfac3d4792b1"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -76192,6 +76262,12 @@
       "release/atm-root-drop/packages/cli/dist/migration/codemod-registry.js",
       "release/atm-root-drop/packages/cli/dist/migration/migration-index.json",
       "release/atm-root-drop/packages/cli/dist/npm-runtime/atm.mjs",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/atomize-helpers/atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/atomize-helpers/docs/ATOMIZATION_COVERAGE_TAXONOMY.md",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/atomize-helpers/scripts/src/atomization-register-receipt.js",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/atomize-helpers/scripts/src/atomize-backfill.js",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/atomize-helpers/scripts/src/atomize-inventory.js",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/atomize-helpers/scripts/src/atomize-score.js",
       "release/atm-root-drop/packages/cli/dist/npm-runtime/build-identity.json",
       "release/atm-root-drop/packages/cli/dist/npm-runtime/data/_vendor/atm-markdown-task-source/templates/aao-l2-split-template.md",
       "release/atm-root-drop/packages/cli/dist/npm-runtime/data/_vendor/atm-markdown-task-source/templates/adopter-task-template.md",
@@ -79851,6 +79927,7 @@
       "release/atm-root-drop/tests/cli/normal-close-operator-convergence.test.ts",
       "release/atm-root-drop/tests/cli/npm-clean-install.test.ts",
       "release/atm-root-drop/tests/cli/npm-first-use-environment.test.ts",
+      "release/atm-root-drop/tests/cli/npm-runtime-adopter-atomize-proposal.test.ts",
       "release/atm-root-drop/tests/cli/numeric-scalar-order-safety.test.ts",
       "release/atm-root-drop/tests/cli/observed-evidence-production-callers.test.ts",
       "release/atm-root-drop/tests/cli/onefile-adopter-atomize-proposal.test.ts",
