@@ -45,3 +45,14 @@ onefile 來源：`origin/claude/project-thread-dbtbbj` 的 `release/atm-onefile/
 **未做的事**：不手寫 registry 或偽造 atomCid。那會跳過 ATM 的身分驗證，產生的「通過」沒有意義。`compose` 與 `steward plan/apply` 在這次嘗試中沒有執行。
 
 **解除條件**：需要 ATM 提供正式的 atomCid 來源（例如 atom 建立／註冊流程能產出 cid），然後 proposal validate 才能通過。通過後再依序跑 compose、steward plan、steward apply，並用 oracle 判定結果。
+
+## 第三次嘗試：PR #263 已合併（main 含 #263）、分支 HEAD e40dea4
+
+| 步驟 | 結果 |
+|---|---|
+| `setup --agents none` | 通過 |
+| `atomize inventory` | 通過 |
+| `atomize backfill --dry-run` | 通過，`total_atom_proposals: 0` |
+| `broker proposal validate` | 失敗：仍是 `missing-atom-refs` |
+
+atomCid 來源不在 #263 內，preflight 仍未通過。ATM 臂維持 `unverified`。
