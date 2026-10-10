@@ -68,7 +68,8 @@ test('unsafe home, filesystem root and symlink targets are rejected', t => {
   assert.throws(() => validateSetupTarget(path.join(f.homeDir, '.claude/skills/new'), f.homeDir, {}), /project directory/);
   assert.equal(isSameOrWithin('C:\\Users\\Alice\\.CLAUDE\\skills', 'c:\\users\\alice\\.claude', true, 'win32'), true);
   assert.equal(isSameOrWithin('C:\\Users\\Alice\\projects', 'C:\\Users\\Alice\\.claude', true, 'win32'), false);
-  symlinkSync(f.homeDir, path.join(f.project, '.atm'), 'dir');
+  // Windows junctions need no symlink privilege and are reported as links by lstat.
+  symlinkSync(f.homeDir, path.join(f.project, '.atm'), process.platform === 'win32' ? 'junction' : 'dir');
   assert.throws(() => validateSetupTarget(f.project, f.homeDir, {}), /UNSAFE_PATH/);
 });
 
