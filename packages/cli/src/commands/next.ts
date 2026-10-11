@@ -474,7 +474,8 @@ async function runNextRoute(argv: string[]): Promise<NextCommandResult> {
     governanceCommandPrefix(process.argv[1] ?? null),
     classifyRunnerMode(process.argv[1] ?? null),
     detectFrameworkRepoIdentity(options.cwd).isFrameworkRepo ? 'framework' : 'adopter',
-    existsSync(path.join(options.cwd, 'package.json'))
+    existsSync(path.join(options.cwd, 'package.json')),
+    packageHasTestScript(options.cwd)
   );
   const userNotice = buildFirstUseUserNotice(nextAction);
   profile.flush('default-next');
@@ -507,6 +508,17 @@ async function runNextRoute(argv: string[]): Promise<NextCommandResult> {
       lastHandoffAt: runtime.lastHandoffAt
     }
   }), options.cwd);
+}
+
+function packageHasTestScript(cwd: string): boolean {
+  const packagePath = path.join(cwd, 'package.json');
+  if (!existsSync(packagePath)) return false;
+  try {
+    const manifest = JSON.parse(readFileSync(packagePath, 'utf8')) as { scripts?: { test?: unknown } };
+    return typeof manifest.scripts?.test === 'string' && manifest.scripts.test.trim().length > 0;
+  } catch {
+    return false;
+  }
 }
 
 import { createNextProfiler } from './next/profiler.ts';

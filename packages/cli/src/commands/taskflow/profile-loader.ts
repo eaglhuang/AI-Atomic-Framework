@@ -518,11 +518,13 @@ export function validateProfile(value: unknown): TaskflowProfileV1 {
     }
   }
 
-  // 硬性安全限制：supportsWrite 必須為 false
-  if (raw.capabilities.supportsWrite === true) {
+  // supportsWrite is true only for the built-in opener, which really does write
+  // the task card. Any other profile that claims write permission is rejected.
+  const openerPath = typeof raw.delegation?.openerPath === 'string' ? raw.delegation.openerPath : '';
+  if (raw.capabilities.supportsWrite === true && openerPath !== 'atm:builtin') {
     throw new CliError(
       'ATM_TASKFLOW_PROFILE_WRITE_NOT_ALLOWED',
-      'Taskflow profile write permission is not allowed in this version. "supportsWrite" must be false.',
+      'Taskflow profile write permission is only valid for the built-in opener (delegation.openerPath "atm:builtin"). Other profiles must keep "supportsWrite" false.',
       { exitCode: 1 }
     );
   }

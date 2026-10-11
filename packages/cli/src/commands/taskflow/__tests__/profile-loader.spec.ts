@@ -78,6 +78,20 @@ try {
   }
 }
 
+const builtinWritePath = path.join(rootDir, 'fixtures/taskflow-profile/temp-builtin-write-true.profile.json');
+try {
+  fs.writeFileSync(builtinWritePath, JSON.stringify({
+    ...invalidWriteProfile,
+    id: 'builtin-write-profile',
+    delegation: { ...invalidWriteProfile.delegation, openerPath: 'atm:builtin' }
+  }, null, 2), 'utf8');
+  const builtin = loadProfile(builtinWritePath);
+  assert.equal(builtin.capabilities.supportsWrite, true);
+  assert.equal(builtin.delegation.openerPath, 'atm:builtin');
+} finally {
+  if (fs.existsSync(builtinWritePath)) fs.unlinkSync(builtinWritePath);
+}
+
 // 4. 測試不存在的 profile 讀取
 const missingPath = path.join(rootDir, 'fixtures/taskflow-profile/does-not-exist.json');
 assert.throws(() => {
