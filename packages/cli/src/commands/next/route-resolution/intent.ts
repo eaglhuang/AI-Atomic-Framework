@@ -18,7 +18,6 @@ import { readConfiguredPlanningRoots, shouldReportPlanningRootMissing } from '..
 import { resolveCandidatePlanningRoots } from '../planning-root-preference.ts';
 import { bootstrapTaskId } from '../../governance-runtime.ts';
 import { CliError, parseJsonText, quoteCliValue } from '../../shared.ts';
-import { quoteCliToken } from '../view-projections.ts';
 import {
   abandonTaskQueue,
   buildAllowedFilesForTask,
@@ -69,6 +68,7 @@ import {
   type PromptScopedTaskRoute
 } from '../route-predicates.ts';
 import {
+  quoteCliToken,
   sha256,
   uniqueInOrder,
   uniqueSorted
