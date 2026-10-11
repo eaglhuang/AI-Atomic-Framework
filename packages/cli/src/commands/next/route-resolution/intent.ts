@@ -279,8 +279,11 @@ export function buildPromptSuggestedRoutes(prompt: string, commandPrefix = 'node
     files.length > 0 ? null : '--scope-path',
     files.length === 1 ? null : '--validator'
   ].filter((flag): flag is string => Boolean(flag));
+  // --write without --actor/--scope-path/--validator exits non-zero. Keep the
+  // paste target as a dry-run until every required flag is known.
+  const openVerb = missingOpenFlags.length === 0 ? 'taskflow open --write' : 'taskflow open';
   const openCommand = [
-    `${commandPrefix} taskflow open --write${actorFlag}`,
+    `${commandPrefix} ${openVerb}${actorFlag}`,
     `--title ${quoteCliValue(title)}`,
     `--goal ${quoteCliValue(prompt)}`,
     files.length > 0 ? `--scope-path ${quoteCliValue(files.join(','))}` : '',
@@ -303,7 +306,7 @@ export function buildPromptSuggestedRoutes(prompt: string, commandPrefix = 'node
   });
   routes.push({
     when: missingOpenFlags.length > 0
-      ? `open a task card; still add ${missingOpenFlags.join(', ')}`
+      ? `open a task card; this command is a dry-run until you add ${missingOpenFlags.join(', ')} and --write`
       : 'open a task card for this request, then claim it',
     channel: 'task-card',
     command: openCommand

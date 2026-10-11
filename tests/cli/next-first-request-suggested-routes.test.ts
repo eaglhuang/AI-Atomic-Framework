@@ -13,7 +13,8 @@ try {
   const nextAction = (guidance.evidence as Record<string, any>).nextAction;
   assert.equal(nextAction.status, 'prompt-guidance-required');
   assert.ok(Array.isArray(nextAction.suggestedRoutes) && nextAction.suggestedRoutes.length >= 2, 'a first free-text request lists suggested routes');
-  assert.match(nextAction.command, /taskflow open --write/);
+  assert.match(nextAction.command, /taskflow open /);
+  assert.doesNotMatch(nextAction.command, /--write/);
   assert.doesNotMatch(JSON.stringify(nextAction.suggestedRoutes), /<[^>]+>/);
   assert.equal(nextAction.suggestedRoutes.some((route: { channel: string | null }) => route.channel === 'fast'), false, 'a prompt with no files does not offer a placeholder quick-fix claim');
   assert.equal(nextAction.suggestedRoutes.find((route: { channel: string | null }) => route.channel === 'task-card').command, nextAction.command);

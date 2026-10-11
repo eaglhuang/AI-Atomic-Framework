@@ -23,8 +23,15 @@ try {
 
   const guidance = await runNext(['--cwd', cwd, '--prompt', 'Add a note to the project', '--json']) as any;
   const guidanceAction = guidance.evidence.nextAction;
-  assert.match(guidanceAction.command, /taskflow open --write/);
+  assert.match(guidanceAction.command, /taskflow open /);
+  assert.doesNotMatch(guidanceAction.command, /--write/, guidanceAction.command);
+  assert.match(guidanceAction.suggestedRoutes.find((route: { channel: string | null }) => route.channel === 'task-card').when, /--actor/);
   assert.doesNotMatch(JSON.stringify(guidanceAction.suggestedRoutes), /<[^>]+>/);
+  const dryOpen = await runTaskflow(['open', '--cwd', cwd, '--title', 'Add a note to the project', '--goal', 'Add a note to the project', '--json']) as any;
+  assert.equal(dryOpen.ok, true);
+  assert.notEqual(dryOpen.writeReadinessHint.status, 'ready');
+  const afterDryRun = await runNext(['--cwd', cwd, '--json']) as any;
+  assert.equal(afterDryRun.evidence.nextAction.status, 'ready', afterDryRun.evidence.nextAction.command);
   assert.equal(guidanceAction.suggestedRoutes.some((route: { channel: string | null }) => route.channel === 'fast'), false);
 
   const dry = await runTaskflow(['open', '--cwd', cwd, '--dry-run', '--json']) as any;

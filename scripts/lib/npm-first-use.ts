@@ -57,7 +57,44 @@ export function resolveFirstUseArguments(command: string, bin: string, guideGoal
   const action = actions.find(([text]) => suffix === text);
   if (action) return action[1];
   const handoff = suffix.match(/^handoff summarize --task ([A-Za-z0-9_-]+) --json$/);
-  return handoff ? ['handoff', 'summarize', '--task', handoff[1], '--json'] : null;
+  if (handoff) return ['handoff', 'summarize', '--task', handoff[1], '--json'];
+  return parseBoundedTaskflowOpen(suffix);
+}
+
+/** Accept a prefilled taskflow open that contains only known flags.
+ * A dry-run (no --write) is the paste target while required flags are missing.
+ * --write is accepted only when actor, scope, and validator are all present. */
+function parseBoundedTaskflowOpen(suffix: string): string[] | null {
+  if (!suffix.startsWith('taskflow open ') || !suffix.endsWith(' --json')) return null;
+  if (/[;&|`$<>\n]/.test(suffix)) return null;
+  const body = suffix.slice('taskflow open '.length, suffix.length - ' --json'.length).trim();
+  const tokens = [...body.matchAll(/"((?:[^"\\]|\\.)*)"|(\S+)/g)]
+    .map((match) => (match[1] ?? match[2]).replace(/\\(.)/g, (_full, char: string) => char));
+  const valued = new Set(['--actor', '--title', '--goal', '--scope-path', '--validator']);
+  const values = new Map<string, string>();
+  let write = false;
+  for (let index = 0; index < tokens.length; index += 1) {
+    const token = tokens[index];
+    if (token === '--write') {
+      write = true;
+      continue;
+    }
+    if (!valued.has(token) || values.has(token)) return null;
+    const value = tokens[index + 1];
+    if (!value || value.startsWith('--')) return null;
+    values.set(token, value);
+    index += 1;
+  }
+  if (!values.get('--title') || !values.get('--goal')) return null;
+  if (write && (!values.get('--actor') || !values.get('--scope-path') || !values.get('--validator'))) return null;
+  const argv = ['taskflow', 'open'];
+  if (write) argv.push('--write');
+  for (const flag of valued) {
+    const value = values.get(flag);
+    if (value) argv.push(flag, value);
+  }
+  argv.push('--json');
+  return argv;
 }
 
 type FirstUseCommandResult = {

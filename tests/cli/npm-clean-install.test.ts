@@ -92,6 +92,13 @@ try {
   assert.equal(resolveFirstUseArguments(`node /untrusted/atm.mjs ${suffix}`, bin), null);
   assert.equal(resolveFirstUseArguments(`${command}; echo unexpected`, bin), null);
   assert.equal(resolveFirstUseArguments(`${governanceCommandPrefix(runtime)} arbitrary --json`, bin), null);
+  const openSuffix = 'taskflow open --title "public npm first-use contract" --goal "public npm first-use contract" --json';
+  assert.deepEqual(
+    resolveFirstUseArguments(`${governanceCommandPrefix(runtime)} ${openSuffix}`, bin),
+    ['taskflow', 'open', '--title', 'public npm first-use contract', '--goal', 'public npm first-use contract', '--json']
+  );
+  assert.equal(resolveFirstUseArguments(`${governanceCommandPrefix(runtime)} taskflow open --write --title "x" --goal "x" --json`, bin), null);
+  assert.equal(resolveFirstUseArguments(`${governanceCommandPrefix(runtime)} taskflow open --title "x" --goal "x; rm -rf /" --json`, bin), null);
 } finally {
   rmSync(commandFixture, { recursive: true, force: true });
 }
