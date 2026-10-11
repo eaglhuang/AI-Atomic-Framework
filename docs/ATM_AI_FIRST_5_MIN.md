@@ -31,7 +31,7 @@ Read `evidence.versions.frameworkVersion` and pin that npm version. On 0.1.20, `
 
 **Empty queue: skip `guide`, `orient`, and `start`.** `next --prompt` with no task card returns `guide` and `ATM_NEXT_PLAYBOOK_ABSENT`. Do not follow it. `welcome` and `doctor` on that project point at `npm test --if-present` or `next --json`. Those are not the first write.
 
-**Trust the playbook over a conflicting `nextAction.command`.** After claim, that command is `start`. Pasting it loops back into an unflagged dry-run. Run the playbook lines extracted below.
+**Trust the playbook.** After claim, `nextAction.command` is `implement-deliverables`, the same sentinel as `playbook.commandSequence[0]`. It means edit the declared files. It is not a shell command, and pasting it does not run `start`. Run the playbook lines extracted below.
 
 **Replace every `<...>` placeholder before pasting.** Unquoted `<id>` is a shell redirect.
 
@@ -49,7 +49,7 @@ bash -c "$CLOSE" > /tmp/atm-close.json
 jq -r '.ok, .messages[0].code' /tmp/atm-close.json
 ```
 
-The card is `docs/tasks/<task-id>.task.md` (the id is `evidence.generation.taskId`, not a name you invent). Edit only the scope you declared. The playbook's first line, `<implement task deliverables>`, is the file edit, not a command. `pre-close` and the dry-run `close` are listed and are optional for this hello.txt path. `close --write` must keep the playbook's `--lane-session`.
+The card is `docs/tasks/<task-id>.task.md` (the id is `evidence.generation.taskId`, not a name you invent). Edit only the scope you declared. The playbook's first line, `implement-deliverables`, is that file edit, not a command. `pre-close` and the dry-run `close` are listed and are optional for this hello.txt path. `close --write` must keep the playbook's `--lane-session`.
 
 ## 3. Git author versus ATM identity
 

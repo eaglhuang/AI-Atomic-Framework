@@ -68,7 +68,7 @@ Run this from the new project (`cd my-app`). It is the short path checked on 0.1
 
 **Empty queue: skip `guide`, `orient`, and `start`.** `next --prompt` on an empty project returns `guide` and `ATM_NEXT_PLAYBOOK_ABSENT`. Do not follow it.
 
-**Trust the playbook over a conflicting `nextAction.command`.** After claim, `nextAction.command` is `start`, and pasting it loops. Run the playbook's `evidence run` line and its `taskflow close --write` line. The playbook also lists `pre-close` and a dry-run `close`; this hello.txt path closes without them. The first playbook line, `<implement task deliverables>`, means edit the files. It is not a shell command.
+**Trust the playbook.** After claim, `nextAction.command` is `implement-deliverables`, the same sentinel as `playbook.commandSequence[0]`. It means edit the declared files. It is not a shell command, and it is not `start`. Run the playbook's `evidence run` line and its `taskflow close --write` line. The playbook also lists `pre-close` and a dry-run `close`; this hello.txt path closes without them.
 
 **Replace every `<...>` placeholder before pasting.** An unquoted `<id>` is a shell redirect. This block has none.
 
