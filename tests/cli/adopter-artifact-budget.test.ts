@@ -10,7 +10,7 @@ function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
 }
 
-assert(JSON.stringify(cliPackage.files) === JSON.stringify(['dist/npm-runtime']), 'CLI npm package must publish only its compact runtime.');
+assert(JSON.stringify(cliPackage.files) === JSON.stringify(['dist/npm-runtime', 'README.md']), 'CLI npm package must publish its compact runtime and the Day-1 README.');
 assert(cliPackage.atmArtifactBudget?.schemaId === 'atm.cliArtifactBudget.v1', 'CLI must seal an artifact budget.');
 assert(cliPackage.atmArtifactBudget?.budget?.maxPackedBytes === 3365772, 'CLI must enforce the original 70% byte-reduction target.');
 assert(cliPackage.atmArtifactBudget?.budget?.maxPackedEntries === 308, 'CLI must enforce the original 80% entry-reduction target.');
