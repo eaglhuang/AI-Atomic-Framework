@@ -55,9 +55,10 @@ for (const name of publicCliCommandNames) {
 for (const name of ['toString', 'constructor', 'valueOf', 'hasOwnProperty', '__proto__', 'not-an-atm-command']) {
   for (const args of [[name], [name, '--help'], ['help', name]]) {
     test(`reject non-command ${args.join(' ')}`, async () => {
-      const { exitCode, stdout, result } = await invoke(args);
+      const { exitCode, stdout, stderr, result } = await invoke(args);
       assert.notEqual(exitCode, 0);
-      assert.equal(stdout, '');
+      assert.equal(stderr, '');
+      assert.match(stdout, /^\{/);
       assert.equal(result.ok, false);
       assert.ok(result.messages.some((entry: { code: string }) => entry.code === 'ATM_CLI_UNKNOWN_COMMAND'));
       assert.ok(!result.messages.some((entry: { code: string }) => entry.code === 'ATM_CLI_UNHANDLED'));
