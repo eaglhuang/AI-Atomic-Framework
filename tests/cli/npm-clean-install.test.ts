@@ -92,6 +92,10 @@ try {
   assert.equal(resolveFirstUseArguments(`node /untrusted/atm.mjs ${suffix}`, bin), null);
   assert.equal(resolveFirstUseArguments(`${command}; echo unexpected`, bin), null);
   assert.equal(resolveFirstUseArguments(`${governanceCommandPrefix(runtime)} arbitrary --json`, bin), null);
+  assert.deepEqual(
+    resolveFirstUseArguments(`${governanceCommandPrefix(runtime)} doctor --json`, bin),
+    ['doctor', '--json']
+  );
 } finally {
   rmSync(commandFixture, { recursive: true, force: true });
 }

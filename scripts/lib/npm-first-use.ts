@@ -52,7 +52,8 @@ export function resolveFirstUseArguments(command: string, bin: string, guideGoal
     ['bootstrap --cwd . --task "Bootstrap ATM in this repository"', ['bootstrap', '--cwd', '.', '--task', 'Bootstrap ATM in this repository']],
     ['bootstrap --cwd . --force --task "Bootstrap ATM in this repository"', ['bootstrap', '--cwd', '.', '--force', '--task', 'Bootstrap ATM in this repository']],
     ['atm-chart render --cwd . --json', ['atm-chart', 'render', '--cwd', '.', '--json']],
-    ['orient --cwd . --json', ['orient', '--cwd', '.', '--json']]
+    ['orient --cwd . --json', ['orient', '--cwd', '.', '--json']],
+    ['doctor --json', ['doctor', '--json']]
   ];
   const action = actions.find(([text]) => suffix === text);
   if (action) return action[1];
