@@ -65,7 +65,7 @@ try {
   ], {
     stdout: { write(value: string) { stdout += value; } },
     stderr: { write(value: string) { stderr += value; } }
-  });
+  } as Parameters<typeof runPublicCli>[1]);
   assert.notEqual(exitCode, 0);
   assert.equal(stderr, '', stderr);
   const body = JSON.parse(stdout);
