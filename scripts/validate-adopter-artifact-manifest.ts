@@ -22,7 +22,7 @@ function fail(message: string): never {
   throw new Error(`[adopter-artifact-manifest] ${message}`);
 }
 
-const expectedPublishFiles = ['dist/npm-runtime'];
+const expectedPublishFiles = ['dist/npm-runtime', 'README.md'];
 if (JSON.stringify(packageJson.files) !== JSON.stringify(expectedPublishFiles)) {
   fail(`CLI npm manifest must publish only ${expectedPublishFiles.join(', ')}.`);
 }

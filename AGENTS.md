@@ -1,5 +1,35 @@
 # ATM Bootstrap Instructions
 
+## Day 1
+
+Use only these five commands: `welcome`, `next`, `taskflow`, `evidence`, `doctor`.
+
+**Empty queue: skip `guide`, `orient`, and `start`.** **Trust `evidence.nextAction.playbook` over a conflicting `nextAction.command`** (after claim it is often `start`; do not paste it). **Replace every `<...>` placeholder before pasting; unquoted `<id>` is a shell redirect.** **Do not dump the JSON. Write it to a file and extract fields with `jq`.**
+
+First governed write, from the project root. Checked on npm 0.1.20. Change the title, goal, scope file, and validator for the real task. `--lane-session` comes from the playbook lines below; do not invent it.
+
+```bash
+node atm.mjs taskflow open --write --actor newcomer-ai --title "Add hello.txt" --goal "Create hello.txt with one line of text." --scope-path hello.txt --validator "test -f hello.txt" --json > /tmp/atm-open.json
+TASK=$(jq -r '.evidence.generation.taskId' /tmp/atm-open.json)
+node atm.mjs next --claim --actor newcomer-ai --task "$TASK" --json > /tmp/atm-claim.json
+printf 'hello\n' > hello.txt
+EVIDENCE=$(jq -r '.evidence.nextAction.playbook.commandSequence[] | select(startswith("node atm.mjs evidence run"))' /tmp/atm-claim.json)
+CLOSE=$(jq -r '.evidence.nextAction.playbook.commandSequence[] | select(startswith("node atm.mjs taskflow close") and contains(" --write "))' /tmp/atm-claim.json)
+bash -c "$EVIDENCE" > /tmp/atm-evidence.json
+bash -c "$CLOSE" > /tmp/atm-close.json
+jq -r '.ok, .messages[0].code' /tmp/atm-close.json
+```
+
+This block is the adopter path for an empty queue. This framework repository already has task cards; do not open a `hello.txt` card here.
+
+`welcome --json` reports the product version at `evidence.versions.frameworkVersion`. Pin that npm version. Do not pin `evidence.versions.releaseTrain.frameworkVersion` (`0.0.0` on 0.1.20) or a git tag such as `v0.9.0-alpha.1`. `doctor --json` is the health check; its empty-project `evidence.recommendedAction` (`next --json`) is not this write.
+
+Git `user.name` / `user.email` are the author of commits, including the commit inside `taskflow close --write`. ATM `identity set` is a different actor profile. On 0.1.20 a missing Git author fails close with `ATM_CLI_UNHANDLED` and no `identity set` hint. Set the Git author and retry the same close line.
+
+## Day 2+
+
+Captain, dispatch, wave, batch, and team flows are not day-1 work.
+
 This repository uses the default ATM bootstrap pack.
 
 Terminology boundary: ATM is the product, framework, CLI, and governance workflow. AI-Atomic-Framework is only this repository name; do not call ATM AAF or use AAF as a shorthand for the framework.

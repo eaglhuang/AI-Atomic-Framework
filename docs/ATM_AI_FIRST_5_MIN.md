@@ -1,62 +1,67 @@
 # ATM: The First Five Minutes for an AI Agent
 
-This is the only document a new AI agent needs before doing user work in an ATM repository. Everything else (taskflow, broker, team agents, release flow) is advanced material you can skip on day one.
+This is the only document a new AI agent needs before doing user work in an ATM repository. Day 1 uses five commands: `welcome`, `next`, `taskflow`, `evidence`, `doctor`. Captain, dispatch, wave, batch, and team flows are day 2 or later.
 
 ## 1. Get a runnable ATM in the repository
 
-Pick one:
+New project (Node 20+). `create-atm` runs `git init` and the first commit, so Git `user.name` and `user.email` must already be set (`git config --global user.name` and `git config --global user.email`):
 
-| Situation | Command |
-| --- | --- |
-| New project | `npx create-atm <app> --agent <cursor\|claude-code\|codex\|copilot\|gemini\|antigravity> --json` |
-| Existing repository | Copy `release/atm-onefile/atm.mjs` to the repository root, then `node atm.mjs bootstrap --json` |
-| Existing repository with npm | `npm install --save-exact @ai-atomic-framework/cli`, then `npx atm bootstrap --json` |
+```bash
+npx --yes create-atm@latest my-app --agent cursor --json
+```
 
-`bootstrap` also renders the ATMChart (`.atm/memory/atm-chart.md`). If your editor integration is not installed yet, run `node atm.mjs integration add <editor-id> --json`.
+If that fails at `initial commit` (`ATM_CREATE_FAILED`), the files are kept. From `my-app`: `git config user.name`, `git config user.email`, `git add -A`, then `git commit -m "chore: initialize ATM project"`.
 
-Runtime adopters can use Node 20 or newer. Building or testing the ATM framework repository itself requires Node 24.
+Existing repository: keep the CLI at a stable path and run `setup`. The generated `atm.mjs` stores that absolute path.
 
-## 2. Orient once
+```bash
+npm install --prefix ~/atm-runner @ai-atomic-framework/cli@latest
+node ~/atm-runner/node_modules/@ai-atomic-framework/cli/dist/npm-runtime/atm.mjs setup --cwd /absolute/path/to/existing-repo --agents cursor --json
+```
+
+Building or testing the ATM framework repository itself requires Node 24. Runtime adopters can use Node 20 or newer.
+
+## 2. Read the version, then do the first write
 
 ```bash
 node atm.mjs welcome --json
 ```
 
-If the result contains `ATM_USER_NOTICE` or `evidence.userNotice`, tell the user in one or two sentences before continuing.
+Read `evidence.versions.frameworkVersion` and pin that npm version. On 0.1.20, `evidence.versions.releaseTrain.frameworkVersion` is `0.0.0`; do not pin to it. Git tags such as `v0.9.0-alpha.1` are paper snapshots, not the npm package. If the result contains `ATM_USER_NOTICE` or `evidence.userNotice`, tell the user in one or two sentences before continuing.
 
-## 3. Route the user request
+**Empty queue: skip `guide`, `orient`, and `start`.** `next --prompt` with no task card returns `guide` and `ATM_NEXT_PLAYBOOK_ABSENT`. Do not follow it. `welcome` and `doctor` on that project point at `npm test --if-present` or `next --json`. Those are not the first write.
 
-```bash
-node atm.mjs next --prompt "<the user's request>" --json
-```
+**Trust the playbook over a conflicting `nextAction.command`.** After claim, that command is `start`. Pasting it loops back into an unflagged dry-run. Run the playbook lines extracted below.
 
-- Use `--prompt` for any user-requested work. `node atm.mjs next --json` without a prompt is read-only orientation; in a repository that already has task cards it answers `prompt-required`, which is expected.
-- Read `evidence.nextAction.playbook` and the returned scope before editing.
-- Execute the single command ATM returns (for example a claim), then do the work inside the allowed files.
+**Replace every `<...>` placeholder before pasting.** Unquoted `<id>` is a shell redirect.
 
-### Ordinary work without a task card
-
-Bootstrap gives every project a `taskflow.profile.json`, so you can open the task card yourself. Turn the request into a title, a one-paragraph goal, the files you will change, and the command that proves the change, then:
+**Do not dump the JSON.** Redirect it and use `jq`.
 
 ```bash
-node atm.mjs taskflow open --write --actor <id> --title "<title>" --goal "<goal>" --scope-path "<file>,<file>" --validator "<command>" --json
-node atm.mjs next --claim --actor <id> --task <TASK-ID> --auto-intent --json
+node atm.mjs taskflow open --write --actor newcomer-ai --title "Add hello.txt" --goal "Create hello.txt with one line of text." --scope-path hello.txt --validator "test -f hello.txt" --json > /tmp/atm-open.json
+TASK=$(jq -r '.evidence.generation.taskId' /tmp/atm-open.json)
+node atm.mjs next --claim --actor newcomer-ai --task "$TASK" --json > /tmp/atm-claim.json
+printf 'hello\n' > hello.txt
+EVIDENCE=$(jq -r '.evidence.nextAction.playbook.commandSequence[] | select(startswith("node atm.mjs evidence run"))' /tmp/atm-claim.json)
+CLOSE=$(jq -r '.evidence.nextAction.playbook.commandSequence[] | select(startswith("node atm.mjs taskflow close") and contains(" --write "))' /tmp/atm-claim.json)
+bash -c "$EVIDENCE" > /tmp/atm-evidence.json
+bash -c "$CLOSE" > /tmp/atm-close.json
+jq -r '.ok, .messages[0].code' /tmp/atm-close.json
 ```
 
-The card is written to `docs/tasks/<TASK-ID>.task.md` and is your delivery contract: edit only its `scopePaths`, and open another card instead of widening the scope. Planning repositories are only for developing ATM itself.
+The card is `docs/tasks/<task-id>.task.md` (the id is `evidence.generation.taskId`, not a name you invent). Edit only the scope you declared. The playbook's first line, `<implement task deliverables>`, is the file edit, not a command. `pre-close` and the dry-run `close` are listed and are optional for this hello.txt path. `close --write` must keep the playbook's `--lane-session`.
 
-The claim response's playbook lists every later command with `--lane-session <id>` already appended. Keep that flag: each shell starts without the claim's lane, and mutations without it are refused.
+## 3. Git author versus ATM identity
 
-## 4. Leave evidence and finish
+`taskflow close --write` commits the deliverables and the governance bundle as one git commit. That commit needs Git's `user.name` and `user.email`.
 
-- Run the validators the playbook names and record them with `node atm.mjs evidence run ... --json`.
-- For the normal task-card lane, `taskflow close --write` commits the deliverables and governance bundle as part of the governed close. Do not add a separate delivery commit before or after it. If identity is missing, follow its `identity set` recovery command.
-- Follow the playbook through `taskflow pre-close`, `taskflow close` dry-run, and the ready `--write` command. Explicit stage-only or interrupted-close results must follow their returned recovery commands; WIP, fast, and batch lanes retain their own playbooks. Do not edit `.atm/` files by hand.
-- If the user drops the request, run `node atm.mjs taskflow abandon --task <TASK-ID> --actor <id> --reason "<why>" --write --json` (with the playbook's `--lane-session`). It marks the card and ledger abandoned and commits all of the task's records; do not leave a backend `tasks abandon` uncommitted.
-- Report the changed files and the evidence path to the user.
+On 0.1.20, a missing Git author fails with `ATM_CLI_UNHANDLED` and the raw `git commit` error. The JSON does not include an `identity set` recovery command. Do not wait for one.
 
-## Which version to pin
+Git author identity and ATM actor identity are different. `node atm.mjs identity set` records an ATM actor profile. It is not the repair for this failure. Set the Git author in the project and retry the same playbook close line:
 
-- npm packages (`@ai-atomic-framework/cli`, `create-atm`) carry the product version; pin those.
-- `welcome --json` reports the same `frameworkVersion` for the runner you are using.
-- Git tags such as `v0.9.0-alpha.1` mark paper and research snapshots, not the installable product version.
+```bash
+git config user.name "Your Name"
+git config user.email "you@example.com"
+```
+
+`doctor --json` is the day-1 health check. Do not edit `.atm/` files by hand. Report the changed files and `.atm/history/evidence/<task-id>.bundle-manifest.json`. A successful close can still leave `.atm/runtime/welcome.lineage.json` untracked after `welcome`.
