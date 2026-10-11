@@ -6,6 +6,8 @@ import { carryLaneSessionIntoPrintedCommands } from './lane-session-flag.ts';
 import { compactPrintedGovernanceJson, printedGovernanceJsonIsCompact } from './governance-json-compact.ts';
 import { CliError, type CommandMessage, type CommandResult, type EnrichedCommandResult, enrichCommandResult, getOutputProjectionState, makeResult, message, setFieldsProjection, setOutputJsonPath, setSummaryProjection } from './result-core.ts';
 
+const LITERAL_PLACEHOLDER_FLAGS = new Set(['--actor', '--validator', '--scope-path', '--task', '--task-id', '--command', '--id']);
+
 export interface CommandOption {
   readonly flag: string;
   readonly value?: boolean;
@@ -203,6 +205,12 @@ export function parseArgsForCommand(
               allowedFlags,
               suggestedCommand: null
             }
+          });
+        }
+        if (LITERAL_PLACEHOLDER_FLAGS.has(optionSpec.flag) && /<[^>\r\n]+>/.test(value)) {
+          throw new CliError('ATM_CLI_PLACEHOLDER_VALUE', `${optionSpec.flag} is the literal placeholder ${JSON.stringify(value)}. Replace it with a real value; angle-bracket samples are not accepted.`, {
+            exitCode: 2,
+            details: { flag: optionSpec.flag, value }
           });
         }
         if (optionSpec.repeatable) {

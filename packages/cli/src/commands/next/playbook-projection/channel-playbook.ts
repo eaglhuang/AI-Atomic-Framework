@@ -96,8 +96,8 @@ export function buildChannelPlaybook(input: {
       ],
       commandSequence: [
         ...(input.fastClaimActive ? [] : [defaultClaimCommand]),
-        '<edit allowed files>',
-        '<run focused validator>',
+        'implement-deliverables',
+        'run the focused validator for the touched files',
         commitCommand
       ],
       commitTiming: 'Commit after the focused validator passes. The ATM wrapper auto-stages only the quickfix-allowed files and governed provenance; bare `git commit` is for read-only inspection or non-governed maintenance only.',
@@ -122,8 +122,8 @@ export function buildChannelPlaybook(input: {
     const commandSequence = isRepairState
       ? [
         batchRepairCommand,
-        batchClaimCommand,
-        '<implement queue-head deliverables>',
+        ...(input.claimActive ? [] : [batchClaimCommand]),
+        'implement-deliverables',
         'node atm.mjs evidence add --task <queue-head-task-id> --actor <id> --kind test --freshness fresh --summary "<what passed>" --artifacts <real-files> --validators <validator-name> --command "<command>" --exit-code 0 --stdout-sha256 sha256:<hash> --stderr-sha256 sha256:<hash> --json',
         'git add <deliverables> .atm/history/evidence/<queue-head-task-id>.bundle-manifest.json',
         `node atm.mjs batch checkpoint --actor ${actor} --json`,
@@ -131,8 +131,8 @@ export function buildChannelPlaybook(input: {
         `node atm.mjs git commit --actor ${actor} --task <queue-head-task-id> --message "<scope>: complete <queue-head-task-id>" --json`
       ]
       : [
-        batchClaimCommand,
-        '<implement queue-head deliverables>',
+        ...(input.claimActive ? [] : [batchClaimCommand]),
+        'implement-deliverables',
         'node atm.mjs evidence add --task <queue-head-task-id> --actor <id> --kind test --freshness fresh --summary "<what passed>" --artifacts <real-files> --validators <validator-name> --command "<command>" --exit-code 0 --stdout-sha256 sha256:<hash> --stderr-sha256 sha256:<hash> --json',
         'git add <deliverables> .atm/history/evidence/<queue-head-task-id>.bundle-manifest.json',
         `node atm.mjs batch checkpoint --actor ${actor} --json`,
@@ -216,8 +216,8 @@ export function buildChannelPlaybook(input: {
     ],
     commandSequence: [
       ...(input.claimActive ? [] : [defaultClaimCommand]),
-      '<implement task deliverables>',
-      ...(input.validators?.length ? input.validators : ['<validator>']).map((validator) => `node atm.mjs evidence run --task ${taskId} --actor ${actor}${lane} --command ${quoteCliValue(validator)} --validators ${quoteCliValue(validator)} --json`),
+      'implement-deliverables',
+      ...(input.validators ?? []).filter((validator) => validator.trim() && !/<[^>\r\n]+>/.test(validator)).map((validator) => `node atm.mjs evidence run --task ${taskId} --actor ${actor}${lane} --command ${quoteCliValue(validator)} --validators ${quoteCliValue(validator)} --json`),
       closeOps.preClose,
       closeOps.dryRun,
       closeOps.write

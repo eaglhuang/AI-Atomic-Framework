@@ -6,7 +6,7 @@ import { inspectRuntimeAdapterReadiness } from '../../runtime-adapter-readiness.
 import { allowedGuidanceBootstrapCommands, blockedMutationCommands } from '../channel-strategy.ts';
 import { parseMarkdownFrontmatter, normalizeTaskRouteStatus, normalizeOptionalTaskPath, normalizeSearchText, readStringArray } from '../intent-normalizers.ts';
 import { type ImportedTaskQueue, type ImportedTaskSummary } from '../route-predicates.ts';
-import { quoteCliValue, toTaskCandidateView, uniqueSorted } from '../view-projections.ts';
+import { quoteCliToken, quoteCliValue, toTaskCandidateView, uniqueSorted } from '../view-projections.ts';
 import { extractPathLikeStringsFromPrompt, isPathAllowedByScope } from '../../work-channels.ts';
 import { makeResult, message, parseJsonText } from '../../shared.ts';
 import { allowsPlanningMirror } from '../match-and-sort.ts';
@@ -158,16 +158,19 @@ export function buildActiveTaskDivergenceResult(input: {
   // end either: offer the same claimable routes as an unscoped prompt, plus
   // resuming the active task.
   const suggestedRoutes = [
-    ...buildPromptSuggestedRoutes(input.taskIntent?.userPrompt?.trim() || '<current user prompt>'),
+    ...buildPromptSuggestedRoutes(input.taskIntent?.userPrompt?.trim() || 'the current request'),
     {
       when: `the request is really part of ${activeTaskId}: resume it as its owner`,
       channel: 'resume',
-      command: `node atm.mjs next --claim --actor ${divergence.activeTask.activeClaimActorId ?? '<id>'} --task ${activeTaskId} --json`
+      command: divergence.activeTask.activeClaimActorId
+        ? `node atm.mjs next --claim --actor ${quoteCliToken(divergence.activeTask.activeClaimActorId)} --task ${activeTaskId} --json`
+        : `node atm.mjs next --claim --task ${activeTaskId} --json`
     }
   ];
+  const openRoute = suggestedRoutes.find((route) => route.channel === 'task-card') ?? suggestedRoutes[0];
   const nextAction = {
     status: 'active-task-divergence-blocked',
-    command: suggestedRoutes[1].command,
+    command: openRoute.command,
     reason: `the prompt appears to diverge from active task ${activeTaskId}; ATM will not attach new work to the active task silently. Claim the new work separately with suggestedRoutes, or resume ${activeTaskId}`,
     suggestedRoutes,
     activeTask: toTaskCandidateView(divergence.activeTask),

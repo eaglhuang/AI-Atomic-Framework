@@ -13,10 +13,11 @@ try {
   const nextAction = (guidance.evidence as Record<string, any>).nextAction;
   assert.equal(nextAction.status, 'prompt-guidance-required');
   assert.ok(Array.isArray(nextAction.suggestedRoutes) && nextAction.suggestedRoutes.length >= 2, 'a first free-text request lists suggested routes');
-  const fast = nextAction.suggestedRoutes[0];
-  assert.equal(fast.channel, 'fast');
-  assert.match(fast.command, /next --claim --actor <id> --prompt "quick fix: add a tiny hello script and leave evidence in <path>" --json$/);
-  assert.equal(nextAction.suggestedRoutes[1].command, nextAction.command, 'the second route is the existing guide command');
+  assert.match(nextAction.command, /taskflow open /);
+  assert.doesNotMatch(nextAction.command, /--write/);
+  assert.doesNotMatch(JSON.stringify(nextAction.suggestedRoutes), /<[^>]+>/);
+  assert.equal(nextAction.suggestedRoutes.some((route: { channel: string | null }) => route.channel === 'fast'), false, 'a prompt with no files does not offer a placeholder quick-fix claim');
+  assert.equal(nextAction.suggestedRoutes.find((route: { channel: string | null }) => route.channel === 'task-card').command, nextAction.command);
 
   // Filling in the path yields a prompt that ATM routes straight to the fast quickfix channel.
   const filled = `quick fix: ${prompt} in scripts/hello.mjs`;

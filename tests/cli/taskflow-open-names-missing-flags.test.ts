@@ -30,7 +30,7 @@ try {
 
   const noActor = usage(atm(project, [...open, '--scope-path', 'src/a.js', '--validator', 'node --check src/a.js']));
   assert.deepEqual(noActor?.data?.missingFlags, ['--actor']);
-  assert.match(noActor!.text, /missing --actor <id>\./);
+  assert.match(noActor!.text, /missing --actor\./);
 
   const noValidator = usage(atm(project, [...open, '--actor', 'ai-a', '--scope-path', 'src/a.js']));
   assert.deepEqual(noValidator?.data?.missingFlags, ['--validator']);

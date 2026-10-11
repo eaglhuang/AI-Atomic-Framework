@@ -27,7 +27,7 @@ Pin `evidence.versions.frameworkVersion` from `node atm.mjs welcome --json`. On 
 
 Day-1 commands: `welcome`, `next`, `taskflow`, `evidence`, `doctor`. From the project root:
 
-**Empty queue: skip `guide`, `orient`, and `start`.** **Trust the playbook over a conflicting `nextAction.command`** (after claim it is `start`). **Replace every `<...>` placeholder; this block has none.** **Do not dump the JSON; use `jq`.**
+**Empty queue: skip `guide`, `orient`, and `start`.** **After claim, `nextAction.command` is `implement-deliverables`**, the same sentinel as `playbook.commandSequence[0]`. It is the file edit, not a shell command. **Replace every `<...>` placeholder; this block has none.** **Do not dump the JSON; use `jq`.**
 
 ```bash
 node atm.mjs taskflow open --write --actor newcomer-ai --title "Add hello.txt" --goal "Create hello.txt with one line of text." --scope-path hello.txt --validator "test -f hello.txt" --json > /tmp/atm-open.json

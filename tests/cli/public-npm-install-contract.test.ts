@@ -234,8 +234,11 @@ try {
   const quickfixAction = (quickfixRoute.evidence as any).nextAction;
   assert.equal(quickfixAction.status, 'quickfix-ready');
   assert.match(quickfixAction.command, /^npm exec -- atm next --claim /);
+  assert.doesNotMatch(quickfixAction.command, /<[^>\r\n]+>/);
   assert.ok(quickfixAction.allowedCommands.every((command: string) => command.startsWith('npm exec -- atm ')));
-  const quickfixCommand = quickfixAction.command.replace('<id>', 'public-npm-contract');
+  const quickfixCommand = quickfixAction.command.includes('--actor')
+    ? quickfixAction.command
+    : quickfixAction.command.replace('next --claim', 'next --claim --actor public-npm-contract');
   const quickfixCommandResult = runGeneratedNpmCommand(quickfixCommand);
   assert.ok(quickfixCommandResult.status === 0 || quickfixCommandResult.status === 1, `generated quickfix command did not invoke ATM: ${quickfixCommandResult.stdout}${quickfixCommandResult.stderr}`);
   assert.ok(!/ERR_MODULE_NOT_FOUND|Cannot find module/.test(`${quickfixCommandResult.stdout}${quickfixCommandResult.stderr}`));

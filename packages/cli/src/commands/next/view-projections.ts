@@ -76,3 +76,8 @@ export function dedupeStrings(values: readonly string[]) {
 export function quoteCliValue(value: string): string {
   return `"${value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
 }
+
+/** Leave shell-safe tokens bare so a pasted command does not gain extra quotes. */
+export function quoteCliToken(value: string): string {
+  return /^[A-Za-z0-9_./:@+-]+$/.test(value) ? value : quoteCliValue(value);
+}
