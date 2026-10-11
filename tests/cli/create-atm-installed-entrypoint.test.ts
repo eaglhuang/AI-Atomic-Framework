@@ -139,6 +139,33 @@ test('successful starter creates exactly one target-local initial commit', () =>
   } finally { rmSync(f.root, { recursive: true, force: true }); }
 });
 
+test('missing Git author keeps generated files and returns requiredFollowUp', () => {
+  const f = fixture();
+  try {
+    const child = spawnSync(process.execPath, [f.starter, 'project', '--cwd', f.root, '--json'], {
+      encoding: 'utf8',
+      env: {
+        ...process.env,
+        npm_execpath: path.join(f.root, 'npm-cli.js'),
+        GIT_CONFIG_GLOBAL: '/dev/null',
+        GIT_CONFIG_SYSTEM: '/dev/null',
+        GIT_AUTHOR_NAME: '',
+        GIT_AUTHOR_EMAIL: '',
+        GIT_COMMITTER_NAME: '',
+        GIT_COMMITTER_EMAIL: ''
+      }
+    });
+    assert.notEqual(child.status, 0, child.stdout);
+    const result = JSON.parse(child.stdout || child.stderr);
+    assert.equal(result.ok, false);
+    assert.equal(result.messages[0].level, 'warning');
+    assert.equal(result.messages[0].code, 'ATM_CREATE_GIT_AUTHOR_MISSING');
+    assert.match(result.evidence.nextAction.command, /git config user\.name "Your Name"/);
+    assert.ok(result.evidence.requiredFollowUp.includes('git add -A'));
+    assert.equal(existsSync(path.join(f.root, 'project', 'package.json')), true);
+  } finally { rmSync(f.root, { recursive: true, force: true }); }
+});
+
 test('explicit latest opts into the floating channel', () => {
   const f = fixture();
   try {

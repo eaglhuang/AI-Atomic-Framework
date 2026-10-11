@@ -193,7 +193,7 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
           commands: Object.keys(cliCommandRunners)
         }
       }));
-      writeResult(result, io.stderr, outputFormat);
+      writeResult(result, outputFormat === 'json' ? io.stdout : io.stderr, outputFormat);
       return result.exitCode;
     }
     const result = enrichCommandResult(makeHelpResult(spec, process.cwd()));
@@ -214,7 +214,7 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
       }
     }));
     recordCommandGateTelemetry(process.cwd(), commandName, commandStartedAt, result, commandArgs);
-    writeResult(result, io.stderr, outputFormat);
+    writeResult(result, outputFormat === 'json' ? io.stdout : io.stderr, outputFormat);
     return result.exitCode;
   }
 
@@ -228,7 +228,7 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
         messages: [message('error', 'ATM_CLI_HELP_NOT_FOUND', `No help spec found for ${commandName}.`)],
         evidence: {}
       }));
-      writeResult(result, io.stderr, outputFormat);
+      writeResult(result, outputFormat === 'json' ? io.stdout : io.stderr, outputFormat);
       return result.exitCode;
     }
     // ATM-GOV-0364: `atm tasks import --help` asks about `import`, not about
@@ -251,7 +251,7 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
         evidence: { trustIntegrity }
       }));
       recordCommandGateTelemetry(process.cwd(), commandName, commandStartedAt, result, commandArgs);
-      writeResult(result, io.stderr, outputFormat);
+      writeResult(result, outputFormat === 'json' ? io.stdout : io.stderr, outputFormat);
       return result.exitCode;
     }
   }
@@ -272,7 +272,7 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
       evidence: { knownBadStatus }
     }));
     recordCommandGateTelemetry(process.cwd(), commandName, commandStartedAt, result, commandArgs);
-    writeResult(result, io.stderr, outputFormat);
+    writeResult(result, outputFormat === 'json' ? io.stdout : io.stderr, outputFormat);
     return result.exitCode;
   }
 
@@ -280,7 +280,7 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
     const rawResult = await runner(commandArgs);
     const result = enrichCommandResult(rawResult as CommandResult);
     recordCommandGateTelemetry(process.cwd(), commandName, commandStartedAt, result, commandArgs);
-    writeResult(result, result.ok ? io.stdout : io.stderr, outputFormat);
+    writeResult(result, outputFormat === 'json' || result.ok ? io.stdout : io.stderr, outputFormat);
     return result.exitCode;
   } catch (error) {
     const cliError = error instanceof CliError
@@ -296,7 +296,7 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
       evidence: {}
     }), { cliErrorExitCode: cliError.exitCode });
     recordCommandGateTelemetry(process.cwd(), commandName, commandStartedAt, result, commandArgs);
-    writeResult(result, io.stderr, outputFormat);
+    writeResult(result, outputFormat === 'json' ? io.stdout : io.stderr, outputFormat);
     return result.exitCode;
   }
 }
