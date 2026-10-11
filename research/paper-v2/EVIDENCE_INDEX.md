@@ -362,6 +362,20 @@ DRAFT HIST-v2 prereg（非 generation、尚未凍結、沒有 run）：[`working
 
 沒有 `SHA256SUMS`，因為這份修訂還不是凍結世代。冒煙、pilot、主跑、留出集都還沒有使用者同意，也沒有 run。
 
+## 23. HIST-v2 設計稿修訂 r3（2026-10-11；DRAFT，非 generation，沒有任何 run）
+
+> **DRAFT，不是封存，不主張任何結論、不宣稱勝出。** 不修改 §22 的 r2，也不凍結預先登記。外部審閱 r2 之後的契約修正在這裡。
+
+| 項目 | 值 |
+|---|---|
+| 路徑 | [`benchmark-design/2026-10-11-hist-bench-v2-r3/`](./benchmark-design/2026-10-11-hist-bench-v2-r3/README.md) |
+| 上一稿 | [`benchmark-design/2026-10-10-hist-bench-v2-r2/`](./benchmark-design/2026-10-10-hist-bench-v2-r2/README.md)（不改） |
+| 分類器 v3 | PR #274，規則雜湊 `72437b355071436d786d22f3d5394b31e68ee24f9d7289d70697b7d2e5ff1982`。v1、v2 的規則雜湊不改 |
+| 要點 | 功能交付率與對 R(S) 的語意保留分開，合法拒絕、沒有測試、零分母各一列。零事件用分量上的單側 Clopper–Pearson，bootstrap 在全 0 時退化，該上界不是 proposal 失敗率。答案鍵列出全部合法子集。occ 與 git 三方收成 `textual_merge_file`，主格每題 60。逾時時該題所有寫入者停止 |
+| 已決定 | [`DECISIONS.md`](./benchmark-design/2026-10-11-hist-bench-v2-r3/DECISIONS.md)：R2-D1～R2-D4 原樣帶入；R3-D1 一條文字合併臂；R3-D2 兩個終點分開；R3-D3 分量上界；R3-D4 全部合法子集；R3-D5 逾時停止與跨專案等權。仍是 DRAFT，不凍結 v2.0 |
+
+沒有 `SHA256SUMS`。沒有分類 run，也沒有臂的 run。
+
 
 ## 6. 不在 repo 的參照
 - ATM pin 原始碼：GitHub `eaglhuang/AI-Atomic-Framework` commit `5692474f7db70ab52a7a71c8af4867609e7e4b43`（r3 另加 `bea35380d7f381f998c9930fa95f01b999c7f208`，box tarball `/workspace/atm-main-bea35380/atm-main.tar.gz` sha256 `9346e5b175b176618f435aeb4b41ab93ef7575f9bf77d77c47a5aeac87ad34b5`；r4 另加 `2118bc66efb3ac3bc0ddaede6a2f7cb18526b030`，box tarball `/workspace/atm-main-2118bc66/atm-main.tar.gz` sha256 `aa959607c35c51b7fc3c4e3d81b3d9e979ee62f4d9361ef9e9f5ee72e78abd88`；r5 另加 `37847584e24afc08ea58cfe380bb5b1220fbe335`，box tarball `/workspace/atm-main-37847584/atm-main.tar.gz` sha256 `e17a90ddceaf3c70d580c96e31f14cf8251d5a664985c1eb494f0d8db8045e3d`；r6 另加 `b35a6141bd5bfbaec654f1cd3079323581b04074`，box tarball `/workspace/atm-main-b35a6141/atm-main.tar.gz` sha256 `93fa7839d8e0fee51e5ad224833df2b57397fead3e77e0528117f21f5d5e59ef`）；box tarball `/workspace/atm-main-5692474f/atm-main.tar.gz` sha256 `1d498a397e6a5db119d40b8f539dc165cb0028fbfe9577f953023f8ec8d45795`。
