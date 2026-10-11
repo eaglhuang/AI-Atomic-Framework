@@ -37,7 +37,7 @@ try {
   ], { cwd: root, encoding: 'utf8' });
 
   assert.equal(result.status, 1, `source-first close must fail closed: ${result.stderr}`);
-  const payload = JSON.parse(result.stderr) as { diagnostics?: { errorCodes?: string[] } };
+  const payload = JSON.parse(result.stdout || result.stderr) as { diagnostics?: { errorCodes?: string[] } };
   assert.deepEqual(payload.diagnostics?.errorCodes, ['ATM_SOURCE_FIRST_WRITE_REFUSED']);
   assert.equal(readFileSync(taskPath, 'utf8'), beforeTask, 'source-first close must leave the task ledger byte-identical');
   assert.equal(existsSync(path.join(repo, '.atm', 'history', 'task-events', taskId)), false, 'source-first close must not create a transition event');
