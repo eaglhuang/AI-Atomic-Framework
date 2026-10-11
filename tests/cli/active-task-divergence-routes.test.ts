@@ -50,7 +50,10 @@ try {
     assert.match(resume.command, new RegExp(`--actor ai-a --task ${taskId}`));
   }
   const fast = nextAction.suggestedRoutes[0].command;
-  const claimed = atm(project, argvOf(fast.replace('<id>', 'ai-b')));
+  assert.doesNotMatch(fast, /<[^>]+>/);
+  const fastArgs = argvOf(fast);
+  if (!fastArgs.includes('--actor')) fastArgs.splice(fastArgs.indexOf('--claim') + 1, 0, '--actor', 'ai-b');
+  const claimed = atm(project, fastArgs);
   assert.deepEqual(claimed.evidence?.quickfixLock?.allowedFiles, ['README.md'], `the new work can be claimed while ${taskId} stays active: ${JSON.stringify(claimed.messages)}`);
 } finally {
   rmSync(root, { recursive: true, force: true });

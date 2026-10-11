@@ -31,7 +31,7 @@ try {
   const notFound = typo.json.messages.find((entry: { code: string }) => entry.code === 'ATM_NEXT_CLAIM_TASK_NOT_FOUND');
   assert.ok(notFound, JSON.stringify(typo.json.messages));
   assert.deepEqual(notFound.data.knownTaskIds, ['TASK-SHOP-0001']);
-  assert.equal(notFound.data.requiredCommand, 'node atm.mjs next --claim --actor <id> --task TASK-SHOP-0001 --auto-intent --json');
+  assert.equal(notFound.data.requiredCommand, 'node atm.mjs next --claim --actor ai --task TASK-SHOP-0001 --auto-intent --json');
 
   const flag = await atm(cwd, ['tasks', 'close', '--task', 'TASK-SHOP-0001', '--actor', 'ai', '--write']);
   const usage = flag.json.messages.find((entry: { code: string }) => entry.code === 'ATM_CLI_USAGE');

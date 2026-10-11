@@ -107,6 +107,7 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
   if (!importedTaskQueue.claimableTask) {
     return buildNoClaimableTaskResult({
       cwd: input.cwd,
+      actorId: input.actor,
       claimIntent,
       importedTaskQueue,
       taskIntent: input.taskIntent
@@ -479,23 +480,24 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
       ttlSeconds: 1800
     });
   }
+  const claimPlaybook = buildChannelPlaybook({
+    channel: recommendedChannel === 'batch' ? 'batch' : 'normal',
+    taskId: claimableTask.workItemId,
+    queueHeadTaskId: batchRun?.currentTaskId ?? claimableTask.workItemId,
+    originalPrompt: batchRun?.sourcePrompt ?? input.taskIntent?.userPrompt ?? claimableTask.workItemId,
+    actorPlaceholder: resolvedActor.actorId,
+    claimActive: true,
+    laneSessionId: laneSession?.laneSessionId ?? null,
+    validators: readTaskValidators(taskPathFor(input.cwd, claimableTask.workItemId))
+  });
   const nextActionBase: NextActionLike = {
     status: 'ready',
-    command: `node atm.mjs start --cwd . --goal ${quoteCliValue(claimableTask.title)} --json`,
+    command: claimPlaybook.commandSequence[0] ?? 'implement-deliverables',
     reason: `claimed imported work item ${claimableTask.workItemId} for ${resolvedActor.actorId}`,
     recommendedChannel,
     claimIntent: resolvedClaimIntent,
     riskLevel: recommendedChannel === 'batch' ? 'high' : 'medium',
-    playbook: buildChannelPlaybook({
-      channel: recommendedChannel === 'batch' ? 'batch' : 'normal',
-      taskId: claimableTask.workItemId,
-      queueHeadTaskId: batchRun?.currentTaskId ?? claimableTask.workItemId,
-      originalPrompt: batchRun?.sourcePrompt ?? input.taskIntent?.userPrompt ?? claimableTask.workItemId,
-      actorPlaceholder: resolvedActor.actorId,
-      claimActive: true,
-      laneSessionId: laneSession?.laneSessionId ?? null,
-      validators: readTaskValidators(taskPathFor(input.cwd, claimableTask.workItemId))
-    }),
+    playbook: claimPlaybook,
     deliveryPrinciple: buildTaskDeliveryPrinciple({
       channel: recommendedChannel === 'batch' ? 'batch' : 'normal',
       taskId: claimableTask.workItemId

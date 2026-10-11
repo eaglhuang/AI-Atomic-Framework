@@ -10,7 +10,7 @@ import { isQuickfixPrompt } from '../work-channels.ts';
 import { type ImportedTaskQueue, isFrameworkMaintenancePrompt } from './route-predicates.ts';
 import { buildAgentPackHint, buildChannelPlaybook, buildGovernanceReadinessHint, buildNextMessages } from './playbook-projection.ts';
 
-import { quoteCliValue, toTaskCandidateView } from './view-projections.ts';
+import { quoteCliToken, quoteCliValue, toTaskCandidateView } from './view-projections.ts';
 import type { NextActionLike } from './next-action-assembly.ts';
 
 export function buildPromptGuidanceNextResult(input: {
@@ -29,7 +29,7 @@ export function buildPromptGuidanceNextResult(input: {
   if (isQuickfixPrompt(prompt) && quickfixScope.length > 0) {
     const nextAction: NextActionLike = {
       status: 'quickfix-ready',
-      command: `${commandPrefix} next --claim --actor <id> --prompt ${quoteCliValue(prompt)} --json`,
+      command: `${commandPrefix} next --claim${input.actor && !/<[^>\r\n]+>/.test(input.actor) ? ` --actor ${quoteCliToken(input.actor)}` : ''} --prompt ${quoteCliValue(prompt)} --json`,
       reason: 'the prompt looks like a small targeted fix with path-like scope, so ATM can use the fast quickfix channel',
       recommendedChannel: 'fast',
       riskLevel: 'low',
@@ -185,12 +185,12 @@ function buildGeneralPromptGuidanceResult(
   prompt: string
 ) {
   const commandPrefix = input.commandPrefix ?? 'node atm.mjs';
-  const guideCommand = `${commandPrefix} guide --goal ${quoteCliValue(prompt)} --cwd . --json`;
-  const suggestedRoutes = buildPromptSuggestedRoutes(prompt, commandPrefix);
+  const suggestedRoutes = buildPromptSuggestedRoutes(prompt, commandPrefix, input.actor);
+  const openRoute = suggestedRoutes.find((route) => route.channel === 'task-card') ?? suggestedRoutes[suggestedRoutes.length - 1];
   const nextAction: NextActionLike = {
     status: 'prompt-guidance-required',
-    command: guideCommand,
-    reason: 'the user supplied a prompt that is not task-scoped, so ATM routes guidance from that prompt instead of reusing stale global guidance; for a small change with known files, suggestedRoutes[0] claims the fast quickfix channel directly; for larger work, suggestedRoutes[2] opens a task card to claim',
+    command: openRoute.command,
+    reason: 'the user supplied a prompt that is not task-scoped, so the next action is taskflow open with the flags ATM can already fill; add any flags named by the task-card route before writing',
     suggestedRoutes,
     recommendedChannel: null,
     riskLevel: 'medium',
@@ -213,7 +213,7 @@ function buildGeneralPromptGuidanceResult(
       userNotice,
       input.integrationBootstrap,
       input.runtimeAdapterReadiness,
-      message('info', 'ATM_NEXT_PROMPT_GUIDANCE_REQUIRED', 'ATM routed next-action guidance from the current prompt instead of stale global state. For a small change with known files, use suggestedRoutes[0] to claim the fast quickfix channel; for larger work, suggestedRoutes[2] opens a task card.', {
+      message('info', 'ATM_NEXT_PROMPT_GUIDANCE_REQUIRED', 'ATM routed next-action guidance from the current prompt instead of stale global state. The next action opens a task card; a fast claim is listed only when the prompt already names files.', {
         command: nextAction.command,
         suggestedRoutes
       })

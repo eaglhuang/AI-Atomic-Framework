@@ -18,6 +18,7 @@ import { readConfiguredPlanningRoots, shouldReportPlanningRootMissing } from '..
 import { resolveCandidatePlanningRoots } from '../planning-root-preference.ts';
 import { bootstrapTaskId } from '../../governance-runtime.ts';
 import { CliError, parseJsonText, quoteCliValue } from '../../shared.ts';
+import { quoteCliToken } from '../view-projections.ts';
 import {
   abandonTaskQueue,
   buildAllowedFilesForTask,
@@ -265,35 +266,49 @@ export function extractPromptFileTokens(prompt: string): readonly string[] {
  * claimable shortcut (the fast quickfix channel, which needs a path-like
  * scope) next to guidance, so an agent is not sent through
  * guide -> orient -> start before it can claim anything. Files the prompt
- * already names are used as that scope instead of a <path> placeholder.
+ * already names are filled into the fast claim. An empty queue's primary
+ * command is taskflow open, with only the flags ATM can already fill.
  */
-export function buildPromptSuggestedRoutes(prompt: string, commandPrefix = 'node atm.mjs') {
+export function buildPromptSuggestedRoutes(prompt: string, commandPrefix = 'node atm.mjs', actorId?: string | null) {
   const files = extractPromptFileTokens(prompt);
-  return [
-    files.length > 0
-      ? {
-        when: `small change limited to ${files.join(', ')}`,
-        channel: 'fast',
-        command: `${commandPrefix} next --claim --actor <id> --prompt ${quoteCliValue(`quick fix: ${prompt}`)} --json`
-      }
-      : {
-        when: 'small change where you can name the files to edit (replace <path>)',
-        channel: 'fast',
-        command: `${commandPrefix} next --claim --actor <id> --prompt ${quoteCliValue(`quick fix: ${prompt} in <path>`)} --json`
-      },
-    {
-      when: 'unclear what the work involves',
-      channel: null,
-      command: `${commandPrefix} guide --goal ${quoteCliValue(prompt)} --cwd . --json`
-    },
-    // Guidance alone loops back to next for larger work; the exit is a task
-    // card of your own, then next --claim --task <TASK-ID>.
-    {
-      when: 'larger work: open a task card that names the files and the validator command, then claim it with next --claim --task <TASK-ID>',
-      channel: 'task-card',
-      command: `${commandPrefix} taskflow open --write --actor <id> --title ${quoteCliValue(prompt.length > 72 ? `${prompt.slice(0, 69)}...` : prompt)} --goal ${quoteCliValue(prompt)} --scope-path ${quoteCliValue(files.length > 0 ? files.join(',') : '<files>')} --validator "<command>" --json`
-    }
-  ];
+  const actor = actorId?.trim() && !/<[^>\r\n]+>/.test(actorId) ? actorId.trim() : '';
+  const actorFlag = actor ? ` --actor ${quoteCliToken(actor)}` : '';
+  const title = prompt.length > 72 ? `${prompt.slice(0, 69)}...` : prompt;
+  const missingOpenFlags = [
+    actor ? null : '--actor',
+    files.length > 0 ? null : '--scope-path',
+    files.length === 1 ? null : '--validator'
+  ].filter((flag): flag is string => Boolean(flag));
+  const openCommand = [
+    `${commandPrefix} taskflow open --write${actorFlag}`,
+    `--title ${quoteCliValue(title)}`,
+    `--goal ${quoteCliValue(prompt)}`,
+    files.length > 0 ? `--scope-path ${quoteCliValue(files.join(','))}` : '',
+    files.length === 1 ? `--validator ${quoteCliValue(`test -f ${files[0]}`)}` : '',
+    '--json'
+  ].filter(Boolean).join(' ');
+  const routes: Array<{ when: string; channel: string | null; command: string }> = [];
+  if (files.length > 0) {
+    const quickPrompt = /^\s*quick fix:/i.test(prompt) ? prompt : `quick fix: ${prompt}`;
+    routes.push({
+      when: `small change limited to ${files.join(', ')}`,
+      channel: 'fast',
+      command: `${commandPrefix} next --claim${actorFlag} --prompt ${quoteCliValue(quickPrompt)} --json`
+    });
+  }
+  routes.push({
+    when: 'unclear what the work involves',
+    channel: null,
+    command: `${commandPrefix} guide --goal ${quoteCliValue(prompt)} --cwd . --json`
+  });
+  routes.push({
+    when: missingOpenFlags.length > 0
+      ? `open a task card; still add ${missingOpenFlags.join(', ')}`
+      : 'open a task card for this request, then claim it',
+    channel: 'task-card',
+    command: openCommand
+  });
+  return routes;
 }
 
 /**
@@ -303,9 +318,10 @@ export function buildPromptSuggestedRoutes(prompt: string, commandPrefix = 'node
  */
 export function buildTaskScopeNotFoundRoute(prompt: string | null | undefined, planningRootMissing: { readonly detail: string; readonly requiredCommand: string } | null) {
   if (planningRootMissing) return { command: planningRootMissing.requiredCommand, reason: planningRootMissing.detail };
-  const suggestedRoutes = buildPromptSuggestedRoutes(prompt?.trim() || '<current user prompt>');
+  const suggestedRoutes = buildPromptSuggestedRoutes(prompt?.trim() || 'the current request');
+  const openRoute = suggestedRoutes.find((route) => route.channel === 'task-card') ?? suggestedRoutes[0];
   return {
-    command: suggestedRoutes[1].command,
+    command: openRoute.command,
     reason: 'the prompt mentions task scope, but no matching ATM task card or ledger task was found; if this is ordinary work rather than an ATM task card, use suggestedRoutes',
     suggestedRoutes
   };
