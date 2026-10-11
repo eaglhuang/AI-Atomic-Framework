@@ -30,10 +30,17 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
-function slimPassingChecks(checks: unknown): unknown {
+const DOCTOR_DETAIL_KEEP = new Set([
+  'git-head-evidence',
+  'git-worktree-readiness',
+  'governance-entry-readiness',
+  'package-dist'
+]);
+
+function slimDoctorChecks(checks: unknown): unknown {
   if (!Array.isArray(checks)) return checks;
   return checks.map((check) => {
-    if (!isRecord(check) || check.ok !== true) return check;
+    if (!isRecord(check) || check.ok !== true || DOCTOR_DETAIL_KEEP.has(String(check.name))) return check;
     return { name: check.name, ok: true };
   });
 }
@@ -57,8 +64,12 @@ export function compactPrintedGovernanceJson<T>(result: T): T {
   const copy = structuredClone(result) as T & { command?: string; evidence?: Record<string, unknown> };
   const evidence = isRecord(copy.evidence) ? copy.evidence : null;
   if (!evidence) return copy;
-  if (Array.isArray(evidence.checks)) evidence.checks = slimPassingChecks(evidence.checks) as unknown[];
   const command = String(copy.command ?? '');
+  if (command === 'doctor') {
+    if (Array.isArray(evidence.checks)) evidence.checks = slimDoctorChecks(evidence.checks) as unknown[];
+    delete evidence.integrationBootstrap;
+    delete evidence.frameworkHookReadiness;
+  }
   const omit = command === 'next'
     ? CLAIM_EVIDENCE_OMIT
     : command === 'taskflow close' || command === 'taskflow pre-close'

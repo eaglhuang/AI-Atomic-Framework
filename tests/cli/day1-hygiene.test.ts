@@ -44,9 +44,8 @@ try {
     after: JSON.stringify(doctorAfter).length
   };
   assert.ok(doctorBytes.after < doctorBytes.before, JSON.stringify(doctorBytes));
-  const passing = (doctorAfter.evidence as { checks: Array<{ name: string; ok: boolean; details?: unknown }> }).checks.find((check) => check.ok === true);
-  assert.ok(passing);
-  assert.equal(passing.details, undefined);
+  const gitCheck = (doctorAfter.evidence as { checks: Array<{ name: string; details?: { status?: string } }> }).checks.find((check) => check.name === 'git-head-evidence');
+  assert.equal(gitCheck?.details?.status, (doctorBefore.evidence as { checks: Array<{ name: string; details?: { status?: string } }> }).checks.find((check) => check.name === 'git-head-evidence')?.details?.status);
 
   git(['add', '-A']);
   git(['commit', '-qm', 'init', '--no-verify']);
