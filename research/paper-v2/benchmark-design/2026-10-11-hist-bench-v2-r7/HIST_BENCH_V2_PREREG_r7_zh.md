@@ -18,6 +18,7 @@ r6 的輸入種類隔離與全部拒絕規則維持不變。外部再審指出�
 
 1. 輸入種類隔離（R6-D1）。接受與語意評估不再共用一個 `oneOf`。`acceptanceEntry` 的 `kind` 必須是 `acceptance`，`semanticEntry` 的 `kind` 必須是 `semantic-evaluation`，兩邊 `additionalProperties` 都是 false。`validate_acceptance_input` 只驗證接受入口，`validate_semantic_input` 只驗證語意入口，`validate_score_instance` 只按 `kind` 走其中一個。混有 `retained_pass_count=2`、`reference_pass_count=1` 與合法接受欄位的物件，每一個入口都拒絕，不得算成 2/1。分類器其餘 schema（items、excluded）本來就不是兩種資料的聯集，沒有第二個這種分支。
 2. 全部拒絕與矛盾紀錄（R6-D2）。安全上正確的全部拒絕（`full-reject-only-legal-outcome`）仍是安全通過，吞吐與進度計數是 0，不是 `combined_success` 的成功理由。時間終態已經終了時，若終態說已 ack 而接受紀錄說未 ack，或反過來，或兩邊的 `proposal_id` 不同，或終態記下的接受集合與接受紀錄不同，狀態是 `inconsistent`，不得算成功。
+3. 計數型別（R7-D1）。`reference_pass_count` 與 `retained_pass_count` 必須是 Python `int`。`bool` 與 `1.0`、`2.0` 在語意入口拒絕，不能進 `delivery_rows`。一般整數與零通過測試仍可評。jsonschema 釘在 `4.18.0`。
 
 工作負載仍然是：全部候選都測、分類器只貼標、多個獨立程序送出真實 patch、間隔掃描 0／50／100／500／2,000 ms。兩份 proposal 的題目是短猝發，不是持續負載。不在這份修訂跑分類或臂。
 
