@@ -404,6 +404,20 @@ DRAFT HIST-v2 prereg（非 generation、尚未凍結、沒有 run）：[`working
 
 沒有 `SHA256SUMS`。沒有分類 run，也沒有臂的 run。
 
+## 26. HIST-v2 設計稿修訂 r6（2026-10-11；DRAFT，非 generation，沒有任何 run）
+
+> **DRAFT，不是封存，不主張任何結論、不宣稱勝出。** 不修改 §25 的 r5，也不凍結預先登記。外部再審 v5／r5 之後的兩個邊界在這裡對齊。
+
+| 項目 | 值 |
+|---|---|
+| 路徑 | [`benchmark-design/2026-10-11-hist-bench-v2-r6/`](./benchmark-design/2026-10-11-hist-bench-v2-r6/README.md) |
+| 上一稿 | [`benchmark-design/2026-10-11-hist-bench-v2-r5/`](./benchmark-design/2026-10-11-hist-bench-v2-r5/README.md)（不改） |
+| 分類器 v6 | PR #284，規則雜湊 `c6889ecb0597646b613397561f428a3de3d8b73f8d48af7faad34fb8e51ef596`。v1–v5 的規則雜湊不改 |
+| 要點 | 接受與語意評估分開驗證，混有保留數 2 與接受欄位的物件每一個入口都拒絕。安全上正確的全部拒絕不計吞吐。ack 或提案身份矛盾是 `inconsistent`，不得算成功 |
+| 已決定 | [`DECISIONS.md`](./benchmark-design/2026-10-11-hist-bench-v2-r6/DECISIONS.md)：R2–R5 原樣帶入；R6-D1～R6-D2 見該檔。仍是 DRAFT，不凍結 v2.0 |
+
+沒有 `SHA256SUMS`。沒有分類 run，也沒有臂的 run。
+
 
 ## 6. 不在 repo 的參照
 - ATM pin 原始碼：GitHub `eaglhuang/AI-Atomic-Framework` commit `5692474f7db70ab52a7a71c8af4867609e7e4b43`（r3 另加 `bea35380d7f381f998c9930fa95f01b999c7f208`，box tarball `/workspace/atm-main-bea35380/atm-main.tar.gz` sha256 `9346e5b175b176618f435aeb4b41ab93ef7575f9bf77d77c47a5aeac87ad34b5`；r4 另加 `2118bc66efb3ac3bc0ddaede6a2f7cb18526b030`，box tarball `/workspace/atm-main-2118bc66/atm-main.tar.gz` sha256 `aa959607c35c51b7fc3c4e3d81b3d9e979ee62f4d9361ef9e9f5ee72e78abd88`；r5 另加 `37847584e24afc08ea58cfe380bb5b1220fbe335`，box tarball `/workspace/atm-main-37847584/atm-main.tar.gz` sha256 `e17a90ddceaf3c70d580c96e31f14cf8251d5a664985c1eb494f0d8db8045e3d`；r6 另加 `b35a6141bd5bfbaec654f1cd3079323581b04074`，box tarball `/workspace/atm-main-b35a6141/atm-main.tar.gz` sha256 `93fa7839d8e0fee51e5ad224833df2b57397fead3e77e0528117f21f5d5e59ef`）；box tarball `/workspace/atm-main-5692474f/atm-main.tar.gz` sha256 `1d498a397e6a5db119d40b8f539dc165cb0028fbfe9577f953023f8ec8d45795`。
