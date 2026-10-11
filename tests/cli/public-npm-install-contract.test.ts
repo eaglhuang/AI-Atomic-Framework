@@ -202,7 +202,7 @@ try {
   }
   assert.ok(ready, `generated npm first-use actions did not reach ready/no-work within five steps: ${JSON.stringify(lifecycle)}`);
   const readyCommand = current.evidence?.nextAction?.command;
-  assert.equal(readyCommand, 'npm test --if-present', `ready lifecycle must expose the next normal action: ${JSON.stringify(current)}`);
+  assert.match(readyCommand, /doctor --json$/, `a generated project with no test script must not be told to run npm test --if-present: ${readyCommand}`);
   const readyAction = runGeneratedNpmCommand(readyCommand);
   lifecycle.push({ command: readyCommand, status: readyAction.status ?? -1 });
   assert.equal(readyAction.status, 0, `generated ready action failed: ${readyAction.stdout}${readyAction.stderr}`);

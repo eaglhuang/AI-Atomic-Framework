@@ -173,7 +173,7 @@ and delegates to the target backend with `--historical-delivery-repo <repo>`.
 
 ## Invariants
 
-1. **Profile write flag**: `capabilities.supportsWrite` in the profile must remain `false`. ATM rejects profiles that attempt to declare direct profile write permission.
+1. **Profile write flag**: `capabilities.supportsWrite` is `true` only when `delegation.openerPath` is `atm:builtin`, because that opener creates the task card through `taskflow open --write`. Every other profile must keep `supportsWrite` `false`. ATM rejects a non-builtin profile that sets it to `true`.
 2. **Schema ID Verification**: Every profile must contain a `"schemaId"` field exactly equal to `"taskflow.profile.v1"`.
 3. **Generation surface**: Markdown generation always flows through `tasks new` / `generateTaskCard`; `taskflow open` does not render templates directly.
 4. **Runtime continuity**: `taskflow open --write` is not complete until the generated task card has been imported into `.atm/history/tasks` through `tasks import --write`.

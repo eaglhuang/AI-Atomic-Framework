@@ -51,7 +51,8 @@ export function decideRuntimeNextAction(
   commandPrefix = 'node atm.mjs',
   runnerMode: RunnerModeClass = 'frozen',
   repositoryKind: 'framework' | 'adopter' = runnerMode === 'npm-package' ? 'adopter' : 'framework',
-  hasPackageManifest = true
+  hasPackageManifest = true,
+  hasTestScript = false
 ): RuntimeNextAction {
   if (runtime.migrationNeeded || runtime.hasV1 && runtime.hasV2 === false) {
     return {
@@ -140,7 +141,7 @@ export function decideRuntimeNextAction(
     status: 'ready',
     command: repositoryKind === 'framework'
       ? 'npm test'
-      : hasPackageManifest ? 'npm test --if-present' : `${commandPrefix} doctor --json`,
+      : hasPackageManifest && hasTestScript ? 'npm test --if-present' : `${commandPrefix} doctor --json`,
     reason: 'runtime state, governance state, and engineering checks are all green',
     allowedCommands: allowedGuidanceBootstrapCommands(commandPrefix),
     blockedCommands: blockedMutationCommands()

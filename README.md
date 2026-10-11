@@ -66,7 +66,7 @@ Day-1 commands are only `welcome`, `next`, `taskflow`, `evidence`, and `doctor`.
 
 Run this from the new project (`cd my-app`). It is the short path checked on 0.1.20: open, claim, write, evidence, close. Adapt the title, goal, scope file, and validator to the real task.
 
-**Empty queue: skip `guide`, `orient`, and `start`.** `next --prompt` on an empty project returns `guide` and `ATM_NEXT_PLAYBOOK_ABSENT`. Do not follow it.
+**Empty queue: skip `guide`, `orient`, and `start`.** `next --prompt` on an empty project returns a prefilled `taskflow open`. Until `--actor`, `--scope-path`, and `--validator` are known, that command is a dry-run and names the missing flags. Do not follow `guide`.
 
 **Trust the playbook.** After claim, `nextAction.command` is `implement-deliverables`, the same sentinel as `playbook.commandSequence[0]`. It means edit the declared files. It is not a shell command, and it is not `start`. Run the playbook's `evidence run` line and its `taskflow close --write` line. The playbook also lists `pre-close` and a dry-run `close`; this hello.txt path closes without them.
 

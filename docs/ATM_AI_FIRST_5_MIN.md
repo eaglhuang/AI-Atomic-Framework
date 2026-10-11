@@ -29,7 +29,7 @@ node atm.mjs welcome --json
 
 Read `evidence.versions.frameworkVersion` and pin that npm version. On 0.1.20, `evidence.versions.releaseTrain.frameworkVersion` is `0.0.0`; do not pin to it. Git tags such as `v0.9.0-alpha.1` are paper snapshots, not the npm package. If the result contains `ATM_USER_NOTICE` or `evidence.userNotice`, tell the user in one or two sentences before continuing.
 
-**Empty queue: skip `guide`, `orient`, and `start`.** `next --prompt` with no task card returns `guide` and `ATM_NEXT_PLAYBOOK_ABSENT`. Do not follow it. `welcome` and `doctor` on that project point at `npm test --if-present` or `next --json`. Those are not the first write.
+**Empty queue: skip `guide`, `orient`, and `start`.** `next --prompt` with no task card returns a prefilled `taskflow open`. Until `--actor`, `--scope-path`, and `--validator` are known, that command is a dry-run and names the missing flags. Do not follow `guide`. `welcome` and `doctor` on a project with no `scripts.test` point at `doctor --json`, not `npm test --if-present`. Those are not the first write.
 
 **Trust the playbook.** After claim, `nextAction.command` is `implement-deliverables`, the same sentinel as `playbook.commandSequence[0]`. It means edit the declared files. It is not a shell command, and pasting it does not run `start`. Run the playbook lines extracted below.
 

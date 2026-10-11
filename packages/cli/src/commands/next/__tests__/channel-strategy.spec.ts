@@ -45,10 +45,12 @@ assert.equal(npmRecovery.command, 'npm exec -- atm bootstrap --cwd . --task "Boo
 assert.ok(npmRecovery.allowedCommands.includes('npm exec -- atm orient --cwd . --json'));
 const npmOnboardingRecovery = decideRuntimeNextAction({ config: true }, 'onboarding-lifecycle', emptyQueue, 'npm exec -- atm');
 assert.equal(npmOnboardingRecovery.command, 'npm exec -- atm atm-chart render --cwd . --json');
-const npmReady = decideRuntimeNextAction({ config: true, currentTaskId: 'TASK-1', lastEvidenceAt: 'now', lastHandoffAt: 'now' }, null, emptyQueue, 'npm exec -- atm', 'npm-package');
+const npmReady = decideRuntimeNextAction({ config: true, currentTaskId: 'TASK-1', lastEvidenceAt: 'now', lastHandoffAt: 'now' }, null, emptyQueue, 'npm exec -- atm', 'npm-package', 'adopter', true, true);
 assert.equal(npmReady.command, 'npm test --if-present');
+const npmReadyWithoutTests = decideRuntimeNextAction({ config: true, currentTaskId: 'TASK-1', lastEvidenceAt: 'now', lastHandoffAt: 'now' }, null, emptyQueue, 'npm exec -- atm', 'npm-package', 'adopter', true, false);
+assert.equal(npmReadyWithoutTests.command, 'npm exec -- atm doctor --json');
 const explicitNpmReady = decideRuntimeNextAction({ config: true, currentTaskId: 'TASK-1', lastEvidenceAt: 'now', lastHandoffAt: 'now' }, null, emptyQueue,
-  "node '/shared runtime/node_modules/@ai-atomic-framework/cli/dist/npm-runtime/atm.mjs'", 'npm-package');
+  "node '/shared runtime/node_modules/@ai-atomic-framework/cli/dist/npm-runtime/atm.mjs'", 'npm-package', 'adopter', true, true);
 assert.equal(explicitNpmReady.command, 'npm test --if-present');
 assert.equal(decideRuntimeNextAction({ config: true, currentTaskId: 'TASK-1', lastEvidenceAt: 'now', lastHandoffAt: 'now' }, null, emptyQueue,
   'npm exec -- atm', 'frozen').command, 'npm test', 'runner kind, not display text, owns ready semantics');
@@ -56,8 +58,11 @@ assert.equal(decideRuntimeNextAction({ config: true, currentTaskId: 'TASK-1', la
 const inputProbe = { probe: 'value', nested: { count: 1 } };
 const readyRuntime = { config: true, currentTaskId: 'TASK-1', lastEvidenceAt: 'now', lastHandoffAt: 'now' };
 assert.equal(decideRuntimeNextAction(readyRuntime, null, emptyQueue,
-  'node atm.mjs', 'frozen', 'adopter').command, 'npm test --if-present',
-  'a create-atm shim must use adopter validation despite its frozen runner mode');
+  'node atm.mjs', 'frozen', 'adopter', true, true).command, 'npm test --if-present',
+  'a create-atm shim with a test script uses npm test despite its frozen runner mode');
+assert.equal(decideRuntimeNextAction(readyRuntime, null, emptyQueue,
+  'node atm.mjs', 'frozen', 'adopter', true, false).command, 'node atm.mjs doctor --json',
+  'a package without a test script must not be told to run npm test --if-present');
 assert.equal(decideRuntimeNextAction(readyRuntime, null, emptyQueue,
   'node atm.mjs', 'frozen', 'adopter', false).command, 'node atm.mjs doctor --json',
   'a non-npm adopter must not receive an npm command');

@@ -99,6 +99,10 @@ try {
   );
   assert.equal(resolveFirstUseArguments(`${governanceCommandPrefix(runtime)} taskflow open --write --title "x" --goal "x" --json`, bin), null);
   assert.equal(resolveFirstUseArguments(`${governanceCommandPrefix(runtime)} taskflow open --title "x" --goal "x; rm -rf /" --json`, bin), null);
+  assert.deepEqual(
+    resolveFirstUseArguments(`${governanceCommandPrefix(runtime)} doctor --json`, bin),
+    ['doctor', '--json']
+  );
 } finally {
   rmSync(commandFixture, { recursive: true, force: true });
 }
