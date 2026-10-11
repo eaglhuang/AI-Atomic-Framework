@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "hist-v2-score-input/4",
+  "title": "HIST-v2 scorer inputs",
+  "$defs": {
+    "acceptance": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["accepted_prs", "observed_sha256", "acked"],
+      "properties": {
+        "accepted_prs": {
+          "type": "array",
+          "items": {"type": "integer"},
+          "description": "Set S as presented by the arm. Lookup uses the sorted unique ids, so [3, 1] and [1, 3] are the same key."
+        },
+        "observed_sha256": {"type": "string"},
+        "acked": {"type": "boolean", "description": "True only for a success ack at or before the effective stop."}
+      }
+    },
+    "semanticEvaluation": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["passing_test_ids", "reference_pass_count", "retained_pass_count", "is_legal_reject"],
+      "properties": {
+        "passing_test_ids": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Test ids that pass on the reference bytes R(S). Empty means R(S) has no passing tests."
+        },
+        "reference_pass_count": {"type": "integer", "minimum": 0},
+        "retained_pass_count": {"type": "integer", "minimum": 0},
+        "is_legal_reject": {"type": "boolean"}
+      }
+    }
+  }
+}
