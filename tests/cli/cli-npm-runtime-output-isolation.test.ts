@@ -20,7 +20,7 @@ try {
   const dist = path.join(cli, 'dist');
   mkdirSync(dist, { recursive: true });
   mkdirSync(path.join(cli, 'src'), { recursive: true });
-  const metadata = JSON.stringify({ name: 'atm-fixture', version: '1.0.0', type: 'module', files: ['dist/npm-runtime'],
+  const metadata = JSON.stringify({ name: 'atm-fixture', version: '1.0.0', type: 'module', files: ['dist/npm-runtime', 'README.md'],
     atmArtifactBudget: { schemaId: 'atm.cliArtifactBudget.v1', budget: { maxPackedBytes: 100000, maxPackedEntries: 100, maxInstalledPathChars: 180 } } }) + '\n';
   writeFileSync(path.join(cli, 'package.json'), metadata);
   writeFileSync(path.join(cli, 'README.md'), 'Fixture package\n');
