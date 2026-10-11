@@ -18,6 +18,7 @@ import { resolveTaskflowDeclaredFiles, resolveTaskflowEffectiveDeliverables } fr
 import { isCurrentTaskCloseEvidenceFile } from './current-task-close-evidence.ts';
 import { applyExplicitGovernanceDirtyDeferral } from './governance-dirty-deferral.ts';
 import { buildGovernanceDirtyBlocker, buildScopeDirtyBlocker, buildUnexpectedStagedBlocker } from './dirty-blockers.ts';
+import { inspectTaskflowGitAuthorGap, TASKFLOW_GIT_AUTHOR_MISSING } from './git-author-guard.ts';
 
 interface PreflightCommitRepoBundle {
   readonly repoRoot: string | null;
@@ -37,10 +38,11 @@ export type HistoricalClosePreflightBlockerId =
   | 'unexpectedStagedNonBundleFiles'
   | 'mixedDeliveryCommit'
   | 'staleEvidence'
-  | 'missingApprovalLease';
+  | 'missingApprovalLease'
+  | 'gitAuthor';
 
 export interface HistoricalClosePreflightRemediationChoice {
-  readonly id: 'restore-accidental-drift' | 'commit-scoped-delivery' | 'defer-foreign-staged' | 'request-waiver' | 'refresh-evidence' | 'restore-accidental-staged';
+  readonly id: 'restore-accidental-drift' | 'commit-scoped-delivery' | 'defer-foreign-staged' | 'request-waiver' | 'refresh-evidence' | 'restore-accidental-staged' | 'configure-git-author';
   readonly summary: string;
   readonly requiredCommand: string | null;
 }
@@ -526,6 +528,20 @@ export function buildHistoricalClosePreflight(input: {
       waiverReason: input.waiverReason
     })
   ].filter((entry): entry is HistoricalClosePreflightBlocker => entry !== null);
+  const gitAuthorGap = inspectTaskflowGitAuthorGap(input.cwd, input.actorId);
+  if (gitAuthorGap) {
+    operationalBlockers.unshift({
+      id: 'gitAuthor',
+      code: TASKFLOW_GIT_AUTHOR_MISSING,
+      summary: gitAuthorGap.summary,
+      remediationChoices: [{
+        id: 'configure-git-author',
+        summary: 'Set repo-local Git user.name and user.email, then retry the same close.',
+        requiredCommand: gitAuthorGap.requiredCommand
+      }],
+      requiredCommand: gitAuthorGap.requiredCommand
+    });
+  }
   const staleBlocker = buildStaleEvidenceBlocker({
     findings: missingReport?.blockingFindings.filter((entry) =>
       entry.category === 'stale' || entry.category === 'absent' || entry.category === 'failed-run' || entry.category === 'diagnostic-only'
