@@ -40,7 +40,10 @@ try {
   assert.ok(cardRoute, 'larger work is offered a task-card route');
   assert.match(cardRoute.command, /taskflow open --write .*--scope-path "src\/checkout\.js"/);
 
-  const openCommand = cardRoute.command.replace('<id>', 'ai-a').replace('"<command>"', '"node --check src/checkout.js"');
+  assert.doesNotMatch(cardRoute.command, /<[^>\r\n]+>/, cardRoute.command);
+  const openCommand = cardRoute.command.includes('--actor')
+    ? cardRoute.command
+    : cardRoute.command.replace('taskflow open --write', 'taskflow open --write --actor ai-a');
   const opened = atm(project, argvOf(openCommand));
   assert.equal(opened.ok, true, codes(opened).join(','));
   const claimCommand = opened.evidence.nextAction?.command as string;
