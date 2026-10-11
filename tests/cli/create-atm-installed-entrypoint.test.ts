@@ -209,7 +209,8 @@ test('missing Git identity preserves generated files without staging or a commit
     assert.equal(child.status, 1);
     const payload = JSON.parse(child.stdout);
     assert.equal(payload.ok, false);
-    assert.match(payload.messages[0].text, /Configure Git user.name and user.email/);
+    assert.equal(payload.messages[0].code, 'ATM_CREATE_GIT_AUTHOR_MISSING');
+    assert.match(payload.evidence.nextAction.command, /git config user\.name "Your Name"/);
     const target = path.join(f.root, 'project');
     assert.equal(existsSync(path.join(target, 'package-lock.json')), true);
     const index = spawnSync('git', ['ls-files'], { cwd: target, encoding: 'utf8', env });
