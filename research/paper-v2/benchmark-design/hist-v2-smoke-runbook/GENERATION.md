@@ -16,4 +16,10 @@ trial-only — 不得作為論文結果
 
 ## 這次沒有做的事
 
-沒有建立 `research/paper-v2/benchmark-trials/<date>-hist-v2-smoke/`。分類後的 dev 題還沒有接到 harness v2 的歷史重播。`run_smoke.sh --execute` 在作者批准之前，以及在重播綁定出現之前，都不會建立 run 目錄。單元測試只在暫存目錄封存 fixture 觀察，用來確認 `verify.sh`。
+沒有建立 `research/paper-v2/benchmark-trials/<date>-hist-v2-smoke/`。分類後的 dev 題還沒有接到可核對雜湊的歷史 patch。`run_smoke.sh --execute` 在作者批准且重播綁定齊全之前不會建立 run 目錄。單元測試只在暫存目錄封存觀察，用來確認 `verify.sh`。
+
+## 2026-10-15 執行閘
+
+作者於 2026-10-15 06:56（Asia/Taipei）批准只跑 smoke。`--execute` 在批准值吻合，而且抽中的每一題都有 `hist-v2-dev-replay/1` 歷史 patch 綁定時，才會重播該題並封存。catalog fixture 不能代替 dev 題。pilot、main、held-out 仍是退出碼 2。
+
+本次倉庫沒有封存的分類器 v8 `items.jsonl`，也沒有歷史 git 物件。因此沒有 smoke generation，沒有勝出主張，也不是 C1′–C3′ 的證據。上一份程序封印的 `SHA256SUMS` sha256 是 `0b9c83569cae021f0cfd63e1e7a7d25e9cb29927d8841e672b7a00ccf378cf87`。預先登記目錄沒有修改。

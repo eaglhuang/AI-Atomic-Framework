@@ -87,8 +87,10 @@ sh research/paper-v2/benchmark-design/hist-v2-smoke-runbook/run_smoke.sh --stage
 
 預期非 0，且沒有 run 目錄。
 
-`--execute` 還需要環境變數 `HIST_V2_SMOKE_AUTHOR_APPROVAL=issue-292-author-approved-smoke-only`。即使設了，現在也會因「dev 題還沒有重播綁定」而退出，並且不建立目錄。不要把這個環境變數當成已經批准的紀錄。
+`--execute` 需要環境變數 `HIST_V2_SMOKE_AUTHOR_APPROVAL=issue-292-author-approved-smoke-only`，再加上 `--items`（分類器 v8 的 `items.jsonl`）與 `--binding`（每一題的歷史 patch 綁定）。批准值不符時退出碼 3。沒有綁定、diff 或 R(S) 的 SHA-256 對不上分類器欄位，或題目是 harness catalog fixture 時，退出碼 4，不建立目錄。環境變數本身不是批准紀錄；批准是作者另一次明示。
+
+綁定檔 schema 是 `hist-v2-dev-replay/1`。每一題要有 base 原文、每份 proposal 的 unified diff，以及每個合法子集的 R(S) 原文。diff 的 SHA-256 必須等於該題 `patches[].code_patch_sha256`。base 與 R(S) 的 SHA-256 必須等於答案鍵。catalog fixture 的 id，或與 catalog 相同的檔名加 base，都拒絕。pilot、main、held-out 仍直接退出碼 2。
 
 ## 已知缺口
 
-harness v2 尚未把分類器 v8 的 dev 題綁到可重播的歷史 patch。在作者另作批准、並有明確的重播綁定之前，不要開跑，也不要用六個 catalog fixture 充當 dev 抽題。這是程序缺口，不是某一次 run 的 counterexample。
+倉庫裡還沒有封存的分類器 v8 `items.jsonl`，也沒有對得上那些雜湊的歷史 git patch。作者於 2026-10-15 06:56（Asia/Taipei）批准只跑 smoke 之後，`--execute` 仍然因缺少重播綁定而退出碼 4，不建立 `benchmark-trials/`。六個 catalog fixture 不能充當 dev 抽題。這是程序缺口，不是某一次 run 的 counterexample。

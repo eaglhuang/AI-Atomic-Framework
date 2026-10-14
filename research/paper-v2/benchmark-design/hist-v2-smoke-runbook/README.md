@@ -9,4 +9,4 @@ sh research/paper-v2/benchmark-design/hist-v2-smoke-runbook/run_smoke.sh
 sh research/paper-v2/benchmark-design/hist-v2-smoke-runbook/verify.sh research/paper-v2/benchmark-design/hist-v2-smoke-runbook
 ```
 
-預設命令只做開跑前檢查，並印出 `executed: false`。它不建立 `benchmark-trials/`。
+預設命令只做開跑前檢查，並印出 `executed: false`。它不建立 `benchmark-trials/`。`--execute` 只在作者批准且分類器 v8 dev 題有歷史 patch 綁定時才會跑 smoke；catalog fixture 不能代替那些題。pilot、main、held-out 直接拒絕。

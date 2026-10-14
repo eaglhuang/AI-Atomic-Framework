@@ -77,6 +77,31 @@ class CliPinTests(unittest.TestCase):
             self.assertIn("no run directory created", proc.stderr)
             self.assertFalse(out.exists())
 
+    def test_execute_with_unbound_dev_items_creates_no_directory(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "2026-10-15-hist-v2-smoke"
+            env = _env()
+            env["HIST_V2_SMOKE_AUTHOR_APPROVAL"] = load_pins()["approval_value"]
+            proc = _cli(
+                "--execute",
+                "--stage",
+                "smoke",
+                "--items",
+                str(Path(__file__).resolve().parents[1] / "tests" / "fixtures" / "dev-items.jsonl"),
+                "--binding",
+                str(Path(tmp) / "binding"),
+                "--out",
+                str(out),
+                "--date",
+                "2026-10-15",
+                env=env,
+            )
+            self.assertEqual(proc.returncode, 4, proc.stderr)
+            self.assertIn("catalog fixtures are not a substitute", proc.stderr)
+            self.assertIn("no run directory created", proc.stderr)
+            self.assertFalse(out.exists())
+            self.assertFalse((REPO / "research/paper-v2/benchmark-trials").exists() and any((REPO / "research/paper-v2/benchmark-trials").glob("*hist-v2-smoke*")))
+
     def test_shell_entry_refuses_held_out(self) -> None:
         script = runbook_root() / "run_smoke.sh"
         proc = subprocess.run(
@@ -94,8 +119,13 @@ def _env() -> dict[str, str]:
     env = os.environ.copy()
     env["HIST_V2_REPO_ROOT"] = str(REPO)
     env["PYTHONDONTWRITEBYTECODE"] = "1"
-    src = str(runbook_root() / "src")
-    env["PYTHONPATH"] = src if not env.get("PYTHONPATH") else src + os.pathsep + env["PYTHONPATH"]
+    root = runbook_root()
+    entries = [
+        str(root / "src"),
+        str(REPO / "research/paper-v2/benchmark-harness/hist-v2-harness-v2/src"),
+        str(REPO / "research/paper-v2/benchmark-design/hist-v2-classifier-v8/src"),
+    ]
+    env["PYTHONPATH"] = os.pathsep.join(entries + ([env["PYTHONPATH"]] if env.get("PYTHONPATH") else []))
     return env
 
 

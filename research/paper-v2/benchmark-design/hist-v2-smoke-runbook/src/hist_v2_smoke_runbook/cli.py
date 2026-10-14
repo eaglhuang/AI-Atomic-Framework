@@ -27,6 +27,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="HIST-v2 trial-only smoke preflight. Formal runs stay closed.")
     parser.add_argument("--pins", type=Path)
     parser.add_argument("--items", type=Path)
+    parser.add_argument("--binding", type=Path)
     parser.add_argument("--out", type=Path)
     parser.add_argument("--date")
     parser.add_argument("--stage", default="check")
@@ -69,11 +70,23 @@ def main(argv: list[str] | None = None) -> int:
     if os.environ.get(pins["approval_env"]) != pins["approval_value"]:
         print("author approval missing; no run directory created", file=sys.stderr)
         return 3
-    print(
-        "replay binding missing; harness catalog fixtures are not a substitute for dev items; no run directory created",
-        file=sys.stderr,
+    if stage not in {"check", "smoke"}:
+        print(f"refusing stage {stage}; no run directory created", file=sys.stderr)
+        return 2
+    from .replay import execute_smoke
+
+    date = args.date or "2026-10-15"
+    dest = args.out
+    if dest is None:
+        dest = (args.repo or repo_root()) / "research/paper-v2/benchmark-trials" / f"{date}-hist-v2-smoke"
+    return execute_smoke(
+        repo=args.repo or repo_root(),
+        pins=pins,
+        items_path=args.items,
+        binding_dir=args.binding,
+        dest=dest,
+        date=date,
     )
-    return 4
 
 
 if __name__ == "__main__":
