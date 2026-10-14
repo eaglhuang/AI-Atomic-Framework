@@ -33,6 +33,7 @@ export * from './generated-projection-steward.ts';
 export * from './wave-manifest.ts';
 export * from './wave-broker-scheduler.ts';
 export * from './shared-delivery-commit.ts';
+export * from './shared-compose-inbox.ts';
 export * from './shared-write-provenance-policy.ts';
 export * from './wave-generated-executor.ts';
 export * from './parallel-admission-policy.ts';
