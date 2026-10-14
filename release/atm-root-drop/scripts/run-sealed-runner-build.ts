@@ -47,8 +47,6 @@ const releaseManifestPaths = [path.join('release', 'atm-root-drop', 'release-man
  * junction; recursive rmSync would traverse into the host tree and wipe it.
  */
 export function removeTreeWithoutFollowingLinks(targetPath: string): void {
-  if (!existsSync(targetPath)) return;
-
   let stats;
   try {
     stats = lstatSync(targetPath);
@@ -204,6 +202,7 @@ function runSealedBuild(buildTarget: BuildTarget): void {
     });
     timePhase(timings, 'artifactSyncMs', () => writeSealedBuildMetadata({
       cwd: repoRoot,
+      buildTarget,
       sealedSourceSha,
       buildInputsTreeHash,
       buildDecision: cacheDecision.decision,
@@ -334,6 +333,7 @@ function runSealedBuild(buildTarget: BuildTarget): void {
     timings.totalElapsedMs = elapsedSince(timings.startedAt);
     writeSealedBuildMetadata({
       cwd: repoRoot,
+      buildTarget,
       sealedSourceSha,
       buildInputsTreeHash,
       buildDecision,

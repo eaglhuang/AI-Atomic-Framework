@@ -14,6 +14,7 @@ import {
 } from '../../../../../core/src/commit-attribution/sealed-commit-bundle.ts';
 import { CliError } from '../../shared.ts';
 import { runGitCommand, runGitCommandWithEnv } from './git-process-port.ts';
+import { forEachPathspecBatch } from './pathspec-argv-batching.ts';
 
 const QUIET_STDIO = ['ignore', 'pipe', 'pipe'] as const;
 const LS_FILES_STAGE_PATTERN = /^(\d+) ([0-9a-f]+) \d+\t(.+)$/i;
@@ -24,11 +25,21 @@ const NULL_OBJECT_ID = /^0+$/;
 function normalizePath(value: string): string { return String(value ?? '').replace(/\\/g, '/').replace(/^\.\//, '').trim(); }
 function splitLines(output: string): readonly string[] { return String(output ?? '').split(/\r?\n/).map((line) => line.trim()).filter(Boolean); }
 
+/** Share the canonical process budget for every bulk sealed-index operation. */
+function runPathspecCommand(cwd: string, fixedArgs: readonly string[], paths: readonly string[], env?: NodeJS.ProcessEnv): string {
+  const output: string[] = [];
+  forEachPathspecBatch({ paths, fixedArgs }, (batch) => {
+    const args = [...fixedArgs, ...batch];
+    output.push(env ? runGitCommandWithEnv(cwd, args, env, [...QUIET_STDIO]) : runGitCommand(cwd, args));
+  });
+  return output.join('');
+}
+
 export function sealCommitBundleFromLiveIndex(input: { readonly cwd: string; readonly paths: readonly string[]; readonly provenance: SealedCommitEntryProvenance; readonly baseTreeSha?: string | null; readonly baseRef?: string | null }): SealedCommitBundle {
   const paths = [...new Set(input.paths.map(normalizePath).filter(Boolean))].sort();
   if (paths.length === 0) return sealCommitBundle({ entries: [], baseTreeSha: input.baseTreeSha ?? null });
   const entries: SealedCommitBundleEntry[] = [];
-  for (const line of splitLines(runGitCommand(input.cwd, ['ls-files', '-s', '--', ...paths]))) {
+  for (const line of splitLines(runPathspecCommand(input.cwd, ['ls-files', '-s', '--'], paths))) {
     const match = line.match(LS_FILES_STAGE_PATTERN);
     if (match) entries.push({ path: normalizePath(match[3]), mode: match[1], blobId: match[2], provenance: input.provenance, disposition: 'present' });
   }
@@ -42,7 +53,7 @@ export function withWorktreeCandidateIndex<T>(input: { readonly cwd: string; rea
   const env = { ...process.env, GIT_INDEX_FILE: path.join(tempDir, 'index') };
   try {
     runGitCommandWithEnv(input.cwd, ['read-tree', 'HEAD'], env, [...QUIET_STDIO]);
-    if (paths.length > 0) runGitCommandWithEnv(input.cwd, ['add', '-A', '-f', '--', ...paths], env, [...QUIET_STDIO]);
+    if (paths.length > 0) runPathspecCommand(input.cwd, ['add', '-A', '-f', '--'], paths, env);
     return input.run(env);
   } finally { rmSync(tempDir, { recursive: true, force: true }); }
 }
@@ -58,23 +69,23 @@ export function assembleSealedCommitIndex(input: { readonly cwd: string; readonl
   runGitCommandWithEnv(input.cwd, ['read-tree', input.baseRef ?? 'HEAD'], input.env, [...QUIET_STDIO]);
   const paths = input.bundle.entries.map((entry) => entry.path);
   if (paths.length === 0) return;
-  runGitCommandWithEnv(input.cwd, ['rm', '--cached', '--quiet', '--ignore-unmatch', '--force', '--', ...paths], input.env, [...QUIET_STDIO]);
+  runPathspecCommand(input.cwd, ['rm', '--cached', '--quiet', '--ignore-unmatch', '--force', '--'], paths, input.env);
   const presentEntries = input.bundle.entries.filter((entry) => !isTombstone(entry));
   const baseRef = input.baseRef ?? 'HEAD';
   const inheritedEntries = presentEntries.filter((entry) => isTrackedInBaseTree({ cwd: input.cwd, env: input.env, baseRef, path: entry.path }));
   const newEntryPaths = presentEntries.filter((entry) => !inheritedEntries.some((inherited) => inherited.path === entry.path)).map((entry) => entry.path);
   for (const entry of presentEntries) runGitCommandWithEnv(input.cwd, ['update-index', '--add', '--cacheinfo', `${entry.mode},${entry.blobId},${entry.path}`], input.env, [...QUIET_STDIO]);
   if (newEntryPaths.length > 0) {
-    runGitCommandWithEnv(input.cwd, ['add', '-A', '-f', '--', ...newEntryPaths], input.env, [...QUIET_STDIO]);
+    runPathspecCommand(input.cwd, ['add', '-A', '-f', '--'], newEntryPaths, input.env);
     for (const entry of presentEntries.filter((entry) => newEntryPaths.includes(entry.path))) runGitCommandWithEnv(input.cwd, ['update-index', '--add', '--cacheinfo', `${entry.mode},${entry.blobId},${entry.path}`], input.env, [...QUIET_STDIO]);
   }
-  if (inheritedEntries.length > 0) runGitCommandWithEnv(input.cwd, ['update-index', '--assume-unchanged', '--', ...inheritedEntries.map((entry) => entry.path)], input.env, [...QUIET_STDIO]);
+  if (inheritedEntries.length > 0) runPathspecCommand(input.cwd, ['update-index', '--assume-unchanged', '--'], inheritedEntries.map((entry) => entry.path), input.env);
 }
 
 export function readCandidateTreeEntries(input: { readonly cwd: string; readonly env: NodeJS.ProcessEnv; readonly baseRef?: string; readonly sealedPaths?: readonly string[] }): readonly CommitTreeEntry[] {
   const sealedPaths = [...new Set((input.sealedPaths ?? []).map(normalizePath).filter(Boolean))].sort();
   const entries = new Map<string, CommitTreeEntry>();
-  if (sealedPaths.length > 0) for (const line of splitLines(runGitCommandWithEnv(input.cwd, ['ls-files', '-s', '--', ...sealedPaths], input.env, [...QUIET_STDIO]))) {
+  if (sealedPaths.length > 0) for (const line of splitLines(runPathspecCommand(input.cwd, ['ls-files', '-s', '--'], sealedPaths, input.env))) {
     const match = line.match(LS_FILES_STAGE_PATTERN);
     if (match) entries.set(normalizePath(match[3]), { path: normalizePath(match[3]), mode: match[1], blobId: match[2], disposition: 'present' });
   }
@@ -85,7 +96,7 @@ export function readCandidateTreeEntries(input: { readonly cwd: string; readonly
 export function readCommittedTreeEntries(cwd: string, commitSha: string, sealedPaths: readonly string[] = []): readonly CommitTreeEntry[] {
   const normalized = [...new Set(sealedPaths.map(normalizePath).filter(Boolean))].sort();
   const entries = new Map<string, CommitTreeEntry>();
-  if (normalized.length > 0) for (const line of splitLines(runGitCommand(cwd, ['ls-tree', '-r', commitSha, '--', ...normalized]))) {
+  if (normalized.length > 0) for (const line of splitLines(runPathspecCommand(cwd, ['ls-tree', '-r', commitSha, '--'], normalized))) {
     const match = line.match(LS_TREE_PATTERN);
     if (match) entries.set(normalizePath(match[3]), { path: normalizePath(match[3]), mode: match[1], blobId: match[2], disposition: 'present' });
   }
@@ -97,7 +108,7 @@ export function sealCommitBundleFromCandidateIndex(input: { readonly cwd: string
   const paths = [...new Set(input.paths.map(normalizePath).filter(Boolean))].sort();
   if (paths.length === 0) return sealCommitBundle({ entries: [], baseTreeSha: input.baseTreeSha ?? null });
   const entries: SealedCommitBundleEntry[] = [];
-  for (const line of splitLines(runGitCommandWithEnv(input.cwd, ['ls-files', '-s', '--', ...paths], input.env, [...QUIET_STDIO]))) {
+  for (const line of splitLines(runPathspecCommand(input.cwd, ['ls-files', '-s', '--'], paths, input.env))) {
     const match = line.match(LS_FILES_STAGE_PATTERN);
     if (match) entries.push({ path: normalizePath(match[3]), mode: match[1], blobId: match[2], provenance: input.provenance ?? 'governance-evidence', disposition: 'present' });
   }
@@ -106,7 +117,7 @@ export function sealCommitBundleFromCandidateIndex(input: { readonly cwd: string
 }
 
 function readStagedDeletionEntries(input: { readonly cwd: string; readonly paths: readonly string[]; readonly baseRef: string; readonly env?: NodeJS.ProcessEnv; readonly provenance?: SealedCommitEntryProvenance }): readonly SealedCommitBundleEntry[] {
-  const output = input.env ? runGitCommandWithEnv(input.cwd, ['diff-index', '--cached', '--raw', '--diff-filter=D', input.baseRef, '--', ...input.paths], input.env, [...QUIET_STDIO]) : runGitCommand(input.cwd, ['diff-index', '--cached', '--raw', '--diff-filter=D', input.baseRef, '--', ...input.paths]);
+  const output = runPathspecCommand(input.cwd, ['diff-index', '--cached', '--raw', '--diff-filter=D', input.baseRef, '--'], input.paths, input.env);
   return splitLines(output).flatMap((line) => {
     const match = line.match(RAW_DIFF_PATTERN);
     return match ? [{ path: normalizePath(match[6]), mode: match[1], blobId: '', provenance: input.provenance ?? 'task-scope', disposition: 'deleted' as const }] : [];

@@ -137,7 +137,7 @@ export function buildSkillCorpusAudit() {
     sourceDigest: snapshot.sourceFiles.find((file) => file.id === template.frontmatter.id)?.sourceDigest,
     class: classificationById.get(template.frontmatter.id) ?? (minimumIds.has(template.frontmatter.id) ? 'minimum-entry' : 'specialist'),
     action: canaryIds.has(template.frontmatter.id) ? 'canary-rewritten' : 'keep',
-    progressiveDisclosure: template.body.includes('references/') || template.body.includes('.files/')
+    progressiveDisclosure: ['references/', '.files/', '{{REFERENCE_ROOT}}/'].some((marker) => template.body.includes(marker))
   }));
 
   const sourceSnapshotReview = createDeepModuleReviewReport({

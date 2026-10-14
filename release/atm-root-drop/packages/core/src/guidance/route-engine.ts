@@ -148,15 +148,27 @@ export function decideGuidanceRoute(input: RouteEngineInput): RouteDecision {
     });
   }
 
+  if (firstLayerMatch?.intent !== 'create') {
+    return buildDecision({
+      route: 'docs-first',
+      confidence: 0.72,
+      reasons: ['The goal has no classified atom or legacy route. Preview the existing taskflow plan, then specify scope and validators before requesting a write claim.'],
+      requiredEvidence: ['original user goal', 'bounded task scope', 'selected validators', 'taskflow open dry-run plan'],
+      blockedBy: releaseBlockers.filter((blocker) => blocker !== 'package-json-missing'),
+      nextCommand: 'node atm.mjs taskflow open --dry-run --json',
+      routeChoices: [{ route: 'docs-first', reason: 'Unclassified project work needs an explicit scope; absence of legacy evidence does not imply atom birth.' }]
+    });
+  }
+
   return buildDecision({
     route: 'create-atom',
     confidence: 0.72,
-    reasons: ['No legacy or upgrade evidence was detected, so a new atom discovery path is the safest default.'],
+    reasons: ['The first-layer command contract explicitly identifies atom birth.'],
     requiredEvidence: ['bucket', 'title', 'description', 'logical-name'],
     blockedBy: releaseBlockers,
     nextCommand: 'node atm.mjs guide create-atom --json',
     routeChoices: [
-      { route: 'create-atom', reason: 'default for new capability work' },
+      { route: 'create-atom', reason: firstLayerMatch.authority },
       { route: 'docs-first', reason: 'choose this if the goal is only specification/documentation' }
     ]
   });

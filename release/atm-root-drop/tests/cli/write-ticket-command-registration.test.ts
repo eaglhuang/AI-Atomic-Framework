@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { cliCommandRunners } from '../../packages/cli/src/atm.ts';
 import { getCommandSpec, listCommandSpecs } from '../../packages/cli/src/commands/command-specs.ts';
+import { readSkillGuidanceClosure } from '../../scripts/lib/skill-guidance-closure.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const atmEntrypoint = path.join(root, 'packages/cli/src/atm.ts');
@@ -30,7 +30,7 @@ for (const adapterPath of [
   '.gemini/commands/atm-governance-router.toml',
   'GEMINI.md'
 ]) {
-  const text = readFileSync(path.join(root, adapterPath), 'utf8');
+  const text = readSkillGuidanceClosure(root, adapterPath).text;
   assert.match(text, /write-ticket/);
   assert.doesNotMatch(text, /guard mutation/);
 }

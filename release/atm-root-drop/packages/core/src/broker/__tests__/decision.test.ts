@@ -219,12 +219,12 @@ function testCidConflictScenario() {
   });
 
   const decision = calculateBrokerDecision(conflictingIntent, registryWith([toActiveIntent(active, 'intent-a')]));
-  assert.equal(decision.verdict, 'blocked-cid-conflict');
-  assert.equal(decision.lane, 'blocked');
+  assert.equal(decision.verdict, 'serial');
+  assert.equal(decision.lane, 'serial');
   assert.ok(decision.conflicts.some((conflict) => conflict.kind === 'cid'));
   assert.equal(decision.failureReason?.blockingLayer, 'cid');
   assert.equal(decision.failureReason?.recommendedRoute, 'serialize');
-  console.log('ok: CID conflict on the same write surface is blocked');
+  console.log('ok: cold CID conflict on the same write surface is queued before write');
 }
 
 function testFileOverlapScenario() {
@@ -389,7 +389,7 @@ function testSameOwnerProposalDisjointRegionsRouteComposerBeforeWrite() {
   console.log('ok: same-owner disjoint proposal regions route through composer before write');
 }
 
-function testSameOwnerProposalOverlapRemainsBlocked() {
+function testSameOwnerProposalOverlapQueuesBeforeWrite() {
   const active = makeIntent({
     taskId: 'TASK-A',
     actorId: 'agent-a',
@@ -432,8 +432,10 @@ function testSameOwnerProposalOverlapRemainsBlocked() {
     }
   });
   const decision = calculateBrokerDecision(newIntent, registryWith([toActiveIntent(active, 'intent-a')]));
-  assert.equal(decision.verdict, 'blocked-cid-conflict');
-  assert.equal(decision.lane, 'blocked');
+  assert.equal(decision.verdict, 'serial');
+  assert.equal(decision.lane, 'serial');
+  assert.equal(decision.queueReason, 'hot-write-conflict');
+  assert.equal(decision.applyMethod, 'none');
   assert.ok(Boolean(decision.decompositionRequest));
   assert.equal(decision.decompositionRequest?.suggestionKind, 'coarse-owner-map-split');
   assert.equal(decision.decompositionRequest?.ownerAtomId, 'atm.shared-owner-map');
@@ -442,10 +444,10 @@ function testSameOwnerProposalOverlapRemainsBlocked() {
     decision.decompositionRequest?.suggestedAtoms?.map((atom) => atom.role),
     ['focus', 'before', 'after']
   );
-  console.log('ok: same-owner overlapping proposal regions remain blocked');
+  console.log('ok: same-owner overlapping proposal regions queue without write authority');
 }
 
-function testProposalOverlapParksFirstWriterForRearbitration() {
+function testProposalOverlapParksIncomingWriterForRevalidation() {
   const active = makeIntent({
     taskId: 'TASK-A',
     actorId: 'agent-a',
@@ -470,10 +472,11 @@ function testProposalOverlapParksFirstWriterForRearbitration() {
     }
   });
   const decision = calculateBrokerDecision(newIntent, registryWith([toActiveIntent(active, 'intent-a')]));
-  assert.equal(decision.verdict, 'blocked-active-lease');
+  assert.equal(decision.verdict, 'serial');
+  assert.equal(decision.queueReason, 'provisional-overlap');
   assert.equal(decision.admission?.state, 'blocked-before-write');
   assert.equal(decision.admission?.rearbitrationRequired, true);
-  console.log('ok: overlapping proposal regions park first writer and block before write');
+  console.log('ok: overlapping proposal regions park the incoming writer before write');
 }
 
 testParallelSafeScenario();
@@ -489,6 +492,6 @@ testProposalFirstHotFileScenario();
 testProposalFirstBlockedBeforeWriteScenario();
 testProposalDisjointRegionsRouteComposerBeforeWrite();
 testSameOwnerProposalDisjointRegionsRouteComposerBeforeWrite();
-testSameOwnerProposalOverlapRemainsBlocked();
-testProposalOverlapParksFirstWriterForRearbitration();
+testSameOwnerProposalOverlapQueuesBeforeWrite();
+testProposalOverlapParksIncomingWriterForRevalidation();
 console.log('all broker decision tests passed');

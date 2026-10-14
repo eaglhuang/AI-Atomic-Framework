@@ -1,12 +1,23 @@
 // @ts-nocheck
+import { readFileSync } from 'node:fs';
 import { quoteCliValue } from '../view-projections.ts';
 
-function buildTaskflowCloseOperatorCommands(taskId: string, actor: string) {
+/** Validator commands a claimed task card declares, read from its ledger record. */
+export function readTaskValidators(taskPath: string): readonly string[] {
+  try {
+    const validators = JSON.parse(readFileSync(taskPath, 'utf8')).validators;
+    return Array.isArray(validators) ? validators.filter((entry) => typeof entry === 'string' && entry.trim()).map((entry) => entry.trim()) : [];
+  } catch {
+    return [];
+  }
+}
+
+function buildTaskflowCloseOperatorCommands(taskId: string, actor: string, lane = '') {
   const id = taskId || '<task-id>';
   return {
-    preClose: `node atm.mjs taskflow pre-close --task ${id} --actor ${actor} --json`,
-    dryRun: `node atm.mjs taskflow close --task ${id} --actor ${actor} --json`,
-    write: `node atm.mjs taskflow close --task ${id} --actor ${actor} --write --json`
+    preClose: `node atm.mjs taskflow pre-close --task ${id} --actor ${actor}${lane} --json`,
+    dryRun: `node atm.mjs taskflow close --task ${id} --actor ${actor}${lane} --json`,
+    write: `node atm.mjs taskflow close --task ${id} --actor ${actor}${lane} --write --json`
   };
 }
 
@@ -44,6 +55,13 @@ export function buildChannelPlaybook(input: {
   readonly fastClaimLabel?: string | null;
   /** The response carrying this playbook already acquired the fast lock. */
   readonly fastClaimActive?: boolean;
+  /** The response carrying a normal playbook already claimed the task. */
+  readonly claimActive?: boolean;
+  /** Lane minted by that claim; agents run each command in a fresh shell, so
+   * later mutations carry it as --lane-session instead of an exported env. */
+  readonly laneSessionId?: string | null;
+  /** Validators the claimed card declares; each gets its own evidence run. */
+  readonly validators?: readonly string[] | null;
 }) {
   const actor = input.actorPlaceholder ?? '<id>';
   const prompt = input.originalPrompt?.trim() || '<current user prompt>';
@@ -51,7 +69,8 @@ export function buildChannelPlaybook(input: {
   const defaultClaimCommand = input.fastClaimCommand?.trim()
     || `node atm.mjs next --claim --actor ${actor} --prompt ${quoteCliValue(prompt)} --auto-intent --json`;
   const fastClaimLabel = input.fastClaimLabel?.trim() || 'quickfix lock';
-  const closeOps = buildTaskflowCloseOperatorCommands(taskId, actor);
+  const lane = input.laneSessionId ? ` --lane-session ${input.laneSessionId}` : '';
+  const closeOps = buildTaskflowCloseOperatorCommands(taskId, actor, lane);
   if (input.channel === 'fast') {
     const commitCommand = `node atm.mjs git commit --actor ${actor} --message "<message>" --auto-stage --json`;
     return {
@@ -177,7 +196,9 @@ export function buildChannelPlaybook(input: {
     mustFollow: true,
     summary: 'Use this for one explicit task card. Preview close with taskflow pre-close and taskflow close dry-run before --write.',
     steps: [
-      `Run: ${defaultClaimCommand}`,
+      input.claimActive
+        ? `${taskId} is already claimed by this response; do not run the claim again.${lane ? ` Pass${lane} to every later ATM command (each shell starts without the lane).` : ''}`
+        : `Run: ${defaultClaimCommand}`,
       'Work only on the claimed task and its allowed files.',
       'Implement the real non-.atm deliverables.',
       'Run required validators or a focused reproducible verification command.',
@@ -190,17 +211,16 @@ export function buildChannelPlaybook(input: {
       'Do not manually claim before next --claim.',
       'Do not call tasks close directly for normal closeback; taskflow close owns the operator lane.',
       'Do not run taskflow close --write before dry-run/pre-close when blockers are unknown.',
-      'Do not commit task closure separately from the deliverable it proves.'
+      'Do not commit task closure separately from the deliverable it proves.',
+      'Do not add a separate delivery commit before or after a successful taskflow close --write; it owns the normal closure commit.'
     ],
     commandSequence: [
-      defaultClaimCommand,
+      ...(input.claimActive ? [] : [defaultClaimCommand]),
       '<implement task deliverables>',
-      'node atm.mjs evidence run --task <task-id> --actor <id> --command "<validator>" --json',
+      ...(input.validators?.length ? input.validators : ['<validator>']).map((validator) => `node atm.mjs evidence run --task ${taskId} --actor ${actor}${lane} --command ${quoteCliValue(validator)} --validators ${quoteCliValue(validator)} --json`),
       closeOps.preClose,
       closeOps.dryRun,
-      closeOps.write,
-      'git add <deliverables> .atm/history/tasks/<task-id>.json .atm/history/evidence/<task-id>.bundle-manifest.json .atm/history/task-events/<task-id>/',
-      `node atm.mjs git commit --actor ${actor} --task <task-id> --message "<scope>: complete <task-id>" --json`
+      closeOps.write
     ],
     closePreview: {
       schemaId: 'atm.taskflowClosePreviewPlaybook.v1',
@@ -209,9 +229,9 @@ export function buildChannelPlaybook(input: {
       writeCommand: closeOps.write,
       hintField: 'evidence.writeReadinessHint.blockers[].requiredCommand'
     },
-    commitTiming: 'Commit only after taskflow close --write succeeds and the governed bundle is committed.',
+    commitTiming: 'taskflow close --write commits the deliverables and governance bundle as part of the governed close. Do not add a separate normal delivery commit. An explicit stage-only result or interrupted close must follow its returned recovery command; WIP commits and other channels retain their own playbooks.',
     governedGitEntrypoint: {
-      preferredCommand: `node atm.mjs git commit --actor ${actor} --task <task-id> --message "<scope>: complete <task-id>" --json`,
+      preferredCommand: closeOps.write,
       directGitPolicy: 'Use taskflow close --write for normal closure. Bare git commit is not banned globally, but governed task/evidence bundles must use the ATM wrapper.',
       fallbackFields: ['copyableCommitCommand', 'hostGitCompatibilityGuidance']
     }

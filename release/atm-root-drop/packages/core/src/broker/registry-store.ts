@@ -2,6 +2,7 @@ import { closeSync, existsSync, fsyncSync, mkdirSync, openSync, readFileSync, re
 import { createHash } from 'node:crypto';
 import { dirname } from 'node:path';
 import type { WriteBrokerRegistryDocument } from './types.ts';
+import { isSerialQueueDocument } from './serial-queue/policy.ts';
 
 export type BrokerRegistryRecoveryKind =
   | 'missing'
@@ -223,6 +224,7 @@ function isRegistryDocument(value: unknown): value is WriteBrokerRegistryDocumen
     && (value as { schemaId?: unknown }).schemaId === 'atm.writeBrokerRegistry.v1'
     && (value as { specVersion?: unknown }).specVersion === '0.1.0'
     && Array.isArray((value as { activeIntents?: unknown }).activeIntents)
+    && ((value as WriteBrokerRegistryDocument).serialQueue === undefined || isSerialQueueDocument((value as WriteBrokerRegistryDocument).serialQueue))
   );
 }
 

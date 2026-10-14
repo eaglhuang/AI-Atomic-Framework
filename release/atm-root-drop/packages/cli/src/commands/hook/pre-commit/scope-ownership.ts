@@ -11,6 +11,7 @@ import {
   type SharedWriteObservedFile
 } from '../../../../../core/src/broker/shared-write-provenance-policy.ts';
 import { inspectTrackedActorRegistryState } from '../../actor-registry.ts';
+import { resolveCandidateAttributionAuthority } from '../../git-governance/implementation/candidate-attribution.ts';
 import { readActiveCloseCommitWindows } from '../../framework-development.ts';
 import { readFrameworkTempLockProjection } from '../../framework-development/framework-temp-lock-projection.ts';
 import { listTaskOwnedProtectedOverrideAuditFiles } from '../../git-governance.ts';
@@ -353,9 +354,9 @@ export function collectTaskGovernedCommitAllowedFiles(cwd: string, taskId: strin
     if (planPath) files.push(planPath);
     collectStringArrayField((task as Record<string, unknown>).planningMirrorPaths, files);
   }
-  const actorRegistryState = inspectTrackedActorRegistryState(cwd);
-  if (actorRegistryState.tracked && (actorRegistryState.staged || actorRegistryState.unstaged)) {
-    files.push(actorRegistryState.path);
+  const registryAuthority = resolveCandidateAttributionAuthority({ cwd, taskId, actorId: process.env.ATM_COMMIT_ACTOR_ID ?? null, laneSessionId: process.env.ATM_COMMIT_LANE_SESSION_ID ?? null }, ['.atm/catalog/registry/actors.json']);
+  if (registryAuthority.ok) {
+    files.push('.atm/catalog/registry/actors.json');
   }
   files.push(...listTaskOwnedProtectedOverrideAuditFiles(cwd, taskId));
   return uniqueSorted(files.map(normalizeRelativePath).filter(isTaskDirectionPathCandidate));

@@ -25,7 +25,7 @@ function latestLifecycleAction(cwd, taskId) {
         .map((entry) => {
         const event = readJson(path.join(directory, entry));
         const action = normalize(event?.action ?? event?.eventType ?? event?.transition);
-        if (action !== 'release' && action !== 'abandon')
+        if (action !== 'release' && action !== 'abandon' && action !== 'repair-claim')
             return null;
         const timestamp = String(event?.createdAt ?? event?.timestamp ?? event?.at ?? '');
         return { action, timestamp };
@@ -52,7 +52,7 @@ export function readGeneratedResidueTaskDisposition(cwd, taskId) {
         // `owner` is durable attribution retained after close/release; it is not
         // lease liveness.  Only the explicit claim state may prevent a completed
         // foreign receipt from being preserved as external residue.
-        hasActiveClaim: claimState === 'active' || claimState === 'claimed',
+        hasActiveClaim: claimState === 'active' || claimState === 'claimed' || claimState === 'handoff',
     };
 }
 export function isReleasedGeneratedBundleSafeToClean(disposition) {
@@ -60,7 +60,8 @@ export function isReleasedGeneratedBundleSafeToClean(disposition) {
         return false;
     const terminalStatus = disposition.status === 'done' || disposition.status === 'abandoned';
     const releasedLifecycle = disposition.lastLifecycleAction === 'release' || disposition.lastLifecycleAction === 'abandon';
-    return (terminalStatus || releasedLifecycle) && disposition.status !== 'running' && disposition.status !== 'review';
+    const repairedRelease = disposition.lastLifecycleAction === 'repair-claim' && disposition.claimState === 'released';
+    return (terminalStatus || releasedLifecycle || repairedRelease) && disposition.status !== 'running' && disposition.status !== 'review';
 }
 /**
  * Decides whether a foreign staged governance bundle can be isolated by the

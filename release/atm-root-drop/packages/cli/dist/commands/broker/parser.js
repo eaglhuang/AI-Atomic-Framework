@@ -39,6 +39,7 @@ export function parseBrokerArgs(argv) {
         expectedTasks: [],
         collectionTimeoutMs: 120000,
         intentFile: null,
+        queueTicketId: null,
         freezeId: null,
         ttlSeconds: 1800,
         surfaces: [],
@@ -167,6 +168,11 @@ export function parseBrokerArgs(argv) {
         }
         if (arg === '--intent-file') {
             state.intentFile = requireValue(argv, index, '--intent-file');
+            index += 1;
+            continue;
+        }
+        if (arg === '--queue-ticket') {
+            state.queueTicketId = requireValue(argv, index, arg);
             index += 1;
             continue;
         }
@@ -389,6 +395,7 @@ export function parseBrokerArgs(argv) {
         expectedTasks: state.expectedTasks,
         collectionTimeoutMs: state.collectionTimeoutMs,
         intentFile: state.intentFile,
+        queueTicketId: state.queueTicketId,
         freezeId: state.freezeId,
         ttlSeconds: state.ttlSeconds,
         surfaces: state.surfaces,

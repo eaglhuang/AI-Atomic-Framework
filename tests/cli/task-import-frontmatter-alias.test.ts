@@ -17,4 +17,10 @@ for (const field of ['id', 'task_id']) {
 assert.equal(parse('id: doc_ai_0018').tasks.length, 0, 'document ids are not task declarations');
 assert.equal(parse('id: PROG-2-0111x').tasks.length, 0, 'partial identifiers are rejected');
 assert.equal(parse('task_id: TASK-ERR-0001\nid: PROG-2-0111').tasks[0].workItemId, 'TASK-ERR-0001', 'canonical field takes precedence');
+const documentPlan = parsePlanMarkdown({
+  planText: '---\nid: doc_ai_0018\n---\n# TASK-PLAN-0001 Real task heading\n',
+  planRelativePath: 'docs/plan.md',
+  importedAt: '2026-10-14T00:00:00.000Z'
+});
+assert.equal(documentPlan.tasks[0]?.workItemId, 'TASK-PLAN-0001', 'document ids must not hide real task headings');
 console.log('task-import-frontmatter-alias.test passed');

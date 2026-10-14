@@ -12,7 +12,30 @@ materializeValidatorFixture(root, closureRepo, {
   ...fixture,
   runtimeIdentities: [],
   planningCards: [],
-  copyEntries: ['.gitignore', 'AGENTS.md', 'LICENSE', 'CONTRIBUTING.md', 'turbo.json', '.agents', 'integrations', 'docs/governance', 'docs/AGENT_PACK_ONBOARDING.md', 'docs/HOST_GOVERNANCE_INTEGRATION.md', 'docs/ARCHITECTURE.md', 'docs/ECOSYSTEM_POSITIONING.md', 'tests', 'fixtures', 'atomic_workbench/atomization-coverage/path-to-atom-map-shards'].map((source) => ({ source }))
+  copyEntries: [
+    '.gitignore',
+    'AGENTS.md',
+    'LICENSE',
+    'CONTRIBUTING.md',
+    'turbo.json',
+    '.agents',
+    '.atm/charter',
+    '.claude/skills',
+    '.cursor/rules/skills',
+    '.gemini/commands',
+    'GEMINI.md',
+    'integrations',
+    'docs/governance',
+    'docs/AGENT_PACK_ONBOARDING.md',
+    'docs/ATM_AI_FIRST_5_MIN.md',
+    'docs/ANTIGRAVITY_INTEGRATION.md',
+    'docs/HOST_GOVERNANCE_INTEGRATION.md',
+    'docs/ARCHITECTURE.md',
+    'docs/ECOSYSTEM_POSITIONING.md',
+    'tests',
+    'fixtures',
+    'atomic_workbench/atomization-coverage/path-to-atom-map-shards'
+  ].map((source) => ({ source }))
 });
 console.log('[git-hooks-enforcement] installing isolated closure fixture dependencies');
 const dependencies = spawnSync('npm', ['ci', '--ignore-scripts', '--no-audit', '--no-fund'], { cwd: closureRepo, encoding: 'utf8', shell: process.platform === 'win32', timeout: 120000 });

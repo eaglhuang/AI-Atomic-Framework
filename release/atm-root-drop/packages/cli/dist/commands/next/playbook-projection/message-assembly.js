@@ -49,7 +49,7 @@ export function buildNextMessages(nextAction, userNotice, integrationBootstrap, 
     if (nextAction.playbook) {
         messages.push(message('warning', 'ATM_CHANNEL_PLAYBOOK_REQUIRED', `Follow the ${nextAction.playbook.channel} playbook exactly before editing, closing, or committing.`, nextAction.playbook));
         if (nextAction.playbook.channel === 'normal') {
-            messages.push(message('info', 'ATM_TASK_CLOSE_REMINDER', 'Normal task cards are not finished at validators or evidence: after deliverables exist, always run tasks close before committing.', {
+            messages.push(message('info', 'ATM_TASK_CLOSE_REMINDER', 'Normal task cards are not finished at validators or evidence: follow the pre-close and dry-run playbook, then taskflow close --write commits the deliverables and governance bundle as part of the governed close.', {
                 schemaId: 'atm.taskCloseReminder.v1',
                 taskId: readTaskId(nextAction.selectedTask) ?? nextAction.queueHeadTaskId ?? null,
                 playbookChannel: 'normal'

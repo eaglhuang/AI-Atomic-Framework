@@ -12,7 +12,7 @@ import { codexBridgeManifest, codexHostBridge } from './setup/codex-bridge.js';
 import { safeIntegrationHooks } from './integration/safe-hooks.js';
 import { preflightBootstrap } from './setup/bootstrap-preflight.js';
 import { setupRunnerPath } from './setup/runner.js';
-import { ensureSetupProjectRunner } from './setup/project-runner.js';
+import { ensureSetupProjectRunner, preflightSetupProjectRunner } from './setup/project-runner.js';
 /** One composition of existing project governance. No agent login/global writes. */
 export async function runSetup(argv, input = {}) {
     const spec = getCommandSpec('setup');
@@ -58,6 +58,7 @@ export async function runSetup(argv, input = {}) {
     const recoveryArgs = [runner, 'setup', '--cwd', cwd, '--agents', agents.length ? agents.join(',') : 'none', '--json'];
     try {
         preflightBootstrap(cwd);
+        preflightSetupProjectRunner(cwd);
         // Plan every adapter before bootstrap writes any configuration that could
         // alter detection. No --force is used, including on repeat installations.
         for (const id of agents) {

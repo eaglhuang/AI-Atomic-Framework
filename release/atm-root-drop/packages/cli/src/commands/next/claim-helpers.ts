@@ -3,9 +3,12 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { runBroker } from '../broker.ts';
 import { CliError } from '../shared.ts';
+import { describeMissingGitBase } from '../shared/git-base-remediation.ts';
 import { prepareTaskForClaim } from '../tasks/public-surface.ts';
 import { projectGovernanceSharedSurfacesFromPaths } from '../../../../core/src/broker/global-resource-projection.ts';
+import type { WriteIntentAtomRef } from '../../../../core/src/broker/types.ts';
 import { normalizeTaskRouteStatus } from './intent-normalizers.ts';
+import { reserveDerivedAtoms } from '../shared/derived-atom-occupancy.ts';
 import type { ImportedTaskSummary } from './route-predicates.ts';
 
 export async function prepareImportedTaskForClaim(input: {
@@ -44,17 +47,22 @@ export async function registerPreClaimBrokerTransaction(input: {
   readonly taskId: string;
   readonly actorId: string;
   readonly targetFiles: readonly string[];
+  readonly atoms?: readonly string[];
 }): Promise<Record<string, unknown>> {
   const head = spawnSync('git', ['rev-parse', '--verify', 'HEAD'], { cwd: input.cwd, encoding: 'utf8' });
   const baseCommit = head.status === 0 ? head.stdout.trim() : '';
   if (!baseCommit) {
-    throw new CliError('ATM_BROKER_TRANSACTION_BASE_MISSING', 'next --claim requires a resolvable HEAD before registering its Broker transaction.', { exitCode: 1 });
+    throw new CliError('ATM_BROKER_TRANSACTION_BASE_MISSING', 'next --claim requires a resolvable HEAD before registering its Broker transaction.', { exitCode: 1, details: describeMissingGitBase(input.cwd).details });
   }
+  const derivedAtomReservation = (input.atoms ?? []).length > 0
+    ? reserveDerivedAtoms({ cwd: input.cwd, baseCommit, targetFiles: input.targetFiles, symbols: input.atoms ?? [] })
+    : null;
   const intent = buildPreClaimWriteIntent({
     taskId: input.taskId,
     actorId: input.actorId,
     baseCommit,
-    targetFiles: input.targetFiles
+    targetFiles: input.targetFiles,
+    atomRefs: derivedAtomReservation?.refs ?? []
   });
   const intentPath = path.join(input.cwd, '.atm', 'runtime', 'broker-intents', `${input.taskId}.json`);
   mkdirSync(path.dirname(intentPath), { recursive: true });
@@ -65,6 +73,16 @@ export async function registerPreClaimBrokerTransaction(input: {
   const evidence = result && typeof result === 'object' && 'evidence' in result
     ? (result.evidence as Record<string, unknown>)
     : null;
+  const admission = evidence?.admission as { disposition?: string; ticket?: { queue?: unknown }; decisionReason?: string } | undefined;
+  // Empty legacy claim metadata carries no file-write authority. A native ticket,
+  // including an owner/scope mismatch, must still block that metadata-only route.
+  const metadataOnly = intent.targetFiles.length === 0 && !admission?.ticket?.queue;
+  if (admission?.disposition === 'queue' || (admission?.disposition === 'revalidate' && !metadataOnly)) {
+    throw new CliError('ATM_NEXT_CLAIM_BLOCKED', admission.decisionReason ?? 'Native broker ticket must be revalidated before task claim.', {
+      exitCode: 1, details: { taskId: input.taskId, brokerAdmission: admission,
+        requiredCommand: evidence?.resumeCommand ?? 'node atm.mjs broker status --json', writeAuthorized: false }
+    });
+  }
   const queueAdmission = evidence?.queueAdmission;
   if (!queueAdmission || typeof queueAdmission !== 'object' || !('status' in queueAdmission)) {
     throw new CliError('ATM_BROKER_TRANSACTION_INVALID', 'Broker pre-claim registration returned no canonical queue admission.', { exitCode: 1 });
@@ -73,7 +91,15 @@ export async function registerPreClaimBrokerTransaction(input: {
     intentPath: path.relative(input.cwd, intentPath).replace(/\\/g, '/'),
     baseCommit,
     queueAdmission,
-    brokerDecision: evidence.decision ?? null
+    brokerDecision: evidence.decision ?? null,
+    ...(derivedAtomReservation ? {
+      derivedAtomReservation: {
+        resolved: derivedAtomReservation.resolved,
+        unresolved: derivedAtomReservation.unresolved,
+        staleFormalFiles: derivedAtomReservation.staleFormalFiles,
+        note: 'Reserved atoms are an intent ceiling; the staged diff confirms final occupancy at commit time. Unresolved symbols (new code) are confirmed when committed.'
+      }
+    } : {})
   };
 }
 
@@ -82,6 +108,7 @@ export function buildPreClaimWriteIntent(input: {
   readonly actorId: string;
   readonly baseCommit: string;
   readonly targetFiles: readonly string[];
+  readonly atomRefs?: readonly WriteIntentAtomRef[];
 }) {
   const targetFiles = [...new Set(input.targetFiles.map((entry) => entry.replace(/\\/g, '/').replace(/^\.\//, '').trim()).filter(Boolean))].sort();
   return {
@@ -92,7 +119,7 @@ export function buildPreClaimWriteIntent(input: {
     actorId: input.actorId,
     baseCommit: input.baseCommit,
     targetFiles,
-    atomRefs: [],
+    atomRefs: [...(input.atomRefs ?? [])],
     sharedSurfaces: projectGovernanceSharedSurfacesFromPaths(targetFiles),
     requestedLane: 'auto'
   } as const;

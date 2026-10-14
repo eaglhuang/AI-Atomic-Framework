@@ -55,6 +55,7 @@ export default defineCommandSpec({
     { flag: '--origin-url', value: 'url', summary: 'External task URL for tasks mirror.' },
     { flag: '--sync-status', value: 'state', summary: 'Mirror sync status for tasks mirror.' },
     { flag: '--files', value: 'csv', summary: 'Comma-separated scope files for claim/takeover lock acquisition.' },
+    { flag: '--adopt-unowned-wip', summary: 'Claim backend flag forwarded by exact-task next --claim adoption. It never permits taking foreign-owned WIP; use the normal next route.', subcommands: ['claim'] },
     { flag: '--add', value: 'csv', summary: 'Comma-separated paths to add to the active task direction lock allowedFiles. Used with tasks scope add/repair.' },
     { flag: '--remove', value: 'csv', summary: 'Comma-separated non-deliverable paths to remove from an active task runtime scope. Used with tasks scope remove; requires the active claim owner and never needs emergency approval.' },
     { flag: '--claim-first', summary: 'For tasks scope add, auto-claim the task with --auto-intent before scope amendment when no active claim exists.' },

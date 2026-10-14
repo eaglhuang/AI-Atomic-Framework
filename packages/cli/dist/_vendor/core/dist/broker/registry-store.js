@@ -1,6 +1,7 @@
 import { closeSync, existsSync, fsyncSync, mkdirSync, openSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { dirname } from 'node:path';
+import { isSerialQueueDocument } from './serial-queue/policy.js';
 export class BrokerRegistryStoreError extends Error {
     code;
     recoveryFact;
@@ -140,7 +141,8 @@ function isRegistryDocument(value) {
         && !Array.isArray(value)
         && value.schemaId === 'atm.writeBrokerRegistry.v1'
         && value.specVersion === '0.1.0'
-        && Array.isArray(value.activeIntents));
+        && Array.isArray(value.activeIntents)
+        && (value.serialQueue === undefined || isSerialQueueDocument(value.serialQueue)));
 }
 function registryStoreError(code, input) {
     return new BrokerRegistryStoreError(code, {

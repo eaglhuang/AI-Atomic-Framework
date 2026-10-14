@@ -243,6 +243,7 @@ for (const entryDefinition of packageModule.minimumAtmEntrySkillDefinitions) {
   assert(template.frontmatter.command === entryDefinition.command, `${entryDefinition.id} command must match minimum entry definition`);
   assert(
     template.frontmatter.firstCommand === packageModule.atmFirstCommand
+      || template.frontmatter.firstCommand === packageModule.atmFirstRunCommand
       || template.frontmatter.firstCommand === packageModule.atmPromptScopedFirstCommand
       || template.frontmatter.firstCommand === packageModule.atmIntentScopedFirstCommand,
     `${entryDefinition.id} first command mismatch`
@@ -268,11 +269,18 @@ for (const entryDefinition of packageModule.minimumAtmEntrySkillDefinitions) {
     assert(template.body.includes('registry-missing'), 'atm-error-code-resolver must expose missing registry entries explicitly');
     assert(template.body.includes('human approval'), 'atm-error-code-resolver must preserve approval guidance');
   }
+  let contractBody = template.body;
+  if (entryDefinition.id === 'atm-governance-router') {
+    const reference = 'templates/skills/atm-governance-router.files/references/advanced-governance.md';
+    assert(template.body.includes('{{REFERENCE_ROOT}}/advanced-governance.md'), 'thin router must link its mandatory advanced governance reference');
+    assert(existsSync(path.join(root, reference)), 'thin router advanced governance reference must be shipped');
+    if (existsSync(path.join(root, reference))) contractBody += readFileSync(path.join(root, reference), 'utf8');
+  }
   for (const requiredTerm of requiredTeamAgentsTermsByTemplate[entryDefinition.id] || []) {
-    assert(template.body.includes(requiredTerm), `${entryDefinition.id} missing Team Agents skill surface term: ${requiredTerm}`);
+    assert(contractBody.includes(requiredTerm), `${entryDefinition.id} missing Team Agents skill surface term: ${requiredTerm}`);
   }
   for (const requiredTerm of requiredGovernanceFlowTermsByTemplate[entryDefinition.id] || []) {
-    assert(template.body.includes(requiredTerm), `${entryDefinition.id} missing governance-flow skill surface term: ${requiredTerm}`);
+    assert(contractBody.includes(requiredTerm), `${entryDefinition.id} missing governance-flow skill surface term: ${requiredTerm}`);
   }
   assert(!hasForbiddenPlanningHint(readFileSync(path.join(root, template.sourcePath), 'utf8')), `${entryDefinition.id} must not bake planning hints into template source`);
 }
@@ -300,15 +308,17 @@ assert(corpusProjection.manifestDigest.startsWith('sha256:'), 'corpus projection
 assert(Array.isArray(corpusProjection.degradationDiagnostics), 'corpus projection must carry degradation diagnostics');
 assert(claudeFiles.length === skillAdapterCompiledCount, 'Claude compiler output must contain one primary file per template plus all companion files');
 assert(codexFiles.length === skillAdapterCompiledCount, 'Codex compiler output must contain one primary file per template plus all companion files');
-assert(copilotFiles.length === templates.length * 2, 'Copilot compiler output must contain one instruction and one prompt per template');
+assert(copilotFiles.length === templates.length * 2 + companionFileCount, 'Copilot compiler output must contain one instruction and one prompt per template plus all companion files');
 assert(cursorFiles.length === skillAdapterCompiledCount, 'Cursor compiler output must contain one primary file per template plus all companion files');
-assert(geminiFiles.length === templates.length, 'Gemini compiler output must contain one command file per template');
+assert(geminiFiles.length === skillAdapterCompiledCount, 'Gemini compiler output must contain one command file per template plus all companion files');
 
 for (const compiledFile of [...claudeFiles, ...codexFiles, ...copilotFiles, ...cursorFiles, ...geminiFiles]) {
   const isPrimaryEntry = isPrimaryCompiledEntry(compiledFile.relativePath);
   if (isPrimaryEntry) {
     assert(
       compiledFile.content.includes(packageModule.atmFirstCommand)
+        || compiledFile.content.includes(packageModule.atmFirstRunCommand)
+        || compiledFile.content.includes(packageModule.atmFirstRunCommand.replaceAll('"', '\\"'))
         || compiledFile.content.includes(packageModule.atmPromptScopedFirstCommand)
         || compiledFile.content.includes(packageModule.atmPromptScopedFirstCommand.replaceAll('"', '\\"'))
         || compiledFile.content.includes(packageModule.atmIntentScopedFirstCommand),

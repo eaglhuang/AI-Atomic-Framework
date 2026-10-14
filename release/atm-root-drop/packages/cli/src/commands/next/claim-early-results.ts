@@ -1,3 +1,5 @@
+import { existsSync } from 'node:fs';
+import path from 'node:path';
 import { buildFirstUseUserNotice } from '../first-use-notice.ts';
 import { resolveActorId } from '../actor-registry.ts';
 import { CliError, makeResult, message } from '../shared.ts';
@@ -11,6 +13,8 @@ import { quoteCliValue } from './view-projections.ts';
 import type { inspectIntegrationBootstrap } from '../integration.ts';
 import type { inspectRuntimeAdapterReadiness } from '../runtime-adapter-readiness.ts';
 import type { NextActionLike } from './next-action-assembly.ts';
+import { editDistance } from '../shared/usage-error-hints.ts';
+import { requireGitRepository } from '../shared/git-base-remediation.ts';
 
 export function tryBuildQuickfixClaimResult(input: {
   readonly cwd: string;
@@ -30,6 +34,8 @@ export function tryBuildQuickfixClaimResult(input: {
     if (!resolvedActor) {
       throw new CliError('ATM_ACTOR_ID_MISSING', 'next --claim requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
     }
+    // A quickfix ends in a governed commit; refuse before taking the lock.
+    requireGitRepository(input.cwd, 'next --claim');
     const quickfixLock = writeQuickfixLock({
       cwd: input.cwd,
       actorId: resolvedActor.actorId,
@@ -114,6 +120,30 @@ export function buildNoClaimableTaskResult(input: {
           taskIntent: input.taskIntent,
           importedTaskQueue: input.importedTaskQueue
         }
+      });
+    }
+    const unknownTaskId = !primaryBlocker
+      ? (input.taskIntent?.explicitTaskIds ?? []).find((id) => !input.importedTaskQueue.tasks.some((task) => task.workItemId === id)
+        && !existsSync(path.join(input.cwd, '.atm', 'history', 'tasks', `${id}.json`)))
+      : undefined;
+    if (unknownTaskId) {
+      const knownTaskIds = input.importedTaskQueue.tasks
+        .map((task) => ({ id: task.workItemId, distance: editDistance(unknownTaskId, task.workItemId) }))
+        .sort((left, right) => left.distance - right.distance)
+        .slice(0, 3)
+        .map((entry) => entry.id);
+      return makeResult({
+        ok: false,
+        command: 'next',
+        cwd: input.cwd,
+        messages: [message('error', 'ATM_NEXT_CLAIM_TASK_NOT_FOUND', `Task ${unknownTaskId} is not in the task ledger.${knownTaskIds.length > 0 ? ` Did you mean ${knownTaskIds.join(', ')}?` : ''}`, {
+          taskId: unknownTaskId,
+          knownTaskIds,
+          requiredCommand: knownTaskIds[0]
+            ? `node atm.mjs next --claim --actor <id> --task ${knownTaskIds[0]} --auto-intent --json`
+            : 'node atm.mjs taskflow open --write --actor <id> --title "<title>" --goal "<goal>" --json'
+        })],
+        evidence: { taskIntent: input.taskIntent, importedTaskQueue: input.importedTaskQueue }
       });
     }
     const claimCode = primaryBlocker?.blockerCode === 'ATM_NEXT_CLAIM_DEPENDENCY_BLOCKED'

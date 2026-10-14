@@ -36,23 +36,35 @@ export function candidatesToWriteIntent(candidates, ctx) {
         requestedLane: ctx.requestedLane ?? 'auto'
     };
 }
+export const ATOM_CID_FORMULA_VERSION = 'cid.v2';
 /**
- * Deterministic atom CID: SHA-256 over the canonical candidate contract
- * `(kind || symbol || sourcePaths || detectionMethod)`, where `sourcePaths`
- * is the deduplicated, sorted union of `filePath` and `suggestedSourcePaths`.
- * The same candidate always produces the same CID across runs and processes.
+ * Deterministic atom CID (cid.v2, TASK-ASP-0006): SHA-256 over
+ * `cid.v2 || languageId || sourcePaths || kind || symbol || ordinal`, where
+ * `sourcePaths` is the deduplicated, sorted union of `filePath` and
+ * `suggestedSourcePaths`. Line numbers and `detectionMethod` are not part of
+ * the identity: inserting lines above an atom or upgrading the detector keeps
+ * its CID. Content changes are tracked separately (`computeAtomContentVersion`).
  */
 export function computeCandidateAtomCid(candidate) {
     const sourcePaths = [...new Set([candidate.filePath, ...(candidate.suggestedSourcePaths ?? [])].map(normalizePath))].sort();
-    const lineSignature = `${candidate.lineStart ?? ''}:${candidate.lineEnd ?? ''}`;
     const contract = [
+        ATOM_CID_FORMULA_VERSION,
+        candidate.languageId ?? inferLanguageId(candidate.filePath),
+        sourcePaths.join(','),
         candidate.kind,
         candidate.symbol,
-        sourcePaths.join(','),
-        lineSignature,
-        candidate.detectionMethod
+        candidate.ordinal == null ? '' : String(candidate.ordinal)
     ].join('||');
     return createHash('sha256').update(contract).digest('hex');
+}
+const languageIdByExtension = {
+    '.ts': 'typescript', '.tsx': 'typescript', '.mts': 'typescript', '.cts': 'typescript',
+    '.js': 'javascript', '.jsx': 'javascript', '.mjs': 'javascript', '.cjs': 'javascript',
+    '.py': 'python', '.cs': 'csharp'
+};
+export function inferLanguageId(filePath) {
+    const match = /\.[^./\\]+$/.exec(filePath);
+    return (match && languageIdByExtension[match[0].toLowerCase()]) ?? 'unknown';
 }
 function normalizePath(filePath) {
     return filePath.replace(/\\/g, '/');

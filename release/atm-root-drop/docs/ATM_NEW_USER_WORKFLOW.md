@@ -1,6 +1,8 @@
 # ATM New User Workflow
 
 > Advanced guide. If you are an AI agent starting work in an ATM repository, read [ATM_AI_FIRST_5_MIN.md](ATM_AI_FIRST_5_MIN.md) first; this guide covers the two-repository taskflow with a `taskflow.profile.json`.
+>
+> **Single-repository projects need none of the planning-repo setup below.** `bootstrap` writes a `taskflow.profile.json` whose `delegation.openerPath` is `atm:builtin`, so `taskflow open --write --actor <id> --title ... --scope-path ... --validator ...` writes the card to `docs/tasks/` of the same repository and imports it; the rest of the loop (claim, evidence, `taskflow close`) is identical. Separate planning repositories are mainly for developing ATM itself or for teams that keep task cards outside the code repository.
 
 A friendly guide for the first day with ATM. Read this once and you will know how to take a single sentence — *"I want users to export a CSV report"* — and turn it into a task that opens, runs, validates, and closes across two repos, without ever hand-editing governance files.
 

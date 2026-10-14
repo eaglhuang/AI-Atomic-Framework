@@ -1,3 +1,4 @@
+import { writeBuildIdentity, treeFiles, sourceIdentity } from './release-artifact-manifest.ts';
 import { chmodSync, copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
@@ -41,16 +42,30 @@ const CLI_TEMPLATE_ASSETS = [
 // is derived from the sources that name one. Test sources are excluded: they may
 // name paths that do not exist.
 function collectReferencedSchemaAssets(): string[] {
-  const literalPattern = /schemas\/[A-Za-z0-9/_-]+\.schema\.json/g;
+  const literalPattern = /(?:^|\/)schemas\/([A-Za-z0-9/_-]+\.schema\.json)$/;
   // resolveShippedSchemaPath names a schema relative to the schemas/ directory,
   // so those call sites carry no literal path to match.
-  const shippedPattern = /resolveShippedSchemaPath\(\s*import\.meta\.url\s*,\s*['"]([A-Za-z0-9/_-]+\.schema\.json)['"]/g;
+  const shippedPattern = /^[A-Za-z0-9/_-]+\.schema\.json$/;
   const referenced = new Set<string>();
   for (const file of listFiles(path.join(root, 'packages'))) {
     if (!file.endsWith('.ts') || file.includes('__tests__') || file.endsWith('.test.ts')) continue;
     const source = readFileSync(file, 'utf8');
-    for (const match of source.matchAll(literalPattern)) referenced.add(match[0]);
-    for (const match of source.matchAll(shippedPattern)) referenced.add(`schemas/${match[1]}`);
+    const sourceFile = ts.createSourceFile(file, source, ts.ScriptTarget.Latest, true);
+    const visit = (node: ts.Node): void => {
+      if (ts.isStringLiteralLike(node)) {
+        const literalPath = node.text.replaceAll('\\', '/');
+        const match = literalPath.match(literalPattern);
+        if (match) referenced.add(`schemas/${match[1]}`);
+        const parent = node.parent;
+        if (ts.isCallExpression(parent) && parent.arguments[1] === node
+          && ts.isIdentifier(parent.expression) && parent.expression.text === 'resolveShippedSchemaPath'
+          && shippedPattern.test(literalPath)) {
+          referenced.add(`schemas/${literalPath}`);
+        }
+      }
+      ts.forEachChild(node, visit);
+    };
+    visit(sourceFile);
   }
   // Schemas the bundle already embeds must not travel a second time as files.
   for (const embedded of Object.keys(embeddedATMChartSchemaAssets)) referenced.delete(embedded);
@@ -293,12 +308,19 @@ const packageDirs = readdirSync(path.join(root, 'packages'), { withFileTypes: tr
   .filter((packageDir) => !onlyPackage || packageDir === onlyPackage || packageDir.endsWith(`/${onlyPackage}`))
   .filter((packageDir) => !onlyPackages || onlyPackages.has(packageDir) || onlyPackages.has(packageDir.replace(/^packages\//, '')));
 
+const buildSourceSnapshot = JSON.stringify(sourceIdentity(root));
 const mode = onlyPackage || onlyPackages ? 'incremental' : 'full';
 for (const packageDir of packageDirs) buildPackage(packageDir, mode);
 if (packageDirs.includes(CLI_PACKAGE_DIR)) {
   buildCliRuntimeClosure();
+  const cliDist = path.join(outputRoot, CLI_PACKAGE_DIR, 'dist');
   await buildCliNpmRuntime({ repositoryRoot: root, sourceDistRoot: path.join(outputRoot, CLI_PACKAGE_DIR, 'dist') });
+  writeBuildIdentity(root, cliDist, '@ai-atomic-framework/cli', JSON.parse(readFileSync(path.join(root, CLI_PACKAGE_DIR, 'package.json'), 'utf8')).version, treeFiles(cliDist).filter(file => !file.includes(`${path.sep}npm-runtime${path.sep}`) && path.basename(file) !== 'build-identity.json'));
   assertCliArtifactBudget();
+}
+if (packageDirs.includes('packages/create-atm')) {
+  const starterDist = path.join(outputRoot, 'packages/create-atm/dist');
+  writeBuildIdentity(root, starterDist, 'create-atm', JSON.parse(readFileSync(path.join(root, 'packages/create-atm/package.json'), 'utf8')).version, treeFiles(starterDist).filter(file => path.basename(file) !== 'build-identity.json'));
 }
 for (const packageDir of packageDirs) {
   for (const entrypoint of declaredDeclarationEntrypoints(packageDir)) {
@@ -307,6 +329,7 @@ for (const packageDir of packageDirs) {
     }
   }
 }
+if (JSON.stringify(sourceIdentity(root)) !== buildSourceSnapshot) throw new Error('Source inputs changed during package build; discard output and rebuild');
 console.log(`[build-package-dist] built ${packageDirs.length} packages (${mode})`);
 
 function assertCliArtifactBudget(): void {

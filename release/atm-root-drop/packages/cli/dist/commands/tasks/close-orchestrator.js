@@ -4,7 +4,6 @@ import { createLocalGovernanceAdapter } from '../../_vendor/plugin-governance-lo
 import { resolveActorId } from '../actor-registry.js';
 import { resolveActorWorkSession, updateActorWorkSessionState } from '../actor-session.js';
 import { computeMissingValidatorReport, verifyTaskEvidence } from '../evidence.js';
-import { cleanupStaleTeamRunsForTerminalTasks } from '../team-runtime-cleanup.js';
 import { evaluateTeamRequiredCompletionGate } from '../team.js';
 import { createFrameworkModeStatus, inspectFrameworkCloseWorktree, registerCloseCommitWindow, requireTargetRepoClosureAuthority, } from '../framework-development.js';
 import { assertEmergencyApproval, recordProtectedOverrideOutcome } from '../emergency/gate.js';
@@ -459,11 +458,7 @@ export async function runTasksClose(argv) {
                 reason: options.reason ?? (typeof taskDocument.closeReason === 'string' ? taskDocument.closeReason : null)
             });
         }
-        const cleanedTeamRuns = cleanupStaleTeamRunsForTerminalTasks({
-            cwd: options.cwd,
-            taskId: options.taskId,
-            terminalTaskStatus: options.status
-        });
+        const cleanedTeamRuns = closeWriteResult.cleanedTeamRuns;
         const closeCommitWindowPathFromClose = (options.status === 'done' || options.status === 'abandoned')
             ? registerCloseCommitWindow({
                 cwd: options.cwd,

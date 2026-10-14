@@ -9,7 +9,7 @@ import { isClosedTaskStatus } from './route-predicates.js';
 import { quoteCliValue, toTaskCandidateView } from './view-projections.js';
 import { makeResult, message } from '../shared.js';
 import { buildAgentPackHint, buildChannelPlaybook, buildGovernanceReadinessHint, buildMirrorSyncNextAction, buildNextMessages, buildTaskDeliveryPrinciple, embedTeamRecommendation } from './playbook-projection.js';
-import { buildNonPlaybookRouteHints, findTaskByTaskIdReference, withMirrorSyncOnlyTarget, withMirrorSyncOnlyTargetQueue } from './route-resolution.js';
+import { buildNonPlaybookRouteHints, buildTaskScopeNotFoundRoute, findTaskByTaskIdReference, withMirrorSyncOnlyTarget, withMirrorSyncOnlyTargetQueue } from './route-resolution.js';
 import { buildPlanningCardImportRequirement, buildPromptScopeQueueResult, createNextProfiler, isReadOnlyPromptScopeMiss } from './prompt-result-contracts.js';
 export function buildPromptScopedNextResult(input) {
     const profile = createNextProfiler('ATM_NEXT_PROMPT_SCOPE_PROFILE');
@@ -91,8 +91,7 @@ export function buildPromptScopedNextResult(input) {
         }
         const nextAction = {
             status: planningRootMissing ? 'planning-root-missing' : 'task-scope-not-found',
-            command: planningRootMissing?.requiredCommand ?? 'node atm.mjs next --prompt "<current user prompt>" --json',
-            reason: planningRootMissing?.detail ?? 'the prompt mentions task scope, but no matching ATM task card or ledger task was found',
+            ...buildTaskScopeNotFoundRoute(input.taskIntent?.userPrompt, planningRootMissing),
             taskIntent: input.taskIntent,
             candidates: [],
             planningRootMissing,

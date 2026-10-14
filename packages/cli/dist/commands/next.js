@@ -1,3 +1,5 @@
+import { withActiveClaimResume } from './next/active-claim-resume.js';
+import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { readActiveGuidanceSession, toGuidanceNextAction } from '../_vendor/core/dist/guidance/index.js';
 import { buildFirstUseUserNotice } from './first-use-notice.js';
@@ -7,7 +9,7 @@ import { classifyRunnerMode, governanceCommandPrefix, withRunnerMode } from './n
 import { bootstrapTaskId, detectGovernanceRuntime } from './governance-runtime.js';
 import { inspectIntegrationBootstrap } from './integration.js';
 import { inspectRuntimeAdapterReadiness } from './runtime-adapter-readiness.js';
-import { createFrameworkModeStatus } from './framework-development.js';
+import { createFrameworkModeStatus, detectFrameworkRepoIdentity } from './framework-development.js';
 import { describeRestrictedExecutionPolicy } from '../_vendor/core/dist/team-agents/restricted-execution-gateway.js';
 import { isQuickfixPrompt } from './work-channels.js';
 import { makeResult, message, parseOptions, resolveNextDefaultOutputPath, setOutputJsonPath } from './shared.js';
@@ -18,11 +20,12 @@ import { buildPromptScopedNextResult } from './next/prompt-results.js';
 export { resolvePromptScopedTaskContext, resolveHandoffResumeTaskRoute, shouldSkipExternalTaskCardScan, shouldSkipMarkdownTaskDiscovery } from './next/route-resolution.js';
 export { buildActiveWorkSummary } from './next/playbook-projection.js';
 import { compactNextRouteResult } from './next/result-compaction.js';
+import { extractUnownedWipAdoption } from './next/unowned-wip-adoption.js';
 export async function runNext(argv) {
     const verbose = Array.isArray(argv) && argv.includes('--verbose');
     const routeArgv = verbose ? argv.filter((arg) => arg !== '--verbose') : argv;
     const result = await runNextRoute(routeArgv);
-    return withRestrictedExecutionGuidance(verbose ? result : compactNextRouteResult(result));
+    return withActiveClaimResume(routeArgv, withRestrictedExecutionGuidance(verbose ? result : compactNextRouteResult(result)));
 }
 /**
  * Structured ATM-only route guidance. `next` projects the
@@ -45,6 +48,8 @@ function withRestrictedExecutionGuidance(result) {
     };
 }
 async function runNextRoute(argv) {
+    const adoption = extractUnownedWipAdoption(argv);
+    argv = adoption.argv;
     const profile = createNextProfiler();
     // TASK-CID-0024: --claim-intent is a next-only claim flag; extract it before
     // the shared option parser so the rest of the surface stays unchanged.
@@ -53,6 +58,14 @@ async function runNextRoute(argv) {
     const claimIntent = claimIntentExtraction.claimIntent;
     const autoIntent = claimIntentExtraction.autoIntent;
     const allowStaleRunner = argv.includes('--allow-stale-runner');
+    // TASK-ASP-0007: --atoms reserves derived atoms at claim time (an intent
+    // ceiling, not an exclusive guarantee); commit-time confirmation decides.
+    const atomsIndex = argv.indexOf('--atoms');
+    const claimAtoms = atomsIndex >= 0
+        ? String(argv[atomsIndex + 1] ?? '').split(',').map((entry) => entry.trim()).filter(Boolean)
+        : [];
+    if (atomsIndex >= 0)
+        argv = argv.filter((_, index) => index !== atomsIndex && index !== atomsIndex + 1);
     const emergencyApprovalIndex = argv.indexOf('--emergency-approval');
     const emergencyApproval = emergencyApprovalIndex >= 0
         ? argv[emergencyApprovalIndex + 1] ?? null
@@ -164,8 +177,10 @@ async function runNextRoute(argv) {
             autoIntent,
             forceClaim: Boolean(options.force),
             claimFiles: options.files,
+            claimAtoms,
             allowStaleRunner,
             emergencyApproval,
+            adoptUnownedWip: adoption.enabled,
             taskIntent,
             importedTaskQueue,
             integrationBootstrap,
@@ -248,7 +263,7 @@ async function runNextRoute(argv) {
     profile.mark('detect-governance-runtime');
     const doctorChecks = doctor.evidence.checks;
     const failed = doctorChecks.find((check) => check.ok !== true);
-    const nextAction = decideRuntimeNextAction(runtime, failed?.name ?? null, importedTaskQueue, governanceCommandPrefix(process.argv[1] ?? null), classifyRunnerMode(process.argv[1] ?? null));
+    const nextAction = decideRuntimeNextAction(runtime, failed?.name ?? null, importedTaskQueue, governanceCommandPrefix(process.argv[1] ?? null), classifyRunnerMode(process.argv[1] ?? null), detectFrameworkRepoIdentity(options.cwd).isFrameworkRepo ? 'framework' : 'adopter', existsSync(path.join(options.cwd, 'package.json')));
     const userNotice = buildFirstUseUserNotice(nextAction);
     profile.flush('default-next');
     return withRunnerMode(makeResult({

@@ -360,6 +360,78 @@
           "$ref": "#/$defs/stringList"
         }
       }
+    },
+    "fileHeat": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaId",
+        "mode",
+        "policyDigest",
+        "frozen",
+        "files"
+      ],
+      "properties": {
+        "schemaId": {
+          "const": "atm.fileHeatReceipt.v1"
+        },
+        "mode": {
+          "enum": [
+            "static",
+            "hybrid",
+            "learned"
+          ]
+        },
+        "policyDigest": {
+          "type": "string",
+          "minLength": 1
+        },
+        "frozen": {
+          "type": "boolean"
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "path",
+              "temperature",
+              "observedTemperature",
+              "pHot",
+              "hot",
+              "experienceCandidate"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "temperature": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "observedTemperature": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "pHot": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "hot": {
+                "type": "boolean"
+              },
+              "experienceCandidate": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      }
     }
   },
   "$defs": {

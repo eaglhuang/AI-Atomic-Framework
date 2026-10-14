@@ -1,11 +1,10 @@
 import assert from 'node:assert/strict';
-import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { cleanupStaleTeamRunsForTerminalTasks } from '../../packages/cli/src/commands/team-runtime-cleanup.ts';
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-const tempDir = path.join(root, '.atm-temp-test-team-runtime-cleanup');
+const tempDir = mkdtempSync(path.join(os.tmpdir(), 'atm-team-runtime-cleanup-'));
 
 function writeJson(filePath: string, value: unknown) {
   mkdirSync(path.dirname(filePath), { recursive: true });
@@ -13,8 +12,6 @@ function writeJson(filePath: string, value: unknown) {
 }
 
 try {
-  rmSync(tempDir, { recursive: true, force: true });
-  mkdirSync(tempDir, { recursive: true });
 
   writeJson(path.join(tempDir, '.atm', 'history', 'tasks', 'TASK-DONE-0001.json'), {
     workItemId: 'TASK-DONE-0001',
@@ -61,3 +58,4 @@ try {
 } finally {
   rmSync(tempDir, { recursive: true, force: true });
 }
+assert.equal(existsSync(tempDir), false, 'test must remove only its uniquely allocated fixture');

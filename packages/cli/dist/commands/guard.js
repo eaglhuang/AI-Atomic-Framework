@@ -4,6 +4,7 @@ import path from 'node:path';
 import { validateAtomRefReadability } from '../_vendor/core/dist/registry/atom-ref-readability.js';
 import { resolveActorId } from './actor-registry.js';
 import { runFrameworkDevelopmentGuard } from './framework-development.js';
+import { declaredFilesFromNewlineFile } from './framework-development/files-from.js';
 import { evaluateGitGovernanceCheck } from './git-governance.js';
 import { runCommitRangeGuard } from './hook.js';
 import { CliError, makeResult, message } from './shared.js';
@@ -258,6 +259,11 @@ function parseGuardArgs(argv) {
             }
             state.files = files.map((entry) => normalizeRelativePath(entry)).filter(Boolean);
             index = cursor - 1;
+            continue;
+        }
+        if (arg === '--files-from') {
+            state.files = declaredFilesFromNewlineFile(requireValue(argv, index, '--files-from'));
+            index += 1;
             continue;
         }
         if (arg === '--task') {

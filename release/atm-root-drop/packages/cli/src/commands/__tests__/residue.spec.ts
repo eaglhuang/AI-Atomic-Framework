@@ -50,7 +50,7 @@ async function testResidueReconcileAppliesOnlySafeOwnerAwareResidue(): Promise<v
       status: 'active',
       actorId: 'other-agent'
     });
-    writeJson(pushAttemptPath, { actorId: 'tester', remote: 'origin', branch: 'main' });
+    writeJson(pushAttemptPath, { schemaId: 'atm.gitPushAttemptStatus.v1', actorId: 'tester', remote: 'origin', branch: 'main', status: 'pushed', phase: 'complete' });
     writeJson(archivedIncidentPath, { schemaId: 'atm.incidentReport.v1', taskId: 'TASK-OLD-0001' });
     writeJson(releasedBrokerIntentPath, { taskId: 'TASK-OLD-0001', actorId: 'tester' });
     writeJson(activeBrokerIntentPath, { taskId: 'TASK-ACTIVE-0001', actorId: 'other-agent' });
@@ -81,8 +81,8 @@ async function testResidueReconcileAppliesOnlySafeOwnerAwareResidue(): Promise<v
     assert.equal(dryRun.ok, true);
     assert.equal(dryRun.evidence.report.dryRun, true);
     assert.ok(
-      dryRun.evidence.report.actions.some((action: any) => action.path === '.atm/history/evidence/TASK-OLD-0001.json'),
-      'abandoned evidence should be planned for cleanup'
+      !dryRun.evidence.report.actions.some((action: any) => action.path === '.atm/history/evidence/TASK-OLD-0001.json'),
+      'abandoned evidence must remain as historical provenance'
     );
     assert.ok(
       dryRun.evidence.report.actions.some((action: any) => action.path === '.atm/runtime/git-push-attempts/tester__origin__main.json'),
@@ -125,9 +125,9 @@ async function testResidueReconcileAppliesOnlySafeOwnerAwareResidue(): Promise<v
     const applied = runResidue(['reconcile', '--apply', '--cwd', repo]) as any;
     assert.equal(applied.ok, true);
     assert.equal(applied.evidence.report.dryRun, false);
-    assert.equal(existsSync(abandonedTaskPath), false, 'abandoned task ledger residue should be removed');
-    assert.equal(existsSync(abandonedEvidencePath), false, 'abandoned evidence residue should be removed');
-    assert.equal(existsSync(abandonedEventPath), false, 'abandoned task-event residue should be removed');
+    assert.equal(existsSync(abandonedTaskPath), true, 'abandoned task ledger must remain');
+    assert.equal(existsSync(abandonedEvidencePath), true, 'abandoned evidence must remain');
+    assert.equal(existsSync(abandonedEventPath), true, 'abandoned task events must remain');
     assert.equal(existsSync(pushAttemptPath), false, 'runtime push-attempt residue should be removed');
     assert.equal(existsSync(archivedIncidentPath), false, 'archived runtime incident residue should be removed');
     assert.equal(existsSync(releasedBrokerIntentPath), false, 'released broker-intent residue should be removed');

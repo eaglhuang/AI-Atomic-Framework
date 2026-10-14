@@ -1,5 +1,5 @@
-import { runFirstUseChain } from './lib/npm-first-use.ts';
-import { execFileSync, spawnSync } from 'node:child_process';
+import { runCleanNpmConsumerCommand, runFirstUseChain } from './lib/npm-first-use.ts';
+import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, lstatSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -258,18 +258,13 @@ function runSmoke(tarball: string, tempRoot: string, runs: number): { installMs:
   for (const [name, ...rawCommandArgs] of smokeCommands) {
     const commandArgs = rawCommandArgs.map((argument) => argument === 'WORKFLOW_PLACEHOLDER' ? workflow : argument);
     const startupMs: number[] = [];
-    let result!: ReturnType<typeof spawnSync>;
+    let result!: ReturnType<typeof runCleanNpmConsumerCommand>;
     // Execute every invocation inside the measurement loop; an unmeasured
     // warm-up duplicates stateful bootstrap/create commands unnecessarily.
     const repeatCount = name === 'version' ? runs : 1;
     for (let index = 0; index < repeatCount; index += 1) {
       const started = performance.now();
-      result = spawnSync(bin, commandArgs, {
-        cwd: consumer,
-        encoding: 'utf8',
-        shell: process.platform === 'win32',
-        windowsHide: true
-      });
+      result = runCleanNpmConsumerCommand(bin, commandArgs, consumer);
       startupMs.push(performance.now() - started);
     }
     const combined = `${result.stdout ?? ''}${result.stderr ?? ''}`;

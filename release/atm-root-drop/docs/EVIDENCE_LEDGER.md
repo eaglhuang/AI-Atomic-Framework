@@ -10,6 +10,14 @@ Only compact, offline-verifiable governance receipts are Git-eligible. The durab
 
 Files already present below `.atm/history/evidence/` are bounded legacy inputs. ATM may read and migrate them, but new runtime payloads must never be written there.
 
+Governed commit observations follow the same boundary: new git-head receipts are
+appended only to `.atm/runtime/telemetry/git-head.jsonl`. They are local
+diagnostics, not staged commit content; commit trailers and Git author,
+committer, parent, and tree metadata remain the durable attribution record.
+Legacy `.atm/history/evidence/git-head.json` remains readable but is no longer
+refreshed. At cutover, one tracked receipt occupied 1,066 bytes; future governed
+commits add zero git-head receipt bytes and zero receipt files to Git history.
+
 ## Offline access and checkpoints
 
 Each runtime object stores its work-item id, original evidence record, and digest. `verifyEvidence` recomputes the digest before returning trust. A checkpoint is the digest of the sorted object-digest set, so it can be verified without Git or a remote service.
@@ -25,7 +33,8 @@ Run `scripts/migrate-evidence-ledger.ts` against the repository to import legacy
 1. Record the tracked legacy count and byte baseline.
 2. Run migration without deletion and require every record to report equal source and ledger digests.
 3. Restore into a fresh store and verify the checkpoint.
-4. Switch production writers and readers to the canonical evidence path policy.
+4. Switch production writers to runtime-only storage and let active readers
+   prefer runtime receipts while retaining read-only support for legacy files.
 5. Keep legacy reads enabled while all existing history remains untouched.
 6. Disable legacy reads only in a later governed release after external adopters have migrated.
 

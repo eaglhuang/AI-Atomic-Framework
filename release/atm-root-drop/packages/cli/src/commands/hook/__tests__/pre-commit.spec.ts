@@ -202,7 +202,7 @@ try {
 
 const repairRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-git-governance-repair-'));
 try {
-  const evidencePath = path.join(repairRoot, '.atm', 'history', 'evidence', 'git-head.jsonl');
+  const evidencePath = path.join(repairRoot, '.atm', 'runtime', 'telemetry', 'git-head.jsonl');
   mkdirSync(path.dirname(evidencePath), { recursive: true });
   writeFileSync(evidencePath, '{"prepared":"before"}\n', 'utf8');
   const snapshot = captureGitHeadEvidencePreparation(repairRoot);
@@ -212,7 +212,7 @@ try {
 
   const absentRoot = path.join(repairRoot, 'absent');
   const absentSnapshot = captureGitHeadEvidencePreparation(absentRoot);
-  const absentEvidencePath = path.join(absentRoot, '.atm', 'history', 'evidence', 'git-head.jsonl');
+  const absentEvidencePath = path.join(absentRoot, '.atm', 'runtime', 'telemetry', 'git-head.jsonl');
   mkdirSync(path.dirname(absentEvidencePath), { recursive: true });
   writeFileSync(absentEvidencePath, '{"prepared":"orphan"}\n', 'utf8');
   assert.equal(rollbackFailedGitHeadEvidencePreparation(absentSnapshot), true);

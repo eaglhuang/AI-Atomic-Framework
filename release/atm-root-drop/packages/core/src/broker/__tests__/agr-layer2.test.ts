@@ -86,7 +86,7 @@ function makeLayer2ConflictRegion(overlap: LineRange): Layer2OverlapConflict {
       atomId: 'left',
       atomCid: 'left-cid',
       symbol: 'left',
-      sourceRange: overlap
+      sourceRange: { ...overlap, lineStart: 1, lineEnd: 10 }
     },
     rightAtom: {
       atomId: 'right',
@@ -101,7 +101,7 @@ function makeLayer2ConflictRegion(overlap: LineRange): Layer2OverlapConflict {
 function testShouldTriggerLayer2() {
   const conflicts = [
     makeLayer2ConflictRegion({ filePath: 'src/overlap.ts', lineStart: 1, lineEnd: 1 }),
-    makeLayer2ConflictRegion({ filePath: 'src/overlap.ts', lineStart: 3, lineEnd: 3 })
+    makeLayer2ConflictRegion({ filePath: 'src/overlap.ts', lineStart: 4, lineEnd: 4 })
   ];
 
   const result = shouldTriggerLayer2(conflicts, { maxConflictCount: 4, maxConflictDensity: 0.5 });
@@ -158,7 +158,7 @@ function testNoTriggerMultiFile() {
 
   const result = shouldTriggerLayer2(conflicts, { maxConflictCount: 4, maxConflictDensity: 0.5 });
   assert.equal(result.trigger, false);
-  assert.match(result.reason, /one target body/);
+  assert.match(result.reason, /one file body/);
   console.log('ok: shouldTriggerLayer2 false when conflicts are not single-file bounded');
 }
 
@@ -177,13 +177,9 @@ function testDecisionEmitsDecompositionRequest() {
   });
 
   const decision = calculateBrokerDecision(intent, registryWithActive({ filePath: 'src/overlap.ts', lineStart: 8, lineEnd: 9 }));
-  assert.equal(decision.verdict, 'needs-physical-split');
-  assert.ok(Boolean(decision.decompositionRequest));
-  if (!decision.decompositionRequest) return;
-  assert.equal(decision.decompositionRequest.conflictRegion.lineStart, 8);
-  assert.equal(decision.decompositionRequest.conflictRegion.lineEnd, 9);
-  assert.equal(decision.decompositionRequest.constraint, 'preserve-signature');
-  console.log('ok: Layer2 decision emits bounded decomposition request');
+  assert.equal(decision.verdict, 'serial');
+  assert.equal(decision.decompositionRequest, undefined, 'A 100% dense overlap exceeds the 50% Layer2 threshold');
+  console.log('ok: dense cold overlap queues without inventing a Layer2 split suggestion');
 }
 
 function testDecisionKeepsSyntacticSeparation() {

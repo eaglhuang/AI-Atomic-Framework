@@ -315,7 +315,7 @@ export function isQuickfixPrompt(prompt) {
     if (!normalized)
         return false;
     return /\b(typo|small fix|quick fix|quickfix|one line|one-line|rename|minor fix|hotfix)\b/.test(normalized)
-        || /(小改|小修|小修正|快速修|快修|修一行|改一行|改個 typo|小 typo|小錯字|熱修)/.test(prompt);
+        || /(小改|小修|小修正|快速修|快修|修一行|改一行|改個 typo|小 typo|小錯字|錯別字|錯字|熱修)/.test(prompt);
 }
 export function isBatchPrompt(prompt) {
     const normalized = prompt.trim().toLowerCase();

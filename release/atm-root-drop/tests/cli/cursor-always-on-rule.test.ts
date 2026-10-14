@@ -18,7 +18,9 @@ try {
   assert.ok(existsSync(rulePath), 'cursor integration installs an always-on rule');
   const rule = readFileSync(rulePath, 'utf8');
   assert.match(rule, /^---\n[\s\S]*alwaysApply: true[\s\S]*\n---\n/, 'the rule is always applied');
-  assert.ok(rule.includes('node atm.mjs next --prompt'), 'the rule points at the ATM entry route');
+  assert.ok(rule.includes('read `.cursor/rules/skills/atm-governance-router/SKILL.md` and follow its first-run runtime/target inspection'), 'the always-on rule delegates to the canonical first-run entry');
+  assert.ok(rule.includes('evidence.nextAction.playbook') && rule.includes('edit only inside the scope ATM returns'), 'first-run delegation retains playbook and scope authority');
+  assert.ok(!rule.includes('Before user-requested work, run `node atm.mjs next'), 'the native bridge must not skip first-run inspection');
   assert.ok(existsSync(path.join(cwd, '.cursor', 'rules', 'skills', 'atm-governance-router', 'SKILL.md')), 'skills keep their install path');
 
   const verify = atm(cwd, ['integration', 'verify', 'cursor']);

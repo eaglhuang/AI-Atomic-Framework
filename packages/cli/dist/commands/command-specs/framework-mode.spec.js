@@ -10,6 +10,7 @@ export default defineCommandSpec({
         commonCwdOption,
         { flag: '--repo', value: 'path', summary: 'Repository path to inspect.' },
         { flag: '--files', value: 'csv', summary: 'Optional comma-separated declared change scope instead of git diff.' },
+        { flag: '--files-from', value: 'path', summary: 'Newline-separated declared change scope. Each line is one path and is normalized like one --files field, so the list does not pass through a single argv string.' },
         { flag: '--target-repo', value: 'path', summary: 'Optional cross-repo target repository path.' },
         { flag: '--actor', value: 'id', summary: 'Actor id for temporary framework-development claim/release.' },
         { flag: '--task', value: 'id', summary: 'Explicit active governed task to bind to a temporary framework claim; required when the actor has ambiguous active lanes.' },
@@ -23,6 +24,7 @@ export default defineCommandSpec({
         'node atm.mjs framework-mode status --files packages/core/src/index.ts --json',
         'node atm.mjs framework-mode status --target-repo ../AI-Atomic-Framework --json',
         'node atm.mjs framework-mode claim --actor codex-main --task ATM-GOV-0001 --files packages/cli/src/commands/next.ts --reason "temporary framework maintenance" --json',
+        'node atm.mjs framework-mode claim --actor ci --files-from /tmp/changed-files.txt --reason "CI preflight framework-development claim" --json',
         'node atm.mjs framework-mode release --actor codex-main --json'
     ]
 });

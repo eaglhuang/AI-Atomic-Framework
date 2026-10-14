@@ -1,5 +1,5 @@
 import { isAllowedGovernanceArtifactPath, isExplicitTerminalHistoryCleanupArtifact, isFileAllowedInTaskBundle, listTaskOwnedProtectedOverrideAuditFiles, readProtectedOverrideAuditTaskId, readStagedFiles, readStagedJsonFile, } from './git-index-transaction.js';
-import { isCommitAttributionSideEffectPath, isIgnorableTaskScopedDirtySideEffect, listCommitAttributionSideEffectPaths, resolveGitExecutable, runGitCommand, } from './git-process-port.js';
+import { isCommitAttributionSideEffectPath, isIgnorableTaskScopedDirtySideEffect, resolveGitExecutable, runGitCommand, } from './git-process-port.js';
 import { forEachPathspecBatch } from './pathspec-argv-batching.js';
 import { resolveTaskHistoryOwnerTaskId } from '../../../_vendor/core/dist/broker/cross-task-mutation-guard.js';
 import { existsSync, readFileSync, readdirSync, rmSync, statSync, } from "node:fs";
@@ -196,7 +196,6 @@ export function resolveTaskDeclaredScope(cwd, taskId, taskDocument) {
         ...extractStringList(claim.files),
         ...extractStringList(taskDocument.targetAllowedFiles),
         ...extractTaskDeclaredFiles(taskDocument),
-        ...listCommitAttributionSideEffectPaths(cwd),
         ...listTaskOwnedProtectedOverrideAuditFiles(cwd, taskId),
     ]));
 }

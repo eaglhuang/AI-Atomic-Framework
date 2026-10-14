@@ -89,7 +89,7 @@ function addAdoptableMessages(input) {
         .slice(0, 3);
     if (adoptable.length === 0)
         return;
-    input.messages.push(message('warn', 'ATM_LANE_SESSION_ADOPTABLE', 'Other active lane sessions exist for this actor; bare flows may continue, or export one of the listed lanes to adopt it.', {
+    input.messages.push(message('warn', 'ATM_LANE_SESSION_ADOPTABLE', 'Other active lane sessions exist for this actor; bare flows may continue, or pass one of the listed lanes as --lane-session <id> (or export ATM_LANE_SESSION_ID) to adopt it.', {
         actorId: input.actorId,
         currentLaneSessionId: input.currentLaneId,
         adoptable: adoptable.map((session) => ({

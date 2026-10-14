@@ -18,7 +18,7 @@ export const gitHeadEvidencePath = gitHeadEvidencePaths.trackedReceipt;
  * or malformed JSON is never an ownership grant.
  */
 export function readLatestGitHeadReceiptTaskId(cwd) {
-    for (const relativePath of [gitHeadEvidencePaths.trackedReceipt, gitHeadEvidencePaths.jsonl]) {
+    for (const relativePath of [gitHeadEvidencePaths.runtimeJsonl, gitHeadEvidencePaths.trackedReceipt, gitHeadEvidencePaths.jsonl]) {
         const receipt = path.join(cwd, relativePath);
         if (!existsSync(receipt))
             continue;
@@ -98,7 +98,7 @@ export function createGitHeadEvidenceCheck(cwd, runtime) {
                 treeSha,
                 governedTreeSha,
                 parentCommitShas,
-                expectedEvidencePath: gitHeadEvidencePath,
+                expectedEvidencePath: gitHeadEvidencePaths.runtimeJsonl,
                 evidenceRecordsScanned: evidenceRecords.length,
                 matchedBy,
                 matchedEvidencePath: null,
@@ -115,7 +115,7 @@ export function createGitHeadEvidenceCheck(cwd, runtime) {
         treeSha,
         governedTreeSha,
         parentCommitShas,
-        expectedEvidencePath: gitHeadEvidencePath,
+        expectedEvidencePath: gitHeadEvidencePaths.runtimeJsonl,
         evidenceRecordsScanned: evidenceRecords.length,
         matchedBy,
         matchedEvidencePath: matchedRecord?.path ?? null,
@@ -252,7 +252,11 @@ function readEvidenceRecords(cwd, runtime) {
     const evidenceRoots = runtime?.layoutVersion === 1
         ? [path.join(cwd, '.atm', 'evidence')]
         : [path.join(cwd, '.atm', 'history', 'evidence')];
-    return evidenceRoots.filter(existsSync).flatMap((evidenceRoot) => listJsonFiles(evidenceRoot)).flatMap((filePath) => {
+    const files = evidenceRoots.filter(existsSync).flatMap((evidenceRoot) => listJsonFiles(evidenceRoot));
+    const runtimeReceipt = path.join(cwd, gitHeadEvidencePaths.runtimeJsonl);
+    if (existsSync(runtimeReceipt))
+        files.push(runtimeReceipt);
+    return files.flatMap((filePath) => {
         const isJsonl = filePath.endsWith('.jsonl');
         if (!isJsonl && toPortablePath(path.relative(cwd, filePath)) === gitHeadEvidencePaths.trackedReceipt) {
             const compact = readJsonIfPossible(filePath);

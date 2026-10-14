@@ -66,6 +66,13 @@ export function runGitLines(cwd: string, args: readonly string[]): readonly stri
   return result.stdout.split(/\r?\n/).map((entry) => entry.trim()).filter(Boolean);
 }
 
+/** Git path records are NUL-delimited: no quoting, trimming or line splitting. */
+export function runGitPathList(cwd: string, args: readonly string[]): readonly string[] {
+  const result = runGit(cwd, [...args, '-z']);
+  if (result.exitCode !== 0) throw new Error(`Git read failed: ${result.stderr || result.exitCode}`);
+  return result.stdout.split('\0').filter(Boolean);
+}
+
 export function runGitScalar(cwd: string, args: readonly string[]): string | null {
   const result = runGit(cwd, args);
   return result.exitCode === 0 && result.stdout.trim().length > 0 ? result.stdout.trim() : null;

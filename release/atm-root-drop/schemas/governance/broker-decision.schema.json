@@ -55,6 +55,9 @@
     "reason": {
       "type": "string"
     },
+    "queueReason": {
+      "enum": ["cold-write-conflict", "hot-write-conflict", "provisional-overlap", "fifo-predecessor"]
+    },
     "failureReason": {
       "$ref": "#/$defs/failureReason"
     },

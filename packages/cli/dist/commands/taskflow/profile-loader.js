@@ -1,10 +1,16 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { CliError } from '../shared.js';
+/** `openerPath: "atm:builtin"` selects ATM's own opener: taskflow open
+ * generates the card with tasks new and imports it, exactly as it does for a
+ * declared host opener, so a single-repository adopter needs no opener script. */
+export const BUILTIN_TASKFLOW_OPENER = 'atm:builtin';
 export function buildDelegationContract(profile) {
     const openerPath = profile?.delegation?.openerPath?.trim() || null;
     const hostOpenerAvailable = openerPath !== null;
-    const describeOnly = profile?.delegation?.writerInvocation?.describeOnly !== false;
+    const describeOnly = openerPath === BUILTIN_TASKFLOW_OPENER
+        ? false
+        : profile?.delegation?.writerInvocation?.describeOnly !== false;
     const invocable = hostOpenerAvailable && !describeOnly;
     const policy = normalizePolicy(profile?.delegation?.policy ?? null, describeOnly, hostOpenerAvailable);
     return {
@@ -28,7 +34,7 @@ export function collectMissingPrerequisites(input) {
     if (!input.profile?.delegation?.openerPath?.trim()) {
         missing.push('delegation.openerPath');
     }
-    if (input.profile && input.profile.delegation.writerInvocation?.describeOnly !== false) {
+    if (input.profile && input.profile.delegation.openerPath?.trim() !== BUILTIN_TASKFLOW_OPENER && input.profile.delegation.writerInvocation?.describeOnly !== false) {
         missing.push('delegation.writerInvocation.invoke');
     }
     const delegation = buildDelegationContract(input.profile);
@@ -225,6 +231,11 @@ export function loadProfile(profilePath) {
     catch (err) {
         throw new CliError('ATM_TASKFLOW_PROFILE_PARSE_FAILED', `Failed to parse taskflow profile: ${err instanceof Error ? err.message : String(err)}`, { exitCode: 1 });
     }
+    return validateProfile(raw);
+}
+/** Validate an already-read snapshot without reopening its source path. */
+export function validateProfile(value) {
+    const raw = value;
     if (!raw || typeof raw !== 'object') {
         throw new CliError('ATM_TASKFLOW_PROFILE_SCHEMA_INVALID', 'Taskflow profile must be a valid JSON object.', { exitCode: 1 });
     }

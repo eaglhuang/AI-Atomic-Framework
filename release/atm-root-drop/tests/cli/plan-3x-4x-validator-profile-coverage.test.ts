@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
+import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { resolveValidationObligations } from '../../packages/cli/src/commands/validation-obligations.ts';
 
@@ -75,10 +76,105 @@ for (const expected of [
   'npm run validate:runner-reproducibility',
   'release/atm-onefile/atm.mjs --version',
   'release/atm-root-drop/atm.mjs --version',
-  'release/sbom.json',
-  'npm pack --workspaces --dry-run'
+  'release/sbom.json'
 ]) assert.ok(releaseWorkflow.includes(expected), `release workflow must include ${expected}`);
 assert.match(releaseWorkflow, /Post-publish full validation/);
+
+// Inspect executable steps: comments, echoes and optional gates cannot satisfy
+// the immutable-artifact wiring contract. Dynamic release tests check contents.
+type ReleaseStep = { run?: string; if?: unknown; 'continue-on-error'?: unknown };
+type ReleaseWorkflow = { jobs: { publish: { steps: ReleaseStep[] } } };
+const { load: loadYaml } = createRequire(import.meta.url)('js-yaml') as {
+  load: (text: string) => ReleaseWorkflow;
+};
+const artifactScripts = [
+  'build-release-artifacts', 'validate-adopter-artifact-manifest',
+  'validate-npm-clean-install', 'release-candidate'
+];
+const shellLines = (run: string) => run.replace(/\\\r?\n\s*/g, ' ').split('\n').map(line => line.trim());
+function verifyArtifactSteps(workflow: ReleaseWorkflow): void {
+  const steps = workflow.jobs.publish.steps;
+  assert.ok(Array.isArray(steps), 'publish steps must exist');
+  let previous = -1;
+  for (const [position, script] of artifactScripts.entries()) {
+    const expression = new RegExp(`^node\\s+--(?:experimental-)?strip-types\\s+scripts/${script}\\.ts(?:\\s|$)`);
+    const calls = steps.flatMap((step, index) => shellLines(step.run ?? '')
+      .filter(line => expression.test(line)).map(line => ({ step, index, line })));
+    assert.equal(calls.length, 1, `${script} must run exactly once as a direct node command`);
+    const { step, index, line } = calls[0];
+    assert.ok(index > previous, 'seal, budget, install and candidate must be distinct ordered steps');
+    previous = index;
+    assert.ok(step.if === undefined || step.if === 'success()', `${script} must not be conditionally skipped`);
+    assert.ok(step['continue-on-error'] === undefined || step['continue-on-error'] === false,
+      `${script} must fail the release on error`);
+    assert.doesNotMatch(line, /[;&|]/, `${script} must not be an optional shell chain`);
+    const option = position === 0 ? '--output' : position === 3 ? '--manifest' : '--artifact-manifest';
+    const target = position === 0 ? 'release/npm-artifacts' : 'release/npm-artifacts/manifest.json';
+    const commands = shellLines(step.run ?? '').filter(command => command && !command.startsWith('#'));
+    if (position < 3) assert.deepEqual(commands, [line], `${script} must be one unconditional command`);
+    else assert.deepEqual(commands, [
+      'dry_run=()',
+      'if [[ "$RELEASE_DRY_RUN" == "true" ]]; then dry_run=(--dry-run); fi',
+      line
+    ], 'candidate must use the supported dry-run setup followed by unconditional execution');
+    assert.deepEqual(line.split(/\s+/).slice(2), [
+      `scripts/${script}.ts`, option, target,
+      ...(position === 3 ? ['--target-tag', '"$NPM_DIST_TAG"', '"${dry_run[@]}"'] : [])
+    ], `${script} must use one exact artifact option without extra shell tokens`);
+  }
+  for (const step of steps) for (const line of shellLines(step.run ?? '')) {
+    if (!/^npm\s/.test(line) || !/\b(?:pack|publish)\b/.test(line)) continue;
+    assert.doesNotMatch(line, /(?:^|\s)(?:--workspaces?(?:=|\s|$)|-w\S*)/,
+      'release must not repack or publish a workspace');
+  }
+}
+const parsedRelease = loadYaml(releaseWorkflow);
+verifyArtifactSteps(parsedRelease);
+const candidateIndex = parsedRelease.jobs.publish.steps.findIndex(step => step.run?.includes('scripts/release-candidate.ts'));
+const singleLine = structuredClone(parsedRelease);
+singleLine.jobs.publish.steps[candidateIndex].run = shellLines(singleLine.jobs.publish.steps[candidateIndex].run ?? '').join('\n');
+verifyArtifactSteps(singleLine);
+function rejectMutation(name: string, mutate: (steps: ReleaseStep[]) => void): void {
+  const changed = structuredClone(parsedRelease);
+  mutate(changed.jobs.publish.steps);
+  assert.throws(() => verifyArtifactSteps(changed), name);
+}
+for (const script of artifactScripts) {
+  const find = (steps: ReleaseStep[]) => steps.find(step => step.run?.includes(`scripts/${script}.ts`))!;
+  rejectMutation(`${script}: commented command`, steps => {
+    find(steps).run = (find(steps).run ?? '').replace(/^\s*node /gm, '# node ');
+  });
+  rejectMutation(`${script}: echoed command`, steps => {
+    find(steps).run = (find(steps).run ?? '').replace(/^\s*node /gm, 'echo node ');
+  });
+  rejectMutation(`${script}: disabled step`, steps => { find(steps).if = false; });
+  rejectMutation(`${script}: optional failure`, steps => { find(steps)['continue-on-error'] = true; });
+  rejectMutation(`${script}: wrong artifact location`, steps => {
+    find(steps).run = (find(steps).run ?? '').replaceAll('release/npm-artifacts', 'release/wrong-artifacts');
+  });
+  rejectMutation(`${script}: fake artifact option in comment`, steps => {
+    const step = find(steps);
+    const expected = script === 'build-release-artifacts' ? '--output release/npm-artifacts'
+      : script === 'release-candidate' ? '--manifest release/npm-artifacts/manifest.json'
+      : '--artifact-manifest release/npm-artifacts/manifest.json';
+    step.run = shellLines(step.run ?? '').map(line => line.startsWith('node ')
+      ? line.replace(expected, expected.replace('release/npm-artifacts', 'release/wrong')) + ` # ${expected}` : line).join('\n');
+  });
+  rejectMutation(`${script}: conditional shell body`, steps => {
+    find(steps).run = `if false; then\n${find(steps).run}\nfi`;
+  });
+}
+rejectMutation('candidate before install gate', steps => {
+  const install = steps.findIndex(step => step.run?.includes('scripts/validate-npm-clean-install.ts'));
+  [steps[install], steps[candidateIndex]] = [steps[candidateIndex], steps[install]];
+});
+rejectMutation('candidate missing manifest', steps => {
+  steps[candidateIndex].run = (steps[candidateIndex].run ?? '').replace('--manifest release/npm-artifacts/manifest.json', '');
+});
+for (const run of ['npm pack --workspaces --dry-run', 'npm publish \\\n  --workspace cli', 'npm -w cli publish', 'npm --workspace=cli pack']) {
+  rejectMutation(`workspace command: ${run}`, steps => { steps.push({ run }); });
+}
+
 
 const runnerSource = readText('scripts/run-validators/implementation.ts');
 for (const contractMarker of [

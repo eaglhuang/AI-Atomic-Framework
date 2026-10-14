@@ -91,7 +91,7 @@ export function runContextMapAdvisor(cwd) {
 }
 function readStagedFiles(cwd) {
     try {
-        const stdout = execSync('git diff --cached --name-only --diff-filter=ACMRT', { cwd, encoding: 'utf8', stdio: ['pipe', 'pipe', 'ignore'] });
+        const stdout = execSync('git diff --cached --name-only --diff-filter=ACMRTD', { cwd, encoding: 'utf8', stdio: ['pipe', 'pipe', 'ignore'] });
         return stdout
             .split('\n')
             .map(line => line.trim())

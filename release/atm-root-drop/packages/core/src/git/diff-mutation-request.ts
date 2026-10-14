@@ -23,6 +23,7 @@ export interface GitBranchTopologySnapshot {
   readonly remoteSha: string;
   readonly mergeBaseSha: string;
   readonly fetched: boolean;
+  readonly remoteBranchExists?: boolean;
 }
 
 export type GitDiffChangeKind = 'added' | 'modified' | 'deleted' | 'renamed' | 'copied' | 'typechanged' | 'unmerged' | 'unknown';
@@ -48,7 +49,30 @@ export function collectGitDiffMutationRequests(input: GitDiffMutationRequestOpti
   const remote = (input.remote?.trim() || 'origin');
   const remoteRef = `${remote}/${branch}`;
   if (input.fetch !== false) {
-    runGit(input.cwd, ['fetch', '--quiet', '--no-tags', remote, branch], input.gitExecutable, input.timeoutMs);
+    try {
+      runGit(input.cwd, ['fetch', '--quiet', '--no-tags', remote, branch], input.gitExecutable, input.timeoutMs);
+    } catch (fetchError) {
+      // Only Git's advertised absence admits ref creation. Network/auth errors
+      // and unverified local tracking-ref absence must remain fail-closed.
+      let absent = false;
+      try {
+        runGit(input.cwd, ['ls-remote', '--exit-code', '--heads', remote, `refs/heads/${branch}`], input.gitExecutable, input.timeoutMs);
+      } catch (probeError) {
+        const result = probeError as { status?: number; stdout?: string | Buffer };
+        absent = result.status === 2 && String(result.stdout ?? '').trim() === '';
+      }
+      if (!absent) throw fetchError;
+      return {
+        topology: {
+          branch, remote, remoteRef,
+          headSha: runGitScalar(input.cwd, ['rev-parse', 'HEAD'], input.gitExecutable, input.timeoutMs),
+          remoteSha: 'absent', mergeBaseSha: 'not-applicable', fetched: false, remoteBranchExists: false
+        },
+        // Creating an absent ref has no same-ref file competition. The normal
+        // push and hooks still enforce provenance, protection and creation races.
+        localDiff: [], remoteDiff: [], localRequests: [], remoteRequests: []
+      };
+    }
   }
   const headSha = runGitScalar(input.cwd, ['rev-parse', 'HEAD'], input.gitExecutable, input.timeoutMs);
   const remoteSha = runGitScalar(input.cwd, ['rev-parse', remoteRef], input.gitExecutable, input.timeoutMs);

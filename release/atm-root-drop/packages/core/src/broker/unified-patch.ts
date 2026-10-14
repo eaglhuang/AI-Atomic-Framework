@@ -21,20 +21,21 @@ export class UnifiedPatchApplicationError extends Error {
   }
 }
 
-interface Hunk {
+export interface UnifiedPatchHunk {
   readonly oldStart: number;
   readonly lines: readonly string[];
 }
 
 const HUNK_HEADER = /^@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@/;
 
-function parseHunks(patchText: string): readonly Hunk[] {
+/** Parse the hunks of a unified diff; shared with the steward base composer. */
+export function parseUnifiedPatchHunks(patchText: string): readonly UnifiedPatchHunk[] {
   const lines = patchText.split(/\r?\n/);
   // A patch normally ends with a newline, which split() turns into a trailing
   // empty element. That element is punctuation, not a blank context line, and
   // treating it as one demands an empty line the source does not have.
   if (lines.length > 0 && lines[lines.length - 1] === '') lines.pop();
-  const hunks: Hunk[] = [];
+  const hunks: UnifiedPatchHunk[] = [];
   let current: { oldStart: number; lines: string[] } | null = null;
   for (const line of lines) {
     const header = HUNK_HEADER.exec(line);
@@ -77,7 +78,7 @@ function detectLineEnding(text: string): string {
  * surface that as a blocked apply; they must not fall back to any other write.
  */
 export function applyUnifiedPatch(before: string, patchText: string): string {
-  const hunks = parseHunks(patchText);
+  const hunks = parseUnifiedPatchHunks(patchText);
   if (hunks.length === 0) return before;
 
   const lineEnding = detectLineEnding(before);
