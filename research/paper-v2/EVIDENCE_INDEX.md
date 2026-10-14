@@ -449,6 +449,19 @@ DRAFT HIST-v2 prereg（非 generation、尚未凍結、沒有 run）：[`working
 
 沒有分類 run，也沒有臂的 run。
 
+## 29. HIST-v2 分類器 v8（准入閘門；非 generation，沒有分類 run）
+
+> **工具 only。** 不是正式分類證據，沒有 `items.jsonl` 封存產出，沒有跑臂，不宣稱勝出。v1–v7 的目錄與規則雜湊不改。
+
+| 項目 | 值 |
+|---|---|
+| 路徑 | [`benchmark-design/hist-v2-classifier-v8/`](./benchmark-design/hist-v2-classifier-v8/README.md) |
+| 方法凍結 | [`benchmark-prereg/2026-10-14-hist-v2.0/`](./benchmark-prereg/2026-10-14-hist-v2.0/GENERATION.md) |
+| 規則雜湊 | `329165d10ea2fe26885f6e7e06cb065f5cb1e356fc34efd9cce38e1995c97541` |
+| 相對 v7 | NUL 路徑清單與反引號；合法特殊檔名通過下游檢查，絕對路徑與 `..` 仍拒絕。封印釘到預先登記 v2.0、完整 SHA、檔案雜湊、`jsonschema==4.18.0`、實際 argv 與日期窗。共享 PR 連通分量仍是 v7 的 `apply_holdout_leakage`，多個 batch 只在聯集上跑一次 |
+
+沒有分類 run，也沒有臂的 run。
+
 
 ## 6. 不在 repo 的參照
 - ATM pin 原始碼：GitHub `eaglhuang/AI-Atomic-Framework` commit `5692474f7db70ab52a7a71c8af4867609e7e4b43`（r3 另加 `bea35380d7f381f998c9930fa95f01b999c7f208`，box tarball `/workspace/atm-main-bea35380/atm-main.tar.gz` sha256 `9346e5b175b176618f435aeb4b41ab93ef7575f9bf77d77c47a5aeac87ad34b5`；r4 另加 `2118bc66efb3ac3bc0ddaede6a2f7cb18526b030`，box tarball `/workspace/atm-main-2118bc66/atm-main.tar.gz` sha256 `aa959607c35c51b7fc3c4e3d81b3d9e979ee62f4d9361ef9e9f5ee72e78abd88`；r5 另加 `37847584e24afc08ea58cfe380bb5b1220fbe335`，box tarball `/workspace/atm-main-37847584/atm-main.tar.gz` sha256 `e17a90ddceaf3c70d580c96e31f14cf8251d5a664985c1eb494f0d8db8045e3d`；r6 另加 `b35a6141bd5bfbaec654f1cd3079323581b04074`，box tarball `/workspace/atm-main-b35a6141/atm-main.tar.gz` sha256 `93fa7839d8e0fee51e5ad224833df2b57397fead3e77e0528117f21f5d5e59ef`）；box tarball `/workspace/atm-main-5692474f/atm-main.tar.gz` sha256 `1d498a397e6a5db119d40b8f539dc165cb0028fbfe9577f953023f8ec8d45795`。

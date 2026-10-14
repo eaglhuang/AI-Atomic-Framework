@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "hist-v2-score-input/8",
+  "title": "HIST-v2 scorer inputs are separate kinds",
+  "description": "The document root is not an instance entry. Validate acceptanceEntry or semanticEntry alone.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {},
+  "$defs": {
+    "acceptanceEntry": {
+      "$id": "hist-v2-acceptance-input/8",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "accepted_prs", "observed_sha256", "acked"],
+      "properties": {
+        "kind": {"const": "acceptance"},
+        "proposal_id": {"type": "string"},
+        "accepted_prs": {
+          "type": "array",
+          "items": {"type": "integer"},
+          "description": "Set S as presented by the arm. Lookup uses the sorted unique ids, so [3, 1] and [1, 3] are the same key."
+        },
+        "observed_sha256": {"type": "string"},
+        "acked": {"type": "boolean", "description": "True only for a success ack at or before the effective stop."}
+      }
+    },
+    "semanticEntry": {
+      "$id": "hist-v2-semantic-input/8",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "passing_test_ids", "retained_test_ids", "reference_pass_count", "retained_pass_count", "is_legal_reject"],
+      "properties": {
+        "kind": {"const": "semantic-evaluation"},
+        "passing_test_ids": {
+          "type": "array",
+          "items": {"type": "string"},
+          "uniqueItems": true,
+          "description": "Test ids that pass on the reference bytes R(S). Empty means R(S) has no passing tests."
+        },
+        "retained_test_ids": {
+          "type": "array",
+          "items": {"type": "string"},
+          "uniqueItems": true,
+          "description": "Subset of passing_test_ids that still pass on the final bytes. Length is retained_pass_count."
+        },
+        "reference_pass_count": {"type": "integer", "minimum": 0},
+        "retained_pass_count": {"type": "integer", "minimum": 0},
+        "is_legal_reject": {"type": "boolean"}
+      },
+      "histV2Bounds": true
+    }
+  }
+}
