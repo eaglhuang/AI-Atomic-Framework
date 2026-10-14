@@ -20,6 +20,7 @@ ATM（AI-Atomic-Framework）論文 2.0（composer＋中立 steward，RQ2 主臂 
 | HIST-v2 重新設計稿 2026-10-10 | [`benchmark-design/2026-10-10-hist-bench-v2/`](./benchmark-design/2026-10-10-hist-bench-v2/README.md)（DRAFT 設計稿；不是凍結的預先登記、沒有任何 run；待作者決定 D1–D9 後另行凍結） |
 | HIST-v2 預先登記 v2.0（方法凍結） | [`benchmark-prereg/2026-10-14-hist-v2.0/`](./benchmark-prereg/2026-10-14-hist-v2.0/GENERATION.md)（2026-10-14；只凍結方法設計，自 r7 原樣帶入全部 DECISIONS。分類與實驗仍有准入閘門。來源 commit `f08599c7d864cd4ede0b50e4c6b6742b4a892f0b`。不宣稱勝出、沒有 run） |
 | HIST-v2 harness v2 | [`benchmark-harness/hist-v2-harness-v2/`](./benchmark-harness/hist-v2-harness-v2/GENERATION.md)（2026-10-14；四條臂的 fixture 接線。不跑 smoke／pilot／主跑／留出集。不宣稱勝出、沒有正式 run） |
+| HIST-v2 smoke runbook | [`benchmark-design/hist-v2-smoke-runbook/`](./benchmark-design/hist-v2-smoke-runbook/RUNBOOK_zh.md)（2026-10-14；trial-only 程序。沒有執行 smoke／pilot／主跑／留出集。不宣稱勝出） |
 | 校驗 | `generations/<gen>/verify.sh`（唯讀；`sha256sum -c SHA256SUMS`） |
 | benchmark-trials/2026-10-09-hist-smoke, benchmark-trials/2026-10-09-hist-pilot | 試跑（trial runs, not formal results）：歷史真實 PR benchmark 冒煙＋Django pilot，ATM pin b35a6141（2026-10-09） |
 | benchmark-trials/2026-10-09-hist-mining | 只挖掘、沒有 run（不列入正式結果）：六專案合併 commit base 重新挖掘、可行性 dry-run、prereg v1.1 提案草稿（未套用）（2026-10-09） |
@@ -70,5 +71,6 @@ sh research/paper-v2/benchmark-design/2026-10-10-hist-bench-v2/verify.sh researc
 sh research/paper-v2/benchmark-prereg/2026-10-14-hist-v2.0/verify.sh research/paper-v2/benchmark-prereg/2026-10-14-hist-v2.0
 # 預期：OK: 5 files verified (read-only) in research/paper-v2/benchmark-prereg/2026-10-14-hist-v2.0
 sh research/paper-v2/benchmark-harness/hist-v2-harness-v2/verify.sh research/paper-v2/benchmark-harness/hist-v2-harness-v2
+sh research/paper-v2/benchmark-design/hist-v2-smoke-runbook/verify.sh research/paper-v2/benchmark-design/hist-v2-smoke-runbook
 ```
 **注意：** `harness/reproduce.sh`（r1 版）的 verify 模式會重寫 manifest／checksums，**不可**用來驗證 r1（外審 P0-3）。r2–r6 已把 reproduce 拆成 verify／analyze／rerun／seal；驗證只用各代 `verify.sh`。
