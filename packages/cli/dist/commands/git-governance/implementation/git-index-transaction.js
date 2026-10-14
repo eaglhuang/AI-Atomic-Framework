@@ -437,5 +437,8 @@ export function stageTaskScopedBundleFiles(cwd, files, env) {
     if (normalizedFiles.length === 0) {
         return;
     }
-    runGitCommandWithEnv(cwd, ["add", "-A", "-f", "--", ...normalizedFiles], env ?? process.env, ["ignore", "pipe", "pipe"]);
+    const fixedArgs = ["add", "-A", "-f", "--"];
+    forEachPathspecBatch({ paths: normalizedFiles, fixedArgs }, (batch) => {
+        runGitCommandWithEnv(cwd, [...fixedArgs, ...batch], env ?? process.env, ["ignore", "pipe", "pipe"]);
+    });
 }
