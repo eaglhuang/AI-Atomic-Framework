@@ -128,7 +128,7 @@ function validateWorkflow(input: string) {
   assert(/release_version:/.test(input), 'DIST_TAG_WORKFLOW_VERSION_INPUT_MISSING', 'release workflow must expose release_version dry-run input');
   assert(/release_tier:/.test(input), 'DIST_TAG_WORKFLOW_TIER_INPUT_MISSING', 'release workflow must expose release_tier input');
   assert(/validate-dist-tag\.ts --mode resolve/.test(input), 'DIST_TAG_WORKFLOW_RESOLVE_MISSING', 'release workflow must resolve NPM_DIST_TAG with validate-dist-tag.ts');
-  assert(/--tag "\$NPM_DIST_TAG"/.test(input), 'DIST_TAG_WORKFLOW_PUBLISH_TAG_MISSING', 'npm publish commands must pass --tag "$NPM_DIST_TAG"');
+  assert(/--target-tag "\$NPM_DIST_TAG"/.test(input), 'DIST_TAG_WORKFLOW_PUBLISH_TAG_MISSING', 'candidate promotion must pass the resolved target tag');
   assert(/alpha\|beta\|lts/.test(input), 'DIST_TAG_WORKFLOW_REGEX_MISSING', 'release tag regex must allow alpha, beta, and lts prerelease segments');
 }
 

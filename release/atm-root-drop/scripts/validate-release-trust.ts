@@ -69,34 +69,24 @@ const skeletonPackageNames = Array.isArray(packageFixture.packages)
 const publicPackageNames = (packageFixture.publishClosure?.publishedPackages ?? [])
   .filter((name): name is string => typeof name === 'string');
 
-const publishLines = workflow.split(/\r?\n/).filter((line) => line.includes('npm publish'));
-assert(publishLines.length >= 2, 'release-npm.yml: must publish the complete workspace closure in both dry-run and release branches');
-for (const line of publishLines) {
-  assert(line.includes('--provenance'), `release-npm.yml: npm publish line must include --provenance: ${line.trim()}`);
-  assert(line.includes('--access public'), `release-npm.yml: npm publish line must make public packages explicitly public: ${line.trim()}`);
-  assert(line.includes('--tag "$NPM_DIST_TAG"'), `release-npm.yml: npm publish line must use the resolved NPM_DIST_TAG: ${line.trim()}`);
-  assert(line.includes('--workspace "$workspace"'), `release-npm.yml: npm publish line must target one explicit workspace: ${line.trim()}`);
-}
-assert(workflow.includes('PUBLIC_WORKSPACES=('), 'release-npm.yml: must declare the explicit public workspace closure');
-assert(workflow.includes('for workspace in "${PUBLIC_WORKSPACES[@]}"; do'), 'release-npm.yml: must iterate every explicitly declared public workspace');
-assert(workflow.includes('npm view "$workspace@$release_version" version --json'), 'release-npm.yml: release retries must skip already-published workspace versions');
-assert(!workflow.includes('npm publish --workspaces'), 'release-npm.yml: must not publish example workspaces through --workspaces');
+const candidateScript = readFileSync(path.join(root, 'scripts/release-candidate.ts'), 'utf8');
+const manifestScript = readFileSync(path.join(root, 'scripts/release-artifact-manifest.ts'), 'utf8');
+assert(workflow.includes('scripts/build-release-artifacts.ts --output release/npm-artifacts'), 'release must seal immutable tarballs');
+assert(workflow.includes('scripts/release-candidate.ts') && workflow.includes('--target-tag "$NPM_DIST_TAG"'), 'release must use candidate verification and promotion');
+assert(workflow.includes('--artifact-manifest release/npm-artifacts/manifest.json'), 'local install gate must test the sealed artifact manifest');
+assert(workflow.includes('npm@11.21.0'), 'release must pin npm with OIDC dist-tag support');
+assert(candidateScript.includes('io.preflight(candidateTag)'), 'release must preflight tag permission before publishing');
+assert(candidateScript.includes("'--prefer-online'") && candidateScript.includes("'--cache'"), 'registry verification must use isolated caches and prefer-online');
+assert(!/npm publish/.test(workflow), 'workflow must not bypass candidate orchestration');
+assert(!candidateScript.includes('--workspace'), 'candidate publication must never rebuild a workspace');
+assert(candidateScript.includes("'--provenance'") && candidateScript.includes("'--access', 'public'") && candidateScript.includes("'--ignore-scripts'"), 'candidate tarball publication requires provenance, public access and disabled lifecycle scripts');
+assert(candidateScript.includes('io.lifecycle(candidateTag)') && candidateScript.indexOf('io.lifecycle(candidateTag)') < candidateScript.indexOf('io.setTag(artifact.name, artifact.version, targetTag)'), 'promotion must follow complete candidate lifecycle');
+assert(candidateScript.includes('verifyArtifact(manifest, artifact, downloaded)'), 'public downloads must match sealed candidate bytes');
+assert(candidateScript.includes('scripts/validate-public-starter.sh'), 'release must retain public starter governed task lifecycle');
 assert(publicPackageNames.length > 0, 'tests/package-skeleton.fixture.json must declare publishClosure.publishedPackages');
-for (const packageName of publicPackageNames) {
-  assert(workflow.includes(`"${packageName}"`), `release-npm.yml: missing explicit public workspace ${packageName}`);
-}
-// A workspace outside the declared closure must not be reachable from the
-// publish list, or the release silently widens back to the multi-package surface.
-for (const packageName of skeletonPackageNames) {
-  if (publicPackageNames.includes(packageName)) continue;
-  assert(
-    !new RegExp(`^\\s*"${packageName.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&')}"\\s*$`, 'm').test(workflow),
-    `release-npm.yml: ${packageName} is outside publishClosure.publishedPackages and must not be listed for publish`
-  );
-}
-
-assert(/workflow_dispatch/.test(workflow) && /dry_run/.test(workflow), 'release-npm.yml: must expose workflow_dispatch dry_run mode');
-assert(/--dry-run/.test(workflow), 'release-npm.yml: dry-run mode must call npm publish --dry-run with --provenance');
+for (const name of publicPackageNames) assert(manifestScript.includes(`'${name}'`), `release artifact closure missing ${name}`);
+for (const name of skeletonPackageNames.filter(name => !publicPackageNames.includes(name))) assert(!manifestScript.includes(`'${name}'`), `release artifact closure includes private workspace ${name}`);
+assert(/workflow_dispatch/.test(workflow) && /dry_run/.test(workflow) && /--dry-run/.test(workflow), 'release must retain nonpublishing dry-run');
 
 assert(
   /sbom|cdxgen|cyclonedx/i.test(workflow),

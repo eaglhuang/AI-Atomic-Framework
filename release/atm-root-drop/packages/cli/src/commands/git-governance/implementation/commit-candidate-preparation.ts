@@ -3,7 +3,6 @@ import { resolveTaskScopedCommitBundle } from './commit-bundle-resolution.ts';
 import { ensureGovernedGitHeadEvidenceStagedForCommit } from './git-head-evidence-transaction.ts';
 import {
   shouldStageGovernedGitHeadEvidenceBeforeCommit,
-  stageTrackedActorRegistryIfNeeded,
 } from './git-process-port.ts';
 import { readStagedFiles } from './git-index-transaction.ts';
 import { inspectTouchedPhysicalLineBudget } from '../commit-scope-policy.ts';
@@ -43,10 +42,9 @@ export function prepareCommitCandidate(input: LegacyValue): CommitCandidatePrepa
     taskScopedBundleReport: resolvedTaskBundle,
     frameworkClaimCommitFiles: input.frameworkClaimCommitFiles,
   });
-  const autoStagedActorRegistryPath =
-    input.options.taskId === null
-      ? stageTrackedActorRegistryIfNeeded(input.options.cwd)
-      : null;
+  if (((input.options.taskId !== null && input.taskDocument) || input.hookTaskId?.startsWith('ATM-FRAMEWORK-TEMP-')) && bundleFiles.length === 0) {
+    throw new CliError('ATM_GIT_COMMIT_BUNDLE_BLOCKED', 'The task-scoped candidate is empty; foreign staged paths cannot supply a fallback candidate.', { exitCode: 1 });
+  }
   const scopedCommitFiles =
     bundleFiles.length > 0 ? bundleFiles : input.frameworkClaimCommitFiles;
   const preStagedEvidence =
@@ -76,7 +74,6 @@ export function prepareCommitCandidate(input: LegacyValue): CommitCandidatePrepa
           actorId: input.actorId,
           taskId: input.options.taskId,
           stagedCommitSurface,
-          autoStagedActorRegistryPath,
           autoStagedFrameworkPaths: input.autoStagedFrameworkPaths,
         },
       },

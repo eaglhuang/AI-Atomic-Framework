@@ -3,14 +3,42 @@ import { readFileSync, realpathSync } from 'node:fs';
 import path from 'node:path';
 import { governanceCommandPrefix } from '../../packages/cli/src/commands/shared/atm-cli-entrypoint.ts';
 
+/** A clean npm consumer has no authority or runner selection from its parent. */
+export function cleanNpmConsumerEnvironment(env: NodeJS.ProcessEnv = process.env): NodeJS.ProcessEnv {
+  return Object.fromEntries(Object.entries(env).filter(([key]) => !/^ATM_/i.test(key)
+    && key.toUpperCase() !== 'AGENT_IDENTITY'));
+}
+
 /** Accept only the bounded onboarding actions for this installed package.
  * Never execute a binary or shell expression supplied by generated text. */
-export function resolveFirstUseArguments(command: string, bin: string, guideGoal?: string): string[] | null {
+function installedRuntime(bin: string): string | null {
   const packageRoot = path.resolve(path.dirname(bin), '../@ai-atomic-framework/cli');
   const pkg = JSON.parse(readFileSync(path.join(packageRoot, 'package.json'), 'utf8'));
   if (pkg.name !== '@ai-atomic-framework/cli' || typeof pkg.bin?.atm !== 'string') return null;
   const runtime = path.resolve(packageRoot, pkg.bin.atm);
   if (!runtime.startsWith(`${packageRoot}${path.sep}`)) return null;
+  return runtime;
+}
+
+export function runCleanNpmConsumerCommand(bin: string, argv: string[], cwd: string) {
+  const runtime = installedRuntime(bin);
+  if (!runtime) throw new Error('Installed npm consumer has no bounded ATM runtime entry');
+  // Retain a real npm-bin probe; complex argv uses Node to avoid cmd tokenization.
+  if (argv[0] === '--version' && argv.every((arg) => arg === '--version' || arg === '--json')) {
+    return spawnSync(process.platform === 'win32' ? `"${bin}"` : bin, argv, {
+      cwd, encoding: 'utf8', windowsHide: true, shell: process.platform === 'win32',
+      env: cleanNpmConsumerEnvironment()
+    });
+  }
+  return spawnSync(process.execPath, [runtime, ...argv], {
+    cwd, encoding: 'utf8', windowsHide: true, shell: false,
+    env: cleanNpmConsumerEnvironment()
+  });
+}
+
+export function resolveFirstUseArguments(command: string, bin: string, guideGoal?: string): string[] | null {
+  const runtime = installedRuntime(bin);
+  if (!runtime) return null;
   const entries = [runtime];
   if (process.platform !== 'win32' && realpathSync(bin) === realpathSync(runtime)) entries.push(path.resolve(bin));
   const prefixes = [...entries.map(entry => `${governanceCommandPrefix(entry)} `), 'npm exec -- atm '];
@@ -56,9 +84,7 @@ function commandOutput(result: ReturnType<typeof spawnSync>): string {
 
 export function runFirstUseChain(bin: string, cwd: string): Record<string, unknown> {
   const steps: Array<{ command: string; exitCode: number | null }> = [];
-  const runBin = (argv: string[]) => spawnSync(bin, argv, {
-    cwd, encoding: 'utf8', windowsHide: true, shell: process.platform === 'win32'
-  });
+  const runBin = (argv: string[]) => runCleanNpmConsumerCommand(bin, argv, cwd);
   const guideGoal = 'Verify first-use npm install workflow';
   const initial = runBin(['next', '--prompt', guideGoal, '--json']);
   steps.push({ command: 'atm next --prompt <validation prompt> --json', exitCode: initial.status });

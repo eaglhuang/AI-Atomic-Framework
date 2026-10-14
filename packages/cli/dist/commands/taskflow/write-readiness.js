@@ -262,14 +262,15 @@ export function buildTaskflowCloseWriteReadinessHint(input) {
             planningRepoRoot: planningResolved.repoRoot,
             planningRelativePath: planningResolved.relativePath
         });
-        const historicalRefHint = detectedDelivery.ref ?? '<commit>';
         const detectedSummary = detectedDelivery.ref
-            ? `Framework delivery already landed at ${detectedDelivery.ref}; taskflow close --write requires --historical-delivery before backend close can proceed.`
-            : 'Framework delivery already landed; taskflow close --write will require --historical-delivery before backend close can proceed.';
+            ? `Scoped delivery was found at ${detectedDelivery.ref}; taskflow close --write requires --historical-delivery before backend close can proceed.`
+            : 'No qualified historical delivery was found. Preserved WIP/non-delivery commits cannot close the task; resume its real deliverables and validation before requesting closure.';
         blockers.push({
             code: 'ATM_TASKFLOW_CLOSE_HISTORICAL_DELIVERY_REQUIRED',
             summary: detectedSummary,
-            requiredCommand: `node atm.mjs taskflow close --task ${input.taskId} --actor ${quoteCliValue(input.actorId || '<actor>')} --historical-delivery ${historicalRefHint} --write --json`
+            requiredCommand: detectedDelivery.ref
+                ? `node atm.mjs taskflow close --task ${input.taskId} --actor ${quoteCliValue(input.actorId || '<actor>')} --historical-delivery ${detectedDelivery.ref} --write --json`
+                : `node atm.mjs next --actor ${quoteCliValue(input.actorId || '<actor>')} --prompt ${quoteCliValue(`Resume ${input.taskId} and complete its scoped deliverables`)} --json`
         });
     }
     if (input.planningAuthorityDeliveryGate.required && !input.planningAuthorityDeliveryGate.ok) {
@@ -281,10 +282,14 @@ export function buildTaskflowCloseWriteReadinessHint(input) {
             requiredCommand: `node atm.mjs taskflow close --task ${input.taskId} --actor ${quoteCliValue(input.actorId || '<actor>')} --historical-delivery <commit> --write --json`
         });
     }
-    const historicalRef = input.historicalDeliveryRefs[0] ?? null;
-    if (historicalRef && input.declaredFiles.length > 0) {
+    // Match the backend's --historical-delivery-repo authority. A planning-only
+    // delivery SHA need not exist in the target repository's object database.
+    const historicalDeliveryRepo = input.planningAuthorityDeliveryGate.ok
+        ? input.planningAuthorityDeliveryGate.repoRoot ?? input.cwd
+        : input.cwd;
+    for (const historicalRef of input.historicalDeliveryRefs) {
         const historicalReport = inspectHistoricalDelivery({
-            cwd: input.cwd,
+            cwd: historicalDeliveryRepo,
             taskId: input.taskId,
             requestedRef: historicalRef,
             declaredFiles: [...input.declaredFiles],
@@ -292,12 +297,12 @@ export function buildTaskflowCloseWriteReadinessHint(input) {
             waiverOutOfScopeDelivery: input.waiverOutOfScopeDelivery === true,
             waiverReason: input.waiverReason ?? null
         });
-        if (historicalReport.reason === 'no-scoped-deliverable-files'
-            || historicalReport.reason === 'out-of-scope-source-files-present'
-            || historicalReport.reason === 'out-of-scope-waiver-reason-required') {
+        if (!historicalReport.ok) {
             blockers.push({
                 code: 'ATM_TASK_CLOSE_DELIVERABLE_DIFF_REQUIRED',
-                summary: `Historical delivery ${historicalRef} contains no declared non-.atm deliverable for ${input.taskId}; record a scoped delivery before requesting task closure.`,
+                summary: historicalReport.reason === 'commit-marked-non-delivery'
+                    ? `Historical reference ${historicalRef} is explicitly marked WIP/non-delivery or closeout-ineligible and cannot close ${input.taskId}. Resume the task's real deliverables and validation; a scope waiver cannot qualify this snapshot.`
+                    : `Historical delivery ${historicalRef} is not a qualified scoped delivery for ${input.taskId} (${historicalReport.reason}); record a valid scoped delivery before requesting task closure.`,
                 requiredCommand: null
             });
         }

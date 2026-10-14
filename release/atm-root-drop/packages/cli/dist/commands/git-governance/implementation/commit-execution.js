@@ -4,7 +4,7 @@ import { recordProtectedOverrideOutcome, } from "../../emergency/gate.js";
 import { buildProtectedOverrideRepairCandidate } from "../../emergency/protected-override-audit.js";
 import { CliError, makeResult, message, quoteCliValue, } from "../../shared.js";
 import { withBranchCommitQueueLock } from './branch-commit-window.js';
-import { buildCopyableGitCommitCommand, buildHostGitCompatibilityGuidance, cleanupDeferredForeignStagedSnapshot, rollbackNewlyStagedLiveIndexResidue } from './git-index-transaction.js';
+import { buildCopyableGitCommitCommand, buildHostGitCompatibilityGuidance, cleanupDeferredForeignStagedSnapshot } from './git-index-transaction.js';
 import { captureIndexRestorationSnapshot, restoreIndexToSnapshot, } from './index-restoration.js';
 import { isHeadRaceCommitFailure, readHeadCommitSha } from './push-command.js';
 import { prepareCommitCandidate, assertGovernedCommitPhysicalLineBudget } from './commit-candidate-preparation.js';
@@ -21,13 +21,12 @@ export function applyLiveIndexRollbackAfterCommitError(input) {
         return { indexRestoration: null, liveIndexResidueRollback: [] };
     }
     const indexRestoration = input.indexRestorationSnapshot
-        ? restoreIndexToSnapshot(input.cwd, input.indexRestorationSnapshot)
+        ? restoreIndexToSnapshot(input.cwd, input.indexRestorationSnapshot, { paths: input.operationOwnedPaths ?? [], expected: input.expectedOperationIndex ?? input.indexRestorationSnapshot })
         : null;
     return {
         indexRestoration,
         liveIndexResidueRollback: Array.from(new Set([
             ...(indexRestoration?.restoredPaths ?? []),
-            ...rollbackNewlyStagedLiveIndexResidue(input.cwd, input.liveIndexSnapshotBeforeAttempt),
         ])).sort(),
     };
 }
@@ -36,7 +35,9 @@ export function executeGitCommit(options, context) {
     // ATM-GOV-0369 amendment 1: the boundary that can fail owns its own
     // pre-operation snapshot, so restoration never depends on a caller
     // remembering to take one.
-    const indexRestorationSnapshotBeforeCommitAttempt = captureIndexRestorationSnapshot(options.cwd);
+    const indexRestorationSnapshotBeforeCommitAttempt = context.liveIndexRestorationSnapshotBeforeCommitAttempt ?? captureIndexRestorationSnapshot(options.cwd);
+    let expectedOperationIndex = captureIndexRestorationSnapshot(options.cwd);
+    const operationOwnedPaths = new Set(autoStagedFrameworkPaths ?? []);
     try {
         withBranchCommitQueueLock({
             cwd: options.cwd,
@@ -89,6 +90,9 @@ export function executeGitCommit(options, context) {
                 hookTaskId,
                 autoStagedFrameworkPaths,
             });
+            if (candidate.preStagedEvidence?.evidencePath)
+                operationOwnedPaths.add(candidate.preStagedEvidence.evidencePath);
+            expectedOperationIndex = captureIndexRestorationSnapshot(options.cwd);
             // executeHookBypassCommitBoundary( is reached inside executeCommitAttempt
             // only after withBranchCommitQueueLock admits this branch commit window.
             protectedOverrideAudit = executeCommitAttempt({
@@ -122,11 +126,13 @@ export function executeGitCommit(options, context) {
         const headAdvancedDuringAttempt = Boolean(headShaAfterFailure &&
             headShaBeforeCommit &&
             headShaAfterFailure !== headShaBeforeCommit);
-        const { liveIndexResidueRollback } = applyLiveIndexRollbackAfterCommitError({
+        const { liveIndexResidueRollback, indexRestoration } = applyLiveIndexRollbackAfterCommitError({
             cwd: options.cwd,
             headAdvancedDuringAttempt,
             indexRestorationSnapshot: indexRestorationSnapshotBeforeCommitAttempt,
             liveIndexSnapshotBeforeAttempt: liveIndexSnapshotBeforeCommitAttempt,
+            operationOwnedPaths: [...operationOwnedPaths],
+            expectedOperationIndex,
         });
         const gitHeadEvidenceRollback = headAdvancedDuringAttempt
             ? false
@@ -179,13 +185,14 @@ export function executeGitCommit(options, context) {
                 ? error.code
                 : isCommitTimeoutFailure
                     ? "ATM_GIT_COMMIT_TIMEOUT"
-                    : "UNKNOWN",
+                    : readAtmErrorCode(error) ?? "UNKNOWN",
             errorSummary: hookFailureSummary
                 ?? (error instanceof Error ? error.message.slice(0, 500) : String(error)),
             statusCommand,
             retryCommand,
             copyableCommitCommand: rawCopyableCommitCommand,
             liveIndexResidueRollback,
+            indexRestoration,
         });
         if (error instanceof CliError &&
             (error.code === "ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY" ||
@@ -263,6 +270,11 @@ export function executeGitCommit(options, context) {
                 liveIndexResidueRollback: nestedAttemptStatus.liveIndexResidueRollback ?? null,
             }
             : null;
+        // Retrying cannot help when there is nothing to commit, so say so instead
+        // of pointing at an opaque nested failure and the same retry command.
+        if (!headAdvancedDuringAttempt && readAtmErrorCode(error) === "ATM_COMMIT_ATTRIBUTION_EMPTY_BUNDLE") {
+            throw new CliError("ATM_GIT_COMMIT_NOTHING_TO_COMMIT", "Nothing to commit: none of the files this commit may include has a change. Edit the claimed files first; if the change already landed in an earlier commit, there is nothing left to commit.", { exitCode: 1, details: { actorId, taskId: options.taskId, headShaBeforeCommit, commitAttemptStatusPath, statusCommand, gitHeadEvidenceRollback } });
+        }
         throw new CliError("ATM_GIT_COMMIT_FAILED", hookFailureSummary ?? "ATM git commit wrapper failed.", {
             exitCode: 1,
             details: {
@@ -398,4 +410,9 @@ export function executeGitCommit(options, context) {
             protectedOverrideOutcome,
         },
     });
+}
+/** Coded errors from the commit path keep their ATM code in the attempt record. */
+function readAtmErrorCode(error) {
+    const code = error?.code;
+    return typeof code === "string" && code.startsWith("ATM_") ? code : null;
 }

@@ -104,6 +104,9 @@ try {
   assert.equal((autoStageCommit.evidence as any).branchCommitQueue?.headShaAtCommitStart, (autoStageCommit.evidence as any).branchCommitQueue?.headShaAtAcquire);
   assertBranchCommitQueueSchema((autoStageCommit.evidence as any).branchCommitQueue, 'auto-stage commit branch queue evidence');
   assert.ok(String((autoStageCommit.evidence as any).copyableCommitCommand).includes('ATM-Task'));
+  const taskScopedCommitFiles = runGit(tempDir, ['show', '--name-only', '--format=', 'HEAD']);
+  assert.doesNotMatch(taskScopedCommitFiles, /\.atm\/history\/evidence\/git-head\.jsonl?/,
+    'task-scoped commit trees must not contain runtime git-head receipts');
   rmSync(path.join(tempDir, outsideFile), { force: true });
 
   // ATM-BUG-2026-07-13-177: framework temp-claim commits must not absorb ordinary-unowned staged files.

@@ -1,6 +1,7 @@
 import type { FreezeAck, FreezeResolution, FreezeSignal } from './freeze.ts';
 import type { ContentAnchor } from './boundaries/content-anchor.ts';
 import type { ResourceOverlap } from './resource-overlap.ts';
+import type { SerialQueueDocument } from './serial-queue/contracts.ts';
 
 export interface MigrationRecord {
   readonly strategy: 'none' | 'additive' | 'breaking';
@@ -176,6 +177,8 @@ export interface BrokerDecision {
   readonly stewardId?: string | null;
   readonly applyMethod: 'patch-apply' | 'ast-rewrite' | 'git-three-way-fallback' | 'steward-authored-final-patch' | 'none';
   readonly reason: string;
+  /** Explains waiting, never grants write authority or proves ticket persistence. */
+  readonly queueReason?: import('./serial-queue/contracts.ts').SerialQueueReason;
   readonly admission?: ProposalAdmissionEvidence;
   readonly failureReason?: BrokerDecisionFailureReason;
 }
@@ -273,6 +276,7 @@ export interface WriteBrokerRegistryDocument {
   readonly workspaceId: string;
   readonly currentEpoch?: number;
   readonly activeIntents: readonly ActiveWriteIntent[];
+  readonly serialQueue?: SerialQueueDocument;
 }
 
 export type BrokerArbitrationVerdict = 'allow' | 'watch' | 'freeze' | 'takeover';

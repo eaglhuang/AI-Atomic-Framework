@@ -7,6 +7,20 @@
   },
   "entries": [
     {
+      "key": "cli.git-head.runtime-only",
+      "capability": "validator",
+      "family": "git-governance-regression",
+      "source": "repository-test",
+      "scope": "task-local",
+      "tiers": ["quick", "standard"],
+      "command": "node --strip-types tests/cli/git-head-runtime-only-receipt.test.ts && node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts && node --strip-types tests/cli/git-record-commit.test.ts",
+      "pathTriggers": ["packages/cli/src/commands/git-head-evidence.ts", "packages/cli/src/commands/git-governance/implementation/git-head-evidence-transaction.ts", "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts", "packages/cli/src/commands/hook/pre-commit/input-state.ts", "tests/cli/git-head-runtime-only-receipt.test.ts", "tests/cli/git-commit-task-scoped-staging.test.ts", "tests/cli/git-record-commit.test.ts"],
+      "dedupeKeys": ["git-governance:git-head-runtime-only"],
+      "costBudgetMs": 120000,
+      "performanceGate": "advisory",
+      "responsibility": "task-required"
+    },
+    {
       "key": "language.typescript.static.fast",
       "capability": "validator",
       "family": "language-static",

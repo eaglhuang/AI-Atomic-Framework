@@ -3,6 +3,8 @@ import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { createTempWorkspace } from './temp-root.ts';
 import { buildFirstLayerCommandContract, classifyFirstLayerIntent, classifyGuidanceIntent } from '../packages/core/src/guidance/index.ts';
+import { atmFirstRunCommand } from '../packages/integrations-core/src/index.ts';
+import { readSkillGuidanceClosure } from './lib/skill-guidance-closure.ts';
 
 
 const validator = createValidator('guide', { portableCliExecution: 'source-in-process' });
@@ -380,7 +382,12 @@ for (const projectionPath of [
   '.gemini/commands/atm-governance-router.toml',
   'GEMINI.md'
 ]) {
-  const projectionText = readText(projectionPath);
+  const guidance = readSkillGuidanceClosure(root, projectionPath);
+  const projectionText = guidance.text;
+  if (guidance.referencePath) {
+    assert(guidance.entryText.includes(atmFirstRunCommand) || guidance.entryText.includes(atmFirstRunCommand.replaceAll('"', '\\"')), `${projectionPath} must retain the exact first-run command`);
+    assert(guidance.entryText.includes('evidence.firstRun'), `${projectionPath} must consume the first-run contract before governed routes`);
+  }
   assert(projectionText.includes('guide first-layer'), `${projectionPath} must project guide first-layer`);
   assert(projectionText.includes('execute-now'), `${projectionPath} must project execute-now ticket state`);
   assert(projectionText.includes('batch/applyStrategy=compose'), `${projectionPath} must project compose ticket state`);

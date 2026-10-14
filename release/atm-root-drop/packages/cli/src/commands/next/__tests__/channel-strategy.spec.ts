@@ -54,6 +54,18 @@ assert.equal(decideRuntimeNextAction({ config: true, currentTaskId: 'TASK-1', la
   'npm exec -- atm', 'frozen').command, 'npm test', 'runner kind, not display text, owns ready semantics');
 
 const inputProbe = { probe: 'value', nested: { count: 1 } };
+const readyRuntime = { config: true, currentTaskId: 'TASK-1', lastEvidenceAt: 'now', lastHandoffAt: 'now' };
+assert.equal(decideRuntimeNextAction(readyRuntime, null, emptyQueue,
+  'node atm.mjs', 'frozen', 'adopter').command, 'npm test --if-present',
+  'a create-atm shim must use adopter validation despite its frozen runner mode');
+assert.equal(decideRuntimeNextAction(readyRuntime, null, emptyQueue,
+  'node atm.mjs', 'frozen', 'adopter', false).command, 'node atm.mjs doctor --json',
+  'a non-npm adopter must not receive an npm command');
+assert.equal(decideRuntimeNextAction(readyRuntime, 'onboarding-policy', emptyQueue,
+  'node atm.mjs', 'frozen', 'adopter').command, 'node atm.mjs doctor --json',
+  'adopter recovery must not assume the framework validate:full script exists');
+assert.equal(decideRuntimeNextAction(readyRuntime, 'onboarding-policy', emptyQueue,
+  'node atm.mjs', 'frozen', 'framework').command, 'npm run validate:full');
 assert.equal(channelStrategyPreservesInput(inputProbe, () => selectQuickfixChannel()), true);
 
 console.log('[channel-strategy.spec] ok');

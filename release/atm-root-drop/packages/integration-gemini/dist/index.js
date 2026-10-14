@@ -1,4 +1,4 @@
-import { atmFirstCommand, compileSkillTemplatesForAdapter, createStaticIntegrationAdapter, resolveDefaultSkillSourceCoverage, renderCharterInvariantsBlock } from '../../integrations-core/dist/index.js';
+import { loadMinimumAtmSkillTemplates, compileSkillTemplatesForAdapter, createStaticIntegrationAdapter, resolveDefaultSkillSourceCoverage, renderCharterInvariantsBlock } from '../../integrations-core/dist/index.js';
 export const integrationGeminiPackage = {
     packageName: '@ai-atomic-framework/integration-gemini',
     packageRole: 'gemini-integration-adapter',
@@ -32,6 +32,9 @@ export function createGeminiSourceFiles(repositoryRoot = process.cwd()) {
     return compileSkillTemplatesForAdapter('gemini', undefined, { repositoryRoot });
 }
 export function createAntigravitySourceFiles(repositoryRoot = process.cwd()) {
+    const entryCommand = loadMinimumAtmSkillTemplates().find(template => template.frontmatter.id === 'atm-governance-router')?.frontmatter.firstCommand;
+    if (!entryCommand)
+        throw new Error('The canonical ATM governance router entry is missing.');
     const skillFiles = compileSkillTemplatesForAdapter('codex', undefined, { repositoryRoot })
         .map(({ relativePath, ...sourceFile }) => ({
         ...sourceFile,
@@ -42,10 +45,10 @@ export function createAntigravitySourceFiles(repositoryRoot = process.cwd()) {
     const geminiRoot = [
         '# ATM Antigravity Onboarding',
         '',
-        'First command:',
+        'Read `.agents/skills/atm-governance-router/SKILL.md` first. Select the project and verified runner before this read-only first command:',
         '',
         '```bash',
-        atmFirstCommand,
+        entryCommand,
         '```',
         '',
         'Antigravity adapter entry routes through `GEMINI.md` and delegates detailed command skills to `.agents/skills/atm-*/SKILL.md`.',

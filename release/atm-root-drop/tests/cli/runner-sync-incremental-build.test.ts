@@ -109,6 +109,23 @@ const manifest = JSON.parse(readFileSync(path.join(repo, 'release/atm-root-drop/
 assert.match(manifest.tsBuildCacheDigest, /^sha256:[a-f0-9]{64}$/);
 assert.equal(manifest.rawTelemetryPolicy, 'gitignored-runtime-only');
 
+for (const buildTarget of ['onefile', 'root-drop', 'packages', 'full'] as const) {
+  const rootManifest = path.join(repo, 'release/atm-root-drop/release-manifest.json');
+  const oneManifest = path.join(repo, 'release/atm-onefile/release-manifest.json');
+  mkdirSync(path.dirname(oneManifest), { recursive: true });
+  writeFileSync(rootManifest, '{"fixture":"root-drop"}\n');
+  writeFileSync(oneManifest, '{"fixture":"onefile"}\n');
+  writeBuildMetadataToReleaseManifests({ cwd: repo, buildTarget,
+    sealedSourceSha: gitHead(repo), buildInputsTreeHash: 'sha256:fixture',
+    buildDecision: 'fullRebuild', timings: timings() });
+  for (const [file, target] of [[rootManifest, 'root-drop'], [oneManifest, 'onefile']] as const) {
+    const selected = buildTarget === 'full' || buildTarget === target;
+    const bytes = readFileSync(file, 'utf8');
+    if (selected) assert.equal(JSON.parse(bytes).sealedSourceCommit, gitHead(repo));
+    else assert.equal(bytes, `{"fixture":"${target}"}\n`, `${buildTarget} must not stamp unbuilt ${target}`);
+  }
+}
+
 const receipt = buildRunnerSyncReceipt({
   admission: {
     queueHeadOwnership: {

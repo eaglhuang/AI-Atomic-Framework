@@ -2,6 +2,8 @@ import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { loadRegistry } from '../../../../core/src/broker/registry.ts';
 import { calculateBrokerDecision } from '../../../../core/src/broker/decision.ts';
+import { evaluateBrokerAdmission } from '../../../../core/src/broker/admission/evaluate-broker-admission.ts';
+import { activeAsIntent, pendingSerialTickets } from '../../../../core/src/broker/serial-queue/policy.ts';
 import type { ActiveWriteIntent, WriteIntent, WriteIntentAtomRef } from '../../../../core/src/broker/types.ts';
 import { resolveCanonicalDecisionClass } from '../broker/replay/closure-policy.ts';
 import { quoteCliValue, relativePathFrom } from '../shared.ts';
@@ -133,8 +135,23 @@ export function evaluateTaskflowBrokerConflictGate(input: {
     return noConflictGate('No broker conflict evidence is available for this close.');
   }
 
-  const registry = loadRegistry(registryPath);
+  const registry = loadRegistry(registryPath, { persistCleanup: false });
   const currentIntent = registry.activeIntents.find((entry) => entry.taskId === input.taskId) ?? null;
+  const ownTicket = pendingSerialTickets(registry).find((entry) => entry.taskId === input.taskId);
+  const queuedScopeRequested = ownTicket?.intent.targetFiles.some((queued) => currentFiles.some((file) => brokerPathMatches(file, queued) || brokerPathMatches(queued, file)));
+  const nativeIntent: WriteIntent = ownTicket && queuedScopeRequested ? ownTicket.intent : currentIntent ? activeAsIntent(currentIntent) : {
+    schemaId: 'atm.writeIntent.v1', specVersion: '0.1.0', migration: { strategy: 'none', fromVersion: null, notes: 'close queue observation' },
+    taskId: input.taskId, actorId: input.actorId ?? 'unresolved-close-actor', baseCommit: 'unresolved-close-base', targetFiles: currentFiles,
+    atomRefs: [], sharedSurfaces: { generators: [], projections: [], registries: [], validators: [], artifacts: [] }, requestedLane: 'auto'
+  };
+  const native = evaluateBrokerAdmission({ intent: nativeIntent }, registry, {});
+  if (native.disposition === 'queue' || (native.disposition === 'revalidate' && native.ticket.queue)) {
+    return { schemaId: 'atm.taskflowBrokerConflictGate.v1', verdict: 'confirmedConflict', confirmedConflict: true,
+      overlappingTaskIds: pendingSerialTickets(registry).filter((entry) => entry.taskId !== input.taskId).map((entry) => entry.taskId),
+      summary: 'Native serial queue has not granted this write scope; close must wait for explicit revalidation.',
+      requiredCommand: 'node atm.mjs broker status --json', brokerVerdict: native.decision.verdict,
+      decisionClass: 'serial-release', decisionReason: native.decisionReason, violationStatus: 'broker-conflict-blocked', statusCode: 'broker-conflict-blocked' };
+  }
   const overlapping = registry.activeIntents.filter((entry) =>
     entry.taskId !== input.taskId
     && entry.resourceKeys.files.some((entryFile) => currentFiles.some((file) => brokerPathMatches(file, entryFile) || brokerPathMatches(entryFile, file)))
@@ -208,7 +225,7 @@ export function evaluateTaskflowBrokerConflictGate(input: {
     activeIntents: overlapping
   };
   const decision = calculateBrokerDecision(currentWriteIntent, comparisonRegistry);
-  if (decision.verdict === 'blocked-cid-conflict') {
+  if (decision.verdict === 'blocked-cid-conflict' || decision.verdict === 'serial') {
     return {
       schemaId: 'atm.taskflowBrokerConflictGate.v1',
       verdict: 'confirmedConflict',

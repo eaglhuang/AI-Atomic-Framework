@@ -15,6 +15,7 @@ import {
 } from '../../packages/integrations-core/src/compiler/skill-templates.ts';
 import { compileSkillTemplatesForAdapter } from '../../packages/integrations-core/src/compiler/compile.ts';
 import { buildSkillCorpusAudit, probeSkillSourceTracking } from '../../scripts/audit-skill-corpus.ts';
+import { readSkillGuidanceClosure } from '../../scripts/lib/skill-guidance-closure.ts';
 
 const root = process.cwd();
 const canaryOrder = [
@@ -76,6 +77,7 @@ assert(projection.files.length >= snapshot.templateCount);
 
 const audit = buildSkillCorpusAudit();
 assert.equal(audit.schemaId, 'atm.skillCorpusAudit.v1');
+assert.equal(audit.classifications.find((entry) => entry.id === 'atm-governance-router')?.progressiveDisclosure, true, 'the compiler reference placeholder remains progressive disclosure');
 assert.equal(audit.sourceSnapshot.templateCount, snapshot.templateCount);
 assert.equal(audit.sourceSnapshot.sourceDigest, snapshot.sourceDigest);
 assert.deepEqual(audit.canaryOrder, canaryOrder);
@@ -109,7 +111,7 @@ assert.deepEqual(audit.adapterProjectionContract.requiredFields, [
 
 for (const canaryId of canaryOrder) {
   const templatePath = path.join(root, 'templates', 'skills', `${canaryId}.skill.md`);
-  const source = readFileSync(templatePath, 'utf8');
+  const source = readSkillGuidanceClosure(root, templatePath).text;
   assert(source.includes('Cohesion-First Split Rule'), `${canaryId} missing cohesion-first split rule`);
   assert(source.includes('TASK-SKL-0020'), `${canaryId} missing TASK-SKL-0020 provenance`);
   assert(source.includes('TASK-SKL-0028'), `${canaryId} missing TASK-SKL-0028 provenance`);

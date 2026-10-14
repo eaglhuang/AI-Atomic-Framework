@@ -30,7 +30,7 @@ export function buildOnefileRelease(options: any = {}) {
   assertPayloadLauncherIsNotNested(path.join(rootDropRoot, 'atm.mjs'));
 
   const payloadFiles = collectPayloadFiles(rootDropRoot);
-  const payloadInputManifestHash = digestJson({ launcherTemplate: renderOnefileRuntime.toString(), cacheTemplate: renderCacheIntegrityRuntime.toString(), files: payloadFiles.map((file: any) => ({
+  const payloadInputManifestHash = digestJson({ launcherTemplate: renderOnefileRuntime.toString(), cacheTemplate: renderCacheIntegrityRuntime.toString(), fastVersionTemplate: renderOnefileFastVersionRuntime(), files: payloadFiles.map((file: any) => ({
     path: file.path,
     mode: file.mode,
     dataDigest: createHash('sha256').update(file.dataBase64).digest('hex')
@@ -329,13 +329,13 @@ function resolveFilePath(root, relativePath) {
   return resolved;
 }
 
-function decodePayload() {
+function decodePayload(maxOutputLength) {
   const compressed = Buffer.from(payloadBase64, 'base64');
   const digest = createHash('sha256').update(compressed).digest('hex');
   if (digest !== payloadSha256) {
     throw new Error('Embedded payload hash mismatch.');
   }
-  return JSON.parse(gunzipSync(compressed).toString('utf8'));
+  return JSON.parse(gunzipSync(compressed, { maxOutputLength }).toString('utf8'));
 }
 
 function readPositiveIntEnv(name, fallback) {

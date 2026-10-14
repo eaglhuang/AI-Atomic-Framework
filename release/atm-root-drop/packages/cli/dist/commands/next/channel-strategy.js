@@ -17,7 +17,7 @@ export function blockedMutationCommands() {
         'apply without human review approval'
     ];
 }
-export function decideRuntimeNextAction(runtime, failedCheckName, importedTaskQueue, commandPrefix = 'node atm.mjs', runnerMode = 'frozen') {
+export function decideRuntimeNextAction(runtime, failedCheckName, importedTaskQueue, commandPrefix = 'node atm.mjs', runnerMode = 'frozen', repositoryKind = runnerMode === 'npm-package' ? 'adopter' : 'framework', hasPackageManifest = true) {
     if (runtime.migrationNeeded || runtime.hasV1 && runtime.hasV2 === false) {
         return {
             status: 'needs-bootstrap',
@@ -95,7 +95,7 @@ export function decideRuntimeNextAction(runtime, failedCheckName, importedTaskQu
     if (failedCheckName) {
         return {
             status: 'needs-validation',
-            command: 'npm run validate:full',
+            command: repositoryKind === 'framework' ? 'npm run validate:full' : `${commandPrefix} doctor --json`,
             reason: `doctor reported a failing check: ${failedCheckName}`,
             allowedCommands: allowedGuidanceBootstrapCommands(commandPrefix),
             blockedCommands: blockedMutationCommands()
@@ -103,7 +103,9 @@ export function decideRuntimeNextAction(runtime, failedCheckName, importedTaskQu
     }
     return {
         status: 'ready',
-        command: runnerMode === 'npm-package' ? 'npm test --if-present' : 'npm test',
+        command: repositoryKind === 'framework'
+            ? 'npm test'
+            : hasPackageManifest ? 'npm test --if-present' : `${commandPrefix} doctor --json`,
         reason: 'runtime state, governance state, and engineering checks are all green',
         allowedCommands: allowedGuidanceBootstrapCommands(commandPrefix),
         blockedCommands: blockedMutationCommands()

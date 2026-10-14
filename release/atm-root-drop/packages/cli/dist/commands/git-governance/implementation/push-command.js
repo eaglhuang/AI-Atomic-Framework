@@ -1,12 +1,16 @@
 import { createSanitizedGitEnv, resolveGitExecutable, runGitCommandWithTimeout, } from './git-process-port.js';
 import { execFileSync } from "node:child_process";
-import { mkdirSync, writeFileSync, } from "node:fs";
+import { randomUUID } from 'node:crypto';
+import { mkdirSync, rmSync, writeFileSync, } from "node:fs";
 import path from "node:path";
 import { actorIdEnvVar, } from "../../actor-registry.js";
 import { evaluateGitAdmission } from "../../../_vendor/core/dist/git/admission.js";
 import { buildGitBoundaryEvidenceEnvelope } from "../../../_vendor/core/dist/evidence/index.js";
 import { CliError, makeResult, message, quoteCliValue, } from "../../shared.js";
 import { buildPostPushRecoveryRecommendation, classifyPostPushRecoveryKind, } from './push-recovery.js';
+function gitPushResult(input) {
+    return makeResult(input);
+}
 export function gitPushAttemptStatusRelativePath(actorId, branch, remote) {
     const safeActor = actorId.replace(/[^a-zA-Z0-9_.-]/g, "_");
     const safeTarget = `${remote}__${branch}`.replace(/[^a-zA-Z0-9_.-]/g, "_");
@@ -26,7 +30,7 @@ export function runGitPush(options) {
     }
     const branch = options.branch?.trim() || resolveCurrentBranchName(options.cwd);
     const remote = options.remote?.trim() || "origin";
-    const statusPath = gitPushAttemptStatusRelativePath(options.actorId, branch, remote);
+    const statusPath = gitPushAttemptStatusRelativePath(options.actorId, branch, remote).replace(/\.json$/, `__${randomUUID()}.json`);
     const startedAt = new Date().toISOString();
     const headShaBeforePush = readHeadCommitSha(options.cwd);
     writeGitPushAttemptStatus(options.cwd, statusPath, {
@@ -78,7 +82,7 @@ export function runGitPush(options) {
             retryCommand: `node atm.mjs git push --actor ${quoteCliValue(options.actorId)} --branch ${quoteCliValue(branch)} --remote ${quoteCliValue(remote)} --json`,
             recoveryCommand: `node atm.mjs git recover-push-fail --actor ${quoteCliValue(options.actorId)} --branch ${quoteCliValue(branch)} --remote ${quoteCliValue(remote)} --json`,
         });
-        return makeResult({
+        return gitPushResult({
             ok: false,
             command: "git",
             cwd: options.cwd,
@@ -106,7 +110,7 @@ export function runGitPush(options) {
             },
         });
     }
-    if (options.dryRun || admission.outcome === "no-op") {
+    if (options.dryRun || (admission.outcome === "no-op" && admission.topology.remoteBranchExists !== false)) {
         const updatedAt = new Date().toISOString();
         const status = options.dryRun ? "dry-run" : "no-op";
         writeGitPushAttemptStatus(options.cwd, statusPath, {
@@ -124,7 +128,13 @@ export function runGitPush(options) {
             headShaAfterAttempt: readHeadCommitSha(options.cwd),
             admissionOutcome: admission.outcome,
         });
-        return makeResult({
+        // The operation owns a unique path, so finishing it cannot delete another
+        // attempt's in-progress or recovery bytes. Failed cleanup remains classifiable.
+        try {
+            rmSync(path.join(options.cwd, statusPath));
+        }
+        catch { }
+        return gitPushResult({
             ok: true,
             command: "git",
             cwd: options.cwd,
@@ -167,7 +177,11 @@ export function runGitPush(options) {
             admissionOutcome: admission.outcome,
             remoteShaAfterPush,
         });
-        return makeResult({
+        try {
+            rmSync(path.join(options.cwd, statusPath));
+        }
+        catch { }
+        return gitPushResult({
             ok: true,
             command: "git",
             cwd: options.cwd,
@@ -214,7 +228,7 @@ export function runGitPush(options) {
             errorSummary: stderr.slice(0, 4000),
             recoveryCommand: `node atm.mjs git recover-push-fail --actor ${quoteCliValue(options.actorId)} --branch ${quoteCliValue(branch)} --remote ${quoteCliValue(remote)} --json`,
         });
-        return makeResult({
+        return gitPushResult({
             ok: false,
             command: "git",
             cwd: options.cwd,

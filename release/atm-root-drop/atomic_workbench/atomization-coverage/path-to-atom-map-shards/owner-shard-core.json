@@ -3,6 +3,20 @@
   "owner": "core",
   "mappings": [
     {
+      "path_pattern": "packages/core/src/broker/serial-queue/**",
+      "atom_id": "atom-core-broker",
+      "capability": "Native cold serial FIFO tickets, owner/scope/base revalidation, bounded eligibility and durable lifecycle events in the canonical broker registry.",
+      "coverage_status": "active",
+      "source_task": "ATM-GOV-0421"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/decision/serial.ts",
+      "atom_id": "atom-core-broker",
+      "capability": "Cold logical conflict and pending FIFO decision boundary preserving protected guards and compose-first admission.",
+      "coverage_status": "active",
+      "source_task": "ATM-GOV-0421"
+    },
+    {
       "path_pattern": "packages/core/src/upgrade/map-curator.ts",
       "atom_id": "atm.upgrade-map-curation-map",
       "capability": "TASK-RFT-0090 bounded atom map curator facade preserving deterministic report and proposal orchestration exports.",

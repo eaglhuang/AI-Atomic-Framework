@@ -422,13 +422,11 @@ function resolveExplicitRecordPaths(cwd: string, paths: readonly string[]): read
 function assertExplicitRecordPathsAreDirty(cwd: string, paths: readonly string[]): void {
   const changed = new Set<string>();
   for (const args of [
-    ["diff", "--name-only", "--", ...paths],
-    ["ls-files", "--others", "--exclude-standard", "--", ...paths],
+    ["diff", "--name-only", "-z", "--", ...paths],
+    ["ls-files", "--others", "--exclude-standard", "-z", "--", ...paths],
   ]) {
-    for (const entry of runGitCommand(cwd, args).split(/\r?\n/)) {
-      const normalized = entry.trim().replace(/\\/g, "/");
-      if (normalized) changed.add(normalized);
-    }
+    for (const entry of runGitCommand(cwd, args).split("\0"))
+      if (entry) changed.add(entry);
   }
   const unchangedPaths = paths.filter((entry) => !changed.has(entry));
   if (unchangedPaths.length > 0) {

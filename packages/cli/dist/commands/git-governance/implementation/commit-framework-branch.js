@@ -17,14 +17,29 @@ import { uniqueSorted } from '../commit-scope-policy.js';
 import { CliError, makeResult, message, quoteCliValue } from '../../shared.js';
 import { buildCopyableGitCommitCommand, readStagedFiles } from './git-index-transaction.js';
 import { autoStageFrameworkClaimFiles, frameworkTempTaskId, inspectFrameworkScopedUnstagedCommit, isFrameworkGeneratedArtifactAllowed, isIgnorableFrameworkCommitStagingSideEffect, readActiveFrameworkClaimFiles, readReleaseGeneratedArtifactPaths } from './task-scope-staging.js';
+import { resolveCandidateAttribution } from './candidate-attribution.js';
+import { resolveFrameworkTempPublicationCapability } from '../../framework-development/framework-temp-publication-capability.js';
+import { isCommitAttributionSideEffectPath } from './git-process-port.js';
 export function routeFrameworkClaimCommitBranch(input) {
     const { options, actorId, usesFrameworkClaimCommit, frameworkClaimFiles } = input;
+    const capability = usesFrameworkClaimCommit ? resolveFrameworkTempPublicationCapability({ cwd: options.cwd, taskId: null, actorId, laneSessionId: process.env.ATM_LANE_SESSION_ID ?? null }) : null;
+    const attribution = resolveCandidateAttribution({ cwd: options.cwd, taskId: capability?.taskId ?? options.taskId, actorId, phase: 'selection', autoStage: options.autoStage });
+    if (usesFrameworkClaimCommit && attribution.registryChanged && !attribution.ok) {
+        throw new CliError(attribution.code, attribution.reason, { exitCode: 1, details: { requiredCommand: 'node atm.mjs identity show --actor <actor-id> --json' } });
+    }
     const autoStagedFrameworkPaths = usesFrameworkClaimCommit && options.autoStage
         ? autoStageFrameworkClaimFiles(options.cwd, actorId, !options.dryRun, frameworkClaimFiles)
         : [];
     let frameworkClaimCommitFiles = [];
     if (usesFrameworkClaimCommit) {
         const frameworkStagingInspection = inspectFrameworkScopedUnstagedCommit(options.cwd, actorId, frameworkClaimFiles);
+        const claimedScope = new Set(frameworkClaimFiles ?? readActiveFrameworkClaimFiles(options.cwd, actorId));
+        const generatedScope = readReleaseGeneratedArtifactPaths(options.cwd);
+        const stagedOwned = readStagedFiles(options.cwd).filter((filePath) => (!isCommitAttributionSideEffectPath(filePath) || attribution.registryAllowed) &&
+            isFrameworkGeneratedArtifactAllowed(filePath, claimedScope, generatedScope, { cwd: options.cwd, currentTaskId: capability?.taskId ?? frameworkTempTaskId(actorId) }));
+        if (!stagedOwned.length && !autoStagedFrameworkPaths.length && !(frameworkStagingInspection?.inScopeDirtyFiles?.length)) {
+            throw new CliError('ATM_GIT_COMMIT_BUNDLE_BLOCKED', 'The framework candidate is empty; foreign staged state cannot supply a fallback commit.', { exitCode: 1 });
+        }
         if (options.dryRun && options.autoStage) {
             if (frameworkStagingInspection?.kind === "mixed-scope" &&
                 !options.deferForeignStaged &&
@@ -98,8 +113,9 @@ export function routeFrameworkClaimCommitBranch(input) {
         if (claimedFiles.size > 0) {
             const releaseGeneratedArtifacts = readReleaseGeneratedArtifactPaths(options.cwd);
             const ownerScope = { cwd: options.cwd, currentTaskId: frameworkTempTaskId(actorId) };
-            frameworkClaimCommitFiles = uniqueSorted(readStagedFiles(options.cwd).filter((filePath) => (!options.deferForeignStaged && isIgnorableFrameworkCommitStagingSideEffect(filePath)) ||
-                isFrameworkGeneratedArtifactAllowed(filePath, claimedFiles, releaseGeneratedArtifacts, ownerScope)));
+            frameworkClaimCommitFiles = uniqueSorted(readStagedFiles(options.cwd).filter((filePath) => (!isCommitAttributionSideEffectPath(filePath) || attribution.registryAllowed) &&
+                ((!options.deferForeignStaged && isIgnorableFrameworkCommitStagingSideEffect(filePath)) ||
+                    isFrameworkGeneratedArtifactAllowed(filePath, claimedFiles, releaseGeneratedArtifacts, ownerScope))));
         }
     }
     return { kind: "staged", autoStagedFrameworkPaths, frameworkClaimCommitFiles };

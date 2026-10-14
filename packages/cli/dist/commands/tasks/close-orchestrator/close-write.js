@@ -1,11 +1,12 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, unlinkSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { executeTaskCloseTransaction, writeClosurePacket } from '../../framework-development.js';
+import { executeTaskCloseTransaction, closeJournalPath, writeClosurePacket } from '../../framework-development.js';
 import { buildTaskTransitionCommand, createClosureTransitionMetadata, writeTaskDocumentWithTransition } from '../close-helpers/task-transition-writer.js';
 import { existingTaskCloseArtifacts, stageTaskCloseArtifacts } from '../close-helpers/close-artifact-staging.js';
 import { relativePathFrom } from '../../shared.js';
 import { writeCloseTransactionStatus } from '../../taskflow/close-transaction-status.js';
+import { createTerminalTeamRunCleanupTransaction } from '../../team-runtime-cleanup.js';
 function normalizeRel(filePath) {
     return filePath.replace(/\\/g, '/');
 }
@@ -139,72 +140,120 @@ export async function executeCloseWrites(input) {
         batchId: input.owningBatch?.batchId ?? options.batchId,
         historicalDeliveryRefs: input.effectiveHistoricalDeliveryRefs
     });
-    const closeWriteResult = await executeTaskCloseTransaction({
-        cwd: options.cwd,
-        taskId: options.taskId,
-        taskPath: input.taskPath,
-        phase: 'close',
-        previousTaskContent: input.previousTaskContent,
-        createdClosurePacketAbsolute: input.createdClosurePacketAbsolute,
-        runWrites: () => {
-            if (input.pendingClosurePacket) {
-                closurePacketPath = writeClosurePacket(options.cwd, options.taskId, input.pendingClosurePacket);
-                closurePacket = input.pendingClosurePacket;
-                input.taskDocument.closurePacket = closurePacketPath;
-            }
-            let abandonResidueDispositionPath = null;
-            if (options.status === 'abandoned') {
-                const disposition = applyAbandonedResidueDisposition({
-                    cwd: options.cwd,
-                    taskId: options.taskId,
-                    actorId,
-                    reason: typeof options.reason === 'string' ? options.reason : null
-                });
-                abandonResidueDispositionPath = disposition.dispositionPath;
-                input.taskDocument.abandonResidueDisposition = disposition.dispositionPath;
-            }
-            const transitionPath = writeTaskDocumentWithTransition({
-                cwd: options.cwd,
-                taskPath: input.taskPath,
-                taskId: options.taskId,
-                taskDocument: input.taskDocument,
-                action: options.status === 'blocked' ? 'block' : options.status === 'abandoned' ? 'abandon' : 'close',
-                actorId,
-                sessionId: input.activeSession?.sessionId ?? null,
-                previousStatus: input.previousStatus,
-                closureMetadata: options.status === 'done'
-                    ? createClosureTransitionMetadata(closurePacketPath, closurePacket, input.owningBatch?.batchId ?? options.batchId, input.activeSession?.sessionId ?? null)
-                    : null,
-                command: closeTransitionCommand
-            });
-            const closeArtifactFiles = existingTaskCloseArtifacts(options.cwd, [
-                relativePathFrom(options.cwd, input.taskPath),
-                `.atm/history/evidence/${options.taskId}.json`,
-                `.atm/history/evidence/${options.taskId}.bundle-manifest.json`,
-                transitionPath,
-                closurePacketPath
-            ]);
-            try {
-                stageTaskCloseArtifacts(options.cwd, closeArtifactFiles);
-            }
-            catch (error) {
-                // The transaction cannot learn the transition path until runWrites returns.
-                // Remove artifacts produced by this callback before rethrowing so its outer
-                // ledger rollback restores the pre-close state as one atomic operation.
-                const transitionAbsolute = path.resolve(options.cwd, transitionPath);
-                if (existsSync(transitionAbsolute))
-                    unlinkSync(transitionAbsolute);
-                if (input.createdClosurePacketAbsolute && existsSync(input.createdClosurePacketAbsolute)) {
-                    unlinkSync(input.createdClosurePacketAbsolute);
+    const teamCleanup = createTerminalTeamRunCleanupTransaction({ cwd: options.cwd, taskId: options.taskId, terminalTaskStatus: options.status });
+    let cleanedTeamRuns = [];
+    const indexBefore = execFileSync('git', ['write-tree'], { cwd: options.cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
+    let stagedPaths = [];
+    let stagedEntries = null;
+    const readScopedIndex = () => execFileSync('git', ['ls-files', '--stage', '-z', '--', ...stagedPaths], { cwd: options.cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+    let closeWriteResult;
+    try {
+        closeWriteResult = await executeTaskCloseTransaction({
+            cwd: options.cwd,
+            taskId: options.taskId,
+            taskPath: input.taskPath,
+            phase: 'close',
+            previousTaskContent: input.previousTaskContent,
+            createdClosurePacketAbsolute: input.createdClosurePacketAbsolute,
+            runWrites: () => {
+                if (input.pendingClosurePacket) {
+                    closurePacketPath = writeClosurePacket(options.cwd, options.taskId, input.pendingClosurePacket);
+                    closurePacket = input.pendingClosurePacket;
+                    input.taskDocument.closurePacket = closurePacketPath;
                 }
-                throw error;
+                let abandonResidueDispositionPath = null;
+                if (options.status === 'abandoned') {
+                    const disposition = applyAbandonedResidueDisposition({
+                        cwd: options.cwd,
+                        taskId: options.taskId,
+                        actorId,
+                        reason: typeof options.reason === 'string' ? options.reason : null
+                    });
+                    abandonResidueDispositionPath = disposition.dispositionPath;
+                    input.taskDocument.abandonResidueDisposition = disposition.dispositionPath;
+                }
+                const transitionPath = writeTaskDocumentWithTransition({
+                    cwd: options.cwd,
+                    taskPath: input.taskPath,
+                    taskId: options.taskId,
+                    taskDocument: input.taskDocument,
+                    action: options.status === 'blocked' ? 'block' : options.status === 'abandoned' ? 'abandon' : 'close',
+                    actorId,
+                    sessionId: input.activeSession?.sessionId ?? null,
+                    previousStatus: input.previousStatus,
+                    closureMetadata: options.status === 'done'
+                        ? createClosureTransitionMetadata(closurePacketPath, closurePacket, input.owningBatch?.batchId ?? options.batchId, input.activeSession?.sessionId ?? null)
+                        : null,
+                    command: closeTransitionCommand
+                });
+                const closeArtifactFiles = existingTaskCloseArtifacts(options.cwd, [
+                    relativePathFrom(options.cwd, input.taskPath),
+                    `.atm/history/evidence/${options.taskId}.json`,
+                    `.atm/history/evidence/${options.taskId}.bundle-manifest.json`,
+                    transitionPath,
+                    closurePacketPath
+                ]);
+                try {
+                    stagedPaths = [...closeArtifactFiles];
+                    stageTaskCloseArtifacts(options.cwd, closeArtifactFiles);
+                    stagedEntries = readScopedIndex();
+                }
+                catch (error) {
+                    stagedEntries = readScopedIndex();
+                    // The transaction cannot learn the transition path until runWrites returns.
+                    // Remove artifacts produced by this callback before rethrowing so its outer
+                    // ledger rollback restores the pre-close state as one atomic operation.
+                    const transitionAbsolute = path.resolve(options.cwd, transitionPath);
+                    if (existsSync(transitionAbsolute))
+                        unlinkSync(transitionAbsolute);
+                    if (input.createdClosurePacketAbsolute && existsSync(input.createdClosurePacketAbsolute)) {
+                        unlinkSync(input.createdClosurePacketAbsolute);
+                    }
+                    throw error;
+                }
+                return { transitionPath, closurePacketPath, abandonResidueDispositionPath };
+            },
+            stageArtifacts: () => {
+                cleanedTeamRuns = teamCleanup.cleanup();
+                writeCloseTransactionStatus({ cwd: options.cwd, taskId: options.taskId, phase: 'ledger-written' });
             }
-            return { transitionPath, closurePacketPath, abandonResidueDispositionPath };
+        });
+    }
+    catch (error) {
+        const rollbackErrors = [];
+        try {
+            teamCleanup.rollback();
         }
-    });
-    writeCloseTransactionStatus({ cwd: options.cwd, taskId: options.taskId, phase: 'ledger-written' });
+        catch (rollbackError) {
+            rollbackErrors.push(rollbackError);
+        }
+        try {
+            if (stagedPaths.length) {
+                if (stagedEntries !== readScopedIndex())
+                    throw new Error('Close index changed after staging; refusing to overwrite concurrent work');
+                execFileSync('git', ['restore', '--source', indexBefore, '--staged', '--', ...stagedPaths], { cwd: options.cwd, stdio: ['ignore', 'ignore', 'pipe'] });
+            }
+        }
+        catch (rollbackError) {
+            rollbackErrors.push(rollbackError);
+        }
+        try {
+            writeCloseTransactionStatus({ cwd: options.cwd, taskId: options.taskId, phase: rollbackErrors.length ? 'failed' : 'rolled-back', failure: String(error) });
+            if (rollbackErrors.length) {
+                // Reuse the close journal instead of introducing a second resource registry.
+                writeFileSync(closeJournalPath(options.cwd, options.taskId), `${JSON.stringify({ schemaId: 'atm.closeJournal.v1', taskId: options.taskId, actorId, phase: 'close', status: 'rollback-required', indexBefore, stagedPaths, stagedEntries, teamRecords: teamCleanup.recoveryRecords(), failure: String(error), rollbackErrors: rollbackErrors.map(String) }, null, 2)}\n`, { flag: 'wx' });
+            }
+        }
+        catch (rollbackError) {
+            rollbackErrors.push(rollbackError);
+        }
+        if (rollbackErrors.length)
+            throw new AggregateError([error, ...rollbackErrors], 'Close failed and rollback needs recovery');
+        throw error;
+    }
     return {
         transitionPath: closeWriteResult.transitionPath,
+        cleanedTeamRuns,
         closurePacketPath: closeWriteResult.closurePacketPath ?? closurePacketPath
     };
 }

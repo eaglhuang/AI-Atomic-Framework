@@ -11,6 +11,7 @@ import { handleBrokerWaveScheduler } from './wave-scheduler-actions.ts';
 import { handleBrokerBatchExecute } from './batch-execute-actions.ts';
 import { handleBrokerParallelAdmissionPolicy } from './policy-actions.ts';
 import { handleBrokerReplayActions } from './replay-actions.ts';
+import { handleBrokerHeatActions } from './heat-actions.ts';
 import { runPostComposeSemanticValidation } from './post-compose-semantic-validation.ts';
 
 export async function runBroker(argv: string[]) {
@@ -49,6 +50,8 @@ export async function runBroker(argv: string[]) {
   if (policyResult) return policyResult;
   const replayResult = await handleBrokerReplayActions(options);
   if (replayResult) return replayResult;
+  const heatResult = handleBrokerHeatActions(options);
+  if (heatResult) return heatResult;
 
-  throw new CliError('ATM_CLI_USAGE', 'broker supports: register, decision, status, release, acknowledge, cleanup, proposal, compose, steward, runtime, runner-sync, projection, plan-batch, schedule, batch, parallel-admission, replay, post-compose-semantic-validation', { exitCode: 2 });
+  throw new CliError('ATM_CLI_USAGE', 'broker supports: register, decision, status, release, acknowledge, cleanup, proposal, compose, steward, runtime, runner-sync, projection, plan-batch, schedule, batch, parallel-admission, replay, heat-status, heat-reset, post-compose-semantic-validation', { exitCode: 2 });
 }

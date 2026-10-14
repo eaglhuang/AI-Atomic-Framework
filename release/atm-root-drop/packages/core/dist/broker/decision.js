@@ -6,12 +6,13 @@ import { evaluateProposalOverlap, shouldRefineProposalScopedCidConflict } from '
 import { hasSharedWriteSurface } from './decision/surfaces.js';
 import { withFailureReason } from './decision/failure.js';
 import { findResourceOverlapMatches } from './resource-overlap.js';
+import { coldSerialBlockers, hotSerialBlockers, pendingSerialDecision, serialDecision } from './decision/serial.js';
 function formatSharedSurfaceDetail(axis, match, activeTaskId) {
     const keyDisplay = match.leftKey === match.rightKey ? `'${match.leftKey}'` : `'${match.leftKey}' vs active '${match.rightKey}'`;
     const suffix = match.verdict === 'unknown' ? ' (possible overlap; unresolved key syntax)' : '';
     return `Shared ${axis} conflict: ${keyDisplay} is in use by task '${activeTaskId}'${suffix}`;
 }
-export function calculateBrokerDecision(newIntent, registry) {
+export function calculateBrokerDecision(newIntent, registry, revalidatedSerialTicketId) {
     const conflicts = [];
     const taskId = newIntent.taskId;
     const conflictMatrix = evaluateConflictMatrix(newIntent, registry.activeIntents, {
@@ -138,6 +139,16 @@ export function calculateBrokerDecision(newIntent, registry) {
         }
     }
     if (conflicts.length > 0) {
+        const blockers = coldSerialBlockers(newIntent, registry);
+        if (blockers.length > 0 && !conflictMatrix.conflicts.some((conflict) => conflict.kind === 'read-set')) {
+            return serialDecision(newIntent, baseAdmission, conflictMatrix, 'Cold logical write conflict is queued before mutation.', blockers, conflicts);
+        }
+        const hotBlockers = hotSerialBlockers(newIntent, registry, baseAdmission);
+        if (hotBlockers.length > 0 && !conflictMatrix.conflicts.some((conflict) => conflict.kind === 'read-set')) {
+            const decompositionRequest = maybeBuildCidConflictDecompositionRequest(newIntent, registry.activeIntents);
+            return { ...serialDecision(newIntent, baseAdmission, conflictMatrix, 'Incoming hot writer waits for the current logical write owner; register a native ticket before retrying.', hotBlockers, conflicts, 'hot-write-conflict'),
+                ...(decompositionRequest ? { decompositionRequest } : {}) };
+        }
         const decompositionRequest = maybeBuildCidConflictDecompositionRequest(newIntent, registry.activeIntents);
         const decision = {
             schemaId: 'atm.brokerDecision.v1',
@@ -159,6 +170,13 @@ export function calculateBrokerDecision(newIntent, registry) {
         };
         return withFailureReason(decision);
     }
+    const pendingDecision = pendingSerialDecision(newIntent, registry, baseAdmission, conflictMatrix, revalidatedSerialTicketId);
+    if (pendingDecision)
+        return pendingDecision;
+    const hotBlockers = hotSerialBlockers(newIntent, registry, baseAdmission);
+    if (hotBlockers.length > 0) {
+        return serialDecision(newIntent, baseAdmission, conflictMatrix, 'Incoming hot writer is parked behind overlapping provisional work; the incumbent keeps its lease.', hotBlockers, undefined, 'provisional-overlap');
+    }
     const proposalOverlapDecision = evaluateProposalOverlap(newIntent, registry.activeIntents, baseAdmission, conflictMatrix);
     if (proposalOverlapDecision) {
         return proposalOverlapDecision;
@@ -166,6 +184,11 @@ export function calculateBrokerDecision(newIntent, registry) {
     // 3. Physical file overlap checks
     const fileOverlapResult = evaluatePhysicalOverlap(newIntent, registry.activeIntents);
     if (fileOverlapResult != null) {
+        const blockers = coldSerialBlockers(newIntent, registry);
+        if (blockers.length > 0) {
+            return { ...serialDecision(newIntent, baseAdmission, conflictMatrix, 'Cold overlapping write region is queued before mutation.', blockers, fileOverlapResult.conflicts),
+                ...(fileOverlapResult.decompositionRequest ? { decompositionRequest: fileOverlapResult.decompositionRequest } : {}) };
+        }
         const decision = {
             schemaId: 'atm.brokerDecision.v1',
             specVersion: '0.1.0',
@@ -206,7 +229,9 @@ export function calculateBrokerDecision(newIntent, registry) {
         conflictMatrix,
         admission: finalizeProposalAdmission(baseAdmission, baseAdmission.requiresProposal ? 'provisional-write-lease' : 'write-admitted', {
             reason: baseAdmission.requiresProposal
-                ? 'Proposal-first lane is active; broker recorded a provisional write lease before final admission.'
+                ? baseAdmission.summarySubmitted
+                    ? 'Proposal-first lane is active; broker recorded a provisional write lease before final admission.'
+                    : 'Proposal-only registration is available; submit the required summary before write authority.'
                 : 'No proposal-first trigger is active; direct brokered write is admitted.'
         })
     });

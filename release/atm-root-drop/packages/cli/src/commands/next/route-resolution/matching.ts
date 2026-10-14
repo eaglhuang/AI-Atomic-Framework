@@ -443,9 +443,35 @@ export function resolveRouteTargetRepo(tasks: readonly ImportedTaskSummary[]): s
   return targets.length === 1 ? targets[0] : null;
 }
 
+/** File/URL tokens are scope artifacts, not task IDs merely because their
+ * names contain a numbered identifier. Task-card and ledger basenames remain
+ * usable references; standalone slash/comma task ranges remain usable too. */
+function isTaskReferenceContext(prompt: string, match: RegExpMatchArray): boolean {
+  const index = match.index ?? 0;
+  const before = prompt.slice(0, index).match(/[^\s`"'()[\]{}<>,，。；]+$/u)?.[0] ?? '';
+  const after = prompt.slice(index + match[0].length).match(/^[^\s`"'()[\]{}<>,，。；]+/u)?.[0] ?? '';
+  const token = `${before}${match[0]}${after}`
+    .replace(/[.;:!?]+$/, '')
+    .replace(/(?::\d+(?::\d+)?|#L\d+(?:-L?\d+)?)$/i, '')
+    .replace(/\\/g, '/');
+  if (!/\/|\.[\p{L}\p{N}_]/u.test(token)) return true;
+  const standaloneId = /^(?:TASK-|ATM-)?[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)*-\d{2,}(?:-[A-Z0-9][A-Z0-9-]*)*$/i;
+  const range = token.split(/\s*[\/,]\s*/);
+  if (range.length > 1 && standaloneId.test(range[0])
+    && range.slice(1).every((entry) => /^\d{2,}$/.test(entry) || standaloneId.test(entry))) return true;
+  const basenameStart = token.lastIndexOf('/') + 1;
+  if (before.length !== basenameStart) return false;
+  const suffix = token.slice(basenameStart + match[0].length);
+  const directory = token.slice(0, basenameStart);
+  return /^\.task\.md$/i.test(suffix)
+    || (/^\.md$/i.test(suffix) && /(?:^|\/)tasks\/$/i.test(directory))
+    || (/^\.json$/i.test(suffix) && /(?:^|\/)\.atm\/history\/tasks\/$/i.test(directory));
+}
+
 export function extractTaskRootHintsFromPrompt(prompt: string, mentionedTaskIds: readonly string[]): readonly string[] {
-  const directRoots = (prompt.match(/\b[A-Z][A-Z0-9]+(?:-[A-Z0-9]+)+\b/g) ?? [])
-    .map((entry) => entry.toUpperCase())
+  const directRoots = [...prompt.matchAll(/\b[A-Z][A-Z0-9]+(?:-[A-Z0-9]+)+\b/g)]
+    .filter((match) => isTaskReferenceContext(prompt, match))
+    .map((match) => match[0].toUpperCase())
     .filter((entry) => !/\d{2,}(?:-[A-Z0-9][A-Z0-9-]*)*$/.test(entry));
   const derivedRoots = mentionedTaskIds
     .map((taskId) => taskId.match(/^(.*)-\d{2,}(?:-[A-Z0-9][A-Z0-9-]*)*$/)?.[1] ?? null)
@@ -456,12 +482,14 @@ export function extractTaskRootHintsFromPrompt(prompt: string, mentionedTaskIds:
 export function extractTaskIdReferencesFromPrompt(prompt: string): readonly string[] {
   const references = new Set<string>();
   for (const match of prompt.matchAll(/\b(?:TASK-|ATM-)?[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)*-\d{2,}(?:-[A-Z0-9][A-Z0-9-]*)*\b/gi)) {
+    if (!isTaskReferenceContext(prompt, match)) continue;
     const reference = match[0].toUpperCase();
     if (!isBacklogIdentifier(reference)) {
       references.add(reference);
     }
   }
   for (const match of prompt.matchAll(/\b((?:TASK-|ATM-)?[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)*)-(\d{2,})((?:\s*[\/,]\s*\d{2,})+)/gi)) {
+    if (!isTaskReferenceContext(prompt, match)) continue;
     const prefix = match[1]?.toUpperCase();
     const firstNumber = match[2] ?? '';
     const suffix = match[3] ?? '';
@@ -498,6 +526,7 @@ export function extractTaskFamilyRootHintsFromPrompt(prompt: string): readonly s
   const ignoredCodes = new Set(['AI', 'API', 'ATM', 'CLI', 'CPU', 'CSS', 'GIT', 'HTML', 'HTTP', 'JSON', 'MD', 'NPM', 'SDK', 'TASK', 'TS', 'UI']);
   const output = new Set<string>();
   for (const match of prompt.matchAll(/\b([A-Z][A-Z0-9]{1,9})\b/g)) {
+    if (!isTaskReferenceContext(prompt, match)) continue;
     const code = match[1]?.toUpperCase();
     if (!code || ignoredCodes.has(code)) continue;
     const index = match.index ?? 0;

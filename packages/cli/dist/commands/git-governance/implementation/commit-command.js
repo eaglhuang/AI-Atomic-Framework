@@ -1,7 +1,9 @@
+import { captureIndexRestorationSnapshot } from './index-restoration.js';
+import { resolveCandidateAttribution } from './candidate-attribution.js';
 import { resolveCommitLaneSessionId } from './command-router.js';
 import { captureGitHeadEvidencePreparation } from './git-head-evidence-transaction.js';
 import { readWorkAdmissionTicket } from '../work-admission-check.js';
-import { actorIdEnvVar, findActorByResolvedId, resolveActorId } from "../../actor-registry.js";
+import { actorIdEnvVar, actorRegistryRelativePath, findActorByResolvedId, resolveActorId } from "../../actor-registry.js";
 import { CliError, quoteCliValue } from "../../shared.js";
 import { prepareHookBypassRequest } from './broker-hook-bypass-preflight.js';
 import { buildCopyableGitCommitCommand, inspectCloseCommitWindowStagedArtifacts, readStagedFiles } from './git-index-transaction.js';
@@ -59,6 +61,17 @@ export function runGitCommit(options) {
     const { usesFrameworkClaimCommit, frameworkClaimRequired, frameworkClaimFiles, frameworkClaimTaskId, frameworkClaimResolution } = resolveFrameworkCommitAuthorityContext({
         cwd: options.cwd, taskId: options.taskId, actorId, taskExists: taskDocument !== null,
     });
+    const selectedAttribution = resolveCandidateAttribution({
+        cwd: options.cwd, actorId, taskId: options.taskId ?? frameworkClaimTaskId, phase: 'selection',
+        autoStage: options.autoStage && !(usesFrameworkClaimCommit && readStagedFiles(options.cwd).includes(actorRegistryRelativePath)),
+        ...((options.deliverySliceManifestPath || options.deliverySliceReceiptPath) ? { candidateFiles: [] } : {}),
+    });
+    if (selectedAttribution.registryChanged && selectedAttribution.ok && selectedAttribution.identity
+        && (selectedAttribution.identity.gitName !== gitName || selectedAttribution.identity.gitEmail !== gitEmail)) {
+        throw new CliError(selectedAttribution.identity.gitName !== gitName ? 'ATM_COMMIT_AUTHOR_NAME_MISMATCH' : 'ATM_COMMIT_AUTHOR_EMAIL_MISMATCH', 'Resolved Git author differs from the selected candidate identity. Configure the actor-local identity to match the intended staged candidate before retrying.', {
+            exitCode: 1, details: { requiredCommand: buildIdentitySetRequiredCommand(options.cwd, actorId) },
+        });
+    }
     // `git record-commit` reaches this executor only after its own strict
     // low-risk record allowlist, single-owner check, and payload assertion path
     // have admitted the exact staged files.  It is a governed taskless maintenance
@@ -102,6 +115,7 @@ export function runGitCommit(options) {
     let deferredForeignStagedSnapshotPath = null;
     let taskScopedBundleReport = null;
     const liveIndexSnapshotBeforeCommitAttempt = readStagedFiles(options.cwd);
+    const liveIndexRestorationSnapshotBeforeCommitAttempt = captureIndexRestorationSnapshot(options.cwd);
     if (options.taskId && !session && !bypassesActiveSession) {
         throw new CliError("ATM_GIT_COMMIT_SESSION_REQUIRED", `git commit requires an active or recent ATM work session for ${options.taskId}.`, {
             exitCode: 1,
@@ -219,5 +233,5 @@ export function runGitCommit(options) {
         liveIndexResidueRollback: [],
     });
     assertDryRunReachedNoExecutor(dryRunPurity, { taskId: options.taskId ?? null, usesFrameworkClaimCommit });
-    return executeGitCommit(options, { actorId, args, autoStagedFrameworkPaths, branchName, branchRef, bypassesActiveSession, claimForTrailers, commitAttemptStartedAt, commitAttemptStatusPath, commitCommand, commitTimeoutMs, deferredForeignStagedSnapshotPath, frameworkClaimCommitFiles, gitEmail, gitHeadEvidenceSnapshotBeforeCommitAttempt, gitName, headShaAtCommitStart, headShaBeforeCommit, hookBypassRequest, hookTaskId, laneSessionId, liveIndexSnapshotBeforeCommitAttempt, profile, protectedOverrideAudit, protectedOverrideOutcome, rawCopyableCommitCommand, retryCommand, session, statusCommand, taskDocument, taskScopedBundleReport, trailers });
+    return executeGitCommit(options, { liveIndexRestorationSnapshotBeforeCommitAttempt, actorId, args, autoStagedFrameworkPaths, branchName, branchRef, bypassesActiveSession, claimForTrailers, commitAttemptStartedAt, commitAttemptStatusPath, commitCommand, commitTimeoutMs, deferredForeignStagedSnapshotPath, frameworkClaimCommitFiles, gitEmail, gitHeadEvidenceSnapshotBeforeCommitAttempt, gitName, headShaAtCommitStart, headShaBeforeCommit, hookBypassRequest, hookTaskId, laneSessionId, liveIndexSnapshotBeforeCommitAttempt, profile, protectedOverrideAudit, protectedOverrideOutcome, rawCopyableCommitCommand, retryCommand, session, statusCommand, taskDocument, taskScopedBundleReport, trailers });
 }

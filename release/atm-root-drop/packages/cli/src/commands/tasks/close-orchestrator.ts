@@ -4,7 +4,6 @@ import { createLocalGovernanceAdapter } from '../../../../plugin-governance-loca
 import { resolveActorId } from '../actor-registry.ts';
 import { resolveActorWorkSession, updateActorWorkSessionState } from '../actor-session.ts';
 import { computeMissingValidatorReport, verifyTaskEvidence } from '../evidence.ts';
-import { cleanupStaleTeamRunsForTerminalTasks } from '../team-runtime-cleanup.ts';
 import { evaluateTeamRequiredCompletionGate } from '../team.ts';
 import {
   assertRunnerFreshForWriteAction,
@@ -506,11 +505,7 @@ export async function runTasksClose(argv: string[]) {
       reason: options.reason ?? (typeof taskDocument.closeReason === 'string' ? taskDocument.closeReason : null)
     });
   }
-  const cleanedTeamRuns = cleanupStaleTeamRunsForTerminalTasks({
-    cwd: options.cwd,
-    taskId: options.taskId,
-    terminalTaskStatus: options.status
-  });
+  const cleanedTeamRuns = closeWriteResult.cleanedTeamRuns;
   const closeCommitWindowPathFromClose = (options.status === 'done' || options.status === 'abandoned')
     ? registerCloseCommitWindow({
       cwd: options.cwd,

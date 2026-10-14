@@ -3,6 +3,7 @@ import { existsSync, mkdirSync, unlinkSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import {
   executeTaskCloseTransaction,
+  closeJournalPath,
   type ClosurePacket,
   writeClosurePacket
 } from '../../framework-development.ts';
@@ -17,6 +18,7 @@ import {
 } from '../close-helpers/close-artifact-staging.ts';
 import { relativePathFrom } from '../../shared.ts';
 import { writeCloseTransactionStatus } from '../../taskflow/close-transaction-status.ts';
+import { createTerminalTeamRunCleanupTransaction } from '../../team-runtime-cleanup.ts';
 
 type AbandonResidueDispositionClass = 'keep-diagnostic' | 'abandon' | 'remove-evidence';
 
@@ -190,7 +192,15 @@ export async function executeCloseWrites(input: {
     batchId: input.owningBatch?.batchId ?? options.batchId,
     historicalDeliveryRefs: input.effectiveHistoricalDeliveryRefs
   });
-  const closeWriteResult = await executeTaskCloseTransaction({
+  const teamCleanup = createTerminalTeamRunCleanupTransaction({ cwd: options.cwd, taskId: options.taskId, terminalTaskStatus: options.status });
+  let cleanedTeamRuns: ReturnType<typeof teamCleanup.cleanup> = [];
+  const indexBefore = execFileSync('git', ['write-tree'], { cwd: options.cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
+  let stagedPaths: string[] = [];
+  let stagedEntries: string | null = null;
+  const readScopedIndex = () => execFileSync('git', ['ls-files', '--stage', '-z', '--', ...stagedPaths], { cwd: options.cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+  let closeWriteResult;
+  try {
+  closeWriteResult = await executeTaskCloseTransaction({
     cwd: options.cwd,
     taskId: options.taskId,
     taskPath: input.taskPath,
@@ -236,8 +246,11 @@ export async function executeCloseWrites(input: {
         closurePacketPath
       ]);
       try {
+        stagedPaths = [...closeArtifactFiles];
         stageTaskCloseArtifacts(options.cwd, closeArtifactFiles);
+        stagedEntries = readScopedIndex();
       } catch (error) {
+        stagedEntries = readScopedIndex();
         // The transaction cannot learn the transition path until runWrites returns.
         // Remove artifacts produced by this callback before rethrowing so its outer
         // ledger rollback restores the pre-close state as one atomic operation.
@@ -249,11 +262,34 @@ export async function executeCloseWrites(input: {
         throw error;
       }
       return { transitionPath, closurePacketPath, abandonResidueDispositionPath };
+    },
+    stageArtifacts: () => {
+      cleanedTeamRuns = teamCleanup.cleanup();
+      writeCloseTransactionStatus({ cwd: options.cwd, taskId: options.taskId, phase: 'ledger-written' });
     }
   });
-  writeCloseTransactionStatus({ cwd: options.cwd, taskId: options.taskId, phase: 'ledger-written' });
+  } catch (error) {
+    const rollbackErrors: unknown[] = [];
+    try { teamCleanup.rollback(); } catch (rollbackError) { rollbackErrors.push(rollbackError); }
+    try {
+      if (stagedPaths.length) {
+        if (stagedEntries !== readScopedIndex()) throw new Error('Close index changed after staging; refusing to overwrite concurrent work');
+        execFileSync('git', ['restore', '--source', indexBefore, '--staged', '--', ...stagedPaths], { cwd: options.cwd, stdio: ['ignore', 'ignore', 'pipe'] });
+      }
+    } catch (rollbackError) { rollbackErrors.push(rollbackError); }
+    try {
+      writeCloseTransactionStatus({ cwd: options.cwd, taskId: options.taskId, phase: rollbackErrors.length ? 'failed' : 'rolled-back', failure: String(error) });
+      if (rollbackErrors.length) {
+        // Reuse the close journal instead of introducing a second resource registry.
+        writeFileSync(closeJournalPath(options.cwd, options.taskId), `${JSON.stringify({ schemaId: 'atm.closeJournal.v1', taskId: options.taskId, actorId, phase: 'close', status: 'rollback-required', indexBefore, stagedPaths, stagedEntries, teamRecords: teamCleanup.recoveryRecords(), failure: String(error), rollbackErrors: rollbackErrors.map(String) }, null, 2)}\n`, { flag: 'wx' });
+      }
+    } catch (rollbackError) { rollbackErrors.push(rollbackError); }
+    if (rollbackErrors.length) throw new AggregateError([error, ...rollbackErrors], 'Close failed and rollback needs recovery');
+    throw error;
+  }
   return {
     transitionPath: closeWriteResult.transitionPath,
+    cleanedTeamRuns,
     closurePacketPath: closeWriteResult.closurePacketPath ?? closurePacketPath
   };
 }

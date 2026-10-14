@@ -4,6 +4,7 @@ import {
   runGitCommandWithTimeout,
 } from './git-process-port.ts';
 import { execFileSync } from "node:child_process";
+import { randomUUID } from 'node:crypto';
 import {
   appendFileSync,
   existsSync,
@@ -39,6 +40,7 @@ import {
   message,
   quoteCliValue,
   relativePathFrom,
+  type CommandResult,
 } from "../../shared.ts";
 import {
   buildPostPushRecoveryRecommendation,
@@ -47,6 +49,30 @@ import {
 } from './push-recovery.ts';
 
 type LegacyValue = ReturnType<typeof JSON.parse>;
+
+type HostPushEvidence =
+  | null
+  | {
+      command: string;
+      exitCode: number;
+      stdout?: string;
+      stderr?: string;
+    };
+
+type GitPushResult = CommandResult & {
+  evidence: { hostPush: HostPushEvidence };
+};
+
+function gitPushResult<E extends { hostPush: HostPushEvidence }>(input: {
+  ok: boolean;
+  command: string;
+  cwd: string;
+  messages: Array<ReturnType<typeof message>>;
+  evidence: E;
+}): GitPushResult {
+  return makeResult(input) as GitPushResult;
+}
+
 export function gitPushAttemptStatusRelativePath(actorId: LegacyValue, branch: LegacyValue, remote: LegacyValue) {
   const safeActor = actorId.replace(/[^a-zA-Z0-9_.-]/g, "_");
   const safeTarget = `${remote}__${branch}`.replace(/[^a-zA-Z0-9_.-]/g, "_");
@@ -61,7 +87,7 @@ export function writeGitPushAttemptStatus(cwd: LegacyValue, statusRelativePath: 
   } catch {}
 }
 
-export function runGitPush(options: LegacyValue) {
+export function runGitPush(options: LegacyValue): GitPushResult {
   if (!options.actorId?.trim()) {
     throw new CliError(
       "ATM_ACTOR_ID_MISSING",
@@ -76,7 +102,7 @@ export function runGitPush(options: LegacyValue) {
     options.actorId,
     branch,
     remote,
-  );
+  ).replace(/\.json$/, `__${randomUUID()}.json`);
   const startedAt = new Date().toISOString();
   const headShaBeforePush = readHeadCommitSha(options.cwd);
   writeGitPushAttemptStatus(options.cwd, statusPath, {
@@ -129,7 +155,7 @@ export function runGitPush(options: LegacyValue) {
       retryCommand: `node atm.mjs git push --actor ${quoteCliValue(options.actorId)} --branch ${quoteCliValue(branch)} --remote ${quoteCliValue(remote)} --json`,
       recoveryCommand: `node atm.mjs git recover-push-fail --actor ${quoteCliValue(options.actorId)} --branch ${quoteCliValue(branch)} --remote ${quoteCliValue(remote)} --json`,
     });
-    return makeResult({
+    return gitPushResult({
       ok: false,
       command: "git",
       cwd: options.cwd,
@@ -162,7 +188,7 @@ export function runGitPush(options: LegacyValue) {
       },
     });
   }
-  if (options.dryRun || admission.outcome === "no-op") {
+  if (options.dryRun || (admission.outcome === "no-op" && admission.topology.remoteBranchExists !== false)) {
     const updatedAt = new Date().toISOString();
     const status = options.dryRun ? "dry-run" : "no-op";
     writeGitPushAttemptStatus(options.cwd, statusPath, {
@@ -180,7 +206,10 @@ export function runGitPush(options: LegacyValue) {
       headShaAfterAttempt: readHeadCommitSha(options.cwd),
       admissionOutcome: admission.outcome,
     });
-    return makeResult({
+    // The operation owns a unique path, so finishing it cannot delete another
+    // attempt's in-progress or recovery bytes. Failed cleanup remains classifiable.
+    try { rmSync(path.join(options.cwd, statusPath)); } catch {}
+    return gitPushResult({
       ok: true,
       command: "git",
       cwd: options.cwd,
@@ -236,7 +265,8 @@ export function runGitPush(options: LegacyValue) {
       admissionOutcome: admission.outcome,
       remoteShaAfterPush,
     });
-    return makeResult({
+    try { rmSync(path.join(options.cwd, statusPath)); } catch {}
+    return gitPushResult({
       ok: true,
       command: "git",
       cwd: options.cwd,
@@ -288,7 +318,7 @@ export function runGitPush(options: LegacyValue) {
       errorSummary: stderr.slice(0, 4000),
       recoveryCommand: `node atm.mjs git recover-push-fail --actor ${quoteCliValue(options.actorId)} --branch ${quoteCliValue(branch)} --remote ${quoteCliValue(remote)} --json`,
     });
-    return makeResult({
+    return gitPushResult({
       ok: false,
       command: "git",
       cwd: options.cwd,

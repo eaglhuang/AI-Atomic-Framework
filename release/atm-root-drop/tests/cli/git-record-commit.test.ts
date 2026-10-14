@@ -6,7 +6,7 @@
 
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { CliError } from '../../packages/cli/src/commands/shared.ts';
@@ -415,8 +415,10 @@ try {
   assert.match(log, /ATM-Record-Commit: true/);
   const committedFiles = runGit(repo, ['show', '--name-only', '--format=', 'HEAD']);
   assert.match(committedFiles, /\.atm\/history\/tasks\/TASK-RECORD-0001\.json/);
-  // The append-only git-head.jsonl log was replaced by git-head.json.
-  assert.match(committedFiles, /\.atm\/history\/evidence\/git-head\.json/);
+  assert.doesNotMatch(committedFiles, /\.atm\/history\/evidence\/git-head\.jsonl?/,
+    'runtime git-head receipts must stay outside the commit tree');
+  assert.equal(existsSync(path.join(repo, '.atm/runtime/telemetry/git-head.jsonl')), true,
+    'the runtime journal should be written locally');
 
   // ATM-BUG-2026-07-31-007: task-import recovery must preserve dry-run/write
   // parity. A single task ledger and its matching import transition are a

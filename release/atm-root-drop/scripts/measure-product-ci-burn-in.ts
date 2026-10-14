@@ -176,7 +176,16 @@ function validateLifecycle(run: CiRun): CiFailureLifecycle {
   }
   if (run.conclusion !== 'success' && lifecycle.firstFailureAt === null) throw new Error(`record-${run.databaseId}-missing-first-failure`);
   if (run.conclusion !== 'success' && (!lifecycle.failureClass || lifecycle.failureClass.trim().length === 0)) throw new Error(`record-${run.databaseId}-missing-failureClass`);
-  if (run.conclusion === 'success' && lifecycle.retryCount > 0 && (lifecycle.firstFailureAt === null || lifecycle.repairAcceptedAt === null)) throw new Error(`record-${run.databaseId}-unrepaired-retry`);
+  if (run.conclusion === 'success' && lifecycle.retryCount > 0 && (lifecycle.firstFailureAt === null || lifecycle.repairAcceptedAt === null)) {
+    // A rerun is not itself a Product CI failure. Admit only complete, ordered
+    // successful-attempt evidence; never infer an absent failure was repaired.
+    validateAttemptProvenance(run);
+    const attempts = [...run.attempts!].sort((left, right) => left.runAttempt - right.runAttempt);
+    const successfulRerun = lifecycle.firstFailureAt === null
+      && attempts.length === lifecycle.retryCount + 1
+      && attempts.every((attempt, index) => attempt.runAttempt === index + 1 && attempt.productJobConclusion === 'success');
+    if (!successfulRerun) throw new Error(`record-${run.databaseId}-unrepaired-retry`);
+  }
   return lifecycle;
 }
 

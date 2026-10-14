@@ -1,7 +1,32 @@
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
+import { loadRegistry } from '../../_vendor/core/dist/broker/registry.js';
+import { pendingSerialTickets } from '../../_vendor/core/dist/broker/serial-queue/policy.js';
+import { observeSerialTicket } from '../../_vendor/core/dist/broker/serial-queue/queue.js';
+import { resourceListsOverlap } from '../../_vendor/core/dist/broker/resource-overlap.js';
 export function evaluateBrokerQueueAdmission(input) {
     const allowedFiles = uniquePaths(input.allowedFiles);
+    const registryPath = path.join(input.cwd, '.atm/runtime/write-broker.registry.json');
+    if (existsSync(registryPath)) {
+        try {
+            const registry = loadRegistry(registryPath, { persistCleanup: false });
+            const ticket = pendingSerialTickets(registry).find((entry) => entry.taskId === input.taskId);
+            if (ticket) {
+                const queuedSharedPaths = allowedFiles.filter((file) => resourceListsOverlap('file', [file], ticket.intent.targetFiles));
+                if (queuedSharedPaths.length > 0) {
+                    const privateFiles = allowedFiles.filter((file) => !queuedSharedPaths.includes(file));
+                    const observed = observeSerialTicket(registry, ticket);
+                    return { schemaId: 'atm.brokerQueueAdmission.v1', taskId: input.taskId,
+                        status: privateFiles.length > 0 ? 'queued-private-work' : 'queued-blocked', allowedFiles: privateFiles, queuedSharedPaths,
+                        waitingOn: queuedSharedPaths.map((surfacePath) => ({ surfacePath, queueHeadTaskId: ticket.taskId, position: observed.position })),
+                        reason: 'Native serial ticket is not write authority; explicitly revalidate its current owner, scope and base before using queued paths.' };
+                }
+            }
+        }
+        catch {
+            return invalid(input.taskId, allowedFiles, 'Native broker queue authority cannot be read.');
+        }
+    }
     const queues = readQueues(input.cwd);
     if (!queues.ok)
         return invalid(input.taskId, allowedFiles, queues.reason);

@@ -1,5 +1,6 @@
-import { existsSync, readdirSync, rmSync } from 'node:fs';
+import { existsSync, lstatSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { createHash } from 'node:crypto';
 import { readJsonFile, relativePathFrom } from './shared.js';
 const terminalTaskStatuses = new Set(['done', 'abandoned', 'blocked']);
 export function cleanupStaleTeamRunsForTerminalTasks(input) {
@@ -10,6 +11,7 @@ export function cleanupStaleTeamRunsForTerminalTasks(input) {
     const cleaned = [];
     for (const entry of readdirSync(directory).filter((name) => name.endsWith('.json')).sort((left, right) => left.localeCompare(right))) {
         const absolutePath = path.join(directory, entry);
+        const decisionBytes = readFileSync(absolutePath);
         const run = readJsonFile(absolutePath, 'ATM_TEAM_RUN_INVALID');
         const taskId = normalizeOptionalString(run.taskId);
         if (!taskId)
@@ -21,7 +23,15 @@ export function cleanupStaleTeamRunsForTerminalTasks(input) {
         const terminalTaskStatus = resolveTerminalTaskStatus(input.cwd, taskId, input);
         if (!terminalTaskStatus)
             continue;
+        if (!lstatSync(absolutePath).isFile())
+            throw new Error(`Refusing non-file Team run cleanup: ${absolutePath}`);
+        const previousBytes = readFileSync(absolutePath);
+        // Bind deletion to the bytes used for this decision, not a later replacement.
+        if (!previousBytes.equals(decisionBytes)) {
+            throw new Error(`Team run changed during cleanup: ${absolutePath}`);
+        }
         rmSync(absolutePath, { force: true });
+        input.onRemoved?.(absolutePath, previousBytes);
         cleaned.push({
             teamRunId: normalizeOptionalString(run.teamRunId) ?? path.basename(entry, '.json'),
             taskId,
@@ -31,6 +41,37 @@ export function cleanupStaleTeamRunsForTerminalTasks(input) {
         });
     }
     return cleaned;
+}
+/** Keep removed bytes only for the lifetime of the existing close transaction. */
+export function createTerminalTeamRunCleanupTransaction(input) {
+    const removed = new Map();
+    return {
+        recoveryRecords: () => [...removed].map(([absolutePath, bytes]) => ({ path: relativePathFrom(input.cwd, absolutePath), bytes: bytes.toString('base64'), sha256: createHash('sha256').update(bytes).digest('hex') })),
+        cleanup: () => cleanupStaleTeamRunsForTerminalTasks({
+            ...input,
+            onRemoved: (absolutePath, bytes) => { removed.set(absolutePath, bytes); }
+        }),
+        rollback: () => {
+            const errors = [];
+            for (const [absolutePath, bytes] of removed) {
+                try {
+                    if (existsSync(absolutePath)) {
+                        if (!lstatSync(absolutePath).isFile() || !readFileSync(absolutePath).equals(bytes)) {
+                            throw new Error(`Refusing to overwrite changed Team run during rollback: ${absolutePath}`);
+                        }
+                    }
+                    else {
+                        writeFileSync(absolutePath, bytes, { flag: 'wx' });
+                    }
+                }
+                catch (error) {
+                    errors.push(error);
+                }
+            }
+            if (errors.length)
+                throw new AggregateError(errors, 'Team run cleanup rollback failed');
+        }
+    };
 }
 function resolveTerminalTaskStatus(cwd, taskId, input) {
     if (input.taskId === taskId) {

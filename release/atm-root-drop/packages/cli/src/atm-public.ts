@@ -1,12 +1,16 @@
 #!/usr/bin/env node
+import { readRuntimeBuildIdentity } from './commands/shared/runtime-build-identity.ts';
 import path from 'node:path';
 import { recordCommandGateTelemetry } from './commands/setup/telemetry.ts';
 import { fileURLToPath } from 'node:url';
 import { getCommandSpec } from './commands/command-specs.ts';
+import { createFirstRunContract, resolveFirstRunRuntime, rootHelpSubcommand } from './commands/first-run.ts';
+import { withUnsupportedOptionHints } from './commands/shared/usage-error-hints.ts';
 import { applyOutputProjectionFlagsFromArgv, CliError, enrichCommandResult, makeHelpResult, makeResult, message, readFrameworkVersion, writeResult, type CommandResult } from './commands/shared.ts';
 import { checkStartupKnownBadVersion, isKnownBadReadOnlyCommand } from './startup-known-bad.ts';
 import { checkStartupIntegrity, resolveBundledIntegrityRoot } from './startup-integrity.ts';
 import { describeRunnerMode } from './commands/next/runner-mode.ts';
+import { applyLaneSessionFlagFromArgv } from './commands/shared/lane-session-flag.ts';
 import { runNext } from './commands/next.ts';
 import { runDoctor } from './commands/doctor.ts';
 import { runGuide } from './commands/guide.ts';
@@ -30,6 +34,7 @@ import { runSetup } from './commands/setup.ts';
 import { runStart } from './commands/start.ts';
 import { runTasks } from './commands/tasks.ts';
 import { runATMChart } from './commands/atm-chart.ts';
+import { applyProjectRootRedirect } from './commands/shared/project-root.ts';
 
 type CliRunner = (argv: string[]) => Promise<CommandResult | object> | CommandResult | object;
 
@@ -71,13 +76,15 @@ export async function runPublicCli(
   argv = process.argv.slice(2),
   io = { stdout: process.stdout, stderr: process.stderr }
 ) {
+  argv = applyLaneSessionFlagFromArgv(argv);
   applyOutputProjectionFlagsFromArgv(argv);
+  applyProjectRootRedirect(argv);
   const [commandName, ...rawCommandArgs] = argv;
   const outputFormat = selectOutputFormat(argv, io);
   const commandArgs = commandName === 'setup' ? rawCommandArgs : stripFormatFlags(rawCommandArgs);
 
   if (!commandName || commandName === '--help' || commandName === '--json' || commandName === '--pretty') {
-    const result = enrichCommandResult(createPublicHelpResult(process.cwd()));
+    const result = enrichCommandResult(createPublicHelpResult(process.cwd(), rawCommandArgs));
     writeResult(result, io.stdout, outputFormat);
     return result.exitCode;
   }
@@ -89,9 +96,9 @@ export async function runPublicCli(
   }
 
   if (commandName === 'help') {
-    const targetCommand = commandArgs.find((arg) => !arg.startsWith('-'));
+    const targetCommand = rootHelpSubcommand(commandArgs);
     if (!targetCommand) {
-      const result = enrichCommandResult(createPublicHelpResult(process.cwd()));
+      const result = enrichCommandResult(createPublicHelpResult(process.cwd(), rawCommandArgs));
       writeResult(result, io.stdout, outputFormat);
       return result.exitCode;
     }
@@ -174,7 +181,7 @@ export async function runPublicCli(
       ok: false,
       command: commandName,
       cwd: process.cwd(),
-      messages: [message('error', cliError.code, cliError.message, cliError.details)],
+      messages: [message('error', cliError.code, cliError.message, withUnsupportedOptionHints(commandName, commandArgs, cliError.message, cliError.details))],
       evidence: { publicSurface: 'adopter-core' }
     }), { cliErrorExitCode: cliError.exitCode });
     recordCommandGateTelemetry(result.cwd || process.cwd(), commandName, commandStartedAt, result, commandArgs);
@@ -205,7 +212,7 @@ function writeHelp(
   return result.exitCode;
 }
 
-function createPublicHelpResult(cwd: string) {
+function createPublicHelpResult(cwd: string, argv: readonly string[] = []) {
   return makeResult({
     ok: true,
     command: 'help',
@@ -213,6 +220,7 @@ function createPublicHelpResult(cwd: string) {
     messages: [message('info', 'ATM_CLI_HELP', 'Use "node atm.mjs <command> --help" for command details.')],
     evidence: {
       publicSurface: 'adopter-core',
+      firstRun: createFirstRunContract(argv, resolveFirstRunRuntime(publicCliCommandNames, import.meta.url)),
       commands: [...publicCliCommandNames]
         .map((command) => ({ command, summary: getCommandSpec(command)?.summary ?? 'Published adopter command' }))
         .sort((left, right) => left.command.localeCompare(right.command)),
@@ -235,7 +243,7 @@ function createVersionResult(cwd: string) {
         ? [message('warning', 'ATM_RUNNER_SOURCE_DRIFT', runnerSourceDrift.advisory, runnerSourceDrift)]
         : [])
     ],
-    evidence: { frameworkVersion: version, runnerMode, runnerSourceDrift, publicSurface: 'adopter-core' }
+    evidence: { frameworkVersion: version, runtimeBuildIdentity: readRuntimeBuildIdentity(import.meta.url), runnerMode, runnerSourceDrift, publicSurface: 'adopter-core' }
   });
 }
 

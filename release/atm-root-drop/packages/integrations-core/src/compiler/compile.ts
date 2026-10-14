@@ -97,7 +97,7 @@ export function compileSkillTemplatesForAdapter(
     ]);
   }
   if (adapterTarget === 'gemini') {
-    return resolvedTemplates.map((template) => ({
+    return resolvedTemplates.flatMap((template) => [{
       relativePath: `${template.frontmatter.id}.toml`,
       content: compileSkillTemplate(template, 'gemini', options),
       fileFormat: 'toml',
@@ -107,7 +107,12 @@ export function compileSkillTemplatesForAdapter(
       sourceCatalogDigest,
       installProfileId: profileId,
       managed: true
-    }));
+    }, ...loadSkillTemplateCompanionFiles(template.frontmatter.id, {
+      skillId: template.frontmatter.id,
+      sourceDigest: digestSkillTemplate(template),
+      sourceCatalogDigest,
+      installProfileId: profileId
+    })]);
   }
   return resolvedTemplates.flatMap((template) => [
     {
@@ -131,7 +136,13 @@ export function compileSkillTemplatesForAdapter(
       sourceCatalogDigest,
       installProfileId: profileId,
       managed: true
-    }
+    },
+    ...loadSkillTemplateCompanionFiles(template.frontmatter.id, {
+      skillId: template.frontmatter.id,
+      sourceDigest: digestSkillTemplate(template),
+      sourceCatalogDigest,
+      installProfileId: profileId
+    })
   ]);
 }
 
@@ -156,7 +167,9 @@ export function compileSkillTemplate(
   options: CompileSkillTemplateOptions = {}
 ): string {
   const frontmatter = template.frontmatter;
-  const body = renderSkillTemplateBody(template, options);
+  const referenceRoot = adapterTarget === 'gemini' ? `${frontmatter.id}/references`
+    : adapterTarget === 'copilot-instructions' || adapterTarget === 'copilot-prompt' ? `../${frontmatter.id}/references` : 'references';
+  const body = renderSkillTemplateBody(template, options).replaceAll('{{REFERENCE_ROOT}}', referenceRoot);
   if (adapterTarget === 'claude-code' || adapterTarget === 'codex') {
     return `---
 name: ${frontmatter.id}

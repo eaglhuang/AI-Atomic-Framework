@@ -144,7 +144,7 @@ export function removeBrokerRegistryIfEmpty(cwd) {
     if (!existsSync(registryPath))
         return false;
     const registry = cleanupStale(loadRegistry(registryPath));
-    if ((registry.activeIntents ?? []).length > 0) {
+    if ((registry.activeIntents ?? []).length > 0 || registry.serialQueue) {
         return false;
     }
     unlinkSync(registryPath);

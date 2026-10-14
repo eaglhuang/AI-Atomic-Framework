@@ -5,7 +5,7 @@ import { existsSync, readFileSync, readdirSync, rmSync, statSync } from 'node:fs
 import path from 'node:path';
 import { findCloseCommitWindowCoveringPaths, readActiveCloseCommitWindows } from '../../framework-development.js';
 import { isFreshFrameworkTempLock, isLockBackedRunnerPublicationEvidence, runnerPublicationEvidencePath } from '../../framework-development/runner-publication-evidence-context.js';
-import { findActorByResolvedId, inspectTrackedActorRegistryState, readRuntimeIdentityDefault, readRuntimeIdentityForActor } from '../../actor-registry.js';
+import { findActorByResolvedId, readRuntimeIdentityDefault, readRuntimeIdentityForActor } from '../../actor-registry.js';
 import { resolveActorWorkSession } from '../../actor-session.js';
 import { normalizeIdentitySegment } from '../../shared/identity-normalization.js';
 import { hasLiveFrameworkTempClaimAttribution } from './framework-temp-claim-attribution.js';
@@ -20,6 +20,7 @@ import { findCaseInsensitiveRelativePath, taskIdsEqual, taskIdsInclude } from '.
 import { normalizeRelativePath, runGit, runGitScalar } from '../git-index-diagnostics.js';
 import { normalizeOptionalText, readGitObjectText, readJsonText } from '../commit-range-guard.js';
 import { readStagedFiles } from './input-state.js';
+import { inspectCandidateAttributionDependency, resolveCandidateAttributionAuthority } from '../../git-governance/implementation/candidate-attribution.js';
 import { resolveCommittedTaskContext } from './committed-task-context.js';
 export const INVARIANT_TASK_AUDIT_CODES = new Set(['ATM_TASK_AUDIT_CROSS_REPO_DONE_WITHOUT_PACKET', 'ATM_TASK_AUDIT_BULK_CLOSE_WITHOUT_MANIFEST']);
 const textFileExtensions = new Set(['.cjs', '.css', '.html', '.js', '.json', '.jsx', '.md', '.mjs', '.ps1', '.sh', '.ts', '.tsx', '.txt', '.yaml', '.yml']);
@@ -139,9 +140,9 @@ export function collectTaskGovernedCommitAllowedFiles(cwd, taskId) {
             files.push(planPath);
         collectStringArrayField(task.planningMirrorPaths, files);
     }
-    const actorRegistryState = inspectTrackedActorRegistryState(cwd);
-    if (actorRegistryState.tracked && (actorRegistryState.staged || actorRegistryState.unstaged)) {
-        files.push(actorRegistryState.path);
+    const registryAuthority = resolveCandidateAttributionAuthority({ cwd, taskId, actorId: normalizeOptionalText(process.env.ATM_COMMIT_ACTOR_ID), laneSessionId: normalizeOptionalText(process.env.ATM_COMMIT_LANE_SESSION_ID) }, ['.atm/catalog/registry/actors.json']);
+    if (registryAuthority.ok) {
+        files.push('.atm/catalog/registry/actors.json');
     }
     files.push(...listTaskOwnedProtectedOverrideAuditFiles(cwd, taskId));
     return uniqueSorted(files.map(normalizeRelativePath).filter(isTaskDirectionPathCandidate));
@@ -518,12 +519,9 @@ export function inspectCommitAttribution(cwd, stagedFiles) {
     const pendingBatchCheckpointTaskId = resolvePendingBatchCheckpointTaskId(cwd, stagedFiles);
     const findings = [];
     const suggestedTaskId = pendingBatchCheckpointTaskId ?? (knownStagedTaskIds.length === 1 ? knownStagedTaskIds[0] : knownStagedTaskIds[0] ?? null);
-    const actorRegistryState = inspectTrackedActorRegistryState(cwd);
-    if (actorRegistryState.blocking) {
-        const governedRecoveryCommand = suggestedTaskId ? `git add ${quoteCliValue(actorRegistryState.path)} && node atm.mjs git commit --actor <id> --task ${suggestedTaskId} --message "<summary>" --json` : `node atm.mjs git commit --actor <id> --message "<summary>" --json`;
-        findings.push({ code: 'ATM_COMMIT_ACTOR_REGISTRY_UNSTAGED', source: 'commit-attribution', detail: `Tracked actor registry ${actorRegistryState.path} has ${actorRegistryState.status === 'mixed' ? 'both staged and unstaged' : 'unstaged'} changes. Governed node atm.mjs git commit can auto-stage that tracked registry when it belongs to the governed commit surface, but bare git commit cannot. Re-run through the ATM wrapper or restore the drift first.`, requiredCommand: governedRecoveryCommand, classification: 'current-task' });
-        return { ok: false, findings };
-    }
+    const { candidateAttribution, independentAttribution, failure } = inspectCandidateAttributionDependency({ cwd, taskId, actorId, laneSessionId: normalizeOptionalText(process.env.ATM_COMMIT_LANE_SESSION_ID), candidateFiles: stagedFiles, suggestedTaskId });
+    if (failure)
+        return failure;
     if (!actorId && !taskId && !sessionId) {
         if (stagedTaskIds.length > 0) {
             const wrapperRequired = { code: 'ATM_GIT_COMMIT_WRAPPER_REQUIRED', source: 'commit-attribution', detail: 'Staged ATM task/evidence changes must commit through node atm.mjs git commit so ATM can bind author, session, claim, and trailers consistently. Direct git commit remains valid for read-only git and non-governed maintenance.', requiredCommand: suggestedTaskId ? `node atm.mjs git commit --actor <id> --task ${suggestedTaskId} --message "<summary>" --json` : 'node atm.mjs git commit --actor <id> --task <task> --message "<summary>" --json', classification: 'current-task' };
@@ -537,7 +535,7 @@ export function inspectCommitAttribution(cwd, stagedFiles) {
         return { ok: false, findings };
     }
     if (!effectiveTaskId) {
-        const expectedIdentity = resolveExpectedGitIdentityForActor(cwd, actorId);
+        const expectedIdentity = independentAttribution ? candidateAttribution.identity : resolveExpectedGitIdentityForActor(cwd, actorId);
         findings.push(...collectIdentityProvenanceFindings(actorId, expectedIdentity));
         const authorName = normalizeOptionalText(process.env.GIT_AUTHOR_NAME) ?? runGitScalar(cwd, ['config', '--local', '--get', 'user.name']);
         const authorEmail = normalizeOptionalText(process.env.GIT_AUTHOR_EMAIL) ?? runGitScalar(cwd, ['config', '--local', '--get', 'user.email']);
@@ -578,7 +576,7 @@ export function inspectCommitAttribution(cwd, stagedFiles) {
     if (session && (claimLeaseId ?? claimForSession?.leaseId ?? null) && session.claimLeaseId !== (claimLeaseId ?? claimForSession?.leaseId ?? null)) {
         findings.push({ code: 'ATM_COMMIT_SESSION_CLAIM_MISMATCH', source: 'commit-attribution', detail: `Session ${session.sessionId} is bound to claim ${session.claimLeaseId ?? 'unset'}, not ${(claimLeaseId ?? claimForSession?.leaseId) ?? 'unset'}.`, classification: 'current-task' });
     }
-    const expectedIdentity = resolveExpectedGitIdentityForActor(cwd, actorId);
+    const expectedIdentity = independentAttribution ? candidateAttribution.identity : resolveExpectedGitIdentityForActor(cwd, actorId);
     findings.push(...collectIdentityProvenanceFindings(actorId, expectedIdentity));
     const authorName = normalizeOptionalText(process.env.GIT_AUTHOR_NAME) ?? runGitScalar(cwd, ['config', '--local', '--get', 'user.name']);
     const authorEmail = normalizeOptionalText(process.env.GIT_AUTHOR_EMAIL) ?? runGitScalar(cwd, ['config', '--local', '--get', 'user.email']);

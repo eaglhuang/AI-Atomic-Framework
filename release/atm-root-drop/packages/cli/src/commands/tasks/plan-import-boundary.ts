@@ -1,16 +1,32 @@
 import {
   parsePlanMarkdown as parseLegacyPlanMarkdown,
+  parseSingleCardFromPlugin,
   type ParsedPlanResult,
   type TaskImportDiagnostic
 } from './legacy/implementation.ts';
 import { isCanonicalTaskIdDeclaration } from './canonical-task-id-boundary.ts';
+import { extractFrontMatter } from './task-import-validators.ts';
 
 export function parsePlanMarkdown(input: {
   readonly planText: string;
   readonly planRelativePath: string;
   readonly importedAt: string;
 }): ParsedPlanResult {
-  const parsed = parseLegacyPlanMarkdown(input);
+  const frontMatter = extractFrontMatter(input.planText);
+  const declaredId = frontMatter?.data.task_id ?? frontMatter?.data.id;
+  // Match the external markdown source contract without rewriting the card or
+  // inventing an alias in the runtime ledger. Explicit task_id keeps precedence.
+  const parsed = frontMatter && typeof declaredId === 'string' && !frontMatter.data.task_id
+    ? {
+        tasks: [parseSingleCardFromPlugin({
+          taskId: declaredId,
+          frontmatter: frontMatter.data,
+          body: input.planText.slice(frontMatter.endIndex),
+          sourcePath: input.planRelativePath
+        }, input.importedAt)],
+        diagnostics: []
+      }
+    : parseLegacyPlanMarkdown(input);
   const diagnostics: TaskImportDiagnostic[] = [...parsed.diagnostics];
   const fencedCodeLines = collectFencedCodeLines(input.planText);
   const tasks = parsed.tasks.filter((task) => {
