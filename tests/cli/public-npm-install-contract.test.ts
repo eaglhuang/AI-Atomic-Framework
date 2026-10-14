@@ -230,18 +230,38 @@ try {
   const journalingAction = runGeneratedNpmCommand(journalingActionCommand);
   assert.equal(journalingAction.status, 0, `generated journaling command failed: ${journalingAction.stdout}${journalingAction.stderr}`);
 
+  const savedActor = process.env.ATM_ACTOR_ID;
+  const savedLegacy = process.env.AGENT_IDENTITY;
+  delete process.env.ATM_ACTOR_ID;
+  delete process.env.AGENT_IDENTITY;
+  try {
   const quickfixRoute = guidanceFor('Quick fix a typo in src/example.ts');
   const quickfixAction = (quickfixRoute.evidence as any).nextAction;
-  assert.equal(quickfixAction.status, 'quickfix-ready');
-  assert.match(quickfixAction.command, /^npm exec -- atm next --claim /);
-  assert.doesNotMatch(quickfixAction.command, /<[^>\r\n]+>/);
+  assert.equal(quickfixAction.status, 'quickfix-actor-required');
+  assert.equal(quickfixAction.pasteReady, false);
+  assert.ok(quickfixAction.missing?.includes('--actor'), JSON.stringify(quickfixAction.missing));
+  assert.match(quickfixAction.command, /^npm exec -- atm next --claim --actor ATM_ACTOR_ID /);
+  assert.doesNotMatch(quickfixAction.command, /[<>]/);
   assert.ok(quickfixAction.allowedCommands.every((command: string) => command.startsWith('npm exec -- atm ')));
-  const quickfixCommand = quickfixAction.command.includes('--actor')
-    ? quickfixAction.command
-    : quickfixAction.command.replace('next --claim', 'next --claim --actor public-npm-contract');
-  const quickfixCommandResult = runGeneratedNpmCommand(quickfixCommand);
+  const knownQuickfixRoute = buildPromptGuidanceNextResult({
+    ...routeContext,
+    actor: 'public-npm-contract',
+    taskIntent: createDeterministicTaskIntent('Quick fix a typo in src/example.ts')
+  })!;
+  const knownQuickfixAction = (knownQuickfixRoute.evidence as any).nextAction;
+  assert.equal(knownQuickfixAction.status, 'quickfix-ready');
+  assert.notEqual(knownQuickfixAction.pasteReady, false);
+  assert.match(knownQuickfixAction.command, /--actor public-npm-contract/);
+  assert.doesNotMatch(knownQuickfixAction.command, /[<>]/);
+  const quickfixCommandResult = runGeneratedNpmCommand(knownQuickfixAction.command);
   assert.ok(quickfixCommandResult.status === 0 || quickfixCommandResult.status === 1, `generated quickfix command did not invoke ATM: ${quickfixCommandResult.stdout}${quickfixCommandResult.stderr}`);
   assert.ok(!/ERR_MODULE_NOT_FOUND|Cannot find module/.test(`${quickfixCommandResult.stdout}${quickfixCommandResult.stderr}`));
+  } finally {
+    if (savedActor === undefined) delete process.env.ATM_ACTOR_ID;
+    else process.env.ATM_ACTOR_ID = savedActor;
+    if (savedLegacy === undefined) delete process.env.AGENT_IDENTITY;
+    else process.env.AGENT_IDENTITY = savedLegacy;
+  }
 
   const frameworkRoute = guidanceFor('Improve ATM framework routing');
   const frameworkAction = (frameworkRoute.evidence as any).nextAction;
@@ -269,9 +289,13 @@ try {
   });
   const promptRequiredAction = (promptRequiredRoute.evidence as any).nextAction;
   assert.equal(promptRequiredAction.status, 'prompt-required');
+  assert.equal(promptRequiredAction.pasteReady, false);
+  assert.ok(promptRequiredAction.missing?.includes('--prompt'), JSON.stringify(promptRequiredAction.missing));
   assert.match(promptRequiredAction.command, /^npm exec -- atm next --prompt /);
+  assert.match(promptRequiredAction.command, /ATM_USER_PROMPT/);
+  assert.doesNotMatch(promptRequiredAction.command, /[<>]/);
   assert.ok(promptRequiredAction.allowedCommands.every((command: string) => command.startsWith('npm exec -- atm ')));
-  const promptRequiredCommand = promptRequiredAction.command.replace('<current user prompt>', 'a bounded smoke task');
+  const promptRequiredCommand = promptRequiredAction.command.replaceAll('ATM_USER_PROMPT', 'a bounded smoke task');
   const promptRequiredActionResult = runGeneratedNpmCommand(promptRequiredCommand);
   assert.ok(promptRequiredActionResult.status === 0 || promptRequiredActionResult.status === 1);
   assert.ok(!/ERR_MODULE_NOT_FOUND|Cannot find module/.test(`${promptRequiredActionResult.stdout}${promptRequiredActionResult.stderr}`));

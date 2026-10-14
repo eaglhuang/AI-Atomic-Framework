@@ -13,7 +13,8 @@ import type { NextActionLike } from './next-action-assembly.ts';
 import type { NextDecisionTrailEntry } from './match-and-sort.ts';
 import type { inspectIntegrationBootstrap } from '../integration.ts';
 import type { inspectRuntimeAdapterReadiness } from '../runtime-adapter-readiness.ts';
-import { quoteCliValue, toTaskCandidateView } from './view-projections.ts';
+import { resolvePasteActor } from './paste-actor.ts';
+import { quoteCliToken, quoteCliValue, toTaskCandidateView } from './view-projections.ts';
 import { makeResult, message } from '../shared.ts';
 import {
   buildActiveWorkSummary,
@@ -47,6 +48,8 @@ export function buildPromptScopedNextResult(input: {
   readonly runtimeAdapterReadiness: ReturnType<typeof inspectRuntimeAdapterReadiness>;
 }) {
   const profile = createNextProfiler('ATM_NEXT_PROMPT_SCOPE_PROFILE');
+  const pasteActor = resolvePasteActor(input.actor, input.cwd);
+  const actorSlot = pasteActor ? quoteCliToken(pasteActor) : '<id>';
   const promptScope = input.importedTaskQueue.promptScope;
   if (!promptScope) return null;
   profile.mark('read-prompt-scope');
@@ -274,23 +277,23 @@ export function buildPromptScopedNextResult(input: {
   if (isHistoricalDoneStale) {
     const nextAction: NextActionLike = {
       status: 'task-reconcile-suggested',
-      command: `node atm.mjs tasks reconcile --task ${selectedTask.workItemId} --actor <id> --delivery-commit <historicalCommitSha> --json`,
+      command: `node atm.mjs tasks reconcile --task ${selectedTask.workItemId} --actor ${actorSlot} --delivery-commit <historicalCommitSha> --json`,
       reason: `task ${selectedTask.workItemId} is marked as done in the planning card but the target ledger is not closed yet; reconcile it using the historical sync channel`,
       recommendedChannel: 'reconcile',
       riskLevel: 'low',
       selectedTask,
-      requiredCommand: `node atm.mjs tasks reconcile --task ${selectedTask.workItemId} --actor <id> --delivery-commit <historicalCommitSha> --json`,
+      requiredCommand: `node atm.mjs tasks reconcile --task ${selectedTask.workItemId} --actor ${actorSlot} --delivery-commit <historicalCommitSha> --json`,
       playbook: {
         schemaId: 'atm.playbook.v1',
         channel: 'reconcile',
         steps: [
           `Find the historical Git commit SHA that delivered this task's changes (e.g., e26f3a73)`,
-          `Run node atm.mjs tasks reconcile --task ${selectedTask.workItemId} --actor <actorId> --delivery-commit <historicalCommitSha> --json`,
+          `Run node atm.mjs tasks reconcile --task ${selectedTask.workItemId} --actor ${actorSlot} --delivery-commit <historicalCommitSha> --json`,
           `This will automatically generate the closure packet, update the ledger status to done, write task-events, and synchronize the governance record without claiming the task or mutating source files.`
         ]
       },
       allowedCommands: [
-        `node atm.mjs tasks reconcile --task ${selectedTask.workItemId} --actor <id> --delivery-commit <historicalCommitSha> --json`,
+        `node atm.mjs tasks reconcile --task ${selectedTask.workItemId} --actor ${actorSlot} --delivery-commit <historicalCommitSha> --json`,
         ...allowedGuidanceBootstrapCommands()
       ],
       blockedCommands: [
@@ -382,11 +385,11 @@ export function buildPromptScopedNextResult(input: {
     if (!consistency.ok) {
       const nextAction: NextActionLike = {
         status: 'batch-state-repair-required',
-        command: `node atm.mjs batch repair --actor <id> --batch ${activeBatch.batchId} --json`,
+        command: `node atm.mjs batch repair --actor ${actorSlot} --batch ${activeBatch.batchId} --json`,
         reason: 'active batch runtime is inconsistent; repair it before claiming, editing, closing, or committing',
         recommendedChannel: 'batch',
         riskLevel: 'high',
-        requiredCommand: `node atm.mjs batch repair --actor <id> --batch ${activeBatch.batchId} --json`,
+        requiredCommand: `node atm.mjs batch repair --actor ${actorSlot} --batch ${activeBatch.batchId} --json`,
         blockedCommands: blockedMutationCommands()
       };
       return makeResult({
@@ -436,7 +439,7 @@ export function buildPromptScopedNextResult(input: {
     };
     const nextAction: NextActionLike = embedTeamRecommendation({
       status: 'task-batch-context-active',
-      command: `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(activeBatch.sourcePrompt)} --auto-intent --json`,
+      command: `node atm.mjs next --claim --actor ${actorSlot} --prompt ${quoteCliValue(activeBatch.sourcePrompt)} --auto-intent --json`,
       reason: `task ${selectedTask.workItemId} belongs to active batch ${activeBatch.batchId}; continue through the current batch queue head`,
       recommendedChannel: 'batch',
       riskLevel: 'high',
@@ -447,7 +450,8 @@ export function buildPromptScopedNextResult(input: {
         queueHeadTaskId,
         originalPrompt: activeBatch.sourcePrompt,
         batchId: activeBatch.batchId,
-        batchState: 'queue-head-active'
+        batchState: 'queue-head-active',
+        actorPlaceholder: pasteActor ?? undefined
       }),
       deliveryPrinciple: buildTaskDeliveryPrinciple({
         channel: 'batch',
@@ -455,7 +459,7 @@ export function buildPromptScopedNextResult(input: {
       }),
       selectedTask,
       targetRepo: selectedTask.targetRepo,
-      requiredCommand: `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(activeBatch.sourcePrompt)} --auto-intent --json`,
+      requiredCommand: `node atm.mjs next --claim --actor ${actorSlot} --prompt ${quoteCliValue(activeBatch.sourcePrompt)} --auto-intent --json`,
       taskQueue,
       queueId: activeQueue?.queueId ?? activeBatch.batchId,
       batchId: activeBatch.batchId,
@@ -495,7 +499,7 @@ export function buildPromptScopedNextResult(input: {
           queueHeadTaskId,
           selectedTaskId: selectedTask.workItemId,
           requiredCommand: nextAction.requiredCommand,
-          batchCheckpointCommand: 'node atm.mjs batch checkpoint --actor <id> --json',
+          batchCheckpointCommand: `node atm.mjs batch checkpoint --actor ${actorSlot} --json`,
           blockedPattern: 'manual per-task normal-flow switching during active batch'
         })
       ),
@@ -519,12 +523,13 @@ export function buildPromptScopedNextResult(input: {
   const claimCommandContract = buildTaskScopedClaimCommand({
     selectedTaskId: selectedTask.workItemId,
     explicitTaskSelector,
-    userPrompt: input.taskIntent?.userPrompt ?? selectedTask.workItemId
+    userPrompt: input.taskIntent?.userPrompt ?? selectedTask.workItemId,
+    actorId: pasteActor
   });
   const normalClaimCommand = claimCommandContract?.normalClaimCommand
-    ?? `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(input.taskIntent?.userPrompt ?? selectedTask.workItemId)} --auto-intent --json`;
+    ?? `node atm.mjs next --claim --actor ${actorSlot} --prompt ${quoteCliValue(input.taskIntent?.userPrompt ?? selectedTask.workItemId)} --auto-intent --json`;
   const taskScopedClaimCommand = claimCommandContract?.taskScopedClaimCommand
-    ?? `node atm.mjs next --claim --actor <id> --task ${selectedTask.workItemId} --auto-intent --json`;
+    ?? `node atm.mjs next --claim --actor ${actorSlot} --task ${selectedTask.workItemId} --auto-intent --json`;
   profile.mark('build-claim-commands');
   const governanceReadiness = buildGovernanceReadinessHint(input.cwd, {
     channel: 'normal',
@@ -543,6 +548,11 @@ export function buildPromptScopedNextResult(input: {
   const nextAction: NextActionLike = embedTeamRecommendation({
     status: 'task-route-ready',
     command: planningCardImport?.requiredCommand ?? normalClaimCommand,
+    ...(planningCardImport || claimCommandContract?.pasteReady !== false ? {} : {
+      pasteReady: false as const,
+      missing: claimCommandContract?.missing,
+      commandTemplate: claimCommandContract?.commandTemplate
+    }),
     reason: `the prompt resolves to task ${selectedTask.workItemId}`,
     recommendedChannel: 'normal',
     riskLevel: 'medium',
@@ -551,7 +561,8 @@ export function buildPromptScopedNextResult(input: {
     playbook: buildChannelPlaybook({
       channel: 'normal',
       taskId: selectedTask.workItemId,
-      originalPrompt: input.taskIntent?.userPrompt ?? selectedTask.workItemId
+      originalPrompt: input.taskIntent?.userPrompt ?? selectedTask.workItemId,
+      actorPlaceholder: pasteActor ?? undefined
     }),
     governanceReadiness,
     deliveryPrinciple: buildTaskDeliveryPrinciple({

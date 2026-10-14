@@ -89,7 +89,8 @@ export function tryBuildQuickfixClaimResult(input: {
 
 function claimActorFlag(actorId: string | null | undefined): string {
   const actor = actorId?.trim() ?? '';
-  return actor && !/<[^>\r\n]+>/.test(actor) ? ` --actor ${quoteCliToken(actor)}` : '';
+  if (actor && !/<[^>\r\n]+>/.test(actor)) return ` --actor ${quoteCliToken(actor)}`;
+  return ' --actor <id>';
 }
 
 export function buildNoClaimableTaskResult(input: {
@@ -104,7 +105,7 @@ export function buildNoClaimableTaskResult(input: {
       input.cwd,
       input.importedTaskQueue.promptScope?.selectedTasks ?? input.importedTaskQueue.tasks,
       input.claimIntent,
-      { dependencyMode: input.importedTaskQueue.claimableTask ? 'claim-files' : 'hard' }
+      { dependencyMode: input.importedTaskQueue.claimableTask ? 'claim-files' : 'hard', actorId: input.actorId }
     );
     const primaryBlocker = claimReadiness.primaryBlocker;
     const selectedReviewTask = input.importedTaskQueue.selectedTask
