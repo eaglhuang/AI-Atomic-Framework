@@ -17,6 +17,7 @@ ATM（AI-Atomic-Framework）論文 2.0（composer＋中立 steward，RQ2 主臂 
 | 工作稿快照 | [`working-docs/2026-10-09/`](./working-docs/2026-10-09/SNAPSHOT.md)（DRAFT 工作稿；**不是 generation**、不主張結論；不可變。內含早期 backup 與中間版，為「所有產出都進 repo」而收錄，不適用 Generation 政策第 5 條） |
 | 工作稿快照 2026-10-10 | [`working-docs/2026-10-10/`](./working-docs/2026-10-10/SNAPSHOT.md)（DRAFT 工作稿；**不是 generation**、不主張結論；不可變。論文 2.0 草稿寫入 HIST 結果＋三份追蹤文件，含修改前備份與 diff） |
 | 工作稿快照 2026-10-10b | [`working-docs/2026-10-10b/`](./working-docs/2026-10-10b/SNAPSHOT.md)（DRAFT 工作稿；不是 generation、不主張結論；不可變。外部審閱後的論文文字修正與揭露，含修改前備份與 diff） |
+| 工作稿快照 2026-10-14 | [`working-docs/2026-10-14/`](./working-docs/2026-10-14/SNAPSHOT.md)（DRAFT 論文稿；不是 generation、不宣稱勝出、沒有 HIST-v2 run。§5 改寫為已凍結預先登記；C1′–C3′ 占位；Phase 3 450-run 作廢） |
 | HIST-v2 重新設計稿 2026-10-10 | [`benchmark-design/2026-10-10-hist-bench-v2/`](./benchmark-design/2026-10-10-hist-bench-v2/README.md)（DRAFT 設計稿；不是凍結的預先登記、沒有任何 run；待作者決定 D1–D9 後另行凍結） |
 | HIST-v2 預先登記 v2.0（方法凍結） | [`benchmark-prereg/2026-10-14-hist-v2.0/`](./benchmark-prereg/2026-10-14-hist-v2.0/GENERATION.md)（2026-10-14；只凍結方法設計，自 r7 原樣帶入全部 DECISIONS。分類與實驗仍有准入閘門。來源 commit `f08599c7d864cd4ede0b50e4c6b6742b4a892f0b`。不宣稱勝出、沒有 run） |
 | HIST-v2 harness v2 | [`benchmark-harness/hist-v2-harness-v2/`](./benchmark-harness/hist-v2-harness-v2/GENERATION.md)（2026-10-14；四條臂的 fixture 接線。不跑 smoke／pilot／主跑／留出集。不宣稱勝出、沒有正式 run） |
@@ -72,5 +73,7 @@ sh research/paper-v2/benchmark-prereg/2026-10-14-hist-v2.0/verify.sh research/pa
 # 預期：OK: 5 files verified (read-only) in research/paper-v2/benchmark-prereg/2026-10-14-hist-v2.0
 sh research/paper-v2/benchmark-harness/hist-v2-harness-v2/verify.sh research/paper-v2/benchmark-harness/hist-v2-harness-v2
 sh research/paper-v2/benchmark-design/hist-v2-smoke-runbook/verify.sh research/paper-v2/benchmark-design/hist-v2-smoke-runbook
+sh research/paper-v2/working-docs/2026-10-14/verify.sh research/paper-v2/working-docs/2026-10-14
+# 預期：OK: 3 files verified (read-only) in research/paper-v2/working-docs/2026-10-14
 ```
 **注意：** `harness/reproduce.sh`（r1 版）的 verify 模式會重寫 manifest／checksums，**不可**用來驗證 r1（外審 P0-3）。r2–r6 已把 reproduce 拆成 verify／analyze／rerun／seal；驗證只用各代 `verify.sh`。
