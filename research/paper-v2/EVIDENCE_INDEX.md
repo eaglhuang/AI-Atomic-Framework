@@ -462,6 +462,24 @@ DRAFT HIST-v2 prereg（非 generation、尚未凍結、沒有 run）：[`working
 
 沒有分類 run，也沒有臂的 run。
 
+## 30. HIST-v2 harness v2（2026-10-14；fixture 接線，沒有正式 run）
+
+> **不是實驗證據。** 不跑 smoke、pilot、主跑或留出集。不宣稱勝出。不修改預先登記 v2.0、分類器 v8，或 r2–r7 設計稿。
+
+| 項目 | 值 |
+|---|---|
+| 路徑 | [`benchmark-harness/hist-v2-harness-v2/`](./benchmark-harness/hist-v2-harness-v2/GENERATION.md) |
+| 預先登記 | [`benchmark-prereg/2026-10-14-hist-v2.0/`](./benchmark-prereg/2026-10-14-hist-v2.0/GENERATION.md)（不修改） |
+| 分類器 v8 `RULES.md` sha256 | `329165d10ea2fe26885f6e7e06cb065f5cb1e356fc34efd9cce38e1995c97541` |
+| ATM core merge | `cb25242433882d34b514b79338d1a00def53a875`（PR #297，共用 compose inbox） |
+| 臂 | `atm`、`textual_merge_file`、`steward`、`file_lock` |
+| 期限 | 30 秒、第一次送出後 8 次重試、間隔 0／50／100／500／2000 ms、`combined_success`、合法子集鍵 |
+| SHA256SUMS sha256 | `393ea1deec292674d6fe60b2a11ccf6fb47a0c7602af82f2ea2fcf402009e74c` |
+| 檔案數 | 42（不含 SHA256SUMS） |
+| 驗證 | `sh benchmark-harness/hist-v2-harness-v2/verify.sh benchmark-harness/hist-v2-harness-v2` |
+
+沒有正式 run。單元與 fixture 測試不是基準結果。
+
 
 ## 6. 不在 repo 的參照
 - ATM pin 原始碼：GitHub `eaglhuang/AI-Atomic-Framework` commit `5692474f7db70ab52a7a71c8af4867609e7e4b43`（r3 另加 `bea35380d7f381f998c9930fa95f01b999c7f208`，box tarball `/workspace/atm-main-bea35380/atm-main.tar.gz` sha256 `9346e5b175b176618f435aeb4b41ab93ef7575f9bf77d77c47a5aeac87ad34b5`；r4 另加 `2118bc66efb3ac3bc0ddaede6a2f7cb18526b030`，box tarball `/workspace/atm-main-2118bc66/atm-main.tar.gz` sha256 `aa959607c35c51b7fc3c4e3d81b3d9e979ee62f4d9361ef9e9f5ee72e78abd88`；r5 另加 `37847584e24afc08ea58cfe380bb5b1220fbe335`，box tarball `/workspace/atm-main-37847584/atm-main.tar.gz` sha256 `e17a90ddceaf3c70d580c96e31f14cf8251d5a664985c1eb494f0d8db8045e3d`；r6 另加 `b35a6141bd5bfbaec654f1cd3079323581b04074`，box tarball `/workspace/atm-main-b35a6141/atm-main.tar.gz` sha256 `93fa7839d8e0fee51e5ad224833df2b57397fead3e77e0528117f21f5d5e59ef`）；box tarball `/workspace/atm-main-5692474f/atm-main.tar.gz` sha256 `1d498a397e6a5db119d40b8f539dc165cb0028fbfe9577f953023f8ec8d45795`。
