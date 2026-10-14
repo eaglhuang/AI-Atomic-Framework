@@ -1,7 +1,7 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
-export type GeneratedResidueLifecycleAction = 'release' | 'abandon' | null;
+export type GeneratedResidueLifecycleAction = 'release' | 'abandon' | 'repair-claim' | null;
 
 export interface GeneratedResidueTaskDisposition {
   readonly status: string | null;
@@ -49,11 +49,11 @@ function latestLifecycleAction(cwd: string, taskId: string): GeneratedResidueLif
     .map((entry) => {
       const event = readJson(path.join(directory, entry));
       const action = normalize(event?.action ?? event?.eventType ?? event?.transition);
-      if (action !== 'release' && action !== 'abandon') return null;
+      if (action !== 'release' && action !== 'abandon' && action !== 'repair-claim') return null;
       const timestamp = String(event?.createdAt ?? event?.timestamp ?? event?.at ?? '');
       return { action, timestamp };
     })
-    .filter((entry): entry is { action: 'release' | 'abandon'; timestamp: string } => Boolean(entry))
+    .filter((entry): entry is { action: Exclude<GeneratedResidueLifecycleAction, null>; timestamp: string } => Boolean(entry))
     .sort((left, right) => right.timestamp.localeCompare(left.timestamp));
   return candidates[0]?.action ?? null;
 }
@@ -74,7 +74,7 @@ export function readGeneratedResidueTaskDisposition(cwd: string, taskId: string)
     // `owner` is durable attribution retained after close/release; it is not
     // lease liveness.  Only the explicit claim state may prevent a completed
     // foreign receipt from being preserved as external residue.
-    hasActiveClaim: claimState === 'active' || claimState === 'claimed',
+    hasActiveClaim: claimState === 'active' || claimState === 'claimed' || claimState === 'handoff',
   };
 }
 
@@ -84,7 +84,8 @@ export function isReleasedGeneratedBundleSafeToClean(
   if (!disposition || disposition.hasActiveClaim) return false;
   const terminalStatus = disposition.status === 'done' || disposition.status === 'abandoned';
   const releasedLifecycle = disposition.lastLifecycleAction === 'release' || disposition.lastLifecycleAction === 'abandon';
-  return (terminalStatus || releasedLifecycle) && disposition.status !== 'running' && disposition.status !== 'review';
+  const repairedRelease = disposition.lastLifecycleAction === 'repair-claim' && disposition.claimState === 'released';
+  return (terminalStatus || releasedLifecycle || repairedRelease) && disposition.status !== 'running' && disposition.status !== 'review';
 }
 
 /**
