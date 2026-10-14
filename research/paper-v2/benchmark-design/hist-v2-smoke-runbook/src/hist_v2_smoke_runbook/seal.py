@@ -24,10 +24,13 @@ def seal_generation(
     observations: list[dict],
     deviations: list[str] | None = None,
     negative: dict | None = None,
+    stage_raw=None,
 ) -> int:
     if dest.exists() and any(dest.iterdir()):
         raise OverwriteRefused(dest)
     dest.mkdir(parents=True, exist_ok=True)
+    if stage_raw is not None:
+        stage_raw(dest)
     banner = pins["trial_banner"]
     deviations = list(deviations or [])
     if negative is None:
