@@ -7,11 +7,13 @@ source "$HERE/lib/common.sh"
 load_state
 
 PUBLISH=0
-INDEX_FILE="$HERE/../../../EVIDENCE_INDEX.md"
+INDEX_EXPLICIT=0
+# kit -> prereg-v3-smoke -> paper-v2/EVIDENCE_INDEX.md
+INDEX_FILE="$HERE/../../EVIDENCE_INDEX.md"
 while [ $# -gt 0 ]; do
   case "$1" in
     --publish-index) PUBLISH=1; shift ;;
-    --index-file) INDEX_FILE="$2"; shift 2 ;;
+    --index-file) INDEX_FILE="$2"; INDEX_EXPLICIT=1; shift 2 ;;
     --dest) DEST="$2"; shift 2 ;;
     *) die "unknown seal argument $1" ;;
   esac
@@ -74,6 +76,9 @@ EOF
 ROW="| \`prereg-v3-smoke/${DATE_STAMP}-${SUFFIX}/\` | smoke / exploratory, not results | no win claim | mode=${PREREG_SMOKE_MODE:-django}; model=${MODEL}; base=${COMMON_BASE} |"
 printf '%s\n' "$ROW" > "$DEST/EVIDENCE_INDEX_ROW.md"
 if [ "$PUBLISH" -eq 1 ]; then
+  if [ "$INDEX_EXPLICIT" -eq 0 ] && [ ! -f "$INDEX_FILE" ]; then
+    die "evidence index not found: $INDEX_FILE"
+  fi
   if ! grep -q "prereg-v3-smoke/${DATE_STAMP}-${SUFFIX}" "$INDEX_FILE" 2>/dev/null; then
     mkdir -p "$(dirname "$INDEX_FILE")"
     {

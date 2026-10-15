@@ -27,6 +27,8 @@ bash research/paper-v2/prereg-v3-smoke/kit/evaluate.sh
 bash research/paper-v2/prereg-v3-smoke/kit/seal.sh --publish-index
 ```
 
+`--publish-index` 只在 `research/paper-v2/EVIDENCE_INDEX.md` 追加一列，標成 smoke / exploratory、沒有勝出宣稱。索引檔不存在時會停，不會另建一份。
+
 模型用環境變數 `CODEX_MODEL`。留空時不加 `--model`，讓已登入的免費 ChatGPT 帳戶使用它自己的預設模型。腳本會把實際模型名稱寫進各臂的 `model.txt`。兩臂用同一組旗標。
 
 ## 免費額度停止規則

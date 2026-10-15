@@ -2,6 +2,8 @@
 # Quota-free end-to-end check: fixture repo, stub agent, both arms, evaluate, seal.
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
+test -f "$HERE/../../EVIDENCE_INDEX.md"
+grep -q 'INDEX_FILE="$HERE/../../EVIDENCE_INDEX.md"' "$HERE/seal.sh"
 export PREREG_SMOKE_MODE=fixture
 export PREREG_SMOKE_CODEX="$HERE/bin/stub-codex.mjs"
 export PREREG_SMOKE_STATE="$HERE/state-selfcheck"
