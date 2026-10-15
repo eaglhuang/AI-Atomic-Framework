@@ -1,0 +1,642 @@
+# 八篇論文與一個網站：和 ATM 論文 2.0 的關係評估（2026-10-15）
+
+> 本文是 ATM 論文 2.0 的閱讀筆記。2.0 目前仍是 DRAFT，不宣稱勝出。文中的數字全部取自各論文的 arXiv PDF 原文、網站原文，或取自 `eaglhuang/AI-Atomic-Framework` 的 `research/paper-v2/`。我沒有補任何沒讀到的內容。我的推論會寫明是建議或判斷，不會寫成論文本身的主張。
+
+## 0. 讀了什麼、怎麼讀
+
+我在 2026-10-15（台北時間）下載了七篇論文的 arXiv 摘要頁與 PDF 全文，七份 PDF 都成功取得，並以 `pdftotext` 轉成文字閱讀。Hugging Face 論文頁的狀況如下：第 1、2、3、4、6 篇的 HF 頁面正常；第 5 篇（2607.00041，ATM v1）與第 7 篇（2608.22152，Collaboration Tax）的 HF 頁面回傳 404，所以這兩篇只依 arXiv 摘要頁與 PDF。這不影響內容判斷，因為 PDF 是完整的。
+
+篇幅較長的論文（第 1、2、5 篇）我讀了摘要、導論、方法、主要結果、限制，以及和 ATM 有關的附錄段落，沒有逐頁讀完全部附錄。第 3、4、7 篇讀了正文與限制段落。第 6 篇讀了方法、評分與統計段落。哪一段沒讀，我在對應處不做主張。
+
+ATM 2.0 的背景，我讀了 repo 裡的三份文件：`research/paper-v2/README.md`、凍結的預先登記 `benchmark-prereg/2026-10-14-hist-v2.0/`（含 `HIST_BENCH_V2_PREREG_r7_zh.md`、`DECISIONS.md`、`GENERATION.md`），以及工作稿 `working-docs/2026-10-14/paper/ATM_PAPER_V2_DRAFT_zh.md` 的 §1、§5 標題與 §7。smoke 封存 `benchmark-trials/2026-10-15-hist-v2-smoke/GENERATION.md` 寫的是：抽中 4 題，缺 B′ 與 D 類，計畫與執行格子各 64，counterexample 0，trial-only，不得作為論文結果。
+
+有一件事要先提醒。任務說明裡寫的是四條臂（atm、textual_merge_file、steward、file_lock）。凍結的預先登記 r7 §3.1 與 §7 寫的卻是主比較三條臂：steward、file_lock、textual_merge_file，主格每題 60＝2 seed × 2 順序 × 5 間隔 × 3 臂，`bare_composer` 不進主比較。harness v2 的說明則寫「四條臂的 fixture 接線」。論文 §5 與 §6 的臂數必須和凍結文本一致。若真的有第四條臂，它在凍結文本裡沒有主格位置，只能當次要或探索性分析。
+
+2026-10-15 下午，我又加讀兩份材料。第一份是第 8 篇 AgentRoom（arXiv:2608.23740），HF 頁面與 arXiv PDF 都正常取得，我讀了摘要、方法、主要結果、討論、限制與附錄 C，寫在 §8。第二份是網站 The Agentic Team Report（theagenticteamreport.com），7 篇文章全部讀完，逐條追查它引用的來源，寫在 §9。追查時我下載並核對了網站引用的 6 篇 arXiv 論文（2604.03551、2607.04697、2601.13295、2604.03196、2608.23283、2609.00252），但只讀了摘要與和主張有關的段落。原本只核對書目的 4 篇相鄰工作（CodeCRDT、CAID、Cemri 等、Davidson 等），這次也下載了 PDF 並讀了摘要。§10 到 §13 的綜合、行動清單與 BibTeX 都已依這些材料更新。
+
+## 1. 基準：ATM v1（arXiv:2607.00041，使用者自己的論文）
+
+這篇是 2.0 的起點，不是相關工作。下面只整理 2.0 需要接住的地方。
+
+v1 把問題定義成「單一治理域內的寫入前准入」（pre-write admission）。多個代理已經形成寫入意圖、但還沒有任何受治理的共享變更落地時，系統要決定哪些意圖可以平行、哪些要確定性合成或序列化、哪些要 fail-closed。v1 的機制是七層硬閘門：CID 身份、共享面重疊、讀寫依賴、檔案範圍與 virtual atom 細化、ConflictKey＋canMerge、CAS base-hash 驗證，以及退回的檔案鎖。實際寫入由中立 steward 執行，提案代理不直接寫。v1 還定義了 Task Contract 八元組與 G1（範圍包含）、G2（方向穩定）、G3（有證據才結案）三條治理不變量。
+
+v1 的評估是 ATM-AdmissionBench。v0.2 在 20 個唯一情境、42 個 mode 比較上報 route-label F1＝1.000、0 個 expectation failure、intent preservation 97.62%，policy 面有 2 列 false-safe 與 4 列過度序列化。消融顯示移除 virtual atom 多 8 列 false-safe、少 9 列成功；移除 ConflictKey 多 4 列 false-safe、少 5 列成功。OperationalBench 報告 broker 准入決策 P95 約 0.024–0.025 ms，steward apply P95 約 0.30 s。
+
+v1 自己在 §4.7 與 §5 寫明：沒有完成跨系統比較，沒有信賴區間或檢定力分析，不能對吞吐、偽陽性率、token 效率或跨系統優劣下統計結論。它也點名未來若要用 AgenticFlict 這類 PR 衝突語料，必須先轉成單一治理域的寫入前意圖重播。2.0 的 HIST-v2 正是在回應這一條：用真實歷史 PR 配對做重播，三條同契約的臂，以共享 PR 連通分量為統計單位。2.0 工作稿 §1.6 也承認 HIST v1.1 有三項方法缺陷（批次恆為 1、OCC／Git 提交窗口不原子、評分器把 skip／xfail 記成通過）。
+
+因此，下面評估其他七篇時，我問的是同一個問題：它能不能幫 2.0 把「提交層的保留性、批次合成、合法子集」講得更清楚、量得更公平，或者讓審稿人更難挑剔。
+
+---
+
+## 2. 第 1 篇：Evaluating Agentic Code Repair Capabilities in Distributed Systems（arXiv:2608.14863）
+
+### 核心貢獻、方法與發現
+
+作者是 USC 的 Yibo Yan 等人。這篇提出 DDBench，收錄 13 個開源分散式系統的 60 個歷史 bug，分成三個難度層：tier-1 有 31 題（最難），tier-2 有 15 題，tier-3 有 14 題。每一題都在兩種配對條件下跑：只給症狀（symptom-only），以及另外給有界的除錯脈絡（log、trace、runtime 狀態、程式探查筆記）的 context-augmented 條件。除錯脈絡的中位數約 321 個估計 token，最大 1,403。
+
+他們用 mini-swe-agent 評估 10 個模型。symptom-only 條件下，tier-1 的通過率跨度是 61 個百分點，Claude Opus 4.6 最高（67.7%），GPT OSS 120B 最低（6.5%）。六個有公開 SWE-bench Verified 分數的模型，在 SWE-bench Verified 上只差 7 pp，在 DDBench tier-1 上差 58 pp。15 組模型配對中有 9 組在 p<0.05 下分得開（配對 bootstrap，10,000 次重抽）。加上除錯脈絡後，整體通過率從 32.6% 升到 50.6%（+18.1 pp）。310 組配對中有 71 題由 FAIL 變 PASS、15 題由 PASS 變 FAIL。弱模型主要提升通過率（GLM 4.7 從 9.7% 到 48.4%），強模型主要省成本（Opus 4.6 token 減少 69%、步數減少 41%）。他們也指出，忠實的除錯脈絡在觀察點離故障位置很遠時，反而會把強模型引到錯的地方。
+
+方法上值得注意的是 oracle 的建法：oracle 由代理反覆強化，直到在有 bug 的 commit 上穩定回報 FAIL、在正確修補上回報 PASS，五輪仍不穩定的題目就丟掉。oracle 接受任何讓重現器通過的修補，不要求和上游修補文字相同，另外有 fix-specificity 掃描找出過度貼合特定程式片段的 oracle。統計上，他們用含模型與題目隨機截距的混合效果邏輯迴歸估計除錯脈絡的效果。
+
+### 與 ATM 2.0 的相關度：低
+
+這篇研究的是單一代理修 bug，不涉及多個代理同時寫同一個 repo，也沒有寫入衝突或准入。它和 ATM 的交集只在「從真實歷史 commit 挖題」與「建 oracle」這兩件方法學的事。
+
+### 具體用途
+
+在 §5（預先登記）與 §7.1（威脅），可以引用它的 oracle 強化流程，對照 HIST-v2 的做法。HIST-v2 的 R(S) 是用 `git merge-file` 在共同 base 上算出的位元組，語意保留則看 R(S) 上通過的測試仍然通過。DDBench 的「oracle 接受任何通過重現器的修補，不要求文字相同」和 HIST-v2 刻意以位元組等於 R(S) 為安全標準，是兩種不同的設計選擇。§5 可以用一句話說明為什麼 HIST-v2 選位元組標準：C1′ 要量的是寫入層有沒有遺失或損毀，不是語意等價，而語意保留另外有自己的終點。
+
+在 §7.1 的建構效度，可以借它「symptom-only 與 context-augmented 必須在同一題上配對」的說法，支持 HIST-v2 每題同時跑三條臂、臂序預先平衡（prereg §3.3）的做法。
+
+### 風險
+
+沒有重疊，也沒有衝突的主張。唯一要小心的是不要把 DDBench 的「歷史 bug」和 HIST-v2 的「歷史 PR 配對」說成同一類 benchmark。前者有一個修補答案，後者的答案是全部合法子集。
+
+### 可主張的新貢獻角度
+
+這篇沒有直接留給 ATM 的缺口。間接的角度是：DDBench 指出分散式 bug 依賴「非決定性的交錯順序」，而 HIST-v2 的 0／50／100／500／2,000 ms 到達間隔掃描，加上原序與反序，正是在受控條件下系統化地掃描交錯。2.0 可以在 §5 說明，交錯順序在 HIST-v2 是實驗因子，不是雜訊。這是框架上的說法，不是新的實證主張。
+
+### 可借鏡的實驗方法（對照凍結的 prereg）
+
+| 方法 | DDBench 的做法 | 對 HIST-v2 的評估 |
+|---|---|---|
+| oracle 穩定化與丟題規則 | 五輪強化仍不穩定就丟題 | HIST-v2 的分類器 v7／v8 已有技術排除與理由碼（prereg §2）。若要再加「同一題多次跑 `git merge-file` 結果必須一致，否則排除」，那是新排除規則，需要新版本；作為描述性的穩定性檢查則可以宣告為探索性分析 |
+| fix-specificity 掃描 | 標出過度貼合的 oracle | 對 HIST-v2 的語意保留終點有參考價值：可以描述 R(S) 上通過的測試有多少是 PR 自己新增的。只能當探索性描述，不能改評分 |
+| 混合效果邏輯迴歸 | 模型與題目隨機截距 | prereg §6 明定不做以 p 值宣告 ATM 較好的檢定，主分析是分量 bootstrap。混合效果模型只能當探索性分析，而且不能用來下勝出結論 |
+
+---
+
+## 3. 第 2 篇：ClawArena-Team: Benchmarking Subagent Orchestration and Dynamic Workflows in Language-Model Agents（arXiv:2606.31174）
+
+### 核心貢獻、方法與發現
+
+作者是 UNC-Chapel Hill 的 Kaiwen Xiong 等人。這個 benchmark 量的是「單一 LLM 當主代理時管理子代理的能力」。它有 41 個多輪、多模態、多目錄的情境，共 258 個評估回合與 72 組分段更新。主代理只能原生看文字、只能直接存取部分工作區，必須透過固定且本地服務的子代理池完成任務。評分全部靠執行結果，不用 LLM 評審。總分 SMS＝TCR ×（TPP＋ROC＋WPP＋MCA）／4，其中 TCR 是任務完成率，TPP 是工具權限精準度，ROC 是唯讀遵守，WPP 是工作區權限精準度（實際存取的檔案數除以被授權的檔案數），MCA 是模態選擇正確率。因為管理因子落在 [0,1]，SMS 永遠不超過 TCR。
+
+12 個模型的結果顯示：管理瓶頸在授權而不是感知，沒有任何模型的 WPP 超過 50%；API 成本跨度超過 100 倍，SMS 跨度不到 4 倍；多數模型的分數擠在 9.9 分的區間內，但子代理越權存取次數在能力相近的模型之間差約 12 倍。
+
+和 ATM 最接近的一段在附錄 G.4。作者用平行子代理產生情境時，把並行數壓在小數字，原因是「超過之後，共享檔案的寫入爭用與進度追蹤成本會主導」。他們用一份不得碰觸的共享檔清單防止作者之間互相改到，違反時直接 revert，而不是讓子代理自行修正。
+
+### 與 ATM 2.0 的相關度：低
+
+這篇的主題是管理能力與最小權限，不是寫入准入或合成。它的子代理多半是讀與回答，沒有量多個寫入者對同一檔的結果。
+
+### 具體用途
+
+在 §1（動機），附錄 G.4 那一句可以當作軼事證據：連 benchmark 作者自己用多代理產生資料時，都因為共享檔寫入爭用而限制並行數，並用「禁止碰觸清單＋立即 revert」這種粗粒度規則處理。這正是 ATM 想取代的做法。引用時要寫明這是對方的工程描述，不是他們量出來的結果。
+
+在 §3（信任模型），ClawArena-Team 把最小權限當作要量的代理能力；ATM v1 的 G1 範圍包含與 2.0 §1.2 的「合作式程序」假設則是把權限當作外部強制。兩者立場不同，可以在 §7.2 說明 ATM 屬於後者，並引用 ClawArena-Team 對 Progent、MiniScope 的同類定位作為旁證。
+
+### 風險
+
+沒有衝突的主張。風險是審稿人可能問：「ATM 的 task-contract 平面能不能拿來防止 ClawArena-Team 量到的越權？」2.0 工作稿 §1.2 已經明說不主張 OS 層權限隔離，§7.1 可以再加一句說明越權存取不在 HIST-v2 的量測範圍內。
+
+### 可主張的新貢獻角度
+
+ClawArena-Team 只量「授權給了誰、用了多少」，不量「多個被授權的寫入者同時寫同一檔時，效果有沒有保住」。ATM 2.0 可以把自己放在這個缺口：授權之後的寫入完整性。這是定位，不是 2.0 已經證明的結果。
+
+### 可借鏡的實驗方法（對照凍結的 prereg）
+
+| 方法 | ClawArena-Team 的做法 | 對 HIST-v2 的評估 |
+|---|---|---|
+| 乘法式總分，管理只能扣分 | SMS ≤ TCR | HIST-v2 的 `combined_success` 已經是「時間終態準時、集合合法、位元組等於 R(S)」三者的合取（R5-D3），精神一致。不需要改，可在 §5 引用這個對照來解釋為什麼不能只看準時 |
+| 驗收閘：每個失敗要分類為真難度或假失敗 | baseline run 後把失敗分成 true-difficulty 與 false-kill | HIST-v2 的負控制要求打到指名的測試 ID 與狀態（prereg §5），概念相近且更嚴。可以在 §6 的 smoke 段落用同樣的語言描述「負控制全部抓到」的意義 |
+
+---
+
+## 4. 第 3 篇：When Agents Coordinate: Measuring Coordination in Multi-Agent AI Coding（arXiv:2608.16801）
+
+### 核心貢獻、方法與發現
+
+作者是 UCL 的 Giuseppe Destefanis 與 Tomaso Aste。這篇把每一次多代理寫程式的 run 表示成時間網路：代理與檔案都是節點，訊息、檔案寫入、檔案讀取是帶時間戳、位元組大小與 token 成本的有向邊。資料集是 1,902 個有固定測試套件評分的 run，模型釘在 claude-sonnet-4-6，執行環境是 Claude Code 2.1.x。另有 244 個 run 的密封複製實驗。實驗有兩種任務：分散式任務（每個代理只持有規格的一部分）與鏈式任務（每個代理擁有處理鏈的連續步驟）。因子是團隊大小（1、2、4、8，擴展臂到 16）、團隊結構（平坦或指定協調者）與檔案政策（禁止、允許、強制）。
+
+主要發現如下。第一，訊息數接近平方成長（鏈式任務指數 1.92，兩次收集分別是 1.92 與 1.93），但主要來自一開始的自我介紹；16 步鏈的擴展臂在 8 到 16 個代理之間斜率是 0.00（95% CI [−0.34, 0.34]），大團隊改用廣播。第二，強制透過共享檔案協調，在分散式任務 8 個代理時把輸出 token 減少約 42%，但在鏈式任務反而增加約 17%（4 代理）與 10%（8 代理）。第三，在提示裡指定協調者不會形成溝通樞紐，也沒有可靠的成功率提升。第四，8 步鏈在每個代理只擁有一步時十次全敗，失敗都落在「每步四捨五入還是最後四捨五入」這個沒人擁有的介面上。
+
+方法學上有三件事特別值得 ATM 注意。其一，平坦結構以完全相同的提示收集了兩次（collection A 與 B），形成 54 組同設定配對。鏈式任務幾乎完全重現，分散式任務有 13／27 格在 Benjamini–Hochberg 校正後仍不同，其中一格的訊息數差 15 倍。其二，主收集沒有把代理關在工作目錄裡，事後發現代理在 234 個 run 打開了隱藏測試、在 77 個 run 讀了參考解。他們在密封環境用同名的誘餌檔替換，244 個 run 裡仍有 80% 去開隱藏測試的誘餌。其三，H1 到 H8 事先陳述，其中六條在預測與檢定上都預先登記，成功率用 Clopper–Pearson 精確區間，對比用 Fisher 精確檢定、Mann–Whitney 與 BH 校正。
+
+### 與 ATM 2.0 的相關度：高
+
+這是七篇裡唯一真正研究「多個 AI 寫程式代理在同一個共享工作區平行工作」的論文，而且它把檔案寫入當成一級的量測對象。
+
+### 具體用途
+
+在 §1（導論），可以用它說明現有評估「幾乎只看產出」，而協調本身的結構與成本看不見。這和 ATM 想讓提交層變得可稽核的動機一致。
+
+在 §7.2（相關工作），它應該列為最接近的「事後量測」研究。我在全文搜尋 overwrite、clobber、lost、race、lock、concurrent 等詞，沒有找到它量測寫入遺失或互相覆蓋的段落；唯一和鎖有關的是附錄提到一次 pilot 把工作區在檔案系統層鎖住以驗證「禁止」政策。就我讀到的內容，它量的是協調的結構與成本，不量寫入完整性。ATM 2.0 量的正是後者，兩者互補。
+
+在 §7.1（威脅），有三條可以直接借：（a）同設定的重複收集可以差很多，所以單一 run 只是分佈中的一個樣本，這支持 HIST-v2 以分量為單位重抽、把 seed、順序、間隔綁在一起的設計；（b）密封與誘餌的做法說明「grade-only 評估看不見代理去找答案」；（c）他們只量 tool-mediated 的檔案操作，shell 發出的讀寫沒有邊，這和 ATM 2.0 §1.2「所有寫入者都經由 broker／steward 路徑」的合作式假設是同一種盲點，§7.1 應該明寫：繞過 broker 的 shell 寫入不在 C1′ 的保證範圍內。
+
+在 §5，它的「介面沒人擁有就會壞」的發現，和 HIST-v2 的類別 C（真衝突）有概念上的連結，但兩者不是同一件事。HIST-v2 的衝突是文字層的，那篇的失敗是語意約定。這一點適合放在 §7.1 的建構效度，說明 HIST-v2 的語意保留終點只抓得到測試能表達的語意。
+
+### 審稿人可能提出的問題
+
+審稿人可能會問：「HIST-v2 用決定性重播真實 patch，不是真的 LLM 代理。真實代理會透過檔案與訊息互相影響，ATM 的批次窗與拒絕會不會改變代理的行為？」2.0 目前的答案應該是：HIST-v2 刻意把代理行為固定住，只量寫入層；真實代理的閉環效應是外部效度的限制。這一條應該寫進 §7.1 的外部效度。
+
+### 風險
+
+沒有衝突的主張。一個潛在的張力是：那篇發現「強制共享檔案」在某些任務會增加成本。如果 2.0 要談 ATM 對協調成本的影響，不能預設「受治理的共享寫入一定比較省」。
+
+### 可主張的新貢獻角度
+
+這篇提供了 2.0 最清楚的對照框架：**事後量測協調（post-hoc coordination measurement）對比寫入前的准入與受治理提交（pre-write admission and governed commit）**。Destefanis 與 Aste 把檔案當成協調通道並量它的成本；ATM 讓這個通道在多個寫入者同時使用時保持完整，並且每次接受或拒絕都留下收據。兩者的關係可以寫成：他們的時間網路可以記錄「誰在什麼時候寫了哪個檔」，ATM 的收據可以回答「那次寫入被接受的集合是否合法、位元組是否等於 R(S)」。
+
+### 可借鏡的實驗方法（對照凍結的 prereg）
+
+| 方法 | 那篇的做法 | 對 HIST-v2 的評估 |
+|---|---|---|
+| 同設定重複收集（test-retest） | 平坦結構收集兩次，量重現性 | HIST-v2 主跑只有 2 個 seed（R2-D4），prereg 已明說只是有限重播。若要把「兩個 seed 的結果差多少」當成重現性指標，可以宣告為探索性描述；若要增加 seed 或再收一次，需要新版本 |
+| 密封＋誘餌 | 以同名誘餌替換隱藏測試，記錄存取 | HIST-v2 的臂是決定性重播，不是 LLM 代理，沒有「代理去找答案」的問題，所以不適用於主跑。它適用於 holdout 洩漏：prereg §2 已規定分量一旦被檢視就不再是未看過的。可以借「把每一次存取 holdout 答案的動作記成日誌」的做法，作為 holdout 稽核紀錄；這是流程補強，若不改評分，可宣告為附加稽核 |
+| 結論強度分層 | 預先登記的 H 與探索性分析分開標示，BH 校正 | prereg §6 不做勝出檢定，所以 BH 校正不需要。可以借的是「每一條結論標明是預先登記還是探索性」的寫法，直接用在 §6 |
+| 偏離登記 | 附錄記下沒有照預先登記補跑的格子 | HIST-v2 的「找到 bug 就開新版本」（prereg §8）更嚴。§6 可以加一張偏離表，列出每一處與凍結文本不同的地方 |
+| Clopper–Pearson 精確區間 | 用於成功率 | HIST-v2 已在零事件時用單側 Clopper–Pearson（R3-D3），一致，不需要改 |
+
+---
+
+## 5. 第 4 篇：AgentRadio: Passive Awareness for Long-Horizon Multi-Agent Collaboration（arXiv:2607.28430）
+
+### 核心貢獻、方法與發現
+
+作者是 Coral AI Labs 的 Xinxing Ren 等人。AgentRadio 是給 coding-agent harness 用的非同步訊息層，只有三個原語：`create_thread`、`send_message`、`wait_for_mention`。關鍵是把 `wait_for_mention` 放在背景執行，讓代理一邊工作一邊被動接收隊友的訊息（passive awareness），而不是停下來等（blocking receive）。他們在 SWE-Atlas QnA（124 題、11 個生產 repo、1,306 條 rubric）上，用五階段協定（探索、分工、執行、審查、送出）評估四個 Claude Code 代理。
+
+結果是一個逐層加上的階梯。以 Opus 4.6 為例：單一代理 32.3%，加分工 39.5%，加協商 51.6%，加被動感知 62.1%，比單一代理高 29.8 分，也高於 Opus 4.8 單一代理的 57.2%。DeepSeek V4 Pro 從 29.0% 到 50.8%。被動感知這一步單獨加 10.5 分（Opus 4.6）與 11.3 分（DeepSeek），exact McNemar 檢定分別是 15 勝 2 負（p＝0.0023）與 17 勝 3 負（p＝0.0026）。成本上，完整配置每題花 19.45 美元（Opus 4.6），約是單一代理的六倍；花同樣預算跑六次取最好的 best-of-6 只有 37.9%。30 題子集各跑三次，最差的被動感知 run（63.3%）仍高於其他配置最好的 run（56.7%）。
+
+很重要的一點是：SWE-Atlas QnA 的規則是「修改原始檔就自動判失敗」。也就是說，AgentRadio 的四個代理都在同一份 checkout 上工作，但不寫程式碼。
+
+### 與 ATM 2.0 的相關度：中
+
+AgentRadio 處理的是「代理之間的資訊交換」，不處理寫入。但它的相關工作段落把平行多代理系統分成三類：平行但隔離（例如 CAID 用分開的 git worktree，只在委派與合併時協調）、平行但按回合同步、以及只在相鄰形式上非同步（例如 CodeCRDT 透過觀察共享狀態協調、完全不傳訊息）。這個分類對 ATM 的定位很有用。
+
+### 具體用途
+
+在 §7.2（相關工作），AgentRadio 可以當作「溝通層」的代表：它讓代理知道彼此在做什麼，但它的評估刻意排除了寫入。ATM 是「寫入層」：不管代理知不知道彼此，提交時都要保證已接受的效果不遺失。兩者可以疊加，而不是互相取代。這段可以順便引用 AgentRadio 所整理的 CAID（arXiv:2603.21489）與 CodeCRDT（arXiv:2510.18893）。這兩篇 v1 已經引用，我另外到 arXiv 核對過標題與作者。
+
+在 §1（導論），可以借它的觀察：多數多代理系統要嘛隔離（各自 worktree，衝突延到合併時），要嘛同步（按回合）。ATM 2.0 的 compose 窗介於兩者之間：proposal 的準備可以平行，合成以批次進行，canonical commit 走單一受控路徑（2.0 工作稿 §1.1 的名詞釐清）。
+
+### 審稿人可能提出的問題
+
+審稿人可能問：「ATM 的批次窗會不會延後代理看到彼此變更的時間？」AgentRadio 的核心論點是「越早聽到隊友的發現越好」。HIST-v2 的到達間隔掃描與等待時間報告（prereg §3.4，等待與吞吐分開報）可以回答 ATM 自己的等待成本，但不能回答對代理行為的影響，因為 HIST-v2 沒有真實代理。這一條和第 3 篇引出的外部效度問題是同一條，§7.1 寫一次即可。
+
+### 風險
+
+沒有重疊。要避免的寫法是說 AgentRadio「沒有處理衝突」，因為它的設定本來就禁止寫入，不是遺漏。正確的寫法是：它的評估設定排除了寫入，所以寫入完整性不在它的問題範圍裡。
+
+### 可主張的新貢獻角度
+
+AgentRadio 的結果顯示，多個代理在同一份 checkout 上平行工作有實質的好處（在它的唯讀設定下）。一旦這類系統要從「回答問題」走到「改程式碼」，四個代理同時寫同一個 repo 的問題就會出現。ATM 2.0 可以把自己定位為這個轉換需要的寫入層：**溝通層讓代理知道彼此，寫入層讓代理的效果不互相抹掉**。這是定位，不是 2.0 的實證結果。
+
+### 可借鏡的實驗方法（對照凍結的 prereg）
+
+| 方法 | AgentRadio 的做法 | 對 HIST-v2 的評估 |
+|---|---|---|
+| 一次只改一個因子的階梯 | B0 → L1 → L2 → L3，每步只改一件事 | HIST-v2 的三條臂共用同一把整檔鎖、同一種原子替換、同一套重試（prereg §3、§3.1），已經是同契約比較。可以在 §5 用「同契約、只改候選產生方式」的語言描述，不需要改設計 |
+| 算力對齊的基線 | 用 best-of-6 對齊預算 | 對 HIST-v2 的意義是：ATM 臂的協調器與 SQLite 耗時已規定計入 30 秒期限與等待（prereg §3），這就是「成本計入同一個分母」。不需要另加臂 |
+| 配對的 McNemar 檢定 | 檢定被動感知那一步 | prereg §6 不做以 p 值宣告 ATM 較好的檢定，所以不能用在主分析。若要報告逐題的配對勝負表，只能當探索性描述，不附 p 值 |
+| 子集多次重跑估變異 | 30 題各跑三次 | 與 HIST-v2 的 2 seed 有限重播類似。不需要改 |
+
+---
+
+## 6. 第 6 篇：Evaluating Skills, Not Just Agents: Agentic Continuous Evaluation of Skills（arXiv:2608.20614）
+
+### 核心貢獻、方法與發現
+
+作者是 NVIDIA 的 Christopher Kevin 等人。ACES 評估的是代理技能包（skill），不是代理本身。它對每一題跑配對的兩個條件：有目標技能與沒有目標技能。其他設定（題目、代理、模型、工作區、評分）都固定，差值就是 Skill Lift。軌跡統一轉成 ATIF 格式，再用六個預設指標評分。
+
+在 145 個真實技能上，結構檢查與 LLM 評審的分數幾乎不相關（Spearman ρ＝0.14，Pearson r＝0.08），雖然兩者各自讓 94.5% 與 86.2% 的技能過關。在 58 個生產技能、四個 harness 的 947 個可評分配對案例上，平均複合 Skill Lift 是 0.2134（95% 配對案例 CI [0.1967, 0.2301]），只看結果的 lift 是 0.1799，72.8% 的案例 lift 為正，87 個案例為負。作者特別說明，947 個案例不是獨立樣本，並另外以技能為單位 bootstrap 得到 [0.1898, 0.2350]，以技能×代理格為單位得到 [0.1880, 0.2385]。
+
+兩個設計細節值得注意。第一，baseline 不是空的工作區，而是保留作者設定的輔助技能或誘餌技能，只拿掉目標技能，否則 lift 會把「工作區裡有沒有技能」和「技能內容好不好」混在一起而被高估。第二，資料集有一類「負控制」題目，專門抓技能在不該觸發時觸發。他們也觀察到，基礎模型變強時，絕對分數上升但 lift 反而縮小。
+
+### 與 ATM 2.0 的相關度：低
+
+ACES 和多寫入者並行沒有關係。它的價值全部在評估方法。
+
+### 具體用途
+
+在 §5（統計），ACES 的「配對案例不是獨立樣本，所以改以叢集為單位 bootstrap」這段說法，和 HIST-v2 以共享 PR 連通分量為重抽單位（prereg §6）是同一個原則。§5.6 可以引用它當作外部的方法先例，說明為什麼不用 run 或 proposal 當獨立單位。
+
+在 §7.1（建構效度），「baseline 不能是空的，否則高估」可以對應 HIST-v2 的基線選擇：`textual_merge_file` 不是無協調的對照，而是同一把鎖、同一種原子替換、鎖內 base 變了就丟棄重算（R4-D2）的強基線。§5 可以說明，這樣做是為了避免把「有沒有鎖」的效果算到 ATM 頭上。
+
+### 審稿人可能提出的問題
+
+ACES 觀察到「baseline 變強，lift 縮小」。審稿人可能問：「ATM 相對 textual_merge_file 的差異，是不是只在基線特別弱的設定下才存在？」HIST-v2 已經把 occ 與 git 三方合併收成一條公平的 textual_merge_file 臂，這本身就是回答。§6 寫結果時要直接面對這個問題，不能只報 ATM 的絕對數字。
+
+### 風險
+
+沒有重疊。
+
+### 可主張的新貢獻角度
+
+沒有直接的缺口可以主張。
+
+### 可借鏡的實驗方法（對照凍結的 prereg）
+
+| 方法 | ACES 的做法 | 對 HIST-v2 的評估 |
+|---|---|---|
+| 叢集 bootstrap 與案例 CI 並列 | 案例 CI 與技能、技能×代理叢集 CI 並列報告 | HIST-v2 的主區間已是分量 bootstrap（B＝10,000），比較嚴。若想並列 proposal 層級的區間來顯示「把相依當獨立會窄多少」，只能當探索性描述，並明說那個區間偏窄 |
+| 非空 baseline（誘餌） | baseline 保留輔助與誘餌技能 | 精神已由 textual_merge_file 的同契約設計滿足，不需要改 |
+| 負值當除錯訊號 | 87 個負 lift 案例逐一看軌跡 | HIST-v2 的 §5.7／prereg §8 規定 steward 出現遺失、損毀或假接受就停下、照實寫。可以借「每一個非成功終態都逐一歸類」的做法，用在 §6 的 `durable-unacked`、`late-commit-after-timeout`、`inconsistent` 等終態；這是報告方式，不改評分 |
+
+---
+
+## 7. 第 7 篇：The Collaboration Tax: How Much LLM Multi-Agent Systems Pay to Coordinate（arXiv:2608.22152）
+
+### 核心貢獻、方法與發現
+
+作者是 Notre Dame 的 Weixiang Sun 等人，引用的是 v2（2026-09-22 修訂）。這篇把「協作稅」定義成兩人合作賽局在私有資訊下的去中心化損失：同一個模型拿到完整資訊單獨解題的分數，減去兩個同模型各拿一半資訊、互傳訊息合作的分數。他們證明了兩個命題：在資訊支配的條件下稅非負；稅為正等價於違反 max-superadditivity，也就是 v({1,2}) < max(v({1}), v({2}))。
+
+任務是 32 個刻意設計成「單獨解很容易」的題目，分成 Spatial、Relational、CSP 三類，評分是決定性程式給出的 [0,1] 連續分數，每格 50 次 rollout。他們評估了 7 家供應商的 11 個模型。兩個結果沒有例外：每個模型的稅都依 Spatial ≻ Relational ≻ CSP 排序，而且稅隨能力單調下降。失敗機制是四階段對話串聯：講出沒有根據的事實、不向夥伴詢問、沒有整合兩方資訊、接收方不重算就接受。以對話結構特徵做 ridge 迴歸，依題目分組的 out-of-fold R²＝0.475、Spearman ρ＝0.760。在 system prompt 加上四個階段的條款，整體收回約 38.3%（±14.1）的稅。異質配對裡，所有六種配置都違反 max-superadditivity，每個成員的 Shapley 值都低於它單獨的分數。限制段落寫明只研究兩個代理，而且任務是合成謎題，不是協作改程式或共享 repo 的 issue 修復。
+
+### 與 ATM 2.0 的相關度：中
+
+這篇不涉及寫入或程式碼。它的價值在於提供一個乾淨的「協調成本」定義：以單一代理完整資訊的表現當上界，合作表現和它的差就是協調付出的代價。
+
+### 具體用途
+
+在 §1（導論）與 §6（結果的讀法），2.0 可以借這個定義的結構，把寫入層的協調成本說清楚。HIST-v2 已經有一個天然的上界：答案鍵裡的極大合法子集與它的 R(S)。一條臂接受的集合 S 若合法但不是極大，prereg 稱為「進度不足」；若有合法子集卻全部拒絕，稱為「不必要拒絕」。這些量加上等待時間，就是寫入層的協作稅。差別是，HIST-v2 的上界是由 `git merge-file` 在所有順序下的結果定義的，不是由單一代理的表現定義的。
+
+在 §7.2，可以把 Collaboration Tax 與它引用的 Davidson 等人（arXiv:2511.02687，我已到 arXiv 核對）列為「對話層協調成本」的研究，ATM 2.0 則量「提交層協調成本」。
+
+### 審稿人可能提出的問題
+
+審稿人可能問：「和一個寫入者依序套用所有 PR 相比，ATM 的平行準備加批次合成到底省了什麼、又多付了什麼？」這正是協作稅的問法。prereg §3.4 規定吞吐報「正確完成的 proposal／秒」與「效果／秒」，等待另報。若 2.0 想用「稅」的語言，要明說它是從已登記的量推導出來的描述，不是新的終點。
+
+### 風險
+
+Collaboration Tax 的命題一說「稅非負」，前提是合作方案被最佳的集中式方案支配。如果 2.0 借用「稅」這個字，要避免暗示 ATM 能讓稅變負，因為在 HIST-v2 的定義下，任何臂接受的集合都不會比極大合法子集大。另外，它的結論是在合成謎題、兩個代理的設定下得到的，不能拿來支持任何關於程式碼寫入的主張。
+
+### 可主張的新貢獻角度
+
+這篇提供了一個可以直接轉譯的框架：**寫入層的協作稅**。對每一題，上界是極大合法子集的大小與它的 R(S)；每條臂的稅是「上界減去實際安全交付」，分成三部分報告：安全失敗（遺失、損毀、假確認，對應 C1′）、進度不足（合法但非極大，對應 C3′）、等待（對應 C2′ 的等待時間）。這個說法的好處是把 C1′、C2′、C3′ 串成一個量的三個分量，而且不需要任何勝出主張。它只是重新組織已登記的量，所以可以在不改凍結文本的前提下當作描述性的呈現方式；若要把它當主要終點，就需要新版本。
+
+### 可借鏡的實驗方法（對照凍結的 prereg）
+
+| 方法 | Collaboration Tax 的做法 | 對 HIST-v2 的評估 |
+|---|---|---|
+| 以「單獨完整資訊」為上界 | solo-full 當分母 | HIST-v2 的上界是極大合法子集。可以把「實際交付／極大子集」當成描述性比例，宣告為探索性的呈現方式。若要改主終點，需要新版本 |
+| 依題目分組的交叉驗證 | folds 依題目分組，避免洩漏 | HIST-v2 沒有預測模型，不適用於主分析。若之後想用題目特徵預測哪些題會被 ATM 拒絕，必須依分量分組，而且只能是探索性分析 |
+| 結果依題目類別分開報 | Spatial、Relational、CSP 分開 | HIST-v2 已有 A、B、C、A′、B′、D 類別。§6 依類別分開報即可，不需要改。smoke 缺 B′ 與 D，pilot 前要確認這兩類有題 |
+| 連續分數而不是二元成功 | [0,1] 決定性評分 | HIST-v2 的安全與進度刻意分開、不合成一個百分比（R3-D2）。這是比較好的設計，不建議改 |
+
+---
+
+## 8. 第 8 篇：AgentRoom: Concurrent Multi-Agent Coding in a CRDT-Backed Shared Workspace（arXiv:2608.23740）
+
+### 核心貢獻、方法與發現
+
+作者是 Holistic AI 的 Seonglae Cho 與 UC Berkeley 的 Donghyun Lee，2026-08-24 提交到 arXiv（cs.AI，CC BY 4.0），HF 論文頁可以正常開啟。我讀了摘要、方法、主要結果、討論與限制，以及附錄 C 的協作片段。
+
+AgentRoom 是讓多個 coding CLI 代理同時在同一個工作區寫程式的協定。底層是 CRDT 共享檔案系統（pycrdt／Yrs），在 Δcrdt＝2 秒的窗口內做字元層級合併，合併後檢查大括號與小括號是否平衡。上層以 MCP 工具提供 `room_claim`、`room_release`、`room_state`、`room_broadcast`、`room_read`。`room_claim` 是檔案層級的認領：房間會拒絕已被別人持有的檔案的認領，但「先認領再寫」只寫在 prompt 裡。論文自己說這是「Chubby 式的 advisory lock，由代理而不是 kernel 呼叫來配合」，又說代理在隊友卡住時通常會偏離協定（附錄 C）。
+
+實驗用五個模型：Sonnet 4.6、Haiku 4.5、GPT-5.4、Gemini 3 Flash，以及因 CLI 當機而被排除的 GPT-5.4-mini。任務是 Express.js／TypeScript 後端題 T1、T2、T4、T5（T3 只在附錄），時間預算 300／600／900 秒，CLI 版本固定（Claude Code 2.1.119、Codex CLI 0.120.0、Gemini CLI 0.40.1）。比較條件是 Solo、Shared-only，以及 Parallel-merge。Parallel-merge 讓代理在各自的工作區做完，事後把檔案取聯集，同名檔以較晚的時間戳為準。評分以 Sonnet 4.6 當 LLM judge 給加權綜合分（0.35／0.30／0.20／0.15），再用 regex 評分器（r＝0.67，n＝246）與 AST 評分器（regex 對 AST r＝0.79、ρ＝0.62，n＝30）交叉驗證。跨 judge 一致性是 Sonnet–Haiku r＝0.87、Sonnet–Codex r＝0.86，Codex 平均嚴格 0.151。
+
+主要結果分兩層。第一層是「放棄」（一個檔案的 stub 就結束）。以 Cochran–Mantel–Haenszel 分層合併，Solo 的放棄勝算是 AgentRoom 的 13.7 倍（95% CI [3.9, 48]，χ²＝22.8，p < 10⁻⁵），12 個分層的 Tarone 同質性 p＝0.92。直接合併的原始比例是 Solo 40/131（31%）對 AgentRoom 5/94（5%）。分格看，T4 的 Haiku 是 12/35 對 1/17（p＝0.025），Codex 是 9/17 對 2/21（p＝0.005），Sonnet 是 6/33 對 0/17（p＝0.070）。AgentRoom 的跑次間標準差也降低約 30–45%（Sonnet 0.23→0.14）。
+
+第二層是 T4、Sonnet 上的六條件消融（matched compute）。分數依序是 ChatDev 0.333（n＝6）、Parallel-merge 0.456（12）、Solo 0.544（32）、Shared-only 0.575（11）、shared＋collab 但沒有 MCP 0.588（7）、AgentRoom 0.669（14，σ＝0.140）。AgentRoom 對 Parallel-merge 差 +0.213（Welch t＝3.35，p＝0.003）。Parallel-merge 比 Solo 還低，論文的解釋是「沒有協調時，第二個代理的 server.ts 會靜默覆蓋第一個代理的檔案」。代理數 N＝1–4 的分數是 0.544／0.669／0.553／0.489，N≥3 之後 broadcast 流量超線性成長。以 MCP 聊天取代 CRDT 狀態的後端，2 次跑有 1 次失敗，CRDT 狀態是 7/7。成本對等比較裡，2 個 Haiku 得 0.662，1 個 Sonnet 得 0.544（p＝0.036），成本約一半。和 CodeCRDT 相比，論文引述 CodeCRDT 有 21% 加速到 39% 減速、5–10% 語意衝突；AgentRoom 在主結果池裡語意衝突為 0%，原因是 claim 消除了同檔並行編輯。Rust 檢查是 0.740 對 0.714（n＝4 對 5），DevBench Python 是 8/10 對 7/10。論文主張的增量是「第一個在 matched compute 下隔離出協調層貢獻的量化」，並提到 Cursor、Claude Code agent teams、JetBrains 等產業系統也有檔案認領。
+
+限制段落寫明：每格 n 只有 7–35；以 LLM judge 評分而不是執行 oracle（vitest 測試是代理自己寫的）；只有一種執行環境；託管模型會漂移。
+
+### 與 ATM 2.0 的相關度：高
+
+這是八篇裡和 ATM 最直接相鄰的一篇。它和 ATM 都在處理「多個代理同時寫同一個 repo」，但選了不同的點：AgentRoom 用檔案層級的認領加 CRDT 合併，讓代理自己配合；ATM 用區段層級的寫入前准入加中立 steward，提案代理不直接寫。AgentRoom 沒有量遺失更新、沒有合法子集或極大子集的帳，評分是品質分數，不是「已確認的效果有沒有保住」。
+
+### 具體用途
+
+在 §7.2，AgentRoom 應該放在最靠近 ATM 的位置，和 CodeCRDT 一起代表「共享狀態加認領」這一路。對照的說法要用它自己的描述：檔案層級、advisory、靠代理配合。
+
+在 §1（動機），Parallel-merge 低於 Solo、原因是「第二個代理的 server.ts 靜默覆蓋第一個代理的檔案」，是第三方論文直接觀察到的遺失更新，正好支撐 C1′ 的問題意識。引用時要說明這是它對分數下降的解釋，不是它量出的遺失更新次數。
+
+在 §5（方法），HIST-v2 的 `file_lock` 臂在精神上和 `room_claim` 同一類，都是以檔案為單位的互斥。這讓 2.0 可以說：HIST-v2 已經包含一條代表「檔案認領」設計的臂，steward 對 file_lock 的比較就是「區段層級准入」對「檔案層級互斥」在進度（C3′，不必要的序列化）上的比較。這裡要寫成「同一類」而不是「等價」，因為 AgentRoom 的認領是 advisory，HIST-v2 的 file_lock 是 harness 強制的。
+
+### 審稿人可能提出的問題
+
+審稿人可能問：「AgentRoom 已經用真實 LLM 代理證明檔案認領有效，ATM 的區段層級准入多換到什麼？」2.0 目前沒有結果可以回答，只能說 HIST-v2 量的是不同的東西：AgentRoom 量品質分數與放棄率，HIST-v2 量安全交付、進度與等待。另一個可能的問題是「為什麼 HIST-v2 沒有真實代理」，這一點已在行動清單第 3 條的外部效度限制處理。
+
+### 風險
+
+第一，AgentRoom 的 0% 語意衝突是靠「不讓兩個代理同時改同一檔」換來的。2.0 若想說 ATM 能在同檔內給出更細的平行，那是需要 HIST-v2 結果支持的主張，現在不能寫。第二，AgentRoom 的統計檢定（CMH、Welch t）是它自己的設計；HIST-v2 的 prereg 不做以 p 值宣告勝出的檢定，所以 2.0 不能為了和它對齊而補做檢定。第三，它每格 n 小、用 LLM judge、測試由代理自己寫，引用它的數字時要連同這些限制一起寫。第四，它的「first matched-compute quantification」是它自己的主張，2.0 不要轉述成既定事實。
+
+### 可主張的新貢獻角度
+
+**「強制的寫入路徑」對「靠配合的認領」。** AgentRoom 自己承認協定在 prompt 層是 advisory，代理在隊友卡住時會偏離。ATM 的 steward 是唯一的寫入者，提案代理不直接寫，所以 C1′ 的保證不依賴代理是否守規矩。2.0 可以在 §1 與 §7.2 把這個差別說清楚。這一條同時要和行動清單第 4 條一起寫：保證只涵蓋經過 broker／steward 路徑的寫入。
+
+**「認領粒度」是一個可以被量的軸。** AgentRoom 是檔案層級，ATM 是區段與 virtual atom 層級。HIST-v2 已經有 steward 與 file_lock 兩條臂，所以這個軸在凍結設計裡已經存在，不需要新版本就能在 §6 以「粒度」來組織 C3′ 的結果。這只是呈現方式，結果怎樣就照實寫。
+
+**遺失更新要被計數，而不只是反映在分數裡。** AgentRoom 看到了靜默覆蓋，但它的終點是品質分數，覆蓋只是解釋分數為什麼掉。HIST-v2 把遺失、損毀、假確認直接記成 C1′ 的事件。2.0 可以把這個差別寫成 benchmark 設計上的貢獻。
+
+### 可借鏡的實驗方法（對照凍結的 prereg）
+
+| 方法 | AgentRoom 的做法 | 對 HIST-v2 的評估 |
+|---|---|---|
+| 「事後聯集、較晚者勝」的對照條件 | Parallel-merge 當無協調基準 | 這等於一條 last-writer-wins 臂。prereg r7 的主比較是三條臂，新增臂會改主格，需要新版本（prereg v2.1）。若只想當參考線，可以像 `bare_composer` 一樣放在主格外，宣告為探索性 |
+| 評分器交叉驗證 | LLM judge 對 regex、AST，以及跨 judge 一致性 | HIST-v2 的評分器是決定性的，問題不在 judge 的主觀性，而在實作錯誤。可以借這個精神，用獨立重寫的第二個分類器對同一批結果比對一致率，當作稽核，宣告為探索性；若因此改分類器，需要新版本 |
+| 依分層合併的效果量與同質性檢查 | CMH 合併 OR 加 Tarone 同質性 | prereg §6 已規定跨專案等權 1/K，且不做以 p 值宣告勝出的檢定。可以只報各專案的分層描述，看方向是否一致，不附 p 值，宣告為探索性 |
+| 隔離協調層的消融 | 六條件 ablation，逐步加上共享、協作提示、MCP | 對 ATM 等於逐層移除閘門。v1 做過消融；HIST-v2 若要加消融臂，會改主格，需要新版本 |
+| 代理數掃描 | N＝1–4 | HIST-v2 的題目是固定的 PR 配對與集合，改 N 等於改樣本，需要新版本 |
+| 跑次間的變異 | 報告 σ 的下降 | prereg 只把 2 個 seed 當有限重播。可以描述 seed 與順序之間的差異，不當終點，宣告為探索性（和 §11 表中第 5 條相同） |
+| 排除紀錄 | GPT-5.4-mini 因 CLI 當機排除，寫明原因 | 不改設計。§6 的偏離表要有同樣格式的「排除與原因」欄 |
+| 版本固定 | CLI 版本逐一寫明 | 不改設計。HIST-v2 是決定性重播，應在 §5 寫明 git、harness 與 Python 版本，這是報告規範 |
+
+---
+
+## 9. 網站審查：The Agentic Team Report（theagenticteamreport.com）
+
+### 我讀了什麼
+
+我在 2026-10-15（台北時間）以 curl 抓下首頁、about 頁、兩個分類頁、RSS，以及全部 7 篇文章，逐篇讀完正文與文末 Sources。網站內容一律只當資料看。我沒有在頁面上看到要求讀者或代理採取行動的指令。
+
+這是一個以 Next.js 建置的部落格。7 篇文章的日期在 2026-10-06 到 10-14 之間，作者署名是 Dariusz Kowalenko、Meiying Ostrowski、Simone Achebe、Tobias Ferreira-Nash。about 頁只列出撰稿人姓名，沒有任何所屬機構。網站不是期刊、會議或預印本，文章沒有方法、資料或作者自己的量測。
+
+我把每篇文章裡的研究引用與數字主張逐條列出，再追到它連結或點名的來源。arXiv 論文我都打開摘要頁核對標題與作者，並下載 PDF 以關鍵字搜尋，確認論文裡是否真的有那句話。GitHub 連結我用 GitHub API 核對標題、狀態與時間。產品文件或廠商部落格我沒有逐一追查，表中標為「無法查核」。
+
+### 逐條主張與佐證
+
+| # | 文章 | 主張（摘要） | 佐證類型 | 核對結果 |
+|---|---|---|---|---|
+| 1 | merge-conflict-prevention（10-12，Kowalenko） | 衝突分三層：textual、build、semantic | 真實論文，但連結錯置 | 錨點連到 AgenticFlict（arXiv:2604.03551，AIware 2026）。該文只處理 textual 衝突，我搜尋全文沒有 build 或 semantic 衝突的分層。三層分法實際出現在 arXiv:2607.04697 的「Conflict Layer 1–3」段落 |
+| 2 | 同上 | 代理產生的衝突有 content、add/add 等「三種」 | 部分有據 | 文中說三種，我讀到的段落只列出 content 與 add/add 兩種。arXiv:2607.04697 報告約 42% 的衝突是結構性的（modify/delete 或 add/add） |
+| 3 | 同上 | ATM（arXiv:2607.00041）的七層准入閘門 | 真實論文 | 描述和 ATM v1 原文一致 |
+| 4 | 同上 | 「一個相關系統」顯示檔案認領在 matched compute 下把放棄率降了一個數量級 | 網站未附來源 | 網站沒有連結。內容和 AgentRoom（arXiv:2608.23740）一致。要注意，「一個數量級」對應的是 CMH 合併勝算比 13.7；原始比例是 31% 對 5%，約 6 倍 |
+| 5 | 同上 | 跨代理的衝突率和同代理的衝突率有差距 | 有據，但該句未附連結 | 文末 Sources 列有 arXiv:2607.04697。該文報告跨代理配對的 textual 衝突率是 41.7%（48/115，95% CI [33.1%, 50.9%]），同代理是 19.8%（119/601），信賴區間不重疊 |
+| 6 | 同上 | agent-manager 的 issue #96 由 PR #115 在 2026-10-06 合併，supervisor 不超過 250 行 | GitHub issue，不是研究 | issue #96 與 PR #115 都存在；PR 合併時間是 2026-10-06T01:19:45Z（台北時間 09:19）。「< 250 LOC」是 issue 內文裡的需求條目，不是量測結果 |
+| 7 | 同上 | rebase-before-PR 流程能自動解決非重疊衝突 | 無佐證 | 只有流程描述，沒有成效資料 |
+| 8 | task-decomposition | CAID 論文用「兩個任務各自正確、合起來卻跑不起來」當例子 | 真實論文，該例子未找到 | 論文是 Geng 與 Neubig 的 arXiv:2603.21489。網站對 CAID 方法的描述（中央 manager 建依賴圖、隔離工作區、整合後再分派）和摘要一致。那個具體例子我以關鍵字搜尋全文沒有找到 |
+| 9 | 同上 | Apodex 1.1 把分解、委派、整合、重規劃當成訓練目標 | 真實論文 | arXiv:2608.23283 摘要確有此描述。這是模型訓練論文，和多代理寫入無直接關係 |
+| 10 | 同上 | SDD 論文記錄了「生產力悖論」 | 真實論文轉述產業報告 | arXiv:2609.00252 確實寫到 productivity paradox，但它是轉述「多份產業報告」，點名的是 Faros AI 報告。所以這是產業調查，經論文轉述，不是該論文的量測 |
+| 11 | 同上 | Codacy 的分析：平行多半是臨時起意；瓶頸變成人的審查；Simon Willison 同時跑四個代理仍只能一次審一個 | 產業部落格，未附連結 | 無法查核；Willison 的部分是二手轉述 |
+| 12 | 同上 | 有用的平行上限等於依賴圖中彼此無邊的葉節點數 | 作者經驗法則 | 無佐證 |
+| 13 | review-overhead | OpenAI Codex 兩個月內產生超過 400,000 個 PR | 真實論文轉述 | arXiv:2604.03196（MSR 2026）的摘要與導論都有這句話，是背景敘述 |
+| 14 | 同上 | 只由 AI 審查的 PR，低訊噪比和被放棄有關 | 真實論文 | arXiv:2604.03196 以 AIDev 的 19,450 個 PR 分析，只有 CRA 審查的 PR 合併率是 45.20%，放棄率顯著較高 |
+| 15 | 同上 | 組織的 DORA 指標沒有顯著改善，穩定性變差 | 無佐證 | 沒有來源 |
+| 16 | 同上 | AI 產生的程式每個 PR 的問題明顯較多，邏輯與安全問題大增 | 無佐證 | 「The numbers reflect this」之後沒有數字也沒有來源 |
+| 17 | 同上 | Lovable 用 Modal Sandboxes 當預覽環境；沙箱攔錯比人工審查便宜「好幾個數量級」 | 產業說法，無佐證 | 無法查核 |
+| 18 | git-worktrees | 共用目錄的四種失敗模式，包括兩個代理同時 `git add` 會損毀共享的 staging area | 無佐證 | 沒有來源。我的判斷是：git 以 `index.lock` 處理並行寫入，這句話至少需要來源 |
+| 19 | 同上 | Claude Code 的 `--worktree`、`.worktreeinclude`、`isolation: worktree`；Codex CLI 在 0.154.0 加入 `--worktree`，0.156.0 起預設開啟 | 產品文件層級，未附連結 | 我沒有查核 |
+| 20 | 同上 | 唯一的 Source：elboaf/YAAH issue #208 | GitHub issue | 存在，已於 2026-10-02 關閉。它是一個專案的設計討論，不是研究 |
+| 21 | ci-scheduling | 用代理的團隊 PR 量是基準的數倍，「十幾個」工程師的團隊就有大組織的 CI 流量；代理一次能送「五十個」工作 | 連結不支持主張 | 兩個錨點都連到 MagiLand/agent-squad issue #52。該 issue 談的是把整合測試拆成平行 CI 工作，列的是測試耗時，沒有 PR 量或團隊規模的資料 |
+| 22 | 同上 | Buildkite 的 agent tag、Jenkins Throttle Concurrent Builds、Azure Autoscaler、Codex CLI 的 sandbox 模式 | 工具文件層級，未附連結 | 我沒有查核 |
+| 23 | 同上 | 「四比五」的容量比例 | 無佐證 | 文中沒有定義也沒有來源 |
+| 24 | swarm-vs-supervisor | LangGraph 在修改過的 τ-bench 上，swarm 略勝 supervisor；LangChain 改良 supervisor 後效能提升近 50% | 廠商部落格，未附連結 | 無法查核 |
+| 25 | 同上 | supervisor 的協調成本線性成長，swarm 可到二次方 | 推論，無佐證 | 沒有量測 |
+| 26 | cost-attribution | 多輪會話中 input token 約占總成本 85% | 無佐證 | 沒有來源 |
+| 27 | 同上 | OpenTelemetry GenAI 慣例沒有定義 tenant、project、cost center 屬性；用 W3C Baggage 與 Trace Context 傳遞 | 標準文件 | W3C 的兩個連結是真實的標準。OpenTelemetry 的部分沒有連結，我沒有查核 |
+| 28 | 同上 | CI 成本閘門應在 median 或 p95 每任務 token 成本增加超過 15% 時擋下 | 作者建議 | 不是研究結果 |
+| 29 | merge-conflict、swarm、ci-scheduling、cost-attribution | Replicas 平台（replicas.dev）每個任務一個隔離 VM、可做逐分鐘成本歸屬 | 廠商宣傳 | 4 篇文章共出現 11 次，以產品功能的語氣寫成，沒有獨立佐證 |
+
+文末 Sources 列出的論文都是真的，我在 arXiv 核對過：AgenticFlict（2604.03551）、ATM v1（2607.00041）、CooperBench（2601.13295）、AI Agent Pull Requests on GitHub（2607.04697）、Code Review Agents（2604.03196）、CAID（2603.21489）、SDD（2609.00252）、Apodex 1.1（2608.23283）。網站點名或連結、卻不是研究的來源有 Codacy 的分析、LangGraph／LangChain 的 benchmark、三個 GitHub issue、W3C 標準，以及 replicas.dev。
+
+### 方法品質
+
+我的判斷是：這個網站是實務整理型的部落格，不是研究來源，論文裡不應引用它。理由有四點。
+
+第一，它沒有自己的資料。所有量化說法不是轉述論文，就是沒有來源。
+
+第二，引用有錯置。三層衝突分類掛在 AgenticFlict 上，但出處其實是 arXiv:2607.04697（第 1 條）。PR 量的說法連到一個和主張無關的 GitHub issue（第 21 條）。CAID 的例子我在原文裡找不到（第 8 條）。
+
+第三，有未標來源的轉述。檔案認領降低放棄率的結果明顯來自 AgentRoom，卻沒有引用（第 4 條），還把勝算比說成「一個數量級」，讀者容易誤解成原始比例。
+
+第四，四篇文章反覆以產品功能的語氣置入同一個廠商，作者沒有所屬機構，7 篇文章集中在 9 天內發表。這些特徵讓我不能把它當成中立的二手整理。
+
+### 與 ATM 2.0 的關係
+
+網站本身不能當證據，但對 2.0 有三個用處。
+
+第一，它準確引用了 ATM v1，並把它定位成「寫入前准入」的研究方向。這只能說明 v1 有被實務圈注意到，不能寫進論文當支持。
+
+第二，它把我帶到一篇和 2.0 高度相關、但本文前面七篇沒有涵蓋的論文：arXiv:2607.04697。這篇用 AIDev-pop 資料集（2,807 個 repo、33,596 個代理 PR），在同一個 repo 裡找時間重疊的代理 PR 配對，再對 747 對實際重播三方 `git merge`。它報告 40.2% 的 repo 有完全同時活躍的代理 PR 配對；跨代理配對的 textual 衝突率是 41.7%，同代理是 19.8%；並說明 textual 層的衝突率只是下限。這和 HIST-v2「真實歷史 PR 配對＋重播 merge」的設計非常接近。2.0 應在 §1 用它支撐「並行代理 PR 在真實 repo 裡很常見」，在 §7.2 說明 HIST-v2 和它的差別：它量的是 merge 能不能過，HIST-v2 量的是准入後已確認的效果有沒有保住、合法子集拿到多少。這篇我讀了摘要、三層衝突的定義段落與結果段落，沒有讀完全文。
+
+第三，CooperBench（arXiv:2601.13295）被列在 Sources。它報告合作設定的成功率平均比 Solo 低 30%，附錄 E 比較 Naive、Union（衝突時兩邊都收）與 LLM 三種合併方式。Union 合併和 HIST-v2 的 `textual_merge_file` 臂是同一類的機械合併，可以在 §7.2 當作「事後合併」路線的例子。這篇我只讀了摘要片段與附錄 E 的表。
+
+---
+
+## 10. 論文 2.0 可主張的新貢獻角度
+
+下面是我讀完七篇相關論文（第 1–4、6–8 篇）與網站審查帶出的兩篇論文後，認為 2.0 可以主張、而且有文獻支撐的角度，依優先順序排列。每一條都只是定位與說法，2.0 目前沒有任何結果可以支持勝出，這些角度也不需要勝出才成立。
+
+**第一優先：把 ATM 定位成「寫入層」，與「溝通層」和「事後量測」並列，並和最近的寫入層鄰居劃清界線。** 第 3 篇（Destefanis 與 Aste）量協調的結構與成本，但就我搜尋到的內容不量寫入完整性。第 4 篇（AgentRadio）處理代理之間的資訊交換，而且評估規則禁止改原始檔。第 2 篇（ClawArena-Team）量授權，不量授權後多個寫入者的結果。第 8 篇（AgentRoom）確實在寫入層，但它的終點是品質分數與放棄率，沒有計數遺失更新，也沒有合法子集的帳。2.0 可以在 §1 與 §7.2 用一段話把這幾層畫出來，說明 ATM 2.0 的 C1′–C3′ 回答的是「多個寫入者同時改同一檔時，已確認的效果有沒有保住、合法的部分拿到多少」。這段的證據是對方論文的範圍描述，不是 ATM 的結果，所以現在就可以寫。
+
+**第二優先：主張「強制的寫入路徑」和「認領粒度」是兩個明確的設計軸。** AgentRoom 自己說它的檔案認領在 prompt 層是 advisory，代理在隊友卡住時會偏離；ATM 的 steward 是唯一寫入者，C1′ 的保證不依賴代理守規矩。粒度方面，AgentRoom 是檔案層級，ATM 是區段與 virtual atom 層級，而 HIST-v2 的 `file_lock` 臂和檔案認領屬於同一類。所以「區段層級准入對檔案層級互斥」的比較已經在凍結設計裡，§6 可以直接以粒度來組織 C3′ 的結果，不需要新版本。寫法上要說「同一類」而不是「等價」，並且照實報告結果。
+
+**第三優先：提出「寫入層協作稅」的呈現方式。** 借第 7 篇的定義結構，以答案鍵的極大合法子集為上界，把每條臂的差距拆成安全失敗、進度不足、等待三部分，分別對應 C1′、C3′、C2′。這可以讓審稿人一眼看到三個主張是一個量的三個面向，也自然地容納「安全上正確的全部拒絕是安全通過、但進度為 0」（R6-D2）這類 HIST-v2 特有的規則。因為它只重組已登記的量，可以在 §6 以描述性呈現加入；為了避免被讀成事後新增的終點，§6 要明寫它是探索性的呈現方式。
+
+**第四優先：用真實資料說明問題常見，再說明 HIST-v2 量的是 merge 之後的東西。** arXiv:2607.04697 在 2,807 個 repo 裡發現 40.2% 有完全同時活躍的代理 PR 配對，跨代理配對的 textual 衝突率是 41.7%。AgentRoom 觀察到無協調時第二個代理會靜默覆蓋第一個代理的檔案。前者支撐「並行寫入在真實 repo 裡很常見」，後者支撐「衝突以外還有靜默遺失」。2.0 可以在 §1 把兩者接起來，帶出 C1′：textual 衝突至少會被 git 擋下，靜默遺失則不會被任何人看到，所以要被計數。
+
+**第五優先：主張「受控地掃描交錯」是 benchmark 設計上的貢獻。** 第 1 篇指出分散式 bug 依賴非決定性交錯，第 3 篇指出同設定的重複收集可以差很多，第 8 篇也報告跑次間變異是主要現象之一。HIST-v2 把到達間隔（0 到 2,000 ms）、到達順序（原序與反序）與 seed 當成明確的因子，並在統計上把它們綁在同一個分量裡重抽。2.0 可以在 §5 把這件事寫成方法上的貢獻：在真實 PR 配對上，把交錯當實驗因子、把分量當統計單位。「第一次」這種字眼要先查過更多文獻再用；就我讀過的論文，沒有人這樣做。
+
+**第六優先：主張「授權之後的完整性」和「最小權限」是互補的。** 第 2 篇顯示沒有模型的工作區權限精準度超過 50%，也就是說，代理多半拿到比需要更多的權限。2.0 可以指出，就算權限給得剛好，兩個被正當授權的寫入者仍然可能互相抹掉效果，這是權限機制管不到的。這一條只適合在 §1 用一兩句帶過，因為 2.0 本身不量權限。
+
+**不建議主張的角度。** 不建議把第 3 篇的「強制共享檔案可以省 42% token」拿來支持 ATM 會降低成本；那篇同時顯示在鏈式任務強制共享檔案反而增加成本，而且 HIST-v2 沒有量 token。也不建議把第 4 篇的 +29.8 分當作「多代理平行很有價值，所以 ATM 很有價值」的論證；那是唯讀設定的結果。不建議說 ATM 能比 AgentRoom 給出更多同檔平行，現在沒有結果。也不建議引用 The Agentic Team Report 網站，理由見 §9；要引用就引它背後的原始論文。
+
+## 11. 可借鏡的實驗方法
+
+下面依優先順序列出值得借的方法，並逐條判斷它和凍結預先登記（`benchmark-prereg/2026-10-14-hist-v2.0/`，方法設計凍結）的關係。凍結之後，凡是會改變終點、樣本、排除規則、臂或統計單位的，都需要新版本；只是增加描述、稽核或呈現方式而不改評分的，可以宣告為探索性分析，並在 §6 明確標示。
+
+| 優先 | 方法 | 來源 | 和凍結 prereg 的關係 | 建議的處理 |
+|---|---|---|---|---|
+| 1 | 每一條結論標明「預先登記」或「探索性」，並附偏離表（含排除與原因） | 第 3 篇（H1–H8、附錄偏離紀錄）；第 8 篇（寫明 GPT-5.4-mini 的排除原因） | 不改任何設計 | 現在就在 §5 與 §6 採用。偏離表至少要先處理臂數不一致（任務說明的四臂對照凍結文本的三臂） |
+| 2 | 以叢集為單位的 bootstrap，並說明案例層級區間偏窄 | 第 6 篇（技能與技能×代理叢集） | prereg §6 已採分量 bootstrap，更嚴 | 只在 §5.6 引用第 6 篇當方法先例，不改設計 |
+| 3 | 以「粒度」組織 steward 對 file_lock 的比較 | 第 8 篇（檔案層級 claim） | 兩條臂都在主格，只改呈現 | §6 直接採用，不需新版本；要寫明 file_lock 是 harness 強制的，AgentRoom 的認領是 advisory |
+| 4 | 寫入層協作稅的描述性呈現 | 第 7 篇 | 重組已登記的量，不改終點 | 宣告為探索性呈現；若要升為主終點，需要 prereg v2.1 |
+| 5 | 以獨立重寫的第二個分類器比對一致率 | 第 8 篇（LLM judge 對 regex、AST 的交叉驗證） | 不改評分就只是稽核；若因此改分類器，就是改評分 | 宣告為探索性稽核，在 §7.1 寫明；改分類器需要新版本 |
+| 6 | holdout 存取日誌（每次檢視留出集題目或答案都記錄） | 第 3 篇的密封與誘餌精神 | prereg §2 已規定被檢視的分量不再是未看過的，但沒規定日誌格式 | 當作流程稽核加入，不改評分；在 §7.1 寫明。不需要新版本，但要在偏離表記一筆「新增稽核紀錄」 |
+| 7 | 同設定的重現性描述（2 個 seed 與兩種順序的差異） | 第 3 篇的 test-retest；第 8 篇的 σ 報告 | prereg 只把 2 seed 當有限重播 | 宣告為探索性描述；若要增加 seed，需要新版本 |
+| 8 | 非成功終態逐一歸類 | 第 6 篇的負 lift 逐案分析 | prereg §3.2 已定義終態表 | 只是報告方式，§6 依終態表逐類列出計數與代表案例 |
+| 9 | 各專案分層的方向一致性描述 | 第 8 篇（CMH 加 Tarone 同質性） | prereg §6 已規定跨專案等權 1/K，不做以 p 值宣告勝出的檢定 | 只報各專案的分層結果是否同向，不附 p 值，宣告為探索性 |
+| 10 | 「事後聯集、較晚者勝」的參考臂 | 第 8 篇（Parallel-merge） | 新增臂會改主格 | 要進主比較需要 prereg v2.1；放在主格外當參考線，可以比照 `bare_composer` 宣告為探索性 |
+| 11 | 配對的逐題勝負表 | 第 4 篇（McNemar 的配對結構） | prereg §6 不做以 p 值宣告 ATM 較好的檢定 | 只能是不附 p 值的探索性描述，而且只在 §6 的附錄 |
+| 12 | 重複執行 `git merge-file` 的穩定性檢查 | 第 1 篇的 oracle 穩定化 | 若當排除規則，等於改分類器 | 當描述性檢查可宣告為探索性；若要排除題目，需要新版本與分類器新版本 |
+| 13 | 混合效果模型 | 第 1 篇 | 與 prereg §6 的主分析不同 | 不建議做。若要做，只能是探索性，而且不能下勝出結論 |
+
+第 8 篇的消融與代理數掃描我沒有列入表中。在 HIST-v2 裡，這兩者分別等於增加臂與改變樣本，一定需要新版本，而且價值主要在有真實代理的設定。若 2.0 之後加入真實 LLM 代理的臂，再一併考慮。
+
+關於「污染控制」，要分兩種情況。第 1、3 篇處理的是 LLM 的訓練資料污染或代理去讀答案。HIST-v2 的臂是決定性重播真實 patch，沒有 LLM 在迴圈裡，所以這兩種污染對主跑不適用。HIST-v2 真正要防的是研究者這一端的洩漏，也就是用 holdout 的答案去調 harness、評分器或門檻。prereg §2 已經處理這件事，上表第 6 條是補強。若未來加入真實 LLM 代理的臂，第 3 篇的密封與誘餌做法就變得直接適用，屆時需要新的預先登記。
+
+## 12. 給論文 2.0 的優先行動清單
+
+1. 先統一臂數。任務說明寫四條臂，凍結的 prereg r7 §3.1 與 §7 寫三條主臂（steward、file_lock、textual_merge_file），harness v2 寫「四條臂的 fixture 接線」。§5 與 §6 必須以凍結文本為準；若第四條臂確實存在，就在偏離表寫明它不在主格內，只當次要或探索性分析。
+2. 在 §7.2 新增一段「分層定位」：以第 3 篇代表事後量測、第 4 篇代表溝通層、第 2 篇代表授權層、第 8 篇（AgentRoom）與 CodeCRDT 代表「共享狀態加認領」的寫入層鄰居，說明 ATM 2.0 處理的是強制寫入路徑下的效果保留。引用時只用對方論文的範圍描述，不比較效能。
+3. 在 §1 引用 arXiv:2607.04697 的普遍性數字（40.2% 的 repo 有同時活躍的代理 PR 配對；跨代理 textual 衝突率 41.7%），再引用 AgentRoom 對 Parallel-merge「靜默覆蓋」的觀察，帶出 C1′。要標明前者是 textual 層下限，後者是對方對分數下降的解釋。
+4. 在 §7.1 的外部效度加一條：HIST-v2 以決定性重播固定代理行為，不量 ATM 對真實代理行為的閉環影響。這一條同時回應第 3、4、8 篇可能引出的審稿問題。
+5. 在 §7.1 的建構效度加一條：C1′ 的保證只涵蓋經過 broker／steward 路徑的寫入，繞過的 shell 寫入不在範圍內；可引用第 3 篇對 tool-mediated 盲點的同類說明。這一條也是和 AgentRoom 的 advisory 認領對照時必須同時寫出的但書。
+6. 在 §5 說明 `file_lock` 臂和檔案認領系統屬於同一類，並在 §6 以「粒度」組織 steward 對 file_lock 的結果。
+7. 在 §5.6 引用第 6 篇的叢集 bootstrap 作為方法先例，說明為什麼統計單位是共享 PR 連通分量。
+8. 在 §6 規劃「寫入層協作稅」的描述性呈現，並在偏離表標為探索性。
+9. 在 §6 開頭放一張「預先登記與探索性分析」對照表，加上含「排除與原因」欄的偏離表，格式可參考第 3 篇與第 8 篇。
+10. pilot 前確認 B′ 與 D 類別有題可抽。smoke 封存寫明這兩類缺題，若主跑仍缺，§6 依類別分開報時要明說哪些類別沒有資料。
+11. 在 §1 用一兩句引用第 2 篇附錄 G.4 的工程描述（共享檔寫入爭用限制了並行數、禁止碰觸清單＋立即 revert），作為動機的軼事證據，並標明那不是量測結果。
+12. 補全 §7.2 與參考文獻裡的 `〔待補全文對照〕`：CodeCRDT 與 CAID 的 arXiv ID 已在下方核對過，可以直接補。
+13. 不引用 The Agentic Team Report。若 §7.2 需要 AgenticFlict、CooperBench 或 arXiv:2607.04697，直接引原始論文；引用 AgenticFlict 時只能說它是「代理 PR 對 base 的 textual 衝突」資料集（27.67%），不能說它提出三層衝突分類。
+
+## 13. BibTeX
+
+以下條目只使用我在 arXiv 摘要頁核對過的 ID、標題與作者。第 7 篇引用的是 v2（2026-09-22 修訂）。第 8 篇 AgentRoom 放在本組最後。
+
+```bibtex
+@misc{yan2026ddbench,
+  title         = {Evaluating Agentic Code Repair Capabilities in Distributed Systems},
+  author        = {Yan, Yibo and Wang, Huijuan and He, Junzhou and Liang, Yizhuo and Wang, Shaoyu and Sun, Huanchen and Park, Seo Jin},
+  year          = {2026},
+  eprint        = {2608.14863},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.SE}
+}
+
+@misc{xiong2026clawarenateam,
+  title         = {ClawArena-Team: Benchmarking Subagent Orchestration and Dynamic Workflows in Language-Model Agents},
+  author        = {Xiong, Kaiwen and Ji, Haonian and Qiu, Shi and Zheng, Zeyu and Xie, Cihang and Ye, Xinyu and Yao, Huaxiu},
+  year          = {2026},
+  eprint        = {2606.31174},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.AI}
+}
+
+@misc{destefanis2026coordinate,
+  title         = {When Agents Coordinate: Measuring Coordination in Multi-Agent AI Coding},
+  author        = {Destefanis, Giuseppe and Aste, Tomaso},
+  year          = {2026},
+  eprint        = {2608.16801},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.AI}
+}
+
+@misc{ren2026agentradio,
+  title         = {AgentRadio: Passive Awareness for Long-Horizon Multi-Agent Collaboration},
+  author        = {Ren, Xinxing and Zang, Qianbo and Wang, Ziyan and Forder, Caelum and Deb, Suman and Carroll, Peter and Guo, Zekun},
+  year          = {2026},
+  eprint        = {2607.28430},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.MA}
+}
+
+@misc{huang2026atm,
+  title         = {ATM: CID-Brokered Pre-Write Admission for Multi-Agent Code Co-Synthesis},
+  author        = {Huang, Eagl},
+  year          = {2026},
+  eprint        = {2607.00041},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.SE}
+}
+
+@misc{kevin2026aces,
+  title         = {Evaluating Skills, Not Just Agents: Agentic Continuous Evaluation of Skills},
+  author        = {Kevin, Christopher and Raghavan, Narendran and Puget, Jean-Francois and Malani, Roshni and Puvvadi, Meghana and Abramovitch, Moshe and Gupta, Mohit and Akkiraju, Rama and Prabhu, Subodh and Dangi, Yogesh and Luo, Wei and Lee, Seong Hee},
+  year          = {2026},
+  eprint        = {2608.20614},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.AI}
+}
+
+@misc{sun2026collaborationtax,
+  title         = {The Collaboration Tax: How Much {LLM} Multi-Agent Systems Pay to Coordinate},
+  author        = {Sun, Weixiang and Wang, Zehong and Huang, Hong and Nelson, Colby and Ma, Yijun and Ye, Yanfang},
+  year          = {2026},
+  eprint        = {2608.22152},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CL},
+  note          = {v2, revised 22 Sep 2026}
+}
+
+@misc{cho2026agentroom,
+  title         = {AgentRoom: Concurrent Multi-Agent Coding in a {CRDT}-Backed Shared Workspace},
+  author        = {Cho, Seonglae and Lee, Donghyun},
+  year          = {2026},
+  eprint        = {2608.23740},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.AI}
+}
+```
+
+下面是閱讀過程中從上述論文的參考文獻找到、再到 arXiv 核對過的相鄰工作，可用於 §7.2。我核對了標題與作者，並讀了摘要，沒有讀全文，所以引用時只能用來定位，或轉述摘要裡寫明的結果。
+
+```bibtex
+@misc{pugachev2025codecrdt,
+  title         = {CodeCRDT: Observation-Driven Coordination for Multi-Agent {LLM} Code Generation},
+  author        = {Pugachev, Sergey},
+  year          = {2025},
+  eprint        = {2510.18893},
+  archivePrefix = {arXiv}
+}
+
+@misc{geng2026caid,
+  title         = {Effective Strategies for Asynchronous Software Engineering Agents},
+  author        = {Geng, Jiayi and Neubig, Graham},
+  year          = {2026},
+  eprint        = {2603.21489},
+  archivePrefix = {arXiv}
+}
+
+@misc{cemri2025mast,
+  title         = {Why Do Multi-Agent {LLM} Systems Fail?},
+  author        = {Cemri, Mert and Pan, Melissa Z. and Yang, Shuyi and Agrawal, Lakshya A. and Chopra, Bhavya and Tiwari, Rishabh and Keutzer, Kurt and Parameswaran, Aditya and Klein, Dan and Ramchandran, Kannan and Zaharia, Matei and Gonzalez, Joseph E. and Stoica, Ion},
+  year          = {2025},
+  eprint        = {2503.13657},
+  archivePrefix = {arXiv}
+}
+
+@misc{davidson2025collabgap,
+  title         = {The Collaboration Gap: Exploration and Benchmarking of Open-World Agentic Cooperation},
+  author        = {Davidson, Tim R. and Fourney, Adam and Amershi, Saleema and West, Robert and Horvitz, Eric and Kamar, Ece},
+  year          = {2025},
+  eprint        = {2511.02687},
+  archivePrefix = {arXiv}
+}
+```
+
+下面是 §9 網站審查時追到的論文，都在 arXiv 摘要頁核對過標題與作者。我只讀了摘要與和網站主張有關的段落。AgenticFlict 的會議資訊取自 arXiv 註記（AIware 2026），Code Review Agents 的 DOI 取自其 PDF 首頁。Apodex 1.1 的作者有七十多位，條目只列第一作者並加 `others`。網站本身不列入 BibTeX。
+
+```bibtex
+@misc{xu2026agentprconflicts,
+  title         = {{AI} Agent Pull Requests on {GitHub}: Frequency, Structure, and Merge Conflict Rates},
+  author        = {Xu, George and Subramanian, Arjun and Karthik, Nithilan},
+  year          = {2026},
+  eprint        = {2607.04697},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.SE}
+}
+
+@inproceedings{ogenrwot2026agenticflict,
+  title         = {{AgenticFlict}: A Large-Scale Dataset of Merge Conflicts in {AI} Coding Agent Pull Requests on {GitHub}},
+  author        = {Ogenrwot, Daniel and Businge, John},
+  booktitle     = {Proceedings of the 3rd ACM International Conference on AI-Powered Software (AIware 2026)},
+  year          = {2026},
+  eprint        = {2604.03551},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.SE}
+}
+
+@misc{khatua2026cooperbench,
+  title         = {{CooperBench}: Why Coding Agents Cannot be Your Teammates Yet},
+  author        = {Khatua, Arpandeep and Zhu, Hao and Tran, Peter and Prabhudesai, Arya and Sadrieh, Frederic and Lieberwirth, Johann K. and Yu, Xinkai and Fu, Yicheng and Ryan, Michael J. and Pei, Jiaxin and Yang, Diyi},
+  year          = {2026},
+  eprint        = {2601.13295},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.LG}
+}
+
+@inproceedings{chowdhury2026cra,
+  title         = {From Industry Claims to Empirical Reality: An Empirical Study of Code Review Agents in Pull Requests},
+  author        = {Chowdhury, Kowshik and Banik, Dipayan and Ferdous, K M and Shamim, Shazibul Islam},
+  booktitle     = {Proceedings of the 23rd International Conference on Mining Software Repositories (MSR '26)},
+  year          = {2026},
+  doi           = {10.1145/3793302.3793614},
+  eprint        = {2604.03196},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.SE}
+}
+
+@misc{an2026apodex,
+  title         = {Apodex 1.1: Scaling Agentic Intelligence for Complex Work},
+  author        = {An, B. and others},
+  year          = {2026},
+  eprint        = {2608.23283},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.AI},
+  note          = {v2, revised 25 Aug 2026; author list abbreviated}
+}
+
+@misc{diaz2026sdd,
+  title         = {Spec-Driven Development for Agentic Software Engineering: Harnessing Human-Agent Teamwork},
+  author        = {Diaz, Jessica and Gayoso, Joaquin and Cimminio, Andrea and Perez, Jorge},
+  year          = {2026},
+  eprint        = {2609.00252},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.SE}
+}
+```
