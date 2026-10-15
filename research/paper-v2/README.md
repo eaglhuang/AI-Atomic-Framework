@@ -27,7 +27,7 @@ ATM（AI-Atomic-Framework）論文 2.0（composer＋中立 steward，RQ2 主臂 
 | HIST-v2 pilot | [`benchmark-trials/2026-10-15-hist-v2-pilot/`](./benchmark-trials/2026-10-15-hist-v2-pilot/GENERATION.md)（2026-10-15；作者批准 pilot only。dev 29 題、三條主比較臂、1740 格。負控制全部抓到。沒有 counterexample。pilot，不是論文結果，不宣稱勝出） |
 | 相關工作文獻集 2026-10-15 | [`related-work/2026-10-15/`](./related-work/2026-10-15/GENERATION.md)（2026-10-15；14 篇索引、評論文與 BibTeX。9 份 CC 授權 PDF 原樣轉存；5 篇 arXiv 非專屬授權只留連結，含 SDD 2609.00252 與 Apodex 1.1 2608.23283。不是實驗 generation、沒有 run、不宣稱勝出） |
 | 相關工作文獻集 2026-10-15-r2 | [`related-work/2026-10-15-r2/`](./related-work/2026-10-15-r2/GENERATION.md)（2026-10-15；19 條 BibTeX 與 PR 衝突證據。沒有新 PDF。新增 5 條只留連結。已封存的 `2026-10-15/` 不修改。不是實驗 generation、沒有 run、不宣稱勝出） |
-| HIST-v3 預先登記草稿 | [`prereg-v3-draft/2026-10-15/`](./prereg-v3-draft/2026-10-15/GENERATION.md)（2026-10-15；**DRAFT，NOT FROZEN，exploratory**。尚未批准。HIST-v2 預先登記 v2.0 維持凍結。ATM 只處理同一台機器、同一個 repo 的代理衝突；外部 git 衝突仍走 merge／rebase。沒有 run、不宣稱勝出） |
+| HIST-v3 預先登記草稿 | [`prereg-v3-draft/2026-10-15/`](./prereg-v3-draft/2026-10-15/GENERATION.md)（2026-10-15；**DRAFT，NOT FROZEN，exploratory**。尚未批准。HIST-v2 預先登記 v2.0 維持凍結。ATM 只處理同一台機器、同一個 repo 的代理衝突；外部 git 衝突仍走 merge／rebase。§11 只記錄 push 前檢查，不擴大主張。沒有 run、不宣稱勝出） |
 | 校驗 | `generations/<gen>/verify.sh`（唯讀；`sha256sum -c SHA256SUMS`） |
 | benchmark-trials/2026-10-09-hist-smoke, benchmark-trials/2026-10-09-hist-pilot | 試跑（trial runs, not formal results）：歷史真實 PR benchmark 冒煙＋Django pilot，ATM pin b35a6141（2026-10-09） |
 | benchmark-trials/2026-10-09-hist-mining | 只挖掘、沒有 run（不列入正式結果）：六專案合併 commit base 重新挖掘、可行性 dry-run、prereg v1.1 提案草稿（未套用）（2026-10-09） |
