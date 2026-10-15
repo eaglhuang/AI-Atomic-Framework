@@ -14,14 +14,16 @@
 ## 1. 範圍
 這是刻意畫下的範圍邊界。主張只到這條邊界為止，不超出它。
 
-- **納入**：同一台機器、同一個 repo 裡，多個代理（不同行程或對話）並行寫入。ATM 只處理這一種衝突。原因是它的 CAS、鎖和佇列都在本機的 `.atm/runtime/`。
-- **不納入**：外部 git 衝突。別台機器的 push、其他 clone，以及遠端 PR，都不在 ATM 能擋住的範圍。這些仍然走一般的 git merge 或 rebase。
+- **納入**：同一台機器、同一個 repo 裡，多個代理（不同行程或對話）並行寫入。ATM 只在這個範圍內避免代理彼此的衝突。原因是它的 CAS、鎖和佇列都在本機的 `.atm/runtime/`。
+- **不納入，也不主張能防止**：外部 git 衝突。別台機器的 push、其他 clone，以及遠端 PR，都不在這套本機機制能擋住的範圍。這些仍然走一般的 git merge 或 rebase。§11 只記錄 push 前的 broker 檢查，那是程式現況，不是超出這條邊界的主張。
 - **不主張語意等價**：ATM 不保證合併後的語意和各代理原意一樣，人類也做不到。語意層的結果只描述，不當成 ATM 的勝負指標。
 
 ## 限制（Limitations）
 ATM 只避免同一台機器、同一個 repo 裡，代理彼此之間的衝突。CAS、鎖和佇列都放在本機 `.atm/runtime/`，所以效力只到這台機器上的這個工作目錄。
 
 它不能避免外部 git 衝突。別台機器的 push、其他 clone，或遠端 PR，都不會被這套本機機制擋住。那些衝突仍依一般 git 的 merge 或 rebase 來解。
+
+§11 寫的 push 前檢查，是在推送當下對同名遠端分支做一次快照。那不是本主張的一部分，也不能拿來主張 ATM 防止了外部 git 衝突。
 
 這是刻意的範圍邊界。本草稿不主張 ATM 能處理這條邊界以外的衝突。
 
@@ -78,7 +80,7 @@ git_worktree 用來代表 Claude Code worktree、CAID 等常見作法；它和 H
 - **沒有來源支持「大部分 PR 會衝突」，論文不得這樣寫。**
 
 ## 8. 威脅與限制
-- 外部 git 衝突不在範圍內，見「限制（Limitations）」。本機 `.atm/runtime/` 裡的 CAS、鎖和佇列擋不住別台機器的 push、其他 clone 或遠端 PR；那些仍走一般的 git merge 或 rebase。本草稿不主張超出這條邊界。
+- 外部 git 衝突不在範圍內，見「限制（Limitations）」。本機 `.atm/runtime/` 裡的 CAS、鎖和佇列擋不住別台機器的 push、其他 clone 或遠端 PR；那些仍走一般的 git merge 或 rebase。§11 的 push 前檢查不把這條邊界往外推。本草稿不主張超出這條邊界。
 - 程式化寫手不能代表真實代理的行為，階段 B 才能回答成本問題。
 - 窗口注入延遲是人為操作，只能檢驗機制，不能代表自然分布。
 - 語意正確性不在主張內。build 和測試只能部分代理語意。
@@ -127,3 +129,52 @@ git_worktree 用來代表 Claude Code worktree、CAID 等常見作法；它和 H
 4. 整合後掛 build 和測試。
 5. 加入多檔提案與過時讀取兩種題目產生器。
 6. 本草稿要經作者批准、凍結並記入 EVIDENCE_INDEX 之後，才能跑 smoke 和 pilot。
+
+## 11. 追加（2026-10-15 19:20）：ATM 的 push／PR 前檢查現況與範圍修訂
+
+### 11.1 程式碼現況（main，透過 cursor-github 讀取；行號約略，誤差 ±2 行）
+**有的部分**
+- **push 前的准入**：`packages/cli/src/commands/git-governance/implementation/push-command.ts`，`runGitPush`（約 90–340 行）。
+  - 先呼叫 `evaluateGitAdmission({... fetch: !options.noFetch ...})`（約 122–131 行）。
+  - 准入結果不是 allow 或 no-op 時，回報「ATM git push blocked before host git push」，不會執行 push。
+  - 准入通過後，才執行 `git push <remote> HEAD:<branch>`（約 241–246 行）。
+- **抓取遠端**：`packages/core/src/git/diff-mutation-request.ts`，`collectGitDiffMutationRequests`（約 47–90 行）。
+  - 預設會執行 `git fetch --quiet --no-tags <remote> <branch>`，可用 `--no-fetch` 關掉。
+  - 接著跑 `git merge-base HEAD <remote>/<branch>`，再分別算本地和遠端相對 merge-base 的 diff。
+- **broker 檢查**：`packages/core/src/git/admission.ts`，`evaluateGitAdmission`（約 63–190 行）。
+  - 遠端的變更被建模成虛擬代理 `virtual:git-remote@<remoteSha>` 的 active intent，交給 `calculateBrokerDecision` 判斷。
+  - 結果分成 `allow`、`block`、`composer-routed`、`no-op`、`internal-error`，並列出 `conflictingFiles`。
+- **失敗後復原**：`runGitPostPushFailRecovery`（約 359 行起）會重新 fetch，判斷本地是落後還是分歧。
+- **pre-push hook**：`packages/cli/src/commands/hook/pre-push.ts`，`resolvePushBase`（約 387–420 行）以 `@{upstream}` 作為 base。
+
+**沒有的部分**
+- **沒有自動 rebase**：程式只在建議文字中提到 rebase（`admission.ts` 約 422 行：「rebase, split the work, or rearbitrate before push」），不會自己執行。
+- **沒有建立 PR 的程式**：用 search_code 搜 `"gh pr create"`、`"pulls"`、`"pull request"`（限 packages 下的 TypeScript），結果都是 0 筆。搜尋索引可能不完整，但讀過的檔案裡也沒看到。
+- **准入比對的是同名遠端分支**（`<remote>/<branch>`），**不是 PR 的目標 base**（例如 main）。只有直接推 main 時，兩者才一樣。
+- **沒有明確對遠端 ref 做 CAS**：沒有 `--force-with-lease`。repo 內唯一的命中在 research 文件，不在程式碼裡。
+  - 唯一的保護是 git 預設會拒絕非快轉推送，這等於隱含的「遠端沒動才成功」。但 fetch／准入和 push 之間仍然有競爭窗口，程式沒有鎖住這段。
+
+### 11.2 對範圍的影響
+- 這個機制讓 ATM 在**推送前**，能偵測並擋下「遠端同名分支在 fetch 當下已有的重疊修改」。所以 ATM 對跨機器衝突**有部分前移偵測**，不是完全沒處理。
+- 但它**不能防止**以下情況，論文不得主張防止：
+  - fetch 之後才發生的遠端推送；
+  - PR 目標分支（例如 main）上的後續變更；
+  - PR 開出後才合入的其他 PR。
+
+### 11.3 建議改寫 §1 範圍
+> **主要範圍**：同一台機器、同一個 repo 內，不同代理並行寫入所產生的衝突。ATM 在寫入前准入，主張可避開這類衝突的寫入後解衝突成本。
+> **次要（描述性）範圍**：推送到遠端前，ATM 會 fetch 同名遠端分支，並把遠端變更當成虛擬代理交給 broker 判斷。本研究可以描述這一步攔下的重疊數量，但只作描述，不列入主張。
+> **不在範圍內**：fetch／准入之後才發生的遠端推送、PR 目標分支（base）的後續變更、PR 開出後的合併衝突。ATM 沒有自動 rebase、沒有建立 PR 的流程，也沒有對遠端 ref 的明確 CAS，所以這些衝突只能**降低機率，無法防止**。
+
+### 11.4 建議加進 §8 威脅與限制
+- ATM 推送前的准入是時間點快照：從 fetch 到 `git push` 之間，遠端仍可能前進。git 預設會拒絕非快轉推送，失敗後走 `recover-push-fail` 流程重新准入，但這段重試成本本研究不量。
+- 准入比對的是同名遠端分支，不是 PR 目標分支。所以「PR 開出後與 main 衝突」的機率，ATM 沒有直接處理。外部文獻中的 PR 衝突率（AgenticFlict 27.67%、2607.04697 的 19.8%／41.7%）都屬於這一類，**不能拿來當 ATM 的效果**。
+- 若日後加入「以 PR 目標 base 為對象的 fetch 加 rebase 加准入」或「`--force-with-lease`」，需要另開預先登記來評估，不能沿用本研究的結論。
+
+### 11.5 可選的探索性子實驗（不列入主張）
+在本機建一個 bare repo 當作 remote，模擬「另一台機器」在 ATM fetch 之後的 Δt 秒推送，Δt 依序設為 0、1、5、30 秒。量測：
+- ATM 准入攔下的比例；
+- 推送被非快轉拒絕的比例；
+- 需要 recover 的比例。
+
+這只用來描述殘餘風險，需要另外經作者批准。

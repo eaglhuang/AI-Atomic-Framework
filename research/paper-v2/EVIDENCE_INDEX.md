@@ -634,10 +634,10 @@ pilot、主跑、留出集實驗仍不在這次範圍。dev 題沒有 B′ 與 D
 | 路徑 | [`prereg-v3-draft/2026-10-15/`](./prereg-v3-draft/2026-10-15/GENERATION.md) |
 | 草稿 | [`prereg-v3-draft/2026-10-15/prereg-v3-draft.md`](./prereg-v3-draft/2026-10-15/prereg-v3-draft.md) |
 | 狀態 | DRAFT。NOT FROZEN。exploratory。目錄位元組封存之後不可改，但這不是方法凍結 |
-| 範圍邊界 | ATM 只處理同一台機器、同一個 repo 裡代理之間的衝突，因為 CAS、鎖和佇列在本機 `.atm/runtime/`。別台機器的 push、其他 clone 與遠端 PR 仍走一般的 git merge 或 rebase。不主張超出這條邊界 |
+| 範圍邊界 | ATM 只處理同一台機器、同一個 repo 裡代理之間的衝突，因為 CAS、鎖和佇列在本機 `.atm/runtime/`。別台機器的 push、其他 clone 與遠端 PR 仍走一般的 git merge 或 rebase。§11 只記錄 push 前的 broker 檢查，不把這條邊界往外推。不主張超出這條邊界 |
 | HIST-v2 | 維持凍結，未修改 |
 | 檔案數 | 3（不含 SHA256SUMS） |
-| SHA256SUMS sha256 | `71020468a668074d7f9f7246daeac548bcccbbfe8daf5ec630414ab2d1d57b3f` |
+| SHA256SUMS sha256 | `39583171fff13b5bd8e755db761d3d673b7db2ee9f8d68ede8ed2f2df736915b` |
 | 驗證 | `sh research/paper-v2/prereg-v3-draft/2026-10-15/verify.sh` |
 
 在作者批准並把文本凍結成新的預先登記目錄之前，不從這份草稿跑 smoke、pilot、main 或 held-out。
