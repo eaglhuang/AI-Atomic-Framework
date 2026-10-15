@@ -630,19 +630,52 @@ pilot、主跑、留出集實驗仍不在這次範圍。dev 題沒有 B′ 與 D
 
 ## 39. HIST-v2 harness v3（2026-10-15；fixture 接線，沒有正式 run）
 
-> **harness 接線 — 不得作為論文結果。** 沒有 smoke、pilot-r2、主跑或留出集。不宣稱勝出。v2 位元組沒有改，`SHA256SUMS` 仍是 `393ea1deec292674d6fe60b2a11ccf6fb47a0c7602af82f2ea2fcf402009e74c`。
+> **harness 接線 — 不得作為論文結果。** 寫下這一節時沒有 smoke、pilot-r2、主跑或留出集。後來的 replay v2 與未跑完的 pilot-r2 見 §40、§41。不宣稱勝出。v2 位元組沒有改，`SHA256SUMS` 仍是 `393ea1deec292674d6fe60b2a11ccf6fb47a0c7602af82f2ea2fcf402009e74c`。
 
 | 項目 | 值 |
 |---|---|
 | 路徑 | [`benchmark-harness/hist-v2-harness-v3/`](./benchmark-harness/hist-v2-harness-v3/GENERATION.md) |
 | 修正 | §9 均勻抖動。proposal 帶 parent／head 時，textual_merge_file、steward、atm 用三方 mine。context mismatch 記 `rejected-conflict`。file_lock 仍用歷史 hunk |
 | 測試 | 26 項，含抖動與三方 mine 反例。v2 的 `verify.sh` 仍通過 |
-| 沒有重跑 | 封存 replay 綁定沒有 parent／head，不能靠舊綁定做 pilot-r2 |
+| 當時沒有重跑 | 寫下這一節時，封存 replay v1 沒有 parent／head。之後的綁定見 §40 |
 | 檔案數 | 46（不含 SHA256SUMS） |
 | SHA256SUMS sha256 | `07a8f10f9894aa64faf42f7aef3daf33c7c685151e9b3318d9bedb1dbad18a59` |
 | 驗證 | `sh research/paper-v2/benchmark-harness/hist-v2-harness-v3/verify.sh` |
 
-## 40. 相關工作文獻集 r2（2026-10-15；閱讀封存，沒有新 PDF）
+## 40. HIST-v2 dev replay 綁定 v2（2026-10-15；pilot 輸入，沒有臂）
+
+> **pilot 輸入 — 不得作為論文結果。** 沒有 run。不宣稱勝出。v1 目錄 `dev-replay-bindings/` 沒有改。
+
+| 項目 | 值 |
+|---|---|
+| 路徑 | [`benchmark-main/2026-10-15-hist-v2-dev-replay-v2/`](./benchmark-main/2026-10-15-hist-v2-dev-replay-v2/GENERATION.md) |
+| schema | `hist-v2-dev-replay/2` |
+| 題目 | 與已封存 pilot 相同的 29 題 `set=dev`。每份 proposal 另有 `parent_text`（`selected_mb`）與 `head_text`（`selected_head`） |
+| 測試 | `git merge-file(base, parent, head)` 乾淨且等於該 proposal 的 `R({pr})`。v1 檔案雜湊仍等於分類器封印。PR 16703 的兩方套用仍是 context mismatch |
+| 檔案數 | 36（不含 SHA256SUMS） |
+| SHA256SUMS sha256 | `7fb0eca49d5282346ff01102d68df663b0e797050d6baa8f1341db03d0cf1d1a` |
+| 驗證 | `sh research/paper-v2/benchmark-main/2026-10-15-hist-v2-dev-replay-v2/verify.sh` |
+
+## 41. HIST-v2 pilot-r2（2026-10-15；未跑完；有一筆 counterexample；不是論文結果）
+
+> **pilot-r2 — 不得作為論文結果。** 計畫 1740 格，執行 747 格後停止。有一筆 `inconsistent`，鑑識保留，沒有覆蓋。沒有主跑，沒有留出集。不宣稱勝出。A′、C 與其餘 B 題沒有執行，下面的 B 列不是完整 pilot。
+
+| 項目 | 值 |
+|---|---|
+| 路徑 | [`benchmark-trials/2026-10-15-hist-v2-pilot-r2/`](./benchmark-trials/2026-10-15-hist-v2-pilot-r2/GENERATION.md) |
+| 旁註 | [`benchmark-trials/2026-10-15-hist-v2-pilot-r2.NOTE.md`](./benchmark-trials/2026-10-15-hist-v2-pilot-r2.NOTE.md) |
+| 輸入 | harness v3，`SHA256SUMS` sha256 `07a8f10f9894aa64faf42f7aef3daf33c7c685151e9b3318d9bedb1dbad18a59`。replay v2，見 §40。v2 harness 仍是 `393ea1deec292674d6fe60b2a11ccf6fb47a0c7602af82f2ea2fcf402009e74c` |
+| 臂 | steward、file_lock、textual_merge_file。`atm` 不跑 |
+| 矩陣 | 29 題 × 3 臂 × 2 順序 × 5 間隔（含 §9 抖動）× 2 seed = 1740。已執行 747。負控制五個全部被抓到 |
+| 終態 | 已執行的 proposal 沒有 `error`。`committed` 1306，`rejected-conflict` 188 |
+| A（10 題都跑完） | steward 400／400，textual_merge_file 400／400，file_lock 251／400。五題舊錯誤提案上 file_lock 仍是每格 1、另外兩條臂是每格 2 |
+| counterexample | `django:dev:17554_18450` related_descriptors.py，textual_merge_file，reverse，500 ms，seed 0。兩份都 committed，本體等於 `R({17554,18450})`，與同格 steward 的 sha256 相同。18450 的 `first_submit` 比 17554 晚 110.327 秒，排程延遲只有 506.5 ms。終態是 `late-commit-after-timeout`，評分 `inconsistent:ack`。見 `forensics/0746-inconsistent.json` |
+| steward 與 textual_merge_file | 已完成的 249 組裡，248 組的 accepted_ids、sha256 與 combined_success 相同。上面那一組位元組相同，成功計數是 2 與 1 |
+| 檔案數 | 8229（不含 SHA256SUMS） |
+| SHA256SUMS sha256 | `e44080d174d2ab69ab233bb6764e419d0404a2ae1d1bd0173bf7f3dc3c1fe6d9` |
+| 驗證 | `sh research/paper-v2/benchmark-trials/2026-10-15-hist-v2-pilot-r2/verify.sh` |
+
+## 42. 相關工作文獻集 r2（2026-10-15；閱讀封存，沒有新 PDF）
 
 > **閱讀封存 — 不得作為論文結果。** 沒有 run。不宣稱勝出。不是 C1′–C3′ 的證據。已封存的 `related-work/2026-10-15/` 沒有修改。本目錄沒有 PDF。
 
@@ -658,7 +691,7 @@ pilot、主跑、留出集實驗仍不在這次範圍。dev 題沒有 B′ 與 D
 | SHA256SUMS sha256 | `24ed0e0c8d1938a4265584945b3ffc9227744c9dbbc23c35264e9d8b6873eddd` |
 | 驗證 | `sh research/paper-v2/related-work/2026-10-15-r2/verify.sh` |
 
-## 41. HIST-v3 預先登記草稿（2026-10-15；DRAFT，NOT FROZEN，exploratory）
+## 43. HIST-v3 預先登記草稿（2026-10-15；DRAFT，NOT FROZEN，exploratory）
 
 > **DRAFT — NOT FROZEN — exploratory。** 尚未經作者批准。不是凍結的方法，不是實驗證據，沒有 run，不宣稱勝出。HIST-v2 預先登記 v2.0（`benchmark-prereg/2026-10-14-hist-v2.0/`）維持凍結，本目錄不修改它，也不取代它。
 
