@@ -10,10 +10,25 @@ checks = {
     "fixture.tests.MarkerTests.test_session_two": "delta-two" in text,
     "fixture.tests.MarkerTests.test_untouched": "alpha" in text and "zeta" in text,
 }
-labels = sys.argv[1:]
+verbosity = 1
+labels = []
+args = sys.argv[1:]
+index = 0
+while index < len(args):
+    token = args[index]
+    if token == "--verbosity" and index + 1 < len(args):
+        verbosity = int(args[index + 1])
+        index += 2
+        continue
+    labels.append(token)
+    index += 1
 if not labels:
     labels = list(checks)
 failed = 0
+if verbosity < 2:
+    print("." * len(labels))
+    print("OK" if all(checks.get(label) for label in labels) else "FAILED")
+    sys.exit(0 if all(checks.get(label) for label in labels) else 1)
 for label in labels:
     ok = checks.get(label)
     if ok is None:

@@ -1,9 +1,7 @@
 #!/usr/bin/env node
 /**
- * Quota-free stand-in for `codex exec`.
- * Applies this session's gold patch from the base snapshot.
- * Arm A writes the file directly (a later writer clobbers an earlier one).
- * Arm B submits the same patch only through atm-write.
+ * 不消耗額度的 codex exec 替身。
+ * 只依提示詞產生修改，不讀取金標路徑。Arm A 直接寫檔；Arm B 只呼叫 PATH 上的 atm-write。
  */
 import { spawnSync } from 'node:child_process';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -11,55 +9,63 @@ import path from 'node:path';
 
 const promptPath = process.argv[2];
 if (!promptPath) {
-  process.stderr.write('stub-codex: missing prompt file\n');
+  process.stderr.write('stub-codex: 缺少提示檔\n');
   process.exit(2);
 }
 const prompt = readFileSync(promptPath, 'utf8');
 const sessionDir = process.env.PREREG_SESSION_DIR;
 const work = process.env.PREREG_WORK;
 const instanceId = process.env.PREREG_INSTANCE_ID;
-const gold = process.env.PREREG_GOLD_PATCH;
 const slot = process.env.PREREG_SESSION_SLOT || '1';
 const arm = process.env.PREREG_ARM || 'A';
 const writeAfter = Number(process.env.PREREG_WRITE_AFTER_MS || 0);
-if (!sessionDir || !work || !instanceId || !gold) {
-  process.stderr.write('stub-codex: missing session environment\n');
+if (!sessionDir || !work || !instanceId) {
+  process.stderr.write('stub-codex: 缺少工作階段環境\n');
+  process.exit(2);
+}
+if (process.env.PREREG_GOLD_PATCH || process.env.GOLD_ROOT) {
+  process.stderr.write('stub-codex: 工作階段環境含有金標路徑，拒絕繼續\n');
   process.exit(2);
 }
 
+const match = prompt.match(/Change the (\S+) marker in (\S+) to (\S+)\./);
+if (!match) {
+  process.stderr.write('stub-codex: 提示詞沒有可推導的 fixture 修改，且不會讀取金標\n');
+  process.exit(2);
+}
+const marker = match[1];
+const file = match[2].replace(/[.,]$/, '');
+const value = match[3].replace(/[.,]$/, '');
+
 const started = new Date().toISOString();
-const files = splitPatch(readFileSync(gold, 'utf8'));
 mkdirSync(sessionDir, { recursive: true });
-writeFileSync(path.join(sessionDir, 'intended.patch'), readFileSync(gold));
+const base = git(['show', `HEAD:${file}`]);
+if (base.status !== 0) {
+  process.stderr.write(base.stderr || 'stub-codex: 無法讀取基底檔\n');
+  process.exit(1);
+}
+const original = base.stdout;
+const lines = splitLines(original);
+const index = lines.lines.indexOf(marker);
+if (index < 0) {
+  process.stderr.write(`stub-codex: 找不到標記 ${marker}\n`);
+  process.exit(1);
+}
+const nextLines = lines.lines.slice();
+nextLines[index] = value;
+const next = joinLines(nextLines, lines.endsWithNewline);
+const patch = singleLinePatch(file, index + 1, marker, value);
+writeFileSync(path.join(sessionDir, 'agent-output.diff'), patch);
 
 const events = [{ type: 'stub.session.started', at: started, instanceId, arm, slot }];
 let exitCode = 0;
-const prepared = [];
-for (const [file, patch] of files) {
-  const base = git(['show', `HEAD:${file}`]);
-  if (base.status !== 0) {
-    events.push({ type: 'stub.error', file, stderr: base.stderr });
-    exitCode = 1;
-    continue;
-  }
-  const applied = applyTemp(base.stdout, patch);
-  if (applied.status !== 0) {
-    events.push({ type: 'stub.apply_failed', file, stderr: applied.stderr });
-    exitCode = 1;
-    continue;
-  }
-  prepared.push({ file, patch, base: base.stdout, next: applied.stdout });
-}
-
 if (arm === 'A') {
   const now = Date.now();
   if (writeAfter > now) Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, writeAfter - now);
   if (slot === '2') Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 400);
-  for (const item of prepared) {
-    writeFileSync(path.join(work, item.file), item.next);
-    events.push({ type: 'stub.direct_write', file: item.file, at: new Date().toISOString() });
-  }
-  const add = gitRetry(['add', '--', ...files.keys()]);
+  writeFileSync(path.join(work, file), next);
+  events.push({ type: 'stub.direct_write', file, at: new Date().toISOString() });
+  const add = gitRetry(['add', '--', file]);
   const commit = gitRetry(['commit', '-m', `stub ${instanceId}`]);
   events.push({
     type: 'stub.git',
@@ -69,28 +75,23 @@ if (arm === 'A') {
   });
   if (commit.status !== 0) exitCode = 1;
 } else {
-  const atmWrite = process.env.PREREG_ATM_WRITE;
-  for (const item of prepared) {
-    const file = item.file;
-    const patch = item.patch;
-    const patchPath = path.join(sessionDir, `file-${file.replaceAll('/', '_')}.patch`);
-    const basePath = path.join(sessionDir, `base-${file.replaceAll('/', '_')}`);
-    writeFileSync(patchPath, patch);
-    writeFileSync(basePath, item.base);
-    const result = spawnSync(atmWrite, [file, patchPath, '--base-file', basePath, '--actor', `stub-${instanceId}`, '--task', instanceId, '--message', `stub ${instanceId} ${file}`], {
-      cwd: work,
-      encoding: 'utf8',
-      env: { ...process.env, ATM_CWD: work }
-    });
-    events.push({
-      type: 'stub.atm-write',
-      file,
-      status: result.status,
-      stdout: result.stdout,
-      stderr: result.stderr
-    });
-    if (result.status !== 0 && result.status !== 3) exitCode = 1;
-  }
+  const patchPath = path.join(sessionDir, `file-${file.replaceAll('/', '_')}.patch`);
+  const basePath = path.join(sessionDir, `base-${file.replaceAll('/', '_')}`);
+  writeFileSync(patchPath, patch);
+  writeFileSync(basePath, original);
+  const result = spawnSync('atm-write', [file, patchPath, '--base-file', basePath, '--actor', `stub-${instanceId}`, '--task', instanceId, '--message', `stub ${instanceId} ${file}`], {
+    cwd: work,
+    encoding: 'utf8',
+    env: process.env
+  });
+  events.push({
+    type: 'stub.atm-write',
+    file,
+    status: result.status,
+    stdout: result.stdout,
+    stderr: result.stderr
+  });
+  if (result.status !== 0 && result.status !== 3) exitCode = 1;
 }
 
 events.push({
@@ -98,6 +99,7 @@ events.push({
   at: new Date().toISOString(),
   usage: { input_tokens: 0, output_tokens: 0, total_tokens: 0, source: 'stub-no-model' }
 });
+events.push({ type: 'stub.intended_patch', text: `BEGIN_INTENDED_PATCH\n${patch}END_INTENDED_PATCH` });
 for (const event of events) process.stdout.write(`${JSON.stringify(event)}\n`);
 process.exit(exitCode);
 
@@ -118,25 +120,25 @@ function gitRetry(args) {
   return last;
 }
 
-function applyTemp(baseText, patchText) {
-  const dir = spawnSync('mktemp', ['-d'], { encoding: 'utf8' }).stdout.trim();
-  const file = path.join(dir, 'target');
-  writeFileSync(file, baseText);
-  const patchPath = path.join(dir, 'p.diff');
-  const normalised = patchText.replace(/^diff --git a\/\S+ b\/\S+\n/m, 'diff --git a/target b/target\n').replace(/^--- a\/\S+\n/m, '--- a/target\n').replace(/^\+\+\+ b\/\S+\n/m, '+++ b/target\n');
-  writeFileSync(patchPath, normalised);
-  const applied = spawnSync(process.env.PREREG_REAL_GIT || '/usr/bin/git', ['apply', '--unsafe-paths', patchPath], { cwd: dir, encoding: 'utf8' });
-  if (applied.status !== 0) return { status: applied.status, stdout: '', stderr: applied.stderr };
-  return { status: 0, stdout: readFileSync(file, 'utf8'), stderr: '' };
+function splitLines(text) {
+  const endsWithNewline = text.endsWith('\n');
+  const lines = text.split('\n');
+  if (endsWithNewline) lines.pop();
+  return { lines, endsWithNewline };
 }
 
-function splitPatch(text) {
-  const parts = new Map();
-  const chunks = text.split(/(?=^diff --git )/m).filter((chunk) => chunk.startsWith('diff --git '));
-  for (const chunk of chunks) {
-    const match = chunk.match(/^diff --git a\/.+ b\/(.+)$/m);
-    if (!match) continue;
-    parts.set(match[1].trim(), chunk.endsWith('\n') ? chunk : `${chunk}\n`);
-  }
-  return parts;
+function joinLines(lines, endsWithNewline) {
+  return lines.join('\n') + (endsWithNewline ? '\n' : '');
+}
+
+function singleLinePatch(rel, lineNo, before, after) {
+  return [
+    `diff --git a/${rel} b/${rel}`,
+    `--- a/${rel}`,
+    `+++ b/${rel}`,
+    `@@ -${lineNo},1 +${lineNo},1 @@`,
+    `-${before}`,
+    `+${after}`,
+    ''
+  ].join('\n');
 }

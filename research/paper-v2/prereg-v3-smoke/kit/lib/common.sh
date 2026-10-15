@@ -1,19 +1,56 @@
 #!/bin/bash
-# Shared helpers for the prereg-v3 smoke kit. Source, do not execute.
+# prereg-v3 冒煙套件共用函式。只供 source，不要直接執行。
 set -euo pipefail
 
 KIT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-STATE_ROOT="${PREREG_SMOKE_STATE:-$KIT_ROOT/state}"
+PUBLIC_CLI_VERSION="0.1.20"
+PUBLIC_CLI_PACKAGE="@ai-atomic-framework/cli@${PUBLIC_CLI_VERSION}"
+# 安裝位置必須在這個 git workspace 外面，否則 npm 會連到倉庫內的 workspace 套件，而不是 registry 上的 0.1.20。
+PUBLIC_CLI_ROOT="${PREREG_ATM_CLI_ROOT:-${HOME}/.cache/prereg-v3-atm-cli-0.1.20}"
+PUBLIC_CLI_CACHE="$PUBLIC_CLI_ROOT/node_modules/@ai-atomic-framework/cli/dist/npm-runtime/atm.mjs"
+
+# 已存在的 state 目錄只讀取，絕不刪除。新的一輪必須用新的 run-id。
+if [ -n "${PREREG_SMOKE_STATE:-}" ]; then
+  STATE_ROOT="$PREREG_SMOKE_STATE"
+elif [ -n "${PREREG_RUN_ID:-}" ]; then
+  STATE_ROOT="$KIT_ROOT/state/runs/${PREREG_RUN_ID}"
+elif [ -f "$KIT_ROOT/state/CURRENT" ]; then
+  STATE_ROOT="$(cat "$KIT_ROOT/state/CURRENT")"
+else
+  STATE_ROOT=""
+fi
 
 iso_now() { date -Ins; }
 
 die() { echo "prereg-v3-smoke: $*" >&2; exit 1; }
 
+abort_arm_b() {
+  echo "prereg-v3-smoke: 公開 CLI ${PUBLIC_CLI_PACKAGE} 不可用。中止 Arm B。沒有 claim 退路，也不改走直接寫檔。" >&2
+  exit 1
+}
+
 load_state() {
+  [ -n "${STATE_ROOT:-}" ] || die "找不到 state。請先執行 setup.sh（每次使用新的 run-id）。"
   local env_file="$STATE_ROOT/env.sh"
-  [ -f "$env_file" ] || die "missing $env_file. Run setup.sh first."
+  [ -f "$env_file" ] || die "缺少 $env_file。請先執行 setup.sh。"
   # shellcheck disable=SC1090
   source "$env_file"
+}
+
+# setup 專用：忽略 CURRENT，每次都指向一個尚不存在的目錄。
+new_state_root() {
+  if [ -n "${PREREG_SMOKE_STATE:-}" ]; then
+    STATE_ROOT="$PREREG_SMOKE_STATE"
+  else
+    if [ -z "${PREREG_RUN_ID:-}" ]; then
+      PREREG_RUN_ID="$(date -u +%Y%m%dT%H%M%SZ)-$$-${RANDOM}"
+      export PREREG_RUN_ID
+    fi
+    STATE_ROOT="$KIT_ROOT/state/runs/${PREREG_RUN_ID}"
+  fi
+  if [ -e "$STATE_ROOT" ]; then
+    die "state 目錄已存在：$STATE_ROOT。拒絕刪除。請換一個新的 run-id。"
+  fi
 }
 
 node_strip_flags() {
@@ -43,25 +80,152 @@ write_env() {
   } > "$dest"
 }
 
+cli_is_public_0120() {
+  local cli="$1"
+  [ -f "$cli" ] || return 1
+  local version
+  version="$(node "$cli" --version 2>/dev/null | jq -r '.evidence.frameworkVersion // empty' || true)"
+  [ "$version" = "$PUBLIC_CLI_VERSION" ]
+}
+
+# 只接受 npm 上的公開 0.1.20 CLI。倉庫內 frozen runner 與 TypeScript 直接載入都不是這條路徑。
+resolve_public_cli() {
+  if [ -n "${PREREG_ATM_CLI:-}" ] && cli_is_public_0120 "$PREREG_ATM_CLI"; then
+    printf '%s\n' "$PREREG_ATM_CLI"
+    return 0
+  fi
+  if cli_is_public_0120 "$PUBLIC_CLI_CACHE"; then
+    printf '%s\n' "$PUBLIC_CLI_CACHE"
+    return 0
+  fi
+  mkdir -p "$PUBLIC_CLI_ROOT"
+  if ! npm install --prefix "$PUBLIC_CLI_ROOT" "$PUBLIC_CLI_PACKAGE" --no-fund --no-audit --silent >&2; then
+    return 1
+  fi
+  if cli_is_public_0120 "$PUBLIC_CLI_CACHE"; then
+    printf '%s\n' "$PUBLIC_CLI_CACHE"
+    return 0
+  fi
+  return 1
+}
+
+require_public_cli() {
+  local cli
+  cli="$(resolve_public_cli)" || abort_arm_b
+  export PREREG_ATM_CLI="$cli"
+  printf '%s\n' "$cli"
+}
+
+make_worktree_readonly() {
+  local work="$1"
+  chmod -R a-w "$work"
+  # git 讀取物件需要寫入 .git；來源檔維持不可寫，直接寫檔才會失敗。
+  if [ -d "$work/.git" ]; then
+    chmod -R u+w "$work/.git"
+  fi
+  if [ -d "$work/.prereg-smoke" ]; then
+    chmod -R u+w "$work/.prereg-smoke"
+  fi
+}
+
 codex_supports() {
   local help="$1" flag="$2"
   grep -q -- "$flag" <<<"$help"
 }
 
+# 工作階段環境允許清單。金標路徑、GOLD_ROOT、state、tasks 都不在裡面。
+session_env_assignments() {
+  local session_dir="$1" work="$2"
+  local node_bin path_value
+  node_bin="$(dirname "$(command -v node)")"
+  path_value="${node_bin}:/usr/bin:/bin"
+  if [ -n "${PREREG_ARM_BIN:-}" ]; then
+    path_value="${PREREG_ARM_BIN}:${path_value}"
+  fi
+  if [ -z "${PREREG_SMOKE_CODEX:-}" ] && command -v codex >/dev/null 2>&1; then
+    local codex_bin
+    codex_bin="$(dirname "$(command -v codex)")"
+    case "$codex_bin" in
+      *"/gold"*) ;;
+      *) path_value="${codex_bin}:${path_value}" ;;
+    esac
+  fi
+  cat <<EOF
+PATH=${path_value}
+HOME=${session_dir}/home
+TMPDIR=${session_dir}/tmp
+LANG=C.UTF-8
+LC_ALL=C.UTF-8
+GIT_AUTHOR_NAME=${GIT_AUTHOR_NAME:-prereg-smoke}
+GIT_AUTHOR_EMAIL=${GIT_AUTHOR_EMAIL:-prereg-smoke@localhost}
+GIT_COMMITTER_NAME=${GIT_COMMITTER_NAME:-prereg-smoke}
+GIT_COMMITTER_EMAIL=${GIT_COMMITTER_EMAIL:-prereg-smoke@localhost}
+PREREG_SESSION_DIR=${session_dir}
+PREREG_WORK=${work}
+PREREG_INSTANCE_ID=${PREREG_INSTANCE_ID:-}
+PREREG_SESSION_SLOT=${PREREG_SESSION_SLOT:-}
+PREREG_ARM=${PREREG_ARM:-}
+PREREG_WRITE_AFTER_MS=${PREREG_WRITE_AFTER_MS:-0}
+PREREG_REAL_GIT=${PREREG_REAL_GIT:-/usr/bin/git}
+EOF
+  if [ -n "${CODEX_MODEL:-}" ]; then
+    printf 'CODEX_MODEL=%s\n' "$CODEX_MODEL"
+  fi
+}
+
+capture_intended_patch() {
+  local session_dir="$1"
+  if [ -s "$session_dir/intended.patch" ]; then
+    return 0
+  fi
+  if [ -s "$session_dir/agent-output.diff" ]; then
+    cp "$session_dir/agent-output.diff" "$session_dir/intended.patch"
+    return 0
+  fi
+  local stdout="$session_dir/stdout.jsonl"
+  [ -f "$stdout" ] || return 0
+  python3 - "$session_dir" "$stdout" <<'PY'
+import pathlib, sys
+session = pathlib.Path(sys.argv[1])
+text = pathlib.Path(sys.argv[2]).read_text(encoding="utf-8", errors="replace")
+begin = "BEGIN_INTENDED_PATCH\n"
+end = "\nEND_INTENDED_PATCH"
+if begin not in text:
+    raise SystemExit(0)
+patch = text.split(begin, 1)[1].split(end, 1)[0]
+if "diff --git " not in patch:
+    raise SystemExit(0)
+if not patch.endswith("\n"):
+    patch += "\n"
+(session / "intended.patch").write_text(patch, encoding="utf-8")
+PY
+}
+
 launch_codex() {
   local session_dir="$1" prompt_file="$2" work="$3"
-  mkdir -p "$session_dir"
+  mkdir -p "$session_dir/home" "$session_dir/tmp"
   local start
   start="$(iso_now)"
   printf '%s\n' "$start" > "$session_dir/started-at"
   local stdout="$session_dir/stdout.jsonl"
   local stderr="$session_dir/stderr.txt"
+  local env_file="$session_dir/launch-env.txt"
+  session_env_assignments "$session_dir" "$work" > "$env_file"
+  local -a env_cmd=(env -i)
+  local line
+  while IFS= read -r line; do
+    [ -n "$line" ] || continue
+    env_cmd+=("$line")
+  done < "$env_file"
   local status=0
   if [ -n "${PREREG_SMOKE_CODEX:-}" ]; then
-    PREREG_SESSION_DIR="$session_dir" PREREG_WORK="$work" \
-      node "$PREREG_SMOKE_CODEX" "$prompt_file" >"$stdout" 2>"$stderr" || status=$?
+    cp "$PREREG_SMOKE_CODEX" "$session_dir/agent.mjs"
+    (
+      cd "$work"
+      "${env_cmd[@]}" node "$session_dir/agent.mjs" "$prompt_file" >"$stdout" 2>"$stderr"
+    ) || status=$?
   else
-    command -v codex >/dev/null 2>&1 || die "codex is not on PATH. Install Codex CLI 0.159.2 and log in, or set PREREG_SMOKE_CODEX for a stub."
+    command -v codex >/dev/null 2>&1 || die "codex 不在 PATH。請安裝 Codex CLI 0.159.2 並登入，或設定 PREREG_SMOKE_CODEX 使用 stub。"
     local help
     help="$(codex exec --help 2>&1 || true)"
     local -a args=(exec)
@@ -89,16 +253,17 @@ launch_codex() {
     printf '%s\n' "${args[*]}" > "$session_dir/codex-argv.txt"
     (
       cd "$work"
-      codex "${args[@]}" - <"$prompt_file" >"$stdout" 2>"$stderr"
+      "${env_cmd[@]}" codex "${args[@]}" - <"$prompt_file" >"$stdout" 2>"$stderr"
     ) || status=$?
   fi
   local end
   end="$(iso_now)"
   printf '%s\n' "$end" > "$session_dir/ended-at"
   printf '%s\n' "$status" > "$session_dir/exit-code"
+  capture_intended_patch "$session_dir"
   if grep -Eiq 'usage limit|rate limit|insufficient_quota|quota exceeded|too many requests|HTTP 429|exceeded your current quota' "$stdout" "$stderr" 2>/dev/null; then
     printf 'quota\n' > "$session_dir/QUOTA_STOP"
-    echo "prereg-v3-smoke: free-quota stop while reading $session_dir" >&2
+    echo "prereg-v3-smoke: 讀取 $session_dir 時遇到免費額度停止" >&2
   fi
   return 0
 }

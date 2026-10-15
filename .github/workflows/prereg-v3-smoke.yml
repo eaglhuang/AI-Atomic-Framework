@@ -1,0 +1,30 @@
+name: prereg-v3-smoke
+
+on:
+  pull_request:
+    paths:
+      - 'research/paper-v2/prereg-v3-smoke/**'
+      - '.github/workflows/prereg-v3-smoke.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'research/paper-v2/prereg-v3-smoke/**'
+      - '.github/workflows/prereg-v3-smoke.yml'
+
+jobs:
+  preflight:
+    name: Smoke kit preflight
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Preflight and stub dry-run
+        run: bash research/paper-v2/prereg-v3-smoke/kit/preflight.sh
