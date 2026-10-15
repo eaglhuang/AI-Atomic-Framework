@@ -1,0 +1,46 @@
+label: feasibility, not results
+No agent session invoked ATM. The notes below are direct CLI checks on this VM.
+
+repo checkout, cwd=/workspace
+command: node atm.mjs --version
+exit: 0
+frameworkVersion: 0.1.2
+runnerMode: frozen
+entrypoint: release/atm-onefile/atm.mjs
+package.json engines.node: >=24
+node used: v22.14.0
+interpretation: version command exited 0 on Node 22. This does not say the full test suite passes on Node 22.
+
+command: node atm.mjs welcome --json
+cwd: /workspace
+exit: 0
+ok: true
+frameworkVersion: 0.1.2
+message codes: ATM_WELCOME_READY, ATM_TELEMETRY_NOTICE, ATM_EXPERIMENTAL_API_NOTICE
+
+command: node atm.mjs doctor --json
+cwd: /workspace
+exit: 0
+ok: true
+message codes: ATM_RUNNER_SOURCE_DRIFT (warning), ATM_PACKAGE_DIST_MISSING (warning, 27 workspace packages have no dist), ATM_DOCTOR_OK
+recommendedAction: node atm.mjs next --json
+build: not run
+npm publish: not run
+git tag: not created
+
+command: node /workspace/atm.mjs welcome --json
+cwd: /tmp
+exit: 2
+ok: false
+code: ATM_CHART_MISSING
+text: ATMChart markdown was not found. Run `node atm.mjs atm-chart render` first.
+
+public package, installed only under a temp prefix, not into this repo:
+npm view @ai-atomic-framework/cli version: 0.1.20
+bin: atm -> dist/npm-runtime/atm.mjs
+npm install exit: 0
+node <prefix>/.../atm.mjs --version exit: 0
+frameworkVersion: 0.1.20
+runnerMode: npm-package
+global-style prefix bin link: atm present under that temp prefix
+default PATH atm: MISSING

@@ -1,0 +1,27 @@
+label: feasibility, not results
+secret policy: values were not printed. Only set/unset and CLI status fields are recorded.
+
+environment names checked, all unset:
+CURSOR_API_KEY
+CURSOR_AUTH_TOKEN
+ANTHROPIC_API_KEY
+CLAUDE_API_KEY
+OPENAI_API_KEY
+CODEX_API_KEY
+GH_TOKEN
+GITHUB_TOKEN
+
+CURSOR_AGENT is set, length 1, not an absolute path. It was not printed.
+The headless CLIs still reported logged out.
+
+cursor-agent status --format json
+exit: 0
+{"status":"unauthenticated","isAuthenticated":false,"hasAccessToken":false,"hasRefreshToken":false,"message":"Not logged in"}
+
+claude auth status --json
+exit: 1
+{"loggedIn":false,"authMethod":"none","apiProvider":"firstParty","analyticsDisabled":false}
+
+codex login status
+exit: 1
+Not logged in

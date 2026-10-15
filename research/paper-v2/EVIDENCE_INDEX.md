@@ -642,6 +642,23 @@ pilot、主跑、留出集實驗仍不在這次範圍。dev 題沒有 B′ 與 D
 | SHA256SUMS sha256 | `07a8f10f9894aa64faf42f7aef3daf33c7c685151e9b3318d9bedb1dbad18a59` |
 | 驗證 | `sh research/paper-v2/benchmark-harness/hist-v2-harness-v3/verify.sh` |
 
+## 40. prereg-v3 真實代理可行性檢查（2026-10-15；可行性，不是結果）
+
+> **可行性檢查 — 不得作為論文結果。** 沒有實驗 run。沒有並行代理編輯。不宣稱勝出。不是 C1′–C3′ 的證據。只記錄這台單一 cloud VM 上，無頭程式代理 CLI 能否安裝、能否用已經存在的環境憑證做非互動登入，以及 ATM CLI 能否在同一台機器上安裝並執行版本指令。
+
+| 項目 | 值 |
+|---|---|
+| 路徑 | [`prereg-v3-feasibility/2026-10-15/`](./prereg-v3-feasibility/2026-10-15/README.md) |
+| 標籤 | feasibility，不是 results |
+| CLI | 預設映像沒有這些指令。安裝後：`cursor-agent` `2026.10.14-941492e`、`claude` `2.1.292`、`codex` `0.162.1` |
+| 認證 | 三者皆未登入。檢查過的 API 金鑰環境變數沒有值。沒有印出或帶走密文 |
+| 並行編輯示範 | 未執行。沒有暫存 repo、沒有最終檔案、沒有遺失更新觀察 |
+| token／時間 | 沒有完成的模型回合，沒有 token 用量。三個失敗探測的平行牆鐘約 15.3 秒 |
+| ATM | 本 repo `node atm.mjs` 的 welcome／doctor 退出碼 0（doctor 有 source-seal drift 與 27 個套件缺 `dist` 的警告）。公開套件 `@ai-atomic-framework/cli@0.1.20` 可裝到暫存 prefix，`--version` 退出碼 0。沒有由代理工作階段呼叫 |
+| 檔案數 | 7（不含 SHA256SUMS） |
+| SHA256SUMS sha256 | `a50a2871efb9d62ecbf5d5e82b4c3a3555f99c15954bcdd072a47314031d6a6f` |
+| 驗證 | `sh research/paper-v2/prereg-v3-feasibility/2026-10-15/verify.sh` |
+
 ## 6. 不在 repo 的參照
 - ATM pin 原始碼：GitHub `eaglhuang/AI-Atomic-Framework` commit `5692474f7db70ab52a7a71c8af4867609e7e4b43`（r3 另加 `bea35380d7f381f998c9930fa95f01b999c7f208`，box tarball `/workspace/atm-main-bea35380/atm-main.tar.gz` sha256 `9346e5b175b176618f435aeb4b41ab93ef7575f9bf77d77c47a5aeac87ad34b5`；r4 另加 `2118bc66efb3ac3bc0ddaede6a2f7cb18526b030`，box tarball `/workspace/atm-main-2118bc66/atm-main.tar.gz` sha256 `aa959607c35c51b7fc3c4e3d81b3d9e979ee62f4d9361ef9e9f5ee72e78abd88`；r5 另加 `37847584e24afc08ea58cfe380bb5b1220fbe335`，box tarball `/workspace/atm-main-37847584/atm-main.tar.gz` sha256 `e17a90ddceaf3c70d580c96e31f14cf8251d5a664985c1eb494f0d8db8045e3d`；r6 另加 `b35a6141bd5bfbaec654f1cd3079323581b04074`，box tarball `/workspace/atm-main-b35a6141/atm-main.tar.gz` sha256 `93fa7839d8e0fee51e5ad224833df2b57397fead3e77e0528117f21f5d5e59ef`）；box tarball `/workspace/atm-main-5692474f/atm-main.tar.gz` sha256 `1d498a397e6a5db119d40b8f539dc165cb0028fbfe9577f953023f8ec8d45795`。
 - 論文 v1：arXiv:2607.00041（box `refs/` 有副本，未上傳）。

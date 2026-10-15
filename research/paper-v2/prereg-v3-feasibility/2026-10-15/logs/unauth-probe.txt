@@ -1,0 +1,24 @@
+label: feasibility, not results
+purpose: one unauthenticated print-mode call per CLI, in /tmp/feasibility-probe, to see whether a hidden credential would still start a session.
+These three processes were started together. Wall clock about 15.3s. No file in the probe directory was an agent edit. No throwaway git repo was created. No concurrent edit demo was run.
+
+cursor-agent -p --output-format text --trust --force --workspace /tmp/feasibility-probe
+exit: 1
+stderr: Error: Authentication required. Please run 'agent login' first, or set CURSOR_API_KEY environment variable.
+
+claude -p --permission-mode dontAsk
+exit: 1
+stdout: Not logged in · Please run /login
+
+codex exec --skip-git-repo-check
+exit: 1
+CLI log timestamp: 2026-10-15T11:38:47Z
+model field shown by CLI before failure: gpt-6.1-sol
+provider: openai
+result: HTTP 401 Unauthorized
+message: Missing bearer or basic authentication in header
+endpoint host: api.openai.com
+token usage: none reported
+request ids and session ids omitted from this log
+
+No completed model turn. No token count was visible for any CLI.
