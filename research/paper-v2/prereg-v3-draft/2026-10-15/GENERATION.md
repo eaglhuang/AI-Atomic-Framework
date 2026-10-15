@@ -4,9 +4,9 @@
 
 HIST-v2 預先登記 v2.0（`research/paper-v2/benchmark-prereg/2026-10-14-hist-v2.0/`）維持凍結。本目錄不修改它，也不取代它。
 
-`prereg-v3-draft.md` 封入本目錄。那份草稿自己寫明：草稿、尚未凍結、還沒經作者批准，而且 HIST-v2 維持凍結。目錄一旦寫入 `SHA256SUMS` 就不可改位元組；這只是把草稿封存下來，不是把方法凍結。
+`prereg-v3-draft.md` 封入本目錄。這是 2026-10-15 第二版：以真實 AI 代理研究為主。benchmark 已由作者決定為 SWE-bench Verified（django 為主，sphinx、sympy 為輔），CooperBench 為備案（使用前須確認授權）。CAID（arXiv:2603.21489v1）§4.2 的工程師人數敘述已按原文核對。前一版的程式化研究與 push 前 broker 檢查收在附錄 A–C。草稿自己寫明：草稿、尚未凍結、還沒經作者批准，而且 HIST-v2 維持凍結。目錄一旦寫入 `SHA256SUMS` 就不可改位元組；這只是把草稿封存下來，不是把方法凍結。
 
-草稿把範圍寫成一條刻意的邊界：ATM 只處理同一台機器、同一個 repo 裡代理之間的衝突，因為 CAS、鎖和佇列在本機 `.atm/runtime/`。別台機器的 push、其他 clone 與遠端 PR 仍走一般的 git merge 或 rebase。不主張超出這條邊界。§11 只記錄 push 前的 broker 檢查，不把這條邊界往外推。
+草稿把範圍寫成一條刻意的邊界：ATM 只處理同一台機器、同一個 repo 裡代理之間的衝突，因為 CAS、鎖和佇列在本機 `.atm/runtime/`。別台機器的 push、其他 clone 與遠端 PR 仍走一般的 git merge 或 rebase。不主張超出這條邊界。正文 §2、§9 寫這條邊界；附錄 C 的 push 前 broker 檢查只記錄程式現況，不把邊界往外推。
 
 要跑 smoke 或 pilot，必須另經作者批准，並把批准後的文本凍結成新的預先登記目錄。在那之前，pilot、main、held-out 都不從這份草稿啟動。
 
