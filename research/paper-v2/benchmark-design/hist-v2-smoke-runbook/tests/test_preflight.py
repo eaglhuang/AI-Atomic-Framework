@@ -78,6 +78,8 @@ class CliPinTests(unittest.TestCase):
             self.assertFalse(out.exists())
 
     def test_execute_with_unbound_dev_items_creates_no_directory(self) -> None:
+        trials = REPO / "research/paper-v2/benchmark-trials"
+        before = _smoke_generation_sums(trials)
         with tempfile.TemporaryDirectory() as tmp:
             out = Path(tmp) / "2026-10-15-hist-v2-smoke"
             env = _env()
@@ -100,7 +102,7 @@ class CliPinTests(unittest.TestCase):
             self.assertIn("catalog fixtures are not a substitute", proc.stderr)
             self.assertIn("no run directory created", proc.stderr)
             self.assertFalse(out.exists())
-            self.assertFalse((REPO / "research/paper-v2/benchmark-trials").exists() and any((REPO / "research/paper-v2/benchmark-trials").glob("*hist-v2-smoke*")))
+        self.assertEqual(_smoke_generation_sums(trials), before)
 
     def test_shell_entry_refuses_held_out(self) -> None:
         script = runbook_root() / "run_smoke.sh"
@@ -113,6 +115,16 @@ class CliPinTests(unittest.TestCase):
         )
         self.assertEqual(proc.returncode, 2, proc.stderr)
         self.assertIn("no run directory created", proc.stderr)
+
+
+def _smoke_generation_sums(trials: Path) -> dict[str, str]:
+    if not trials.is_dir():
+        return {}
+    found: dict[str, str] = {}
+    for path in sorted(trials.glob("*hist-v2-smoke*")):
+        sums = path / "SHA256SUMS"
+        found[path.name] = sha256_file(sums) if sums.is_file() else ""
+    return found
 
 
 def _env() -> dict[str, str]:

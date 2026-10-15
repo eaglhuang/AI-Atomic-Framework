@@ -30,6 +30,17 @@ class ReplayRefused(RuntimeError):
     pass
 
 
+def _prepare_nested(original):
+    """Catalog fixtures are flat names. Historical target paths need their parents."""
+
+    def prepare(root, fixture):
+        target = Path(root) / str(fixture["filename"])
+        target.parent.mkdir(parents=True, exist_ok=True)
+        return original(root, fixture)
+
+    return prepare
+
+
 def sha256_text(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
@@ -184,8 +195,10 @@ def run_bound_cell(item: dict, binding_path: Path | None, cell: dict) -> dict:
 
     original_driver = driver.build_patch
     original_catalog = catalog.build_patch
+    original_prepare = driver.prepare_workspace
     driver.build_patch = _bound_patch
     catalog.build_patch = _bound_patch
+    driver.prepare_workspace = _prepare_nested(original_prepare)
     try:
         run = driver.run_fixture(
             fixture,
@@ -200,6 +213,7 @@ def run_bound_cell(item: dict, binding_path: Path | None, cell: dict) -> dict:
     finally:
         driver.build_patch = original_driver
         catalog.build_patch = original_catalog
+        driver.prepare_workspace = original_prepare
     batch_sizes = [result.batch_size for result in run.results if result.batch_size is not None]
     return {
         "workspace": run.workspace,

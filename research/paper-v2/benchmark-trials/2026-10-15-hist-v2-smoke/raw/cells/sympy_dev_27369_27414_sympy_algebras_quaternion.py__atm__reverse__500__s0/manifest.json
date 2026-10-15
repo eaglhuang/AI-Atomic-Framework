@@ -1,0 +1,160 @@
+{
+  "arm": "atm",
+  "base_sha256": "b336f89dff071224b98a2c12ad7a79991bac7e20cc4ee73cf90ea530ab81ae47",
+  "dirty": true,
+  "dirty_entries": [
+    " M research/paper-v2/EVIDENCE_INDEX.md",
+    " M research/paper-v2/benchmark-design/hist-v2-smoke-runbook/GENERATION.md",
+    " M research/paper-v2/benchmark-design/hist-v2-smoke-runbook/RUNBOOK_zh.md",
+    " M research/paper-v2/benchmark-design/hist-v2-smoke-runbook/SHA256SUMS",
+    " M research/paper-v2/benchmark-design/hist-v2-smoke-runbook/src/hist_v2_smoke_runbook/replay.py",
+    " M research/paper-v2/benchmark-design/hist-v2-smoke-runbook/tests/test_replay.py",
+    "?? research/paper-v2/benchmark-trials/.2026-10-15-hist-v2-smoke.staging/"
+  ],
+  "events": [
+    {
+      "accepted_ids": [
+        27414
+      ],
+      "batch_id": "batch-mv8uq9ne-0a4066e6",
+      "batch_size": 2,
+      "member_proposal_ids": [
+        "27414",
+        "27369"
+      ],
+      "proposal_id": 27414,
+      "type": "batch"
+    },
+    {
+      "proposal_id": 27414,
+      "rename_count": 1,
+      "terminal": "committed",
+      "type": "commit"
+    },
+    {
+      "accepted_ids": [
+        27414
+      ],
+      "batch_id": "batch-mv8uq9ne-0a4066e6",
+      "batch_size": 2,
+      "member_proposal_ids": [
+        "27414",
+        "27369"
+      ],
+      "proposal_id": 27369,
+      "type": "batch"
+    },
+    {
+      "proposal_id": 27369,
+      "rename_count": 0,
+      "terminal": "rejected-conflict",
+      "type": "attempt"
+    }
+  ],
+  "fixture_id": "sympy:dev:27369_27414:sympy/algebras/quaternion.py",
+  "formal_run": false,
+  "git_head": "8eba1b96aae637884a3b1f9fe40918db73d14d93",
+  "inter_arrival_ms": 500,
+  "lockfile_sha256": "867d358ffd60ceb2ceb3feb53a88455340cfb22af7d658ad97b53ba3240b41ee",
+  "node": "v22.14.0",
+  "observed_sha256": "8b6164be38f5e2f03a1ad5e07129290f056621873b4f9cd3d61c38f6c6fffed3",
+  "order": "reverse",
+  "os": "Linux-6.12.94+-x86_64-with-glibc2.39",
+  "patches": [
+    {
+      "patch_sha256": "f9786847570d8d9274e59f5c00f88d8ce7319a8abd288a8136d49613030561cf",
+      "proposal_id": 27414
+    },
+    {
+      "patch_sha256": "a3713d130f77dd4101e0e44f4b52ee5770fefe854d991af2ab56aa70ff46a814",
+      "proposal_id": 27369
+    }
+  ],
+  "proposals": [
+    {
+      "accepted": true,
+      "accepted_ids": [
+        27414
+      ],
+      "ack_at": 1792027206.139,
+      "arm": "atm",
+      "arm_terminal": "committed",
+      "attempts": 1,
+      "batch_id": "batch-mv8uq9ne-0a4066e6",
+      "batch_size": 2,
+      "detail": null,
+      "events": [
+        {
+          "accepted_ids": [
+            27414
+          ],
+          "batch_id": "batch-mv8uq9ne-0a4066e6",
+          "batch_size": 2,
+          "member_proposal_ids": [
+            "27414",
+            "27369"
+          ],
+          "proposal_id": 27414,
+          "type": "batch"
+        },
+        {
+          "proposal_id": 27414,
+          "rename_count": 1,
+          "terminal": "committed",
+          "type": "commit"
+        }
+      ],
+      "executable_seconds": 30.0,
+      "first_submit": 1792027203.976,
+      "metrics": {},
+      "proposal_id": 27414,
+      "rename_at": 1792027206.018,
+      "retries": 0,
+      "stop_reason": "acked-in-window"
+    },
+    {
+      "accepted": false,
+      "accepted_ids": [
+        27414
+      ],
+      "ack_at": 1792027206.141,
+      "arm": "atm",
+      "arm_terminal": "rejected-conflict",
+      "attempts": 1,
+      "batch_id": "batch-mv8uq9ne-0a4066e6",
+      "batch_size": 2,
+      "detail": "excluded-by-arrival-maximal-subset",
+      "events": [
+        {
+          "accepted_ids": [
+            27414
+          ],
+          "batch_id": "batch-mv8uq9ne-0a4066e6",
+          "batch_size": 2,
+          "member_proposal_ids": [
+            "27414",
+            "27369"
+          ],
+          "proposal_id": 27369,
+          "type": "batch"
+        },
+        {
+          "proposal_id": 27369,
+          "rename_count": 0,
+          "terminal": "rejected-conflict",
+          "type": "attempt"
+        }
+      ],
+      "executable_seconds": 30.0,
+      "first_submit": 1792027204.471,
+      "metrics": {},
+      "proposal_id": 27369,
+      "rename_at": null,
+      "retries": 0,
+      "stop_reason": "excluded-by-arrival-maximal-subset"
+    }
+  ],
+  "python": "3.12.3",
+  "schema": "hist-v2-harness-manifest/2",
+  "seed": 0
+}

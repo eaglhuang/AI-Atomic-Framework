@@ -1,0 +1,166 @@
+{
+  "arm": "atm",
+  "base_sha256": "25f7189339ca433e1d43503aa1f4288c618d32481208799582102a7c0b1811ea",
+  "dirty": true,
+  "dirty_entries": [
+    " M research/paper-v2/EVIDENCE_INDEX.md",
+    " M research/paper-v2/benchmark-design/hist-v2-smoke-runbook/GENERATION.md",
+    " M research/paper-v2/benchmark-design/hist-v2-smoke-runbook/RUNBOOK_zh.md",
+    " M research/paper-v2/benchmark-design/hist-v2-smoke-runbook/SHA256SUMS",
+    " M research/paper-v2/benchmark-design/hist-v2-smoke-runbook/src/hist_v2_smoke_runbook/replay.py",
+    " M research/paper-v2/benchmark-design/hist-v2-smoke-runbook/tests/test_replay.py",
+    "?? research/paper-v2/benchmark-trials/.2026-10-15-hist-v2-smoke.staging/"
+  ],
+  "events": [
+    {
+      "accepted_ids": [
+        13802,
+        13803
+      ],
+      "batch_id": "batch-mv8uqo3c-caf01ea7",
+      "batch_size": 2,
+      "member_proposal_ids": [
+        "13803",
+        "13802"
+      ],
+      "proposal_id": 13803,
+      "type": "batch"
+    },
+    {
+      "proposal_id": 13803,
+      "rename_count": 1,
+      "terminal": "committed",
+      "type": "commit"
+    },
+    {
+      "accepted_ids": [
+        13802,
+        13803
+      ],
+      "batch_id": "batch-mv8uqo3c-caf01ea7",
+      "batch_size": 2,
+      "member_proposal_ids": [
+        "13803",
+        "13802"
+      ],
+      "proposal_id": 13802,
+      "type": "batch"
+    },
+    {
+      "proposal_id": 13802,
+      "rename_count": 1,
+      "terminal": "committed",
+      "type": "commit"
+    }
+  ],
+  "fixture_id": "sphinx:dev:13802_13803:sphinx/ext/autodoc/importer.py",
+  "formal_run": false,
+  "git_head": "8eba1b96aae637884a3b1f9fe40918db73d14d93",
+  "inter_arrival_ms": 500,
+  "lockfile_sha256": "867d358ffd60ceb2ceb3feb53a88455340cfb22af7d658ad97b53ba3240b41ee",
+  "node": "v22.14.0",
+  "observed_sha256": "d4ec5d194e20fa7c83012fa1db10d347ae71f706405ee0ea3ad933a88b935899",
+  "order": "reverse",
+  "os": "Linux-6.12.94+-x86_64-with-glibc2.39",
+  "patches": [
+    {
+      "patch_sha256": "c7422d90599a9b40e2a9ffaa43cd5d609db0b4658c3958768f69d64e8c4d2389",
+      "proposal_id": 13803
+    },
+    {
+      "patch_sha256": "c7422d90599a9b40e2a9ffaa43cd5d609db0b4658c3958768f69d64e8c4d2389",
+      "proposal_id": 13802
+    }
+  ],
+  "proposals": [
+    {
+      "accepted": true,
+      "accepted_ids": [
+        13802,
+        13803
+      ],
+      "ack_at": 1792027224.887,
+      "arm": "atm",
+      "arm_terminal": "committed",
+      "attempts": 1,
+      "batch_id": "batch-mv8uqo3c-caf01ea7",
+      "batch_size": 2,
+      "detail": null,
+      "events": [
+        {
+          "accepted_ids": [
+            13802,
+            13803
+          ],
+          "batch_id": "batch-mv8uqo3c-caf01ea7",
+          "batch_size": 2,
+          "member_proposal_ids": [
+            "13803",
+            "13802"
+          ],
+          "proposal_id": 13803,
+          "type": "batch"
+        },
+        {
+          "proposal_id": 13803,
+          "rename_count": 1,
+          "terminal": "committed",
+          "type": "commit"
+        }
+      ],
+      "executable_seconds": 30.0,
+      "first_submit": 1792027222.693,
+      "metrics": {},
+      "proposal_id": 13803,
+      "rename_at": 1792027224.734,
+      "retries": 0,
+      "stop_reason": "acked-in-window"
+    },
+    {
+      "accepted": true,
+      "accepted_ids": [
+        13802,
+        13803
+      ],
+      "ack_at": 1792027224.889,
+      "arm": "atm",
+      "arm_terminal": "committed",
+      "attempts": 1,
+      "batch_id": "batch-mv8uqo3c-caf01ea7",
+      "batch_size": 2,
+      "detail": null,
+      "events": [
+        {
+          "accepted_ids": [
+            13802,
+            13803
+          ],
+          "batch_id": "batch-mv8uqo3c-caf01ea7",
+          "batch_size": 2,
+          "member_proposal_ids": [
+            "13803",
+            "13802"
+          ],
+          "proposal_id": 13802,
+          "type": "batch"
+        },
+        {
+          "proposal_id": 13802,
+          "rename_count": 1,
+          "terminal": "committed",
+          "type": "commit"
+        }
+      ],
+      "executable_seconds": 30.0,
+      "first_submit": 1792027223.193,
+      "metrics": {},
+      "proposal_id": 13802,
+      "rename_at": 1792027224.734,
+      "retries": 0,
+      "stop_reason": "acked-in-window"
+    }
+  ],
+  "python": "3.12.3",
+  "schema": "hist-v2-harness-manifest/2",
+  "seed": 0
+}
