@@ -492,12 +492,12 @@ DRAFT HIST-v2 prereg（非 generation、尚未凍結、沒有 run）：[`working
 | harness v2 | [`benchmark-harness/hist-v2-harness-v2/`](./benchmark-harness/hist-v2-harness-v2/GENERATION.md)，`SHA256SUMS` sha256 `393ea1deec292674d6fe60b2a11ccf6fb47a0c7602af82f2ea2fcf402009e74c` |
 | ATM core merge | `cb25242433882d34b514b79338d1a00def53a875`（PR #297） |
 | 矩陣 | dev 題每個有資料的類別 1 題；臂四條；間隔只留 0 ms 與 500 ms；兩種順序；seed 0 |
-| SHA256SUMS sha256 | `ea1da1ab3fb1343b3be5ec21578468a2e30ae6f4edf01d92c32cfc451231ceb5` |
-| 上一份程序封印 | `0b9c83569cae021f0cfd63e1e7a7d25e9cb29927d8841e672b7a00ccf378cf87`（PR #299，merge `ae342aac`） |
+| SHA256SUMS sha256 | `50d3a7c0b23103f91ff9f9a76f2708e9be75e863b5fc909c78fddd5170b94233` |
+| 上一份程序封印 | `ea1da1ab3fb1343b3be5ec21578468a2e30ae6f4edf01d92c32cfc451231ceb5`；再上一份 `0b9c83569cae021f0cfd63e1e7a7d25e9cb29927d8841e672b7a00ccf378cf87`（PR #299，merge `ae342aac`） |
 | 檔案數 | 24（不含 SHA256SUMS） |
 | 驗證 | `sh benchmark-design/hist-v2-smoke-runbook/verify.sh benchmark-design/hist-v2-smoke-runbook` |
 
-沒有 `benchmark-trials/<date>-hist-v2-smoke/`。釘選不符、禁止階段、尚未批准，或 dev 題沒有歷史 patch 綁定時，`--execute` 都不建立 run 目錄。catalog fixture 不能代替分類器 v8 的 dev 題。harness v2 的 `SHA256SUMS` 仍是 `393ea1deec292674d6fe60b2a11ccf6fb47a0c7602af82f2ea2fcf402009e74c`。預先登記目錄沒有修改。
+沒有把本目錄當成 smoke generation。歷史題的 `target_file` 可以含目錄；重播在呼叫封存 harness 之前建立父目錄，不改 harness 位元組。釘選不符、禁止階段、尚未批准，或 dev 題沒有歷史 patch 綁定時，`--execute` 都不建立 run 目錄。catalog fixture 不能代替分類器 v8 的 dev 題。harness v2 的 `SHA256SUMS` 仍是 `393ea1deec292674d6fe60b2a11ccf6fb47a0c7602af82f2ea2fcf402009e74c`。預先登記目錄沒有修改。
 
 ## 32. 工作稿快照 2026-10-14：論文 2.0 在 HIST-v2 結果之前可寫的章節（DRAFT；非 generation；沒有 run）
 
@@ -547,7 +547,26 @@ pilot、main、held-out 仍是硬拒絕（退出碼 2）。要跑 smoke，需要
 | SHA256SUMS sha256 | `7895681e9833e1cecfc0a0c46cf89ab0204ecabd4f0ef72b385fdbe38d04dd77` |
 | 驗證 | `sh research/paper-v2/benchmark-main/2026-10-15-hist-v2-classify-v8/verify.sh` |
 
-pilot、主跑、留出集實驗仍不在這次範圍。dev 題沒有 B′ 與 D，所以後續 smoke 不會有這兩類的格子。
+pilot、主跑、留出集實驗仍不在這次範圍。dev 題沒有 B′ 與 D，所以 smoke 沒有這兩類的格子。
+
+## 35. HIST-v2 smoke（2026-10-15；作者批准 smoke only；trial-only）
+
+> **trial-only — 不得作為論文結果。** 只跑 dev 題。沒有執行 pilot、主跑或留出集。沒有 counterexample。不宣稱勝出。不是 C1′–C3′ 的證據。預先登記目錄與 harness v2 位元組沒有修改。
+
+| 項目 | 值 |
+|---|---|
+| 路徑 | [`benchmark-trials/2026-10-15-hist-v2-smoke/`](./benchmark-trials/2026-10-15-hist-v2-smoke/GENERATION.md) |
+| 批准 | 作者（repo owner）2026-10-15 06:56 Asia/Taipei，只准 HIST-v2 SMOKE |
+| 題目來源 | [`benchmark-main/2026-10-15-hist-v2-classify-v8/`](./benchmark-main/2026-10-15-hist-v2-classify-v8/GENERATION.md)，`SHA256SUMS` sha256 `7895681e9833e1cecfc0a0c46cf89ab0204ecabd4f0ef72b385fdbe38d04dd77` |
+| 抽題 | `set=dev` 每個有資料的類別 1 題：A、B、C、A′。缺 B′、D。拒絕留出列 213，沒有執行 |
+| 矩陣 | 4 題 × 4 臂 × 2 順序 × 2 間隔 = 64 格，全部執行。seed 0 |
+| 負控制 | 五個植入全部被抓到。每一個 `combined_success` 為 false |
+| counterexample | 沒有 |
+| 檔案數 | 841（不含 SHA256SUMS） |
+| SHA256SUMS sha256 | `fecb61c1178b55fba490507d8afeef1d57ecacb8e8e0a5cf37797574465aab8f` |
+| 驗證 | `sh research/paper-v2/benchmark-trials/2026-10-15-hist-v2-smoke/verify.sh` |
+
+`combined_success` 計數是各格裡算成功的 proposal 數，不是勝出比較。file_lock／B 是 7／8，其餘 A、B、C 是 4／8，A′ 在 atm、steward、textual_merge_file 是 8／8、在 file_lock 是 4／8。pilot、main、held-out 仍是退出碼 2。
 
 ## 6. 不在 repo 的參照
 - ATM pin 原始碼：GitHub `eaglhuang/AI-Atomic-Framework` commit `5692474f7db70ab52a7a71c8af4867609e7e4b43`（r3 另加 `bea35380d7f381f998c9930fa95f01b999c7f208`，box tarball `/workspace/atm-main-bea35380/atm-main.tar.gz` sha256 `9346e5b175b176618f435aeb4b41ab93ef7575f9bf77d77c47a5aeac87ad34b5`；r4 另加 `2118bc66efb3ac3bc0ddaede6a2f7cb18526b030`，box tarball `/workspace/atm-main-2118bc66/atm-main.tar.gz` sha256 `aa959607c35c51b7fc3c4e3d81b3d9e979ee62f4d9361ef9e9f5ee72e78abd88`；r5 另加 `37847584e24afc08ea58cfe380bb5b1220fbe335`，box tarball `/workspace/atm-main-37847584/atm-main.tar.gz` sha256 `e17a90ddceaf3c70d580c96e31f14cf8251d5a664985c1eb494f0d8db8045e3d`；r6 另加 `b35a6141bd5bfbaec654f1cd3079323581b04074`，box tarball `/workspace/atm-main-b35a6141/atm-main.tar.gz` sha256 `93fa7839d8e0fee51e5ad224833df2b57397fead3e77e0528117f21f5d5e59ef`）；box tarball `/workspace/atm-main-5692474f/atm-main.tar.gz` sha256 `1d498a397e6a5db119d40b8f539dc165cb0028fbfe9577f953023f8ec8d45795`。

@@ -22,4 +22,8 @@ trial-only — 不得作為論文結果
 
 作者於 2026-10-15 06:56（Asia/Taipei）批准只跑 smoke。`--execute` 在批准值吻合，而且抽中的每一題都有 `hist-v2-dev-replay/1` 歷史 patch 綁定時，才會重播該題並封存。catalog fixture 不能代替 dev 題。pilot、main、held-out 仍是退出碼 2。
 
-本次倉庫沒有封存的分類器 v8 `items.jsonl`，也沒有歷史 git 物件。因此沒有 smoke generation，沒有勝出主張，也不是 C1′–C3′ 的證據。上一份程序封印的 `SHA256SUMS` sha256 是 `0b9c83569cae021f0cfd63e1e7a7d25e9cb29927d8841e672b7a00ccf378cf87`。預先登記目錄沒有修改。
+寫下執行閘時，倉庫還沒有封存的分類器 v8 `items.jsonl`。因此當時沒有 smoke generation，沒有勝出主張，也不是 C1′–C3′ 的證據。上一份程序封印（PR #299）的 `SHA256SUMS` sha256 是 `0b9c83569cae021f0cfd63e1e7a7d25e9cb29927d8841e672b7a00ccf378cf87`。預先登記目錄沒有修改。
+
+## 2026-10-15 巢狀路徑
+
+歷史題的 `target_file` 可以含目錄。重播在呼叫封存 harness 的 `prepare_workspace` 之前建立父目錄，不改 harness 位元組。分類器 v8 題目已封存在 `benchmark-main/2026-10-15-hist-v2-classify-v8/`（`SHA256SUMS` sha256 `7895681e9833e1cecfc0a0c46cf89ab0204ecabd4f0ef72b385fdbe38d04dd77`）。本目錄仍是程序，不是 smoke generation。緊接在前的程序封印 `SHA256SUMS` sha256 是 `ea1da1ab3fb1343b3be5ec21578468a2e30ae6f4edf01d92c32cfc451231ceb5`。預先登記目錄與 harness v2 沒有修改。

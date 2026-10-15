@@ -1,5 +1,6 @@
 """Dev-item replay accepts a historical binding and refuses catalog fixtures."""
 
+import hashlib
 import json
 import os
 import sys
@@ -58,6 +59,29 @@ class ReplayBindingTests(unittest.TestCase):
             self.assertEqual(observation["accepted_ids"], [11, 12])
             self.assertGreater(observation["combined_success_count"], 0)
 
+    def test_nested_historical_path_opens_one_cell(self) -> None:
+        item, binding = _historical_item(target="pkg/dir/notes.txt")
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp)
+            digest = hashlib.sha256(item["id"].encode("utf-8")).hexdigest()
+            path = directory / f"{digest}.json"
+            path.write_text(json.dumps(binding), encoding="utf-8")
+            self.assertEqual(binding_problems([item], directory), [])
+            outcome = run_bound_cell(
+                item,
+                path,
+                {
+                    "item_id": item["id"],
+                    "arm": "file_lock",
+                    "order": "forward",
+                    "inter_arrival_ms": 0,
+                    "seed": 0,
+                },
+            )
+            self.assertTrue((outcome["workspace"] / "pkg/dir/notes.txt").is_file())
+            self.assertIsNone(outcome["observation"]["counterexample"])
+            self.assertEqual(outcome["observation"]["accepted_ids"], [11, 12])
+
     def test_staged_raw_is_inside_the_seal(self) -> None:
         pins = load_pins()
         with tempfile.TemporaryDirectory() as tmp:
@@ -82,21 +106,21 @@ class ReplayBindingTests(unittest.TestCase):
             self.assertIn("raw/cell.txt", listed)
 
 
-def _historical_item() -> tuple[dict, dict]:
+def _historical_item(target: str = "notes.txt") -> tuple[dict, dict]:
     base = "red\nblue\ngreen\n"
-    first = patch_replace_line("notes.txt", base, 0, "RED")
-    second = patch_replace_line("notes.txt", base, 2, "GREEN")
+    first = patch_replace_line(target, base, 0, "RED")
+    second = patch_replace_line(target, base, 2, "GREEN")
     body_first = apply_unified_patch(base, first)
     body_second = apply_unified_patch(base, second)
     both = apply_unified_patch(body_first, second)
-    item_id = "replay-unit:dev:11_12:notes.txt"
+    item_id = f"replay-unit:dev:11_12:{target}"
     item = {
         "schema_version": "hist-v2-items/8",
         "id": item_id,
         "project": "replay-unit",
         "set": "dev",
         "write_class": "A",
-        "target_file": "notes.txt",
+        "target_file": target,
         "rules_sha256": load_pins()["classifier_rules_sha256"],
         "send_order": [11, 12],
         "patches": [
