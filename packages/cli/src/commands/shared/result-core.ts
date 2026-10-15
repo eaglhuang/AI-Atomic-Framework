@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { sealPublishedCommands } from './paste-command.ts';
 
 let outputJsonPath: string | null = null;
 let globalSummaryProjection = false;
@@ -392,7 +393,9 @@ export function makeResult({ ok, command, cwd, mode = 'standalone', messages = [
   messages?: CommandMessage[];
   evidence?: unknown;
 }): CommandResult {
-  return { ok, command, mode, cwd, messages, evidence: evidence as Record<string, unknown> };
+  const result = { ok, command, mode, cwd, messages, evidence: evidence as Record<string, unknown> };
+  if (command === 'next' || command === 'hook' || command === 'integration') sealPublishedCommands(result);
+  return result;
 }
 export function setSummaryProjection(enabled: boolean): void {
   globalSummaryProjection = enabled;

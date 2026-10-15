@@ -272,7 +272,10 @@ export function extractPromptFileTokens(prompt: string): readonly string[] {
 export function buildPromptSuggestedRoutes(prompt: string, commandPrefix = 'node atm.mjs', actorId?: string | null) {
   const files = extractPromptFileTokens(prompt);
   const actor = actorId?.trim() && !/<[^>\r\n]+>/.test(actorId) ? actorId.trim() : '';
+  // Open stays a runnable dry-run when flags are still unknown. The fast claim
+  // is different: omitting --actor looks like a one-step claim and then fails.
   const actorFlag = actor ? ` --actor ${quoteCliToken(actor)}` : '';
+  const fastActorFlag = ` --actor ${actor ? quoteCliToken(actor) : '<id>'}`;
   const title = prompt.length > 72 ? `${prompt.slice(0, 69)}...` : prompt;
   const missingOpenFlags = [
     actor ? null : '--actor',
@@ -294,9 +297,11 @@ export function buildPromptSuggestedRoutes(prompt: string, commandPrefix = 'node
   if (files.length > 0) {
     const quickPrompt = /^\s*quick fix:/i.test(prompt) ? prompt : `quick fix: ${prompt}`;
     routes.push({
-      when: `small change limited to ${files.join(', ')}`,
+      when: actor
+        ? `small change limited to ${files.join(', ')}`
+        : `small change limited to ${files.join(', ')}; --actor is missing, so this is not a one-step claim`,
       channel: 'fast',
-      command: `${commandPrefix} next --claim${actorFlag} --prompt ${quoteCliValue(quickPrompt)} --json`
+      command: `${commandPrefix} next --claim${fastActorFlag} --prompt ${quoteCliValue(quickPrompt)} --json`
     });
   }
   routes.push({

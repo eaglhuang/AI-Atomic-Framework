@@ -1,4 +1,5 @@
-import { quoteCliValue } from './view-projections.ts';
+import { sealPasteCommand } from '../shared/paste-command.ts';
+import { quoteCliToken, quoteCliValue } from './view-projections.ts';
 
 export type ClaimCommandShape = 'task-scoped' | 'prompt-scoped';
 
@@ -8,12 +9,16 @@ export interface TaskScopedClaimCommandContract {
   readonly taskScopedClaimCommand: string;
   readonly claimCommandShape: ClaimCommandShape;
   readonly explicitTaskSelector: string | null;
+  readonly pasteReady: boolean;
+  readonly missing: readonly string[];
+  readonly commandTemplate?: string;
 }
 
 export interface BuildTaskScopedClaimCommandInput {
   readonly selectedTaskId: string | null;
   readonly explicitTaskSelector: string | null;
   readonly userPrompt: string | null;
+  readonly actorId?: string | null;
 }
 
 /**
@@ -27,15 +32,22 @@ export function buildTaskScopedClaimCommand(input: BuildTaskScopedClaimCommandIn
   const selectedTaskId = input.selectedTaskId.trim();
   const promptValue = input.userPrompt?.trim() || selectedTaskId;
   const explicitTaskSelector = input.explicitTaskSelector?.trim() || null;
-  const taskScopedClaimCommand = `node atm.mjs next --claim --actor <id> --task ${selectedTaskId} --auto-intent --json`;
-  const normalClaimCommand = explicitTaskSelector
-    ? `node atm.mjs next --claim --actor <id> --task ${explicitTaskSelector} --auto-intent --json`
-    : `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(promptValue)} --auto-intent --json`;
+  const suppliedActor = input.actorId?.trim() ?? '';
+  const actor = suppliedActor && !/<[^>\r\n]+>/.test(suppliedActor) ? quoteCliToken(suppliedActor) : '<id>';
+  const taskScoped = sealPasteCommand(`node atm.mjs next --claim --actor ${actor} --task ${selectedTaskId} --auto-intent --json`);
+  const normal = sealPasteCommand(explicitTaskSelector
+    ? `node atm.mjs next --claim --actor ${actor} --task ${explicitTaskSelector} --auto-intent --json`
+    : `node atm.mjs next --claim --actor ${actor} --prompt ${quoteCliValue(promptValue)} --auto-intent --json`);
+  const missing = [...new Set([...normal.missing, ...taskScoped.missing])].sort();
+  const pasteReady = normal.ready && taskScoped.ready;
   return {
     schemaId: 'atm.nextTaskScopedClaimCommand.v1',
-    normalClaimCommand,
-    taskScopedClaimCommand,
+    normalClaimCommand: (normal.ready ? normal.command : normal.commandTemplate) ?? '',
+    taskScopedClaimCommand: (taskScoped.ready ? taskScoped.command : taskScoped.commandTemplate) ?? '',
     claimCommandShape: explicitTaskSelector ? 'task-scoped' : 'prompt-scoped',
-    explicitTaskSelector
+    explicitTaskSelector,
+    pasteReady,
+    missing,
+    ...(pasteReady ? {} : { commandTemplate: normal.commandTemplate ?? taskScoped.commandTemplate })
   };
 }
