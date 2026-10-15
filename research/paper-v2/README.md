@@ -32,6 +32,7 @@ ATM（AI-Atomic-Framework）論文 2.0（composer＋中立 steward，RQ2 主臂 
 | 相關工作文獻集 2026-10-15 | [`related-work/2026-10-15/`](./related-work/2026-10-15/GENERATION.md)（2026-10-15；14 篇索引、評論文與 BibTeX。9 份 CC 授權 PDF 原樣轉存；5 篇 arXiv 非專屬授權只留連結，含 SDD 2609.00252 與 Apodex 1.1 2608.23283。不是實驗 generation、沒有 run、不宣稱勝出） |
 | 相關工作文獻集 2026-10-15-r2 | [`related-work/2026-10-15-r2/`](./related-work/2026-10-15-r2/GENERATION.md)（2026-10-15；19 條 BibTeX 與 PR 衝突證據。沒有新 PDF。新增 5 條只留連結。已封存的 `2026-10-15/` 不修改。不是實驗 generation、沒有 run、不宣稱勝出） |
 | HIST-v3 預先登記草稿 | [`prereg-v3-draft/2026-10-15/`](./prereg-v3-draft/2026-10-15/GENERATION.md)（2026-10-15 第二版；**DRAFT，NOT FROZEN，exploratory**。尚未批准。以真實 AI 代理研究為主。benchmark 已決定為 SWE-bench Verified，CooperBench 為備案。CAID §4.2 已按原文核對。HIST-v2 預先登記 v2.0 維持凍結。ATM 只處理同一台機器、同一個 repo 的代理衝突；外部 git 衝突仍走 merge／rebase。沒有 run、不宣稱勝出） |
+| prereg-v3 真實代理可行性 2026-10-15 | [`prereg-v3-feasibility/2026-10-15/`](./prereg-v3-feasibility/2026-10-15/README.md)（2026-10-15；同一台 VM 上的無頭程式代理 CLI 安裝與非互動認證檢查。可行性，不是結果。沒有並行編輯示範、沒有 run、不宣稱勝出） |
 | 校驗 | `generations/<gen>/verify.sh`（唯讀；`sha256sum -c SHA256SUMS`） |
 | benchmark-trials/2026-10-09-hist-smoke, benchmark-trials/2026-10-09-hist-pilot | 試跑（trial runs, not formal results）：歷史真實 PR benchmark 冒煙＋Django pilot，ATM pin b35a6141（2026-10-09） |
 | benchmark-trials/2026-10-09-hist-mining | 只挖掘、沒有 run（不列入正式結果）：六專案合併 commit base 重新挖掘、可行性 dry-run、prereg v1.1 提案草稿（未套用）（2026-10-09） |
@@ -96,5 +97,7 @@ sh research/paper-v2/related-work/2026-10-15-r2/verify.sh research/paper-v2/rela
 # 預期：OK: 5 files verified (read-only) in research/paper-v2/related-work/2026-10-15-r2
 sh research/paper-v2/prereg-v3-draft/2026-10-15/verify.sh research/paper-v2/prereg-v3-draft/2026-10-15
 # 預期：OK: 3 files verified (read-only) in research/paper-v2/prereg-v3-draft/2026-10-15
+sh research/paper-v2/prereg-v3-feasibility/2026-10-15/verify.sh research/paper-v2/prereg-v3-feasibility/2026-10-15
+# 預期：OK: 7 files verified (read-only) in research/paper-v2/prereg-v3-feasibility/2026-10-15
 ```
 **注意：** `harness/reproduce.sh`（r1 版）的 verify 模式會重寫 manifest／checksums，**不可**用來驗證 r1（外審 P0-3）。r2–r6 已把 reproduce 拆成 verify／analyze／rerun／seal；驗證只用各代 `verify.sh`。

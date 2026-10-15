@@ -1,0 +1,17 @@
+label: feasibility, not results
+Installers wrote under the VM user home. Nothing from these installs was copied into the git repo.
+
+cursor: bash official https://cursor.com/install
+version pin inside that script: 2026.10.14-941492e linux/x64
+result: symlinks ~/.local/bin/agent and ~/.local/bin/cursor-agent
+
+claude: bash official https://claude.ai/install.sh stable
+result: ~/.local/bin/claude -> Claude Code 2.1.292
+installer note: ~/.local/bin was not on PATH until exported for the checks
+
+codex: npm install -g --prefix "$HOME/.local" @openai/codex
+result: codex-cli 0.162.1
+npm reported: added 2 packages
+
+parallel installer wall clock: about 11.6s
+all three --version commands printed a version afterwards
