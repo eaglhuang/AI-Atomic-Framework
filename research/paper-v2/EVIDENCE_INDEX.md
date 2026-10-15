@@ -553,7 +553,9 @@ pilot、主跑、留出集實驗仍不在這次範圍。dev 題沒有 B′ 與 D
 
 ## 35. HIST-v2 smoke（2026-10-15；作者批准 smoke only；trial-only）
 
-> **trial-only — 不得作為論文結果。** 只跑 dev 題。沒有執行 pilot、主跑或留出集。沒有 counterexample。不宣稱勝出。不是 C1′–C3′ 的證據。預先登記目錄與 harness v2 位元組沒有修改。
+> **superseded／invalid — 不得作為論文結果。** 封存位元組沒有改。2026-10-15 診斷確認 harness v2 把歷史 diff 套不上共同 base 記成 `error`，而且沒有做分類器的三方 merge。受影響的數與臂見 [`benchmark-trials/2026-10-15-hist-v2-pilot-diagnosis/DIAGNOSIS_zh.md`](./benchmark-trials/2026-10-15-hist-v2-pilot-diagnosis/DIAGNOSIS_zh.md) 第 4 節。旁註：[`benchmark-trials/2026-10-15-hist-v2-smoke.SUPERSEDED.md`](./benchmark-trials/2026-10-15-hist-v2-smoke.SUPERSEDED.md)。下面的原始計數保留，只說明當時寫了什麼，不能再引用。
+
+> **trial-only — 不得作為論文結果。** 只跑 dev 題。沒有執行 pilot、主跑或留出集。沒有 forensic counterexample。不宣稱勝出。不是 C1′–C3′ 的證據。預先登記目錄與 harness v2 位元組沒有修改。
 
 | 項目 | 值 |
 |---|---|
@@ -572,7 +574,9 @@ pilot、主跑、留出集實驗仍不在這次範圍。dev 題沒有 B′ 與 D
 
 ## 36. HIST-v2 pilot（2026-10-15；作者批准 pilot only；不是論文結果）
 
-> **pilot — 不得作為論文結果。** 只跑 dev 題。沒有執行主跑或留出集。沒有 counterexample。不宣稱勝出。不是 C1′–C3′ 的證據。預先登記目錄與 harness v2 位元組沒有修改。
+> **superseded／invalid — 不得作為論文結果。** 封存位元組沒有改。2026-10-15 診斷確認 harness v2 的 mine／終態 bug。600 筆 `error` 與受影響的成功計數見 [`benchmark-trials/2026-10-15-hist-v2-pilot-diagnosis/DIAGNOSIS_zh.md`](./benchmark-trials/2026-10-15-hist-v2-pilot-diagnosis/DIAGNOSIS_zh.md) 第 2 與第 4 節。旁註：[`benchmark-trials/2026-10-15-hist-v2-pilot.SUPERSEDED.md`](./benchmark-trials/2026-10-15-hist-v2-pilot.SUPERSEDED.md)。下面的原始計數保留，只說明當時寫了什麼，不能再引用。沒有 pilot-r2。
+
+> **pilot — 不得作為論文結果。** 只跑 dev 題。沒有執行主跑或留出集。沒有 forensic counterexample。不宣稱勝出。不是 C1′–C3′ 的證據。預先登記目錄與 harness v2 位元組沒有修改。
 
 | 項目 | 值 |
 |---|---|
@@ -609,7 +613,36 @@ pilot、主跑、留出集實驗仍不在這次範圍。dev 題沒有 B′ 與 D
 
 §6 所記的 box `refs/` 副本仍未另存。`pdf/2607.00041_ATM-v1.pdf` 是這份文獻集裡依 CC BY 4.0 原樣轉存的 arXiv PDF，sha256 `f7d41247cc590ab70ebc9042a014a9b463ba9d76db31d8faaa7754f5a9006f24`。
 
-## 38. 相關工作文獻集 r2（2026-10-15；閱讀封存，沒有新 PDF）
+## 38. HIST-v2 pilot 診斷（2026-10-15；不是實驗 generation）
+
+> **診斷 — 不得作為論文結果。** 沒有重跑 pilot，沒有主跑，沒有留出集。不宣稱勝出。smoke 與 pilot 標成 superseded／invalid，封存位元組沒有改。
+
+| 項目 | 值 |
+|---|---|
+| 路徑 | [`benchmark-trials/2026-10-15-hist-v2-pilot-diagnosis/`](./benchmark-trials/2026-10-15-hist-v2-pilot-diagnosis/GENERATION.md) |
+| 報告 | [`benchmark-trials/2026-10-15-hist-v2-pilot-diagnosis/DIAGNOSIS_zh.md`](./benchmark-trials/2026-10-15-hist-v2-pilot-diagnosis/DIAGNOSIS_zh.md) |
+| 判定 | file_lock 的 A′ 差距與 A 的 50 格是鎖內 hunk。600 筆 `error` 與 steward／textual_merge_file 在那 15 題少記的成功，是 harness v2 把 context mismatch 記成 `error`，而且沒有做三方 mine |
+| 反例 | `tests/test_three_way_mine.py`（harness v3）。封存 pilot 沒有遺失效果、損壞或 inconsistent |
+| 論文引用 | 見報告第 5 節。`EVIDENCE_INDEX` §35、§36 與兩份 `STOP_REPORT.md` 有這些數。論文草稿沒有 |
+| 檔案數 | 3（不含 SHA256SUMS） |
+| SHA256SUMS sha256 | `de8ba004ed3c159acde639d04c0098cab3b4161d64a25dc219cb0bbeed574514` |
+| 驗證 | `sh research/paper-v2/benchmark-trials/2026-10-15-hist-v2-pilot-diagnosis/verify.sh` |
+
+## 39. HIST-v2 harness v3（2026-10-15；fixture 接線，沒有正式 run）
+
+> **harness 接線 — 不得作為論文結果。** 沒有 smoke、pilot-r2、主跑或留出集。不宣稱勝出。v2 位元組沒有改，`SHA256SUMS` 仍是 `393ea1deec292674d6fe60b2a11ccf6fb47a0c7602af82f2ea2fcf402009e74c`。
+
+| 項目 | 值 |
+|---|---|
+| 路徑 | [`benchmark-harness/hist-v2-harness-v3/`](./benchmark-harness/hist-v2-harness-v3/GENERATION.md) |
+| 修正 | §9 均勻抖動。proposal 帶 parent／head 時，textual_merge_file、steward、atm 用三方 mine。context mismatch 記 `rejected-conflict`。file_lock 仍用歷史 hunk |
+| 測試 | 26 項，含抖動與三方 mine 反例。v2 的 `verify.sh` 仍通過 |
+| 沒有重跑 | 封存 replay 綁定沒有 parent／head，不能靠舊綁定做 pilot-r2 |
+| 檔案數 | 46（不含 SHA256SUMS） |
+| SHA256SUMS sha256 | `07a8f10f9894aa64faf42f7aef3daf33c7c685151e9b3318d9bedb1dbad18a59` |
+| 驗證 | `sh research/paper-v2/benchmark-harness/hist-v2-harness-v3/verify.sh` |
+
+## 40. 相關工作文獻集 r2（2026-10-15；閱讀封存，沒有新 PDF）
 
 > **閱讀封存 — 不得作為論文結果。** 沒有 run。不宣稱勝出。不是 C1′–C3′ 的證據。已封存的 `related-work/2026-10-15/` 沒有修改。本目錄沒有 PDF。
 
@@ -625,7 +658,7 @@ pilot、主跑、留出集實驗仍不在這次範圍。dev 題沒有 B′ 與 D
 | SHA256SUMS sha256 | `24ed0e0c8d1938a4265584945b3ffc9227744c9dbbc23c35264e9d8b6873eddd` |
 | 驗證 | `sh research/paper-v2/related-work/2026-10-15-r2/verify.sh` |
 
-## 39. HIST-v3 預先登記草稿（2026-10-15；DRAFT，NOT FROZEN，exploratory）
+## 41. HIST-v3 預先登記草稿（2026-10-15；DRAFT，NOT FROZEN，exploratory）
 
 > **DRAFT — NOT FROZEN — exploratory。** 尚未經作者批准。不是凍結的方法，不是實驗證據，沒有 run，不宣稱勝出。HIST-v2 預先登記 v2.0（`benchmark-prereg/2026-10-14-hist-v2.0/`）維持凍結，本目錄不修改它，也不取代它。
 
