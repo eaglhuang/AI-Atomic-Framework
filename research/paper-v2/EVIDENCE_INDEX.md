@@ -568,7 +568,28 @@ pilot、主跑、留出集實驗仍不在這次範圍。dev 題沒有 B′ 與 D
 | SHA256SUMS sha256 | `fecb61c1178b55fba490507d8afeef1d57ecacb8e8e0a5cf37797574465aab8f` |
 | 驗證 | `sh research/paper-v2/benchmark-trials/2026-10-15-hist-v2-smoke/verify.sh` |
 
-`combined_success` 計數是各格裡算成功的 proposal 數，不是勝出比較。file_lock／B 是 7／8，其餘 A、B、C 是 4／8，A′ 在 atm、steward、textual_merge_file 是 8／8、在 file_lock 是 4／8。pilot、main、held-out 仍是退出碼 2。
+`combined_success` 計數是各格裡算成功的 proposal 數，不是勝出比較。file_lock／B 是 7／8，其餘 A、B、C 是 4／8，A′ 在 atm、steward、textual_merge_file 是 8／8、在 file_lock 是 4／8。寫下這一段時，pilot、main、held-out 仍是退出碼 2。
+
+## 36. HIST-v2 pilot（2026-10-15；作者批准 pilot only；不是論文結果）
+
+> **pilot — 不得作為論文結果。** 只跑 dev 題。沒有執行主跑或留出集。沒有 counterexample。不宣稱勝出。不是 C1′–C3′ 的證據。預先登記目錄與 harness v2 位元組沒有修改。
+
+| 項目 | 值 |
+|---|---|
+| 路徑 | [`benchmark-trials/2026-10-15-hist-v2-pilot/`](./benchmark-trials/2026-10-15-hist-v2-pilot/GENERATION.md) |
+| 批准 | 作者（repo owner）2026-10-15 15:19 Asia/Taipei，只准 HIST-v2 PILOT。批准值 `issue-292-author-approved-pilot-only` |
+| 題目來源 | [`benchmark-main/2026-10-15-hist-v2-classify-v8/`](./benchmark-main/2026-10-15-hist-v2-classify-v8/GENERATION.md)，`SHA256SUMS` sha256 `7895681e9833e1cecfc0a0c46cf89ab0204ecabd4f0ef72b385fdbe38d04dd77` |
+| 抽題 | `set=dev`、恰好兩份 proposal。A 10、B 10、C 1、A′ 8，合計 29。缺 B′、D。拒絕留出列 213，沒有執行 |
+| 臂 | steward、file_lock、textual_merge_file。steward 對應 §3.1 的 ATM 批次協調器處置臂。harness 的 `atm` 臂不跑 |
+| 矩陣 | 29 題 × 3 臂 × 2 順序 × 5 間隔 × 2 seed = 1740 格，全部執行 |
+| 負控制 | 五個植入全部被抓到。每一個 `combined_success` 為 false |
+| counterexample | 沒有 |
+| 偏離 | 凍結 §8 沒有密封題數，題數來自該次批准的 about 30 groups。封存 harness 沒有 §9 的均勻抖動，間隔用名義值 |
+| 檔案數 | 19149（不含 SHA256SUMS） |
+| SHA256SUMS sha256 | `7e4773b2bbe124c9afea211efd43efdf5543695cdf6e430ce8970dd80e9fb938` |
+| 驗證 | `sh research/paper-v2/benchmark-trials/2026-10-15-hist-v2-pilot/verify.sh` |
+
+`combined_success` 是各格裡算成功的 proposal 數，不是勝出比較。file_lock 的 A 是 250／400，steward 與 textual_merge_file 是 300／400；A′ 是 160／320，另外兩條臂是 320／320；B 是 221／400，另外兩條臂是 200／400。C 三條臂都是 20／40。主跑與留出集仍是退出碼 2。
 
 ## 6. 不在 repo 的參照
 - ATM pin 原始碼：GitHub `eaglhuang/AI-Atomic-Framework` commit `5692474f7db70ab52a7a71c8af4867609e7e4b43`（r3 另加 `bea35380d7f381f998c9930fa95f01b999c7f208`，box tarball `/workspace/atm-main-bea35380/atm-main.tar.gz` sha256 `9346e5b175b176618f435aeb4b41ab93ef7575f9bf77d77c47a5aeac87ad34b5`；r4 另加 `2118bc66efb3ac3bc0ddaede6a2f7cb18526b030`，box tarball `/workspace/atm-main-2118bc66/atm-main.tar.gz` sha256 `aa959607c35c51b7fc3c4e3d81b3d9e979ee62f4d9361ef9e9f5ee72e78abd88`；r5 另加 `37847584e24afc08ea58cfe380bb5b1220fbe335`，box tarball `/workspace/atm-main-37847584/atm-main.tar.gz` sha256 `e17a90ddceaf3c70d580c96e31f14cf8251d5a664985c1eb494f0d8db8045e3d`；r6 另加 `b35a6141bd5bfbaec654f1cd3079323581b04074`，box tarball `/workspace/atm-main-b35a6141/atm-main.tar.gz` sha256 `93fa7839d8e0fee51e5ad224833df2b57397fead3e77e0528117f21f5d5e59ef`）；box tarball `/workspace/atm-main-5692474f/atm-main.tar.gz` sha256 `1d498a397e6a5db119d40b8f539dc165cb0028fbfe9577f953023f8ec8d45795`。

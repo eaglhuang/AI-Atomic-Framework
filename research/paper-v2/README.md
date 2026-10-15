@@ -24,6 +24,7 @@ ATM（AI-Atomic-Framework）論文 2.0（composer＋中立 steward，RQ2 主臂 
 | HIST-v2 smoke runbook | [`benchmark-design/hist-v2-smoke-runbook/`](./benchmark-design/hist-v2-smoke-runbook/RUNBOOK_zh.md)（2026-10-14 程序。2026-10-15 加上 smoke 重播閘，以及只放行 pilot 的批准值 `issue-292-author-approved-pilot-only`。`main` 與 `held-out` 仍是退出碼 2。不宣稱勝出） |
 | HIST-v2 分類器 v8 全候選集 | [`benchmark-main/2026-10-15-hist-v2-classify-v8/`](./benchmark-main/2026-10-15-hist-v2-classify-v8/GENERATION.md)（2026-10-15；4095 題，dev replay 綁定 3061。沒有臂。不宣稱勝出） |
 | HIST-v2 smoke trial | [`benchmark-trials/2026-10-15-hist-v2-smoke/`](./benchmark-trials/2026-10-15-hist-v2-smoke/GENERATION.md)（2026-10-15；只跑 dev 4 題、64 格。拒絕留出列 213。缺 B′、D。負控制全部抓到。沒有 counterexample。trial-only，不宣稱勝出，不是 C1′–C3′ 證據） |
+| HIST-v2 pilot | [`benchmark-trials/2026-10-15-hist-v2-pilot/`](./benchmark-trials/2026-10-15-hist-v2-pilot/GENERATION.md)（2026-10-15；作者批准 pilot only。dev 29 題、三條主比較臂、1740 格。負控制全部抓到。沒有 counterexample。pilot，不是論文結果，不宣稱勝出） |
 | 校驗 | `generations/<gen>/verify.sh`（唯讀；`sha256sum -c SHA256SUMS`） |
 | benchmark-trials/2026-10-09-hist-smoke, benchmark-trials/2026-10-09-hist-pilot | 試跑（trial runs, not formal results）：歷史真實 PR benchmark 冒煙＋Django pilot，ATM pin b35a6141（2026-10-09） |
 | benchmark-trials/2026-10-09-hist-mining | 只挖掘、沒有 run（不列入正式結果）：六專案合併 commit base 重新挖掘、可行性 dry-run、prereg v1.1 提案草稿（未套用）（2026-10-09） |
@@ -75,6 +76,7 @@ sh research/paper-v2/benchmark-prereg/2026-10-14-hist-v2.0/verify.sh research/pa
 # 預期：OK: 5 files verified (read-only) in research/paper-v2/benchmark-prereg/2026-10-14-hist-v2.0
 sh research/paper-v2/benchmark-harness/hist-v2-harness-v2/verify.sh research/paper-v2/benchmark-harness/hist-v2-harness-v2
 sh research/paper-v2/benchmark-design/hist-v2-smoke-runbook/verify.sh research/paper-v2/benchmark-design/hist-v2-smoke-runbook
+sh research/paper-v2/benchmark-trials/2026-10-15-hist-v2-pilot/verify.sh research/paper-v2/benchmark-trials/2026-10-15-hist-v2-pilot
 sh research/paper-v2/working-docs/2026-10-14/verify.sh research/paper-v2/working-docs/2026-10-14
 # 預期：OK: 3 files verified (read-only) in research/paper-v2/working-docs/2026-10-14
 ```
