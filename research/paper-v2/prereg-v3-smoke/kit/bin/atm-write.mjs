@@ -7,6 +7,7 @@
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { appendFileSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import net from 'node:net';
 import path from 'node:path';
 
 const STEWARD_ID = 'neutral-write-steward';
@@ -43,6 +44,53 @@ if (!fileArg || !patchArg) {
   fail('usage', 'usage: atm-write <file> <patch> [--base-file path] [--actor id] [--task id] [--message text]');
 }
 
+if (process.env.PREREG_STEWARD_SOCK) {
+  await runStewardClient();
+}
+
+async function runStewardClient() {
+  const patch = patchArg === '-' ? readFileSync(0, 'utf8') : readFileSync(path.resolve(patchArg), 'utf8');
+  const baseFile = argValue('--base-file');
+  const payload = {
+    file: fileArg,
+    patch,
+    actor: argValue('--actor') || process.env.ATM_ACTOR || 'prereg-session',
+    task: argValue('--task') || process.env.ATM_TASK || 'prereg',
+    message: argValue('--message') || 'prereg-v3-smoke'
+  };
+  if (baseFile) payload.baseText = readFileSync(path.resolve(baseFile), 'utf8');
+  const response = await new Promise((resolve, reject) => {
+    const socket = net.createConnection(process.env.PREREG_STEWARD_SOCK);
+    let buf = '';
+    const timer = setTimeout(() => {
+      socket.destroy();
+      reject(new Error('steward socket 逾時'));
+    }, 120000);
+    socket.setEncoding('utf8');
+    socket.on('error', (error) => {
+      clearTimeout(timer);
+      reject(error);
+    });
+    socket.on('connect', () => socket.write(`${JSON.stringify(payload)}\n`));
+    socket.on('data', (chunk) => {
+      buf += chunk;
+    });
+    socket.on('end', () => {
+      clearTimeout(timer);
+      try {
+        resolve(JSON.parse(buf));
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }).catch((error) => {
+    fail('steward-socket', `無法透過 steward socket 寫入：${error.message}`);
+  });
+  if (response.stdout) process.stdout.write(response.stdout);
+  if (response.stderr) process.stderr.write(response.stderr);
+  process.exit(Number.isInteger(response.exitCode) ? response.exitCode : 1);
+}
+
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf8'));
 }
@@ -76,13 +124,6 @@ function parseCli(result) {
     }
   }
   return null;
-}
-
-function chmodTree(mode, root) {
-  const result = spawnSync('chmod', ['-R', mode, root], { encoding: 'utf8' });
-  if (result.status !== 0) {
-    fail('chmod', `chmod ${mode} 失敗：${result.stderr || result.stdout || result.status}`);
-  }
 }
 
 function gitText(repo, args, safePath) {
@@ -143,10 +184,12 @@ if (!cli || !existsSync(cli) || cliVersion(cli, safePath) !== '0.1.20') {
   fail('cli-unavailable', '公開 CLI @ai-atomic-framework/cli@0.1.20 不可用。中止寫入。沒有 claim 退路。', { cli: cli || null });
 }
 
-chmodTree('u+w', writableRoot);
-
 const relativeFile = fileArg.replace(/\\/g, '/').replace(/^\.\//, '');
-const targetPath = path.join(writableRoot, relativeFile);
+const targetPath = path.resolve(writableRoot, relativeFile);
+const relativeCheck = path.relative(writableRoot, targetPath);
+if (relativeCheck.startsWith('..') || path.isAbsolute(relativeCheck)) {
+  fail('path', '目標檔超出工作樹', { file: relativeFile });
+}
 const actorId = argValue('--actor') || process.env.ATM_ACTOR || 'prereg-session';
 const taskId = argValue('--task') || process.env.ATM_TASK || `prereg-${actorId}`;
 const message = argValue('--message') || `prereg-v3-smoke: ${taskId} ${relativeFile}`;
@@ -154,28 +197,20 @@ const baseFile = argValue('--base-file');
 const patch = patchArg === '-' ? readFileSync(0, 'utf8') : readFileSync(path.resolve(patchArg), 'utf8');
 if (!patch.includes('@@')) fail('patch', 'patch 不是 unified diff', { file: relativeFile });
 
-let exitCode = 1;
-try {
-  const result = submitThroughPublicCli({
-    writableRoot,
-    cli,
-    safePath,
-    windowMs,
-    relativeFile,
-    actorId,
-    taskId,
-    message,
-    baseFile,
-    patch
-  });
-  process.stdout.write(`${JSON.stringify(result.record)}\n`);
-  exitCode = result.exitCode;
-} finally {
-  if (existsSync(targetPath)) {
-    spawnSync('chmod', ['a-w', targetPath], { encoding: 'utf8' });
-  }
-}
-process.exit(exitCode);
+const result = submitThroughPublicCli({
+  writableRoot,
+  cli,
+  safePath,
+  windowMs,
+  relativeFile,
+  actorId,
+  taskId,
+  message,
+  baseFile,
+  patch
+});
+process.stdout.write(`${JSON.stringify(result.record)}\n`);
+process.exit(result.exitCode);
 
 function submitThroughPublicCli(input) {
   const inbox = path.join(input.writableRoot, '.prereg-smoke', 'inbox');

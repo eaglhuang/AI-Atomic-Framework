@@ -39,7 +39,15 @@ static_launchers() {
     echo "setup 或 launcher 仍會刪除 state" >&2
     return 1
   fi
-  grep -q 'make_worktree_readonly' "$HERE/lib/run-arm.sh"
+  if grep -n 'make_worktree_readonly' "$HERE/lib/run-arm.sh" "$HERE/lib/common.sh"; then
+    echo "Arm B 仍把 chmod 當成寫入邊界" >&2
+    return 1
+  fi
+  grep -q 'prereg-steward' "$HERE/lib/common.sh"
+  grep -q 'PREREG_STEWARD_SOCK' "$HERE/lib/common.sh"
+  grep -q 'PREREG_STEWARD_SOCK' "$HERE/bin/atm-write.mjs"
+  grep -q 'read-only' "$HERE/lib/common.sh"
+  test -f "$HERE/bin/steward-daemon.mjs"
   grep -q 'capture_intended_patch' "$HERE/lib/run-arm.sh"
 }
 

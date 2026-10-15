@@ -29,6 +29,13 @@ export PREREG_WRITE_AFTER_MS="$(( $(date +%s%3N) + 1200 ))"
 unset PREREG_GOLD_PATCH || true
 unset PREREG_ARM_BIN || true
 
+cleanup_arm() {
+  if [ "${ARM:-}" = "B" ]; then
+    release_worktree "${WORK:-}"
+  fi
+}
+trap cleanup_arm EXIT
+
 if [ "$ARM" = "B" ]; then
   CLI="$(require_public_cli)"
   mkdir -p "$ARM_DIR/bin" "$WORK/.prereg-smoke"
@@ -45,11 +52,24 @@ payload = {
     "cliVersion": "0.1.20",
     "safePath": f"{node_bin}:/usr/bin:/bin",
     "composeWindowMs": 4000,
-    "readonly": True,
+    "boundary": "steward-owner",
 }
 open(dest, "w", encoding="utf-8").write(json.dumps(payload, indent=2) + "\n")
 PY
-  make_worktree_readonly "$WORK"
+  # 父目錄維持啟動者所有，session 不能把整個工作樹刪掉再換一棵自己的。
+  chmod 755 "$ARM_DIR" "$ARM_DIR/bin"
+  own_worktree "$WORK"
+  start_steward_daemon "$WORK" "$ARM_DIR/steward-daemon.log"
+  {
+    echo "boundary=${PREREG_BOUNDARY}"
+    uname -srm
+    if [ -r /etc/os-release ]; then
+      # shellcheck disable=SC1091
+      . /etc/os-release
+      echo "os=${PRETTY_NAME:-unknown}"
+    fi
+    echo "sock=${PREREG_STEWARD_SOCK}"
+  } > "$ARM_DIR/boundary.txt"
 fi
 
 mapfile -t IDS < <(jq -r '.primary.instances[].instanceId' "$TASKS_JSON")
@@ -114,8 +134,9 @@ for slot in 1 2; do
   capture_intended_patch "$ARM_DIR/session-$slot"
 done
 
+# 評估要讀工作樹。先把擁有者還給啟動者，daemon 也在這裡停掉。
 if [ "$ARM" = "B" ]; then
-  chmod -R u+w "$WORK" || true
+  release_worktree "$WORK"
 fi
 
 record_model "$ARM_DIR/session-1" "$ARM_DIR/model.txt"
