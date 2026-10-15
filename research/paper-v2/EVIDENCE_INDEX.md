@@ -677,7 +677,41 @@ pilot、主跑、留出集實驗仍不在這次範圍。dev 題沒有 B′ 與 D
 | SHA256SUMS sha256 | `e44080d174d2ab69ab233bb6764e419d0404a2ae1d1bd0173bf7f3dc3c1fe6d9` |
 | 驗證 | `sh research/paper-v2/benchmark-trials/2026-10-15-hist-v2-pilot-r2/verify.sh` |
 
-## 42. HIST-v2 pilot-r2 停止診斷（2026-10-15；不是實驗 generation）
+## 42. 相關工作文獻集 r2（2026-10-15；閱讀封存，沒有新 PDF）
+
+> **閱讀封存 — 不得作為論文結果。** 沒有 run。不宣稱勝出。不是 C1′–C3′ 的證據。已封存的 `related-work/2026-10-15/` 沒有修改。本目錄沒有 PDF。
+
+| 項目 | 值 |
+|---|---|
+| 路徑 | [`related-work/2026-10-15-r2/`](./related-work/2026-10-15-r2/GENERATION.md) |
+| 索引 | [`related-work/2026-10-15-r2/README.md`](./related-work/2026-10-15-r2/README.md) |
+| 衝突證據 | [`related-work/2026-10-15-r2/pr-conflict-evidence.md`](./related-work/2026-10-15-r2/pr-conflict-evidence.md) |
+| BibTeX | [`related-work/2026-10-15-r2/references.bib`](./related-work/2026-10-15-r2/references.bib)，19 條 |
+| PDF | 沒有新 PDF。9 份 CC PDF 仍只在已封存的 `related-work/2026-10-15/pdf/` |
+| 只留連結 | 上一版 5 篇 arXiv 非專屬授權，加上 Campos Junior 與 Murta（SBES 2026，PDF 未見授權，不轉載），以及 Brun 2011、Ghiotto 2020、Brindescu、Vale 2022（出版社版權，只給 DOI） |
+| 檔案數 | 5（不含 SHA256SUMS） |
+| SHA256SUMS sha256 | `24ed0e0c8d1938a4265584945b3ffc9227744c9dbbc23c35264e9d8b6873eddd` |
+| 驗證 | `sh research/paper-v2/related-work/2026-10-15-r2/verify.sh` |
+
+## 43. HIST-v3 預先登記草稿（2026-10-15；DRAFT，NOT FROZEN，exploratory）
+
+> **DRAFT — NOT FROZEN — exploratory。** 尚未經作者批准。不是凍結的方法，不是實驗證據，沒有 run，不宣稱勝出。HIST-v2 預先登記 v2.0（`benchmark-prereg/2026-10-14-hist-v2.0/`）維持凍結，本目錄不修改它，也不取代它。
+
+| 項目 | 值 |
+|---|---|
+| 路徑 | [`prereg-v3-draft/2026-10-15/`](./prereg-v3-draft/2026-10-15/GENERATION.md) |
+| 草稿 | [`prereg-v3-draft/2026-10-15/prereg-v3-draft.md`](./prereg-v3-draft/2026-10-15/prereg-v3-draft.md) |
+| 狀態 | DRAFT。NOT FROZEN。exploratory。目錄位元組封存之後不可改，但這不是方法凍結 |
+| 版本 | 2026-10-15 第二版。真實 AI 代理研究為主。benchmark 已決定：SWE-bench Verified（django 為主，sphinx、sympy 為輔）；CooperBench 為備案，使用前須確認授權。CAID §4.2 已按原文核對。程式化研究與 push 前檢查在附錄 |
+| 範圍邊界 | ATM 只處理同一台機器、同一個 repo 裡代理之間的衝突，因為 CAS、鎖和佇列在本機 `.atm/runtime/`。別台機器的 push、其他 clone 與遠端 PR 仍走一般的 git merge 或 rebase。正文 §2、§9 寫這條邊界；附錄 C 的 push 前檢查不把邊界往外推。不主張超出這條邊界 |
+| HIST-v2 | 維持凍結，未修改 |
+| 檔案數 | 3（不含 SHA256SUMS） |
+| SHA256SUMS sha256 | `1104710bac3a3d620f6bdd7417be814af7851e8f098f164b3d0853b6b78eff44` |
+| 驗證 | `sh research/paper-v2/prereg-v3-draft/2026-10-15/verify.sh` |
+
+在作者批准並把文本凍結成新的預先登記目錄之前，不從這份草稿跑 smoke、pilot、main 或 held-out。
+
+## 44. HIST-v2 pilot-r2 停止診斷（2026-10-15；不是實驗 generation）
 
 > **診斷 — 不得作為論文結果。** 沒有重跑，沒有 A′、C、主跑或留出集。不宣稱勝出。pilot-r2、harness v3、replay v2 的封存位元組沒有改。
 
