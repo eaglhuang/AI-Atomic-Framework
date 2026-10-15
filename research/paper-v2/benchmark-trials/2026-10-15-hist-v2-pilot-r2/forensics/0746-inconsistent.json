@@ -1,0 +1,56 @@
+{
+  "arm": "textual_merge_file",
+  "detail": {},
+  "injected": false,
+  "item_id": "django:dev:17554_18450:django/db/models/fields/related_descriptors.py",
+  "kind": "inconsistent",
+  "observation": {
+    "accepted_ids": [
+      17554,
+      18450
+    ],
+    "arm": "textual_merge_file",
+    "batch_sizes": [
+      1,
+      1
+    ],
+    "catalog_fixture": false,
+    "claims_benchmark_wins": false,
+    "combined_success_count": 1,
+    "counterexample": "inconsistent",
+    "executed": true,
+    "formal_run": false,
+    "harness": "hist-v2-harness-v3",
+    "inter_arrival_ms": 500,
+    "item_id": "django:dev:17554_18450:django/db/models/fields/related_descriptors.py",
+    "observed_sha256": "4eebe97c7539c93d75aad6070c09be042329218f85e55260ffc1005d58424274",
+    "order": "reverse",
+    "project": "django",
+    "proposal_count": 2,
+    "results": [
+      {
+        "arm_terminal": "committed",
+        "counts_as_success": true,
+        "detail": null,
+        "proposal_id": 17554,
+        "stop_reason": "acked-in-window"
+      },
+      {
+        "arm_terminal": "committed",
+        "counts_as_success": false,
+        "detail": null,
+        "proposal_id": 18450,
+        "stop_reason": "acked-in-window"
+      }
+    ],
+    "seed": 0,
+    "source": "hist-v2-dev-replay/2",
+    "terminals": [
+      "committed",
+      "committed"
+    ],
+    "write_class": "B"
+  },
+  "overwrite": false,
+  "preserved": true
+}

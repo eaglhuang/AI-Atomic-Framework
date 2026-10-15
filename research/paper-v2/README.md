@@ -21,7 +21,9 @@ ATM（AI-Atomic-Framework）論文 2.0（composer＋中立 steward，RQ2 主臂 
 | HIST-v2 重新設計稿 2026-10-10 | [`benchmark-design/2026-10-10-hist-bench-v2/`](./benchmark-design/2026-10-10-hist-bench-v2/README.md)（DRAFT 設計稿；不是凍結的預先登記、沒有任何 run；待作者決定 D1–D9 後另行凍結） |
 | HIST-v2 預先登記 v2.0（方法凍結） | [`benchmark-prereg/2026-10-14-hist-v2.0/`](./benchmark-prereg/2026-10-14-hist-v2.0/GENERATION.md)（2026-10-14；只凍結方法設計，自 r7 原樣帶入全部 DECISIONS。分類與實驗仍有准入閘門。來源 commit `f08599c7d864cd4ede0b50e4c6b6742b4a892f0b`。不宣稱勝出、沒有 run） |
 | HIST-v2 harness v2 | [`benchmark-harness/hist-v2-harness-v2/`](./benchmark-harness/hist-v2-harness-v2/GENERATION.md)（2026-10-14；四條臂的 fixture 接線。位元組保持封存。不跑 smoke／pilot／主跑／留出集。不宣稱勝出、沒有正式 run） |
-| HIST-v2 harness v3 | [`benchmark-harness/hist-v2-harness-v3/`](./benchmark-harness/hist-v2-harness-v3/GENERATION.md)（2026-10-15；補 §9 抖動，並修正共同 base 的三方 mine。沒有 pilot-r2。不宣稱勝出） |
+| HIST-v2 harness v3 | [`benchmark-harness/hist-v2-harness-v3/`](./benchmark-harness/hist-v2-harness-v3/GENERATION.md)（2026-10-15；補 §9 抖動，並修正共同 base 的三方 mine。不宣稱勝出） |
+| HIST-v2 dev replay v2 | [`benchmark-main/2026-10-15-hist-v2-dev-replay-v2/`](./benchmark-main/2026-10-15-hist-v2-dev-replay-v2/GENERATION.md)（2026-10-15；同一 29 題 dev，加上 parent／head。v1 未改。不是論文結果） |
+| HIST-v2 pilot-r2 | [`benchmark-trials/2026-10-15-hist-v2-pilot-r2/`](./benchmark-trials/2026-10-15-hist-v2-pilot-r2/GENERATION.md)（2026-10-15；**未跑完**。747／1740 格後有一筆 `inconsistent`，已保留。旁註 [`2026-10-15-hist-v2-pilot-r2.NOTE.md`](./benchmark-trials/2026-10-15-hist-v2-pilot-r2.NOTE.md)。不是論文結果，不宣稱勝出） |
 | HIST-v2 smoke runbook | [`benchmark-design/hist-v2-smoke-runbook/`](./benchmark-design/hist-v2-smoke-runbook/RUNBOOK_zh.md)（2026-10-14 程序。2026-10-15 加上 smoke 重播閘，以及只放行 pilot 的批准值 `issue-292-author-approved-pilot-only`。`main` 與 `held-out` 仍是退出碼 2。不宣稱勝出） |
 | HIST-v2 分類器 v8 全候選集 | [`benchmark-main/2026-10-15-hist-v2-classify-v8/`](./benchmark-main/2026-10-15-hist-v2-classify-v8/GENERATION.md)（2026-10-15；4095 題，dev replay 綁定 3061。沒有臂。不宣稱勝出） |
 | HIST-v2 smoke trial | [`benchmark-trials/2026-10-15-hist-v2-smoke/`](./benchmark-trials/2026-10-15-hist-v2-smoke/GENERATION.md)（2026-10-15；**superseded／invalid**。封存位元組未改。旁註 [`2026-10-15-hist-v2-smoke.SUPERSEDED.md`](./benchmark-trials/2026-10-15-hist-v2-smoke.SUPERSEDED.md)。不要引用表內數字） |
@@ -79,6 +81,8 @@ sh research/paper-v2/benchmark-prereg/2026-10-14-hist-v2.0/verify.sh research/pa
 # 預期：OK: 5 files verified (read-only) in research/paper-v2/benchmark-prereg/2026-10-14-hist-v2.0
 sh research/paper-v2/benchmark-harness/hist-v2-harness-v2/verify.sh research/paper-v2/benchmark-harness/hist-v2-harness-v2
 sh research/paper-v2/benchmark-harness/hist-v2-harness-v3/verify.sh research/paper-v2/benchmark-harness/hist-v2-harness-v3
+sh research/paper-v2/benchmark-main/2026-10-15-hist-v2-dev-replay-v2/verify.sh research/paper-v2/benchmark-main/2026-10-15-hist-v2-dev-replay-v2
+sh research/paper-v2/benchmark-trials/2026-10-15-hist-v2-pilot-r2/verify.sh research/paper-v2/benchmark-trials/2026-10-15-hist-v2-pilot-r2
 sh research/paper-v2/benchmark-trials/2026-10-15-hist-v2-pilot-diagnosis/verify.sh research/paper-v2/benchmark-trials/2026-10-15-hist-v2-pilot-diagnosis
 sh research/paper-v2/benchmark-design/hist-v2-smoke-runbook/verify.sh research/paper-v2/benchmark-design/hist-v2-smoke-runbook
 sh research/paper-v2/benchmark-trials/2026-10-15-hist-v2-pilot/verify.sh research/paper-v2/benchmark-trials/2026-10-15-hist-v2-pilot
