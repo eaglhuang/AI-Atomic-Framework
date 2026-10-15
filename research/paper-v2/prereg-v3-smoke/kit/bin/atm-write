@@ -1,0 +1,11 @@
+#!/bin/bash
+# Stable entry point. Node type-stripping loads the framework TypeScript pathway.
+set -euo pipefail
+HERE="$(cd "$(dirname "$0")" && pwd)"
+NODE_MAJOR="$(node -p 'process.versions.node.split(".")[0]')"
+if [ "$NODE_MAJOR" -ge 24 ]; then
+  STRIP=(--strip-types)
+else
+  STRIP=(--experimental-strip-types)
+fi
+exec node --disable-warning=ExperimentalWarning "${STRIP[@]}" "$HERE/atm-write.mjs" "$@"
