@@ -18,8 +18,7 @@ import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { appendFileSync, mkdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { pathToFileURL } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 if (process.env.PREREG_UNSHIMMED_PATH) process.env.PATH = process.env.PREREG_UNSHIMMED_PATH;
 const GIT = process.env.PREREG_REAL_GIT || '/usr/bin/git';
