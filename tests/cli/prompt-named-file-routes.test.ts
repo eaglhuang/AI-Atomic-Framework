@@ -22,7 +22,7 @@ assert.deepEqual(createDeterministicTaskIntent('Close the task card in docs/plan
 const publicCli = pathToFileURL(path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', 'packages', 'cli', 'src', 'atm-public.ts')).href;
 function atm(cwd: string, args: string[]) {
   const script = `const { runPublicCli } = await import(${JSON.stringify(publicCli)}); process.exitCode = await runPublicCli(JSON.parse(process.argv[1]));`;
-  const run = spawnSync(process.execPath, ['--strip-types', '--input-type=module', '-e', script, JSON.stringify([...args, '--cwd', cwd, '--json'])], { cwd, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+  const run = spawnSync(process.execPath, ['--strip-types', '--input-type=module', '-e', script, JSON.stringify([...args, '--cwd', cwd, '--json'])], { cwd, encoding: 'utf8', env: { ...process.env, ATM_ACTOR_ID: '', AGENT_IDENTITY: '' }, maxBuffer: 64 * 1024 * 1024 });
   const out = `${run.stdout ?? ''}${run.stderr ?? ''}`;
   return JSON.parse(out.slice(out.indexOf('{')));
 }
@@ -42,7 +42,10 @@ try {
 
   const codeChange = atm(project, ['next', '--prompt', 'Add a cartTotal function in src/cart.js']).evidence.nextAction;
   assert.match(codeChange.suggestedRoutes[0].command, /--prompt "quick fix: Add a cartTotal function in src\/cart\.js"/);
-  assert.doesNotMatch(codeChange.suggestedRoutes[0].command, /<path>/);
+  assert.equal(codeChange.suggestedRoutes[0].pasteReady, false);
+  assert.ok(codeChange.suggestedRoutes[0].missing?.includes('--actor'), JSON.stringify(codeChange.suggestedRoutes[0].missing));
+  assert.match(codeChange.suggestedRoutes[0].command, /--actor ATM_ACTOR_ID/);
+  assert.doesNotMatch(codeChange.suggestedRoutes[0].command, /[<>]/);
 
   const readmeEdit = atm(project, ['next', '--prompt', 'Update the intro in README.md']).evidence.nextAction;
   assert.ok(readmeEdit.suggestedRoutes?.length, `a README edit is not a dead end, got ${readmeEdit.status}`);

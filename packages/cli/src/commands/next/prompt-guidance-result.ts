@@ -10,6 +10,7 @@ import { isQuickfixPrompt } from '../work-channels.ts';
 import { type ImportedTaskQueue, isFrameworkMaintenancePrompt } from './route-predicates.ts';
 import { buildAgentPackHint, buildChannelPlaybook, buildGovernanceReadinessHint, buildNextMessages } from './playbook-projection.ts';
 
+import { resolvePasteActor } from './paste-actor.ts';
 import { quoteCliToken, quoteCliValue, toTaskCandidateView } from './view-projections.ts';
 import type { NextActionLike } from './next-action-assembly.ts';
 
@@ -24,18 +25,25 @@ export function buildPromptGuidanceNextResult(input: {
   const prompt = input.taskIntent?.userPrompt?.trim();
   if (!prompt || input.taskIntent?.taskScopeMentioned === true) return null;
   const commandPrefix = input.commandPrefix ?? 'node atm.mjs';
+  const actorId = resolvePasteActor(input.actor, input.cwd);
   if (isJournalingPrompt(prompt)) return buildJournalingPromptResult(input, prompt);
   const quickfixScope = resolveQuickfixScope(prompt);
   if (isQuickfixPrompt(prompt) && quickfixScope.length > 0) {
+    const actorKnown = Boolean(actorId);
+    const claimCommand = `${commandPrefix} next --claim --actor ${actorKnown ? quoteCliToken(actorId!) : '<id>'} --prompt ${quoteCliValue(prompt)} --json`;
     const nextAction: NextActionLike = {
-      status: 'quickfix-ready',
-      command: `${commandPrefix} next --claim${input.actor && !/<[^>\r\n]+>/.test(input.actor) ? ` --actor ${quoteCliToken(input.actor)}` : ''} --prompt ${quoteCliValue(prompt)} --json`,
-      reason: 'the prompt looks like a small targeted fix with path-like scope, so ATM can use the fast quickfix channel',
+      status: actorKnown ? 'quickfix-ready' : 'quickfix-actor-required',
+      command: claimCommand,
+      reason: actorKnown
+        ? 'the prompt looks like a small targeted fix with path-like scope, so ATM can use the fast quickfix channel'
+        : 'the prompt looks like a small targeted fix, but --actor is missing so this is not a one-step claim',
       recommendedChannel: 'fast',
       riskLevel: 'low',
       playbook: buildChannelPlaybook({
         channel: 'fast',
-        originalPrompt: prompt
+        originalPrompt: prompt,
+        actorPlaceholder: actorId ?? undefined,
+        fastClaimCommand: claimCommand
       }),
       governanceReadiness: buildGovernanceReadinessHint(input.cwd, {
         channel: 'fast',
@@ -56,8 +64,10 @@ export function buildPromptGuidanceNextResult(input: {
         null,
         input.integrationBootstrap,
         input.runtimeAdapterReadiness,
-        message('info', 'ATM_NEXT_QUICKFIX_ROUTE_READY', 'ATM routed this prompt to the fast quickfix channel.', {
-          requiredCommand: nextAction.command,
+        message('info', 'ATM_NEXT_QUICKFIX_ROUTE_READY', actorKnown
+          ? 'ATM routed this prompt to the fast quickfix channel.'
+          : 'ATM routed this prompt to the fast quickfix channel, but --actor is missing so the claim command is not ready.', {
+          ...(actorKnown ? { requiredCommand: claimCommand } : { missing: ['--actor'] }),
           allowedFiles: quickfixScope
         })
       ),
@@ -185,7 +195,7 @@ function buildGeneralPromptGuidanceResult(
   prompt: string
 ) {
   const commandPrefix = input.commandPrefix ?? 'node atm.mjs';
-  const suggestedRoutes = buildPromptSuggestedRoutes(prompt, commandPrefix, input.actor);
+  const suggestedRoutes = buildPromptSuggestedRoutes(prompt, commandPrefix, resolvePasteActor(input.actor, input.cwd));
   const openRoute = suggestedRoutes.find((route) => route.channel === 'task-card') ?? suggestedRoutes[suggestedRoutes.length - 1];
   const nextAction: NextActionLike = {
     status: 'prompt-guidance-required',
