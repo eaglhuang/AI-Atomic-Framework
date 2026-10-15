@@ -22,6 +22,7 @@ ATM（AI-Atomic-Framework）論文 2.0（composer＋中立 steward，RQ2 主臂 
 | HIST-v2 預先登記 v2.0（方法凍結） | [`benchmark-prereg/2026-10-14-hist-v2.0/`](./benchmark-prereg/2026-10-14-hist-v2.0/GENERATION.md)（2026-10-14；只凍結方法設計，自 r7 原樣帶入全部 DECISIONS。分類與實驗仍有准入閘門。來源 commit `f08599c7d864cd4ede0b50e4c6b6742b4a892f0b`。不宣稱勝出、沒有 run） |
 | HIST-v2 harness v2 | [`benchmark-harness/hist-v2-harness-v2/`](./benchmark-harness/hist-v2-harness-v2/GENERATION.md)（2026-10-14；四條臂的 fixture 接線。不跑 smoke／pilot／主跑／留出集。不宣稱勝出、沒有正式 run） |
 | HIST-v2 smoke runbook | [`benchmark-design/hist-v2-smoke-runbook/`](./benchmark-design/hist-v2-smoke-runbook/RUNBOOK_zh.md)（2026-10-14 程序，2026-10-15 加上作者批准後的歷史 patch 重播閘。沒有 smoke generation。catalog fixture 不能代替 dev 題。不宣稱勝出） |
+| HIST-v2 分類器 v8 全候選集 | [`benchmark-main/2026-10-15-hist-v2-classify-v8/`](./benchmark-main/2026-10-15-hist-v2-classify-v8/GENERATION.md)（2026-10-15；4095 題，dev replay 綁定 3061。沒有臂、沒有 smoke。不宣稱勝出） |
 | 校驗 | `generations/<gen>/verify.sh`（唯讀；`sha256sum -c SHA256SUMS`） |
 | benchmark-trials/2026-10-09-hist-smoke, benchmark-trials/2026-10-09-hist-pilot | 試跑（trial runs, not formal results）：歷史真實 PR benchmark 冒煙＋Django pilot，ATM pin b35a6141（2026-10-09） |
 | benchmark-trials/2026-10-09-hist-mining | 只挖掘、沒有 run（不列入正式結果）：六專案合併 commit base 重新挖掘、可行性 dry-run、prereg v1.1 提案草稿（未套用）（2026-10-09） |

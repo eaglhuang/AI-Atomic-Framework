@@ -530,6 +530,25 @@ DRAFT HIST-v2 prereg（非 generation、尚未凍結、沒有 run）：[`working
 
 pilot、main、held-out 仍是硬拒絕（退出碼 2）。要跑 smoke，需要先有分類器 v8 對全部候選的封存題目，以及與答案鍵雜湊一致的歷史 patch 綁定。不能用合成 fixture 補上這個缺口。
 
+## 34. HIST-v2 分類器 v8 全候選集（2026-10-15；分類封存，沒有臂）
+
+> **分類封存 — 不得作為論文勝出。** 沒有 smoke、pilot、主跑或留出集實驗。不宣稱勝出。不是 C1′–C3′ 的證據。預先登記目錄沒有修改。
+
+| 項目 | 值 |
+|---|---|
+| 路徑 | [`benchmark-main/2026-10-15-hist-v2-classify-v8/`](./benchmark-main/2026-10-15-hist-v2-classify-v8/GENERATION.md) |
+| 分類器 | v8，規則雜湊 `329165d10ea2fe26885f6e7e06cb065f5cb1e356fc34efd9cce38e1995c97541` |
+| 資料 | 公開 GitHub Search、公開 PR 頁面、公開 git。沒有使用 token |
+| 題目 | 4095。dev 3061、dev-cross-window 813、cross-window 8、later-period-historical-holdout 194、held-out-project 19 |
+| 技術排除 | 3 |
+| 寫入類別 | A 2873、A′ 10、B 168、C 1、null 1043。沒有 B′，沒有 D |
+| dev 綁定 | `hist-v2-dev-replay/1` 3061 個，`code_patch_sha256` 與 R(S) 雜湊吻合，問題 0。留出集沒有綁定 |
+| 檔案數 | 16360（不含 SHA256SUMS） |
+| SHA256SUMS sha256 | `7895681e9833e1cecfc0a0c46cf89ab0204ecabd4f0ef72b385fdbe38d04dd77` |
+| 驗證 | `sh research/paper-v2/benchmark-main/2026-10-15-hist-v2-classify-v8/verify.sh` |
+
+pilot、主跑、留出集實驗仍不在這次範圍。dev 題沒有 B′ 與 D，所以後續 smoke 不會有這兩類的格子。
+
 ## 6. 不在 repo 的參照
 - ATM pin 原始碼：GitHub `eaglhuang/AI-Atomic-Framework` commit `5692474f7db70ab52a7a71c8af4867609e7e4b43`（r3 另加 `bea35380d7f381f998c9930fa95f01b999c7f208`，box tarball `/workspace/atm-main-bea35380/atm-main.tar.gz` sha256 `9346e5b175b176618f435aeb4b41ab93ef7575f9bf77d77c47a5aeac87ad34b5`；r4 另加 `2118bc66efb3ac3bc0ddaede6a2f7cb18526b030`，box tarball `/workspace/atm-main-2118bc66/atm-main.tar.gz` sha256 `aa959607c35c51b7fc3c4e3d81b3d9e979ee62f4d9361ef9e9f5ee72e78abd88`；r5 另加 `37847584e24afc08ea58cfe380bb5b1220fbe335`，box tarball `/workspace/atm-main-37847584/atm-main.tar.gz` sha256 `e17a90ddceaf3c70d580c96e31f14cf8251d5a664985c1eb494f0d8db8045e3d`；r6 另加 `b35a6141bd5bfbaec654f1cd3079323581b04074`，box tarball `/workspace/atm-main-b35a6141/atm-main.tar.gz` sha256 `93fa7839d8e0fee51e5ad224833df2b57397fead3e77e0528117f21f5d5e59ef`）；box tarball `/workspace/atm-main-5692474f/atm-main.tar.gz` sha256 `1d498a397e6a5db119d40b8f539dc165cb0028fbfe9577f953023f8ec8d45795`。
 - 論文 v1：arXiv:2607.00041（box `refs/` 有副本，未上傳）。
