@@ -609,6 +609,39 @@ pilot、主跑、留出集實驗仍不在這次範圍。dev 題沒有 B′ 與 D
 
 §6 所記的 box `refs/` 副本仍未另存。`pdf/2607.00041_ATM-v1.pdf` 是這份文獻集裡依 CC BY 4.0 原樣轉存的 arXiv PDF，sha256 `f7d41247cc590ab70ebc9042a014a9b463ba9d76db31d8faaa7754f5a9006f24`。
 
+## 38. 相關工作文獻集 r2（2026-10-15；閱讀封存，沒有新 PDF）
+
+> **閱讀封存 — 不得作為論文結果。** 沒有 run。不宣稱勝出。不是 C1′–C3′ 的證據。已封存的 `related-work/2026-10-15/` 沒有修改。本目錄沒有 PDF。
+
+| 項目 | 值 |
+|---|---|
+| 路徑 | [`related-work/2026-10-15-r2/`](./related-work/2026-10-15-r2/GENERATION.md) |
+| 索引 | [`related-work/2026-10-15-r2/README.md`](./related-work/2026-10-15-r2/README.md) |
+| 衝突證據 | [`related-work/2026-10-15-r2/pr-conflict-evidence.md`](./related-work/2026-10-15-r2/pr-conflict-evidence.md) |
+| BibTeX | [`related-work/2026-10-15-r2/references.bib`](./related-work/2026-10-15-r2/references.bib)，19 條 |
+| PDF | 沒有新 PDF。9 份 CC PDF 仍只在已封存的 `related-work/2026-10-15/pdf/` |
+| 只留連結 | 上一版 5 篇 arXiv 非專屬授權，加上 Campos Junior 與 Murta（SBES 2026，PDF 未見授權，不轉載），以及 Brun 2011、Ghiotto 2020、Brindescu、Vale 2022（出版社版權，只給 DOI） |
+| 檔案數 | 5（不含 SHA256SUMS） |
+| SHA256SUMS sha256 | `24ed0e0c8d1938a4265584945b3ffc9227744c9dbbc23c35264e9d8b6873eddd` |
+| 驗證 | `sh research/paper-v2/related-work/2026-10-15-r2/verify.sh` |
+
+## 39. HIST-v3 預先登記草稿（2026-10-15；DRAFT，NOT FROZEN，exploratory）
+
+> **DRAFT — NOT FROZEN — exploratory。** 尚未經作者批准。不是凍結的方法，不是實驗證據，沒有 run，不宣稱勝出。HIST-v2 預先登記 v2.0（`benchmark-prereg/2026-10-14-hist-v2.0/`）維持凍結，本目錄不修改它，也不取代它。
+
+| 項目 | 值 |
+|---|---|
+| 路徑 | [`prereg-v3-draft/2026-10-15/`](./prereg-v3-draft/2026-10-15/GENERATION.md) |
+| 草稿 | [`prereg-v3-draft/2026-10-15/prereg-v3-draft.md`](./prereg-v3-draft/2026-10-15/prereg-v3-draft.md) |
+| 狀態 | DRAFT。NOT FROZEN。exploratory。目錄位元組封存之後不可改，但這不是方法凍結 |
+| 範圍邊界 | ATM 只處理同一台機器、同一個 repo 裡代理之間的衝突，因為 CAS、鎖和佇列在本機 `.atm/runtime/`。別台機器的 push、其他 clone 與遠端 PR 仍走一般的 git merge 或 rebase。不主張超出這條邊界 |
+| HIST-v2 | 維持凍結，未修改 |
+| 檔案數 | 3（不含 SHA256SUMS） |
+| SHA256SUMS sha256 | `71020468a668074d7f9f7246daeac548bcccbbfe8daf5ec630414ab2d1d57b3f` |
+| 驗證 | `sh research/paper-v2/prereg-v3-draft/2026-10-15/verify.sh` |
+
+在作者批准並把文本凍結成新的預先登記目錄之前，不從這份草稿跑 smoke、pilot、main 或 held-out。
+
 ## 6. 不在 repo 的參照
 - ATM pin 原始碼：GitHub `eaglhuang/AI-Atomic-Framework` commit `5692474f7db70ab52a7a71c8af4867609e7e4b43`（r3 另加 `bea35380d7f381f998c9930fa95f01b999c7f208`，box tarball `/workspace/atm-main-bea35380/atm-main.tar.gz` sha256 `9346e5b175b176618f435aeb4b41ab93ef7575f9bf77d77c47a5aeac87ad34b5`；r4 另加 `2118bc66efb3ac3bc0ddaede6a2f7cb18526b030`，box tarball `/workspace/atm-main-2118bc66/atm-main.tar.gz` sha256 `aa959607c35c51b7fc3c4e3d81b3d9e979ee62f4d9361ef9e9f5ee72e78abd88`；r5 另加 `37847584e24afc08ea58cfe380bb5b1220fbe335`，box tarball `/workspace/atm-main-37847584/atm-main.tar.gz` sha256 `e17a90ddceaf3c70d580c96e31f14cf8251d5a664985c1eb494f0d8db8045e3d`；r6 另加 `b35a6141bd5bfbaec654f1cd3079323581b04074`，box tarball `/workspace/atm-main-b35a6141/atm-main.tar.gz` sha256 `93fa7839d8e0fee51e5ad224833df2b57397fead3e77e0528117f21f5d5e59ef`）；box tarball `/workspace/atm-main-5692474f/atm-main.tar.gz` sha256 `1d498a397e6a5db119d40b8f539dc165cb0028fbfe9577f953023f8ec8d45795`。
 - 論文 v1：arXiv:2607.00041（box `refs/` 有副本，未上傳）。
