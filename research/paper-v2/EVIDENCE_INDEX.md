@@ -492,12 +492,12 @@ DRAFT HIST-v2 prereg（非 generation、尚未凍結、沒有 run）：[`working
 | harness v2 | [`benchmark-harness/hist-v2-harness-v2/`](./benchmark-harness/hist-v2-harness-v2/GENERATION.md)，`SHA256SUMS` sha256 `393ea1deec292674d6fe60b2a11ccf6fb47a0c7602af82f2ea2fcf402009e74c` |
 | ATM core merge | `cb25242433882d34b514b79338d1a00def53a875`（PR #297） |
 | 矩陣 | dev 題每個有資料的類別 1 題；臂四條；間隔只留 0 ms 與 500 ms；兩種順序；seed 0 |
-| SHA256SUMS sha256 | `50d3a7c0b23103f91ff9f9a76f2708e9be75e863b5fc909c78fddd5170b94233` |
-| 上一份程序封印 | `ea1da1ab3fb1343b3be5ec21578468a2e30ae6f4edf01d92c32cfc451231ceb5`；再上一份 `0b9c83569cae021f0cfd63e1e7a7d25e9cb29927d8841e672b7a00ccf378cf87`（PR #299，merge `ae342aac`） |
+| SHA256SUMS sha256 | `a344a69a28a40db26f37e0a9c33bba92772279d4787743a51310c5d76373762d` |
+| 上一份程序封印 | `50d3a7c0b23103f91ff9f9a76f2708e9be75e863b5fc909c78fddd5170b94233`；再上一份 `ea1da1ab3fb1343b3be5ec21578468a2e30ae6f4edf01d92c32cfc451231ceb5`；PR #299 是 `0b9c83569cae021f0cfd63e1e7a7d25e9cb29927d8841e672b7a00ccf378cf87`（merge `ae342aac`） |
 | 檔案數 | 24（不含 SHA256SUMS） |
 | 驗證 | `sh benchmark-design/hist-v2-smoke-runbook/verify.sh benchmark-design/hist-v2-smoke-runbook` |
 
-沒有把本目錄當成 smoke generation。歷史題的 `target_file` 可以含目錄；重播在呼叫封存 harness 之前建立父目錄，不改 harness 位元組。釘選不符、禁止階段、尚未批准，或 dev 題沒有歷史 patch 綁定時，`--execute` 都不建立 run 目錄。catalog fixture 不能代替分類器 v8 的 dev 題。harness v2 的 `SHA256SUMS` 仍是 `393ea1deec292674d6fe60b2a11ccf6fb47a0c7602af82f2ea2fcf402009e74c`。預先登記目錄沒有修改。
+沒有把本目錄當成 smoke generation。歷史題的 `target_file` 可以含目錄；重播在呼叫封存 harness 之前建立父目錄，不改 harness 位元組。釘選不符、禁止階段、尚未批准，或 dev 題沒有歷史 patch 綁定時，`--execute` 都不建立 run 目錄。已存在的 smoke generation 只核對路徑與 `SHA256SUMS` 沒有被該次拒絕改寫。catalog fixture 不能代替分類器 v8 的 dev 題。harness v2 的 `SHA256SUMS` 仍是 `393ea1deec292674d6fe60b2a11ccf6fb47a0c7602af82f2ea2fcf402009e74c`。預先登記目錄沒有修改。
 
 ## 32. 工作稿快照 2026-10-14：論文 2.0 在 HIST-v2 結果之前可寫的章節（DRAFT；非 generation；沒有 run）
 

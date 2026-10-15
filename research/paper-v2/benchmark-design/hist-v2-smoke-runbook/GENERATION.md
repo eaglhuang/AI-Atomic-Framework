@@ -26,4 +26,4 @@ trial-only — 不得作為論文結果
 
 ## 2026-10-15 巢狀路徑
 
-歷史題的 `target_file` 可以含目錄。重播在呼叫封存 harness 的 `prepare_workspace` 之前建立父目錄，不改 harness 位元組。分類器 v8 題目已封存在 `benchmark-main/2026-10-15-hist-v2-classify-v8/`（`SHA256SUMS` sha256 `7895681e9833e1cecfc0a0c46cf89ab0204ecabd4f0ef72b385fdbe38d04dd77`）。本目錄仍是程序，不是 smoke generation。緊接在前的程序封印 `SHA256SUMS` sha256 是 `ea1da1ab3fb1343b3be5ec21578468a2e30ae6f4edf01d92c32cfc451231ceb5`。預先登記目錄與 harness v2 沒有修改。
+歷史題的 `target_file` 可以含目錄。重播在呼叫封存 harness 的 `prepare_workspace` 之前建立父目錄，不改 harness 位元組。分類器 v8 題目已封存在 `benchmark-main/2026-10-15-hist-v2-classify-v8/`（`SHA256SUMS` sha256 `7895681e9833e1cecfc0a0c46cf89ab0204ecabd4f0ef72b385fdbe38d04dd77`）。本目錄仍是程序，不是 smoke generation。緊接在前的程序封印 `SHA256SUMS` sha256 是 `50d3a7c0b23103f91ff9f9a76f2708e9be75e863b5fc909c78fddd5170b94233`。再上一份是 `ea1da1ab3fb1343b3be5ec21578468a2e30ae6f4edf01d92c32cfc451231ceb5`。未綁定的 dev 題仍退出碼 4；已存在的 smoke generation 只核對路徑與 `SHA256SUMS` 沒有被該次拒絕改寫。預先登記目錄與 harness v2 沒有修改。
