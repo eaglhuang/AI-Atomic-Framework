@@ -568,6 +568,24 @@ pilot、主跑、留出集實驗仍不在這次範圍。dev 題沒有 B′ 與 D
 
 `combined_success` 計數是各格裡算成功的 proposal 數，不是勝出比較。file_lock／B 是 7／8，其餘 A、B、C 是 4／8，A′ 在 atm、steward、textual_merge_file 是 8／8、在 file_lock 是 4／8。pilot、main、held-out 仍是退出碼 2。
 
+## 36. 相關工作文獻集（2026-10-15；閱讀封存，不是實驗 generation）
+
+> **閱讀封存 — 不得作為論文結果。** 沒有 run。不宣稱勝出。不是 C1′–C3′ 的證據。既有 generations 與其他封存目錄沒有修改。
+
+| 項目 | 值 |
+|---|---|
+| 路徑 | [`related-work/2026-10-15/`](./related-work/2026-10-15/GENERATION.md) |
+| 索引 | [`related-work/2026-10-15/README.md`](./related-work/2026-10-15/README.md) |
+| 評論文 | [`related-work/2026-10-15/related-papers-2026-10-15.md`](./related-work/2026-10-15/related-papers-2026-10-15.md) |
+| BibTeX | [`related-work/2026-10-15/references.bib`](./related-work/2026-10-15/references.bib)，14 條 |
+| PDF | 9 份，CC BY 4.0、CC BY-SA 4.0 或 CC BY-NC-ND 4.0，原樣轉存。CC BY-NC-ND 只限非商業、不得改作 |
+| 只留連結 | arXiv:2608.22152、arXiv:2603.21489、arXiv:2511.02687、arXiv:2609.00252（SDD）、arXiv:2608.23283（Apodex 1.1）（arXiv 非專屬散布授權） |
+| 檔案數 | 14（不含 SHA256SUMS） |
+| SHA256SUMS sha256 | `63c3ccc726158b0a195262a1841bd8e91b9d1ec3b7d918edb0673d81d8d436cf` |
+| 驗證 | `sh research/paper-v2/related-work/2026-10-15/verify.sh` |
+
+§6 所記的 box `refs/` 副本仍未另存。`pdf/2607.00041_ATM-v1.pdf` 是這份文獻集裡依 CC BY 4.0 原樣轉存的 arXiv PDF，sha256 `f7d41247cc590ab70ebc9042a014a9b463ba9d76db31d8faaa7754f5a9006f24`。
+
 ## 6. 不在 repo 的參照
 - ATM pin 原始碼：GitHub `eaglhuang/AI-Atomic-Framework` commit `5692474f7db70ab52a7a71c8af4867609e7e4b43`（r3 另加 `bea35380d7f381f998c9930fa95f01b999c7f208`，box tarball `/workspace/atm-main-bea35380/atm-main.tar.gz` sha256 `9346e5b175b176618f435aeb4b41ab93ef7575f9bf77d77c47a5aeac87ad34b5`；r4 另加 `2118bc66efb3ac3bc0ddaede6a2f7cb18526b030`，box tarball `/workspace/atm-main-2118bc66/atm-main.tar.gz` sha256 `aa959607c35c51b7fc3c4e3d81b3d9e979ee62f4d9361ef9e9f5ee72e78abd88`；r5 另加 `37847584e24afc08ea58cfe380bb5b1220fbe335`，box tarball `/workspace/atm-main-37847584/atm-main.tar.gz` sha256 `e17a90ddceaf3c70d580c96e31f14cf8251d5a664985c1eb494f0d8db8045e3d`；r6 另加 `b35a6141bd5bfbaec654f1cd3079323581b04074`，box tarball `/workspace/atm-main-b35a6141/atm-main.tar.gz` sha256 `93fa7839d8e0fee51e5ad224833df2b57397fead3e77e0528117f21f5d5e59ef`）；box tarball `/workspace/atm-main-5692474f/atm-main.tar.gz` sha256 `1d498a397e6a5db119d40b8f539dc165cb0028fbfe9577f953023f8ec8d45795`。
 - 論文 v1：arXiv:2607.00041（box `refs/` 有副本，未上傳）。

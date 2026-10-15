@@ -1,3 +1,6 @@
 # Normalize line endings to LF on checkout, regardless of OS.
 * text=auto eol=lf
 .atm/history/evidence/git-head.jsonl merge=union
+# PDFs in this sealed related-work directory stay byte-for-byte. One of them
+# has no NUL in the first 8000 bytes, so text=auto would rewrite it.
+research/paper-v2/related-work/2026-10-15/pdf/*.pdf binary
