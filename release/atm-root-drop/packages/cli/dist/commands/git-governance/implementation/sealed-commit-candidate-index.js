@@ -5,6 +5,7 @@ import path from 'node:path';
 import { ATM_COMMIT_ATTRIBUTION_MISMATCH, findSealedBundleProvenanceConflicts, isTombstone, sealCommitBundle } from '../../../_vendor/core/dist/commit-attribution/sealed-commit-bundle.js';
 import { CliError } from '../../shared.js';
 import { runGitCommand, runGitCommandWithEnv } from './git-process-port.js';
+import { forEachPathspecBatch } from './pathspec-argv-batching.js';
 const QUIET_STDIO = ['ignore', 'pipe', 'pipe'];
 const LS_FILES_STAGE_PATTERN = /^(\d+) ([0-9a-f]+) \d+\t(.+)$/i;
 const LS_TREE_PATTERN = /^(\d+) blob ([0-9a-f]+)\t(.+)$/i;
@@ -12,12 +13,21 @@ const RAW_DIFF_PATTERN = /^:(\d+) (\d+) ([0-9a-f]+) ([0-9a-f]+) ([A-Z])\d*\t(.+)
 const NULL_OBJECT_ID = /^0+$/;
 function normalizePath(value) { return String(value ?? '').replace(/\\/g, '/').replace(/^\.\//, '').trim(); }
 function splitLines(output) { return String(output ?? '').split(/\r?\n/).map((line) => line.trim()).filter(Boolean); }
+/** Share the canonical process budget for every bulk sealed-index operation. */
+function runPathspecCommand(cwd, fixedArgs, paths, env) {
+    const output = [];
+    forEachPathspecBatch({ paths, fixedArgs }, (batch) => {
+        const args = [...fixedArgs, ...batch];
+        output.push(env ? runGitCommandWithEnv(cwd, args, env, [...QUIET_STDIO]) : runGitCommand(cwd, args));
+    });
+    return output.join('');
+}
 export function sealCommitBundleFromLiveIndex(input) {
     const paths = [...new Set(input.paths.map(normalizePath).filter(Boolean))].sort();
     if (paths.length === 0)
         return sealCommitBundle({ entries: [], baseTreeSha: input.baseTreeSha ?? null });
     const entries = [];
-    for (const line of splitLines(runGitCommand(input.cwd, ['ls-files', '-s', '--', ...paths]))) {
+    for (const line of splitLines(runPathspecCommand(input.cwd, ['ls-files', '-s', '--'], paths))) {
         const match = line.match(LS_FILES_STAGE_PATTERN);
         if (match)
             entries.push({ path: normalizePath(match[3]), mode: match[1], blobId: match[2], provenance: input.provenance, disposition: 'present' });
@@ -33,7 +43,7 @@ export function withWorktreeCandidateIndex(input) {
     try {
         runGitCommandWithEnv(input.cwd, ['read-tree', 'HEAD'], env, [...QUIET_STDIO]);
         if (paths.length > 0)
-            runGitCommandWithEnv(input.cwd, ['add', '-A', '-f', '--', ...paths], env, [...QUIET_STDIO]);
+            runPathspecCommand(input.cwd, ['add', '-A', '-f', '--'], paths, env);
         return input.run(env);
     }
     finally {
@@ -52,7 +62,7 @@ export function assembleSealedCommitIndex(input) {
     const paths = input.bundle.entries.map((entry) => entry.path);
     if (paths.length === 0)
         return;
-    runGitCommandWithEnv(input.cwd, ['rm', '--cached', '--quiet', '--ignore-unmatch', '--force', '--', ...paths], input.env, [...QUIET_STDIO]);
+    runPathspecCommand(input.cwd, ['rm', '--cached', '--quiet', '--ignore-unmatch', '--force', '--'], paths, input.env);
     const presentEntries = input.bundle.entries.filter((entry) => !isTombstone(entry));
     const baseRef = input.baseRef ?? 'HEAD';
     const inheritedEntries = presentEntries.filter((entry) => isTrackedInBaseTree({ cwd: input.cwd, env: input.env, baseRef, path: entry.path }));
@@ -60,18 +70,18 @@ export function assembleSealedCommitIndex(input) {
     for (const entry of presentEntries)
         runGitCommandWithEnv(input.cwd, ['update-index', '--add', '--cacheinfo', `${entry.mode},${entry.blobId},${entry.path}`], input.env, [...QUIET_STDIO]);
     if (newEntryPaths.length > 0) {
-        runGitCommandWithEnv(input.cwd, ['add', '-A', '-f', '--', ...newEntryPaths], input.env, [...QUIET_STDIO]);
+        runPathspecCommand(input.cwd, ['add', '-A', '-f', '--'], newEntryPaths, input.env);
         for (const entry of presentEntries.filter((entry) => newEntryPaths.includes(entry.path)))
             runGitCommandWithEnv(input.cwd, ['update-index', '--add', '--cacheinfo', `${entry.mode},${entry.blobId},${entry.path}`], input.env, [...QUIET_STDIO]);
     }
     if (inheritedEntries.length > 0)
-        runGitCommandWithEnv(input.cwd, ['update-index', '--assume-unchanged', '--', ...inheritedEntries.map((entry) => entry.path)], input.env, [...QUIET_STDIO]);
+        runPathspecCommand(input.cwd, ['update-index', '--assume-unchanged', '--'], inheritedEntries.map((entry) => entry.path), input.env);
 }
 export function readCandidateTreeEntries(input) {
     const sealedPaths = [...new Set((input.sealedPaths ?? []).map(normalizePath).filter(Boolean))].sort();
     const entries = new Map();
     if (sealedPaths.length > 0)
-        for (const line of splitLines(runGitCommandWithEnv(input.cwd, ['ls-files', '-s', '--', ...sealedPaths], input.env, [...QUIET_STDIO]))) {
+        for (const line of splitLines(runPathspecCommand(input.cwd, ['ls-files', '-s', '--'], sealedPaths, input.env))) {
             const match = line.match(LS_FILES_STAGE_PATTERN);
             if (match)
                 entries.set(normalizePath(match[3]), { path: normalizePath(match[3]), mode: match[1], blobId: match[2], disposition: 'present' });
@@ -85,7 +95,7 @@ export function readCommittedTreeEntries(cwd, commitSha, sealedPaths = []) {
     const normalized = [...new Set(sealedPaths.map(normalizePath).filter(Boolean))].sort();
     const entries = new Map();
     if (normalized.length > 0)
-        for (const line of splitLines(runGitCommand(cwd, ['ls-tree', '-r', commitSha, '--', ...normalized]))) {
+        for (const line of splitLines(runPathspecCommand(cwd, ['ls-tree', '-r', commitSha, '--'], normalized))) {
             const match = line.match(LS_TREE_PATTERN);
             if (match)
                 entries.set(normalizePath(match[3]), { path: normalizePath(match[3]), mode: match[1], blobId: match[2], disposition: 'present' });
@@ -100,7 +110,7 @@ export function sealCommitBundleFromCandidateIndex(input) {
     if (paths.length === 0)
         return sealCommitBundle({ entries: [], baseTreeSha: input.baseTreeSha ?? null });
     const entries = [];
-    for (const line of splitLines(runGitCommandWithEnv(input.cwd, ['ls-files', '-s', '--', ...paths], input.env, [...QUIET_STDIO]))) {
+    for (const line of splitLines(runPathspecCommand(input.cwd, ['ls-files', '-s', '--'], paths, input.env))) {
         const match = line.match(LS_FILES_STAGE_PATTERN);
         if (match)
             entries.push({ path: normalizePath(match[3]), mode: match[1], blobId: match[2], provenance: input.provenance ?? 'governance-evidence', disposition: 'present' });
@@ -110,7 +120,7 @@ export function sealCommitBundleFromCandidateIndex(input) {
     return sealCommitBundle({ entries, baseTreeSha: input.baseTreeSha ?? null });
 }
 function readStagedDeletionEntries(input) {
-    const output = input.env ? runGitCommandWithEnv(input.cwd, ['diff-index', '--cached', '--raw', '--diff-filter=D', input.baseRef, '--', ...input.paths], input.env, [...QUIET_STDIO]) : runGitCommand(input.cwd, ['diff-index', '--cached', '--raw', '--diff-filter=D', input.baseRef, '--', ...input.paths]);
+    const output = runPathspecCommand(input.cwd, ['diff-index', '--cached', '--raw', '--diff-filter=D', input.baseRef, '--'], input.paths, input.env);
     return splitLines(output).flatMap((line) => {
         const match = line.match(RAW_DIFF_PATTERN);
         return match ? [{ path: normalizePath(match[6]), mode: match[1], blobId: '', provenance: input.provenance ?? 'task-scope', disposition: 'deleted' }] : [];

@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "date": "2026-10-16",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Source regression verified; runner sync and adopter close pending",
+  "id": "ATM-BUG-2026-10-16-001",
+  "area": "Taskflow same-repository planning and target bundle classification",
+  "finding": "PROG-2-0136 cannot close after source and a formal docs/tasks index land in one adopter repository. commit-bundle-assembly classifies all docs/tasks entries as foreign planning payload without comparing the resolved planning Git root. The false-positive remains with zero excluded dirty files.",
+  "expectedBehavior": "Compose explicitly declared and scope-authorized metadata and source when the planning root is the target root. Keep cross-repository mixed declarations, missing planning roots, and paths outside the direction lock fail-closed.",
+  "evidenceOrRepro": "node --experimental-strip-types packages/cli/src/commands/taskflow/__tests__/same-repo-planning-bundle.test.ts fails on the same-repo positive case before f182b1566, then passes same-repo, foreign-repo rejection and out-of-scope rejection after repair. commit-bundle-assembly.spec.ts and commit-bundle-markdown-paths.spec.ts pass. Source-level read-only replay on PROG-2-0136 returns failClosed=false and continues excluding unrelated atm.mjs and the 0133 mirror.",
+  "followUp": "Build and sync the repaired runner through the official internal-release lane, then repeat adopter pre-close/close dry-run before any lifecycle write. Current source validation is not proof of a successful adopter close or remote CI. Preserve all existing cross-repo and scope checks; no waiver, second registry, or global policy relaxation. Planning-card ticket acquisition and metadata-only seal synchronization are normal recovery surfaces discovered during diagnosis."
+}

@@ -129,7 +129,7 @@ function countStagedDiffPhysicalLines(cwd: string, file: string): number | null 
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'ignore']
     }).trim();
-    if (!output) return null;
+    if (!output) return 0;
     const [addedRaw, deletedRaw] = output.split(/\s+/);
     const added = Number.parseInt(addedRaw ?? '', 10);
     const deleted = Number.parseInt(deletedRaw ?? '', 10);

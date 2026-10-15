@@ -5,7 +5,7 @@ import {
   type TaskImportDiagnostic
 } from './legacy/implementation.ts';
 import { isCanonicalTaskIdDeclaration } from './canonical-task-id-boundary.ts';
-import { extractFrontMatter } from './task-import-validators.ts';
+import { extractFrontMatter, normalizeTaskId } from './task-import-validators.ts';
 
 export function parsePlanMarkdown(input: {
   readonly planText: string;
@@ -17,6 +17,7 @@ export function parsePlanMarkdown(input: {
   // Match the external markdown source contract without rewriting the card or
   // inventing an alias in the runtime ledger. Explicit task_id keeps precedence.
   const parsed = frontMatter && typeof declaredId === 'string' && !frontMatter.data.task_id
+    && isCanonicalTaskIdDeclaration(normalizeTaskId(declaredId))
     ? {
         tasks: [parseSingleCardFromPlugin({
           taskId: declaredId,
