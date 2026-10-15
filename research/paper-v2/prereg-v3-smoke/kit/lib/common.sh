@@ -228,6 +228,30 @@ ensure_prereg_users() {
   export PREREG_BOUNDARY
 }
 
+# GitHub Actions 的 /home/runner 常常是 750。steward 與 session 不是擁有者，
+# 連工作樹的路徑都走不進去。只補其他人的進入權，不打開寫入。
+ensure_other_can_reach() {
+  local path="$1"
+  [ -n "$path" ] || return 0
+  [ -e "$path" ] || [ -L "$path" ] || return 0
+  local cursor="$path"
+  if [ -f "$cursor" ] || [ -L "$cursor" ]; then
+    chmod a+r "$cursor" 2>/dev/null || as_root chmod a+r "$cursor" || true
+    cursor="$(dirname "$cursor")"
+  fi
+  while [ "$cursor" != "/" ]; do
+    if [ -d "$cursor" ]; then
+      local bits="${cursor}"
+      bits="$(stat -c %a "$cursor")"
+      case "${bits: -1}" in
+        1|3|5|7) ;;
+        *) as_root chmod o+x "$cursor" ;;
+      esac
+    fi
+    cursor="$(dirname "$cursor")"
+  done
+}
+
 # 工作樹改由 steward 擁有。目錄對其他人只有讀與進入，沒有寫，所以 session 不能寫、不能改名、也不能 chmod。
 own_worktree() {
   local work="$1"
@@ -246,6 +270,19 @@ start_steward_daemon() {
   node_bin="$(command -v node)"
   [ -n "$node_bin" ] || die "找不到 node，無法啟動 steward。"
   ensure_prereg_users
+  if [ "${PREREG_BOUNDARY}" = "unix-user" ]; then
+    ensure_other_can_reach "$node_bin"
+    ensure_other_can_reach "$KIT_ROOT/bin/steward-daemon.mjs"
+    ensure_other_can_reach "$KIT_ROOT/bin/atm-write.mjs"
+    ensure_other_can_reach "$KIT_ROOT/bin/atm-write"
+    ensure_other_can_reach "$work"
+    if ! as_root -u "$STEWARD_USER" -- test -r "$KIT_ROOT/bin/steward-daemon.mjs"; then
+      die "prereg-steward 讀不到 ${KIT_ROOT}/bin/steward-daemon.mjs。沿途目錄需要其他人的進入權。"
+    fi
+    if ! as_root -u "$STEWARD_USER" -- test -x "$work"; then
+      die "prereg-steward 進不了工作樹 ${work}。"
+    fi
+  fi
   if [ "${PREREG_BOUNDARY}" = "unix-user" ]; then
     as_root mkdir -p "$STEWARD_SOCK_DIR"
     as_root chown "$STEWARD_USER" "$STEWARD_SOCK_DIR"
@@ -397,6 +434,11 @@ launch_codex() {
   if [ "${PREREG_BOUNDARY:-}" = "unix-user" ] && [ "${PREREG_ARM:-}" = "B" ]; then
     # 只有工作階段的日誌目錄對 session 可寫。儲存庫工作樹不在這裡。
     chmod 1777 "$session_dir" "$session_dir/home" "$session_dir/tmp"
+    ensure_other_can_reach "$session_dir"
+    ensure_other_can_reach "$work"
+    local node_bin
+    node_bin="$(command -v node || true)"
+    [ -n "$node_bin" ] && ensure_other_can_reach "$node_bin"
   fi
   local start
   start="$(iso_now)"

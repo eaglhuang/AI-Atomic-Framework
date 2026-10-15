@@ -5,7 +5,7 @@
 ## 先決條件
 
 - 這個儲存庫的工作目錄。Arm B 寫入只走公開 npm CLI `@ai-atomic-framework/cli@0.1.20` 的 `broker steward apply`。套件裝在 git workspace 外面，Linux 預設是 `/var/cache/prereg-v3-atm-cli-0.1.20`（steward 使用者讀得到；不要裝進家目錄，家目錄通常不可穿越）。不會使用倉庫裡版本較舊的 frozen runner。沒有這支 CLI 就中止 Arm B，沒有 claim 退路，也不改走 TypeScript 直接載入。
-- Linux：免密碼 `sudo`（`sudo -n true` 要成功）。套件會自行建立系統使用者 `prereg-steward`（擁有工作樹與 steward 行程）與 `prereg-session`（跑模型，不在 `sudo` 群組，shell 是 `nologin`）。不需要手動 `useradd`。若 `sudo -n` 失敗，Arm B 直接中止，不會退回 `chmod a-w`。
+- Linux：免密碼 `sudo`（`sudo -n true` 要成功）。套件會自行建立系統使用者 `prereg-steward`（擁有工作樹與 steward 行程）與 `prereg-session`（跑模型，不在 `sudo` 群組，shell 是 `nologin`）。不需要手動 `useradd`。若 `sudo -n` 失敗，Arm B 直接中止，不會退回 `chmod a-w`。工作樹若放在其他人不能進入的家目錄下（GitHub Actions 的 `/home/runner` 常是 `750`），套件會對沿途目錄補上其他人的進入權（`chmod o+x`），不開放寫入，否則這兩個使用者連路徑都走不進去。
 - Windows 或 macOS：這兩個系統使用者通常建不起來。此時邊界改成 Codex `--sandbox read-only`，steward 行程留在沙盒外面。那是另一道控制，不是下面這道 Linux 擁有者邊界。這份套件的擁有者邊界是在 Ubuntu 24.04.5 LTS、Linux 6.12.94+ x86_64 上驗證的；GitHub Actions 的 `ubuntu-latest` 會再跑同一份 preflight。
 - Node.js 22 或更新。24 以上用 `--strip-types`，否則用 `--experimental-strip-types`。
 - `git`、`jq`、`python3`。
