@@ -658,6 +658,8 @@ pilot、主跑、留出集實驗仍不在這次範圍。dev 題沒有 B′ 與 D
 
 ## 41. HIST-v2 pilot-r2（2026-10-15；未跑完；有一筆 counterexample；不是論文結果）
 
+> **superseded／invalid — 不得作為論文結果。** 封存位元組沒有改。第 747 格的 `inconsistent` 是 harness v3 在到達睡眠裡用牆鐘讀 `first_submit`，再讓每個寫入者自開 30 秒。診斷見 [`benchmark-trials/2026-10-15-hist-v2-pilot-r2-stop/DIAGNOSIS_zh.md`](./benchmark-trials/2026-10-15-hist-v2-pilot-r2-stop/DIAGNOSIS_zh.md)。旁註：[`benchmark-trials/2026-10-15-hist-v2-pilot-r2.SUPERSEDED.md`](./benchmark-trials/2026-10-15-hist-v2-pilot-r2.SUPERSEDED.md)。下面的原始計數保留，只說明當時寫了什麼。受影響的是這一格的成功計數 1、248／249 那一組，以及因此提前停止。類別 A 的 400／400 與 251／400 不是這次時鐘差算出來的，但仍在這份封存裡，paper 不引用。
+
 > **pilot-r2 — 不得作為論文結果。** 計畫 1740 格，執行 747 格後停止。有一筆 `inconsistent`，鑑識保留，沒有覆蓋。沒有主跑，沒有留出集。不宣稱勝出。A′、C 與其餘 B 題沒有執行，下面的 B 列不是完整 pilot。
 
 | 項目 | 值 |
@@ -674,6 +676,22 @@ pilot、主跑、留出集實驗仍不在這次範圍。dev 題沒有 B′ 與 D
 | 檔案數 | 8229（不含 SHA256SUMS） |
 | SHA256SUMS sha256 | `e44080d174d2ab69ab233bb6764e419d0404a2ae1d1bd0173bf7f3dc3c1fe6d9` |
 | 驗證 | `sh research/paper-v2/benchmark-trials/2026-10-15-hist-v2-pilot-r2/verify.sh` |
+
+## 42. HIST-v2 pilot-r2 停止診斷（2026-10-15；不是實驗 generation）
+
+> **診斷 — 不得作為論文結果。** 沒有重跑，沒有 A′、C、主跑或留出集。不宣稱勝出。pilot-r2、harness v3、replay v2 的封存位元組沒有改。
+
+| 項目 | 值 |
+|---|---|
+| 路徑 | [`benchmark-trials/2026-10-15-hist-v2-pilot-r2-stop/`](./benchmark-trials/2026-10-15-hist-v2-pilot-r2-stop/GENERATION.md) |
+| 報告 | [`benchmark-trials/2026-10-15-hist-v2-pilot-r2-stop/DIAGNOSIS_zh.md`](./benchmark-trials/2026-10-15-hist-v2-pilot-r2-stop/DIAGNOSIS_zh.md) |
+| 建議修正 | [`benchmark-trials/2026-10-15-hist-v2-pilot-r2-stop/PROPOSED_FIX.md`](./benchmark-trials/2026-10-15-hist-v2-pilot-r2-stop/PROPOSED_FIX.md)。未套用 |
+| 判定 | harness v3。到達 `time.sleep` 期間的牆鐘跳變把 textual 的第二個 `first_submit` 推後 110.327 秒。臂自開 30 秒並標成期限內 ack。評分器的共用 `T_stop` 得到 `late-commit-after-timeout`，R6-D2 記 `inconsistent:ack`。本體仍等於 `R({17554,18450})`，與 steward 相同 |
+| 不是 | replay 資料、分類器答案鍵、或兩條臂合成出不同位元組 |
+| 重現 | 5 項測試。把時間戳收成排程延遲 506.5 ms 後，同一本體兩筆都是 `success`。已執行格子裡只有這一格的 `first_submit` 差超過 30 秒 |
+| 檔案數 | 7（不含 SHA256SUMS） |
+| SHA256SUMS sha256 | `0a78c7cfb1d7f9c6595d809af92f529884c86cbf98d5d7ddbc17bcbbd99b1500` |
+| 驗證 | `sh research/paper-v2/benchmark-trials/2026-10-15-hist-v2-pilot-r2-stop/verify.sh` |
 
 ## 6. 不在 repo 的參照
 - ATM pin 原始碼：GitHub `eaglhuang/AI-Atomic-Framework` commit `5692474f7db70ab52a7a71c8af4867609e7e4b43`（r3 另加 `bea35380d7f381f998c9930fa95f01b999c7f208`，box tarball `/workspace/atm-main-bea35380/atm-main.tar.gz` sha256 `9346e5b175b176618f435aeb4b41ab93ef7575f9bf77d77c47a5aeac87ad34b5`；r4 另加 `2118bc66efb3ac3bc0ddaede6a2f7cb18526b030`，box tarball `/workspace/atm-main-2118bc66/atm-main.tar.gz` sha256 `aa959607c35c51b7fc3c4e3d81b3d9e979ee62f4d9361ef9e9f5ee72e78abd88`；r5 另加 `37847584e24afc08ea58cfe380bb5b1220fbe335`，box tarball `/workspace/atm-main-37847584/atm-main.tar.gz` sha256 `e17a90ddceaf3c70d580c96e31f14cf8251d5a664985c1eb494f0d8db8045e3d`；r6 另加 `b35a6141bd5bfbaec654f1cd3079323581b04074`，box tarball `/workspace/atm-main-b35a6141/atm-main.tar.gz` sha256 `93fa7839d8e0fee51e5ad224833df2b57397fead3e77e0528117f21f5d5e59ef`）；box tarball `/workspace/atm-main-5692474f/atm-main.tar.gz` sha256 `1d498a397e6a5db119d40b8f539dc165cb0028fbfe9577f953023f8ec8d45795`。

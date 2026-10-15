@@ -1,5 +1,7 @@
 # pilot-r2 旁註
 
+> **superseded／invalid。** 封存位元組不要改。原因見 [`2026-10-15-hist-v2-pilot-r2-stop/DIAGNOSIS_zh.md`](2026-10-15-hist-v2-pilot-r2-stop/DIAGNOSIS_zh.md) 與 [`2026-10-15-hist-v2-pilot-r2.SUPERSEDED.md`](2026-10-15-hist-v2-pilot-r2.SUPERSEDED.md)。
+
 這份旁註在封存目錄外面。`2026-10-15-hist-v2-pilot-r2/` 的位元組不要改。
 
 這是 pilot，不是論文結果。沒有勝出主張。主跑與留出集沒有執行。
