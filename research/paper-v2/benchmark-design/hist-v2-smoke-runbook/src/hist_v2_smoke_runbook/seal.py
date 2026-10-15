@@ -7,7 +7,7 @@ from pathlib import Path
 from .negative_controls import collect_negative_controls
 from .pins import runbook_root
 from .preflight import sha256_file
-from .stop_report import counterexamples_from, render_stop_report
+from .stop_report import counterexamples_from, file_lock_contrast_notes, render_stop_report
 
 
 class OverwriteRefused(FileExistsError):
@@ -47,7 +47,7 @@ def seal_generation(
         )
     _write_forensics(dest, counterexamples, observations)
     payload = {
-        "GENERATION.md": _generation(banner, date, sample, plan, counterexamples),
+        "GENERATION.md": _generation(banner, date, sample, plan, counterexamples, pins),
         "STOP_REPORT.md": render_stop_report(
             banner=banner,
             date=date,
@@ -57,6 +57,9 @@ def seal_generation(
             negative=negative,
             counterexamples=counterexamples,
             deviations=deviations,
+            arm_mapping=pins.get("arm_mapping"),
+            notes=_notes(pins, observations),
+            scope_line=pins.get("report_scope_line"),
         ),
         "plan.json": _json(plan),
         "observations.jsonl": _jsonl(observations),
@@ -125,11 +128,19 @@ def _write_forensics(dest: Path, counterexamples: list[dict], observations: list
     (dest / "FORENSIC.json").write_text(_json(summary), encoding="utf-8")
 
 
-def _generation(banner: str, date: str, sample: dict, plan: dict, counterexamples: list[dict]) -> str:
+def _notes(pins: dict, observations: list[dict]) -> list[str]:
+    notes = list(pins.get("report_notes") or [])
+    if pins.get("note_file_lock_contrast"):
+        notes.extend(file_lock_contrast_notes(observations))
+    return notes
+
+
+def _generation(banner: str, date: str, sample: dict, plan: dict, counterexamples: list[dict], pins: dict | None = None) -> str:
     missing = "、".join(sample.get("missing_classes") or []) or "無"
+    kind = (pins or {}).get("generation_kind_line") or "這是 trial-only 封存，不得作為論文結果。"
     return (
         f"{banner}\n\n"
-        f"日期：{date}。這是 trial-only 封存，不得作為論文結果。\n"
+        f"日期：{date}。{kind}\n"
         f"抽中 {len(sample.get('selected', []))} 題。缺的類別：{missing}。\n"
         f"計畫格子 {plan.get('cell_count', 0)}。已執行格子 {sum(1 for cell in plan.get('cells') or [] if cell.get('executed'))}。\n"
         f"counterexample 數：{len(counterexamples)}。有鑑識時保留原檔，不覆蓋。\n"

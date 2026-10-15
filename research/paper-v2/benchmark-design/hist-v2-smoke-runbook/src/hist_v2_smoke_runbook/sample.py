@@ -45,20 +45,29 @@ def sample_dev(items: list[dict], pins: dict) -> dict:
         if split != pins["dev_set"] or item.get("write_class") not in pins["write_classes"]:
             skipped.append(str(item.get("id") or f"line-{index}"))
             continue
+        if pins.get("two_proposal_only") and len(item.get("prs") or []) != 2:
+            skipped.append(str(item.get("id") or f"line-{index}"))
+            continue
         if not item.get("id"):
             errors.append(f"line {index}: missing id")
             continue
         eligible.append(item)
     selected: list[dict] = []
     missing: list[str] = []
+    cap = int(pins.get("per_class_cap") or 1)
+    limit = pins.get("group_cap")
+    limit_n = None if limit is None else int(limit)
     if not errors:
         for write_class in pins["write_classes"]:
+            if limit_n is not None and len(selected) >= limit_n:
+                break
             rows = [item for item in eligible if item["write_class"] == write_class]
             if not rows:
                 missing.append(write_class)
                 continue
             rows.sort(key=lambda item: (str(item["project"]), str(item["id"])))
-            selected.append(_public_item(rows[0]))
+            room = cap if limit_n is None else min(cap, limit_n - len(selected))
+            selected.extend(_public_item(row) for row in rows[:room])
     return {
         "selected": [] if errors else selected,
         "missing_classes": missing if not errors else list(pins["write_classes"]),
