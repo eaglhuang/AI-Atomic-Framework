@@ -24,7 +24,7 @@ ATM（AI-Atomic-Framework）論文 2.0（composer＋中立 steward，RQ2 主臂 
 | HIST-v2 smoke runbook | [`benchmark-design/hist-v2-smoke-runbook/`](./benchmark-design/hist-v2-smoke-runbook/RUNBOOK_zh.md)（2026-10-14 程序，2026-10-15 加上作者批准後的歷史 patch 重播閘。歷史路徑的父目錄在呼叫封存 harness 之前建立。catalog fixture 不能代替 dev 題。不宣稱勝出） |
 | HIST-v2 分類器 v8 全候選集 | [`benchmark-main/2026-10-15-hist-v2-classify-v8/`](./benchmark-main/2026-10-15-hist-v2-classify-v8/GENERATION.md)（2026-10-15；4095 題，dev replay 綁定 3061。沒有臂。不宣稱勝出） |
 | HIST-v2 smoke trial | [`benchmark-trials/2026-10-15-hist-v2-smoke/`](./benchmark-trials/2026-10-15-hist-v2-smoke/GENERATION.md)（2026-10-15；只跑 dev 4 題、64 格。拒絕留出列 213。缺 B′、D。負控制全部抓到。沒有 counterexample。trial-only，不宣稱勝出，不是 C1′–C3′ 證據） |
-| 相關工作文獻集 2026-10-15 | [`related-work/2026-10-15/`](./related-work/2026-10-15/GENERATION.md)（2026-10-15；12 篇索引、評論文與 BibTeX。9 份 CC 授權 PDF 原樣轉存；3 篇 arXiv 非專屬授權只留連結。不是實驗 generation、沒有 run、不宣稱勝出） |
+| 相關工作文獻集 2026-10-15 | [`related-work/2026-10-15/`](./related-work/2026-10-15/GENERATION.md)（2026-10-15；14 篇索引、評論文與 BibTeX。9 份 CC 授權 PDF 原樣轉存；5 篇 arXiv 非專屬授權只留連結，含 SDD 2609.00252 與 Apodex 1.1 2608.23283。不是實驗 generation、沒有 run、不宣稱勝出） |
 | 校驗 | `generations/<gen>/verify.sh`（唯讀；`sha256sum -c SHA256SUMS`） |
 | benchmark-trials/2026-10-09-hist-smoke, benchmark-trials/2026-10-09-hist-pilot | 試跑（trial runs, not formal results）：歷史真實 PR benchmark 冒煙＋Django pilot，ATM pin b35a6141（2026-10-09） |
 | benchmark-trials/2026-10-09-hist-mining | 只挖掘、沒有 run（不列入正式結果）：六專案合併 commit base 重新挖掘、可行性 dry-run、prereg v1.1 提案草稿（未套用）（2026-10-09） |

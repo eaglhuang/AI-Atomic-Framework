@@ -577,11 +577,11 @@ pilot、主跑、留出集實驗仍不在這次範圍。dev 題沒有 B′ 與 D
 | 路徑 | [`related-work/2026-10-15/`](./related-work/2026-10-15/GENERATION.md) |
 | 索引 | [`related-work/2026-10-15/README.md`](./related-work/2026-10-15/README.md) |
 | 評論文 | [`related-work/2026-10-15/related-papers-2026-10-15.md`](./related-work/2026-10-15/related-papers-2026-10-15.md) |
-| BibTeX | [`related-work/2026-10-15/references.bib`](./related-work/2026-10-15/references.bib)，12 條 |
+| BibTeX | [`related-work/2026-10-15/references.bib`](./related-work/2026-10-15/references.bib)，14 條 |
 | PDF | 9 份，CC BY 4.0、CC BY-SA 4.0 或 CC BY-NC-ND 4.0，原樣轉存。CC BY-NC-ND 只限非商業、不得改作 |
-| 只留連結 | arXiv:2608.22152、arXiv:2603.21489、arXiv:2511.02687（arXiv 非專屬散布授權） |
+| 只留連結 | arXiv:2608.22152、arXiv:2603.21489、arXiv:2511.02687、arXiv:2609.00252（SDD）、arXiv:2608.23283（Apodex 1.1）（arXiv 非專屬散布授權） |
 | 檔案數 | 14（不含 SHA256SUMS） |
-| SHA256SUMS sha256 | `7f8f8549c878219f2cb931202fc844ee0b3c8a182f6b3a892cc38aed3178e850` |
+| SHA256SUMS sha256 | `63c3ccc726158b0a195262a1841bd8e91b9d1ec3b7d918edb0673d81d8d436cf` |
 | 驗證 | `sh research/paper-v2/related-work/2026-10-15/verify.sh` |
 
 §6 所記的 box `refs/` 副本仍未另存。`pdf/2607.00041_ATM-v1.pdf` 是這份文獻集裡依 CC BY 4.0 原樣轉存的 arXiv PDF，sha256 `f7d41247cc590ab70ebc9042a014a9b463ba9d76db31d8faaa7754f5a9006f24`。
