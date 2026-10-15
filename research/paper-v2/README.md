@@ -20,11 +20,13 @@ ATM（AI-Atomic-Framework）論文 2.0（composer＋中立 steward，RQ2 主臂 
 | 工作稿快照 2026-10-14 | [`working-docs/2026-10-14/`](./working-docs/2026-10-14/SNAPSHOT.md)（DRAFT 論文稿；不是 generation、不宣稱勝出、沒有 HIST-v2 run。§5 改寫為已凍結預先登記；C1′–C3′ 占位；Phase 3 450-run 作廢） |
 | HIST-v2 重新設計稿 2026-10-10 | [`benchmark-design/2026-10-10-hist-bench-v2/`](./benchmark-design/2026-10-10-hist-bench-v2/README.md)（DRAFT 設計稿；不是凍結的預先登記、沒有任何 run；待作者決定 D1–D9 後另行凍結） |
 | HIST-v2 預先登記 v2.0（方法凍結） | [`benchmark-prereg/2026-10-14-hist-v2.0/`](./benchmark-prereg/2026-10-14-hist-v2.0/GENERATION.md)（2026-10-14；只凍結方法設計，自 r7 原樣帶入全部 DECISIONS。分類與實驗仍有准入閘門。來源 commit `f08599c7d864cd4ede0b50e4c6b6742b4a892f0b`。不宣稱勝出、沒有 run） |
-| HIST-v2 harness v2 | [`benchmark-harness/hist-v2-harness-v2/`](./benchmark-harness/hist-v2-harness-v2/GENERATION.md)（2026-10-14；四條臂的 fixture 接線。不跑 smoke／pilot／主跑／留出集。不宣稱勝出、沒有正式 run） |
+| HIST-v2 harness v2 | [`benchmark-harness/hist-v2-harness-v2/`](./benchmark-harness/hist-v2-harness-v2/GENERATION.md)（2026-10-14；四條臂的 fixture 接線。位元組保持封存。不跑 smoke／pilot／主跑／留出集。不宣稱勝出、沒有正式 run） |
+| HIST-v2 harness v3 | [`benchmark-harness/hist-v2-harness-v3/`](./benchmark-harness/hist-v2-harness-v3/GENERATION.md)（2026-10-15；補 §9 抖動，並修正共同 base 的三方 mine。沒有 pilot-r2。不宣稱勝出） |
 | HIST-v2 smoke runbook | [`benchmark-design/hist-v2-smoke-runbook/`](./benchmark-design/hist-v2-smoke-runbook/RUNBOOK_zh.md)（2026-10-14 程序。2026-10-15 加上 smoke 重播閘，以及只放行 pilot 的批准值 `issue-292-author-approved-pilot-only`。`main` 與 `held-out` 仍是退出碼 2。不宣稱勝出） |
 | HIST-v2 分類器 v8 全候選集 | [`benchmark-main/2026-10-15-hist-v2-classify-v8/`](./benchmark-main/2026-10-15-hist-v2-classify-v8/GENERATION.md)（2026-10-15；4095 題，dev replay 綁定 3061。沒有臂。不宣稱勝出） |
-| HIST-v2 smoke trial | [`benchmark-trials/2026-10-15-hist-v2-smoke/`](./benchmark-trials/2026-10-15-hist-v2-smoke/GENERATION.md)（2026-10-15；只跑 dev 4 題、64 格。拒絕留出列 213。缺 B′、D。負控制全部抓到。沒有 counterexample。trial-only，不宣稱勝出，不是 C1′–C3′ 證據） |
-| HIST-v2 pilot | [`benchmark-trials/2026-10-15-hist-v2-pilot/`](./benchmark-trials/2026-10-15-hist-v2-pilot/GENERATION.md)（2026-10-15；作者批准 pilot only。dev 29 題、三條主比較臂、1740 格。負控制全部抓到。沒有 counterexample。pilot，不是論文結果，不宣稱勝出） |
+| HIST-v2 smoke trial | [`benchmark-trials/2026-10-15-hist-v2-smoke/`](./benchmark-trials/2026-10-15-hist-v2-smoke/GENERATION.md)（2026-10-15；**superseded／invalid**。封存位元組未改。旁註 [`2026-10-15-hist-v2-smoke.SUPERSEDED.md`](./benchmark-trials/2026-10-15-hist-v2-smoke.SUPERSEDED.md)。不要引用表內數字） |
+| HIST-v2 pilot | [`benchmark-trials/2026-10-15-hist-v2-pilot/`](./benchmark-trials/2026-10-15-hist-v2-pilot/GENERATION.md)（2026-10-15；**superseded／invalid**。封存位元組未改。旁註 [`2026-10-15-hist-v2-pilot.SUPERSEDED.md`](./benchmark-trials/2026-10-15-hist-v2-pilot.SUPERSEDED.md)。不要引用表內數字） |
+| HIST-v2 pilot 診斷 | [`benchmark-trials/2026-10-15-hist-v2-pilot-diagnosis/`](./benchmark-trials/2026-10-15-hist-v2-pilot-diagnosis/DIAGNOSIS_zh.md)（2026-10-15；診斷封存。不是論文結果，沒有重跑，不宣稱勝出） |
 | 相關工作文獻集 2026-10-15 | [`related-work/2026-10-15/`](./related-work/2026-10-15/GENERATION.md)（2026-10-15；14 篇索引、評論文與 BibTeX。9 份 CC 授權 PDF 原樣轉存；5 篇 arXiv 非專屬授權只留連結，含 SDD 2609.00252 與 Apodex 1.1 2608.23283。不是實驗 generation、沒有 run、不宣稱勝出） |
 | 校驗 | `generations/<gen>/verify.sh`（唯讀；`sha256sum -c SHA256SUMS`） |
 | benchmark-trials/2026-10-09-hist-smoke, benchmark-trials/2026-10-09-hist-pilot | 試跑（trial runs, not formal results）：歷史真實 PR benchmark 冒煙＋Django pilot，ATM pin b35a6141（2026-10-09） |
@@ -76,6 +78,8 @@ sh research/paper-v2/benchmark-design/2026-10-10-hist-bench-v2/verify.sh researc
 sh research/paper-v2/benchmark-prereg/2026-10-14-hist-v2.0/verify.sh research/paper-v2/benchmark-prereg/2026-10-14-hist-v2.0
 # 預期：OK: 5 files verified (read-only) in research/paper-v2/benchmark-prereg/2026-10-14-hist-v2.0
 sh research/paper-v2/benchmark-harness/hist-v2-harness-v2/verify.sh research/paper-v2/benchmark-harness/hist-v2-harness-v2
+sh research/paper-v2/benchmark-harness/hist-v2-harness-v3/verify.sh research/paper-v2/benchmark-harness/hist-v2-harness-v3
+sh research/paper-v2/benchmark-trials/2026-10-15-hist-v2-pilot-diagnosis/verify.sh research/paper-v2/benchmark-trials/2026-10-15-hist-v2-pilot-diagnosis
 sh research/paper-v2/benchmark-design/hist-v2-smoke-runbook/verify.sh research/paper-v2/benchmark-design/hist-v2-smoke-runbook
 sh research/paper-v2/benchmark-trials/2026-10-15-hist-v2-pilot/verify.sh research/paper-v2/benchmark-trials/2026-10-15-hist-v2-pilot
 sh research/paper-v2/working-docs/2026-10-14/verify.sh research/paper-v2/working-docs/2026-10-14
