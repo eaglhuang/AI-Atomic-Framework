@@ -491,13 +491,15 @@ DRAFT HIST-v2 prereg（非 generation、尚未凍結、沒有 run）：[`working
 | 分類器 v8 `RULES.md` sha256 | `329165d10ea2fe26885f6e7e06cb065f5cb1e356fc34efd9cce38e1995c97541` |
 | harness v2 | [`benchmark-harness/hist-v2-harness-v2/`](./benchmark-harness/hist-v2-harness-v2/GENERATION.md)，`SHA256SUMS` sha256 `393ea1deec292674d6fe60b2a11ccf6fb47a0c7602af82f2ea2fcf402009e74c` |
 | ATM core merge | `cb25242433882d34b514b79338d1a00def53a875`（PR #297） |
-| 矩陣 | dev 題每個有資料的類別 1 題；臂四條；間隔只留 0 ms 與 500 ms；兩種順序；seed 0 |
-| SHA256SUMS sha256 | `a344a69a28a40db26f37e0a9c33bba92772279d4787743a51310c5d76373762d` |
-| 上一份程序封印 | `50d3a7c0b23103f91ff9f9a76f2708e9be75e863b5fc909c78fddd5170b94233`；再上一份 `ea1da1ab3fb1343b3be5ec21578468a2e30ae6f4edf01d92c32cfc451231ceb5`；PR #299 是 `0b9c83569cae021f0cfd63e1e7a7d25e9cb29927d8841e672b7a00ccf378cf87`（merge `ae342aac`） |
-| 檔案數 | 24（不含 SHA256SUMS） |
+| 矩陣 | smoke：dev 題每個有資料的類別 1 題；臂四條；間隔只留 0 ms 與 500 ms；兩種順序；seed 0。pilot 閘另見下段 |
+| SHA256SUMS sha256 | `49d1acbd2b9a456aad588c5f29711170afa4d9c0acfad2ba9493c6e4e1540c1c` |
+| 上一份程序封印 | `a344a69a28a40db26f37e0a9c33bba92772279d4787743a51310c5d76373762d`；再上一份 `50d3a7c0b23103f91ff9f9a76f2708e9be75e863b5fc909c78fddd5170b94233`；再上一份 `ea1da1ab3fb1343b3be5ec21578468a2e30ae6f4edf01d92c32cfc451231ceb5`；PR #299 是 `0b9c83569cae021f0cfd63e1e7a7d25e9cb29927d8841e672b7a00ccf378cf87`（merge `ae342aac`） |
+| 檔案數 | 25（不含 SHA256SUMS） |
 | 驗證 | `sh benchmark-design/hist-v2-smoke-runbook/verify.sh benchmark-design/hist-v2-smoke-runbook` |
 
 沒有把本目錄當成 smoke generation。歷史題的 `target_file` 可以含目錄；重播在呼叫封存 harness 之前建立父目錄，不改 harness 位元組。釘選不符、禁止階段、尚未批准，或 dev 題沒有歷史 patch 綁定時，`--execute` 都不建立 run 目錄。已存在的 smoke generation 只核對路徑與 `SHA256SUMS` 沒有被該次拒絕改寫。catalog fixture 不能代替分類器 v8 的 dev 題。harness v2 的 `SHA256SUMS` 仍是 `393ea1deec292674d6fe60b2a11ccf6fb47a0c7602af82f2ea2fcf402009e74c`。預先登記目錄沒有修改。
+
+2026-10-15 15:19（Asia/Taipei）作者批准只跑 pilot 之後，`--stage pilot` 改為需要 `HIST_V2_PILOT_AUTHOR_APPROVAL=issue-292-author-approved-pilot-only`。沒有這個值時退出碼 3。`main` 與 `held-out` 仍是退出碼 2。pilot 矩陣是凍結正文的三條主比較臂（steward、file_lock、textual_merge_file）、間隔 0／50／100／500／2000 ms、seed 0 與 1、兩種順序。harness 的 `atm` 臂不在這次 pilot。這份索引列仍是程序，不是 pilot generation。
 
 ## 32. 工作稿快照 2026-10-14：論文 2.0 在 HIST-v2 結果之前可寫的章節（DRAFT；非 generation；沒有 run）
 
@@ -566,9 +568,30 @@ pilot、主跑、留出集實驗仍不在這次範圍。dev 題沒有 B′ 與 D
 | SHA256SUMS sha256 | `fecb61c1178b55fba490507d8afeef1d57ecacb8e8e0a5cf37797574465aab8f` |
 | 驗證 | `sh research/paper-v2/benchmark-trials/2026-10-15-hist-v2-smoke/verify.sh` |
 
-`combined_success` 計數是各格裡算成功的 proposal 數，不是勝出比較。file_lock／B 是 7／8，其餘 A、B、C 是 4／8，A′ 在 atm、steward、textual_merge_file 是 8／8、在 file_lock 是 4／8。pilot、main、held-out 仍是退出碼 2。
+`combined_success` 計數是各格裡算成功的 proposal 數，不是勝出比較。file_lock／B 是 7／8，其餘 A、B、C 是 4／8，A′ 在 atm、steward、textual_merge_file 是 8／8、在 file_lock 是 4／8。寫下這一段時，pilot、main、held-out 仍是退出碼 2。
 
-## 36. 相關工作文獻集（2026-10-15；閱讀封存，不是實驗 generation）
+## 36. HIST-v2 pilot（2026-10-15；作者批准 pilot only；不是論文結果）
+
+> **pilot — 不得作為論文結果。** 只跑 dev 題。沒有執行主跑或留出集。沒有 counterexample。不宣稱勝出。不是 C1′–C3′ 的證據。預先登記目錄與 harness v2 位元組沒有修改。
+
+| 項目 | 值 |
+|---|---|
+| 路徑 | [`benchmark-trials/2026-10-15-hist-v2-pilot/`](./benchmark-trials/2026-10-15-hist-v2-pilot/GENERATION.md) |
+| 批准 | 作者（repo owner）2026-10-15 15:19 Asia/Taipei，只准 HIST-v2 PILOT。批准值 `issue-292-author-approved-pilot-only` |
+| 題目來源 | [`benchmark-main/2026-10-15-hist-v2-classify-v8/`](./benchmark-main/2026-10-15-hist-v2-classify-v8/GENERATION.md)，`SHA256SUMS` sha256 `7895681e9833e1cecfc0a0c46cf89ab0204ecabd4f0ef72b385fdbe38d04dd77` |
+| 抽題 | `set=dev`、恰好兩份 proposal。A 10、B 10、C 1、A′ 8，合計 29。缺 B′、D。拒絕留出列 213，沒有執行 |
+| 臂 | steward、file_lock、textual_merge_file。steward 對應 §3.1 的 ATM 批次協調器處置臂。harness 的 `atm` 臂不跑 |
+| 矩陣 | 29 題 × 3 臂 × 2 順序 × 5 間隔 × 2 seed = 1740 格，全部執行 |
+| 負控制 | 五個植入全部被抓到。每一個 `combined_success` 為 false |
+| counterexample | 沒有 |
+| 偏離 | 凍結 §8 沒有密封題數，題數來自該次批准的 about 30 groups。封存 harness 沒有 §9 的均勻抖動，間隔用名義值 |
+| 檔案數 | 19149（不含 SHA256SUMS） |
+| SHA256SUMS sha256 | `7e4773b2bbe124c9afea211efd43efdf5543695cdf6e430ce8970dd80e9fb938` |
+| 驗證 | `sh research/paper-v2/benchmark-trials/2026-10-15-hist-v2-pilot/verify.sh` |
+
+`combined_success` 是各格裡算成功的 proposal 數，不是勝出比較。file_lock 的 A 是 250／400，steward 與 textual_merge_file 是 300／400；A′ 是 160／320，另外兩條臂是 320／320；B 是 221／400，另外兩條臂是 200／400。C 三條臂都是 20／40。主跑與留出集仍是退出碼 2。
+
+## 37. 相關工作文獻集（2026-10-15；閱讀封存，不是實驗 generation）
 
 > **閱讀封存 — 不得作為論文結果。** 沒有 run。不宣稱勝出。不是 C1′–C3′ 的證據。既有 generations 與其他封存目錄沒有修改。
 

@@ -13,13 +13,16 @@ def render_stop_report(
     negative: dict,
     counterexamples: list[dict],
     deviations: list[str],
+    arm_mapping: str | None = None,
+    notes: list[str] | None = None,
+    scope_line: str | None = None,
 ) -> str:
     lines = [
         banner,
         "",
         f"日期：{date}",
         "這份報告只列計數。它不是論文結果，也不比較臂的優劣。",
-        "區間：未計算。冒煙停在計數，不估計比較區間。",
+        scope_line or "區間：未計算。冒煙停在計數，不估計比較區間。",
         "",
         "## 抽題",
         "",
@@ -77,6 +80,12 @@ def render_stop_report(
     else:
         for item in deviations:
             lines.append(f"- {item}")
+    if arm_mapping:
+        lines.extend(["", "## 臂與預先登記的對應", "", arm_mapping.rstrip(), ""])
+    if notes:
+        lines.extend(["", "## 值得注意", ""])
+        for item in notes:
+            lines.append(f"- {item}")
     lines.extend(["", "## 建議", ""])
     if counterexamples:
         lines.append("保留全部鑑識資料。不要重跑覆蓋，不要刪除或改寫。不要用這些觀察修改預先登記、分類器規則或答案鍵。由作者決定。")
@@ -108,6 +117,37 @@ def counterexamples_from(observations: list[dict]) -> list[dict]:
             }
         )
     return found
+
+
+def file_lock_contrast_notes(observations: list[dict]) -> list[str]:
+    """Count notes only. No ordering of arms."""
+
+    grouped: dict[tuple[str, str], list[dict]] = {}
+    for row in observations:
+        grouped.setdefault((str(row.get("write_class")), str(row.get("arm"))), []).append(row)
+    notes = [
+        "2026-10-15 smoke 裡 file_lock 的 combined_success 計數與另外三條臂不同：A′ 是 4／8，atm、steward、textual_merge_file 是 8／8；B 是 7／8，另外三條臂是 4／8。那次 smoke 含 harness 的 atm 臂。本次 pilot 不跑 atm。沒有用那個差異修改預先登記。"
+    ]
+    classes = sorted({write_class for write_class, _arm in grouped})
+    for write_class in classes:
+        arms = sorted(arm for cls, arm in grouped if cls == write_class)
+        if "file_lock" not in arms or len(arms) < 2:
+            continue
+        totals = {}
+        for arm in arms:
+            rows = grouped[(write_class, arm)]
+            totals[arm] = (
+                sum(int(row.get("combined_success_count") or 0) for row in rows),
+                sum(int(row.get("proposal_count") or 0) for row in rows),
+            )
+        others = {totals[arm] for arm in arms if arm != "file_lock"}
+        if len(others) == 1 and totals["file_lock"] not in others:
+            success, proposals = totals["file_lock"]
+            other_success, other_proposals = next(iter(others))
+            notes.append(
+                f"本次類別 {write_class}：file_lock 的 combined_success 是 {success}／{proposals}，同題其他臂是 {other_success}／{other_proposals}。這是計數。"
+            )
+    return notes
 
 
 def _kind(row: dict) -> str | None:

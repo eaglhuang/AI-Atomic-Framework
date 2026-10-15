@@ -112,7 +112,7 @@ def execute_smoke(
         return 4
     plan = build_plan(sample["selected"], pins)
     observations: list[dict] = []
-    deviations: list[str] = []
+    deviations: list[str] = list(pins.get("declared_deviations") or [])
     staging = dest.parent / f".{dest.name}.staging"
     if staging.exists():
         shutil.rmtree(staging)
@@ -132,6 +132,7 @@ def execute_smoke(
                 _say("no run directory created")
                 return 5
             name = _cell_name(cell)
+            _say(f"CELL {len(observations) + 1}/{len(plan['cells'])} {name}")
             target = staging / "cells" / name
             shutil.copytree(outcome["workspace"], target)
             observations.append(outcome["observation"])

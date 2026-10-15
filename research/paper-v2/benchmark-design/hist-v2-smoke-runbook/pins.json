@@ -11,18 +11,95 @@
     "packages/core/src/broker",
     "scripts/validate-shared-compose-inbox.ts"
   ],
-  "write_classes": ["A", "B", "C", "A'", "B'", "D"],
-  "arms": ["atm", "textual_merge_file", "steward", "file_lock"],
-  "comparison_arms": ["steward", "file_lock", "textual_merge_file"],
-  "inter_arrival_ms": [0, 500],
-  "orders": ["forward", "reverse"],
-  "seeds": [0],
+  "write_classes": [
+    "A",
+    "B",
+    "C",
+    "A'",
+    "B'",
+    "D"
+  ],
+  "arms": [
+    "atm",
+    "textual_merge_file",
+    "steward",
+    "file_lock"
+  ],
+  "comparison_arms": [
+    "steward",
+    "file_lock",
+    "textual_merge_file"
+  ],
+  "inter_arrival_ms": [
+    0,
+    500
+  ],
+  "orders": [
+    "forward",
+    "reverse"
+  ],
+  "seeds": [
+    0
+  ],
   "dev_set": "dev",
   "item_schema_version": "hist-v2-items/8",
-  "forbidden_stages": ["pilot", "main", "held-out", "heldout"],
-  "forbidden_projects": ["flask", "requests"],
-  "forbidden_sets": ["later-period-historical-holdout", "held-out-project", "held-out"],
+  "forbidden_stages": [
+    "main",
+    "held-out",
+    "heldout"
+  ],
+  "forbidden_projects": [
+    "flask",
+    "requests"
+  ],
+  "forbidden_sets": [
+    "later-period-historical-holdout",
+    "held-out-project",
+    "held-out"
+  ],
   "approval_env": "HIST_V2_SMOKE_AUTHOR_APPROVAL",
   "approval_value": "issue-292-author-approved-smoke-only",
-  "trial_banner": "trial-only — 不得作為論文結果"
+  "trial_banner": "trial-only — 不得作為論文結果",
+  "pilot": {
+    "approval_env": "HIST_V2_PILOT_AUTHOR_APPROVAL",
+    "approval_value": "issue-292-author-approved-pilot-only",
+    "arms": [
+      "steward",
+      "file_lock",
+      "textual_merge_file"
+    ],
+    "comparison_arms": [
+      "steward",
+      "file_lock",
+      "textual_merge_file"
+    ],
+    "inter_arrival_ms": [
+      0,
+      50,
+      100,
+      500,
+      2000
+    ],
+    "orders": [
+      "forward",
+      "reverse"
+    ],
+    "seeds": [
+      0,
+      1
+    ],
+    "per_class_cap": 10,
+    "group_cap": 30,
+    "banner": "pilot — 不得作為論文結果",
+    "generation_kind_line": "這是 pilot 封存，不是論文結果。",
+    "report_scope_line": "區間：未計算。pilot 停在計數，不估計比較區間，不進正式結果。",
+    "arm_mapping": "凍結預先登記 r7 §3.1 與 §7 的主比較是三條臂，不是四條。§3 所說的 ATM 臂是 steward：候選由 ATM 批次協調器合成，協調器與 SQLite 的耗時計入 30 秒。它不是 harness 裡另外一條名叫 atm 的臂，也不是舊長矩陣裡的「完整 ATM」。bare_composer 不在主比較裡。occ 與 git 三方收成 textual_merge_file 這一條，不拆開。本次 pilot 只跑下面三條。\n\n| 臂 | 預先登記角色 |\n|---|---|\n| steward | 處置。ATM 批次協調器的合成。base 是協調器綁定的不可變 base。整檔鎖與其他臂相同。第一次送出後 8 次重試。 |\n| file_lock | 對照。鎖內讀改寫該 proposal 的 hunk，不用 git merge-file。base 是鎖內讀到的檔案。同一把整檔鎖持有到原子替換結束。 |\n| textual_merge_file | 對照。鎖外用 git merge-file，不用 --union／--ours／--theirs。鎖內 base 變了就作廢並在鎖內重算，計入 8 次重試。 |\n| atm | 不跑。harness v2 另有這條臂。它不在 §3.1 與 §7 的三條主比較裡。 |",
+    "report_notes": [
+      "抽題上限來自作者 2026-10-15 15:19（Asia/Taipei）批准的 about 30 groups，不是凍結正文裡的密封題數。見偏離。"
+    ],
+    "declared_deviations": [
+      "凍結 r7 §8 只寫 pilot 在使用者明確同意後才跑、試跑、不進正式結果，沒有密封題數。作者於 2026-10-15 15:19（Asia/Taipei）批准 about 30 groups。runbook 把它操作成：只抽 set=dev、恰好兩份 proposal、每個 write_class 依 project 與 id 排序後最多 10 題，類別順序 A、B、C、A′、B′、D，合計上限 30。沒有改預先登記。留出集不抽。",
+      "封存的 harness v2 沒有實作預先登記 §9 的均勻抖動（0～min(10 ms, 間隔的 10%)，由 seed 決定）。本次不改 harness 位元組，間隔用名義值 0／50／100／500／2000 ms。這不是用 pilot 回改預先登記。"
+    ]
+  }
 }

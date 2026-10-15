@@ -10,6 +10,7 @@ from pathlib import Path
 
 from hist_v2_smoke_runbook.pins import load_pins, runbook_root
 from hist_v2_smoke_runbook.preflight import check_pins, sha256_file
+from hist_v2_smoke_runbook.sample import load_items
 
 REPO = Path(os.environ.get("HIST_V2_REPO_ROOT", Path(__file__).resolve().parents[5]))
 
@@ -51,11 +52,72 @@ class CliPinTests(unittest.TestCase):
 
     def test_forbidden_stage_creates_no_directory(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
-            out = Path(tmp) / "pilot-out"
-            proc = _cli("--stage", "pilot", "--out", str(out), "--execute")
+            out = Path(tmp) / "main-out"
+            env = _env()
+            env["HIST_V2_PILOT_AUTHOR_APPROVAL"] = load_pins()["pilot"]["approval_value"]
+            proc = _cli("--stage", "main", "--out", str(out), "--execute", env=env)
             self.assertEqual(proc.returncode, 2, proc.stderr)
             self.assertIn("no run directory created", proc.stderr)
             self.assertFalse(out.exists())
+
+    def test_pilot_without_approval_creates_no_directory(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "pilot-out"
+            env = _env()
+            env.pop("HIST_V2_PILOT_AUTHOR_APPROVAL", None)
+            env["HIST_V2_SMOKE_AUTHOR_APPROVAL"] = load_pins()["approval_value"]
+            proc = _cli("--stage", "pilot", "--out", str(out), "--execute", env=env)
+            self.assertEqual(proc.returncode, 3, proc.stderr)
+            self.assertIn("author approval missing", proc.stderr)
+            self.assertFalse(out.exists())
+
+    def test_pilot_approval_does_not_open_held_out(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "held-out"
+            env = _env()
+            env["HIST_V2_PILOT_AUTHOR_APPROVAL"] = load_pins()["pilot"]["approval_value"]
+            proc = _cli("--stage", "held-out", "--out", str(out), "--execute", env=env)
+            self.assertEqual(proc.returncode, 2, proc.stderr)
+            self.assertFalse(out.exists())
+
+    def test_pilot_approval_plans_the_frozen_matrix_and_writes_nothing(self) -> None:
+        pins = load_pins()
+        env = _env()
+        env["HIST_V2_PILOT_AUTHOR_APPROVAL"] = pins["pilot"]["approval_value"]
+        with tempfile.TemporaryDirectory() as tmp:
+            raw, errors = load_items(Path(__file__).resolve().parents[1] / "tests" / "fixtures" / "dev-items.jsonl")
+            self.assertEqual(errors, [])
+            enriched = []
+            for item in raw:
+                row = dict(item)
+                if row.get("set") == "dev" and row.get("write_class"):
+                    row["prs"] = [1, 2]
+                enriched.append(row)
+            item_path = Path(tmp) / "items.jsonl"
+            item_path.write_text(
+                "".join(json.dumps(row, ensure_ascii=False) + "\n" for row in enriched),
+                encoding="utf-8",
+            )
+            out = Path(tmp) / "not-created"
+            proc = _cli(
+                "--stage",
+                "pilot",
+                "--items",
+                str(item_path),
+                "--out",
+                str(out),
+                env=env,
+            )
+            self.assertEqual(proc.returncode, 0, proc.stderr)
+            self.assertFalse(out.exists())
+            payload = json.loads(proc.stdout)
+            self.assertFalse(payload["executed"])
+            self.assertFalse(payload["paper_results"])
+            self.assertEqual(payload["plan"]["arms"], pins["pilot"]["arms"])
+            self.assertNotIn("atm", payload["plan"]["arms"])
+            self.assertEqual(payload["plan"]["inter_arrival_ms"], [0, 50, 100, 500, 2000])
+            self.assertEqual(payload["plan"]["seeds"], [0, 1])
+            self.assertEqual(payload["plan"]["per_item_cell_count"], 60)
 
     def test_execute_without_approval_creates_no_directory(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

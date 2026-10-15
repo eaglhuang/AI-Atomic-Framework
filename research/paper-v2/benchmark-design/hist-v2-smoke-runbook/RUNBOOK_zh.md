@@ -66,7 +66,7 @@ trial-only — 不得作為論文結果
 
 ## 明確不做
 
-- 不執行 pilot、主跑、留出集。`--stage pilot`、`main`、`held-out` 直接非 0，不建立目錄。
+- 不執行主跑、留出集。`--stage main`、`held-out` 直接退出碼 2，不建立目錄。pilot 只在另一個批准值下開放，見下方「pilot」。
 - 不把 catalog fixture 拿來代替 dev 題。harness v2 的 `run_fixture` 只跑合成 fixture。
 - 不用 smoke 結果修改預先登記、分類器規則或答案鍵。設計問題寫在建議節，由作者決定。
 - 不打 git tag，不 npm publish。
@@ -82,14 +82,31 @@ sh research/paper-v2/benchmark-design/hist-v2-smoke-runbook/run_smoke.sh
 這只做釘選檢查。加上 `--items path/to/items.jsonl` 會把抽題與計畫印到標準輸出，仍然不建立 run 目錄。
 
 ```bash
+sh research/paper-v2/benchmark-design/hist-v2-smoke-runbook/run_smoke.sh --stage main
+sh research/paper-v2/benchmark-design/hist-v2-smoke-runbook/run_smoke.sh --stage held-out
 sh research/paper-v2/benchmark-design/hist-v2-smoke-runbook/run_smoke.sh --stage pilot
 ```
 
-預期非 0，且沒有 run 目錄。
+`main` 與 `held-out` 預期退出碼 2，且沒有 run 目錄。沒有 pilot 批准值時，`--stage pilot` 預期退出碼 3，且沒有 run 目錄。smoke 的批准值不能打開 pilot。
 
 `--execute` 需要環境變數 `HIST_V2_SMOKE_AUTHOR_APPROVAL=issue-292-author-approved-smoke-only`，再加上 `--items`（分類器 v8 的 `items.jsonl`）與 `--binding`（每一題的歷史 patch 綁定）。批准值不符時退出碼 3。沒有綁定、diff 或 R(S) 的 SHA-256 對不上分類器欄位，或題目是 harness catalog fixture 時，退出碼 4，不建立目錄。歷史題的 `target_file` 可以含目錄；重播在呼叫封存的 harness 之前建立那些父目錄，不改 harness 位元組。環境變數本身不是批准紀錄；批准是作者另一次明示。
 
-綁定檔 schema 是 `hist-v2-dev-replay/1`。每一題要有 base 原文、每份 proposal 的 unified diff，以及每個合法子集的 R(S) 原文。diff 的 SHA-256 必須等於該題 `patches[].code_patch_sha256`。base 與 R(S) 的 SHA-256 必須等於答案鍵。catalog fixture 的 id，或與 catalog 相同的檔名加 base，都拒絕。pilot、main、held-out 仍直接退出碼 2。
+綁定檔 schema 是 `hist-v2-dev-replay/1`。每一題要有 base 原文、每份 proposal 的 unified diff，以及每個合法子集的 R(S) 原文。diff 的 SHA-256 必須等於該題 `patches[].code_patch_sha256`。base 與 R(S) 的 SHA-256 必須等於答案鍵。catalog fixture 的 id，或與 catalog 相同的檔名加 base，都拒絕。`main` 與 `held-out` 仍直接退出碼 2。
+
+## pilot
+
+作者於 2026-10-15 15:19（Asia/Taipei）批准只跑 pilot。`--stage pilot` 需要環境變數 `HIST_V2_PILOT_AUTHOR_APPROVAL=issue-292-author-approved-pilot-only`。值不符或未設定時退出碼 3，不建立目錄。這個值不能打開 main 或 held-out，smoke 的批准值也不能打開 pilot。
+
+pilot 只用 `set=dev`、恰好兩份 proposal 的題。留出集拒絕。每個 `write_class` 依 `project`、`id` 排序後最多 10 題，類別順序是 A、B、C、A′、B′、D，合計上限 30。凍結 r7 §8 沒有密封這個題數；題數來自該次批准，不回寫預先登記。
+
+矩陣跟凍結正文的主格，不跟 smoke 的縮減矩陣：
+
+- 臂只有 steward、file_lock、textual_merge_file。steward 是 §3.1 的 ATM 批次協調器處置臂。harness 的 `atm` 臂不跑。
+- 間隔 0／50／100／500／2,000 ms。seed 0 與 1。順序 forward、reverse。每題 60 格。
+- 期限 30 秒、第一次送出後 8 次重試，沿用封存的 harness，不改它的位元組。harness 沒有實作 §9 的均勻抖動；pilot 照名義間隔跑，並把這一點寫進偏離。
+- 負控制仍是 smoke 那五個植入。
+
+封存目錄是 `research/paper-v2/benchmark-trials/<date>-hist-v2-pilot/`。`GENERATION.md` 標明這是 pilot，不是論文結果。已存在的檔案不覆蓋。counterexample 保留鑑識並停止。
 
 ## 已知缺口
 

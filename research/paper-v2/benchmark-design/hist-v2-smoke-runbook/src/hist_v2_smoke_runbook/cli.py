@@ -10,6 +10,7 @@ from .pins import load_pins
 from .plan import build_plan
 from .preflight import check_pins
 from .sample import load_items, sample_dev
+from .stage import approval_problem, pilot_overlay
 
 
 def repo_root() -> Path:
@@ -45,6 +46,17 @@ def main(argv: list[str] | None = None) -> int:
             print(f"PIN_MISMATCH {failure}", file=sys.stderr)
         print("no run directory created", file=sys.stderr)
         return 1
+    if stage == "pilot":
+        problem = approval_problem(pins, stage)
+        if problem:
+            print(problem, file=sys.stderr)
+            return 3
+        pins, problems = pilot_overlay(pins)
+        if problems:
+            for problem in problems:
+                print(f"PILOT_MATRIX {problem}", file=sys.stderr)
+            print("no run directory created", file=sys.stderr)
+            return 1
     if not args.execute:
         payload = {
             "preflight": "ok",
@@ -53,6 +65,8 @@ def main(argv: list[str] | None = None) -> int:
             "formal_run": False,
             "trial_only": True,
             "claims_benchmark_wins": False,
+            "stage": stage,
+            "paper_results": False,
         }
         if args.items:
             loaded, errors = load_items(args.items)
@@ -67,10 +81,10 @@ def main(argv: list[str] | None = None) -> int:
             payload["plan"] = build_plan(sample["selected"], pins)
         print(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True))
         return 0
-    if os.environ.get(pins["approval_env"]) != pins["approval_value"]:
+    if stage != "pilot" and os.environ.get(pins["approval_env"]) != pins["approval_value"]:
         print("author approval missing; no run directory created", file=sys.stderr)
         return 3
-    if stage not in {"check", "smoke"}:
+    if stage not in {"check", "smoke", "pilot"}:
         print(f"refusing stage {stage}; no run directory created", file=sys.stderr)
         return 2
     from .replay import execute_smoke
@@ -78,7 +92,8 @@ def main(argv: list[str] | None = None) -> int:
     date = args.date or "2026-10-15"
     dest = args.out
     if dest is None:
-        dest = (args.repo or repo_root()) / "research/paper-v2/benchmark-trials" / f"{date}-hist-v2-smoke"
+        suffix = "hist-v2-pilot" if stage == "pilot" else "hist-v2-smoke"
+        dest = (args.repo or repo_root()) / "research/paper-v2/benchmark-trials" / f"{date}-{suffix}"
     return execute_smoke(
         repo=args.repo or repo_root(),
         pins=pins,
