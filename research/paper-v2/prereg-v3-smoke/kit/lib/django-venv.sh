@@ -130,19 +130,30 @@ pass_to_pass_baseline_failed() {
   return 1
 }
 
-# 與 evaluate.py select_django_labels 相同：只留下 Django test id。
+# 與 evaluate.py resolve_test_ids 相同：Django test id，以及 docstring 對照表。
+# 對不到 label 的 id 不印出來；評估端會把那種 id 記成 test-id-unmapped。
 django_pass_to_pass_labels() {
   local tasks="$1"
   python3 - "$tasks" <<'PY'
 import json, re, sys
 data = json.load(open(sys.argv[1], encoding="utf-8"))
+id_map = ((data.get("testIdNormalization") or {}).get("map") or {})
 labels = []
+seen = set()
 for inst in data["primary"]["instances"]:
     for label in inst.get("PASS_TO_PASS") or []:
         text = str(label)
         if " (" in text or text.startswith("test_"):
             match = re.match(r"(.+) \((.+)\)", text)
-            labels.append(f"{match.group(2)}.{match.group(1)}" if match else text)
+            resolved = f"{match.group(2)}.{match.group(1)}" if match else text
+        elif text in id_map:
+            resolved = str(id_map[text])
+        else:
+            continue
+        if resolved in seen:
+            continue
+        seen.add(resolved)
+        labels.append(resolved)
 for label in labels:
     print(label)
 PY

@@ -76,6 +76,21 @@
       }
     }
   },
+  "testIdNormalization": {
+    "kind": "docstring-to-label",
+    "deviation": false,
+    "note": "SWE-bench ids that are docstrings normalize to Django labels. Test identity is unchanged. FAIL_TO_PASS and PASS_TO_PASS strings stay as published. This is id normalization, not a test-content deviation.",
+    "map": {
+      "Files prefixed with underscore, tilde, or dot aren't loaded.": "migrations.test_loader.LoaderTests.test_ignore_files",
+      "Migration directories without an __init__.py file are ignored.": "migrations.test_loader.LoaderTests.test_loading_namespace_package",
+      "Migration directories without an __init__.py file are loaded.": "migrations.test_loader.LoaderTests.test_loading_namespace_package",
+      "Tests loading a squashed migration": "migrations.test_loader.LoaderTests.test_loading_squashed",
+      "Tests loading a complex set of squashed migrations": "migrations.test_loader.LoaderTests.test_loading_squashed_complex",
+      "Tests loading a complex but erroneous set of squashed migrations": "migrations.test_loader.LoaderTests.test_loading_squashed_erroneous",
+      "Tests loading a squashed migration with a new migration referencing it": "migrations.test_loader.LoaderTests.test_loading_squashed_ref_squashed",
+      "Tests prefix name matching": "migrations.test_loader.LoaderTests.test_name_match"
+    }
+  },
   "primary": {
     "runnable": true,
     "commonBaseCommit": "98ad327864aed8df245fd19ea9d2743279e11643",
