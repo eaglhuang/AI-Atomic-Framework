@@ -350,6 +350,60 @@ own_worktree() {
   as_root chmod -R u+rwX,go+rX,go-w "$work"
 }
 
+steward_socket_accepts() {
+  local sock="$1"
+  python3 - "$sock" <<'PY'
+import socket, sys
+sock = socket.socket(socket.AF_UNIX)
+sock.settimeout(0.5)
+try:
+    sock.connect(sys.argv[1])
+except OSError:
+    raise SystemExit(1)
+sock.close()
+PY
+}
+
+stop_steward_pid() {
+  local pid="${1:-}"
+  [ -n "$pid" ] || return 0
+  if [ "${PREREG_BOUNDARY:-}" = "unix-user" ]; then
+    as_root kill "$pid" >/dev/null 2>&1 || true
+  else
+    kill "$pid" >/dev/null 2>&1 || true
+  fi
+  wait "$pid" 2>/dev/null || true
+}
+
+remove_steward_socket() {
+  local sock="${1:-}"
+  [ -n "$sock" ] || return 0
+  if [ "${PREREG_BOUNDARY:-}" = "unix-user" ]; then
+    as_root rm -f -- "$sock" || true
+  else
+    rm -f -- "$sock" || true
+  fi
+}
+
+# 等到 socket 真的接受連線。只看到檔案存在不夠：listen 回呼之前連進去會失敗。
+wait_for_steward_accept() {
+  local sock="$1" pid="${2:-}"
+  local timeout="${PREREG_STEWARD_START_TIMEOUT:-30}"
+  local ticks=$((timeout * 5))
+  local i=0
+  while [ "$i" -lt "$ticks" ]; do
+    if steward_socket_accepts "$sock"; then
+      return 0
+    fi
+    if [ -n "$pid" ] && ! kill -0 "$pid" 2>/dev/null; then
+      return 1
+    fi
+    sleep 0.2
+    i=$((i + 1))
+  done
+  return 1
+}
+
 start_steward_daemon() {
   local work="$1"
   local log="$2"
@@ -388,27 +442,30 @@ start_steward_daemon() {
   if [ "${#sock}" -gt 100 ]; then
     die "steward socket 路徑長度 ${#sock} 超過 Unix 上限：${sock}"
   fi
+  local daemon_pid
   if [ "${PREREG_BOUNDARY}" = "unix-user" ]; then
     as_root -u "$STEWARD_USER" -- "$node_bin" "$KIT_ROOT/bin/steward-daemon.mjs" \
       --sock "$sock" --cwd "$work" --script "$KIT_ROOT/bin/atm-write.mjs" \
       >"$log" 2>&1 &
+    daemon_pid=$!
   else
     "$node_bin" "$KIT_ROOT/bin/steward-daemon.mjs" \
       --sock "$sock" --cwd "$work" --script "$KIT_ROOT/bin/atm-write.mjs" \
       >"$log" 2>&1 &
+    daemon_pid=$!
   fi
-  local i
-  for i in $(seq 1 50); do
-    if [ -S "$sock" ]; then
-      break
-    fi
-    sleep 0.1
-  done
-  if [ ! -S "$sock" ]; then
-    echo "steward daemon 沒有監聽 $sock" >&2
+  if ! wait_for_steward_accept "$sock" "$daemon_pid"; then
+    echo "steward daemon 沒有在 ${PREREG_STEWARD_START_TIMEOUT:-30}s 內接受連線 ${sock}" >&2
     cat "$log" >&2 || true
+    stop_steward_pid "$daemon_pid"
+    if [ -f "$work/.prereg-smoke/daemon.pid" ]; then
+      stop_steward_pid "$(cat "$work/.prereg-smoke/daemon.pid" 2>/dev/null || true)"
+    fi
+    remove_steward_socket "$sock"
     die "steward daemon 啟動失敗。"
   fi
+  PREREG_STEWARD_PID="$daemon_pid"
+  export PREREG_STEWARD_PID
   PREREG_STEWARD_SOCK="$sock"
   export PREREG_STEWARD_SOCK
 }
@@ -421,13 +478,12 @@ release_worktree() {
     local pid
     pid="$(cat "$pid_file" 2>/dev/null || true)"
     if [ -n "${pid:-}" ]; then
-      if [ "${PREREG_BOUNDARY:-}" = "unix-user" ]; then
-        as_root kill "$pid" >/dev/null 2>&1 || true
-      else
-        kill "$pid" >/dev/null 2>&1 || true
-      fi
-      sleep 0.2
+      stop_steward_pid "$pid"
     fi
+  fi
+  if [ -n "${PREREG_STEWARD_PID:-}" ]; then
+    stop_steward_pid "$PREREG_STEWARD_PID"
+    unset PREREG_STEWARD_PID
   fi
   if [ "${PREREG_BOUNDARY:-}" = "unix-user" ]; then
     as_root chown -R "$(id -u):$(id -g)" "$work" || true
@@ -498,10 +554,9 @@ pinned_codex_exec_args() {
     --ignore-rules
     -c 'approval_policy="never"'
   )
-  if [ "${PREREG_ARM:-}" = "B" ] && sandbox_boundary_active; then
-    # 外層 profile / bwrap 已經讓儲存庫唯讀，並允許連到 scratch 裡的 socket。
-    # 內層若再用 read-only，會把 Unix socket 一起關掉。workspace-write 加上 network
-    # 只讓模型的 shell 連得到 steward；寫入仍被外層沙盒拒絕。
+  if [ "${PREREG_ARM:-}" = "B" ] && { sandbox_boundary_active || [ "${PREREG_BOUNDARY:-}" = "unix-user" ]; }; then
+    # 外層沙盒或擁有者邊界讓儲存庫唯讀。內層若用 read-only，或 workspace-write
+    # 但沒開 network，Unix socket connect 會得到 EPERM。network 只放行 steward socket。
     dest+=(
       --sandbox workspace-write
       -c 'sandbox_workspace_write.network_access=true'
@@ -632,8 +687,11 @@ session_env_assignments() {
   local node_bin path_value
   node_bin="$(dirname "$(command -v node)")"
   path_value="${node_bin}:/usr/bin:/bin"
-  if [ -n "${PREREG_ARM_BIN:-}" ]; then
-    path_value="${PREREG_ARM_BIN}:${path_value}"
+  if [ "${PREREG_ARM:-}" = "B" ]; then
+    path_value="${KIT_ROOT}/bin:${path_value}"
+    if [ -n "${PREREG_ARM_BIN:-}" ]; then
+      path_value="${PREREG_ARM_BIN}:${path_value}"
+    fi
   fi
   if [ -z "${PREREG_SMOKE_CODEX:-}" ] && command -v codex >/dev/null 2>&1; then
     local codex_bin
@@ -697,9 +755,35 @@ capture_intended_patch() {
   local stdout="$session_dir/stdout.jsonl"
   [ -f "$stdout" ] || return 0
   python3 - "$session_dir" "$stdout" <<'PY'
-import pathlib, sys
+import json, pathlib, sys
 session = pathlib.Path(sys.argv[1])
-text = pathlib.Path(sys.argv[2]).read_text(encoding="utf-8", errors="replace")
+raw = pathlib.Path(sys.argv[2]).read_text(encoding="utf-8", errors="replace")
+
+def message_texts(line):
+    try:
+        obj = json.loads(line)
+    except json.JSONDecodeError:
+        return [line]
+    found = []
+    def walk(value):
+        if isinstance(value, dict):
+            kind = value.get("type")
+            text = value.get("text")
+            if kind in {"agent_message", "stub.intended_patch"} and isinstance(text, str):
+                found.append(text)
+            for child in value.values():
+                walk(child)
+        elif isinstance(value, list):
+            for child in value:
+                walk(child)
+    walk(obj)
+    return found
+
+chunks = []
+for line in raw.splitlines():
+    if line.strip():
+        chunks.extend(message_texts(line))
+text = "\n".join(chunks)
 begin = "BEGIN_INTENDED_PATCH\n"
 end = "\nEND_INTENDED_PATCH"
 if begin not in text:
@@ -735,6 +819,10 @@ launch_codex() {
     local node_bin
     node_bin="$(command -v node || true)"
     [ -n "$node_bin" ] && ensure_other_can_reach "$node_bin"
+    ensure_other_can_reach "$KIT_ROOT/bin/atm-write"
+    if [ -n "${PREREG_ARM_BIN:-}" ]; then
+      ensure_other_can_reach "$PREREG_ARM_BIN"
+    fi
   fi
   local start
   start="$(iso_now)"

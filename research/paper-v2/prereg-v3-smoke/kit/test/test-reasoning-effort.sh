@@ -113,4 +113,18 @@ if '"reasoningEffort": "low"' not in blob:
 print("results.json reasoningEffort ok")
 PY
 
+unix_text="$(PREREG_ARM=B PREREG_BOUNDARY=unix-user collect B "$HELP_BLOB")"
+printf '%s\n' "$unix_text" | grep -Fxq 'workspace-write'
+printf '%s\n' "$unix_text" | grep -Fxq 'sandbox_workspace_write.network_access=true'
+if printf '%s\n' "$unix_text" | grep -qx 'read-only'; then
+  echo "unix-user arm B still uses read-only sandbox" >&2
+  exit 1
+fi
+other_text="$(PREREG_ARM=B PREREG_BOUNDARY=codex-sandbox collect B "")"
+printf '%s\n' "$other_text" | grep -qx 'read-only'
+if printf '%s\n' "$other_text" | grep -q 'network_access'; then
+  echo "non-unix fallback enabled network_access" >&2
+  exit 1
+fi
+
 echo "reasoning effort ok"

@@ -1,0 +1,202 @@
+#!/bin/bash
+# 選擇性的真實模型探測。預設跳過，不呼叫 Codex。
+# PREFLIGHT_REAL_MODEL=1 時，每個可用邊界都跑一次很小的、與題目無關的 codex exec。
+# Arm B 必須經 steward 把 atm-write 叫成功，capture 要從真實 stdout 抽出 patch。
+set -euo pipefail
+HERE="$(cd "$(dirname "$0")/.." && pwd)"
+# shellcheck disable=SC1091
+source "$HERE/lib/common.sh"
+
+if [ "${PREFLIGHT_REAL_MODEL:-}" != "1" ]; then
+  echo "skipped real-model: set PREFLIGHT_REAL_MODEL=1 to run a real codex exec in each boundary mode"
+  exit 0
+fi
+
+command -v codex >/dev/null 2>&1 || die "PREFLIGHT_REAL_MODEL=1 但 codex 不在 PATH。"
+if ! codex login status >/dev/null 2>&1; then
+  die "PREFLIGHT_REAL_MODEL=1 但 codex 沒有登入。不印出 auth.json。"
+fi
+unset PREREG_SMOKE_CODEX || true
+
+CLEAN_DIRS=()
+cleanup_real() {
+  local dir
+  for dir in "${CLEAN_DIRS[@]:-}"; do
+    [ -n "${dir:-}" ] && [ -d "$dir" ] || continue
+    release_worktree "$dir" || true
+    rm -rf "$dir"
+  done
+  release_sandbox_scratch "${PREREG_SANDBOX_SCRATCH:-}" || true
+  if [ -n "${PREREG_STEWARD_PID:-}" ]; then
+    stop_steward_pid "$PREREG_STEWARD_PID" || true
+    unset PREREG_STEWARD_PID || true
+  fi
+}
+trap cleanup_real EXIT
+
+track_dir() {
+  CLEAN_DIRS+=("$1")
+}
+
+write_probe_prompt() {
+  local arm="$1" dest="$2"
+  if [ "$arm" = "A" ]; then
+    cat > "$dest" <<'EOF'
+This is a preflight probe, not a software task. Do not mention django or any issue.
+Edit note.txt so that its only line is new.
+Then emit the unified diff between these markers:
+BEGIN_INTENDED_PATCH
+diff --git a/note.txt b/note.txt
+END_INTENDED_PATCH
+EOF
+    return 0
+  fi
+  cat > "$dest" <<EOF
+This is a preflight probe, not a software task. Do not mention django or any issue.
+Do not edit the repository yourself. Do not run git commit.
+Write a unified diff to \$TMPDIR/note.patch that changes note.txt from the single line old to the single line new.
+Then run this exact command and require exit 0:
+
+  ${HERE}/bin/atm-write note.txt \$TMPDIR/note.patch
+
+After it succeeds, emit that same diff between these markers:
+BEGIN_INTENDED_PATCH
+diff --git a/note.txt b/note.txt
+END_INTENDED_PATCH
+EOF
+}
+
+prepare_probe_repo() {
+  local repo="$1"
+  git init -q "$repo"
+  printf 'old\n' > "$repo/note.txt"
+  git -C "$repo" add note.txt
+  git -C "$repo" -c user.name=prereg-smoke -c user.email=prereg-smoke@localhost commit -q -m base
+  mkdir -p "$repo/.prereg-smoke"
+}
+
+wait_for_launch() {
+  local child="$1" label="$2"
+  local waited=0 limit="${PREREG_REAL_MODEL_TIMEOUT:-240}"
+  while kill -0 "$child" 2>/dev/null; do
+    if [ "$waited" -ge "$limit" ]; then
+      kill "$child" 2>/dev/null || true
+      pkill -P "$child" 2>/dev/null || true
+      wait "$child" 2>/dev/null || true
+      die "real codex exec exceeded ${limit}s (${label})"
+    fi
+    sleep 1
+    waited=$((waited + 1))
+  done
+  wait "$child" 2>/dev/null || true
+}
+
+assert_captured_patch() {
+  local session="$1" label="$2"
+  capture_intended_patch "$session"
+  if [ ! -s "$session/intended.patch" ]; then
+    echo "capture 沒有從真實 stdout 抽出 patch (${label})" >&2
+    exit 1
+  fi
+  if ! grep -q 'diff --git ' "$session/intended.patch"; then
+    echo "抽出的 patch 沒有 diff --git (${label})" >&2
+    exit 1
+  fi
+}
+
+run_real_exec() {
+  local arm="$1" mode="$2"
+  local repo session
+  if [ "$arm" = "B" ] && { [ "$mode" = "codex-landlock" ] || [ "$mode" = "bwrap-ro" ]; }; then
+    repo="$(mktemp -d "${HOME}/prereg-real.XXXXXX")"
+  else
+    repo="$(mktemp -d)"
+  fi
+  session="$(mktemp -d)"
+  track_dir "$repo"
+  track_dir "$session"
+  prepare_probe_repo "$repo"
+  unset PREREG_SANDBOX_SCRATCH PREREG_SANDBOX_REPO PREREG_STEWARD_SOCK PREREG_STEWARD_PID || true
+  export PREREG_ARM="$arm"
+  if [ "$arm" = "B" ]; then
+    if [ "$mode" = "unix-user" ]; then
+      unset PREREG_BOUNDARY || true
+      ensure_prereg_users
+      [ "${PREREG_BOUNDARY}" = "unix-user" ]
+      own_worktree "$repo"
+    else
+      PREREG_BOUNDARY="$mode"
+      export PREREG_BOUNDARY
+    fi
+    if sandbox_boundary_active; then
+      allocate_sandbox_scratch >/dev/null
+      PREREG_SANDBOX_REPO="$repo"
+      export PREREG_SANDBOX_REPO
+    fi
+    require_public_cli >/dev/null
+    start_steward_daemon "$repo" "$session/steward.log"
+  else
+    unset PREREG_BOUNDARY || true
+  fi
+  write_probe_prompt "$arm" "$session/prompt.txt"
+  echo "real-model arm=${arm} mode=${mode:-none}"
+  (
+    launch_codex "$session" "$session/prompt.txt" "$repo"
+  ) &
+  local child=$!
+  wait_for_launch "$child" "arm=${arm} mode=${mode:-none}"
+  assert_captured_patch "$session" "arm=${arm} mode=${mode:-none}"
+  if [ "$arm" = "B" ]; then
+    python3 - "$repo/note.txt" "$repo/.prereg-smoke/steward-writes.jsonl" <<'PY'
+import json, pathlib, sys
+text = pathlib.Path(sys.argv[1]).read_text(encoding="utf-8")
+log = pathlib.Path(sys.argv[2])
+if text != "new\n":
+    raise SystemExit(f"atm-write did not update note.txt: {text!r}")
+if not log.is_file():
+    raise SystemExit("missing steward-writes.jsonl")
+accepted = False
+for line in log.read_text(encoding="utf-8").splitlines():
+    if not line.strip():
+        continue
+    row = json.loads(line)
+    if row.get("decision") == "accepted" and row.get("terminal") == "committed":
+        accepted = True
+if not accepted:
+    raise SystemExit("steward log has no accepted write")
+PY
+    release_worktree "$repo" || true
+    release_sandbox_scratch "${PREREG_SANDBOX_SCRATCH:-}" || true
+    unset PREREG_SANDBOX_SCRATCH PREREG_SANDBOX_REPO || true
+  else
+    python3 - "$repo/note.txt" <<'PY'
+import pathlib, sys
+text = pathlib.Path(sys.argv[1]).read_text(encoding="utf-8")
+if text != "new\n":
+    raise SystemExit(f"arm A did not edit note.txt: {text!r}")
+PY
+  fi
+  echo "real-model ok arm=${arm} mode=${mode:-none}"
+}
+
+modes=()
+if [ "$(uname -s)" != "Linux" ]; then
+  modes+=(codex-sandbox)
+else
+  if linux_sudo_ok; then
+    modes+=(unix-user)
+  fi
+  if codex_sandbox_ready; then
+    modes+=(codex-landlock)
+  fi
+  if bwrap_ready; then
+    modes+=(bwrap-ro)
+  fi
+fi
+[ "${#modes[@]}" -gt 0 ] || die "PREFLIGHT_REAL_MODEL=1 但沒有可用的邊界模式。"
+echo "real-model modes: ${modes[*]}"
+run_real_exec A ""
+for mode in "${modes[@]}"; do
+  run_real_exec B "$mode"
+done
+echo "real-model ok"

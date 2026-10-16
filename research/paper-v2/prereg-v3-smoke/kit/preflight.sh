@@ -78,6 +78,14 @@ static_launchers() {
   fi
   test -f "$HERE/bin/steward-daemon.mjs"
   grep -q 'capture_intended_patch' "$HERE/lib/run-arm.sh"
+  grep -q 'json.loads' "$HERE/lib/common.sh"
+  grep -q 'wait_for_steward_accept' "$HERE/lib/common.sh"
+  grep -q 'KIT_ROOT}/bin' "$HERE/lib/common.sh"
+  grep -q 'bin/atm-write' "$HERE/lib/run-arm.sh"
+  if grep -q '## prereg-v3 smoke' "$HERE/seal.sh"; then
+    echo "seal 仍會在索引裡另開小節" >&2
+    return 1
+  fi
   if grep -n 'exits 3, stop' "$HERE/lib/run-arm.sh"; then
     echo "提示詞仍要求 steward 拒絕後停止，重送次數會永遠是 0" >&2
     return 1
@@ -111,4 +119,9 @@ check exec-boundary bash "$HERE/test/test-arm-b-exec-boundary.sh"
 check disposition python3 "$HERE/test/test_write_disposition.py"
 check overlap bash "$HERE/test/test-overlap-decision.sh"
 check stub-dry-run bash "$HERE/self-check.sh"
+check capture-intended bash "$HERE/test/test-capture-intended.sh"
+check seal-one-row bash "$HERE/test/test-seal-one-row.sh"
+check steward-ready bash "$HERE/test/test-steward-ready.sh"
+check real-model bash "$HERE/test/test-real-model.sh"
+check real-model-skip bash "$HERE/test/test-real-model-skip.sh"
 echo "preflight ok"
