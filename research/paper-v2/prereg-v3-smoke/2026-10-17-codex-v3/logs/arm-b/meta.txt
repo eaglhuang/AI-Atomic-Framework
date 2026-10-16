@@ -1,0 +1,9 @@
+arm=B
+boundary=unix-user
+mechanism=unix-user prereg-steward owns the worktree; prereg-session is not the owner and has no sudo; codex exec uses --sandbox workspace-write and sandbox_workspace_write.network_access=true so the steward socket can connect; prereg-session owns .agents .codex .aws so Codex can create them; tracked files stay prereg-steward-owned
+skew_ms=14
+model=gpt-6-luna
+reasoning_effort=medium
+work=/workspace/atm-311/research/paper-v2/prereg-v3-smoke/kit/state/runs/20261016T193610Z-3094581-28522/arm-b/work
+base=98ad327864aed8df245fd19ea9d2743279e11643
+agent=codex
