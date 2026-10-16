@@ -460,6 +460,22 @@ codex_supports() {
   grep -q -- "$flag" <<<"$help"
 }
 
+# 未設定或空字串就省略旗標。兩臂讀同一個 CODEX_REASONING_EFFORT。
+codex_reasoning_effort() {
+  local value="${CODEX_REASONING_EFFORT-}"
+  if [ -z "$value" ]; then
+    return 0
+  fi
+  case "$value" in
+    minimal|low|medium|high)
+      printf '%s\n' "$value"
+      ;;
+    *)
+      die "CODEX_REASONING_EFFORT 只能是 minimal、low、medium 或 high。"
+      ;;
+  esac
+}
+
 # 真實 codex exec 的旗標。審批釘成 never，不讀使用者設定，也不加 bypass。
 # 無 sudo 時外層沙盒才是邊界；這裡的 --sandbox 只決定模型自己再套的那一層。
 pinned_codex_exec_args() {
@@ -506,6 +522,11 @@ pinned_codex_exec_args() {
     elif codex_supports "$help" "-m"; then
       dest+=(-m "$CODEX_MODEL")
     fi
+  fi
+  local effort=""
+  effort="$(codex_reasoning_effort)" || exit 1
+  if [ -n "$effort" ]; then
+    dest+=(-c "model_reasoning_effort=\"${effort}\"")
   fi
 }
 
@@ -651,6 +672,11 @@ EOF
   if [ -n "${CODEX_MODEL:-}" ]; then
     printf 'CODEX_MODEL=%s\n' "$CODEX_MODEL"
   fi
+  if [ -n "${CODEX_REASONING_EFFORT-}" ]; then
+    local effort
+    effort="$(codex_reasoning_effort)" || exit 1
+    printf 'CODEX_REASONING_EFFORT=%s\n' "$effort"
+  fi
   if [ -z "${PREREG_SMOKE_CODEX:-}" ]; then
     # 兩臂用同一份登入。目錄在 /tmp/prereg-sbx.* 或 scratch，不在 session 樹裡。
     [ -n "${PREREG_SESSION_CODEX_HOME:-}" ] || die "缺少工作階段 CODEX_HOME。"
@@ -774,5 +800,12 @@ record_model() {
       model="codex-cli-default-free-login"
     fi
   fi
-  printf '%s\n' "$model" > "$dest"
+  local effort=""
+  if [ -n "${CODEX_REASONING_EFFORT-}" ]; then
+    effort="$(codex_reasoning_effort)" || exit 1
+  fi
+  {
+    printf '%s\n' "$model"
+    printf 'reasoning_effort=%s\n' "$effort"
+  } > "$dest"
 }

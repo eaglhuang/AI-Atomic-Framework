@@ -150,6 +150,8 @@ if [ "$ARM" = "B" ]; then
 fi
 
 record_model "$ARM_DIR/session-1" "$ARM_DIR/model.txt"
+model_name="$(head -n 1 "$ARM_DIR/model.txt")"
+effort_name="$(sed -n '2s/^reasoning_effort=//p' "$ARM_DIR/model.txt")"
 {
   echo "arm=$ARM"
   if [ "$ARM" = "B" ]; then
@@ -157,7 +159,8 @@ record_model "$ARM_DIR/session-1" "$ARM_DIR/model.txt"
     boundary_mechanism_line
   fi
   echo "skew_ms=$SKEW_MS"
-  echo "model=$(cat "$ARM_DIR/model.txt")"
+  echo "model=${model_name}"
+  echo "reasoning_effort=${effort_name}"
   echo "work=$WORK"
   echo "base=$COMMON_BASE"
   if [ -n "${PREREG_SMOKE_CODEX:-}" ]; then
@@ -173,5 +176,5 @@ if [ -f "$ARM_DIR/session-1/QUOTA_STOP" ] || [ -f "$ARM_DIR/session-2/QUOTA_STOP
   exit 75
 fi
 
-echo "arm $ARM finished skew_ms=$SKEW_MS model=$(cat "$ARM_DIR/model.txt")"
+echo "arm $ARM finished skew_ms=$SKEW_MS model=${model_name} reasoning_effort=${effort_name:-unset}"
 exit "$fail"
