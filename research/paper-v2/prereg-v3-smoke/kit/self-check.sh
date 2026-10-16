@@ -43,5 +43,8 @@ DEST="$(mktemp -d)/2026-10-15-codex-stub"
 rmdir "$(dirname "$DEST")"
 bash "$HERE/seal.sh" --index-file "$INDEX" --dest "$DEST" --publish-index
 grep -q "smoke / exploratory, not results" "$INDEX"
+grep -q 'prereg-v3-smoke/2026-10-15-codex-stub/' "$INDEX"
+grep -q 'prereg-v3-smoke/2026-10-15-codex-stub/' "$DEST/EVIDENCE_INDEX_ROW.md"
+[ "$(grep -c 'prereg-v3-smoke/' "$INDEX")" -eq 1 ]
 (cd "$DEST" && sha256sum -c SHA256SUMS)
 echo "self-check seal ok: $DEST"
