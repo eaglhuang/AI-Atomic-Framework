@@ -59,6 +59,8 @@ const validatorSource = readFileSync(path.join(repositoryRoot, 'scripts', 'valid
 const releaseWorkflow = readFileSync(path.join(repositoryRoot, '.github', 'workflows', 'release-npm.yml'), 'utf8');
 assert.match(validatorSource, /process\.env\.ATM_RELEASE_TAG/, 'release compatibility must consume the workflow-provided tag when run through the full validator profile');
 assert.match(releaseWorkflow, /ATM_RELEASE_TAG="\$release_version" npm run validate:full/, 'post-publish full validation must pass its resolved release tag into the validator process');
+const releaseCheckout = releaseWorkflow.match(/- name: Checkout\s*\r?\n\s*uses: actions\/checkout@v4\s*\r?\n([\s\S]*?)(?=\r?\n      - name:)/)?.[1] ?? '';
+assert.match(releaseCheckout, /fetch-depth:\s*0/, 'release checkout must keep full history for publish and post-publish pin checks');
 const postPublishBlock = releaseWorkflow.match(/- name: Post-publish full validation[\s\S]*?(?=\n      - name:|$)/)?.[0] ?? '';
 const dryRunSkipCondition = /if:\s*\$\{\{\s*always\(\)\s*&&\s*!cancelled\(\)\s*&&\s*!\(\s*github\.event_name\s*==\s*'workflow_dispatch'\s*&&\s*inputs\.dry_run\s*==\s*true\s*\)\s*\}\}/;
 assert.match(postPublishBlock, dryRunSkipCondition, 'post-publish validation must skip exactly workflow_dispatch dry-run');

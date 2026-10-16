@@ -50,6 +50,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # Publish and post-publish share this checkout. HIST-v2 pins compare
+          # packages/core/src/broker with an ancestor commit. A depth-1 tag
+          # checkout does not contain that commit.
+          fetch-depth: 0
+          filter: blob:none
 
       - name: Validate release tag
         if: ${{ github.event_name != 'workflow_dispatch' }}
