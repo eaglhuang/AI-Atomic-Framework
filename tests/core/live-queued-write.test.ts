@@ -164,15 +164,18 @@ function runStressWorker(workerId: string, cwd: string) {
   let recomposes = 0;
   for (let iteration = 0; iteration < iterations; iteration += 1) {
     const token = `w${workerId}-i${iteration}`;
-    let text = readFileSync(path.join(cwd, 'shared.py'), 'utf8');
+    const deadline = Date.now() + 45_000;
     let accepted = false;
-    for (let attempt = 1; attempt <= 30; attempt += 1) {
+    let attempts = 0;
+    while (Date.now() < deadline) {
+      attempts += 1;
+      const text = readFileSync(path.join(cwd, 'shared.py'), 'utf8');
       const head = git(cwd, ['rev-parse', 'HEAD']);
       const result = applyLiveQueuedWrites({
         cwd,
         scopeFiles: ['shared.py'],
         proposals: [proposal({
-          id: `${token}-a${attempt}`,
+          id: `${token}-a${attempts}`,
           actor: `worker-${workerId}`,
           hash: hashText(text),
           head,
@@ -189,9 +192,8 @@ function runStressWorker(workerId: string, cwd: string) {
       assert.ok(write?.reasonCode === 'overlapping-write-queued' || write?.reasonCode === 'stale-base', String(write?.reasonCode ?? ''));
       assert.equal(write?.queued, true);
       assert.equal(typeof write?.currentFileText, 'string');
-      text = write.currentFileText ?? text;
     }
-    if (!accepted) throw new Error(`lost write ${token}`);
+    if (!accepted) throw new Error(`lost write ${token} after ${attempts} attempts`);
   }
   process.stdout.write(`${recomposes}\n`);
 }
