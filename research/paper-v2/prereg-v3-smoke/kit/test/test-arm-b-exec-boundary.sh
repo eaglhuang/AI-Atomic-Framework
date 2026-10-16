@@ -44,6 +44,14 @@ REPO="$BASE/repo"
 SCRATCH="$BASE/scratch"
 SESSION="$BASE/session"
 mkdir -p "$REPO" "$SCRATCH" "$SESSION/home/.codex" "$SESSION/tmp"
+DAEMON_DIR="$(readlink -f /tmp)/codex-daemon-$(id -u)"
+DAEMON_MODE_SAVED=""
+if [ -d "$DAEMON_DIR" ] && [ "$(stat -c %u "$DAEMON_DIR")" = "$(id -u)" ]; then
+  DAEMON_MODE_SAVED="$(stat -c %a "$DAEMON_DIR")"
+  chmod 755 "$DAEMON_DIR"
+fi
+CODEX_HOME_A=""
+CODEX_ROOT_A=""
 printf 'seed\n' > "$REPO/shared.py"
 cat > "$SESSION/home/.codex/config.toml" << 'EOF'
 approval_policy = "not-a-policy"
@@ -53,13 +61,50 @@ export PREREG_ARM=B
 export PREREG_SANDBOX_SCRATCH="$SCRATCH"
 export PREREG_SANDBOX_REPO="$REPO"
 PREREG_SANDBOX_EXTRA_WRITES=("$SESSION")
-cleanup() { rm -rf "$BASE"; }
+cleanup() {
+  if [ -n "${CODEX_HOME_A:-}" ]; then
+    PREREG_SESSION_CODEX_ROOT="${CODEX_ROOT_A:-}" release_session_codex_home "$CODEX_HOME_A" || true
+  fi
+  if [ -n "${PREREG_SESSION_CODEX_HOME:-}" ]; then
+    release_session_codex_home "$PREREG_SESSION_CODEX_HOME" || true
+  fi
+  if [ -n "${DAEMON_MODE_SAVED:-}" ] && [ -d "${DAEMON_DIR:-}" ]; then
+    chmod "$DAEMON_MODE_SAVED" "$DAEMON_DIR" || true
+  fi
+  rm -rf "$BASE"
+}
 trap cleanup EXIT
 
 HELP=""
 if command -v codex >/dev/null 2>&1; then
   HELP="$(codex exec --help 2>&1 || true)"
 fi
+python3 - "$BASE/fixture-auth.json" << 'PY'
+import json, secrets, sys
+dest = sys.argv[1]
+marker = "marker-" + secrets.token_hex(8)
+open(dest + ".marker", "w", encoding="utf-8").write(marker)
+json.dump({"tokens": {"id_token": marker, "access_token": marker, "refresh_token": marker}}, open(dest, "w", encoding="utf-8"))
+PY
+chmod 600 "$BASE/fixture-auth.json"
+export PREREG_CODEX_AUTH_FILE="$BASE/fixture-auth.json"
+saved_scratch="$PREREG_SANDBOX_SCRATCH"
+unset PREREG_SANDBOX_SCRATCH
+saved_arm="$PREREG_ARM"
+PREREG_ARM=A
+ARM_A="$BASE/arm-a"
+mkdir -p "$ARM_A"
+prepare_session_codex_home "$ARM_A"
+CODEX_HOME_A="$PREREG_SESSION_CODEX_HOME"
+CODEX_ROOT_A="${PREREG_SESSION_CODEX_ROOT:-}"
+unset PREREG_SESSION_CODEX_HOME PREREG_SESSION_CODEX_ROOT
+export PREREG_SANDBOX_SCRATCH="$saved_scratch"
+PREREG_ARM=B
+PREREG_SESSION_SLOT=1
+prepare_session_codex_home "$SESSION"
+CODEX_HOME_B="$PREREG_SESSION_CODEX_HOME"
+PREREG_ARM="$saved_arm"
+
 pins=()
 pinned_codex_exec_args pins "$HELP" "$REPO"
 full=()
@@ -67,12 +112,13 @@ boundary_launch_args full env -i \
   "HOME=${SESSION}/home" \
   "TMPDIR=${SESSION}/tmp" \
   "PATH=${PATH}" \
-  "CODEX_HOME=${SESSION}/codex-home" \
+  "CODEX_HOME=${CODEX_HOME_B}" \
+  "XDG_RUNTIME_DIR=${CODEX_HOME_B}/runtime" \
   codex "${pins[@]}" -
 
-python3 - "$PREREG_BOUNDARY" "$SCRATCH" "$REPO" "$SESSION" "${full[@]}" << 'PY'
+python3 - "$PREREG_BOUNDARY" "$SCRATCH" "$REPO" "$SESSION" "$CODEX_HOME_B" "$DAEMON_DIR" "${full[@]}" << 'PY'
 import sys
-mode, scratch, repo, session, *argv = sys.argv[1:]
+mode, scratch, repo, session, codex_home, daemon_dir, *argv = sys.argv[1:]
 text = "\n".join(argv)
 def require(token):
     if token not in argv:
@@ -81,7 +127,10 @@ require("codex")
 require("exec")
 require("--ignore-user-config")
 require("--ignore-rules")
-require(f"CODEX_HOME={session}/codex-home")
+require(f"CODEX_HOME={codex_home}")
+require(f"XDG_RUNTIME_DIR={codex_home}/runtime")
+if codex_home.startswith(session):
+    raise SystemExit("CODEX_HOME is inside the session tree")
 require('approval_policy="never"')
 require("--sandbox")
 require("workspace-write")
@@ -109,6 +158,7 @@ elif mode == "bwrap-ro":
         "bwrap", "--unshare-user", "--unshare-pid", "--die-with-parent",
         "--ro-bind", "/", "/",
         "--bind", scratch, scratch,
+        "--bind", f"{scratch}/daemon-bind", daemon_dir,
         "--dev", "/dev", "--proc", "/proc",
         "--bind", session, session,
         "--ro-bind", repo, repo,
@@ -205,8 +255,12 @@ write_exec_driver() {
       "HOME=${SESSION}/home" \
       "TMPDIR=${SESSION}/tmp" \
       "LANG=C.UTF-8"
+    # bypass 必須讀 HOME/.codex 裡的壞設定。釘住的 exec 才帶工作階段 CODEX_HOME。
     if [ "$mode" = "pinned" ]; then
-      printf '%q ' codex "${pins[@]}" -
+      printf '%q ' \
+        "CODEX_HOME=${CODEX_HOME_B}" \
+        "XDG_RUNTIME_DIR=${CODEX_HOME_B}/runtime" \
+        codex "${pins[@]}" -
     else
       printf '%q ' codex exec --dangerously-bypass-approvals-and-sandbox --skip-git-repo-check -C "$REPO" -
     fi
@@ -214,6 +268,32 @@ write_exec_driver() {
   } > "$dest"
   chmod +x "$dest"
 }
+
+if [ "$PREREG_BOUNDARY" = "bwrap-ro" ]; then
+  # codex sandbox 會把這個目錄從內層命令遮掉。bwrap-ro 的外層包裝必須讓
+  # codex 行程自己看得到可寫的 0700 目錄，即使宿主上的那份不是 0700。
+  run_sandboxed env -i \
+    "PATH=${PATH}" \
+    "HOME=${SESSION}/home" \
+    "TMPDIR=${SESSION}/tmp" \
+    bash -c '
+      set -e
+      dir="$1"
+      test "$(stat -c %a "$dir")" = "700"
+      test "$(stat -c %u "$dir")" = "$(id -u)"
+      echo ok > "$dir/probe"
+    ' bash "$DAEMON_DIR" > "$SCRATCH/daemon.out" 2>"$SCRATCH/daemon.err"
+  if [ "$(cat "$PREREG_CODEX_DAEMON_BIND/probe")" != "ok" ]; then
+    echo "Codex socket 目錄在 bwrap 裡不可寫或不是 0700" >&2
+    cat "$SCRATCH/daemon.err" >&2
+    exit 1
+  fi
+else
+  ensure_codex_daemon_socket_mountpoint "$DAEMON_DIR"
+  [ "$(stat -c %a "$DAEMON_DIR")" = "700" ]
+  [ "$(stat -c %u "$DAEMON_DIR")" = "$(id -u)" ]
+fi
+echo "daemon socket dir is writable mode 0700 inside wrapper"
 
 if command -v codex >/dev/null 2>&1; then
   printf 'ping\n' > "$SCRATCH/prompt.txt"
@@ -227,6 +307,11 @@ if command -v codex >/dev/null 2>&1; then
   set -e
   if grep -q 'not-a-policy' "$SCRATCH/pinned.err"; then
     echo "釘住的 codex exec 仍讀到了使用者設定" >&2
+    cat "$SCRATCH/pinned.err" >&2
+    exit 1
+  fi
+  if grep -q 'app-server socket directory must be a user-owned directory with mode 0700' "$SCRATCH/pinned.err"; then
+    echo "釘住的 codex exec 仍被 app-server socket 目錄擋住" >&2
     cat "$SCRATCH/pinned.err" >&2
     exit 1
   fi
@@ -244,38 +329,51 @@ if command -v codex >/dev/null 2>&1; then
   echo "pinned codex exec started inside ${PREREG_BOUNDARY}; bypass could not write"
 fi
 
-python3 - "$BASE/fixture-auth.json" << 'PY'
-import json, secrets, sys
-dest = sys.argv[1]
-marker = "marker-" + secrets.token_hex(8)
-open(dest + ".marker", "w", encoding="utf-8").write(marker)
-json.dump({"tokens": {"id_token": marker, "access_token": marker, "refresh_token": marker}}, open(dest, "w", encoding="utf-8"))
-PY
-chmod 600 "$BASE/fixture-auth.json"
-export PREREG_CODEX_AUTH_FILE="$BASE/fixture-auth.json"
-ARM_A="$BASE/arm-a"
-mkdir -p "$ARM_A"
-saved_arm="$PREREG_ARM"
-PREREG_ARM=A
-prepare_session_codex_home "$ARM_A"
-PREREG_ARM="$saved_arm"
-prepare_session_codex_home "$SESSION"
-cmp -s "$PREREG_CODEX_AUTH_FILE" "$ARM_A/codex-home/auth.json"
-cmp -s "$PREREG_CODEX_AUTH_FILE" "$SESSION/codex-home/auth.json"
-session_env_assignments "$ARM_A" "$REPO" | grep -q "CODEX_HOME=${ARM_A}/codex-home"
-session_env_assignments "$SESSION" "$REPO" | grep -q "CODEX_HOME=${SESSION}/codex-home"
-[ "$(stat -c %a "$SESSION/codex-home/auth.json")" = "600" ]
+cmp -s "$PREREG_CODEX_AUTH_FILE" "$CODEX_HOME_A/auth.json"
+cmp -s "$PREREG_CODEX_AUTH_FILE" "$CODEX_HOME_B/auth.json"
+case "$CODEX_HOME_A" in
+  /tmp/prereg-sbx.*/codex-home*) ;;
+  *) echo "Arm A CODEX_HOME 不在 /tmp/prereg-sbx.*/codex-home.*：$CODEX_HOME_A" >&2; exit 1 ;;
+esac
+case "$CODEX_HOME_B" in
+  "$SCRATCH"/codex-home*) ;;
+  *) echo "Arm B CODEX_HOME 不在 scratch：$CODEX_HOME_B" >&2; exit 1 ;;
+esac
+find "$ARM_A" "$SESSION" -name auth.json | grep -q . && {
+  echo "auth.json 進入了 session 樹" >&2
+  exit 1
+}
+[ "$(stat -c %a "$CODEX_HOME_B")" = "700" ]
+[ "$(stat -c %a "$CODEX_HOME_B/runtime")" = "700" ]
+[ "$(stat -c %a "$CODEX_HOME_B/auth.json")" = "600" ]
+saved_home="$PREREG_SESSION_CODEX_HOME"
+saved_root="${PREREG_SESSION_CODEX_ROOT:-}"
+PREREG_SESSION_CODEX_HOME="$CODEX_HOME_A"
+PREREG_SESSION_CODEX_ROOT="$CODEX_ROOT_A"
+session_env_assignments "$ARM_A" "$REPO" | grep -q "CODEX_HOME=${CODEX_HOME_A}"
+session_env_assignments "$ARM_A" "$REPO" | grep -q "XDG_RUNTIME_DIR=${CODEX_HOME_A}/runtime"
+PREREG_SESSION_CODEX_HOME="$CODEX_HOME_B"
+unset PREREG_SESSION_CODEX_ROOT
+session_env_assignments "$SESSION" "$REPO" | grep -q "CODEX_HOME=${CODEX_HOME_B}"
+session_env_assignments "$SESSION" "$REPO" | grep -q "XDG_RUNTIME_DIR=${CODEX_HOME_B}/runtime"
+PREREG_SESSION_CODEX_HOME="$saved_home"
+if [ -n "$saved_root" ]; then
+  PREREG_SESSION_CODEX_ROOT="$saved_root"
+fi
 run_sandboxed env -i \
   "PATH=${PATH}" \
   "HOME=${SESSION}/home" \
   "TMPDIR=${SESSION}/tmp" \
-  "CODEX_HOME=${SESSION}/codex-home" \
+  "CODEX_HOME=${CODEX_HOME_B}" \
+  "XDG_RUNTIME_DIR=${CODEX_HOME_B}/runtime" \
   bash -c '
     set -e
     test -r "$CODEX_HOME/auth.json"
     test -w "$CODEX_HOME"
+    test -w "$XDG_RUNTIME_DIR"
     mkdir -p "$CODEX_HOME/sessions"
     echo ok > "$CODEX_HOME/sessions/probe"
+    echo ok > "$CODEX_HOME/tmp/probe"
     if command -v codex >/dev/null 2>&1; then
       codex login status > "$CODEX_HOME/login.out" 2> "$CODEX_HOME/login.err" || true
     fi
@@ -283,9 +381,10 @@ run_sandboxed env -i \
       exit 3
     fi
   ' bash "$REPO/shared.py" > "$SCRATCH/auth-probe.out" 2>"$SCRATCH/auth-probe.err"
-[ "$(cat "$SESSION/codex-home/sessions/probe")" = "ok" ]
+[ "$(cat "$CODEX_HOME_B/sessions/probe")" = "ok" ]
+[ "$(cat "$CODEX_HOME_B/tmp/probe")" = "ok" ]
 expect_unchanged
-python3 - "$BASE/fixture-auth.json.marker" "$SESSION/codex-home" "$SCRATCH/auth-probe.out" "$SCRATCH/auth-probe.err" << 'PY'
+python3 - "$BASE/fixture-auth.json.marker" "$CODEX_HOME_B" "$SCRATCH/auth-probe.out" "$SCRATCH/auth-probe.err" << 'PY'
 import pathlib, sys
 marker = pathlib.Path(sys.argv[1]).read_text(encoding="utf-8")
 home = pathlib.Path(sys.argv[2])

@@ -1,8 +1,7 @@
 #!/bin/bash
-# 六項阻斷檢查。任何一項失敗就中止，不啟動真實 A/B。
+# 阻斷檢查。任何一項失敗就立刻停止，不跑後面的檢查，也不啟動真實 A/B。
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
-fail=0
 
 check() {
   local name="$1"
@@ -12,9 +11,16 @@ check() {
     echo "ok ${name}"
   else
     echo "FAIL ${name}" >&2
-    fail=1
+    echo "preflight failed" >&2
+    exit 1
   fi
 }
+
+if [ "${1:-}" = "--fail-fast-self-test" ]; then
+  check should-fail false
+  echo "reached-next" >&2
+  exit 0
+fi
 
 static_launchers() {
   if grep -nE 'PREREG_GOLD_PATCH=' "$HERE/lib/run-arm.sh" "$HERE/lib/common.sh"; then
@@ -52,7 +58,17 @@ static_launchers() {
   grep -q 'approval_policy="never"' "$HERE/lib/common.sh"
   grep -q 'ignore-user-config' "$HERE/lib/common.sh"
   grep -q 'prepare_session_codex_home' "$HERE/lib/common.sh"
+  grep -q 'release_session_codex_home' "$HERE/lib/common.sh"
   grep -q 'CODEX_HOME=' "$HERE/lib/common.sh"
+  grep -q '/tmp/prereg-sbx' "$HERE/lib/common.sh"
+  grep -q 'prefer-offline' "$HERE/lib/common.sh"
+  grep -q 'EAI_AGAIN' "$HERE/lib/common.sh"
+  grep -q 'codex-daemon-' "$HERE/lib/sandbox-boundary.sh"
+  grep -q 'reject_seal_secrets' "$HERE/seal.sh"
+  if grep -n 'cp -a "\$STATE_ROOT/arm-' "$HERE/seal.sh"; then
+    echo "seal 仍整份複製 session 目錄" >&2
+    return 1
+  fi
   if grep -n 'dangerously-bypass-approvals-and-sandbox' "$HERE/lib/common.sh" "$HERE/lib/sandbox-boundary.sh"; then
     echo "launcher 仍把 bypass 放進邊界" >&2
     return 1
@@ -75,10 +91,14 @@ if static_launchers; then
   echo "ok static"
 else
   echo "FAIL static" >&2
-  fail=1
+  echo "preflight failed" >&2
+  exit 1
 fi
 check parser python3 "$HERE/test/test_evaluate_parser.py"
 check evidence python3 "$HERE/test/test_evidence_missing.py"
+check seal-secrets bash "$HERE/test/test-seal-secrets.sh"
+check public-cli bash "$HERE/test/test-public-cli.sh"
+check fail-fast bash "$HERE/test/test-preflight-fail-fast.sh"
 check no-rm bash "$HERE/test/test-no-rm-state.sh"
 check gold bash "$HERE/test/test-gold-isolation.sh"
 check atm-write-path bash "$HERE/test/test-atm-write-path.sh"
@@ -87,9 +107,4 @@ check exec-boundary bash "$HERE/test/test-arm-b-exec-boundary.sh"
 check disposition python3 "$HERE/test/test_write_disposition.py"
 check overlap bash "$HERE/test/test-overlap-decision.sh"
 check stub-dry-run bash "$HERE/self-check.sh"
-
-if [ "$fail" -ne 0 ]; then
-  echo "preflight failed" >&2
-  exit 1
-fi
 echo "preflight ok"

@@ -160,6 +160,10 @@ publish_cli_tree() {
 
 seed_cli_from_local() {
   local root="$1"
+  # 測試掛鉤：不要把這台機器上既有的 /tmp cache 當成安裝結果。
+  if [ "${PREREG_SKIP_CLI_SEED:-}" = "1" ]; then
+    return 1
+  fi
   local candidate cache
   for candidate in /tmp/atm-cli-0.1.21 "${HOME}/.cache/prereg-v3-atm-cli-0.1.21"; do
     cache="$(cli_cache_path "$candidate")"
@@ -172,29 +176,96 @@ seed_cli_from_local() {
   return 1
 }
 
-# 只接受 npm 上的公開 0.1.21 CLI。倉庫內 frozen runner 與 TypeScript 直接載入都不是這條路徑。
-resolve_public_cli() {
-  local root cache
-  root="$(default_public_cli_root)"
-  cache="$(cli_cache_path "$root")"
+# 只接受正好是公開 0.1.21 的 CLI。其他版本即使已經裝好也不採用。
+find_installed_public_cli() {
+  local candidate prefix cache root
   if [ -n "${PREREG_ATM_CLI:-}" ] && cli_is_public_0120 "$PREREG_ATM_CLI"; then
-    publish_cli_tree "$PREREG_ATM_CLI"
     printf '%s\n' "$PREREG_ATM_CLI"
     return 0
   fi
-  if ! cli_is_public_0120 "$cache"; then
-    prepare_cli_root "$root"
-    if ! seed_cli_from_local "$root"; then
-      if ! npm install --prefix "$root" "$PUBLIC_CLI_PACKAGE" --no-fund --no-audit --silent >&2; then
-        return 1
-      fi
+  root="$(default_public_cli_root)"
+  cache="$(cli_cache_path "$root")"
+  if cli_is_public_0120 "$cache"; then
+    printf '%s\n' "$cache"
+    return 0
+  fi
+  if command -v npm >/dev/null 2>&1; then
+    prefix="$(npm prefix -g 2>/dev/null || true)"
+    if [ -n "$prefix" ]; then
+      for candidate in \
+        "$prefix/lib/node_modules/@ai-atomic-framework/cli/dist/npm-runtime/atm.mjs" \
+        "$prefix/node_modules/@ai-atomic-framework/cli/dist/npm-runtime/atm.mjs"
+      do
+        if cli_is_public_0120 "$candidate"; then
+          printf '%s\n' "$candidate"
+          return 0
+        fi
+      done
     fi
+  fi
+  return 1
+}
+
+npm_failure_is_network() {
+  local log="$1"
+  [ -f "$log" ] || return 1
+  grep -Eq 'EAI_AGAIN|ENOTFOUND|ETIMEDOUT|ECONNRESET|ECONNREFUSED|getaddrinfo|network timeout|registry\.npmjs\.org' "$log"
+}
+
+# 先用本機 npm cache（--prefer-offline）。網路失敗就退避重試。成功後仍只接受 0.1.21。
+install_public_cli_from_npm() {
+  local root="$1"
+  local log attempt=0 delay
+  local -a delays
+  log="$(mktemp)"
+  if [ -n "${PREREG_NPM_BACKOFF_SECONDS:-}" ]; then
+    # shellcheck disable=SC2206
+    delays=(${PREREG_NPM_BACKOFF_SECONDS})
+  else
+    delays=(0 2 4 8)
+  fi
+  for delay in "${delays[@]}"; do
+    attempt=$((attempt + 1))
+    if [ "$delay" != "0" ]; then
+      sleep "$delay"
+    fi
+    if npm install --prefix "$root" "$PUBLIC_CLI_PACKAGE" --prefer-offline --no-fund --no-audit --silent >"$log" 2>&1; then
+      rm -f "$log"
+      return 0
+    fi
+    if ! npm_failure_is_network "$log"; then
+      echo "prereg-v3-smoke: npm install ${PUBLIC_CLI_PACKAGE} 失敗。不會改用其他版本。" >&2
+      cat "$log" >&2
+      rm -f "$log"
+      return 1
+    fi
+  done
+  echo "prereg-v3-smoke: 無法連上 registry.npmjs.org 取得 ${PUBLIC_CLI_PACKAGE}（DNS 或網路錯誤，例如 getaddrinfo EAI_AGAIN）。已重試 ${attempt} 次。不會改用其他版本。請先修好網路，或安裝正好 ${PUBLIC_CLI_VERSION}。" >&2
+  cat "$log" >&2
+  rm -f "$log"
+  return 1
+}
+
+# 只接受 npm 上的公開 0.1.21 CLI。倉庫內 frozen runner 與 TypeScript 直接載入都不是這條路徑。
+resolve_public_cli() {
+  local found root cache
+  if found="$(find_installed_public_cli)"; then
+    publish_cli_tree "$found"
+    printf '%s\n' "$found"
+    return 0
+  fi
+  root="$(default_public_cli_root)"
+  cache="$(cli_cache_path "$root")"
+  prepare_cli_root "$root"
+  if ! seed_cli_from_local "$root"; then
+    install_public_cli_from_npm "$root" || return 1
   fi
   if cli_is_public_0120 "$cache"; then
     publish_cli_tree "$cache"
     printf '%s\n' "$cache"
     return 0
   fi
+  echo "prereg-v3-smoke: 安裝結果不是 ${PUBLIC_CLI_PACKAGE}。拒絕改用其他版本。" >&2
   return 1
 }
 
@@ -439,7 +510,8 @@ pinned_codex_exec_args() {
 }
 
 # ChatGPT 登入在 ~/.codex/auth.json。--ignore-user-config 不讀 config.toml，但登入仍用 CODEX_HOME。
-# 只複製 auth.json 到工作階段裡可寫的目錄，不複製設定，也不把內容印出來。
+# 只複製 auth.json。CODEX_HOME 放在 /tmp/prereg-sbx.*/codex-home.*（或沙盒 scratch 裡的同名目錄），
+# 不放進 session、state 或封存會複製的樹。工作階段結束就刪掉。內容不印出來。
 codex_login_auth_file() {
   if [ -n "${PREREG_CODEX_AUTH_FILE:-}" ]; then
     [ -f "$PREREG_CODEX_AUTH_FILE" ] || die "指定的 Codex 登入檔不存在。"
@@ -458,20 +530,79 @@ codex_login_auth_file() {
   return 1
 }
 
+codex_home_is_disposable() {
+  local home="$1"
+  case "$home" in
+    /tmp/prereg-sbx.*/codex-home*) return 0 ;;
+  esac
+  if [ -n "${PREREG_SANDBOX_SCRATCH:-}" ]; then
+    case "$home" in
+      "$PREREG_SANDBOX_SCRATCH"/codex-home*) return 0 ;;
+    esac
+  fi
+  return 1
+}
+
 prepare_session_codex_home() {
   local session_dir="$1"
-  local dest="$session_dir/codex-home"
-  local src
-  src="$(codex_login_auth_file)" || die "找不到 ~/.codex/auth.json。codex exec 需要 ChatGPT 登入；--ignore-user-config 不會略過 CODEX_HOME 裡的 auth.json。"
-  mkdir -p "$dest"
+  local root dest src slot
+  if [ -n "${PREREG_SANDBOX_SCRATCH:-}" ] && [ -d "$PREREG_SANDBOX_SCRATCH" ]; then
+    root="$PREREG_SANDBOX_SCRATCH"
+  else
+    root="$(mktemp -d /tmp/prereg-sbx.XXXXXX)"
+    PREREG_SESSION_CODEX_ROOT="$root"
+    export PREREG_SESSION_CODEX_ROOT
+  fi
+  case "$root" in
+    "$session_dir"|"$session_dir"/*)
+      die "CODEX_HOME 不能放在工作階段目錄裡。"
+      ;;
+  esac
+  case "$session_dir" in
+    "$root"|"$root"/*)
+      die "工作階段目錄不能放在 CODEX_HOME 的根目錄裡。"
+      ;;
+  esac
+  slot="${PREREG_SESSION_SLOT:-$$}"
+  dest="$root/codex-home.$slot"
+  if [ -e "$dest" ]; then
+    dest="$(mktemp -d "$root/codex-home.XXXXXX")"
+  else
+    mkdir -m 700 "$dest"
+  fi
   chmod 700 "$dest"
+  mkdir -m 700 "$dest/runtime" "$dest/tmp"
+  src="$(codex_login_auth_file)" || die "找不到 ~/.codex/auth.json。codex exec 需要 ChatGPT 登入；--ignore-user-config 不會略過 CODEX_HOME 裡的 auth.json。"
   cp "$src" "$dest/auth.json"
   chmod 600 "$dest/auth.json"
   if [ "${PREREG_BOUNDARY:-}" = "unix-user" ] && [ "${PREREG_ARM:-}" = "B" ]; then
+    chmod 711 "$root" 2>/dev/null || as_root chmod 711 "$root"
     as_root chown -R "$SESSION_USER" "$dest"
-    as_root chmod 700 "$dest"
+    as_root chmod 700 "$dest" "$dest/runtime" "$dest/tmp"
     as_root chmod 600 "$dest/auth.json"
   fi
+  PREREG_SESSION_CODEX_HOME="$dest"
+  export PREREG_SESSION_CODEX_HOME
+}
+
+release_session_codex_home() {
+  local home="${1:-${PREREG_SESSION_CODEX_HOME:-}}"
+  local root="${PREREG_SESSION_CODEX_ROOT:-}"
+  if [ -n "$home" ] && [ -d "$home" ] && codex_home_is_disposable "$home"; then
+    if [ "${PREREG_BOUNDARY:-}" = "unix-user" ]; then
+      as_root rm -r -- "$home"
+    else
+      rm -r -- "$home"
+    fi
+  fi
+  case "$root" in
+    /tmp/prereg-sbx.*)
+      if [ -d "$root" ]; then
+        rm -r -- "$root"
+      fi
+      ;;
+  esac
+  unset PREREG_SESSION_CODEX_HOME PREREG_SESSION_CODEX_ROOT
 }
 
 # 工作階段環境允許清單。金標路徑、GOLD_ROOT、state、tasks 都不在裡面。
@@ -521,8 +652,10 @@ EOF
     printf 'CODEX_MODEL=%s\n' "$CODEX_MODEL"
   fi
   if [ -z "${PREREG_SMOKE_CODEX:-}" ]; then
-    # 兩臂用同一份登入。這個目錄在沙盒裡可寫，使用者的 ~/.codex 不是。
-    printf 'CODEX_HOME=%s\n' "${session_dir}/codex-home"
+    # 兩臂用同一份登入。目錄在 /tmp/prereg-sbx.* 或 scratch，不在 session 樹裡。
+    [ -n "${PREREG_SESSION_CODEX_HOME:-}" ] || die "缺少工作階段 CODEX_HOME。"
+    printf 'CODEX_HOME=%s\n' "$PREREG_SESSION_CODEX_HOME"
+    printf 'XDG_RUNTIME_DIR=%s\n' "$PREREG_SESSION_CODEX_HOME/runtime"
   fi
 }
 
@@ -557,6 +690,9 @@ PY
 launch_codex() {
   local session_dir="$1" prompt_file="$2" work="$3"
   mkdir -p "$session_dir/home" "$session_dir/tmp"
+  # 背景子行程會繼承 run-arm 的 EXIT trap。這裡改成只刪登入目錄，避免某一臂的
+  # session 先結束時把 scratch 與 socket 一起清掉。
+  trap 'release_session_codex_home "${PREREG_SESSION_CODEX_HOME:-}"' EXIT
   if [ -z "${PREREG_SMOKE_CODEX:-}" ]; then
     prepare_session_codex_home "$session_dir"
   fi

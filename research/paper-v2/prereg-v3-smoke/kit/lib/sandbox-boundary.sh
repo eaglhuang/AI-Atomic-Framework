@@ -168,12 +168,58 @@ resolve_linux_sandbox_mechanism() {
   return 1
 }
 
+# Codex 0.159.2 的 app-server socket 固定在 /tmp/codex-daemon-<uid>，而且必須是
+# 目前使用者擁有、mode 0700 的目錄。它不看 XDG_RUNTIME_DIR、TMPDIR 或 CODEX_HOME。
+# bwrap --ro-bind / / 會讓這個目錄變成唯讀；既有目錄若不是 0700，內層 sandbox helper
+# 會以「app-server socket directory must be a user-owned directory with mode 0700」失敗。
+codex_daemon_socket_dir() {
+  local tmp uid
+  tmp="$(readlink -f /tmp)"
+  uid="$(id -u)"
+  printf '%s/codex-daemon-%s\n' "$tmp" "$uid"
+}
+
+ensure_codex_daemon_socket_mountpoint() {
+  local dest="$1"
+  if [ -L "$dest" ]; then
+    rm -f "$dest" || die "Codex app-server socket 目錄是符號連結，無法改成 mode 0700：$dest"
+  fi
+  if [ ! -e "$dest" ]; then
+    mkdir -m 700 "$dest" || die "無法建立 Codex app-server socket 目錄 $dest。"
+  fi
+  if [ ! -d "$dest" ]; then
+    die "Codex app-server socket 路徑不是目錄：$dest"
+  fi
+  if [ "$(stat -c %u "$dest")" = "$(id -u)" ] && [ "$(stat -c %a "$dest")" != "700" ]; then
+    chmod 700 "$dest" || die "無法把 $dest 設成 mode 0700。"
+  fi
+}
+
+# 在 scratch 放一個 mode 0700 的目錄，bwrap 把它掛到 Codex 固定的 socket 路徑上。
+# 主機上既有目錄的 mode 或擁有者不對時，沙盒裡看到的仍是這份可寫的 0700 目錄。
+ensure_codex_daemon_bind() {
+  local dest
+  dest="$(codex_daemon_socket_dir)"
+  ensure_codex_daemon_socket_mountpoint "$dest"
+  local parent="${PREREG_SANDBOX_SCRATCH:-}"
+  [ -n "$parent" ] && [ -d "$parent" ] || die "bwrap 需要 scratch 才能放置可寫的 Codex socket 目錄。"
+  local bind="$parent/daemon-bind"
+  if [ ! -d "$bind" ]; then
+    mkdir -m 700 "$bind"
+  fi
+  chmod 700 "$bind"
+  PREREG_CODEX_DAEMON_BIND="$bind"
+  PREREG_CODEX_DAEMON_MOUNT="$dest"
+  export PREREG_CODEX_DAEMON_BIND PREREG_CODEX_DAEMON_MOUNT
+}
+
 # bwrap 參數與 boundary_launch_args 共用，避免探測用的指令和真實 codex exec 的包裝分叉。
 bwrap_sandbox_prefix() {
   local -n dest=$1
   assert_sandbox_layout
   local scratch="$PREREG_SANDBOX_SCRATCH"
   local repo="$PREREG_SANDBOX_REPO"
+  ensure_codex_daemon_bind
   dest=(
     bwrap
     --unshare-user
@@ -181,6 +227,7 @@ bwrap_sandbox_prefix() {
     --die-with-parent
     --ro-bind / /
     --bind "$scratch" "$scratch"
+    --bind "$PREREG_CODEX_DAEMON_BIND" "$PREREG_CODEX_DAEMON_MOUNT"
     --dev /dev
     --proc /proc
   )
@@ -220,6 +267,14 @@ boundary_launch_args() {
 
 run_codex_sandboxed() {
   assert_sandbox_layout
+  ensure_codex_daemon_socket_mountpoint "$(codex_daemon_socket_dir)"
+  local daemon_dir owner mode
+  daemon_dir="$(codex_daemon_socket_dir)"
+  owner="$(stat -c %u "$daemon_dir")"
+  mode="$(stat -c %a "$daemon_dir")"
+  if [ "$owner" != "$(id -u)" ] || [ "$mode" != "700" ]; then
+    die "Codex app-server socket 目錄 $daemon_dir 必須由目前使用者擁有且 mode 0700。沒有 sudo，不能改別人的目錄。"
+  fi
   local scratch="$PREREG_SANDBOX_SCRATCH"
   local home extras=() status=0
   home="$(mktemp -d /tmp/prereg-codex-home.XXXXXX)"

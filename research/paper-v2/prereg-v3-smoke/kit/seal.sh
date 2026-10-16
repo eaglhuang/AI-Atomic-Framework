@@ -35,18 +35,93 @@ cp "$STATE_ROOT/results.json" "$DEST/results.json"
 cp "$STATE_ROOT/setup-tests.log" "$DEST/logs/setup-tests.log" 2>/dev/null || true
 cp "$HERE/tasks.json" "$DEST/tasks.json"
 cp "$HERE/RUNBOOK.md" "$DEST/RUNBOOK.md"
+copy_file() {
+  local src="$1" dest="$2"
+  if [ -f "$src" ]; then
+    mkdir -p "$(dirname "$dest")"
+    cp "$src" "$dest"
+  fi
+}
+
+# 只封這些檔。session 目錄裡的 home、tmp、codex-home、auth.json 都不進封存。
+SESSION_ALLOWLIST=(
+  prompt.txt
+  stdout.jsonl
+  stderr.txt
+  intended.patch
+  agent-output.diff
+  started-at
+  ended-at
+  exit-code
+  launch-env.txt
+  codex-argv.txt
+  QUOTA_STOP
+)
 for arm in a b; do
   if [ -d "$STATE_ROOT/arm-$arm" ]; then
     mkdir -p "$DEST/logs/arm-$arm" "$DEST/diffs"
-    cp -a "$STATE_ROOT/arm-$arm/session-1" "$STATE_ROOT/arm-$arm/session-2" "$DEST/logs/arm-$arm/" 2>/dev/null || true
-    cp "$STATE_ROOT/arm-$arm/meta.txt" "$STATE_ROOT/arm-$arm/model.txt" "$DEST/logs/arm-$arm/" 2>/dev/null || true
-    [ -f "$STATE_ROOT/arm-$arm/final.diff" ] && cp "$STATE_ROOT/arm-$arm/final.diff" "$DEST/diffs/arm-$arm.diff"
-    [ -f "$STATE_ROOT/arm-$arm/git-log.txt" ] && cp "$STATE_ROOT/arm-$arm/git-log.txt" "$DEST/diffs/arm-$arm.git-log.txt"
-    if [ -f "$STATE_ROOT/arm-$arm/work/.prereg-smoke/steward-writes.jsonl" ]; then
-      cp "$STATE_ROOT/arm-$arm/work/.prereg-smoke/steward-writes.jsonl" "$DEST/logs/arm-$arm/steward-writes.jsonl"
-    fi
+    local_slot=""
+    for local_slot in 1 2; do
+      session_src="$STATE_ROOT/arm-$arm/session-$local_slot"
+      [ -d "$session_src" ] || continue
+      session_name=""
+      for session_name in "${SESSION_ALLOWLIST[@]}"; do
+        copy_file "$session_src/$session_name" "$DEST/logs/arm-$arm/session-$local_slot/$session_name"
+      done
+    done
+    for session_name in meta.txt model.txt boundary.txt codex-version.txt; do
+      copy_file "$STATE_ROOT/arm-$arm/$session_name" "$DEST/logs/arm-$arm/$session_name"
+    done
+    copy_file "$STATE_ROOT/arm-$arm/final.diff" "$DEST/diffs/arm-$arm.diff"
+    copy_file "$STATE_ROOT/arm-$arm/git-log.txt" "$DEST/diffs/arm-$arm.git-log.txt"
+    copy_file "$STATE_ROOT/arm-$arm/work/.prereg-smoke/steward-writes.jsonl" "$DEST/logs/arm-$arm/steward-writes.jsonl"
+    copy_file "$STATE_ROOT/arm-$arm/work/.prereg-smoke/session-write.json" "$DEST/logs/arm-$arm/session-write.json"
   fi
 done
+
+reject_seal_secrets() {
+  python3 - "$DEST" <<'PY'
+import re, sys
+from pathlib import Path
+root = Path(sys.argv[1])
+jwt = re.compile(r"eyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}")
+content_patterns = (
+    # 用量統計的 "tokens" 物件不是登入檔。只擋憑證欄位、金鑰前綴與 JWT。
+    ("refresh_token", re.compile(r"refresh_token")),
+    ("access_token", re.compile(r"access_token")),
+    ("id_token", re.compile(r"id_token")),
+    ("tokens-credential", re.compile(r'"tokens"\s*:\s*\{[^}]*"(?:refresh_token|access_token|id_token)"', re.DOTALL)),
+    ("sk-prefix", re.compile(r"sk-[A-Za-z0-9_-]{8,}")),
+    ("jwt", jwt),
+)
+hits = []
+for path in root.rglob("*"):
+    if not path.is_file() or path.name == "SHA256SUMS":
+        continue
+    rel = path.relative_to(root).as_posix()
+    if path.name == "auth.json" or rel.endswith("/auth.json"):
+        hits.append(f"auth.json {rel}")
+        continue
+    data = path.read_bytes()
+    try:
+        text = data.decode("utf-8")
+    except UnicodeDecodeError:
+        text = data.decode("utf-8", errors="replace")
+    for name, pattern in content_patterns:
+        if pattern.search(text):
+            hits.append(f"{name} {rel}")
+if hits:
+    sys.stderr.write("seal rejected secrets:\n")
+    for hit in hits:
+        sys.stderr.write(hit + "\n")
+    raise SystemExit(1)
+PY
+}
+
+if ! reject_seal_secrets; then
+  rm -rf "$DEST"
+  die "封存含有登入或密鑰樣式。已刪除未完成的封存，不寫入索引。"
+fi
 
 MODEL="unrecorded"
 [ -f "$STATE_ROOT/arm-a/model.txt" ] && MODEL="$(cat "$STATE_ROOT/arm-a/model.txt")"
