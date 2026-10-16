@@ -177,12 +177,21 @@ def recompose_or_retry(rows):
     return total
 
 
-def session_rejected(rows, instance_id):
-    return any(
-        (row.get("taskId") == instance_id or instance_id in str(row.get("actorId")))
-        and row.get("terminal") not in (None, "committed")
-        for row in rows
-    )
+def session_rejected(rows, session_files):
+    """Steward rows have no session id. taskId/actorId stay prereg / prereg-session for every session.
+    A session is rejected when the log has a blocked or rejected write for a file in that session's intended patch.
+    """
+    files = {path for path in (session_files or []) if path}
+    if not files:
+        return False
+    for row in rows:
+        target = row.get("file")
+        if target not in files:
+            continue
+        decision = str(row.get("decision") or "")
+        if blocked_steward_write(row) or decision.startswith("rejected") or row.get("terminal") not in (None, "committed"):
+            return True
+    return False
 
 
 def evidence_gaps(arm_dir):
@@ -283,7 +292,7 @@ def score_arm(arm_name, arm_dir, tasks, base):
                 break
         if instance_id is None and slot - 1 < len(tasks["primary"]["instances"]):
             instance_id = tasks["primary"]["instances"][slot - 1]["instanceId"]
-        rejected = session_rejected(rows, instance_id)
+        rejected = session_rejected(rows, parts.keys())
         unfinished = []
         for file, patch in parts.items():
             if is_codex_runtime_path(file):
@@ -444,6 +453,49 @@ def apply_observation_policy(parsed, fail_labels, pass_labels):
     return updated
 
 
+def test_patch_paths(patch_text):
+    paths = []
+    for match in re.finditer(r"^diff --git a/\S+ b/(\S+)", patch_text, flags=re.M):
+        path = match.group(1)
+        if path != "/dev/null" and path not in paths:
+            paths.append(path)
+    return paths
+
+
+def discard_model_test_edits(clone, base, patch_text):
+    """Reset every file the gold test patch touches to base before apply, as SWE-bench does.
+    Model edits on those test files are discarded so git apply does not conflict.
+    """
+    discarded = []
+    clone = str(clone)
+    for path in test_patch_paths(patch_text):
+        diff = subprocess.run(
+            ["/usr/bin/git", "-C", clone, "diff", "--quiet", str(base), "--", path],
+            capture_output=True,
+        )
+        differed = diff.returncode != 0
+        checkout = subprocess.run(
+            ["/usr/bin/git", "-C", clone, "checkout", "--force", str(base), "--", path],
+            text=True,
+            capture_output=True,
+        )
+        if checkout.returncode != 0:
+            target = Path(clone) / path
+            if target.exists() or target.is_symlink():
+                target.unlink()
+                differed = True
+            else:
+                existed = subprocess.run(
+                    ["/usr/bin/git", "-C", clone, "cat-file", "-e", f"{base}:{path}"],
+                    capture_output=True,
+                ).returncode == 0
+                if existed:
+                    raise RuntimeError(f"git checkout {base} -- {path} failed: {checkout.stderr}")
+        if differed:
+            discarded.append(path)
+    return discarded
+
+
 def select_django_labels(labels):
     mapped = []
     for label in labels or []:
@@ -510,11 +562,14 @@ def run_tests(work, tasks, env, arm_score):
                 results.append(apply_observation_policy(parsed, fail_labels, pass_labels))
                 continue
             test_patch = gold_root / instance["testPatch"]
+            patch_text = test_patch.read_text(encoding="utf-8", errors="replace") if test_patch.is_file() else ""
+            base_commit = env.get("COMMON_BASE")
+            discarded = discard_model_test_edits(clone, base_commit, patch_text) if patch_text and base_commit else []
             applied = subprocess.run(["/usr/bin/git", "-C", str(clone), "apply", str(test_patch)], text=True, capture_output=True)
             env_run = os.environ.copy()
             env_run["PYTHONPATH"] = str(clone) + (os.pathsep + env_run["PYTHONPATH"] if env_run.get("PYTHONPATH") else "")
             proc = subprocess.run(
-                [python, "tests/runtests.py", "--verbosity", "2", "--settings=test_sqlite", *mapped],
+                [python, "tests/runtests.py", "--verbosity", "2", "--settings=test_sqlite", "--parallel", "1", *mapped],
                 cwd=clone,
                 text=True,
                 capture_output=True,
@@ -523,6 +578,8 @@ def run_tests(work, tasks, env, arm_score):
             parsed = parse_test_output(instance["instanceId"], mapped, proc.stdout + proc.stderr, proc.returncode)
             parsed["testPatchApplied"] = applied.returncode == 0
             parsed["testPatchError"] = None if applied.returncode == 0 else (applied.stderr or "")[-400:]
+            parsed["modelTestEditsDiscarded"] = bool(discarded)
+            parsed["discardedModelTestFiles"] = discarded
             results.append(apply_observation_policy(parsed, fail_labels, pass_labels))
     arm_score["tests"] = results
     return results

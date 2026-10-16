@@ -41,14 +41,24 @@ import os
 import sys
 
 mode = os.environ.get("PREREG_FAKE_RUNNER", "ok")
+parallel_ok = False
+if "--parallel" in sys.argv:
+    idx = sys.argv.index("--parallel")
+    parallel_ok = idx + 1 < len(sys.argv) and sys.argv[idx + 1] == "1"
+if not parallel_ok:
+    sys.stderr.write("expected --parallel 1\n")
+    raise SystemExit(2)
 if mode == "crash":
     sys.stderr.write("ModuleNotFoundError: No module named 'django'\n")
     sys.stderr.write("RuntimeError: Django module not found, reference tests/README.rst for instructions.\n")
     raise SystemExit(1)
+if mode == "errors":
+    sys.stdout.write("ERROR: tests.Fake.test_ok\n\nRan 1 test in 0.001s\n\nFAILED (errors=1)\n")
+    raise SystemExit(1)
 if mode == "fail":
     sys.stdout.write("FAIL: tests.Fake.test_ok\n\nRan 1 test in 0.001s\n\nFAILED (failures=1)\n")
     raise SystemExit(1)
-sys.stdout.write("test_ok ... ok\n\nRan 1 test in 0.001s\n\nOK\n")
+sys.stdout.write("test_ok (tests.Fake) ... ok\n\nRan 1 test in 0.001s\n\nOK\n")
 PY
 git -C "$REPO" init -q
 git -C "$REPO" add django setup.py tests
@@ -57,7 +67,7 @@ HEAD_SHA="$(git -C "$REPO" rev-parse HEAD)"
 
 TASKS="$BASE/tasks.json"
 cat > "$TASKS" <<EOF
-{"primary":{"commonBaseCommit":"$HEAD_SHA","instances":[{"instanceId":"django__django-13820","FAIL_TO_PASS":["tests.Fake.test_ok"],"PASS_TO_PASS":[]}]}}
+{"primary":{"commonBaseCommit":"$HEAD_SHA","instances":[{"instanceId":"django__django-13820","FAIL_TO_PASS":["tests.Fake.test_should_fail_only_after_test_patch"],"PASS_TO_PASS":["test_ok (tests.Fake)"]}]}}
 EOF
 
 # 模擬沒有 setuptools 的 python：空的 wheelhouse、不用 pip 快取，必須是 kit-error。
@@ -420,6 +430,25 @@ if django_runner_failed "$BASE/fail.out" 1; then
   echo "a completed FAILED report was treated as a kit crash" >&2
   exit 1
 fi
+if pass_to_pass_baseline_failed "$BASE/ok.out" 0; then
+  echo "clean PASS_TO_PASS baseline was rejected" >&2
+  exit 1
+fi
+printf '%s\n' "ERROR: tests.Fake.test_ok" "Ran 1 test in 0.001s" "FAILED (errors=1)" > "$BASE/errors.out"
+if ! pass_to_pass_baseline_failed "$BASE/errors.out" 1; then
+  echo "errors=1 was accepted as a PASS_TO_PASS baseline" >&2
+  exit 1
+fi
+if ! pass_to_pass_baseline_failed "$BASE/fail.out" 1; then
+  echo "unexpected failures were accepted as a PASS_TO_PASS baseline" >&2
+  exit 1
+fi
+if ! pass_to_pass_baseline_failed "$BASE/ok.out" 1; then
+  echo "non-zero exit with an OK line was accepted" >&2
+  exit 1
+fi
+mapped="$(django_pass_to_pass_labels "$TASKS")"
+[ "$mapped" = "tests.Fake.test_ok" ]
 printf '%s\n' "Ran 0 tests in 0.001s" "OK" > "$BASE/zero.out"
 if ! django_runner_failed "$BASE/zero.out" 0; then
   echo "zero tests were accepted" >&2
@@ -459,10 +488,35 @@ fi
 "$BASE/state-ok/venv/bin/python" -c 'import django'
 
 fail_status="$(run_setup reported-fail fail)"
-if [ "$fail_status" -ne 0 ]; then
-  echo "setup treated a completed test failure as a kit crash" >&2
+if [ "$fail_status" -eq 0 ]; then
+  echo "setup printed ok after an unexpected baseline failure" >&2
   cat "$BASE/setup-reported-fail.err" >&2
   exit 1
 fi
+grep -q 'Django test runner failed' "$BASE/setup-reported-fail.err"
 grep -q 'django test runner exit 1' "$BASE/state-reported-fail/setup-tests.log"
+
+errors_status="$(run_setup reported-errors errors)"
+if [ "$errors_status" -eq 0 ]; then
+  echo "setup printed ok after FAILED (errors=1)" >&2
+  cat "$BASE/setup-reported-errors.err" >&2
+  exit 1
+fi
+grep -q 'errors=' "$BASE/state-reported-errors/setup-tests.out"
+
+empty_tasks="$BASE/empty-pass.json"
+printf '%s\n' '{"primary":{"commonBaseCommit":"abc","instances":[{"PASS_TO_PASS":["Migration directories without an __init__.py file are loaded."],"FAIL_TO_PASS":["x"]}]}}' > "$empty_tasks"
+export PREREG_TASKS_JSON="$empty_tasks"
+export PREREG_FAKE_RUNNER=ok
+export PREREG_RUN_ID="django-empty-$$"
+export PREREG_SMOKE_STATE="$BASE/state-empty"
+set +e
+bash "$HERE/setup.sh" >"$BASE/setup-empty.out" 2>"$BASE/setup-empty.err"
+empty_status=$?
+set -e
+if [ "$empty_status" -eq 0 ]; then
+  echo "setup ok with no executable PASS_TO_PASS labels" >&2
+  exit 1
+fi
+grep -q 'PASS_TO_PASS' "$BASE/setup-empty.err"
 echo "django venv preflight ok"

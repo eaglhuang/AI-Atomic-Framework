@@ -162,7 +162,17 @@ EOF
   done > SHA256SUMS
 )
 
-ROW="| \`$INDEX_REL\` | smoke / exploratory, not results | no win claim | mode=${PREREG_SMOKE_MODE:-django}; model=${MODEL}; base=${COMMON_BASE} |"
+RESULT_STATUS="$(jq -r '.status // empty' "$STATE_ROOT/results.json")"
+ROW_LABEL="smoke / exploratory, not results"
+if [ "$RESULT_STATUS" = "invalid" ]; then
+  KIT_ERRORS="$(jq -r '[.arms[]?.tests[]?.kitError // empty] | unique | join(", ")' "$STATE_ROOT/results.json" 2>/dev/null || true)"
+  if [ -n "$KIT_ERRORS" ]; then
+    ROW_LABEL="smoke / exploratory, not results — INVALID (kit-error: ${KIT_ERRORS})"
+  else
+    ROW_LABEL="smoke / exploratory, not results — INVALID"
+  fi
+fi
+ROW="| \`$INDEX_REL\` | ${ROW_LABEL} | no win claim | mode=${PREREG_SMOKE_MODE:-django}; model=${MODEL}; base=${COMMON_BASE} |"
 printf '%s\n' "$ROW" > "$DEST/EVIDENCE_INDEX_ROW.md"
 if [ "$PUBLISH" -eq 1 ]; then
   if [ "$INDEX_EXPLICIT" -eq 0 ] && [ ! -f "$INDEX_FILE" ]; then
