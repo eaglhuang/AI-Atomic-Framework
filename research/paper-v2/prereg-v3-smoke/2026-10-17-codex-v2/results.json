@@ -1,0 +1,707 @@
+{
+  "schema": "prereg-v3-smoke.results.v1",
+  "label": "smoke/exploratory",
+  "winClaim": false,
+  "status": "ok",
+  "mode": "django",
+  "commonBase": "98ad327864aed8df245fd19ea9d2743279e11643",
+  "boundary": "unix-user",
+  "boundaryMechanism": "unix-user prereg-steward owns the worktree; prereg-session is not the owner and has no sudo; codex exec uses --sandbox workspace-write and sandbox_workspace_write.network_access=true so the steward socket can connect; prereg-session owns .agents .codex .aws so Codex can create them; tracked files stay prereg-steward-owned",
+  "arms": {
+    "A": {
+      "arm": "A",
+      "boundary": null,
+      "boundaryMechanism": null,
+      "status": "ok",
+      "work": "/workspace/atm-311/research/paper-v2/prereg-v3-smoke/kit/state/runs/20261016T162959Z-3059031-24779/arm-a/work",
+      "head": "98ad327864aed8df245fd19ea9d2743279e11643",
+      "startSkewMs": 13,
+      "model": "gpt-6-luna",
+      "reasoningEffort": "medium",
+      "sessions": [
+        {
+          "slot": 1,
+          "evidenceStatus": "ok",
+          "instanceId": "django__django-13820",
+          "startedAt": "2026-10-17T00:30:16,047604047+08:00",
+          "endedAt": "2026-10-17T00:30:44,941719092+08:00",
+          "exitCode": 0,
+          "tokens": {
+            "input_tokens": 119851,
+            "output_tokens": 1427,
+            "total_tokens": 0,
+            "events": 1
+          },
+          "lostEdits": [
+            {
+              "file": "django/db/migrations/loader.py",
+              "missingAddedLines": [
+                "                    getattr(module, '__file__', None) is None and",
+                "                    not isinstance(getattr(module, '__path__', None), list)"
+              ],
+              "missingCount": 2
+            }
+          ],
+          "unfinishedEdits": [
+            {
+              "file": "django/db/migrations/loader.py",
+              "missingAddedLines": [
+                "                    getattr(module, '__file__', None) is None and",
+                "                    not isinstance(getattr(module, '__path__', None), list)"
+              ],
+              "missingCount": 2
+            }
+          ],
+          "keptOrRejected": [],
+          "stewardRejected": false,
+          "quotaStop": false
+        },
+        {
+          "slot": 2,
+          "evidenceStatus": "ok",
+          "instanceId": "django__django-11141",
+          "startedAt": "2026-10-17T00:30:16,052418862+08:00",
+          "endedAt": "2026-10-17T00:31:07,182286295+08:00",
+          "exitCode": 0,
+          "tokens": {
+            "input_tokens": 238775,
+            "output_tokens": 2282,
+            "total_tokens": 0,
+            "events": 1
+          },
+          "lostEdits": [],
+          "unfinishedEdits": [],
+          "keptOrRejected": [
+            {
+              "file": "django/db/migrations/loader.py",
+              "missingCount": 0
+            },
+            {
+              "file": "tests/migrations/test_loader.py",
+              "missingCount": 0
+            }
+          ],
+          "stewardRejected": false,
+          "quotaStop": false
+        }
+      ],
+      "lostEditCount": 1,
+      "silentLostEditCount": 1,
+      "corruption": [],
+      "indexLockCount": 2,
+      "gitErrors": [],
+      "conflictCount": 2,
+      "resolutionTimeMs": null,
+      "steward": {
+        "writes": 0,
+        "rejected": 0,
+        "recomposeOrRetry": 0,
+        "queueWaitMs": [],
+        "writeToCommitMs": [],
+        "batchSizes": [],
+        "terminals": [],
+        "decisions": [],
+        "reasonCodes": [],
+        "writesDetail": []
+      },
+      "tests": [
+        {
+          "instanceId": "django__django-13820",
+          "exitCode": 1,
+          "passed": 0,
+          "failed": 0,
+          "notSeen": 18,
+          "tests": [
+            {
+              "label": "migrations.test_loader.LoaderTests.test_loading_package_without__file__",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.RecorderTests.test_apply",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.PycLoaderTests.test_invalid",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.PycLoaderTests.test_valid",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_check_consistent_history",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_check_consistent_history_squashed",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_explicit_missing_module",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_load",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_load_empty_dir",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_load_import_error",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_load_module_file",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_load_unmigrated_dependency",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_loading_squashed_complex_multi_apps",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_loading_squashed_complex_multi_apps_partially_applied",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_marked_as_migrated",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_marked_as_unmigrated",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_plan_handles_repeated_migrations",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_run_before",
+              "status": "not-seen"
+            }
+          ],
+          "outputTail": "Traceback (most recent call last):\n  File \"/tmp/tmpgvryx8h9/tree/tests/runtests.py\", line 14, in <module>\n    import django\nModuleNotFoundError: No module named 'django'\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"/tmp/tmpgvryx8h9/tree/tests/runtests.py\", line 16, in <module>\n    raise RuntimeError(\nRuntimeError: Django module not found, reference tests/README.rst for instructions.\n",
+          "testPatchApplied": true,
+          "testPatchError": null
+        },
+        {
+          "instanceId": "django__django-11141",
+          "exitCode": 1,
+          "passed": 0,
+          "failed": 0,
+          "notSeen": 18,
+          "tests": [
+            {
+              "label": "migrations.test_loader.RecorderTests.test_apply",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.PycLoaderTests.test_invalid",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.PycLoaderTests.test_valid",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_check_consistent_history",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_check_consistent_history_squashed",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_explicit_missing_module",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_first",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_load",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_load_empty_dir",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_load_import_error",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_load_module_file",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_load_unmigrated_dependency",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_loading_squashed_complex_multi_apps",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_loading_squashed_complex_multi_apps_partially_applied",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_marked_as_migrated",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_marked_as_unmigrated",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_plan_handles_repeated_migrations",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_run_before",
+              "status": "not-seen"
+            }
+          ],
+          "outputTail": "Traceback (most recent call last):\n  File \"/tmp/tmpt4hvt7yt/tree/tests/runtests.py\", line 14, in <module>\n    import django\nModuleNotFoundError: No module named 'django'\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"/tmp/tmpt4hvt7yt/tree/tests/runtests.py\", line 16, in <module>\n    raise RuntimeError(\nRuntimeError: Django module not found, reference tests/README.rst for instructions.\n",
+          "testPatchApplied": false,
+          "testPatchError": "error: patch failed: tests/migrations/test_loader.py:508\nerror: tests/migrations/test_loader.py: patch does not apply\nerror: tests/migrations/test_migrations_namespace_package/0001_initial.py: already exists in working directory\n"
+        }
+      ]
+    },
+    "B": {
+      "arm": "B",
+      "boundary": "unix-user",
+      "boundaryMechanism": "unix-user prereg-steward owns the worktree; prereg-session is not the owner and has no sudo; codex exec uses --sandbox workspace-write and sandbox_workspace_write.network_access=true so the steward socket can connect; prereg-session owns .agents .codex .aws so Codex can create them; tracked files stay prereg-steward-owned",
+      "status": "ok",
+      "work": "/workspace/atm-311/research/paper-v2/prereg-v3-smoke/kit/state/runs/20261016T162959Z-3059031-24779/arm-b/work",
+      "head": "5c1e0f9e95214029032b55d8679868601924598c",
+      "startSkewMs": 16,
+      "model": "gpt-6-luna",
+      "reasoningEffort": "medium",
+      "sessions": [
+        {
+          "slot": 1,
+          "evidenceStatus": "ok",
+          "instanceId": "django__django-13820",
+          "startedAt": "2026-10-17T00:31:12,433284516+08:00",
+          "endedAt": "2026-10-17T00:31:36,313392730+08:00",
+          "exitCode": 0,
+          "tokens": {
+            "input_tokens": 149994,
+            "output_tokens": 1598,
+            "total_tokens": 0,
+            "events": 1
+          },
+          "lostEdits": [],
+          "unfinishedEdits": [],
+          "keptOrRejected": [
+            {
+              "file": "django/db/migrations/loader.py",
+              "missingCount": 0
+            }
+          ],
+          "stewardRejected": false,
+          "quotaStop": false
+        },
+        {
+          "slot": 2,
+          "evidenceStatus": "ok",
+          "instanceId": "django__django-11141",
+          "startedAt": "2026-10-17T00:31:12,444703360+08:00",
+          "endedAt": "2026-10-17T00:31:46,345238201+08:00",
+          "exitCode": 0,
+          "tokens": {
+            "input_tokens": 205763,
+            "output_tokens": 2715,
+            "total_tokens": 0,
+            "events": 1
+          },
+          "lostEdits": [],
+          "unfinishedEdits": [],
+          "keptOrRejected": [
+            {
+              "file": "django/db/migrations/loader.py",
+              "missingCount": 0
+            }
+          ],
+          "stewardRejected": false,
+          "quotaStop": false
+        }
+      ],
+      "lostEditCount": 0,
+      "silentLostEditCount": 0,
+      "corruption": [],
+      "indexLockCount": 0,
+      "gitErrors": [],
+      "conflictCount": 4,
+      "resolutionTimeMs": null,
+      "steward": {
+        "writes": 5,
+        "rejected": 4,
+        "recomposeOrRetry": 0,
+        "queueWaitMs": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "writeToCommitMs": [
+          344
+        ],
+        "batchSizes": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "terminals": [
+          "blocked",
+          "committed",
+          "blocked",
+          "blocked",
+          "blocked"
+        ],
+        "decisions": [
+          "rejected-by-design",
+          "accepted",
+          "rejected-by-design",
+          "rejected-by-design",
+          "rejected-by-design"
+        ],
+        "reasonCodes": [
+          "patch-context-mismatch",
+          null,
+          "patch-context-mismatch",
+          "patch-context-mismatch",
+          "patch-context-mismatch"
+        ],
+        "writesDetail": [
+          {
+            "schema": "prereg-v3-smoke.stewardWrite.v1",
+            "ok": false,
+            "decision": "rejected-by-design",
+            "reasonCode": "patch-context-mismatch",
+            "messageCode": "ATM_BROKER_LIVE_WRITE_QUEUED",
+            "verdict": "blocked",
+            "phase": "live",
+            "terminal": "blocked",
+            "stopReason": "patch context mismatch at line 90: expected \"                # Empty directories are namespaces.\", found \"            else:\"",
+            "proposalId": "prop-prereg-session-a1-7998a1979b23",
+            "taskId": "prereg",
+            "actorId": "prereg-session",
+            "file": "django/db/migrations/loader.py",
+            "declaredBaseHash": "sha256:7dca66d253358f3dfbda3d68ceffb8b9fee4d0f47d8ddef2fa4d25e78ff1b05c",
+            "currentFileHash": "sha256:7dca66d253358f3dfbda3d68ceffb8b9fee4d0f47d8ddef2fa4d25e78ff1b05c",
+            "batchSize": 1,
+            "attempt": 1,
+            "retryCount": 0,
+            "hashDriftCount": 0,
+            "writeToCommitMs": null,
+            "commit": {
+              "gitIndexLockWaitMs": 0,
+              "headMoves": 0
+            },
+            "planRequired": false,
+            "cli": "@ai-atomic-framework/cli@0.1.21",
+            "entry": "broker steward apply-live"
+          },
+          {
+            "schema": "prereg-v3-smoke.stewardWrite.v1",
+            "ok": true,
+            "decision": "accepted",
+            "reasonCode": null,
+            "messageCode": "ATM_BROKER_LIVE_WRITE_APPLIED",
+            "verdict": "applied",
+            "phase": "commit",
+            "terminal": "committed",
+            "stopReason": null,
+            "proposalId": "prop-prereg-session-a1-7f80dd413ca2",
+            "taskId": "prereg",
+            "actorId": "prereg-session",
+            "file": "django/db/migrations/loader.py",
+            "declaredBaseHash": "sha256:7dca66d253358f3dfbda3d68ceffb8b9fee4d0f47d8ddef2fa4d25e78ff1b05c",
+            "currentFileHash": "sha256:9d85b779fe198207d6443272ecdf91980dfc18d7df8db0555ab3b02514577d61",
+            "batchSize": 1,
+            "attempt": 1,
+            "retryCount": 0,
+            "hashDriftCount": 0,
+            "writeToCommitMs": 344,
+            "commit": {
+              "gitIndexLockWaitMs": 0,
+              "headMoves": 0
+            },
+            "planRequired": false,
+            "cli": "@ai-atomic-framework/cli@0.1.21",
+            "entry": "broker steward apply-live"
+          },
+          {
+            "schema": "prereg-v3-smoke.stewardWrite.v1",
+            "ok": false,
+            "decision": "rejected-by-design",
+            "reasonCode": "patch-context-mismatch",
+            "messageCode": "ATM_BROKER_LIVE_WRITE_QUEUED",
+            "verdict": "blocked",
+            "phase": "live",
+            "terminal": "blocked",
+            "stopReason": "patch context mismatch at line 88: expected \"                ):\", found \"                    continue\"",
+            "proposalId": "prop-prereg-session-a1-a6ff1b3d2900",
+            "taskId": "prereg",
+            "actorId": "prereg-session",
+            "file": "django/db/migrations/loader.py",
+            "declaredBaseHash": "sha256:9d85b779fe198207d6443272ecdf91980dfc18d7df8db0555ab3b02514577d61",
+            "currentFileHash": "sha256:9d85b779fe198207d6443272ecdf91980dfc18d7df8db0555ab3b02514577d61",
+            "batchSize": 1,
+            "attempt": 1,
+            "retryCount": 0,
+            "hashDriftCount": 0,
+            "writeToCommitMs": null,
+            "commit": {
+              "gitIndexLockWaitMs": 0,
+              "headMoves": 0
+            },
+            "planRequired": false,
+            "cli": "@ai-atomic-framework/cli@0.1.21",
+            "entry": "broker steward apply-live"
+          },
+          {
+            "schema": "prereg-v3-smoke.stewardWrite.v1",
+            "ok": false,
+            "decision": "rejected-by-design",
+            "reasonCode": "patch-context-mismatch",
+            "messageCode": "ATM_BROKER_LIVE_WRITE_QUEUED",
+            "verdict": "blocked",
+            "phase": "live",
+            "terminal": "blocked",
+            "stopReason": "patch context mismatch at line 91: expected \"                raise\", found \"                # Empty directories are namespaces.\"",
+            "proposalId": "prop-prereg-session-a1-389b41391344",
+            "taskId": "prereg",
+            "actorId": "prereg-session",
+            "file": "django/db/migrations/loader.py",
+            "declaredBaseHash": "sha256:9d85b779fe198207d6443272ecdf91980dfc18d7df8db0555ab3b02514577d61",
+            "currentFileHash": "sha256:9d85b779fe198207d6443272ecdf91980dfc18d7df8db0555ab3b02514577d61",
+            "batchSize": 1,
+            "attempt": 1,
+            "retryCount": 0,
+            "hashDriftCount": 0,
+            "writeToCommitMs": null,
+            "commit": {
+              "gitIndexLockWaitMs": 0,
+              "headMoves": 0
+            },
+            "planRequired": false,
+            "cli": "@ai-atomic-framework/cli@0.1.21",
+            "entry": "broker steward apply-live"
+          },
+          {
+            "schema": "prereg-v3-smoke.stewardWrite.v1",
+            "ok": false,
+            "decision": "rejected-by-design",
+            "reasonCode": "patch-context-mismatch",
+            "messageCode": "ATM_BROKER_LIVE_WRITE_QUEUED",
+            "verdict": "blocked",
+            "phase": "live",
+            "terminal": "blocked",
+            "stopReason": "patch context mismatch at line 94: expected \"                # Empty directories are namespaces.\", found \"                    self.unmigrated_apps.add(app_config.label)\"",
+            "proposalId": "prop-prereg-session-a1-e955e4f54e74",
+            "taskId": "prereg",
+            "actorId": "prereg-session",
+            "file": "django/db/migrations/loader.py",
+            "declaredBaseHash": "sha256:9d85b779fe198207d6443272ecdf91980dfc18d7df8db0555ab3b02514577d61",
+            "currentFileHash": "sha256:9d85b779fe198207d6443272ecdf91980dfc18d7df8db0555ab3b02514577d61",
+            "batchSize": 1,
+            "attempt": 1,
+            "retryCount": 0,
+            "hashDriftCount": 0,
+            "writeToCommitMs": null,
+            "commit": {
+              "gitIndexLockWaitMs": 0,
+              "headMoves": 0
+            },
+            "planRequired": false,
+            "cli": "@ai-atomic-framework/cli@0.1.21",
+            "entry": "broker steward apply-live"
+          }
+        ]
+      },
+      "tests": [
+        {
+          "instanceId": "django__django-13820",
+          "exitCode": 1,
+          "passed": 0,
+          "failed": 0,
+          "notSeen": 18,
+          "tests": [
+            {
+              "label": "migrations.test_loader.LoaderTests.test_loading_package_without__file__",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.RecorderTests.test_apply",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.PycLoaderTests.test_invalid",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.PycLoaderTests.test_valid",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_check_consistent_history",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_check_consistent_history_squashed",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_explicit_missing_module",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_load",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_load_empty_dir",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_load_import_error",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_load_module_file",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_load_unmigrated_dependency",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_loading_squashed_complex_multi_apps",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_loading_squashed_complex_multi_apps_partially_applied",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_marked_as_migrated",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_marked_as_unmigrated",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_plan_handles_repeated_migrations",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_run_before",
+              "status": "not-seen"
+            }
+          ],
+          "outputTail": "Traceback (most recent call last):\n  File \"/tmp/tmpgeqw2gow/tree/tests/runtests.py\", line 14, in <module>\n    import django\nModuleNotFoundError: No module named 'django'\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"/tmp/tmpgeqw2gow/tree/tests/runtests.py\", line 16, in <module>\n    raise RuntimeError(\nRuntimeError: Django module not found, reference tests/README.rst for instructions.\n",
+          "testPatchApplied": true,
+          "testPatchError": null
+        },
+        {
+          "instanceId": "django__django-11141",
+          "exitCode": 1,
+          "passed": 0,
+          "failed": 0,
+          "notSeen": 18,
+          "tests": [
+            {
+              "label": "migrations.test_loader.RecorderTests.test_apply",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.PycLoaderTests.test_invalid",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.PycLoaderTests.test_valid",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_check_consistent_history",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_check_consistent_history_squashed",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_explicit_missing_module",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_first",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_load",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_load_empty_dir",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_load_import_error",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_load_module_file",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_load_unmigrated_dependency",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_loading_squashed_complex_multi_apps",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_loading_squashed_complex_multi_apps_partially_applied",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_marked_as_migrated",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_marked_as_unmigrated",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_plan_handles_repeated_migrations",
+              "status": "not-seen"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_run_before",
+              "status": "not-seen"
+            }
+          ],
+          "outputTail": "Traceback (most recent call last):\n  File \"/tmp/tmpykz_8_yg/tree/tests/runtests.py\", line 14, in <module>\n    import django\nModuleNotFoundError: No module named 'django'\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"/tmp/tmpykz_8_yg/tree/tests/runtests.py\", line 16, in <module>\n    raise RuntimeError(\nRuntimeError: Django module not found, reference tests/README.rst for instructions.\n",
+          "testPatchApplied": false,
+          "testPatchError": "error: patch failed: tests/migrations/test_loader.py:508\nerror: tests/migrations/test_loader.py: patch does not apply\nerror: tests/migrations/test_migrations_namespace_package/0001_initial.py: already exists in working directory\n"
+        }
+      ]
+    }
+  }
+}
