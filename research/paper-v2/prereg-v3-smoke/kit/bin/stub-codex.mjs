@@ -75,23 +75,60 @@ if (arm === 'A') {
   });
   if (commit.status !== 0) exitCode = 1;
 } else {
-  const patchPath = path.join(sessionDir, `file-${file.replaceAll('/', '_')}.patch`);
-  const basePath = path.join(sessionDir, `base-${file.replaceAll('/', '_')}`);
-  writeFileSync(patchPath, patch);
-  writeFileSync(basePath, original);
-  const result = spawnSync('atm-write', [file, patchPath, '--base-file', basePath, '--actor', `stub-${instanceId}`, '--task', instanceId, '--message', `stub ${instanceId} ${file}`], {
-    cwd: work,
-    encoding: 'utf8',
-    env: process.env
-  });
-  events.push({
-    type: 'stub.atm-write',
-    file,
-    status: result.status,
-    stdout: result.stdout,
-    stderr: result.stderr
-  });
-  if (result.status !== 0 && result.status !== 3) exitCode = 1;
+  const maxRetries = 3;
+  let attempt = 1;
+  let live = original;
+  let activePatch = patch;
+  while (attempt <= maxRetries + 1) {
+    const patchPath = path.join(sessionDir, `file-${file.replaceAll('/', '_')}.a${attempt}.patch`);
+    const basePath = path.join(sessionDir, `base-${file.replaceAll('/', '_')}.a${attempt}`);
+    writeFileSync(patchPath, activePatch);
+    writeFileSync(basePath, live);
+    const result = spawnSync('atm-write', [
+      file, patchPath, '--base-file', basePath,
+      '--actor', `stub-${instanceId}`,
+      '--task', instanceId,
+      '--message', `stub ${instanceId} ${file} attempt ${attempt}`,
+      '--attempt', String(attempt)
+    ], {
+      cwd: work,
+      encoding: 'utf8',
+      env: process.env
+    });
+    const record = parseStewardRecord(result.stdout);
+    events.push({
+      type: 'stub.atm-write',
+      file,
+      attempt,
+      status: result.status,
+      decision: record?.decision || null,
+      reasonCode: record?.reasonCode || null,
+      retryCount: record?.retryCount ?? null,
+      stdout: result.stdout,
+      stderr: result.stderr
+    });
+    if (result.status === 0 && record?.decision === 'accepted') break;
+    if (result.status !== 3 || record?.decision === 'kit-error' || !record) {
+      events.push({ type: 'stub.kit-error', attempt, status: result.status });
+      exitCode = 1;
+      break;
+    }
+    if (attempt > maxRetries) {
+      events.push({ type: 'stub.blocked', reason: 'retries-exhausted', attempts: attempt });
+      exitCode = 3;
+      break;
+    }
+    if (typeof record.currentFileText === 'string') live = record.currentFileText;
+    const rebuilt = rebuildPatch(live, marker, value, file);
+    if (rebuilt.done) break;
+    if (rebuilt.error) {
+      events.push({ type: 'stub.blocked', reason: rebuilt.error, attempts: attempt });
+      exitCode = 3;
+      break;
+    }
+    activePatch = rebuilt.patch;
+    attempt += 1;
+  }
 }
 
 events.push({
@@ -129,6 +166,27 @@ function splitLines(text) {
 
 function joinLines(lines, endsWithNewline) {
   return lines.join('\n') + (endsWithNewline ? '\n' : '');
+}
+
+function parseStewardRecord(stdout) {
+  if (!stdout) return null;
+  for (const line of stdout.split('\n')) {
+    if (!line.includes('"schema"')) continue;
+    try {
+      return JSON.parse(line);
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
+
+function rebuildPatch(text, marker, value, rel) {
+  const lines = splitLines(text);
+  if (lines.lines.includes(value)) return { done: true };
+  const index = lines.lines.indexOf(marker);
+  if (index < 0) return { error: 'marker-missing' };
+  return { patch: singleLinePatch(rel, index + 1, marker, value) };
 }
 
 function singleLinePatch(rel, lineNo, before, after) {

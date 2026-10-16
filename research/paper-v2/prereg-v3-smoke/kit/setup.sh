@@ -44,7 +44,7 @@ if [ "$MODE" = "fixture" ]; then
     git_author commit -q -m "fixture base"
   )
   BASE="$(git -C "$STATE_ROOT/template" rev-parse HEAD)"
-  TASKS="$HERE/fixture/tasks.json"
+  TASKS="${PREREG_TASKS_JSON:-$HERE/fixture/tasks.json}"
   GOLD="$HERE/fixture"
   cat > "$STATE_ROOT/template/prereg-fixture.json" <<< '{"mode":"fixture"}'
   printf 'fixture\n' > "$STATE_ROOT/setup-tests.log"

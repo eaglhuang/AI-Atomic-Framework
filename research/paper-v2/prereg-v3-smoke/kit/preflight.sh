@@ -49,6 +49,15 @@ static_launchers() {
   grep -q 'read-only' "$HERE/lib/common.sh"
   test -f "$HERE/bin/steward-daemon.mjs"
   grep -q 'capture_intended_patch' "$HERE/lib/run-arm.sh"
+  if grep -n 'exits 3, stop' "$HERE/lib/run-arm.sh"; then
+    echo "提示詞仍要求 steward 拒絕後停止，重送次數會永遠是 0" >&2
+    return 1
+  fi
+  grep -q 'currentFileText' "$HERE/lib/run-arm.sh"
+  grep -q 'currentFileText' "$HERE/bin/atm-write.mjs"
+  grep -q 'rejected-by-design' "$HERE/bin/evaluate.py"
+  grep -q 'kit-error' "$HERE/bin/evaluate.py"
+  grep -q 'retries-exhausted' "$HERE/bin/stub-codex.mjs"
 }
 
 echo "== static"
@@ -64,6 +73,8 @@ check no-rm bash "$HERE/test/test-no-rm-state.sh"
 check gold bash "$HERE/test/test-gold-isolation.sh"
 check atm-write-path bash "$HERE/test/test-atm-write-path.sh"
 check readonly-steward bash "$HERE/test/test-arm-b-readonly.sh"
+check disposition python3 "$HERE/test/test_write_disposition.py"
+check overlap bash "$HERE/test/test-overlap-decision.sh"
 check stub-dry-run bash "$HERE/self-check.sh"
 
 if [ "$fail" -ne 0 ]; then

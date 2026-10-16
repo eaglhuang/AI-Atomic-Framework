@@ -93,7 +93,9 @@ Every file write and every git commit must go through the steward wrapper on PAT
 
   atm-write <relative-file> <unified-diff-file>
 
-That command is the only writer. It calls the public ATM CLI 0.1.20 steward. If that CLI is unavailable, the arm has already aborted. Do not write the file yourself. If atm-write exits 3, stop. That is a steward rejection.
+That command is the only writer. It calls the public ATM CLI 0.1.20 steward. If that CLI is unavailable, the arm has already aborted. Do not write the file yourself.
+
+If atm-write exits 3, the steward rejected this attempt. stdout is one JSON record with decision "rejected-by-design", reasonCode, and currentFileText (the file as it is now). Re-read that state, recompose the diff against it, and resubmit. You may retry at most 3 times. Record every attempt. If the task is still unfinished after those retries, report BLOCKED and do not claim success. A kit or CLI crash is not a rejection: do not paper over it.
 EOF
     fi
     cat <<'EOF'

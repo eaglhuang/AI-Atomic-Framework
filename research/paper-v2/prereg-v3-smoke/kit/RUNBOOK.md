@@ -44,13 +44,14 @@ bash research/paper-v2/prereg-v3-smoke/kit/seal.sh --publish-index
 
 | 層 | 行為 |
 |---|---|
-| 指示 | 提示詞要求只能用 PATH 上的 `atm-write <file> <patch>`。退出碼 3 是 steward 拒絕，不准自己寫檔。 |
+| 指示 | 提示詞要求只能用 PATH 上的 `atm-write <file> <patch>`。退出碼 3 是 steward 拒絕：stdout 的 JSON 帶 `currentFileText` 與 `reasonCode`。代理要依那個檔案狀態重寫 diff，最多再送 3 次，每次都留下紀錄。重試後仍沒做完必須標成 BLOCKED，不能當成成功。 |
 | 強制（Linux） | 工作樹屬於 `prereg-steward`，模式是擁有者可寫、其他人唯讀。模型行程以 `prereg-session` 執行，不是擁有者，所以 `chmod` 改不回來，`mv` / 直接寫入也會失敗。session 沒有 sudo。寫入只走一支由 steward 身份聽的 Unix socket；`atm-write` 把 patch 送過去，steward 再呼叫公開 CLI。socket 目錄不是 session 可寫的，不能被換掉。 |
 | 強制（Windows / macOS 退路） | 建不起系統使用者時，Codex Arm B 加上 `--sandbox read-only`。steward 在沙盒外。Arm A 仍是 `workspace-write`。 |
 | 強制 | `atm-write` 用 `readlink -f` 找到套件內的 `atm-write.mjs`。session 環境有 `PREREG_STEWARD_SOCK` 時它只當 socket 客戶端；steward 行程才呼叫公開 CLI 0.1.20 的 `broker compose` 與 `broker steward apply`。CLI 缺失或版本不是 0.1.20 時，Arm B 在工作階段開始前中止，沒有 claim 退路。 |
 | 強制 | Arm B 的 `PATH` 把 `git` 換成拒絕 `commit`、`add`、`apply`、`checkout`、`reset`、`merge`、`rebase`、`stash` 的 shim。直接 `git commit` 退出碼 86。 |
 | 隔離 | 工作階段以 `env -i` 與允許清單啟動。`PREREG_GOLD_PATCH`、`GOLD_ROOT` 與金標檔路徑不會進入環境或 workspace。金標只在工作階段結束後由 `evaluate.py` 使用。 |
 | 偵測 | launcher 把工作階段的 unified diff 收成 `session/intended.patch`。缺少這份證據時 `evaluate.py` 以狀態 `evidence_missing` 非 0 退出，遺失修改數是 null，不會記成 0。Django 測試用 `--verbosity 2`，依每一列 `... ok` / `FAIL` / `ERROR` 計數。 |
+| 重疊 | 兩筆同時改到同一行時，公開 CLI 0.1.20 的 compose 判決是 `needs-steward`，steward apply 以 `steward-final-patch-required` 拒絕，不寫檔。這是 `rejected-by-design`。套件或 CLI 崩潰是 `kit-error`，整輪狀態是 `invalid`。拒絕後任務仍沒做完則是 `blocked`，不是成功。 |
 
 ## 在 #311 要回報的內容
 
