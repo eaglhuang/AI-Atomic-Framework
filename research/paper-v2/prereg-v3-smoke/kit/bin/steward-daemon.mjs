@@ -81,7 +81,8 @@ const server = net.createServer({ allowHalfOpen: true }, (socket) => {
       '--cwd', cwd,
       '--actor', safeToken(req.actor, 'prereg-session'),
       '--task', safeToken(req.task, 'prereg'),
-      '--message', safeToken(req.message, 'prereg-v3-smoke')
+      '--message', safeToken(req.message, 'prereg-v3-smoke'),
+      '--attempt', String(Number.isInteger(req.attempt) && req.attempt > 0 ? req.attempt : 1)
     ];
     if (req.baseText != null) {
       const basePath = path.join(inbound, `${id}.base`);

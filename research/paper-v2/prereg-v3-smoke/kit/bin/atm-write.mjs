@@ -56,7 +56,8 @@ async function runStewardClient() {
     patch,
     actor: argValue('--actor') || process.env.ATM_ACTOR || 'prereg-session',
     task: argValue('--task') || process.env.ATM_TASK || 'prereg',
-    message: argValue('--message') || 'prereg-v3-smoke'
+    message: argValue('--message') || 'prereg-v3-smoke',
+    attempt: Math.max(1, Number(argValue('--attempt') || 1) || 1)
   };
   if (baseFile) payload.baseText = readFileSync(path.resolve(baseFile), 'utf8');
   const response = await new Promise((resolve, reject) => {
@@ -197,6 +198,7 @@ const baseFile = argValue('--base-file');
 const patch = patchArg === '-' ? readFileSync(0, 'utf8') : readFileSync(path.resolve(patchArg), 'utf8');
 if (!patch.includes('@@')) fail('patch', 'patch 不是 unified diff', { file: relativeFile });
 
+const attempt = Math.max(1, Number(argValue('--attempt') || process.env.PREREG_WRITE_ATTEMPT || 1) || 1);
 const result = submitThroughPublicCli({
   writableRoot,
   cli,
@@ -207,14 +209,52 @@ const result = submitThroughPublicCli({
   taskId,
   message,
   baseFile,
-  patch
+  patch,
+  attempt,
+  targetPath
 });
 process.stdout.write(`${JSON.stringify(result.record)}\n`);
 process.exit(result.exitCode);
 
+function openRound(root, windowMs) {
+  const base = path.join(root, '.prereg-smoke', 'inbox');
+  mkdirSync(base, { recursive: true });
+  for (let round = 0; round < 32; round += 1) {
+    const dir = path.join(base, `round-${round}`);
+    mkdirSync(dir, { recursive: true });
+    if (existsSync(path.join(dir, 'applied.json'))) continue;
+    return { dir, deadline: ensureDeadline(dir, windowMs), round };
+  }
+  fail('inbox', 'compose round 用盡');
+}
+
+function repoRelative(root, file) {
+  return path.relative(root, file).split(path.sep).join('/');
+}
+
+function reasonCodeFrom(reasons, payload) {
+  if (Array.isArray(reasons) && reasons.length > 0) {
+    const head = String(reasons[0]).split(':')[0].trim();
+    if (head) return head;
+  }
+  const messageCode = payload?.messages?.[0]?.code;
+  if (typeof messageCode === 'string' && messageCode) return messageCode;
+  return null;
+}
+
+function classifyDecision(ok, reasonCode, payload) {
+  if (ok) return 'accepted';
+  if (!payload) return 'kit-error';
+  if (reasonCode) return 'rejected-by-design';
+  const blob = `${payload.messages?.[0]?.text || ''} ${payload.stderr || ''}`;
+  if (/ATM_CLI_UNHANDLED|SyntaxError|TypeError|MODULE_NOT_FOUND|unexpected token/i.test(blob)) return 'kit-error';
+  if (payload.ok === false && payload.messages?.[0]?.code) return 'rejected-by-design';
+  return 'kit-error';
+}
+
 function submitThroughPublicCli(input) {
-  const inbox = path.join(input.writableRoot, '.prereg-smoke', 'inbox');
-  mkdirSync(inbox, { recursive: true });
+  const round = openRound(input.writableRoot, input.windowMs);
+  const inbox = round.dir;
   const head = gitText(input.writableRoot, ['rev-parse', 'HEAD'], input.safePath);
   if (head.status !== 0) fail('base', `無法讀取 HEAD：${head.stderr}`);
   const baseCommit = head.stdout.trim();
@@ -222,12 +262,12 @@ function submitThroughPublicCli(input) {
     ? readFileSync(path.resolve(input.baseFile))
     : readFileSync(path.join(input.writableRoot, input.relativeFile));
   const fileBeforeHash = `sha256:${createHash('sha256').update(liveBytes).digest('hex')}`;
-  const proposalId = `prop-${input.actorId}-${createHash('sha256').update(`${input.relativeFile}\n${input.patch}`).digest('hex').slice(0, 12)}`;
+  const proposalId = `prop-${input.actorId}-a${input.attempt}-${createHash('sha256').update(`${input.relativeFile}\n${input.patch}`).digest('hex').slice(0, 12)}`;
   const proposal = proposalDocument({ ...input, proposalId, baseCommit, fileBeforeHash });
   const proposalPath = path.join(inbox, `${proposalId}.proposal.json`);
   writeFileSync(proposalPath, `${JSON.stringify(proposal, null, 2)}\n`);
 
-  const deadline = ensureDeadline(inbox, input.windowMs);
+  const deadline = round.deadline;
   while (Date.now() < deadline) sleep(40);
 
   const lockDir = path.join(inbox, 'lock');
@@ -268,12 +308,25 @@ function applyInbox(input, inbox, started) {
   const names = readdirSync(inbox).filter((name) => name.endsWith('.proposal.json')).sort();
   const proposals = names.map((name) => readJson(path.join(inbox, name)));
   const args = ['broker', 'compose', '--cwd', input.writableRoot, '--persist-merge-plan'];
-  for (const name of names) args.push('--proposal-file', path.join('.prereg-smoke', 'inbox', name));
+  for (const name of names) args.push('--proposal-file', repoRelative(input.writableRoot, path.join(inbox, name)));
   const composed = runCli(input.cli, args, input.writableRoot, input.safePath);
   const composePayload = parseCli(composed);
   if (!composePayload?.evidence?.persistedMergePlan?.path) {
     const message = composePayload?.messages?.[0]?.text || composed.stderr || composed.stdout || 'compose 失敗';
-    writeApplied(inbox, { ok: false, terminal: 'blocked', message, proposalIds: proposals.map((item) => item.proposalId), batchSize: proposals.length, elapsedMs: Date.now() - started });
+    const reasonCode = reasonCodeFrom([], composePayload);
+    const decision = classifyDecision(false, reasonCode, composePayload);
+    writeApplied(inbox, {
+      ok: false,
+      terminal: decision === 'kit-error' ? 'kit-error' : 'blocked',
+      decision,
+      reasonCode,
+      messageCode: composePayload?.messages?.[0]?.code || null,
+      message,
+      proposalIds: proposals.map((item) => item.proposalId),
+      batchSize: proposals.length,
+      elapsedMs: Date.now() - started,
+      blockedReasons: reasonCode ? [message] : []
+    });
     return finishFromApplied(input, proposals, readJson(path.join(inbox, 'applied.json')));
   }
   const planPath = composePayload.evidence.persistedMergePlan.path;
@@ -284,7 +337,7 @@ function applyInbox(input, inbox, started) {
     '--steward-id', STEWARD_ID,
     '--evidence-out', '.prereg-smoke/steward-evidence.json'
   ];
-  for (const name of names) applyArgs.push('--proposal-file', path.join('.prereg-smoke', 'inbox', name));
+  for (const name of names) applyArgs.push('--proposal-file', repoRelative(input.writableRoot, path.join(inbox, name)));
   for (const file of [...new Set(proposals.map((item) => item.targetFile))]) {
     applyArgs.push('--scope-file', file);
   }
@@ -292,15 +345,21 @@ function applyInbox(input, inbox, started) {
   const applyPayload = parseCli(applied);
   const evidence = applyPayload?.evidence?.applyEvidence || null;
   const ok = Boolean(applyPayload?.ok && evidence?.verdict === 'applied');
+  const blockedReasons = evidence?.blockedReasons || [];
+  const reasonCode = ok ? null : reasonCodeFrom(blockedReasons, applyPayload);
+  const decision = classifyDecision(ok, reasonCode, applyPayload ? { ...applyPayload, stderr: applied.stderr } : null);
   writeApplied(inbox, {
     ok,
-    terminal: ok ? 'committed' : 'blocked',
-    message: applyPayload?.messages?.[0]?.text || applied.stderr || '',
+    terminal: ok ? 'committed' : (decision === 'kit-error' ? 'kit-error' : 'blocked'),
+    decision,
+    reasonCode,
+    messageCode: applyPayload?.messages?.[0]?.code || null,
+    message: applyPayload?.messages?.[0]?.text || applied.stderr || applied.stdout || '',
     proposalIds: proposals.map((item) => item.proposalId),
     batchSize: proposals.length,
     elapsedMs: Date.now() - started,
-    blockedReasons: evidence?.blockedReasons || [],
-    verdict: composePayload.evidence.mergePlan?.verdict || null
+    blockedReasons,
+    verdict: composePayload.evidence.mergePlan?.verdict || evidence?.verdict || null
   });
   return finishFromApplied(input, proposals, readJson(path.join(inbox, 'applied.json')));
 }
@@ -328,21 +387,39 @@ function finishFromApplied(input, proposals, applied) {
   return finishRecord(input, mine, applied, Date.now() - applied.elapsedMs);
 }
 
+function currentFileState(input) {
+  const file = input.targetPath || path.join(input.writableRoot, input.relativeFile);
+  if (!existsSync(file)) return { currentFileText: null, currentFileHash: null };
+  const bytes = readFileSync(file);
+  return {
+    currentFileText: bytes.toString('utf8'),
+    currentFileHash: `sha256:${createHash('sha256').update(bytes).digest('hex')}`
+  };
+}
+
 function finishRecord(input, proposal, applied) {
   const ok = Boolean(applied.ok);
+  const decision = applied.decision || (ok ? 'accepted' : 'kit-error');
+  const reasonCode = ok ? null : (applied.reasonCode || null);
   const record = {
     schema: 'prereg-v3-smoke.stewardWrite.v1',
     ok,
+    decision,
+    reasonCode,
+    messageCode: applied.messageCode || null,
+    verdict: applied.verdict || null,
     phase: ok ? 'commit' : 'compose',
-    terminal: ok ? 'committed' : (applied.terminal || 'blocked'),
-    stopReason: ok ? null : (applied.blockedReasons || [applied.message]).join('; '),
+    terminal: ok ? 'committed' : (applied.terminal || (decision === 'kit-error' ? 'kit-error' : 'blocked')),
+    stopReason: ok ? null : (applied.blockedReasons || [applied.message]).filter(Boolean).join('; '),
     proposalId: proposal.proposalId,
     taskId: proposal.taskId,
     actorId: proposal.actorId,
     file: proposal.targetFile,
     declaredBaseHash: proposal.fileBeforeHash,
+    ...currentFileState(input),
     batchSize: applied.batchSize || 1,
-    retryCount: 0,
+    attempt: input.attempt || 1,
+    retryCount: Math.max(0, (input.attempt || 1) - 1),
     hashDriftCount: 0,
     writeToCommitMs: ok ? applied.elapsedMs || 0 : null,
     commit: { gitIndexLockWaitMs: 0, headMoves: 0 },
@@ -352,5 +429,6 @@ function finishRecord(input, proposal, applied) {
   const logPath = path.join(input.writableRoot, '.prereg-smoke', 'steward-writes.jsonl');
   mkdirSync(path.dirname(logPath), { recursive: true });
   appendFileSync(logPath, `${JSON.stringify(record)}\n`);
-  return { record, exitCode: ok ? 0 : 3 };
+  const exitCode = decision === 'accepted' ? 0 : (decision === 'rejected-by-design' ? 3 : 1);
+  return { record, exitCode };
 }

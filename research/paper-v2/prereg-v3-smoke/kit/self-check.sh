@@ -21,8 +21,11 @@ a = results["arms"]["A"]
 b = results["arms"]["B"]
 assert a["startSkewMs"] < 5000, a["startSkewMs"]
 assert b["startSkewMs"] < 5000, b["startSkewMs"]
+assert results["status"] == "ok", results["status"]
 assert a["lostEditCount"] >= 1, a
 assert b["lostEditCount"] == 0, b
+assert b["status"] == "ok", b["status"]
+assert b["steward"]["decisions"] and all(item == "accepted" for item in b["steward"]["decisions"]), b["steward"]
 assert b["steward"]["writes"] >= 2, b["steward"]
 assert any(size and size >= 1 for size in b["steward"]["batchSizes"]), b["steward"]
 text_a = (state / "arm-a" / "work" / "shared.py").read_text()

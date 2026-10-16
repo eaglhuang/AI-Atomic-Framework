@@ -1,0 +1,27 @@
+{
+  "schema": "prereg-v3-smoke.tasks.v1",
+  "label": "fixture-overlap",
+  "winClaim": false,
+  "primary": {
+    "runnable": true,
+    "commonBaseCommit": "FIXTURE",
+    "instances": [
+      {
+        "instanceId": "fixture-overlap-one",
+        "role": "slot-1",
+        "problemStatement": "Change the beta marker in shared.py to beta-one. Do not edit any other marker.",
+        "FAIL_TO_PASS": ["fixture.tests.MarkerTests.test_session_one"],
+        "PASS_TO_PASS": ["fixture.tests.MarkerTests.test_untouched"],
+        "goldPatch": "session-one.patch"
+      },
+      {
+        "instanceId": "fixture-overlap-two",
+        "role": "slot-2",
+        "problemStatement": "Change the beta marker in shared.py to beta-two. Do not edit any other marker.",
+        "FAIL_TO_PASS": ["fixture.tests.MarkerTests.test_session_one"],
+        "PASS_TO_PASS": ["fixture.tests.MarkerTests.test_untouched"],
+        "goldPatch": "session-one.patch"
+      }
+    ]
+  }
+}

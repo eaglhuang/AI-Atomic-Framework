@@ -118,6 +118,18 @@ def steward_rows(work):
     return rows
 
 
+def classify_write(row):
+    decision = row.get("decision")
+    if decision in {"accepted", "rejected-by-design", "kit-error"}:
+        return decision
+    if row.get("ok") is True and row.get("terminal") == "committed":
+        return "accepted"
+    reason = str(row.get("reasonCode") or row.get("stopReason") or "").strip()
+    if row.get("terminal") in {"blocked", "queued"} and reason:
+        return "rejected-by-design"
+    return "kit-error"
+
+
 def session_rejected(rows, instance_id):
     return any(
         (row.get("taskId") == instance_id or instance_id in str(row.get("actorId")))
@@ -187,6 +199,7 @@ def score_arm(arm_name, arm_dir, tasks, base):
         if instance_id is None and slot - 1 < len(tasks["primary"]["instances"]):
             instance_id = tasks["primary"]["instances"][slot - 1]["instanceId"]
         rejected = session_rejected(rows, instance_id)
+        unfinished = []
         for file, patch in parts.items():
             try:
                 base_text = git(work, "show", f"{base}:{file}").stdout
@@ -198,9 +211,11 @@ def score_arm(arm_name, arm_dir, tasks, base):
             item = {"file": file, "missingAddedLines": missing[:12], "missingCount": len(missing)}
             if missing and not rejected:
                 lost.append(item)
+                unfinished.append(item)
             elif missing and rejected:
                 item["classified"] = "steward-rejected"
                 kept.append(item)
+                unfinished.append(item)
             else:
                 kept.append({"file": file, "missingCount": 0})
         sessions.append({
@@ -212,6 +227,7 @@ def score_arm(arm_name, arm_dir, tasks, base):
             "exitCode": exit_code,
             "tokens": tokens_of(session),
             "lostEdits": lost,
+            "unfinishedEdits": unfinished,
             "keptOrRejected": kept,
             "stewardRejected": rejected,
             "quotaStop": (session / "QUOTA_STOP").exists(),
@@ -229,9 +245,22 @@ def score_arm(arm_name, arm_dir, tasks, base):
         if "<<<<<<<" in text and ">>>>>>>" in text:
             corruption.append(str(path.relative_to(work)))
     latencies = [row.get("writeToCommitMs") for row in rows if isinstance(row.get("writeToCommitMs"), int)]
+    decisions = [classify_write(row) for row in rows] if arm_name == "B" else []
+    unfinished = any(session["unfinishedEdits"] for session in sessions)
+    if arm_name == "B" and any(item == "kit-error" for item in decisions):
+        status = "invalid"
+    elif arm_name == "B" and unfinished:
+        status = "blocked"
+    else:
+        status = "ok"
+    labeled = []
+    for row in rows:
+        item = {key: value for key, value in row.items() if key != "currentFileText"}
+        item["decision"] = classify_write(row)
+        labeled.append(item)
     return {
         "arm": arm_name,
-        "status": "ok",
+        "status": status,
         "work": str(work),
         "head": git(work, "rev-parse", "HEAD", check=False).stdout.strip(),
         "startSkewMs": int((arm_dir / "start-skew-ms").read_text().strip()) if (arm_dir / "start-skew-ms").exists() else None,
@@ -252,6 +281,9 @@ def score_arm(arm_name, arm_dir, tasks, base):
             "writeToCommitMs": latencies,
             "batchSizes": [row.get("batchSize") for row in rows],
             "terminals": [row.get("terminal") for row in rows],
+            "decisions": [item["decision"] for item in labeled],
+            "reasonCodes": [item.get("reasonCode") for item in labeled],
+            "writesDetail": labeled,
         },
     }
 
@@ -364,12 +396,20 @@ def main():
             log = git(arm_dir / "work", "log", "--oneline", f"{base}..HEAD", check=False)
             (arm_dir / "git-log.txt").write_text(log.stdout, encoding="utf-8")
         arms[name] = score
-    missing = any(arm.get("status") == "evidence_missing" or arm.get("missing") for arm in arms.values())
+    statuses = [arm.get("status") for arm in arms.values()]
+    if any(status == "invalid" for status in statuses):
+        overall = "invalid"
+    elif any(status == "evidence_missing" or arm.get("missing") for status, arm in zip(statuses, arms.values())):
+        overall = "evidence_missing"
+    elif any(status == "blocked" for status in statuses):
+        overall = "blocked"
+    else:
+        overall = "ok"
     payload = {
         "schema": "prereg-v3-smoke.results.v1",
         "label": "smoke/exploratory",
         "winClaim": False,
-        "status": "evidence_missing" if missing else "ok",
+        "status": overall,
         "mode": env.get("PREREG_SMOKE_MODE"),
         "commonBase": base,
         "arms": arms,
@@ -387,11 +427,16 @@ def main():
         "status": payload["status"],
         "A_lost": public_lost(arms.get("A")),
         "B_lost": public_lost(arms.get("B")),
-        "B_rejected": None if missing else (arms.get("B", {}).get("steward") or {}).get("rejected"),
-        "B_writes": None if missing else (arms.get("B", {}).get("steward") or {}).get("writes"),
+        "B_rejected": None if overall == "evidence_missing" else (arms.get("B", {}).get("steward") or {}).get("rejected"),
+        "B_writes": None if overall == "evidence_missing" else (arms.get("B", {}).get("steward") or {}).get("writes"),
+        "B_decisions": None if overall == "evidence_missing" else (arms.get("B", {}).get("steward") or {}).get("decisions"),
     }))
-    if missing:
+    if overall == "invalid":
+        raise SystemExit(4)
+    if overall == "evidence_missing":
         raise SystemExit(2)
+    if overall == "blocked":
+        raise SystemExit(3)
 
 
 if __name__ == "__main__":
