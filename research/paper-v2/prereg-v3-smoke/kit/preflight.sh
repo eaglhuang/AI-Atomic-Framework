@@ -99,7 +99,8 @@ static_launchers() {
   grep -q 'pick_python' "$HERE/setup.sh"
   grep -q 'django_venv_preflight' "$HERE/setup.sh"
   grep -q 'django_runner_failed' "$HERE/setup.sh"
-  grep -q 'ensure_setuptools_wheel' "$HERE/lib/django-venv.sh"
+  grep -q 'ensure_setuptools' "$HERE/lib/django-venv.sh"
+  grep -q -- '--no-deps' "$HERE/lib/django-venv.sh"
   grep -q 'pick_python' "$HERE/test/test-setup-django-venv.sh"
   if grep -q 'PREREG_PYTHON="$(command -v python3)"' "$HERE/test/test-setup-django-venv.sh"; then
     echo "django venv 測試仍把 PREREG_PYTHON 指到系統 python3" >&2

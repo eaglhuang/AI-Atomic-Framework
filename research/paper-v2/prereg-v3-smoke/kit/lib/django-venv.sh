@@ -25,12 +25,14 @@ pick_python() {
   exit 1
 }
 
-# venv 已能 import setuptools.build_meta 與 wheel 就直接過。
-# 否則只用 wheelhouse、/usr/share/python-wheels 與 pip 快取，不連 PyPI。
+# 離線 editable install 只需要 setuptools。Django 3.2 不用 wheel 套件；
+# wheel 0.46 會再要 packaging，離線目錄常常沒有，整次安裝就會失敗。
+# 已能 import setuptools.build_meta 就直接過。否則只用 wheelhouse、
+# /usr/share/python-wheels 與 pip 快取，不連 PyPI，也不裝相依套件。
 # PREREG_WHEELHOUSE 有設時只看那個目錄，不再加系統 wheel 目錄。
-ensure_setuptools_wheel() {
+ensure_setuptools() {
   local py="$1"
-  if "$py" -c 'import setuptools.build_meta, wheel' >/dev/null 2>&1; then
+  if "$py" -c 'import setuptools.build_meta' >/dev/null 2>&1; then
     return 0
   fi
   local -a links=()
@@ -42,12 +44,12 @@ ensure_setuptools_wheel() {
   local log
   log="$(mktemp)"
   if env PIP_FIND_LINKS= PIP_NO_INDEX=1 \
-      "$py" -m pip install --disable-pip-version-check --no-index "${links[@]}" setuptools wheel >"$log" 2>&1 \
-      && "$py" -c 'import setuptools.build_meta, wheel' >/dev/null 2>&1; then
+      "$py" -m pip install --disable-pip-version-check --no-index --no-deps "${links[@]}" setuptools >"$log" 2>&1 \
+      && "$py" -c 'import setuptools.build_meta' >/dev/null 2>&1; then
     rm -f "$log"
     return 0
   fi
-  echo "prereg-v3-smoke: kit-error: venv 缺少 setuptools 與 wheel，離線 wheel／pip 快取無法安裝（無法 import setuptools.build_meta）。" >&2
+  echo "prereg-v3-smoke: kit-error: venv 缺少 setuptools，離線 wheel／pip 快取無法安裝（無法 import setuptools.build_meta）。" >&2
   cat "$log" >&2 || true
   rm -f "$log"
   return 1
@@ -57,7 +59,7 @@ install_task_repo_into_venv() {
   local py="$1"
   local repo="$2"
   if [ -n "${PREREG_OFFLINE_TEMPLATE:-}" ]; then
-    ensure_setuptools_wheel "$py" || return 1
+    ensure_setuptools "$py" || return 1
     "$py" -m pip install -q --no-build-isolation -e "$repo"
     return
   fi
