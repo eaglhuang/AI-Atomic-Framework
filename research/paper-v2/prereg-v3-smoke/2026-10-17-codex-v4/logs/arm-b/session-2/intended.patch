@@ -1,0 +1,30 @@
+diff --git a/django/db/migrations/loader.py b/django/db/migrations/loader.py
+--- a/django/db/migrations/loader.py
++++ b/django/db/migrations/loader.py
+@@ -90,13 +90,6 @@ class MigrationLoader:
+             else:
+                 # Empty directories are namespaces.
+-                # getattr() needed on PY36 and older (replace w/attribute access).
+-                if (
+-                    getattr(module, '__file__', None) is None and
+-                    not isinstance(getattr(module, '__path__', None), list)
+-                ):
+-                    self.unmigrated_apps.add(app_config.label)
+-                    continue
+                 # Module is not a package (e.g. migrations.py).
+                 if not hasattr(module, '__path__'):
+                     self.unmigrated_apps.add(app_config.label)
+diff --git a/tests/migrations/test_loader.py b/tests/migrations/test_loader.py
+--- a/tests/migrations/test_loader.py
++++ b/tests/migrations/test_loader.py
+@@ -506,11 +506,11 @@ class MigrationLoaderTests(MigrationTestBase):
+         MIGRATION_MODULES={'migrations': 'migrations.test_migrations_namespace_package'},
+     )
+     def test_loading_namespace_package(self):
+-        """Migration directories without an __init__.py file are ignored."""
++        """Migration directories without an __init__.py file are loaded."""
+         loader = MigrationLoader(connection)
+         loader.load_disk()
+         migrations = [name for app, name in loader.disk_migrations if app == 'migrations']
+-        self.assertEqual(migrations, [])
++        self.assertEqual(migrations, ['0001_initial'])
