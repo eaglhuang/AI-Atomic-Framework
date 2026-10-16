@@ -359,6 +359,12 @@ try {
   check(transactional.plan.rollback.returnedQueueRequestIds.length === 1, 'transactional composer must return skipped members to queue');
   check(readFileSync(targetFile, 'utf8') === liveBeforeTransactional, 'transactional composer must not mutate live target file');
 
+  const liveQueued = spawnSync(process.execPath, ['--strip-types', path.join(root, 'tests/core/live-queued-write.test.ts')], {
+    cwd: root,
+    encoding: 'utf8'
+  });
+  check(liveQueued.status === 0, `live queued write regression must pass:\n${liveQueued.stdout}\n${liveQueued.stderr}`);
+
   const concurrent = spawnSync(process.execPath, ['--strip-types', path.join(root, 'tests/core/steward-concurrent-commit.test.ts')], {
     cwd: root,
     encoding: 'utf8'

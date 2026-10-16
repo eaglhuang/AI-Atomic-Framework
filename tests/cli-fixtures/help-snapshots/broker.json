@@ -14,7 +14,7 @@
     },
     {
       "name": "steward-action",
-      "summary": "plan | apply",
+      "summary": "plan | apply | apply-live",
       "required": false
     },
     {
@@ -279,6 +279,7 @@
     "node atm.mjs broker runtime activate --task TASK-GOV-0100 --actor team-planner --merge-plan-file merge-plan.json --proposal-file proposal.json --scope-file src/target.ts --evidence-out runtime-evidence.json --json",
     "node atm.mjs broker steward plan --merge-plan-file merge-plan.json --proposal-file proposal.json --scope-file src/target.ts --json",
     "node atm.mjs broker steward apply --merge-plan-file merge-plan.json --proposal-file proposal.json --scope-file src/target.ts --evidence-out steward-evidence.json --json",
+    "node atm.mjs broker steward apply-live --proposal-file proposal.json --scope-file src/target.ts --json",
     "node atm.mjs broker plan-batch --request-file tmp/request-a.json --request-file tmp/request-b.json --apply --run-evidence-dir .atm/runtime/broker-collision-evidence/runs --json",
     "node atm.mjs broker parallel-admission status --json",
     "node atm.mjs broker parallel-admission set --mode enforce --fallback-mode queue-only --json",
