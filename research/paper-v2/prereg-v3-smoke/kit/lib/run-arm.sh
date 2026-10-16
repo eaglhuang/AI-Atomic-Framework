@@ -38,31 +38,18 @@ cleanup_arm() {
 trap cleanup_arm EXIT
 
 if [ "$ARM" = "B" ]; then
-  CLI="$(require_public_cli)"
+  require_public_cli >/dev/null
   mkdir -p "$ARM_DIR/bin" "$WORK/.prereg-smoke"
   export PREREG_SANDBOX_REPO="$WORK"
   ln -sfn "$HERE/bin/atm-write" "$ARM_DIR/bin/atm-write"
   ln -sfn "$HERE/bin/git-shim" "$ARM_DIR/bin/git"
   export PREREG_ARM_BIN="$ARM_DIR/bin"
-  NODE_BIN="$(dirname "$(command -v node)")"
-  ensure_prereg_users
+  select_run_boundary
   if sandbox_boundary_active; then
     allocate_sandbox_scratch >/dev/null
     ln -sfn "$PREREG_SANDBOX_SCRATCH" "$ARM_DIR/scratch"
   fi
-  python3 - "$WORK/.prereg-smoke/session-write.json" "$WORK" "$CLI" "$NODE_BIN" "$PREREG_BOUNDARY" <<'PY'
-import json, sys
-dest, work, cli, node_bin, boundary = sys.argv[1:]
-payload = {
-    "writableRoot": work,
-    "cli": cli,
-    "cliVersion": "0.1.21",
-    "safePath": f"{node_bin}:/usr/bin:/bin",
-    "composeWindowMs": 4000,
-    "boundary": boundary,
-}
-open(dest, "w", encoding="utf-8").write(json.dumps(payload, indent=2) + "\n")
-PY
+  write_session_write_config "$WORK"
   # 父目錄維持啟動者所有，session 不能把整個工作樹刪掉再換一棵自己的。
   chmod 755 "$ARM_DIR" "$ARM_DIR/bin"
   own_worktree "$WORK"

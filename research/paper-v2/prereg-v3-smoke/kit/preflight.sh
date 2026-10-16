@@ -95,6 +95,25 @@ static_launchers() {
   grep -q 'rejected-by-design' "$HERE/bin/evaluate.py"
   grep -q 'kit-error' "$HERE/bin/evaluate.py"
   grep -q 'retries-exhausted' "$HERE/bin/stub-codex.mjs"
+  grep -q 'prepare_session_codex_runtime_dirs' "$HERE/lib/common.sh"
+  grep -q 'write_session_write_config' "$HERE/lib/common.sh"
+  grep -q 'write_session_write_config' "$HERE/lib/run-arm.sh"
+  grep -q 'write_session_write_config' "$HERE/test/test-real-model.sh"
+  grep -q 'prepare_probe_arm_b' "$HERE/test/test-real-model.sh"
+  if grep -n 'composeWindowMs' "$HERE/lib/run-arm.sh" "$HERE/test/test-real-model.sh" "$HERE/test/test-arm-b-readonly.sh"; then
+    echo "session-write.json 仍有第二份寫入" >&2
+    return 1
+  fi
+  grep -q 'select_run_boundary' "$HERE/lib/common.sh"
+  grep -q 'select_run_boundary' "$HERE/lib/run-arm.sh"
+  grep -q 'select_run_boundary' "$HERE/test/test-real-model.sh"
+  grep -q 'is_codex_runtime_path' "$HERE/bin/evaluate.py"
+  grep -q '0.163.0' "$HERE/RUNBOOK.md"
+  grep -q 'PREREG_BOUNDARY' "$HERE/RUNBOOK.md"
+  if grep -q 'each boundary mode' "$HERE/test/test-real-model.sh" "$HERE/RUNBOOK.md"; then
+    echo "真實模型探測仍會跑每一種邊界" >&2
+    return 1
+  fi
 }
 
 echo "== static"
@@ -122,6 +141,7 @@ check stub-dry-run bash "$HERE/self-check.sh"
 check capture-intended bash "$HERE/test/test-capture-intended.sh"
 check seal-one-row bash "$HERE/test/test-seal-one-row.sh"
 check steward-ready bash "$HERE/test/test-steward-ready.sh"
+check probe-session-write bash "$HERE/test/test-probe-session-write.sh"
 check real-model bash "$HERE/test/test-real-model.sh"
 check real-model-skip bash "$HERE/test/test-real-model-skip.sh"
 echo "preflight ok"
