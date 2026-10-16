@@ -31,7 +31,7 @@ bash research/paper-v2/prereg-v3-smoke/kit/evaluate.sh
 bash research/paper-v2/prereg-v3-smoke/kit/seal.sh --publish-index
 ```
 
-`setup.sh` 每次使用新的 run-id，state 放在 `kit/state/runs/<run-id>/`。目錄已存在就中止，不會 `rm` 既有 state。要自己指定路徑時設定 `PREREG_SMOKE_STATE` 或 `PREREG_RUN_ID`，而且那個目錄必須還不存在。Django 模式會把 template 以 `pip install -e` 裝進 venv，先確認能 `import django` 並跑過一個最小測試。解譯器與測試相同：`PREREG_PYTHON`（可執行檔路徑），否則 CPython 3.8、3.9 或 3.10；都沒有就以 kit-error 結束，不改用系統 `python3`。離線 `pip install -e --no-build-isolation` 之前會先確認 venv 裡有 setuptools 與 wheel，只用現成 wheel 或 pip 快取；拿不到就以 kit-error 結束。runner 沒有印出 `Ran N test` 的完成報告（例如找不到 django）時，setup 以非零退出。
+`setup.sh` 每次使用新的 run-id，state 放在 `kit/state/runs/<run-id>/`。目錄已存在就中止，不會 `rm` 既有 state。要自己指定路徑時設定 `PREREG_SMOKE_STATE` 或 `PREREG_RUN_ID`，而且那個目錄必須還不存在。Django 模式會把 template 以 `pip install -e` 裝進 venv，先確認能 `import django` 並跑過一個最小測試。解譯器與測試相同：`PREREG_PYTHON`（可執行檔路徑），否則 CPython 3.8、3.9 或 3.10；都沒有就以 kit-error 結束，不改用系統 `python3`。離線 `pip install -e --no-build-isolation` 之前只確認 venv 裡有 setuptools（Django 3.2 不需要 wheel 套件），只用現成 wheel 或 pip 快取，且不安裝相依套件；拿不到就以 kit-error 結束。runner 沒有印出 `Ran N test` 的完成報告（例如找不到 django）時，setup 以非零退出。
 
 `--publish-index` 只在 `research/paper-v2/EVIDENCE_INDEX.md` 追加一列。那一列的路徑是這次實際寫入的封存目錄（`--dest` 或預設目錄），不會改用別的日期路徑。標成 smoke / exploratory、沒有勝出宣稱。索引檔不存在時會停，不會另建一份。
 
