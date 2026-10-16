@@ -148,6 +148,25 @@ def evidence_gaps(arm_dir):
     return gaps
 
 
+def read_model_record(path):
+    if not path.is_file():
+        return None, None
+    lines = path.read_text(encoding="utf-8").splitlines()
+    model = lines[0].strip() if lines else None
+    effort = None
+    for line in lines[1:]:
+        if line.startswith("reasoning_effort="):
+            raw = line.split("=", 1)[1].strip()
+            effort = raw or None
+            break
+    return model or None, effort
+
+
+def arm_model_fields(arm_dir):
+    model, effort = read_model_record(arm_dir / "model.txt")
+    return {"model": model, "reasoningEffort": effort}
+
+
 def missing_arm(arm_name, arm_dir, gaps):
     sessions = []
     for slot in (1, 2):
@@ -158,10 +177,13 @@ def missing_arm(arm_name, arm_dir, gaps):
             "lostEdits": None,
             "keptOrRejected": None,
         })
+    fields = arm_model_fields(arm_dir)
     return {
         "arm": arm_name,
         "status": "evidence_missing",
         "work": str(arm_dir / "work"),
+        "model": fields["model"],
+        "reasoningEffort": fields["reasoningEffort"],
         "sessions": sessions,
         "lostEditCount": None,
         "silentLostEditCount": None,
@@ -272,6 +294,7 @@ def score_arm(arm_name, arm_dir, tasks, base):
         item["decision"] = classify_write(row)
         labeled.append(item)
     boundary = read_boundary_file(arm_dir)
+    fields = arm_model_fields(arm_dir)
     return {
         "arm": arm_name,
         "boundary": boundary.get("boundary"),
@@ -280,7 +303,8 @@ def score_arm(arm_name, arm_dir, tasks, base):
         "work": str(work),
         "head": git(work, "rev-parse", "HEAD", check=False).stdout.strip(),
         "startSkewMs": int((arm_dir / "start-skew-ms").read_text().strip()) if (arm_dir / "start-skew-ms").exists() else None,
-        "model": (arm_dir / "model.txt").read_text().strip() if (arm_dir / "model.txt").exists() else None,
+        "model": fields["model"],
+        "reasoningEffort": fields["reasoningEffort"],
         "sessions": sessions,
         "lostEditCount": sum(len(session["lostEdits"]) for session in sessions),
         "silentLostEditCount": sum(len(session["lostEdits"]) for session in sessions),

@@ -4,11 +4,11 @@
 
 ## 先決條件
 
-- 這個儲存庫的工作目錄。Arm B 寫入只走公開 npm CLI `@ai-atomic-framework/cli@0.1.21` 的 `broker steward apply-live`。套件裝在 git workspace 外面，Linux 預設是 `/var/cache/prereg-v3-atm-cli-0.1.21`（steward 使用者讀得到；不要裝進家目錄，家目錄通常不可穿越）。不會使用倉庫裡版本較舊的 frozen runner。沒有這支 CLI 就中止 Arm B，沒有 claim 退路，也不改走 TypeScript 直接載入。preflight 先找已經裝好、版本正好是 0.1.21 的 CLI（環境變數、安裝前綴、全域 npm，或本機 cache 的 `npm install --prefer-offline`）。連不上 registry（例如 `getaddrinfo EAI_AGAIN`）會退避重試；仍然失敗就報網路錯誤並中止，不會改用其他版本。預先算好的 `broker steward apply --merge-plan-file` 仍留在 CLI，這條即時路徑不使用它。
+- 這個儲存庫的工作目錄。Arm B 寫入只走公開 npm CLI `@ai-atomic-framework/cli@0.1.21` 的 `broker steward apply-live`。套件裝在 git workspace 外面，Linux 預設是 `/var/cache/prereg-v3-atm-cli-0.1.21`（steward 使用者讀得到；不要裝進家目錄，家目錄通常不可穿越）。不會使用倉庫裡版本較舊的 frozen runner。沒有這支 CLI 就中止 Arm B，沒有 claim 退路，也不改走 TypeScript 直接載入。preflight 先找已經裝好、版本正好是 0.1.21 的 CLI（環境變數、安裝前綴、全域 npm，或本機 cache 的 `npm install --prefer-offline`）。連不上 registry（例如 `getaddrinfo EAI_AGAIN`）會退避重試；仍然失敗就報網路錯誤並中止，不會改用其他版本。本機 npm cache 如果還留著舊索引，安裝 0.1.21 可能出現 `ETARGET`。這時執行 `npm cache clean`，或刪掉 npm 的 cache 目錄，再重跑 preflight。不要改用其他版本。預先算好的 `broker steward apply --merge-plan-file` 仍留在 CLI，這條即時路徑不使用它。
 - Linux，而且 `sudo -n true` 成功：套件會自行建立系統使用者 `prereg-steward`（擁有工作樹與 steward 行程）與 `prereg-session`（跑模型，不在 `sudo` 群組，shell 是 `nologin`）。不需要手動 `useradd`。工作樹若放在其他人不能進入的家目錄下（GitHub Actions 的 `/home/runner` 常是 `750`），套件會對沿途目錄補上其他人的進入權（`chmod o+x`），不開放寫入，否則這兩個使用者連路徑都走不進去。
 - Linux，而且沒有 `sudo`（`sudo -n true` 結束碼 127，或任何免密碼 sudo 失敗）：Arm B 自動改用下面的無 sudo 沙盒。preflight 會用同一個機制跑一個真實的沙盒行程，確認對儲存庫的直接寫入、`chmod`、`mv`、`rm` 都失敗，而 steward 寫入成功。Codex sandbox 與 bubblewrap 都起不來時，preflight 直接中止。不退回 `chmod a-w`，也不退回沒有強制的模式。工作樹不能放在 `/tmp`（Codex `:workspace` 把 `/tmp` 當可寫根），也不能放在 scratch 裡面。
 - Windows 或 macOS：這兩個系統使用者通常建不起來。此時邊界改成 Codex `--sandbox read-only`，steward 行程留在沙盒外面。那是另一道控制，不是下面這道 Linux 擁有者邊界，也不是 Linux 無 sudo 沙盒。這份套件的擁有者邊界是在 Ubuntu 24.04.5 LTS、Linux 6.12.94+ x86_64 上驗證的；GitHub Actions 的 `ubuntu-latest` 會再跑同一份 preflight，並用系統的 bubblewrap 再驗一次無 sudo 沙盒。
-- Node.js 22 或更新。24 以上用 `--strip-types`，否則用 `--experimental-strip-types`。
+- `node` 必須在 `PATH` 上，而且是 Node.js 22 或更新。24 以上用 `--strip-types`，否則用 `--experimental-strip-types`。
 - `git`、`jq`、`python3`。
 - Django 臂：CPython 3.8、3.9 或 3.10（Django 3.2 的支援範圍）。沒有時可先裝 `uv`，`setup.sh` 會叫 `uv python install 3.10`。SWE-bench 舊的 conda 環境寫的是 Python 3.6，這份套件不使用 3.6。
 - Codex CLI 0.159.2，已用免費 ChatGPT 登入，而且 `codex exec` 在非互動環境跑得起來。
@@ -35,7 +35,7 @@ bash research/paper-v2/prereg-v3-smoke/kit/seal.sh --publish-index
 
 `--publish-index` 只在 `research/paper-v2/EVIDENCE_INDEX.md` 追加一列，標成 smoke / exploratory、沒有勝出宣稱。索引檔不存在時會停，不會另建一份。
 
-模型用環境變數 `CODEX_MODEL`。留空時不加 `--model`，讓已登入的免費 ChatGPT 帳戶使用它自己的預設模型。腳本會把實際模型名稱寫進各臂的 `model.txt`。兩臂用同一組旗標。
+模型用環境變數 `CODEX_MODEL`。留空時不加 `--model`，讓已登入的免費 ChatGPT 帳戶使用它自己的預設模型。推理力度用 `CODEX_REASONING_EFFORT`，只能是 `minimal`、`low`、`medium` 或 `high`。未設定（或空字串）時兩臂都不加 `-c model_reasoning_effort="<值>"`；設了其他值就中止，不啟動工作階段。設了合法值時，兩臂的 `codex exec` 都加上同一條 `-c model_reasoning_effort="<值>"`。腳本把模型名稱寫進各臂 `model.txt` 的第一行，第二行是 `reasoning_effort=`。`evaluate.py` 把這兩欄寫進 `results.json` 各臂的 `model` 與 `reasoningEffort`。兩臂用同一組旗標。
 
 ## 免費額度停止規則
 
@@ -60,5 +60,5 @@ bash research/paper-v2/prereg-v3-smoke/kit/seal.sh --publish-index
 - PR 連結。
 - 兩個 instance id 與共同 base。
 - 各臂遺失寫入數、衝突或 index.lock 數、steward 拒絕數、FAIL_TO_PASS / PASS_TO_PASS 通過數。
-- 模型名稱、Codex 版本、是否觸發免費額度停止。
+- 模型名稱、`CODEX_REASONING_EFFORT`（未設定就寫未設定）、Codex 版本、是否觸發免費額度停止。
 - 任何反例（包含 Arm B 仍遺失寫入）照實寫，不要寫成勝出。

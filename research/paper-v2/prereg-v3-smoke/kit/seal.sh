@@ -124,7 +124,7 @@ if ! reject_seal_secrets; then
 fi
 
 MODEL="unrecorded"
-[ -f "$STATE_ROOT/arm-a/model.txt" ] && MODEL="$(cat "$STATE_ROOT/arm-a/model.txt")"
+[ -f "$STATE_ROOT/arm-a/model.txt" ] && MODEL="$(head -n 1 "$STATE_ROOT/arm-a/model.txt")"
 cat > "$DEST/README.md" <<EOF
 # prereg-v3 smoke archive
 
