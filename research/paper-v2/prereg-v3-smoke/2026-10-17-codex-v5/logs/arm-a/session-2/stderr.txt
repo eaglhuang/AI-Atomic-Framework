@@ -1,0 +1,7 @@
+2026-10-16T22:09:23.073391Z ERROR codex_core::tools::router: error=apply_patch verification failed: Failed to find expected lines in /workspace/atm-311/research/paper-v2/prereg-v3-smoke/kit/state/runs/20261016T220842Z-3157728-17312/arm-a/work/django/db/migrations/loader.py:
+                # Empty directories are namespaces.
+                # getattr() needed on PY36 and older (replace w/attribute access).
+                if getattr(module, '__file__', None) is None:
+                    self.unmigrated_apps.add(app_config.label)
+                    continue
+                # Module is not a package (e.g. migrations.py).
