@@ -67,6 +67,7 @@ boundary_launch_args full env -i \
   "HOME=${SESSION}/home" \
   "TMPDIR=${SESSION}/tmp" \
   "PATH=${PATH}" \
+  "CODEX_HOME=${SESSION}/codex-home" \
   codex "${pins[@]}" -
 
 python3 - "$PREREG_BOUNDARY" "$SCRATCH" "$REPO" "$SESSION" "${full[@]}" << 'PY'
@@ -80,6 +81,7 @@ require("codex")
 require("exec")
 require("--ignore-user-config")
 require("--ignore-rules")
+require(f"CODEX_HOME={session}/codex-home")
 require('approval_policy="never"')
 require("--sandbox")
 require("workspace-write")
@@ -242,4 +244,71 @@ if command -v codex >/dev/null 2>&1; then
   echo "pinned codex exec started inside ${PREREG_BOUNDARY}; bypass could not write"
 fi
 
+python3 - "$BASE/fixture-auth.json" << 'PY'
+import json, secrets, sys
+dest = sys.argv[1]
+marker = "marker-" + secrets.token_hex(8)
+open(dest + ".marker", "w", encoding="utf-8").write(marker)
+json.dump({"tokens": {"id_token": marker, "access_token": marker, "refresh_token": marker}}, open(dest, "w", encoding="utf-8"))
+PY
+chmod 600 "$BASE/fixture-auth.json"
+export PREREG_CODEX_AUTH_FILE="$BASE/fixture-auth.json"
+ARM_A="$BASE/arm-a"
+mkdir -p "$ARM_A"
+saved_arm="$PREREG_ARM"
+PREREG_ARM=A
+prepare_session_codex_home "$ARM_A"
+PREREG_ARM="$saved_arm"
+prepare_session_codex_home "$SESSION"
+cmp -s "$PREREG_CODEX_AUTH_FILE" "$ARM_A/codex-home/auth.json"
+cmp -s "$PREREG_CODEX_AUTH_FILE" "$SESSION/codex-home/auth.json"
+session_env_assignments "$ARM_A" "$REPO" | grep -q "CODEX_HOME=${ARM_A}/codex-home"
+session_env_assignments "$SESSION" "$REPO" | grep -q "CODEX_HOME=${SESSION}/codex-home"
+[ "$(stat -c %a "$SESSION/codex-home/auth.json")" = "600" ]
+run_sandboxed env -i \
+  "PATH=${PATH}" \
+  "HOME=${SESSION}/home" \
+  "TMPDIR=${SESSION}/tmp" \
+  "CODEX_HOME=${SESSION}/codex-home" \
+  bash -c '
+    set -e
+    test -r "$CODEX_HOME/auth.json"
+    test -w "$CODEX_HOME"
+    mkdir -p "$CODEX_HOME/sessions"
+    echo ok > "$CODEX_HOME/sessions/probe"
+    if command -v codex >/dev/null 2>&1; then
+      codex login status > "$CODEX_HOME/login.out" 2> "$CODEX_HOME/login.err" || true
+    fi
+    if printf x >> "$1" 2>/dev/null; then
+      exit 3
+    fi
+  ' bash "$REPO/shared.py" > "$SCRATCH/auth-probe.out" 2>"$SCRATCH/auth-probe.err"
+[ "$(cat "$SESSION/codex-home/sessions/probe")" = "ok" ]
+expect_unchanged
+python3 - "$BASE/fixture-auth.json.marker" "$SESSION/codex-home" "$SCRATCH/auth-probe.out" "$SCRATCH/auth-probe.err" << 'PY'
+import pathlib, sys
+marker = pathlib.Path(sys.argv[1]).read_text(encoding="utf-8")
+home = pathlib.Path(sys.argv[2])
+blobs = []
+for path in [pathlib.Path(sys.argv[3]), pathlib.Path(sys.argv[4]), home / "login.out", home / "login.err"]:
+    if path.is_file():
+        blobs.append(path.read_text(encoding="utf-8", errors="replace"))
+joined = "\n".join(blobs)
+if marker and marker in joined:
+    raise SystemExit("auth contents were printed")
+login_err = home / "login.err"
+login_out = home / "login.out"
+if login_err.is_file() or login_out.is_file():
+    text = ""
+    if login_out.is_file():
+        text += login_out.read_text(encoding="utf-8", errors="replace")
+    if login_err.is_file():
+        text += login_err.read_text(encoding="utf-8", errors="replace")
+    if "Not logged in" in text and "invalid ID token" not in text and "Logged in" not in text:
+        raise SystemExit("codex login status did not read CODEX_HOME/auth.json")
+    if "invalid ID token" not in text and "Logged in" not in text:
+        raise SystemExit("codex did not parse the auth file")
+print("auth readable inside wrapper; session state writable; login not dropped")
+PY
+unset PREREG_CODEX_AUTH_FILE
 echo "exec boundary ok (${PREREG_BOUNDARY})"

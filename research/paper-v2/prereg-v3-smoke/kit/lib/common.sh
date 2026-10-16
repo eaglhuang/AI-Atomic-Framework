@@ -438,6 +438,42 @@ pinned_codex_exec_args() {
   fi
 }
 
+# ChatGPT 登入在 ~/.codex/auth.json。--ignore-user-config 不讀 config.toml，但登入仍用 CODEX_HOME。
+# 只複製 auth.json 到工作階段裡可寫的目錄，不複製設定，也不把內容印出來。
+codex_login_auth_file() {
+  if [ -n "${PREREG_CODEX_AUTH_FILE:-}" ]; then
+    [ -f "$PREREG_CODEX_AUTH_FILE" ] || die "指定的 Codex 登入檔不存在。"
+    printf '%s\n' "$PREREG_CODEX_AUTH_FILE"
+    return 0
+  fi
+  local origin="${CODEX_HOME:-}"
+  if [ -n "$origin" ] && [ -f "$origin/auth.json" ]; then
+    printf '%s\n' "$origin/auth.json"
+    return 0
+  fi
+  if [ -f "${HOME}/.codex/auth.json" ]; then
+    printf '%s\n' "${HOME}/.codex/auth.json"
+    return 0
+  fi
+  return 1
+}
+
+prepare_session_codex_home() {
+  local session_dir="$1"
+  local dest="$session_dir/codex-home"
+  local src
+  src="$(codex_login_auth_file)" || die "找不到 ~/.codex/auth.json。codex exec 需要 ChatGPT 登入；--ignore-user-config 不會略過 CODEX_HOME 裡的 auth.json。"
+  mkdir -p "$dest"
+  chmod 700 "$dest"
+  cp "$src" "$dest/auth.json"
+  chmod 600 "$dest/auth.json"
+  if [ "${PREREG_BOUNDARY:-}" = "unix-user" ] && [ "${PREREG_ARM:-}" = "B" ]; then
+    as_root chown -R "$SESSION_USER" "$dest"
+    as_root chmod 700 "$dest"
+    as_root chmod 600 "$dest/auth.json"
+  fi
+}
+
 # 工作階段環境允許清單。金標路徑、GOLD_ROOT、state、tasks 都不在裡面。
 session_env_assignments() {
   local session_dir="$1" work="$2"
@@ -484,6 +520,10 @@ EOF
   if [ -n "${CODEX_MODEL:-}" ]; then
     printf 'CODEX_MODEL=%s\n' "$CODEX_MODEL"
   fi
+  if [ -z "${PREREG_SMOKE_CODEX:-}" ]; then
+    # 兩臂用同一份登入。這個目錄在沙盒裡可寫，使用者的 ~/.codex 不是。
+    printf 'CODEX_HOME=%s\n' "${session_dir}/codex-home"
+  fi
 }
 
 capture_intended_patch() {
@@ -517,6 +557,9 @@ PY
 launch_codex() {
   local session_dir="$1" prompt_file="$2" work="$3"
   mkdir -p "$session_dir/home" "$session_dir/tmp"
+  if [ -z "${PREREG_SMOKE_CODEX:-}" ]; then
+    prepare_session_codex_home "$session_dir"
+  fi
   if [ "${PREREG_ARM:-}" = "B" ] && sandbox_boundary_active; then
     PREREG_SANDBOX_REPO="$work"
     export PREREG_SANDBOX_REPO

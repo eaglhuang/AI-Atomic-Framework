@@ -51,6 +51,8 @@ static_launchers() {
   grep -q 'bwrap-ro' "$HERE/lib/sandbox-boundary.sh"
   grep -q 'approval_policy="never"' "$HERE/lib/common.sh"
   grep -q 'ignore-user-config' "$HERE/lib/common.sh"
+  grep -q 'prepare_session_codex_home' "$HERE/lib/common.sh"
+  grep -q 'CODEX_HOME=' "$HERE/lib/common.sh"
   if grep -n 'dangerously-bypass-approvals-and-sandbox' "$HERE/lib/common.sh" "$HERE/lib/sandbox-boundary.sh"; then
     echo "launcher 仍把 bypass 放進邊界" >&2
     return 1
