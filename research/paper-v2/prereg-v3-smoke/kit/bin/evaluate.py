@@ -821,6 +821,8 @@ def main():
         "commonBase": base,
         "boundary": (arms.get("B") or {}).get("boundary"),
         "boundaryMechanism": (arms.get("B") or {}).get("boundaryMechanism"),
+        "testIdNormalization": tasks.get("testIdNormalization"),
+        "overlapCondition": env.get("PREREG_OVERLAP_CONDITION") or None,
         "arms": arms,
     }
     dest = STATE / "results.json"

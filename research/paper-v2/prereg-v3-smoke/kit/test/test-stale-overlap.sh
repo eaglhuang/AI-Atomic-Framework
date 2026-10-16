@@ -65,6 +65,7 @@ status = int(sys.argv[2])
 text = pathlib.Path(sys.argv[3]).read_text(encoding="utf-8")
 assert status == 3, (status, row)
 assert row["reasonCode"] == "overlapping-write-queued", row
+assert row["messageCode"] == "ATM_BROKER_LIVE_WRITE_QUEUED", row
 assert "beta-one" in (row.get("currentFileText") or ""), row.get("currentFileText")
 assert "beta-one" in text, text
 assert row.get("declaredBaseHash") != row.get("currentFileHash"), row
@@ -78,6 +79,8 @@ row = json.loads(open(sys.argv[1], encoding="utf-8").read())
 status = int(sys.argv[2])
 assert status == 3, (status, row)
 assert row["reasonCode"] == "patch-context-mismatch", row
+assert row["messageCode"] != "ATM_BROKER_LIVE_WRITE_QUEUED", row
+assert row["messageCode"] is None, row
 assert row.get("declaredBaseHash") == row.get("currentFileHash"), row
 PY
 

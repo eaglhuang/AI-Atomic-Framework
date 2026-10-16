@@ -74,4 +74,21 @@ case "$invalid_line" in
 esac
 grep -q 'INVALID' "$DEST2/EVIDENCE_INDEX_ROW.md"
 [ "$(grep -c 'prereg-v3-smoke/2026-10-17-codex-v3/' "$INDEX")" -eq 1 ]
+
+printf '%s\n' '{"status":"blocked","arms":{"A":{"status":"ok","tests":[]},"B":{"status":"blocked","tests":[]}}}' > "$ROOT/results.json"
+DEST3="$BASE/out/2026-10-17-codex-v6"
+bash "$HERE/seal.sh" --index-file "$INDEX" --dest "$DEST3" --publish-index >"$BASE/seal-blocked.out"
+blocked_line="$(grep 'prereg-v3-smoke/2026-10-17-codex-v6/' "$INDEX")"
+case "$blocked_line" in
+  *blocked*) ;;
+  *) echo "blocked results did not name the block: $blocked_line" >&2; exit 1 ;;
+esac
+case "$blocked_line" in
+  *"arm B"*) ;;
+  *) echo "blocked row omitted the blocked arm: $blocked_line" >&2; exit 1 ;;
+esac
+case "$blocked_line" in
+  *INVALID*) echo "blocked results were marked INVALID: $blocked_line" >&2; exit 1 ;;
+esac
+grep -q 'arm B' "$DEST3/EVIDENCE_INDEX_ROW.md"
 echo "seal index path ok"

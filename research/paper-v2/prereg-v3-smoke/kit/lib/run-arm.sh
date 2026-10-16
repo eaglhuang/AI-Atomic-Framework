@@ -7,6 +7,8 @@ ARM="${1:-}"
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # shellcheck disable=SC1091
 source "$HERE/lib/common.sh"
+# shellcheck disable=SC1091
+source "$HERE/lib/overlap-condition.sh"
 load_state
 
 ARM_DIR="$STATE_ROOT/arm-${ARM,,}"
@@ -80,6 +82,7 @@ write_prompt() {
     echo
     echo "$statement"
     echo
+    overlap_condition_note
     if [ "$ARM" = "A" ]; then
       echo "Edit the repository files directly and commit your own fix with git."
     else

@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """v5：11141 的 docstring FAIL_TO_PASS 對成 test_loading_namespace_package，而且 verbosity 2 看得到。"""
 import json
+import os
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 KIT = Path(__file__).resolve().parents[1]
@@ -83,10 +85,59 @@ def test_setup_labels_include_namespace_package():
     assert labels.count(NAMESPACE) == 1, labels
 
 
+def test_results_record_normalization():
+    root = Path(tempfile.mkdtemp())
+    (root / "env.sh").write_text(
+        "\n".join([
+            f"export TASKS_JSON={KIT / 'tasks.json'}",
+            "export COMMON_BASE=abc",
+            "export PREREG_SMOKE_MODE=fixture",
+            "export PREREG_OVERLAP_CONDITION=same-loader-region",
+            "",
+        ]),
+        encoding="utf-8",
+    )
+    proc = subprocess.run(
+        ["python3", str(KIT / "bin" / "evaluate.py")],
+        cwd=root,
+        text=True,
+        capture_output=True,
+        env={**os.environ, "PREREG_SMOKE_STATE": str(root)},
+    )
+    assert proc.returncode == 2, (proc.returncode, proc.stderr[-400:])
+    payload = json.loads((root / "results.json").read_text(encoding="utf-8"))
+    block = payload["testIdNormalization"]
+    assert block["deviation"] is False, block
+    assert block["map"][DOC_LOADED] == NAMESPACE
+    assert payload["overlapCondition"] == "same-loader-region"
+    plain = Path(tempfile.mkdtemp())
+    (plain / "env.sh").write_text(
+        "\n".join([
+            f"export TASKS_JSON={KIT / 'tasks.json'}",
+            "export COMMON_BASE=abc",
+            "export PREREG_SMOKE_MODE=fixture",
+            "",
+        ]),
+        encoding="utf-8",
+    )
+    proc = subprocess.run(
+        ["python3", str(KIT / "bin" / "evaluate.py")],
+        cwd=plain,
+        text=True,
+        capture_output=True,
+        env={**os.environ, "PREREG_SMOKE_STATE": str(plain)},
+    )
+    assert proc.returncode == 2, proc.returncode
+    recorded = json.loads((plain / "results.json").read_text(encoding="utf-8"))
+    assert recorded["overlapCondition"] is None
+    assert recorded["testIdNormalization"]["map"][DOC_LOADED] == NAMESPACE
+
+
 def main():
     test_map_keeps_published_ids()
     test_v5_log_observes_namespace_package()
     test_setup_labels_include_namespace_package()
+    test_results_record_normalization()
     print("v5 regressions ok")
 
 
