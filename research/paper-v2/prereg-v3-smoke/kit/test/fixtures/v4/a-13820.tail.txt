@@ -1,0 +1,23 @@
+pyc ... ok
+test_valid (migrations.test_loader.PycLoaderTests)
+To support frozen environments, MigrationLoader loads .pyc migrations. ... ok
+
+======================================================================
+FAIL: test_loading_package_without__file__ (migrations.test_loader.LoaderTests)
+To support frozen environments, MigrationLoader loads migrations from
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/tmp75ye2tdp/tree/django/test/utils.py", line 382, in inner
+    return func(*args, **kwargs)
+  File "/tmp/tmp75ye2tdp/tree/tests/migrations/test_loader.py", line 539, in test_loading_package_without__file__
+    self.assertCountEqual(migrations, ['0001_initial', '0002_second'])
+AssertionError: Element counts were not equal:
+First has 0, Second has 1:  '0001_initial'
+First has 0, Second has 1:  '0002_second'
+
+----------------------------------------------------------------------
+Ran 18 tests in 0.066s
+
+FAILED (failures=1)
+Destroying test database for alias 'default' ('file:memorydb_default?mode=memory&cache=shared')...
+Destroying test database for alias 'other' ('file:memorydb_other?mode=memory&cache=shared')...

@@ -182,6 +182,26 @@
   - 不打 tag，也不 npm publish。
 - prereg 凍結前不得跑 main；任何偏離都要寫進偏離表。
 
+### 10.1 偏離表
+
+#### D-11141-test-patch（2026-10-16）：11141 金標測試 patch 改對共同 base
+
+- **為什麼**：共同 base `98ad327864aed8df245fd19ea9d2743279e11643` 已經包含 `test_loading_namespace_package` 與 `tests/migrations/test_migrations_namespace_package/0001_initial.py`。`django__django-11141` 是這個 commit 的祖先，所以官方 SWE-bench 測試 patch 的上下文假設該測試尚不存在、而且 `0001_initial.py` 是新檔。這個原檔無法以 `git apply` 精確套上共同 base。不用 fuzz。
+- **檔案（原檔不變）**：
+  - 上游 SWE-bench 原檔：`research/paper-v2/prereg-v3-smoke/kit/gold/django__django-11141.test.patch`
+  - SHA256 `2368754a38055f10014bbcf18e23e95bbe26b0785de064f4fc561f6c3a03749f`
+  - 評估實際套用的 rebase 檔：`research/paper-v2/prereg-v3-smoke/kit/gold/django__django-11141.common-base.test.patch`
+  - SHA256 `c87a6bde8ecd0c27257bee336f858434490becbe969c4ba104c269b212b8190d`
+  - `tasks.json` 裡 `django__django-11141` 的 `testPatch` 指向 rebase 檔。`FAIL_TO_PASS` 與 `PASS_TO_PASS` 的測試 id 沒有改。
+- **套用後是否等於上游**：
+  - 被碰到的測試 `LoaderTests.test_loading_namespace_package`：上游原檔套在該題自己的 base `5d9cf79baf07fc4aed7ad1b06990532a65378155` 之後，方法本文與 rebase 檔套在共同 base 之後逐位元組相同。SHA256 `d4f185d9b25bf60db2ab78522a76cd016dc9f50baed8ae46dfeb03278177adda`。
+  - `0001_initial.py`：上游 patch 新增的檔案與共同 base 上既有檔案逐位元組相同，SHA256 `a2e4d044ee2145198980a4f5fc7c3ac93522d3c71a6dbfd506656736705b49f9`。rebase 檔不修改它。
+  - 整個 `tests/migrations/test_loader.py` 不是逐位元組相同。精確差異只有官方 patch 沒有碰到、而且共同 base 在套用前就已經如此的三處：
+    1. `test_load`：`[x for x, y in author_state.fields]` 換成 `list(author_state.fields)`。
+    2. `test_load`：`book_state` 的多行 `["id", "author"]` 斷言換成 `self.assertEqual(list(book_state.fields), ['id', 'author'])`。
+    3. `test_load_unmigrated_dependency`：多行 `["id", "user"]` 斷言換成 `self.assertEqual(list(book_state.fields), ['id', 'user'])`。
+  - 離線測試 `research/paper-v2/prereg-v3-smoke/kit/test/test_v4_regressions.py` 會把上游原檔套到該題自己的 base、把 rebase 檔套到共同 base，並鎖定上述位元組與這三處差異。
+
 ## 11. 成本估算（公式）
 令：
 - `G` 為題組數；

@@ -105,6 +105,12 @@ static_launchers() {
   grep -q 'django_runner_failed' "$HERE/lib/django-venv.sh"
   grep -q -- '--parallel", "1"' "$HERE/bin/evaluate.py"
   grep -q 'discard_model_test_edits' "$HERE/bin/evaluate.py"
+  grep -q 'apply_gold_test_patch' "$HERE/bin/evaluate.py"
+  grep -q 'resetTestPatchPaths' "$HERE/bin/evaluate.py"
+  if grep -q -- '--fuzz=5' "$HERE/bin/evaluate.py" "$HERE/setup.sh"; then
+    echo "金標測試 patch 仍用 fuzz 套用" >&2
+    return 1
+  fi
   grep -q 'modelTestEditsDiscarded' "$HERE/bin/evaluate.py"
   grep -q 'def session_rejected' "$HERE/bin/evaluate.py"
   grep -q 'INVALID' "$HERE/seal.sh"
@@ -150,6 +156,7 @@ else
   exit 1
 fi
 check parser python3 "$HERE/test/test_evaluate_parser.py"
+check v4-regressions python3 "$HERE/test/test_v4_regressions.py"
 check evidence python3 "$HERE/test/test_evidence_missing.py"
 check seal-secrets bash "$HERE/test/test-seal-secrets.sh"
 check public-cli bash "$HERE/test/test-public-cli.sh"

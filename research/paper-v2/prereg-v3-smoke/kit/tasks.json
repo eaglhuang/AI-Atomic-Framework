@@ -32,7 +32,7 @@
       "django__django-11141": "clean with offset. verbose: Hunk #1 succeeded at 88 (offset 4 lines); Hunk #2 succeeded at 95 (offset 4 lines).",
       "sequential": "Applying 13820 then 11141 fails: patch failed django/db/migrations/loader.py:84. Applying 11141 then 13820 also fails at loader.py:88.",
       "testPatch13820": "git apply --check clean",
-      "testPatch11141": "does not apply. tests/migrations/test_loader.py hunk context has moved, and tests/migrations/test_migrations_namespace_package/0001_initial.py already exists because PR 11141 is an ancestor of the common base. The code patch still changes loader.py.",
+      "testPatch11141": "DEVIATION. gold/django__django-11141.test.patch is the unchanged upstream SWE-bench file (sha256 2368754a38055f10014bbcf18e23e95bbe26b0785de064f4fc561f6c3a03749f). Evaluation applies gold/django__django-11141.common-base.test.patch (sha256 c87a6bde8ecd0c27257bee336f858434490becbe969c4ba104c269b212b8190d). Common base 98ad327864aed8df245fd19ea9d2743279e11643 already contains test_loading_namespace_package and 0001_initial.py, so the upstream hunk does not git apply. FAIL_TO_PASS and PASS_TO_PASS ids are unchanged. See RUNBOOK DEVIATION D-11141-test-patch.",
       "django__django-11141_stewardPort": "Official gold patch git-applies with a 4-line offset. The steward unified-patch applicator matches context exactly and rejects that offset. gold/django__django-11141.common-base.patch is git diff after the official apply on the common base. cmp confirms the resulting loader.py bytes match. Sessions should submit this retargeted diff, not the offset patch."
     },
     "overlapEvidence": {
@@ -160,7 +160,11 @@
           "test_run_before (migrations.test_loader.LoaderTests)"
         ],
         "goldPatch": "gold/django__django-11141.patch",
-        "testPatch": "gold/django__django-11141.test.patch",
+        "testPatch": "gold/django__django-11141.common-base.test.patch",
+        "upstreamTestPatch": "gold/django__django-11141.test.patch",
+        "upstreamTestPatchSha256": "2368754a38055f10014bbcf18e23e95bbe26b0785de064f4fc561f6c3a03749f",
+        "testPatchSha256": "c87a6bde8ecd0c27257bee336f858434490becbe969c4ba104c269b212b8190d",
+        "testPatchNote": "DEVIATION D-11141-test-patch. Evaluation applies the rebased file. The upstream SWE-bench test patch stays at upstreamTestPatch with its original SHA256. FAIL_TO_PASS and PASS_TO_PASS are unchanged.",
         "environmentSetupCommit": "0668164b4ac93a5be79f5b87fae83c657124d9ab",
         "difficulty": "15 min - 1 hour",
         "applyPatch": "gold/django__django-11141.common-base.patch",
