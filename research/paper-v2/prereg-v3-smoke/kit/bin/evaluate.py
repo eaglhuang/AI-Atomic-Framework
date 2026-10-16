@@ -7,7 +7,19 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-STATE = Path(os.environ.get("PREREG_SMOKE_STATE") or Path(__file__).resolve().parents[1] / "state")
+def resolve_state():
+    if os.environ.get("PREREG_SMOKE_STATE"):
+        return Path(os.environ["PREREG_SMOKE_STATE"])
+    kit = Path(__file__).resolve().parents[1]
+    current = kit / "state" / "CURRENT"
+    if current.is_file():
+        selected = current.read_text(encoding="utf-8").strip()
+        if selected:
+            return Path(selected)
+    return kit / "state"
+
+
+STATE = resolve_state()
 ENV = STATE / "env.sh"
 
 
@@ -114,7 +126,41 @@ def session_rejected(rows, instance_id):
     )
 
 
+def evidence_gaps(arm_dir):
+    gaps = []
+    for slot in (1, 2):
+        session = arm_dir / f"session-{slot}"
+        intended = session / "intended.patch"
+        if not session.is_dir() or not intended.is_file() or intended.stat().st_size == 0:
+            gaps.append(slot)
+    return gaps
+
+
+def missing_arm(arm_name, arm_dir, gaps):
+    sessions = []
+    for slot in (1, 2):
+        session = arm_dir / f"session-{slot}"
+        sessions.append({
+            "slot": slot,
+            "evidenceStatus": "evidence_missing" if slot in gaps else "ok",
+            "lostEdits": None,
+            "keptOrRejected": None,
+        })
+    return {
+        "arm": arm_name,
+        "status": "evidence_missing",
+        "work": str(arm_dir / "work"),
+        "sessions": sessions,
+        "lostEditCount": None,
+        "silentLostEditCount": None,
+        "evidenceGaps": gaps,
+    }
+
+
 def score_arm(arm_name, arm_dir, tasks, base):
+    gaps = evidence_gaps(arm_dir)
+    if gaps:
+        return missing_arm(arm_name, arm_dir, gaps)
     work = arm_dir / "work"
     rows = steward_rows(work)
     sessions = []
@@ -131,38 +177,35 @@ def score_arm(arm_name, arm_dir, tasks, base):
         intended_path = session / "intended.patch"
         lost = []
         kept = []
-        if intended_path.exists():
-            parts = split_patch(intended_path.read_text(encoding="utf-8"))
-            instance_id = None
-            prompt = (session / "prompt.txt").read_text(encoding="utf-8", errors="replace") if (session / "prompt.txt").exists() else ""
-            for instance in tasks["primary"]["instances"]:
-                if instance["problemStatement"][:80] in prompt or instance["instanceId"] in stdout:
-                    instance_id = instance["instanceId"]
-                    break
-            if instance_id is None and slot - 1 < len(tasks["primary"]["instances"]):
-                instance_id = tasks["primary"]["instances"][slot - 1]["instanceId"]
-            rejected = session_rejected(rows, instance_id)
-            for file, patch in parts.items():
-                try:
-                    base_text = git(work, "show", f"{base}:{file}").stdout
-                except RuntimeError:
-                    base_text = ""
-                final = work / file
-                final_text = final.read_text(encoding="utf-8") if final.exists() else ""
-                missing = [line for line in added_lines(patch) if line not in final_text]
-                item = {"file": file, "missingAddedLines": missing[:12], "missingCount": len(missing)}
-                if missing and not rejected:
-                    lost.append(item)
-                elif missing and rejected:
-                    item["classified"] = "steward-rejected"
-                    kept.append(item)
-                else:
-                    kept.append({"file": file, "missingCount": 0})
-        else:
+        parts = split_patch(intended_path.read_text(encoding="utf-8"))
+        instance_id = None
+        prompt = (session / "prompt.txt").read_text(encoding="utf-8", errors="replace") if (session / "prompt.txt").exists() else ""
+        for instance in tasks["primary"]["instances"]:
+            if instance["problemStatement"][:80] in prompt or instance["instanceId"] in stdout:
+                instance_id = instance["instanceId"]
+                break
+        if instance_id is None and slot - 1 < len(tasks["primary"]["instances"]):
             instance_id = tasks["primary"]["instances"][slot - 1]["instanceId"]
-            rejected = False
+        rejected = session_rejected(rows, instance_id)
+        for file, patch in parts.items():
+            try:
+                base_text = git(work, "show", f"{base}:{file}").stdout
+            except RuntimeError:
+                base_text = ""
+            final = work / file
+            final_text = final.read_text(encoding="utf-8") if final.exists() else ""
+            missing = [line for line in added_lines(patch) if line not in final_text]
+            item = {"file": file, "missingAddedLines": missing[:12], "missingCount": len(missing)}
+            if missing and not rejected:
+                lost.append(item)
+            elif missing and rejected:
+                item["classified"] = "steward-rejected"
+                kept.append(item)
+            else:
+                kept.append({"file": file, "missingCount": 0})
         sessions.append({
             "slot": slot,
+            "evidenceStatus": "ok",
             "instanceId": instance_id,
             "startedAt": (session / "started-at").read_text().strip() if (session / "started-at").exists() else None,
             "endedAt": (session / "ended-at").read_text().strip() if (session / "ended-at").exists() else None,
@@ -188,6 +231,7 @@ def score_arm(arm_name, arm_dir, tasks, base):
     latencies = [row.get("writeToCommitMs") for row in rows if isinstance(row.get("writeToCommitMs"), int)]
     return {
         "arm": arm_name,
+        "status": "ok",
         "work": str(work),
         "head": git(work, "rev-parse", "HEAD", check=False).stdout.strip(),
         "startSkewMs": int((arm_dir / "start-skew-ms").read_text().strip()) if (arm_dir / "start-skew-ms").exists() else None,
@@ -219,7 +263,7 @@ def run_tests(work, tasks, env, arm_score):
     if mode == "fixture":
         for instance in tasks["primary"]["instances"]:
             labels = instance["FAIL_TO_PASS"] + instance["PASS_TO_PASS"]
-            proc = subprocess.run([python, "runtests.py", *labels], cwd=work, text=True, capture_output=True)
+            proc = subprocess.run([python, "runtests.py", "--verbosity", "2", *labels], cwd=work, text=True, capture_output=True)
             results.append(parse_test_output(instance["instanceId"], labels, proc.stdout + proc.stderr, proc.returncode))
         return results
     gold_root = Path(env["KIT_ROOT"])
@@ -243,7 +287,7 @@ def run_tests(work, tasks, env, arm_score):
             test_patch = gold_root / instance["testPatch"]
             applied = subprocess.run(["/usr/bin/git", "-C", str(clone), "apply", str(test_patch)], text=True, capture_output=True)
             proc = subprocess.run(
-                [python, "tests/runtests.py", "--verbosity", "1", "--settings=test_sqlite", *mapped],
+                [python, "tests/runtests.py", "--verbosity", "2", "--settings=test_sqlite", *mapped],
                 cwd=clone,
                 text=True,
                 capture_output=True,
@@ -256,17 +300,41 @@ def run_tests(work, tasks, env, arm_score):
     return results
 
 
-def parse_test_output(instance_id, labels, output, returncode):
-    tests = []
-    for label in labels:
-        short = label.split(".")[-1]
-        if re.search(rf"{re.escape(short)}.*\bok\b", output):
+RESULT_LINE = re.compile(
+    r"^(?P<head>.*?)\s+\.\.\. (?P<status>ok|FAIL|ERROR|skipped|expected failure|unexpected success)\s*$",
+    re.M,
+)
+
+
+def parse_verbosity2_results(output):
+    found = {}
+    for match in RESULT_LINE.finditer(output):
+        head = match.group("head").strip()
+        raw = match.group("status")
+        if raw == "ok":
             status = "pass"
-        elif re.search(rf"{re.escape(short)}.*(FAIL|ERROR)", output):
+        elif raw in {"FAIL", "ERROR", "unexpected success"}:
             status = "fail"
         else:
             status = "not-seen"
-        tests.append({"label": label, "status": status})
+        found[head] = status
+    return found
+
+
+def match_test_status(label, found):
+    if label in found:
+        return found[label]
+    short = label.split(".")[-1]
+    method = label.split(" (", 1)[0]
+    for head, status in found.items():
+        if head == short or head.startswith(f"{method} (") or head.endswith(f"({method})"):
+            return status
+    return "not-seen"
+
+
+def parse_test_output(instance_id, labels, output, returncode):
+    found = parse_verbosity2_results(output)
+    tests = [{"label": label, "status": match_test_status(label, found)} for label in labels]
     return {
         "instanceId": instance_id,
         "exitCode": returncode,
@@ -286,19 +354,22 @@ def main():
     for name, folder in (("A", "arm-a"), ("B", "arm-b")):
         arm_dir = STATE / folder
         if not arm_dir.exists():
-            arms[name] = {"arm": name, "missing": True}
+            arms[name] = {"arm": name, "missing": True, "status": "evidence_missing", "lostEditCount": None, "silentLostEditCount": None}
             continue
         score = score_arm(name, arm_dir, tasks, base)
-        score["tests"] = run_tests(arm_dir / "work", tasks, env, score)
-        diff = git(arm_dir / "work", "diff", f"{base}..HEAD", check=False)
-        (arm_dir / "final.diff").write_text(diff.stdout, encoding="utf-8")
-        log = git(arm_dir / "work", "log", "--oneline", f"{base}..HEAD", check=False)
-        (arm_dir / "git-log.txt").write_text(log.stdout, encoding="utf-8")
+        if score.get("status") != "evidence_missing":
+            score["tests"] = run_tests(arm_dir / "work", tasks, env, score)
+            diff = git(arm_dir / "work", "diff", f"{base}..HEAD", check=False)
+            (arm_dir / "final.diff").write_text(diff.stdout, encoding="utf-8")
+            log = git(arm_dir / "work", "log", "--oneline", f"{base}..HEAD", check=False)
+            (arm_dir / "git-log.txt").write_text(log.stdout, encoding="utf-8")
         arms[name] = score
+    missing = any(arm.get("status") == "evidence_missing" or arm.get("missing") for arm in arms.values())
     payload = {
         "schema": "prereg-v3-smoke.results.v1",
         "label": "smoke/exploratory",
         "winClaim": False,
+        "status": "evidence_missing" if missing else "ok",
         "mode": env.get("PREREG_SMOKE_MODE"),
         "commonBase": base,
         "arms": arms,
@@ -306,12 +377,21 @@ def main():
     dest = STATE / "results.json"
     dest.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
     print(f"wrote {dest}")
+
+    def public_lost(arm):
+        if not arm or arm.get("status") == "evidence_missing" or arm.get("missing"):
+            return None
+        return arm.get("lostEditCount")
+
     print(json.dumps({
-        "A_lost": arms.get("A", {}).get("lostEditCount"),
-        "B_lost": arms.get("B", {}).get("lostEditCount"),
-        "B_rejected": (arms.get("B", {}).get("steward") or {}).get("rejected"),
-        "B_writes": (arms.get("B", {}).get("steward") or {}).get("writes"),
+        "status": payload["status"],
+        "A_lost": public_lost(arms.get("A")),
+        "B_lost": public_lost(arms.get("B")),
+        "B_rejected": None if missing else (arms.get("B", {}).get("steward") or {}).get("rejected"),
+        "B_writes": None if missing else (arms.get("B", {}).get("steward") or {}).get("writes"),
     }))
+    if missing:
+        raise SystemExit(2)
 
 
 if __name__ == "__main__":

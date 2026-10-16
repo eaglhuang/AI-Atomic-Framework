@@ -1,5 +1,6 @@
 #!/bin/bash
-# Usage: run-arm.sh A|B
+# 用法：run-arm.sh A|B
+# 工作階段以 env -i 與允許清單啟動。金標路徑不進入工作階段。
 set -euo pipefail
 ARM="${1:-}"
 [ "$ARM" = "A" ] || [ "$ARM" = "B" ] || { echo "usage: run-arm.sh A|B" >&2; exit 2; }
@@ -9,11 +10,13 @@ source "$HERE/lib/common.sh"
 load_state
 
 ARM_DIR="$STATE_ROOT/arm-${ARM,,}"
-rm -rf "$ARM_DIR"
+if [ -e "$ARM_DIR" ]; then
+  die "arm 目錄已存在：$ARM_DIR。拒絕刪除既有 state。"
+fi
 mkdir -p "$ARM_DIR/session-1" "$ARM_DIR/session-2"
 WORK="$ARM_DIR/work"
 git clone --quiet "$TEMPLATE" "$WORK"
-# clone leaves a branch; pin the recorded base so both arms start equal.
+# clone 會留在分支上；釘住紀錄的 base，讓兩臂起點相同。
 git -C "$WORK" checkout --force --detach --quiet "$COMMON_BASE"
 
 export GIT_AUTHOR_NAME=prereg-smoke
@@ -22,20 +25,55 @@ export GIT_COMMITTER_NAME=prereg-smoke
 export GIT_COMMITTER_EMAIL=prereg-smoke@localhost
 export PREREG_REAL_GIT=/usr/bin/git
 export PREREG_ARM="$ARM"
-export PREREG_ATM_WRITE="$HERE/bin/atm-write"
 export PREREG_WRITE_AFTER_MS="$(( $(date +%s%3N) + 1200 ))"
+unset PREREG_GOLD_PATCH || true
+unset PREREG_ARM_BIN || true
 
-PATH_SAVE="$PATH"
+cleanup_arm() {
+  if [ "${ARM:-}" = "B" ]; then
+    release_worktree "${WORK:-}"
+  fi
+}
+trap cleanup_arm EXIT
+
 if [ "$ARM" = "B" ]; then
-  mkdir -p "$ARM_DIR/bin"
+  CLI="$(require_public_cli)"
+  mkdir -p "$ARM_DIR/bin" "$WORK/.prereg-smoke"
   ln -sfn "$HERE/bin/atm-write" "$ARM_DIR/bin/atm-write"
   ln -sfn "$HERE/bin/git-shim" "$ARM_DIR/bin/git"
-  export PREREG_UNSHIMMED_PATH="$PATH"
-  export PATH="$ARM_DIR/bin:$PATH"
+  export PREREG_ARM_BIN="$ARM_DIR/bin"
+  NODE_BIN="$(dirname "$(command -v node)")"
+  python3 - "$WORK/.prereg-smoke/session-write.json" "$WORK" "$CLI" "$NODE_BIN" <<'PY'
+import json, sys
+dest, work, cli, node_bin = sys.argv[1:]
+payload = {
+    "writableRoot": work,
+    "cli": cli,
+    "cliVersion": "0.1.20",
+    "safePath": f"{node_bin}:/usr/bin:/bin",
+    "composeWindowMs": 4000,
+    "boundary": "steward-owner",
+}
+open(dest, "w", encoding="utf-8").write(json.dumps(payload, indent=2) + "\n")
+PY
+  # 父目錄維持啟動者所有，session 不能把整個工作樹刪掉再換一棵自己的。
+  chmod 755 "$ARM_DIR" "$ARM_DIR/bin"
+  own_worktree "$WORK"
+  start_steward_daemon "$WORK" "$ARM_DIR/steward-daemon.log"
+  {
+    echo "boundary=${PREREG_BOUNDARY}"
+    uname -srm
+    if [ -r /etc/os-release ]; then
+      # shellcheck disable=SC1091
+      . /etc/os-release
+      echo "os=${PRETTY_NAME:-unknown}"
+    fi
+    echo "sock=${PREREG_STEWARD_SOCK}"
+  } > "$ARM_DIR/boundary.txt"
 fi
 
 mapfile -t IDS < <(jq -r '.primary.instances[].instanceId' "$TASKS_JSON")
-[ "${#IDS[@]}" -eq 2 ] || die "expected 2 primary instances"
+[ "${#IDS[@]}" -eq 2 ] || die "預期 2 個 primary instances"
 
 write_prompt() {
   local slot="$1" dest="$2" instance="$3"
@@ -43,7 +81,7 @@ write_prompt() {
   statement="$(jq -r --arg id "$instance" '.primary.instances[] | select(.instanceId==$id) | .problemStatement' "$TASKS_JSON")"
   {
     echo "You are working in this local git checkout. Solve only the issue below."
-    echo "Do not mention any other task, session, or agent. Do not look for a gold patch."
+    echo "Do not mention any other task, session, or agent."
     echo
     echo "$statement"
     echo
@@ -51,13 +89,20 @@ write_prompt() {
       echo "Edit the repository files directly and commit your own fix with git."
     else
       cat <<'EOF'
-Every file write and every git commit must go through the steward wrapper:
+Every file write and every git commit must go through the steward wrapper on PATH:
 
   atm-write <relative-file> <unified-diff-file>
 
-That command is the only writer. It submits a proposal, composes, compares the base hash, writes the file atomically, then commits through the shared-delivery transaction. Do not redirect a shell into a source file. Do not use git add or git commit. If atm-write prints a JSON record whose terminal is not "committed", or exits 3, stop. That is a steward rejection. Do not write the file yourself.
+That command is the only writer. It calls the public ATM CLI 0.1.20 steward. If that CLI is unavailable, the arm has already aborted. Do not write the file yourself. If atm-write exits 3, stop. That is a steward rejection.
 EOF
     fi
+    cat <<'EOF'
+
+After you decide the edit, emit the unified diff you intended between these markers:
+BEGIN_INTENDED_PATCH
+diff --git a/...
+END_INTENDED_PATCH
+EOF
   } > "$dest"
 }
 
@@ -67,15 +112,7 @@ for slot in 1 2; do
   instance="${IDS[$((slot - 1))]}"
   session="$ARM_DIR/session-$slot"
   write_prompt "$slot" "$session/prompt.txt" "$instance"
-  gold_rel="$(jq -r --arg id "$instance" '.primary.instances[] | select(.instanceId==$id) | (.applyPatch // .goldPatch)' "$TASKS_JSON")"
-  if [ "$PREREG_SMOKE_MODE" = "fixture" ]; then
-    gold_path="$GOLD_ROOT/$gold_rel"
-  else
-    gold_path="$KIT_ROOT/$gold_rel"
-  fi
-  [ -f "$gold_path" ] || die "missing gold patch $gold_path"
   PREREG_INSTANCE_ID="$instance" \
-  PREREG_GOLD_PATCH="$gold_path" \
   PREREG_SESSION_SLOT="$slot" \
   PREREG_WORK="$WORK" \
     launch_codex "$session" "$session/prompt.txt" "$WORK" &
@@ -93,7 +130,15 @@ for pid in "${pids[@]}"; do
   wait "$pid" || fail=1
 done
 
-export PATH="$PATH_SAVE"
+for slot in 1 2; do
+  capture_intended_patch "$ARM_DIR/session-$slot"
+done
+
+# 評估要讀工作樹。先把擁有者還給啟動者，daemon 也在這裡停掉。
+if [ "$ARM" = "B" ]; then
+  release_worktree "$WORK"
+fi
+
 record_model "$ARM_DIR/session-1" "$ARM_DIR/model.txt"
 {
   echo "arm=$ARM"

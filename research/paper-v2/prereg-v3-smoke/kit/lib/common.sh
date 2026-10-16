@@ -1,19 +1,58 @@
 #!/bin/bash
-# Shared helpers for the prereg-v3 smoke kit. Source, do not execute.
+# prereg-v3 冒煙套件共用函式。只供 source，不要直接執行。
 set -euo pipefail
 
 KIT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-STATE_ROOT="${PREREG_SMOKE_STATE:-$KIT_ROOT/state}"
+PUBLIC_CLI_VERSION="0.1.20"
+PUBLIC_CLI_PACKAGE="@ai-atomic-framework/cli@${PUBLIC_CLI_VERSION}"
+# 安裝位置必須在這個 git workspace 外面，否則 npm 會連到倉庫內的 workspace 套件，而不是 registry 上的 0.1.20。
+# Linux 上還必須讓 prereg-steward 讀得到。使用者家目錄通常不可穿越，所以預設放在 /var/cache。
+STEWARD_USER="${PREREG_STEWARD_USER:-prereg-steward}"
+SESSION_USER="${PREREG_SESSION_USER:-prereg-session}"
+STEWARD_SOCK_DIR="${PREREG_STEWARD_SOCK_DIR:-/tmp/prereg-steward-sockets}"
+
+# 已存在的 state 目錄只讀取，絕不刪除。新的一輪必須用新的 run-id。
+if [ -n "${PREREG_SMOKE_STATE:-}" ]; then
+  STATE_ROOT="$PREREG_SMOKE_STATE"
+elif [ -n "${PREREG_RUN_ID:-}" ]; then
+  STATE_ROOT="$KIT_ROOT/state/runs/${PREREG_RUN_ID}"
+elif [ -f "$KIT_ROOT/state/CURRENT" ]; then
+  STATE_ROOT="$(cat "$KIT_ROOT/state/CURRENT")"
+else
+  STATE_ROOT=""
+fi
 
 iso_now() { date -Ins; }
 
 die() { echo "prereg-v3-smoke: $*" >&2; exit 1; }
 
+abort_arm_b() {
+  echo "prereg-v3-smoke: 公開 CLI ${PUBLIC_CLI_PACKAGE} 不可用。中止 Arm B。沒有 claim 退路，也不改走直接寫檔。" >&2
+  exit 1
+}
+
 load_state() {
+  [ -n "${STATE_ROOT:-}" ] || die "找不到 state。請先執行 setup.sh（每次使用新的 run-id）。"
   local env_file="$STATE_ROOT/env.sh"
-  [ -f "$env_file" ] || die "missing $env_file. Run setup.sh first."
+  [ -f "$env_file" ] || die "缺少 $env_file。請先執行 setup.sh。"
   # shellcheck disable=SC1090
   source "$env_file"
+}
+
+# setup 專用：忽略 CURRENT，每次都指向一個尚不存在的目錄。
+new_state_root() {
+  if [ -n "${PREREG_SMOKE_STATE:-}" ]; then
+    STATE_ROOT="$PREREG_SMOKE_STATE"
+  else
+    if [ -z "${PREREG_RUN_ID:-}" ]; then
+      PREREG_RUN_ID="$(date -u +%Y%m%dT%H%M%SZ)-$$-${RANDOM}"
+      export PREREG_RUN_ID
+    fi
+    STATE_ROOT="$KIT_ROOT/state/runs/${PREREG_RUN_ID}"
+  fi
+  if [ -e "$STATE_ROOT" ]; then
+    die "state 目錄已存在：$STATE_ROOT。拒絕刪除。請換一個新的 run-id。"
+  fi
 }
 
 node_strip_flags() {
@@ -43,32 +82,397 @@ write_env() {
   } > "$dest"
 }
 
+as_root() {
+  if [ "$(id -u)" -eq 0 ]; then
+    "$@"
+  else
+    sudo -n "$@"
+  fi
+}
+
+linux_sudo_ok() {
+  [ "$(uname -s)" = "Linux" ] || return 1
+  as_root true >/dev/null 2>&1
+}
+
+default_public_cli_root() {
+  if [ -n "${PREREG_ATM_CLI_ROOT:-}" ]; then
+    printf '%s\n' "$PREREG_ATM_CLI_ROOT"
+  elif linux_sudo_ok; then
+    printf '%s\n' /var/cache/prereg-v3-atm-cli-0.1.20
+  else
+    printf '%s\n' "${HOME}/.cache/prereg-v3-atm-cli-0.1.20"
+  fi
+}
+
+cli_cache_path() {
+  local root="$1"
+  printf '%s\n' "$root/node_modules/@ai-atomic-framework/cli/dist/npm-runtime/atm.mjs"
+}
+
+cli_is_public_0120() {
+  local cli="$1"
+  [ -f "$cli" ] || return 1
+  local version
+  version="$(node "$cli" --version 2>/dev/null | jq -r '.evidence.frameworkVersion // empty' || true)"
+  [ "$version" = "$PUBLIC_CLI_VERSION" ]
+}
+
+prepare_cli_root() {
+  local root="$1"
+  if [ -d "$root" ] && [ -w "$root" ]; then
+    return 0
+  fi
+  local parent
+  parent="$(dirname "$root")"
+  if [ -w "$parent" ]; then
+    mkdir -p "$root"
+    return 0
+  fi
+  as_root mkdir -p "$root"
+  as_root chown "$(id -u):$(id -g)" "$root"
+}
+
+# steward 與 session 都要能讀 CLI。只放寬安裝前綴，避免 chmod 掃到檔案系統根目錄。
+publish_cli_tree() {
+  local cli="$1"
+  local prefix="$cli"
+  local i
+  for i in 1 2 3 4 5 6; do
+    prefix="$(dirname "$prefix")"
+  done
+  case "$prefix" in
+    /|/usr|/usr/local|/home|/var|/tmp|/var/cache|/opt)
+      die "拒絕放寬 CLI 權限到過寬的路徑：$prefix"
+      ;;
+  esac
+  if [ -d "$prefix" ]; then
+    chmod -R a+rX "$prefix" 2>/dev/null || as_root chmod -R a+rX "$prefix"
+  fi
+}
+
+seed_cli_from_local() {
+  local root="$1"
+  local candidate cache
+  for candidate in /tmp/atm-cli-0.1.20 "${HOME}/.cache/prereg-v3-atm-cli-0.1.20"; do
+    cache="$(cli_cache_path "$candidate")"
+    if cli_is_public_0120 "$cache"; then
+      mkdir -p "$root"
+      cp -a "$candidate/." "$root/"
+      return 0
+    fi
+  done
+  return 1
+}
+
+# 只接受 npm 上的公開 0.1.20 CLI。倉庫內 frozen runner 與 TypeScript 直接載入都不是這條路徑。
+resolve_public_cli() {
+  local root cache
+  root="$(default_public_cli_root)"
+  cache="$(cli_cache_path "$root")"
+  if [ -n "${PREREG_ATM_CLI:-}" ] && cli_is_public_0120 "$PREREG_ATM_CLI"; then
+    publish_cli_tree "$PREREG_ATM_CLI"
+    printf '%s\n' "$PREREG_ATM_CLI"
+    return 0
+  fi
+  if ! cli_is_public_0120 "$cache"; then
+    prepare_cli_root "$root"
+    if ! seed_cli_from_local "$root"; then
+      if ! npm install --prefix "$root" "$PUBLIC_CLI_PACKAGE" --no-fund --no-audit --silent >&2; then
+        return 1
+      fi
+    fi
+  fi
+  if cli_is_public_0120 "$cache"; then
+    publish_cli_tree "$cache"
+    printf '%s\n' "$cache"
+    return 0
+  fi
+  return 1
+}
+
+require_public_cli() {
+  local cli
+  cli="$(resolve_public_cli)" || abort_arm_b
+  export PREREG_ATM_CLI="$cli"
+  printf '%s\n' "$cli"
+}
+
+# Linux 必須用兩個系統使用者。chmod a-w 可以由擁有者改回來，不能當邊界。
+# 非 Linux（Windows / macOS 開發機）沒有這兩個使用者時，改由 Codex --sandbox read-only 把模型關在沙盒裡，steward 留在沙盒外。
+ensure_prereg_users() {
+  if [ "$(uname -s)" != "Linux" ]; then
+    PREREG_BOUNDARY=codex-sandbox
+    export PREREG_BOUNDARY
+    return 0
+  fi
+  if ! linux_sudo_ok; then
+    die "Linux 上需要免密碼 sudo，才能建立 ${STEWARD_USER} 與 ${SESSION_USER}。拒絕退回 chmod a-w。Windows 或 macOS 請改用 Codex --sandbox read-only。"
+  fi
+  local user home shell
+  shell=/usr/sbin/nologin
+  [ -x "$shell" ] || shell=/sbin/nologin
+  for user in "$STEWARD_USER" "$SESSION_USER"; do
+    if ! id "$user" >/dev/null 2>&1; then
+      home="/var/lib/${user}"
+      as_root useradd --system --create-home --home-dir "$home" --shell "$shell" "$user"
+    fi
+  done
+  if id -nG "$SESSION_USER" | tr ' ' '\n' | grep -Eqx 'sudo|wheel|admin'; then
+    die "${SESSION_USER} 屬於管理者群組，擁有者邊界無效。"
+  fi
+  if as_root -u "$SESSION_USER" -- sudo -n true >/dev/null 2>&1; then
+    die "${SESSION_USER} 可以免密碼 sudo，擁有者邊界無效。"
+  fi
+  PREREG_BOUNDARY=unix-user
+  export PREREG_BOUNDARY
+}
+
+# GitHub Actions 的 /home/runner 常常是 750。steward 與 session 不是擁有者，
+# 連工作樹的路徑都走不進去。只補其他人的進入權，不打開寫入。
+ensure_other_can_reach() {
+  local path="$1"
+  [ -n "$path" ] || return 0
+  [ -e "$path" ] || [ -L "$path" ] || return 0
+  local cursor="$path"
+  if [ -f "$cursor" ] || [ -L "$cursor" ]; then
+    chmod a+r "$cursor" 2>/dev/null || as_root chmod a+r "$cursor" || true
+    cursor="$(dirname "$cursor")"
+  fi
+  while [ "$cursor" != "/" ]; do
+    if [ -d "$cursor" ]; then
+      local bits="${cursor}"
+      bits="$(stat -c %a "$cursor")"
+      case "${bits: -1}" in
+        1|3|5|7) ;;
+        *) as_root chmod o+x "$cursor" ;;
+      esac
+    fi
+    cursor="$(dirname "$cursor")"
+  done
+}
+
+# 工作樹改由 steward 擁有。目錄對其他人只有讀與進入，沒有寫，所以 session 不能寫、不能改名、也不能 chmod。
+own_worktree() {
+  local work="$1"
+  ensure_prereg_users
+  if [ "${PREREG_BOUNDARY}" != "unix-user" ]; then
+    return 0
+  fi
+  as_root chown -R "$STEWARD_USER" "$work"
+  as_root chmod -R u+rwX,go+rX,go-w "$work"
+}
+
+start_steward_daemon() {
+  local work="$1"
+  local log="$2"
+  local node_bin sock
+  node_bin="$(command -v node)"
+  [ -n "$node_bin" ] || die "找不到 node，無法啟動 steward。"
+  ensure_prereg_users
+  if [ "${PREREG_BOUNDARY}" = "unix-user" ]; then
+    ensure_other_can_reach "$node_bin"
+    ensure_other_can_reach "$KIT_ROOT/bin/steward-daemon.mjs"
+    ensure_other_can_reach "$KIT_ROOT/bin/atm-write.mjs"
+    ensure_other_can_reach "$KIT_ROOT/bin/atm-write"
+    ensure_other_can_reach "$work"
+    if ! as_root -u "$STEWARD_USER" -- test -r "$KIT_ROOT/bin/steward-daemon.mjs"; then
+      die "prereg-steward 讀不到 ${KIT_ROOT}/bin/steward-daemon.mjs。沿途目錄需要其他人的進入權。"
+    fi
+    if ! as_root -u "$STEWARD_USER" -- test -x "$work"; then
+      die "prereg-steward 進不了工作樹 ${work}。"
+    fi
+  fi
+  if [ "${PREREG_BOUNDARY}" = "unix-user" ]; then
+    as_root mkdir -p "$STEWARD_SOCK_DIR"
+    as_root chown "$STEWARD_USER" "$STEWARD_SOCK_DIR"
+    as_root chmod 755 "$STEWARD_SOCK_DIR"
+  else
+    mkdir -p "$STEWARD_SOCK_DIR"
+    chmod 755 "$STEWARD_SOCK_DIR"
+  fi
+  sock="${STEWARD_SOCK_DIR}/s${$}-${RANDOM}.sock"
+  if [ "${PREREG_BOUNDARY}" = "unix-user" ]; then
+    as_root -u "$STEWARD_USER" -- "$node_bin" "$KIT_ROOT/bin/steward-daemon.mjs" \
+      --sock "$sock" --cwd "$work" --script "$KIT_ROOT/bin/atm-write.mjs" \
+      >"$log" 2>&1 &
+  else
+    "$node_bin" "$KIT_ROOT/bin/steward-daemon.mjs" \
+      --sock "$sock" --cwd "$work" --script "$KIT_ROOT/bin/atm-write.mjs" \
+      >"$log" 2>&1 &
+  fi
+  local i
+  for i in $(seq 1 50); do
+    if [ -S "$sock" ]; then
+      break
+    fi
+    sleep 0.1
+  done
+  if [ ! -S "$sock" ]; then
+    echo "steward daemon 沒有監聽 $sock" >&2
+    cat "$log" >&2 || true
+    die "steward daemon 啟動失敗。"
+  fi
+  PREREG_STEWARD_SOCK="$sock"
+  export PREREG_STEWARD_SOCK
+}
+
+release_worktree() {
+  local work="${1:-}"
+  [ -n "$work" ] && [ -d "$work" ] || return 0
+  local pid_file="$work/.prereg-smoke/daemon.pid"
+  if [ -f "$pid_file" ]; then
+    local pid
+    pid="$(cat "$pid_file" 2>/dev/null || true)"
+    if [ -n "${pid:-}" ]; then
+      if [ "${PREREG_BOUNDARY:-}" = "unix-user" ]; then
+        as_root kill "$pid" >/dev/null 2>&1 || true
+      else
+        kill "$pid" >/dev/null 2>&1 || true
+      fi
+      sleep 0.2
+    fi
+  fi
+  if [ "${PREREG_BOUNDARY:-}" = "unix-user" ]; then
+    as_root chown -R "$(id -u):$(id -g)" "$work" || true
+  fi
+}
+
+# Arm B 的模型行程。Unix 邊界下它不是檔案擁有者，也沒有 sudo。
+run_as_session() {
+  if [ "${PREREG_BOUNDARY:-}" = "unix-user" ] && [ "${PREREG_ARM:-}" = "B" ]; then
+    as_root -u "$SESSION_USER" -- bash -c 'umask 022; exec "$@"' bash "$@"
+  else
+    "$@"
+  fi
+}
+
 codex_supports() {
   local help="$1" flag="$2"
   grep -q -- "$flag" <<<"$help"
 }
 
+# 工作階段環境允許清單。金標路徑、GOLD_ROOT、state、tasks 都不在裡面。
+session_env_assignments() {
+  local session_dir="$1" work="$2"
+  local node_bin path_value
+  node_bin="$(dirname "$(command -v node)")"
+  path_value="${node_bin}:/usr/bin:/bin"
+  if [ -n "${PREREG_ARM_BIN:-}" ]; then
+    path_value="${PREREG_ARM_BIN}:${path_value}"
+  fi
+  if [ -z "${PREREG_SMOKE_CODEX:-}" ] && command -v codex >/dev/null 2>&1; then
+    local codex_bin
+    codex_bin="$(dirname "$(command -v codex)")"
+    case "$codex_bin" in
+      *"/gold"*) ;;
+      *) path_value="${codex_bin}:${path_value}" ;;
+    esac
+  fi
+  cat <<EOF
+PATH=${path_value}
+HOME=${session_dir}/home
+TMPDIR=${session_dir}/tmp
+LANG=C.UTF-8
+LC_ALL=C.UTF-8
+GIT_AUTHOR_NAME=${GIT_AUTHOR_NAME:-prereg-smoke}
+GIT_AUTHOR_EMAIL=${GIT_AUTHOR_EMAIL:-prereg-smoke@localhost}
+GIT_COMMITTER_NAME=${GIT_COMMITTER_NAME:-prereg-smoke}
+GIT_COMMITTER_EMAIL=${GIT_COMMITTER_EMAIL:-prereg-smoke@localhost}
+PREREG_SESSION_DIR=${session_dir}
+PREREG_WORK=${work}
+PREREG_INSTANCE_ID=${PREREG_INSTANCE_ID:-}
+PREREG_SESSION_SLOT=${PREREG_SESSION_SLOT:-}
+PREREG_ARM=${PREREG_ARM:-}
+PREREG_WRITE_AFTER_MS=${PREREG_WRITE_AFTER_MS:-0}
+PREREG_REAL_GIT=${PREREG_REAL_GIT:-/usr/bin/git}
+GIT_OPTIONAL_LOCKS=0
+GIT_CONFIG_NOSYSTEM=1
+GIT_CONFIG_COUNT=1
+GIT_CONFIG_KEY_0=safe.directory
+EOF
+  printf 'GIT_CONFIG_VALUE_0=%s\n' '*'
+  if [ -n "${PREREG_STEWARD_SOCK:-}" ]; then
+    printf 'PREREG_STEWARD_SOCK=%s\n' "$PREREG_STEWARD_SOCK"
+  fi
+  if [ -n "${CODEX_MODEL:-}" ]; then
+    printf 'CODEX_MODEL=%s\n' "$CODEX_MODEL"
+  fi
+}
+
+capture_intended_patch() {
+  local session_dir="$1"
+  if [ -s "$session_dir/intended.patch" ]; then
+    return 0
+  fi
+  if [ -s "$session_dir/agent-output.diff" ]; then
+    cp "$session_dir/agent-output.diff" "$session_dir/intended.patch"
+    return 0
+  fi
+  local stdout="$session_dir/stdout.jsonl"
+  [ -f "$stdout" ] || return 0
+  python3 - "$session_dir" "$stdout" <<'PY'
+import pathlib, sys
+session = pathlib.Path(sys.argv[1])
+text = pathlib.Path(sys.argv[2]).read_text(encoding="utf-8", errors="replace")
+begin = "BEGIN_INTENDED_PATCH\n"
+end = "\nEND_INTENDED_PATCH"
+if begin not in text:
+    raise SystemExit(0)
+patch = text.split(begin, 1)[1].split(end, 1)[0]
+if "diff --git " not in patch:
+    raise SystemExit(0)
+if not patch.endswith("\n"):
+    patch += "\n"
+(session / "intended.patch").write_text(patch, encoding="utf-8")
+PY
+}
+
 launch_codex() {
   local session_dir="$1" prompt_file="$2" work="$3"
-  mkdir -p "$session_dir"
+  mkdir -p "$session_dir/home" "$session_dir/tmp"
+  if [ "${PREREG_BOUNDARY:-}" = "unix-user" ] && [ "${PREREG_ARM:-}" = "B" ]; then
+    # 只有工作階段的日誌目錄對 session 可寫。儲存庫工作樹不在這裡。
+    chmod 1777 "$session_dir" "$session_dir/home" "$session_dir/tmp"
+    ensure_other_can_reach "$session_dir"
+    ensure_other_can_reach "$work"
+    local node_bin
+    node_bin="$(command -v node || true)"
+    [ -n "$node_bin" ] && ensure_other_can_reach "$node_bin"
+  fi
   local start
   start="$(iso_now)"
   printf '%s\n' "$start" > "$session_dir/started-at"
   local stdout="$session_dir/stdout.jsonl"
   local stderr="$session_dir/stderr.txt"
+  local env_file="$session_dir/launch-env.txt"
+  session_env_assignments "$session_dir" "$work" > "$env_file"
+  local -a env_cmd=(env -i)
+  local line
+  while IFS= read -r line; do
+    [ -n "$line" ] || continue
+    env_cmd+=("$line")
+  done < "$env_file"
   local status=0
   if [ -n "${PREREG_SMOKE_CODEX:-}" ]; then
-    PREREG_SESSION_DIR="$session_dir" PREREG_WORK="$work" \
-      node "$PREREG_SMOKE_CODEX" "$prompt_file" >"$stdout" 2>"$stderr" || status=$?
+    cp "$PREREG_SMOKE_CODEX" "$session_dir/agent.mjs"
+    (
+      cd "$work"
+      run_as_session "${env_cmd[@]}" node "$session_dir/agent.mjs" "$prompt_file" >"$stdout" 2>"$stderr"
+    ) || status=$?
   else
-    command -v codex >/dev/null 2>&1 || die "codex is not on PATH. Install Codex CLI 0.159.2 and log in, or set PREREG_SMOKE_CODEX for a stub."
+    command -v codex >/dev/null 2>&1 || die "codex 不在 PATH。請安裝 Codex CLI 0.159.2 並登入，或設定 PREREG_SMOKE_CODEX 使用 stub。"
     local help
     help="$(codex exec --help 2>&1 || true)"
     local -a args=(exec)
     codex_supports "$help" "--json" && args+=(--json)
     codex_supports "$help" "--skip-git-repo-check" && args+=(--skip-git-repo-check)
     if codex_supports "$help" "--sandbox"; then
-      args+=(--sandbox workspace-write)
+      if [ "${PREREG_ARM:-}" = "B" ]; then
+        args+=(--sandbox read-only)
+      else
+        args+=(--sandbox workspace-write)
+      fi
     fi
     if codex_supports "$help" "--cd"; then
       args+=(--cd "$work")
@@ -89,16 +493,17 @@ launch_codex() {
     printf '%s\n' "${args[*]}" > "$session_dir/codex-argv.txt"
     (
       cd "$work"
-      codex "${args[@]}" - <"$prompt_file" >"$stdout" 2>"$stderr"
+      run_as_session "${env_cmd[@]}" codex "${args[@]}" - <"$prompt_file" >"$stdout" 2>"$stderr"
     ) || status=$?
   fi
   local end
   end="$(iso_now)"
   printf '%s\n' "$end" > "$session_dir/ended-at"
   printf '%s\n' "$status" > "$session_dir/exit-code"
+  capture_intended_patch "$session_dir"
   if grep -Eiq 'usage limit|rate limit|insufficient_quota|quota exceeded|too many requests|HTTP 429|exceeded your current quota' "$stdout" "$stderr" 2>/dev/null; then
     printf 'quota\n' > "$session_dir/QUOTA_STOP"
-    echo "prereg-v3-smoke: free-quota stop while reading $session_dir" >&2
+    echo "prereg-v3-smoke: 讀取 $session_dir 時遇到免費額度停止" >&2
   fi
   return 0
 }

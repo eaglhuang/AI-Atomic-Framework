@@ -1,11 +1,6 @@
 #!/bin/bash
-# Stable entry point. Node type-stripping loads the framework TypeScript pathway.
+# Arm B 寫入入口。即使經由 arm-b/bin 的符號連結呼叫，也解析到套件內的 atm-write.mjs。
 set -euo pipefail
-HERE="$(cd "$(dirname "$0")" && pwd)"
-NODE_MAJOR="$(node -p 'process.versions.node.split(".")[0]')"
-if [ "$NODE_MAJOR" -ge 24 ]; then
-  STRIP=(--strip-types)
-else
-  STRIP=(--experimental-strip-types)
-fi
-exec node --disable-warning=ExperimentalWarning "${STRIP[@]}" "$HERE/atm-write.mjs" "$@"
+SOURCE="$(readlink -f -- "${BASH_SOURCE[0]}")"
+HERE="$(cd "$(dirname "$SOURCE")" && pwd)"
+exec node "$HERE/atm-write.mjs" "$@"

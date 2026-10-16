@@ -6,6 +6,8 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 source "$HERE/lib/common.sh"
 
 MODE="${PREREG_SMOKE_MODE:-django}"
+new_state_root
+mkdir -p "$STATE_ROOT"
 
 pick_python() {
   if [ -n "${PREREG_PYTHON:-}" ] && [ -x "${PREREG_PYTHON:-}" ]; then
@@ -27,8 +29,6 @@ pick_python() {
   die "Django 3.2 needs CPython 3.8, 3.9, or 3.10. Set PREREG_PYTHON or install uv."
 }
 
-mkdir -p "$STATE_ROOT"
-rm -rf "$STATE_ROOT/template" "$STATE_ROOT/arm-a" "$STATE_ROOT/arm-b"
 mkdir -p "$STATE_ROOT/template"
 
 git_author() {
@@ -49,7 +49,7 @@ if [ "$MODE" = "fixture" ]; then
   cat > "$STATE_ROOT/template/prereg-fixture.json" <<< '{"mode":"fixture"}'
   printf 'fixture\n' > "$STATE_ROOT/setup-tests.log"
   PYBIN="$(command -v python3)"
-  python3 "$STATE_ROOT/template/runtests.py" fixture.tests.MarkerTests.test_session_one > "$STATE_ROOT/setup-tests.out" 2>&1 || true
+  python3 "$STATE_ROOT/template/runtests.py" --verbosity 2 fixture.tests.MarkerTests.test_session_one > "$STATE_ROOT/setup-tests.out" 2>&1 || true
   grep -q 'test_session_one' "$STATE_ROOT/setup-tests.out" || die "fixture test runner did not start"
 else
   TASKS="$HERE/tasks.json"
@@ -68,7 +68,7 @@ else
   set +e
   (
     cd "$STATE_ROOT/template"
-    "$STATE_ROOT/venv/bin/python" tests/runtests.py --verbosity 1 --settings=test_sqlite "$TEST_LABEL"
+    "$STATE_ROOT/venv/bin/python" tests/runtests.py --verbosity 2 --settings=test_sqlite "$TEST_LABEL"
   ) > "$STATE_ROOT/setup-tests.out" 2>&1
   test_rc=$?
   set -e
@@ -91,5 +91,9 @@ write_env "$STATE_ROOT/env.sh" \
   "PREREG_SMOKE_MODE=$(printf '%q' "$MODE")" \
   "PREREG_PYTHON=$(printf '%q' "${PYBIN:-python3}")"
 
-echo "setup ok mode=$MODE base=$BASE"
+mkdir -p "$KIT_ROOT/state"
+printf '%s\n' "${PREREG_RUN_ID:-explicit}" > "$STATE_ROOT/run-id"
+printf '%s\n' "$STATE_ROOT" > "$KIT_ROOT/state/CURRENT"
+echo "setup ok mode=$MODE base=$BASE run=$(cat "$STATE_ROOT/run-id")"
+echo "state: $STATE_ROOT"
 echo "test log: $STATE_ROOT/setup-tests.log"
