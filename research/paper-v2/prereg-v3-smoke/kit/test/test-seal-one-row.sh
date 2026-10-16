@@ -26,14 +26,17 @@ if grep -q '## prereg-v3 smoke' "$INDEX"; then
   echo "seal opened a new evidence section" >&2
   exit 1
 fi
-grep -q 'prereg-v3-smoke/' "$INDEX"
+grep -q 'prereg-v3-smoke/seal-1/' "$INDEX"
 grep -q 'existing index line' "$INDEX"
 added="$(tail -n 1 "$INDEX")"
 case "$added" in
-  '| `prereg-v3-smoke/'*) ;;
-  *) echo "added line is not one index row: $added" >&2; exit 1 ;;
+  '| `prereg-v3-smoke/seal-1/'*) ;;
+  *) echo "added line is not the dest row: $added" >&2; exit 1 ;;
 esac
 bash "$HERE/seal.sh" --index-file "$INDEX" --dest "$BASE/seal-2" --publish-index >/dev/null
 again="$(wc -l < "$INDEX")"
-[ "$again" -eq "$after" ]
+[ "$again" -eq $((after + 1)) ]
+grep -q 'prereg-v3-smoke/seal-2/' "$INDEX"
+[ "$(grep -c 'prereg-v3-smoke/seal-1/' "$INDEX")" -eq 1 ]
+[ "$(grep -c 'prereg-v3-smoke/seal-2/' "$INDEX")" -eq 1 ]
 echo "seal one row ok"

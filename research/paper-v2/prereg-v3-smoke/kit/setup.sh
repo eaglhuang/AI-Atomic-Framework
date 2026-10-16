@@ -4,6 +4,8 @@ set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 # shellcheck disable=SC1091
 source "$HERE/lib/common.sh"
+# shellcheck disable=SC1091
+source "$HERE/lib/django-venv.sh"
 
 MODE="${PREREG_SMOKE_MODE:-django}"
 new_state_root
@@ -52,33 +54,50 @@ if [ "$MODE" = "fixture" ]; then
   python3 "$STATE_ROOT/template/runtests.py" --verbosity 2 fixture.tests.MarkerTests.test_session_one > "$STATE_ROOT/setup-tests.out" 2>&1 || true
   grep -q 'test_session_one' "$STATE_ROOT/setup-tests.out" || die "fixture test runner did not start"
 else
-  TASKS="$HERE/tasks.json"
+  TASKS="${PREREG_TASKS_JSON:-$HERE/tasks.json}"
   GOLD="$HERE/gold"
   BASE="$(jq -r '.primary.commonBaseCommit' "$TASKS")"
   [ "$BASE" != "null" ] && [ -n "$BASE" ] || die "tasks.json has no common base"
-  echo "cloning django at $BASE"
-  git clone --filter=blob:none --quiet https://github.com/django/django.git "$STATE_ROOT/template"
-  git -C "$STATE_ROOT/template" checkout --force --detach --quiet "$BASE"
+  if [ -n "${PREREG_OFFLINE_TEMPLATE:-}" ]; then
+    git clone --quiet "$PREREG_OFFLINE_TEMPLATE" "$STATE_ROOT/template"
+  else
+    echo "cloning django at $BASE"
+    git clone --filter=blob:none --quiet https://github.com/django/django.git "$STATE_ROOT/template"
+    git -C "$STATE_ROOT/template" checkout --force --detach --quiet "$BASE"
+  fi
   PY="$(pick_python)"
-  "$PY" -m venv "$STATE_ROOT/venv"
-  "$STATE_ROOT/venv/bin/python" -m pip install -q -U pip
-  "$STATE_ROOT/venv/bin/python" -m pip install -q 'asgiref>=3.3.2' 'pytz' 'sqlparse>=0.2.2'
+  if [ -n "${PREREG_OFFLINE_TEMPLATE:-}" ]; then
+    "$PY" -m venv --system-site-packages "$STATE_ROOT/venv"
+  else
+    "$PY" -m venv "$STATE_ROOT/venv"
+  fi
   PYBIN="$STATE_ROOT/venv/bin/python"
+  # 任務 repo（template，或離線測試給的 worktree）必須裝進 venv。只裝 asgiref 時 import django 會失敗。
+  install_task_repo_into_venv "$PYBIN" "$STATE_ROOT/template"
+  if [ -z "${PREREG_OFFLINE_TEMPLATE:-}" ]; then
+    "$PYBIN" -m pip install -q 'asgiref>=3.3.2' 'pytz' 'sqlparse>=0.2.2'
+  fi
+  if ! django_venv_preflight "$PYBIN" >"$STATE_ROOT/django-preflight.out" 2>&1; then
+    echo "venv 無法 import django，或無法跑過一個最小測試。" >&2
+    cat "$STATE_ROOT/django-preflight.out" >&2 || true
+    exit 1
+  fi
   TEST_LABEL="$(jq -r '.primary.instances[] | select(.instanceId=="django__django-13820") | .FAIL_TO_PASS[0]' "$TASKS")"
+  [ "$TEST_LABEL" != "null" ] && [ -n "$TEST_LABEL" ] || die "tasks.json 沒有 django__django-13820 的 FAIL_TO_PASS"
   set +e
   (
     cd "$STATE_ROOT/template"
-    "$STATE_ROOT/venv/bin/python" tests/runtests.py --verbosity 2 --settings=test_sqlite "$TEST_LABEL"
+    "$PYBIN" tests/runtests.py --verbosity 2 --settings=test_sqlite "$TEST_LABEL"
   ) > "$STATE_ROOT/setup-tests.out" 2>&1
   test_rc=$?
   set -e
   cp "$STATE_ROOT/setup-tests.out" "$STATE_ROOT/setup-tests.log"
-  if ! grep -Eq 'Ran |ok$|FAIL|ERROR|Error' "$STATE_ROOT/setup-tests.out"; then
-    echo "Django test runner produced no test report (exit $test_rc)." >&2
+  printf 'django test runner exit %s\n' "$test_rc" >> "$STATE_ROOT/setup-tests.log"
+  if django_runner_failed "$STATE_ROOT/setup-tests.out" "$test_rc"; then
+    echo "Django test runner failed (exit $test_rc)." >&2
     tail -n 40 "$STATE_ROOT/setup-tests.out" >&2 || true
     exit 1
   fi
-  printf 'django test runner exit %s\n' "$test_rc" >> "$STATE_ROOT/setup-tests.log"
 fi
 
 write_env "$STATE_ROOT/env.sh" \

@@ -62,6 +62,27 @@ def added_lines(patch_text):
     return added
 
 
+def removed_lines(patch_text):
+    removed = []
+    for line in patch_text.splitlines():
+        if line.startswith("+++") or line.startswith("---") or line.startswith("diff "):
+            continue
+        if line.startswith("-"):
+            removed.append(line[1:])
+    return removed
+
+
+def missing_edit_lines(patch_text, final_text, final_diff_text):
+    """意圖修改對照最終 diff。新增行不在最終檔，或刪除行仍留在最終檔且 diff 沒有刪掉它，都算沒落地。"""
+    final_lines = set(final_text.splitlines())
+    missing = [line for line in added_lines(patch_text) if line not in final_lines]
+    deleted_in_final = set(removed_lines(final_diff_text))
+    for line in removed_lines(patch_text):
+        if line in final_lines and line not in deleted_in_final:
+            missing.append(line)
+    return missing
+
+
 def split_patch(text):
     parts = {}
     chunks = re.split(r"(?=^diff --git )", text, flags=re.M)
@@ -135,6 +156,25 @@ def classify_write(row):
     if row.get("terminal") in {"blocked", "queued"} and reason:
         return "rejected-by-design"
     return "kit-error"
+
+
+def blocked_steward_write(row):
+    if classify_write(row) == "rejected-by-design":
+        return True
+    reason = str(row.get("reasonCode") or row.get("stopReason") or "").strip()
+    return row.get("terminal") in {"blocked", "queued"} and bool(reason)
+
+
+def recompose_or_retry(rows):
+    """從 steward 紀錄派生。被拒絕的寫入就是一次重寫或重送，即使 retryCount 仍是 0。"""
+    total = 0
+    for row in rows:
+        explicit = int(row.get("retryCount") or 0) + int(row.get("hashDriftCount") or 0) + int((row.get("commit") or {}).get("headMoves") or 0)
+        if blocked_steward_write(row):
+            total += max(explicit, 1)
+        else:
+            total += explicit
+    return total
 
 
 def session_rejected(rows, instance_id):
@@ -217,6 +257,9 @@ def score_arm(arm_name, arm_dir, tasks, base):
         return missing_arm(arm_name, arm_dir, gaps)
     work = arm_dir / "work"
     rows = steward_rows(work)
+    final_diff_text = git(work, "diff", f"{base}..HEAD", check=False).stdout
+    final_parts = split_patch(final_diff_text)
+    blocked_files = {row.get("file") for row in rows if row.get("file") and blocked_steward_write(row)}
     sessions = []
     index_lock = 0
     git_errors = []
@@ -251,12 +294,14 @@ def score_arm(arm_name, arm_dir, tasks, base):
                 base_text = ""
             final = work / file
             final_text = final.read_text(encoding="utf-8") if final.exists() else ""
-            missing = [line for line in added_lines(patch) if line not in final_text]
+            missing = missing_edit_lines(patch, final_text, final_parts.get(file, ""))
             item = {"file": file, "missingAddedLines": missing[:12], "missingCount": len(missing)}
-            if missing and not rejected:
+            # 被 steward 擋住的意圖修改，只要最終 diff 沒有它，就是未完成，不是沉默遺失。
+            blocked = rejected or file in blocked_files
+            if missing and not blocked:
                 lost.append(item)
                 unfinished.append(item)
-            elif missing and rejected:
+            elif missing and blocked:
                 item["classified"] = "steward-rejected"
                 kept.append(item)
                 unfinished.append(item)
@@ -327,7 +372,7 @@ def score_arm(arm_name, arm_dir, tasks, base):
         "steward": {
             "writes": len(rows),
             "rejected": sum(1 for row in rows if row.get("terminal") not in (None, "committed")),
-            "recomposeOrRetry": sum(int(row.get("retryCount") or 0) + int(row.get("hashDriftCount") or 0) + int((row.get("commit") or {}).get("headMoves") or 0) for row in rows),
+            "recomposeOrRetry": recompose_or_retry(rows),
             "queueWaitMs": [int((row.get("commit") or {}).get("gitIndexLockWaitMs") or 0) for row in rows],
             "writeToCommitMs": latencies,
             "batchSizes": [row.get("batchSize") for row in rows],
@@ -339,6 +384,83 @@ def score_arm(arm_name, arm_dir, tasks, base):
     }
 
 
+def null_score_fields(reason):
+    empty = {"denominator": None, "passed": None, "failed": None, "notSeen": None}
+    return {
+        "kitError": reason,
+        "passed": None,
+        "failed": None,
+        "notSeen": None,
+        "failToPass": dict(empty),
+        "passToPass": dict(empty),
+    }
+
+
+def group_summary(labels, tests):
+    if not labels:
+        return {"denominator": 0, "passed": 0, "failed": 0, "notSeen": 0}
+    by_label = {item["label"]: item["status"] for item in tests}
+    statuses = [by_label.get(label, "not-seen") for label in labels]
+    return {
+        "denominator": len(labels),
+        "passed": sum(1 for status in statuses if status == "pass"),
+        "failed": sum(1 for status in statuses if status == "fail"),
+        "notSeen": sum(1 for status in statuses if status == "not-seen"),
+    }
+
+
+def observation_kit_error(parsed, fail_labels, pass_labels):
+    """零筆觀察、測試 patch 沒套上，或任一組分母完全沒被觀察到，都是 kit-error。空清單不是未觀察。"""
+    if parsed.get("kitError"):
+        return parsed["kitError"]
+    if parsed.get("testPatchApplied") is False:
+        return "test-patch-not-applied"
+    expected = list(fail_labels or []) + list(pass_labels or [])
+    if not expected:
+        return None
+    tests = parsed.get("tests") or []
+    seen = [item for item in tests if item.get("status") in {"pass", "fail"}]
+    if not seen:
+        return "tests-unobserved"
+    for labels in (fail_labels, pass_labels):
+        if not labels:
+            continue
+        summary = group_summary(labels, tests)
+        if summary["denominator"] and summary["passed"] == 0 and summary["failed"] == 0:
+            return "denominator-unobserved"
+    return None
+
+
+def apply_observation_policy(parsed, fail_labels, pass_labels):
+    reason = observation_kit_error(parsed, fail_labels, pass_labels)
+    if reason:
+        updated = dict(parsed)
+        updated.update(null_score_fields(reason))
+        return updated
+    updated = dict(parsed)
+    updated["kitError"] = None
+    updated["failToPass"] = group_summary(fail_labels, parsed.get("tests") or [])
+    updated["passToPass"] = group_summary(pass_labels, parsed.get("tests") or [])
+    return updated
+
+
+def select_django_labels(labels):
+    mapped = []
+    for label in labels or []:
+        if " (" in label or str(label).startswith("test_"):
+            match = re.match(r"(.+) \((.+)\)", label)
+            mapped.append(f"{match.group(2)}.{match.group(1)}" if match else label)
+    return mapped
+
+
+def install_task_repo(python, repo):
+    return subprocess.run(
+        [python, "-m", "pip", "install", "-q", "-e", str(repo)],
+        text=True,
+        capture_output=True,
+    )
+
+
 def run_tests(work, tasks, env, arm_score):
     mode = env.get("PREREG_SMOKE_MODE")
     python = env.get("PREREG_PYTHON") or "python3"
@@ -347,15 +469,23 @@ def run_tests(work, tasks, env, arm_score):
         for instance in tasks["primary"]["instances"]:
             labels = instance["FAIL_TO_PASS"] + instance["PASS_TO_PASS"]
             proc = subprocess.run([python, "runtests.py", "--verbosity", "2", *labels], cwd=work, text=True, capture_output=True)
-            results.append(parse_test_output(instance["instanceId"], labels, proc.stdout + proc.stderr, proc.returncode))
+            parsed = parse_test_output(instance["instanceId"], labels, proc.stdout + proc.stderr, proc.returncode)
+            results.append(apply_observation_policy(parsed, instance["FAIL_TO_PASS"], instance["PASS_TO_PASS"]))
         return results
     gold_root = Path(env["KIT_ROOT"])
     for instance in tasks["primary"]["instances"]:
-        labels = [label for label in instance["FAIL_TO_PASS"] + instance["PASS_TO_PASS"] if " (" in label or label.startswith("test_")]
-        mapped = []
-        for label in labels:
-            match = re.match(r"(.+) \((.+)\)", label)
-            mapped.append(f"{match.group(2)}.{match.group(1)}" if match else label)
+        fail_labels = select_django_labels(instance["FAIL_TO_PASS"])
+        pass_labels = select_django_labels(instance["PASS_TO_PASS"])
+        mapped = fail_labels + pass_labels
+        if (instance["FAIL_TO_PASS"] or instance["PASS_TO_PASS"]) and not mapped:
+            parsed = {
+                "instanceId": instance["instanceId"],
+                "note": "FAIL_TO_PASS is not a Django test id; see tasks.json",
+                "tests": [],
+                "exitCode": None,
+            }
+            results.append(apply_observation_policy(parsed, instance["FAIL_TO_PASS"], instance["PASS_TO_PASS"]))
+            continue
         if not mapped:
             results.append({
                 "instanceId": instance["instanceId"],
@@ -367,18 +497,33 @@ def run_tests(work, tasks, env, arm_score):
             clone = Path(scratch) / "tree"
             subprocess.run(["/usr/bin/git", "clone", "--quiet", "--shared", str(work), str(clone)], check=True)
             subprocess.run(["/usr/bin/git", "-C", str(clone), "checkout", "--force", "--detach", "--quiet", "HEAD"], check=True)
+            installed = install_task_repo(python, clone)
+            if installed.returncode != 0:
+                parsed = {
+                    "instanceId": instance["instanceId"],
+                    "kitError": "django-not-installed",
+                    "tests": [],
+                    "exitCode": installed.returncode,
+                    "installError": (installed.stderr or installed.stdout or "")[-400:],
+                    "testPatchApplied": None,
+                }
+                results.append(apply_observation_policy(parsed, fail_labels, pass_labels))
+                continue
             test_patch = gold_root / instance["testPatch"]
             applied = subprocess.run(["/usr/bin/git", "-C", str(clone), "apply", str(test_patch)], text=True, capture_output=True)
+            env_run = os.environ.copy()
+            env_run["PYTHONPATH"] = str(clone) + (os.pathsep + env_run["PYTHONPATH"] if env_run.get("PYTHONPATH") else "")
             proc = subprocess.run(
                 [python, "tests/runtests.py", "--verbosity", "2", "--settings=test_sqlite", *mapped],
                 cwd=clone,
                 text=True,
                 capture_output=True,
+                env=env_run,
             )
             parsed = parse_test_output(instance["instanceId"], mapped, proc.stdout + proc.stderr, proc.returncode)
             parsed["testPatchApplied"] = applied.returncode == 0
             parsed["testPatchError"] = None if applied.returncode == 0 else (applied.stderr or "")[-400:]
-            results.append(parsed)
+            results.append(apply_observation_policy(parsed, fail_labels, pass_labels))
     arm_score["tests"] = results
     return results
 
@@ -442,6 +587,8 @@ def main():
         score = score_arm(name, arm_dir, tasks, base)
         if score.get("status") != "evidence_missing":
             score["tests"] = run_tests(arm_dir / "work", tasks, env, score)
+            if any(item.get("kitError") for item in score.get("tests") or []):
+                score["status"] = "invalid"
             diff = git(arm_dir / "work", "diff", f"{base}..HEAD", check=False)
             (arm_dir / "final.diff").write_text(diff.stdout, encoding="utf-8")
             log = git(arm_dir / "work", "log", "--oneline", f"{base}..HEAD", check=False)

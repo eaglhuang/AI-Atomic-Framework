@@ -31,9 +31,9 @@ bash research/paper-v2/prereg-v3-smoke/kit/evaluate.sh
 bash research/paper-v2/prereg-v3-smoke/kit/seal.sh --publish-index
 ```
 
-`setup.sh` 每次使用新的 run-id，state 放在 `kit/state/runs/<run-id>/`。目錄已存在就中止，不會 `rm` 既有 state。要自己指定路徑時設定 `PREREG_SMOKE_STATE` 或 `PREREG_RUN_ID`，而且那個目錄必須還不存在。
+`setup.sh` 每次使用新的 run-id，state 放在 `kit/state/runs/<run-id>/`。目錄已存在就中止，不會 `rm` 既有 state。要自己指定路徑時設定 `PREREG_SMOKE_STATE` 或 `PREREG_RUN_ID`，而且那個目錄必須還不存在。Django 模式會把 template 以 `pip install -e` 裝進 venv，先確認能 `import django` 並跑過一個最小測試。runner 沒有印出 `Ran N test` 的完成報告（例如找不到 django）時，setup 以非零退出。
 
-`--publish-index` 只在 `research/paper-v2/EVIDENCE_INDEX.md` 追加一列，標成 smoke / exploratory、沒有勝出宣稱。索引檔不存在時會停，不會另建一份。
+`--publish-index` 只在 `research/paper-v2/EVIDENCE_INDEX.md` 追加一列。那一列的路徑是這次實際寫入的封存目錄（`--dest` 或預設目錄），不會改用別的日期路徑。標成 smoke / exploratory、沒有勝出宣稱。索引檔不存在時會停，不會另建一份。
 
 模型用環境變數 `CODEX_MODEL`。留空時不加 `--model`，讓已登入的免費 ChatGPT 帳戶使用它自己的預設模型。推理力度用 `CODEX_REASONING_EFFORT`，只能是 `minimal`、`low`、`medium` 或 `high`。未設定（或空字串）時兩臂都不加 `-c model_reasoning_effort="<值>"`；設了其他值就中止，不啟動工作階段。設了合法值時，兩臂的 `codex exec` 都加上同一條 `-c model_reasoning_effort="<值>"`。腳本把模型名稱寫進各臂 `model.txt` 的第一行，第二行是 `reasoning_effort=`。`evaluate.py` 把這兩欄寫進 `results.json` 各臂的 `model` 與 `reasoningEffort`。兩臂用同一組旗標。
 

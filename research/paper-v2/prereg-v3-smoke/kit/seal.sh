@@ -30,6 +30,20 @@ if [ -e "$DEST" ]; then
 fi
 mkdir -p "$DEST/logs" "$DEST/diffs"
 
+# 索引路徑用實際封存目錄，不用當天日期推回來的舊路徑。
+archive_index_path() {
+  local paper dest_abs rel
+  paper="$(cd "$HERE/../.." && pwd)"
+  dest_abs="$(cd "$DEST" && pwd)"
+  case "$dest_abs" in
+    "$paper"/*) rel="${dest_abs#"$paper"/}" ;;
+    *) rel="prereg-v3-smoke/$(basename "$dest_abs")" ;;
+  esac
+  rel="${rel%/}/"
+  printf '%s\n' "$rel"
+}
+INDEX_REL="$(archive_index_path)"
+
 [ -f "$STATE_ROOT/results.json" ] || die "missing results.json. Run evaluate.sh first."
 cp "$STATE_ROOT/results.json" "$DEST/results.json"
 cp "$STATE_ROOT/setup-tests.log" "$DEST/logs/setup-tests.log" 2>/dev/null || true
@@ -148,14 +162,21 @@ EOF
   done > SHA256SUMS
 )
 
-ROW="| \`prereg-v3-smoke/${DATE_STAMP}-${SUFFIX}/\` | smoke / exploratory, not results | no win claim | mode=${PREREG_SMOKE_MODE:-django}; model=${MODEL}; base=${COMMON_BASE} |"
+ROW="| \`$INDEX_REL\` | smoke / exploratory, not results | no win claim | mode=${PREREG_SMOKE_MODE:-django}; model=${MODEL}; base=${COMMON_BASE} |"
 printf '%s\n' "$ROW" > "$DEST/EVIDENCE_INDEX_ROW.md"
 if [ "$PUBLISH" -eq 1 ]; then
   if [ "$INDEX_EXPLICIT" -eq 0 ] && [ ! -f "$INDEX_FILE" ]; then
     die "evidence index not found: $INDEX_FILE"
   fi
-  if ! grep -q "prereg-v3-smoke/${DATE_STAMP}-${SUFFIX}" "$INDEX_FILE" 2>/dev/null; then
-    mkdir -p "$(dirname "$INDEX_FILE")"
+  mkdir -p "$(dirname "$INDEX_FILE")"
+  if [ ! -e "$INDEX_FILE" ]; then
+    : > "$INDEX_FILE"
+  fi
+  if ! grep -Fq -- "$ROW" "$INDEX_FILE"; then
+    # 檔尾沒有換行時先補一行，然後只追加這一列。同一列已在索引裡就不再加。
+    if [ -s "$INDEX_FILE" ] && [ -n "$(tail -c 1 "$INDEX_FILE")" ]; then
+      printf '\n' >> "$INDEX_FILE"
+    fi
     printf '%s\n' "$ROW" >> "$INDEX_FILE"
   fi
 fi
