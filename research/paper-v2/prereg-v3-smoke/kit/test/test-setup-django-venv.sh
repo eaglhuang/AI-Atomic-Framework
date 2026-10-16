@@ -9,6 +9,26 @@ BASE="$(mktemp -d)"
 cleanup() { rm -rf "$BASE"; }
 trap cleanup EXIT
 
+# 沒有 3.8–3.10、也沒有 PREREG_PYTHON 時要明確失敗，不能默默用系統 python3。
+mkdir -p "$BASE/nopath"
+set +e
+(
+  PATH="$BASE/nopath"
+  unset PREREG_PYTHON
+  pick_python
+) >"$BASE/pick.out" 2>"$BASE/pick.err"
+pick_status=$?
+set -e
+if [ "$pick_status" -eq 0 ]; then
+  echo "pick_python succeeded with no CPython 3.8–3.10 on PATH" >&2
+  exit 1
+fi
+grep -q 'kit-error' "$BASE/pick.err"
+grep -q 'CPython 3.8, 3.9, or 3.10' "$BASE/pick.err"
+host_py="$(command -v python3)"
+got="$(PREREG_PYTHON="$host_py" pick_python)"
+[ "$got" = "$host_py" ]
+
 REPO="$BASE/repo"
 mkdir -p "$REPO/django" "$REPO/tests"
 printf 'VERSION = (3, 2, 0, "final", 0)\n' > "$REPO/django/__init__.py"
@@ -40,7 +60,124 @@ cat > "$TASKS" <<EOF
 {"primary":{"commonBaseCommit":"$HEAD_SHA","instances":[{"instanceId":"django__django-13820","FAIL_TO_PASS":["tests.Fake.test_ok"],"PASS_TO_PASS":[]}]}}
 EOF
 
-python3 -m venv --system-site-packages "$BASE/bare"
+# 模擬沒有 setuptools 的 python：空的 wheelhouse、不用 pip 快取，必須是 kit-error。
+export PREREG_OFFLINE_TEMPLATE="$REPO"
+python3 -m venv "$BASE/nosetup"
+nosetup_py="$BASE/nosetup/bin/python"
+"$nosetup_py" -m pip uninstall -y setuptools wheel >/dev/null 2>&1 || true
+if "$nosetup_py" -c 'import setuptools.build_meta' >/dev/null 2>&1; then
+  echo "failed to simulate a python without setuptools" >&2
+  exit 1
+fi
+mkdir -p "$BASE/empty-wheels"
+set +e
+(
+  export PIP_NO_CACHE_DIR=1
+  export PREREG_WHEELHOUSE="$BASE/empty-wheels"
+  install_task_repo_into_venv "$nosetup_py" "$REPO"
+) >"$BASE/nost.out" 2>"$BASE/nost.err"
+nost_status=$?
+set -e
+if [ "$nost_status" -eq 0 ]; then
+  echo "missing setuptools was not a kit-error" >&2
+  cat "$BASE/nost.err" >&2
+  exit 1
+fi
+grep -q 'kit-error' "$BASE/nost.err"
+grep -q 'setuptools' "$BASE/nost.err"
+
+# 有離線 wheel 時，同一個沒有 setuptools 的 venv 必須能裝起來。裝不出 wheel 的環境略過這一段。
+stage_offline_wheels() {
+  local dest="$1"
+  shift
+  mkdir -p "$dest"
+  local pattern whl py
+  for pattern in /usr/share/python-wheels/setuptools-*.whl /usr/share/python-wheels/wheel-*.whl; do
+    for whl in $pattern; do
+      [ -f "$whl" ] || continue
+      cp "$whl" "$dest/"
+    done
+  done
+  for py in "$@"; do
+    [ -n "$py" ] && [ -x "$py" ] || continue
+    "$py" - "$dest" <<'PY'
+import hashlib, base64, pathlib, sys, zipfile
+dest = pathlib.Path(sys.argv[1])
+
+def have(name):
+    return any(p.name.startswith(name + "-") and p.suffix == ".whl" for p in dest.glob("*.whl"))
+
+def pack(name):
+    if have(name):
+        return
+    try:
+        import importlib.metadata as metadata
+        dist = metadata.distribution(name)
+    except Exception:
+        return
+    root = pathlib.Path(dist.locate_file(""))
+    info = pathlib.Path(str(dist._path))
+    if not info.name.endswith(".dist-info"):
+        return
+    whl = dest / f"{name}-{dist.version}-py3-none-any.whl"
+    records = []
+    def add(z, src, arc):
+        data = src.read_bytes()
+        z.writestr(arc, data)
+        digest = hashlib.sha256(data).digest()
+        b64 = base64.urlsafe_b64encode(digest).rstrip(b"=").decode()
+        records.append(f"{arc},sha256={b64},{len(data)}")
+    with zipfile.ZipFile(whl, "w") as z:
+        top_file = info / "top_level.txt"
+        tops = [ln.strip() for ln in top_file.read_text().splitlines() if ln.strip()] if top_file.is_file() else [name]
+        for top in tops:
+            src_root = root / top
+            if src_root.is_file():
+                add(z, src_root, top)
+            elif src_root.is_dir():
+                for src in src_root.rglob("*"):
+                    if not src.is_file() or "__pycache__" in src.parts or src.suffix == ".pyc":
+                        continue
+                    add(z, src, str(src.relative_to(root)))
+        for src in info.iterdir():
+            if src.is_file() and src.name != "RECORD":
+                add(z, src, f"{info.name}/{src.name}")
+        record_arc = f"{info.name}/RECORD"
+        z.writestr(record_arc, "\n".join(records + [f"{record_arc},,"]) + "\n")
+
+pack("setuptools")
+pack("wheel")
+PY
+  done
+  local setup_whl wheel_whl
+  setup_whl="$(echo "$dest"/setuptools-*.whl)"
+  wheel_whl="$(echo "$dest"/wheel-*.whl)"
+  [ -f "$setup_whl" ] && [ -f "$wheel_whl" ]
+}
+
+if stage_offline_wheels "$BASE/wheels" "$(command -v python3)"; then
+  python3 -m venv "$BASE/fromwheels"
+  from_py="$BASE/fromwheels/bin/python"
+  "$from_py" -m pip uninstall -y setuptools wheel >/dev/null 2>&1 || true
+  if "$from_py" -c 'import setuptools.build_meta, wheel' >/dev/null 2>&1; then
+    echo "wheelhouse venv already had setuptools and wheel" >&2
+    exit 1
+  fi
+  (
+    export PIP_NO_CACHE_DIR=1
+    export PREREG_WHEELHOUSE="$BASE/wheels"
+    install_task_repo_into_venv "$from_py" "$REPO"
+  )
+  "$from_py" -c 'import django, setuptools.build_meta, wheel'
+else
+  echo "offline wheelhouse unavailable; skipped editable install from wheels"
+fi
+
+unset PREREG_PYTHON
+PY="$(pick_python)"
+export PREREG_PYTHON="$PY"
+
+"$PY" -m venv --system-site-packages "$BASE/bare"
 if "$BASE/bare/bin/python" -c 'import django' >/dev/null 2>&1; then
   echo "bare venv imported django before install" >&2
   exit 1
@@ -76,7 +213,6 @@ fi
 
 export PREREG_SMOKE_MODE=django
 export PREREG_TASKS_JSON="$TASKS"
-export PREREG_PYTHON="$(command -v python3)"
 
 run_setup() {
   local name="$1"

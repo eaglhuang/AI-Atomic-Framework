@@ -2,10 +2,62 @@
 # 把任務 repo 以可編輯方式裝進測試 venv。只供 source。
 # 離線假 repo（PREREG_OFFLINE_TEMPLATE）不連 PyPI；正式 Django 仍會安裝相依套件。
 
+# Django 3.2 要用 CPython 3.8–3.10。PREREG_PYTHON 必須是可執行檔路徑。
+# 找不到時以非零退出，訊息寫到 stderr，不回退到系統 python3。
+pick_python() {
+  if [ -n "${PREREG_PYTHON:-}" ] && [ -x "${PREREG_PYTHON}" ]; then
+    printf '%s\n' "$PREREG_PYTHON"
+    return 0
+  fi
+  local candidate found
+  for candidate in python3.10 python3.9 python3.8; do
+    if found="$(command -v "$candidate" 2>/dev/null)" && [ -n "$found" ]; then
+      printf '%s\n' "$found"
+      return 0
+    fi
+  done
+  if command -v uv >/dev/null 2>&1; then
+    uv python install 3.10 >&2
+    uv python find 3.10
+    return 0
+  fi
+  echo "prereg-v3-smoke: kit-error: Django 3.2 needs CPython 3.8, 3.9, or 3.10. Set PREREG_PYTHON or install uv." >&2
+  exit 1
+}
+
+# venv 已能 import setuptools.build_meta 與 wheel 就直接過。
+# 否則只用 wheelhouse、/usr/share/python-wheels 與 pip 快取，不連 PyPI。
+# PREREG_WHEELHOUSE 有設時只看那個目錄，不再加系統 wheel 目錄。
+ensure_setuptools_wheel() {
+  local py="$1"
+  if "$py" -c 'import setuptools.build_meta, wheel' >/dev/null 2>&1; then
+    return 0
+  fi
+  local -a links=()
+  if [ -n "${PREREG_WHEELHOUSE:-}" ]; then
+    links+=(--find-links "$PREREG_WHEELHOUSE")
+  elif [ -d /usr/share/python-wheels ]; then
+    links+=(--find-links /usr/share/python-wheels)
+  fi
+  local log
+  log="$(mktemp)"
+  if env PIP_FIND_LINKS= PIP_NO_INDEX=1 \
+      "$py" -m pip install --disable-pip-version-check --no-index "${links[@]}" setuptools wheel >"$log" 2>&1 \
+      && "$py" -c 'import setuptools.build_meta, wheel' >/dev/null 2>&1; then
+    rm -f "$log"
+    return 0
+  fi
+  echo "prereg-v3-smoke: kit-error: venv 缺少 setuptools 與 wheel，離線 wheel／pip 快取無法安裝（無法 import setuptools.build_meta）。" >&2
+  cat "$log" >&2 || true
+  rm -f "$log"
+  return 1
+}
+
 install_task_repo_into_venv() {
   local py="$1"
   local repo="$2"
   if [ -n "${PREREG_OFFLINE_TEMPLATE:-}" ]; then
+    ensure_setuptools_wheel "$py" || return 1
     "$py" -m pip install -q --no-build-isolation -e "$repo"
     return
   fi
