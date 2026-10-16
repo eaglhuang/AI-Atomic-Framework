@@ -137,6 +137,8 @@ assert.ok(smokeIndex < publishIndex, 'the clean-install smoke must gate publish,
 const validatorSource = readFileSync(validator, 'utf8');
 assert.match(validatorSource, /integration', 'add', 'codex'/, 'the clean-install validator must exercise a real installed integration');
 assert.match(validatorSource, /REQUIRED_ROUTER_REFERENCE/, 'the clean-install validator must guard router companion files');
+assert.match(validatorSource, /resolveFirstUseArguments/, 'the clean-install smoke must execute the bounded command next emits');
+assert.doesNotMatch(validatorSource, /atm next -> guide/, 'the clean-install smoke must not hard-code guide when next emits taskflow open');
 
 const publicInstallValidatorSource = readFileSync(publicInstallValidator, 'utf8');
 assert.match(publicInstallValidatorSource, /--measure/, 'the public npm validator must expose command-backed measurement mode');
