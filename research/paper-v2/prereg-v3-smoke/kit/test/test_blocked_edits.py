@@ -17,6 +17,28 @@ def git(cwd, *args):
     subprocess.run(["/usr/bin/git", *args], cwd=cwd, check=True, text=True, capture_output=True)
 
 
+def test_session_flag_comes_from_steward_file():
+    rows = [{
+        "decision": "rejected-by-design",
+        "terminal": "blocked",
+        "reasonCode": "patch-context-mismatch",
+        "taskId": "prereg",
+        "actorId": "prereg-session",
+        "file": "tests/migrations/test_loader.py",
+    }]
+    assert evaluate.session_rejected(rows, ["tests/migrations/test_loader.py"]) is True
+    assert evaluate.session_rejected(rows, ["django/db/migrations/loader.py"]) is False
+    assert evaluate.session_rejected(rows, []) is False
+    accepted = [{
+        "decision": "accepted",
+        "terminal": "committed",
+        "taskId": "django__django-11141",
+        "actorId": "django__django-11141",
+        "file": "shared.py",
+    }]
+    assert evaluate.session_rejected(accepted, ["shared.py"]) is False
+
+
 def test_recompose_counts_blocked_rows_with_zero_retry_fields():
     rows = []
     for _ in range(4):
@@ -141,6 +163,7 @@ def unfinished_count(arm):
 
 
 def main():
+    test_session_flag_comes_from_steward_file()
     test_recompose_counts_blocked_rows_with_zero_retry_fields()
     code, payload = build("alpha\nbeta\n")
     arm = payload["arms"]["B"]
@@ -148,6 +171,7 @@ def main():
     assert arm["lostEditCount"] == 0, arm["lostEditCount"]
     assert unfinished_count(arm) >= 1, arm["sessions"]
     assert arm["status"] == "blocked", arm["status"]
+    assert all(session["stewardRejected"] is True for session in arm["sessions"]), arm["sessions"]
     assert code == 3, code
     assert payload["status"] == "blocked"
     code, payload = build("alpha\n")
@@ -156,6 +180,7 @@ def main():
     assert arm["lostEditCount"] == 0, arm
     assert unfinished_count(arm) == 0, arm["sessions"]
     assert arm["status"] == "ok", arm["status"]
+    assert all(session["stewardRejected"] is True for session in arm["sessions"]), arm["sessions"]
     assert code == 0, (code, payload["status"])
     print("blocked edits ok")
 

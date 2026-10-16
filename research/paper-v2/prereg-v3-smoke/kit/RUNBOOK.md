@@ -31,9 +31,11 @@ bash research/paper-v2/prereg-v3-smoke/kit/evaluate.sh
 bash research/paper-v2/prereg-v3-smoke/kit/seal.sh --publish-index
 ```
 
-`setup.sh` 每次使用新的 run-id，state 放在 `kit/state/runs/<run-id>/`。目錄已存在就中止，不會 `rm` 既有 state。要自己指定路徑時設定 `PREREG_SMOKE_STATE` 或 `PREREG_RUN_ID`，而且那個目錄必須還不存在。Django 模式會把 template 以 `pip install -e` 裝進 venv，先確認能 `import django` 並跑過一個最小測試。解譯器與測試相同：`PREREG_PYTHON`（可執行檔路徑），否則 CPython 3.8、3.9 或 3.10；都沒有就以 kit-error 結束，不改用系統 `python3`。離線 `pip install -e --no-build-isolation` 之前只確認 venv 裡有 setuptools（Django 3.2 不需要 wheel 套件），只用現成 wheel 或 pip 快取，且不安裝相依套件；拿不到就以 kit-error 結束。runner 沒有印出 `Ran N test` 的完成報告（例如找不到 django）時，setup 以非零退出。
+`setup.sh` 每次使用新的 run-id，state 放在 `kit/state/runs/<run-id>/`。目錄已存在就中止，不會 `rm` 既有 state。要自己指定路徑時設定 `PREREG_SMOKE_STATE` 或 `PREREG_RUN_ID`，而且那個目錄必須還不存在。Django 模式會把 template 以 `pip install -e` 裝進 venv，先確認能 `import django` 並跑過一個最小測試。解譯器與測試相同：`PREREG_PYTHON`（可執行檔路徑），否則 CPython 3.8、3.9 或 3.10；都沒有就以 kit-error 結束，不改用系統 `python3`。離線 `pip install -e --no-build-isolation` 之前只確認 venv 裡有 setuptools（Django 3.2 不需要 wheel 套件），只用現成 wheel 或 pip 快取，且不安裝相依套件；拿不到就以 kit-error 結束。未套測試 patch 的 base 只跑各題可執行的 PASS_TO_PASS（`name (module.Class)` 會對成 `module.Class.name`），並加上 `--parallel 1`。這組必須全過：退出碼 0、報告是 `OK`、沒有 `ERROR` 或 `errors=`。任何未預期的失敗、錯誤，或 runner 沒有印出 `Ran N test` 的完成報告，setup 都以非零退出。FAIL_TO_PASS 要等金標測試 patch 套上之後才預期失敗，setup 不跑那一組。
 
-`--publish-index` 只在 `research/paper-v2/EVIDENCE_INDEX.md` 追加一列。那一列的路徑是這次實際寫入的封存目錄（`--dest` 或預設目錄），不會改用別的日期路徑。標成 smoke / exploratory、沒有勝出宣稱。索引檔不存在時會停，不會另建一份。
+`evaluate.py` 套用金標測試 patch 之前，會把該 patch 碰到的每個檔案先 checkout 回 base（與 SWE-bench 相同）。模型改過那些測試檔時，結果記下 `modelTestEditsDiscarded` 與被丟掉的路徑，再套 patch。Django 測試同樣使用 `--parallel 1`。session 的 `stewardRejected` 依 steward 紀錄裡、與該 session 意圖 patch 檔案重疊的拒絕來決定；紀錄沒有 session id，不能只看 taskId。
+
+`--publish-index` 只在 `research/paper-v2/EVIDENCE_INDEX.md` 追加一列。那一列的路徑是這次實際寫入的封存目錄（`--dest` 或預設目錄），不會改用別的日期路徑。`results.json` 的 status 是 `invalid` 時，那一列標成 INVALID。status 是 ok 時標成 smoke / exploratory、沒有勝出宣稱。索引檔不存在時會停，不會另建一份。
 
 模型用環境變數 `CODEX_MODEL`。留空時不加 `--model`，讓已登入的免費 ChatGPT 帳戶使用它自己的預設模型。推理力度用 `CODEX_REASONING_EFFORT`，只能是 `minimal`、`low`、`medium` 或 `high`。未設定（或空字串）時兩臂都不加 `-c model_reasoning_effort="<值>"`；設了其他值就中止，不啟動工作階段。設了合法值時，兩臂的 `codex exec` 都加上同一條 `-c model_reasoning_effort="<值>"`。腳本把模型名稱寫進各臂 `model.txt` 的第一行，第二行是 `reasoning_effort=`。`evaluate.py` 把這兩欄寫進 `results.json` 各臂的 `model` 與 `reasoningEffort`。兩臂用同一組旗標。
 

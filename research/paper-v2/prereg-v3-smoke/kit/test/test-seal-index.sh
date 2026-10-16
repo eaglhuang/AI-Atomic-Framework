@@ -49,4 +49,29 @@ old_rows="$(grep -c 'prereg-v3-smoke/2026-10-16-codex/' "$INDEX")"
 new_rows="$(grep -c 'prereg-v3-smoke/2026-10-17-codex-v2/' "$INDEX")"
 [ "$old_rows" -eq 1 ]
 [ "$new_rows" -eq 1 ]
+new_line="$(grep 'prereg-v3-smoke/2026-10-17-codex-v2/' "$INDEX")"
+case "$new_line" in
+  *INVALID*) echo "ok results were marked INVALID: $new_line" >&2; exit 1 ;;
+esac
+
+printf '%s\n' '{"status":"invalid","arms":{"A":{"tests":[{"kitError":"test-patch-not-applied"}]},"B":{"tests":[{"kitError":"tests-unobserved"}]}}}' > "$ROOT/results.json"
+DEST2="$BASE/out/2026-10-17-codex-v3"
+bash "$HERE/seal.sh" --index-file "$INDEX" --dest "$DEST2" --publish-index >"$BASE/seal-invalid.out"
+after2="$(wc -l < "$INDEX")"
+if [ "$((after2 - after))" -ne 1 ]; then
+  echo "invalid publish-index added $((after2 - after)) lines, want 1" >&2
+  cat "$INDEX" >&2
+  exit 1
+fi
+invalid_line="$(grep 'prereg-v3-smoke/2026-10-17-codex-v3/' "$INDEX")"
+case "$invalid_line" in
+  *INVALID*) ;;
+  *) echo "invalid results were not marked INVALID: $invalid_line" >&2; exit 1 ;;
+esac
+case "$invalid_line" in
+  *test-patch-not-applied*) ;;
+  *) echo "invalid row omitted kit-error: $invalid_line" >&2; exit 1 ;;
+esac
+grep -q 'INVALID' "$DEST2/EVIDENCE_INDEX_ROW.md"
+[ "$(grep -c 'prereg-v3-smoke/2026-10-17-codex-v3/' "$INDEX")" -eq 1 ]
 echo "seal index path ok"

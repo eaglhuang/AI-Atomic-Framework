@@ -36,6 +36,10 @@ if [ "$MODE" = "fixture" ]; then
 else
   TASKS="${PREREG_TASKS_JSON:-$HERE/tasks.json}"
   GOLD="$HERE/gold"
+  mapfile -t PASS_LABELS < <(django_pass_to_pass_labels "$TASKS")
+  if [ "${#PASS_LABELS[@]}" -eq 0 ]; then
+    die "tasks.json 沒有可執行的 PASS_TO_PASS。未套測試 patch 的 base 必須先跑過 PASS_TO_PASS；FAIL_TO_PASS 只在套上金標測試 patch 之後才預期失敗。"
+  fi
   BASE="$(jq -r '.primary.commonBaseCommit' "$TASKS")"
   [ "$BASE" != "null" ] && [ -n "$BASE" ] || die "tasks.json has no common base"
   if [ -n "${PREREG_OFFLINE_TEMPLATE:-}" ]; then
@@ -62,19 +66,17 @@ else
     cat "$STATE_ROOT/django-preflight.out" >&2 || true
     exit 1
   fi
-  TEST_LABEL="$(jq -r '.primary.instances[] | select(.instanceId=="django__django-13820") | .FAIL_TO_PASS[0]' "$TASKS")"
-  [ "$TEST_LABEL" != "null" ] && [ -n "$TEST_LABEL" ] || die "tasks.json 沒有 django__django-13820 的 FAIL_TO_PASS"
   set +e
   (
     cd "$STATE_ROOT/template"
-    "$PYBIN" tests/runtests.py --verbosity 2 --settings=test_sqlite "$TEST_LABEL"
+    "$PYBIN" tests/runtests.py --verbosity 2 --settings=test_sqlite --parallel 1 "${PASS_LABELS[@]}"
   ) > "$STATE_ROOT/setup-tests.out" 2>&1
   test_rc=$?
   set -e
   cp "$STATE_ROOT/setup-tests.out" "$STATE_ROOT/setup-tests.log"
   printf 'django test runner exit %s\n' "$test_rc" >> "$STATE_ROOT/setup-tests.log"
-  if django_runner_failed "$STATE_ROOT/setup-tests.out" "$test_rc"; then
-    echo "Django test runner failed (exit $test_rc)." >&2
+  if pass_to_pass_baseline_failed "$STATE_ROOT/setup-tests.out" "$test_rc"; then
+    echo "Django test runner failed (exit $test_rc). PASS_TO_PASS on the untouched base must pass; unexpected errors fail setup." >&2
     tail -n 40 "$STATE_ROOT/setup-tests.out" >&2 || true
     exit 1
   fi

@@ -86,7 +86,8 @@ PY
 }
 
 # 回傳 0 代表 runner 沒有真的跑起來（套件缺失、零筆測試、或非零退出且沒有完成報告）。
-# 已印出 Ran N test 與 OK/FAILED 的報告代表 runner 已啟動；FAIL_TO_PASS 在基底上失敗不是 kit 崩潰。
+# 已印出 Ran N test 與 OK/FAILED 的報告代表 runner 已啟動。
+# 未套測試 patch 的 PASS_TO_PASS 是否乾淨，另外看 pass_to_pass_baseline_failed。
 django_runner_failed() {
   local out="$1"
   local rc="$2"
@@ -100,4 +101,49 @@ django_runner_failed() {
     return 0
   fi
   return 1
+}
+
+# 未套測試 patch 的 base 只跑 PASS_TO_PASS，而且必須全過。
+# 回傳 0 代表這不是乾淨的基底：runner 沒起來、非零退出、ERROR、errors=、FAILED，或沒有 OK。
+# FAIL_TO_PASS 要等金標測試 patch 套上之後才預期失敗，setup 不跑那一組。
+pass_to_pass_baseline_failed() {
+  local out="$1"
+  local rc="$2"
+  if django_runner_failed "$out" "$rc"; then
+    return 0
+  fi
+  if [ "$rc" -ne 0 ]; then
+    return 0
+  fi
+  if grep -Eq '^FAILED([[:space:]]|$)' "$out"; then
+    return 0
+  fi
+  if grep -Eq 'errors=' "$out"; then
+    return 0
+  fi
+  if grep -Eq '^ERROR:' "$out"; then
+    return 0
+  fi
+  if ! grep -Eq '^OK([[:space:]]|$)' "$out"; then
+    return 0
+  fi
+  return 1
+}
+
+# 與 evaluate.py select_django_labels 相同：只留下 Django test id。
+django_pass_to_pass_labels() {
+  local tasks="$1"
+  python3 - "$tasks" <<'PY'
+import json, re, sys
+data = json.load(open(sys.argv[1], encoding="utf-8"))
+labels = []
+for inst in data["primary"]["instances"]:
+    for label in inst.get("PASS_TO_PASS") or []:
+        text = str(label)
+        if " (" in text or text.startswith("test_"):
+            match = re.match(r"(.+) \((.+)\)", text)
+            labels.append(f"{match.group(2)}.{match.group(1)}" if match else text)
+for label in labels:
+    print(label)
+PY
 }

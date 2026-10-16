@@ -224,10 +224,107 @@ def test_unapplied_patch_is_kit_error():
     assert observed["passToPass"]["denominator"] is None
 
 
+def test_model_test_edits_reset_before_gold_patch():
+    root = Path(tempfile.mkdtemp())
+    template = root / "template"
+    loader = template / "tests" / "migrations" / "test_loader.py"
+    loader.parent.mkdir(parents=True)
+    loader.write_text("base\n", encoding="utf-8")
+    git(template, "init", "-q")
+    git(template, "add", "tests/migrations/test_loader.py")
+    git(template, "-c", "user.name=prereg", "-c", "user.email=prereg@localhost", "commit", "-q", "-m", "base")
+    base = subprocess.run(["/usr/bin/git", "-C", str(template), "rev-parse", "HEAD"], check=True, text=True, capture_output=True).stdout.strip()
+    gold = root / "gold"
+    gold.mkdir()
+    (gold / "reset.test.patch").write_text(
+        "diff --git a/tests/migrations/test_loader.py b/tests/migrations/test_loader.py\n"
+        "--- a/tests/migrations/test_loader.py\n"
+        "+++ b/tests/migrations/test_loader.py\n"
+        "@@ -1 +1 @@\n"
+        "-base\n"
+        "+gold\n",
+        encoding="utf-8",
+    )
+    tasks = {
+        "primary": {
+            "instances": [
+                {
+                    "instanceId": "django__django-11141",
+                    "problemStatement": "one",
+                    "FAIL_TO_PASS": ["test_fail (migrations.test_loader.LoaderTests)"],
+                    "PASS_TO_PASS": ["test_pass (migrations.test_loader.LoaderTests)"],
+                    "testPatch": "gold/reset.test.patch",
+                },
+                {
+                    "instanceId": "django__django-13820",
+                    "problemStatement": "two",
+                    "FAIL_TO_PASS": [],
+                    "PASS_TO_PASS": [],
+                },
+            ]
+        }
+    }
+    (root / "tasks.json").write_text(json.dumps(tasks), encoding="utf-8")
+    argv_path = root / "argv.txt"
+    stub = root / "stub-python"
+    stub.write_text(
+        "#!/usr/bin/env python3\n"
+        "import sys\n"
+        "from pathlib import Path\n"
+        "args = sys.argv[1:]\n"
+        "if args[:2] == ['-m', 'pip']:\n"
+        "    raise SystemExit(0)\n"
+        "if '--parallel' not in sys.argv or sys.argv[sys.argv.index('--parallel') + 1] != '1':\n"
+        "    sys.stderr.write('expected --parallel 1\\n')\n"
+        "    raise SystemExit(2)\n"
+        f"Path({str(argv_path)!r}).write_text('\\n'.join(sys.argv), encoding='utf-8')\n"
+        "text = Path('tests/migrations/test_loader.py').read_text(encoding='utf-8')\n"
+        "if text != 'gold\\n':\n"
+        "    sys.stderr.write('test file was not reset to base before the gold patch: ' + text)\n"
+        "    raise SystemExit(3)\n"
+        "sys.stdout.write('migrations.test_loader.LoaderTests.test_fail ... ok\\n')\n"
+        "sys.stdout.write('migrations.test_loader.LoaderTests.test_pass ... ok\\n')\n"
+        "raise SystemExit(0)\n",
+        encoding="utf-8",
+    )
+    stub.chmod(stub.stat().st_mode | stat.S_IEXEC)
+    for name in ("arm-a", "arm-b"):
+        arm = root / name
+        work = arm / "work"
+        subprocess.run(["/usr/bin/git", "clone", "--quiet", str(template), str(work)], check=True)
+        (work / "tests" / "migrations" / "test_loader.py").write_text("model\n", encoding="utf-8")
+        git(work, "add", "tests/migrations/test_loader.py")
+        git(work, "-c", "user.name=prereg", "-c", "user.email=prereg@localhost", "commit", "-q", "-m", "model test edit")
+        write_landed_session(arm, 1)
+        write_landed_session(arm, 2)
+        (arm / "start-skew-ms").write_text("1\n", encoding="utf-8")
+    env = "\n".join([
+        f"export KIT_ROOT={root}",
+        f"export STATE_ROOT={root}",
+        f"export TEMPLATE={template}",
+        f"export TASKS_JSON={root / 'tasks.json'}",
+        f"export GOLD_ROOT={gold}",
+        f"export COMMON_BASE={base}",
+        "export PREREG_SMOKE_MODE=django",
+        f"export PREREG_PYTHON={stub}",
+        "",
+    ])
+    code, payload = run_evaluate(root, env)
+    assert code == 0, (code, payload.get("status"), (root / "results.json").read_text()[:800])
+    observed = payload["arms"]["A"]["tests"][0]
+    assert observed["testPatchApplied"] is True, observed
+    assert observed["modelTestEditsDiscarded"] is True, observed
+    assert observed["discardedModelTestFiles"] == ["tests/migrations/test_loader.py"], observed
+    assert observed["kitError"] is None, observed
+    argv = argv_path.read_text(encoding="utf-8")
+    assert "--parallel" in argv and "1" in argv.split(), argv
+
+
 def main():
     test_policy_nulls_unobserved_denominators()
     test_zero_tests_invalidate_without_nulling_missing_arm()
     test_unapplied_patch_is_kit_error()
+    test_model_test_edits_reset_before_gold_patch()
     print("observation kit-error ok")
 
 
