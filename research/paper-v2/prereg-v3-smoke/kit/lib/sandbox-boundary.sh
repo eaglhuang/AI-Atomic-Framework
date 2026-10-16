@@ -168,6 +168,56 @@ resolve_linux_sandbox_mechanism() {
   return 1
 }
 
+# bwrap 參數與 boundary_launch_args 共用，避免探測用的指令和真實 codex exec 的包裝分叉。
+bwrap_sandbox_prefix() {
+  local -n dest=$1
+  assert_sandbox_layout
+  local scratch="$PREREG_SANDBOX_SCRATCH"
+  local repo="$PREREG_SANDBOX_REPO"
+  dest=(
+    bwrap
+    --unshare-user
+    --unshare-pid
+    --die-with-parent
+    --ro-bind / /
+    --bind "$scratch" "$scratch"
+    --dev /dev
+    --proc /proc
+  )
+  local extra
+  if [ "${PREREG_SANDBOX_EXTRA_WRITES+x}" = x ]; then
+    for extra in "${PREREG_SANDBOX_EXTRA_WRITES[@]}"; do
+      [ -n "$extra" ] || continue
+      case "$extra" in
+        "$scratch"|"$scratch"/*) ;;
+        *) dest+=(--bind "$extra" "$extra") ;;
+      esac
+    done
+  fi
+  # 儲存庫的唯讀掛載必須最後，蓋過前面的可寫掛載。
+  dest+=(--ro-bind "$repo" "$repo" --cap-drop ALL --)
+}
+
+# 真實 Arm B 的 codex exec 與此相同。不含暫時的 CODEX_HOME；那個環境只給外層 codex sandbox 行程。
+boundary_launch_args() {
+  local -n dest=$1
+  shift
+  assert_sandbox_layout
+  case "${PREREG_BOUNDARY:-}" in
+    codex-landlock)
+      dest=(codex sandbox -P prereg-session -C "$PREREG_SANDBOX_SCRATCH" -- "$@")
+      ;;
+    bwrap-ro)
+      local -a bwrap_prefix=()
+      bwrap_sandbox_prefix bwrap_prefix
+      dest=("${bwrap_prefix[@]}" "$@")
+      ;;
+    *)
+      die "boundary_launch_args 需要 codex-landlock 或 bwrap-ro，目前是 ${PREREG_BOUNDARY:-unset}。"
+      ;;
+  esac
+}
+
 run_codex_sandboxed() {
   assert_sandbox_layout
   local scratch="$PREREG_SANDBOX_SCRATCH"
@@ -183,31 +233,10 @@ run_codex_sandboxed() {
 }
 
 run_bwrap_sandboxed() {
-  assert_sandbox_layout
-  local scratch="$PREREG_SANDBOX_SCRATCH"
-  local repo="$PREREG_SANDBOX_REPO"
-  local -a args=(
-    --unshare-user
-    --unshare-pid
-    --die-with-parent
-    --ro-bind / /
-    --bind "$scratch" "$scratch"
-    --dev /dev
-    --proc /proc
-  )
-  local extra
-  if [ "${PREREG_SANDBOX_EXTRA_WRITES+x}" = x ]; then
-    for extra in "${PREREG_SANDBOX_EXTRA_WRITES[@]}"; do
-      [ -n "$extra" ] || continue
-      case "$extra" in
-        "$scratch"|"$scratch"/*) ;;
-        *) args+=(--bind "$extra" "$extra") ;;
-      esac
-    done
-  fi
-  # 儲存庫的唯讀掛載必須最後，蓋過前面的可寫掛載。
-  args+=(--ro-bind "$repo" "$repo" --cap-drop ALL --)
-  bwrap "${args[@]}" "$@"
+  local -a prefix
+  bwrap_sandbox_prefix prefix
+  # prefix 含命令名稱 bwrap。
+  "${prefix[@]}" "$@"
 }
 
 run_sandboxed() {

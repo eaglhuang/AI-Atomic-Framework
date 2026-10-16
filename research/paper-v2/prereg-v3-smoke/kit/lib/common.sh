@@ -389,6 +389,55 @@ codex_supports() {
   grep -q -- "$flag" <<<"$help"
 }
 
+# 真實 codex exec 的旗標。審批釘成 never，不讀使用者設定，也不加 bypass。
+# 無 sudo 時外層沙盒才是邊界；這裡的 --sandbox 只決定模型自己再套的那一層。
+pinned_codex_exec_args() {
+  local -n dest=$1
+  local help="$2"
+  local work="$3"
+  dest=(exec)
+  if [ -n "$help" ]; then
+    codex_supports "$help" "--json" && dest+=(--json)
+    codex_supports "$help" "--skip-git-repo-check" && dest+=(--skip-git-repo-check)
+    local flag
+    for flag in --ignore-user-config --ignore-rules --sandbox; do
+      if ! codex_supports "$help" "$flag"; then
+        die "codex exec 缺少 ${flag}，無法釘住審批與沙盒。"
+      fi
+    done
+  fi
+  dest+=(
+    --ignore-user-config
+    --ignore-rules
+    -c 'approval_policy="never"'
+  )
+  if [ "${PREREG_ARM:-}" = "B" ] && sandbox_boundary_active; then
+    # 外層 profile / bwrap 已經讓儲存庫唯讀，並允許連到 scratch 裡的 socket。
+    # 內層若再用 read-only，會把 Unix socket 一起關掉。workspace-write 加上 network
+    # 只讓模型的 shell 連得到 steward；寫入仍被外層沙盒拒絕。
+    dest+=(
+      --sandbox workspace-write
+      -c 'sandbox_workspace_write.network_access=true'
+    )
+  elif [ "${PREREG_ARM:-}" = "B" ]; then
+    dest+=(--sandbox read-only)
+  else
+    dest+=(--sandbox workspace-write)
+  fi
+  if [ -z "$help" ] || codex_supports "$help" "--cd"; then
+    dest+=(--cd "$work")
+  elif codex_supports "$help" "-C"; then
+    dest+=(-C "$work")
+  fi
+  if [ -n "${CODEX_MODEL:-}" ]; then
+    if [ -z "$help" ] || codex_supports "$help" "--model"; then
+      dest+=(--model "$CODEX_MODEL")
+    elif codex_supports "$help" "-m"; then
+      dest+=(-m "$CODEX_MODEL")
+    fi
+  fi
+}
+
 # 工作階段環境允許清單。金標路徑、GOLD_ROOT、state、tasks 都不在裡面。
 session_env_assignments() {
   local session_dir="$1" work="$2"
@@ -506,38 +555,16 @@ launch_codex() {
     command -v codex >/dev/null 2>&1 || die "codex 不在 PATH。請安裝 Codex CLI 0.159.2 並登入，或設定 PREREG_SMOKE_CODEX 使用 stub。"
     local help
     help="$(codex exec --help 2>&1 || true)"
-    local -a args=(exec)
-    codex_supports "$help" "--json" && args+=(--json)
-    codex_supports "$help" "--skip-git-repo-check" && args+=(--skip-git-repo-check)
-    if [ "${PREREG_ARM:-}" = "B" ] && sandbox_boundary_active; then
-      # 外層 codex sandbox / bwrap 已經是邊界。內層再套 read-only 會關掉 Unix socket。
-      if codex_supports "$help" "--dangerously-bypass-approvals-and-sandbox"; then
-        args+=(--dangerously-bypass-approvals-and-sandbox)
-      fi
-    elif codex_supports "$help" "--sandbox"; then
-      if [ "${PREREG_ARM:-}" = "B" ]; then
-        args+=(--sandbox read-only)
-      else
-        args+=(--sandbox workspace-write)
-      fi
-    fi
-    if codex_supports "$help" "--cd"; then
-      args+=(--cd "$work")
-    elif codex_supports "$help" "-C"; then
-      args+=(-C "$work")
-    fi
-    if [ -n "${CODEX_MODEL:-}" ]; then
-      if codex_supports "$help" "--model"; then
-        args+=(--model "$CODEX_MODEL")
-      elif codex_supports "$help" "-m"; then
-        args+=(-m "$CODEX_MODEL")
-      fi
-    fi
-    if codex_supports "$help" "--full-auto"; then
-      args+=(--full-auto)
-    fi
+    local -a args=()
+    pinned_codex_exec_args args "$help" "$work"
     printf '%s\n' "$help" > "$session_dir/codex-exec-help.txt"
-    printf '%s\n' "${args[*]}" > "$session_dir/codex-argv.txt"
+    if [ "${PREREG_ARM:-}" = "B" ] && sandbox_boundary_active; then
+      local -a full=()
+      boundary_launch_args full "${env_cmd[@]}" codex "${args[@]}" -
+      printf '%q\n' "${full[@]}" > "$session_dir/codex-argv.txt"
+    else
+      printf '%q\n' "${env_cmd[@]}" codex "${args[@]}" - > "$session_dir/codex-argv.txt"
+    fi
     (
       cd "$work"
       run_as_session "${env_cmd[@]}" codex "${args[@]}" - <"$prompt_file" >"$stdout" 2>"$stderr"

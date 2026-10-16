@@ -49,7 +49,12 @@ static_launchers() {
   grep -q 'read-only' "$HERE/lib/common.sh"
   grep -q 'codex-landlock' "$HERE/lib/sandbox-boundary.sh"
   grep -q 'bwrap-ro' "$HERE/lib/sandbox-boundary.sh"
-  grep -q 'dangerously-bypass-approvals-and-sandbox' "$HERE/lib/common.sh"
+  grep -q 'approval_policy="never"' "$HERE/lib/common.sh"
+  grep -q 'ignore-user-config' "$HERE/lib/common.sh"
+  if grep -n 'dangerously-bypass-approvals-and-sandbox' "$HERE/lib/common.sh" "$HERE/lib/sandbox-boundary.sh"; then
+    echo "launcher 仍把 bypass 放進邊界" >&2
+    return 1
+  fi
   test -f "$HERE/bin/steward-daemon.mjs"
   grep -q 'capture_intended_patch' "$HERE/lib/run-arm.sh"
   if grep -n 'exits 3, stop' "$HERE/lib/run-arm.sh"; then
@@ -76,6 +81,7 @@ check no-rm bash "$HERE/test/test-no-rm-state.sh"
 check gold bash "$HERE/test/test-gold-isolation.sh"
 check atm-write-path bash "$HERE/test/test-atm-write-path.sh"
 check readonly-steward bash "$HERE/test/test-arm-b-readonly.sh"
+check exec-boundary bash "$HERE/test/test-arm-b-exec-boundary.sh"
 check disposition python3 "$HERE/test/test_write_disposition.py"
 check overlap bash "$HERE/test/test-overlap-decision.sh"
 check stub-dry-run bash "$HERE/self-check.sh"
