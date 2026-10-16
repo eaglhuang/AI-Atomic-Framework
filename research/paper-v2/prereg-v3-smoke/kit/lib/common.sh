@@ -92,8 +92,15 @@ as_root() {
 
 linux_sudo_ok() {
   [ "$(uname -s)" = "Linux" ] || return 1
+  # 測試掛鉤：這台機器有 sudo 時，仍要能走出「完全沒有 sudo」的選擇。
+  if [ "${PREREG_DISABLE_SUDO:-}" = "1" ]; then
+    return 1
+  fi
   as_root true >/dev/null 2>&1
 }
+
+# shellcheck disable=SC1091
+source "$KIT_ROOT/lib/sandbox-boundary.sh"
 
 default_public_cli_root() {
   if [ -n "${PREREG_ATM_CLI_ROOT:-}" ]; then
@@ -198,16 +205,25 @@ require_public_cli() {
   printf '%s\n' "$cli"
 }
 
-# Linux 必須用兩個系統使用者。chmod a-w 可以由擁有者改回來，不能當邊界。
+# Linux 有免密碼 sudo 時用兩個系統使用者。chmod a-w 可以由擁有者改回來，不能當邊界。
+# Linux 沒有 sudo 時改走 Codex sandbox 或 bubblewrap；兩者都不可用就中止，不退回未強制模式。
 # 非 Linux（Windows / macOS 開發機）沒有這兩個使用者時，改由 Codex --sandbox read-only 把模型關在沙盒裡，steward 留在沙盒外。
 ensure_prereg_users() {
+  if [ -n "${PREREG_BOUNDARY:-}" ]; then
+    case "$PREREG_BOUNDARY" in
+      unix-user|codex-landlock|bwrap-ro|codex-sandbox) return 0 ;;
+    esac
+  fi
   if [ "$(uname -s)" != "Linux" ]; then
     PREREG_BOUNDARY=codex-sandbox
     export PREREG_BOUNDARY
     return 0
   fi
   if ! linux_sudo_ok; then
-    die "Linux 上需要免密碼 sudo，才能建立 ${STEWARD_USER} 與 ${SESSION_USER}。拒絕退回 chmod a-w。Windows 或 macOS 請改用 Codex --sandbox read-only。"
+    if resolve_linux_sandbox_mechanism; then
+      return 0
+    fi
+    die "Linux 上沒有免密碼 sudo，而且 Codex sandbox 與 bubblewrap 都不可用。拒絕退回 chmod a-w，也拒絕沒有強制的模式。"
   fi
   local user home shell
   shell=/usr/sbin/nologin
@@ -270,6 +286,12 @@ start_steward_daemon() {
   node_bin="$(command -v node)"
   [ -n "$node_bin" ] || die "找不到 node，無法啟動 steward。"
   ensure_prereg_users
+  if sandbox_boundary_active; then
+    [ -n "${PREREG_SANDBOX_SCRATCH:-}" ] || die "沙盒邊界缺少 PREREG_SANDBOX_SCRATCH。socket 必須放在沙盒允許的 scratch。"
+    [ -n "${PREREG_SANDBOX_REPO:-}" ] || die "沙盒邊界缺少 PREREG_SANDBOX_REPO。"
+    mkdir -p "$PREREG_SANDBOX_SCRATCH"
+    STEWARD_SOCK_DIR="$PREREG_SANDBOX_SCRATCH"
+  fi
   if [ "${PREREG_BOUNDARY}" = "unix-user" ]; then
     ensure_other_can_reach "$node_bin"
     ensure_other_can_reach "$KIT_ROOT/bin/steward-daemon.mjs"
@@ -292,6 +314,9 @@ start_steward_daemon() {
     chmod 755 "$STEWARD_SOCK_DIR"
   fi
   sock="${STEWARD_SOCK_DIR}/s${$}-${RANDOM}.sock"
+  if [ "${#sock}" -gt 100 ]; then
+    die "steward socket 路徑長度 ${#sock} 超過 Unix 上限：${sock}"
+  fi
   if [ "${PREREG_BOUNDARY}" = "unix-user" ]; then
     as_root -u "$STEWARD_USER" -- "$node_bin" "$KIT_ROOT/bin/steward-daemon.mjs" \
       --sock "$sock" --cwd "$work" --script "$KIT_ROOT/bin/atm-write.mjs" \
@@ -338,18 +363,115 @@ release_worktree() {
   fi
 }
 
-# Arm B 的模型行程。Unix 邊界下它不是檔案擁有者，也沒有 sudo。
+# Arm B 的模型行程。Arm A 不套這層邊界，只保留既有的金標隔離。
+# unix-user：行程不是檔案擁有者，也沒有 sudo。
+# codex-landlock / bwrap-ro：行程在沙盒裡，steward 留在外面。
 run_as_session() {
-  if [ "${PREREG_BOUNDARY:-}" = "unix-user" ] && [ "${PREREG_ARM:-}" = "B" ]; then
-    as_root -u "$SESSION_USER" -- bash -c 'umask 022; exec "$@"' bash "$@"
-  else
+  if [ "${PREREG_ARM:-}" != "B" ]; then
     "$@"
+    return
   fi
+  case "${PREREG_BOUNDARY:-}" in
+    unix-user)
+      as_root -u "$SESSION_USER" -- bash -c 'umask 022; exec "$@"' bash "$@"
+      ;;
+    codex-landlock|bwrap-ro)
+      run_sandboxed "$@"
+      ;;
+    *)
+      "$@"
+      ;;
+  esac
 }
 
 codex_supports() {
   local help="$1" flag="$2"
   grep -q -- "$flag" <<<"$help"
+}
+
+# 真實 codex exec 的旗標。審批釘成 never，不讀使用者設定，也不加 bypass。
+# 無 sudo 時外層沙盒才是邊界；這裡的 --sandbox 只決定模型自己再套的那一層。
+pinned_codex_exec_args() {
+  local -n dest=$1
+  local help="$2"
+  local work="$3"
+  dest=(exec)
+  if [ -n "$help" ]; then
+    codex_supports "$help" "--json" && dest+=(--json)
+    codex_supports "$help" "--skip-git-repo-check" && dest+=(--skip-git-repo-check)
+    local flag
+    for flag in --ignore-user-config --ignore-rules --sandbox; do
+      if ! codex_supports "$help" "$flag"; then
+        die "codex exec 缺少 ${flag}，無法釘住審批與沙盒。"
+      fi
+    done
+  fi
+  dest+=(
+    --ignore-user-config
+    --ignore-rules
+    -c 'approval_policy="never"'
+  )
+  if [ "${PREREG_ARM:-}" = "B" ] && sandbox_boundary_active; then
+    # 外層 profile / bwrap 已經讓儲存庫唯讀，並允許連到 scratch 裡的 socket。
+    # 內層若再用 read-only，會把 Unix socket 一起關掉。workspace-write 加上 network
+    # 只讓模型的 shell 連得到 steward；寫入仍被外層沙盒拒絕。
+    dest+=(
+      --sandbox workspace-write
+      -c 'sandbox_workspace_write.network_access=true'
+    )
+  elif [ "${PREREG_ARM:-}" = "B" ]; then
+    dest+=(--sandbox read-only)
+  else
+    dest+=(--sandbox workspace-write)
+  fi
+  if [ -z "$help" ] || codex_supports "$help" "--cd"; then
+    dest+=(--cd "$work")
+  elif codex_supports "$help" "-C"; then
+    dest+=(-C "$work")
+  fi
+  if [ -n "${CODEX_MODEL:-}" ]; then
+    if [ -z "$help" ] || codex_supports "$help" "--model"; then
+      dest+=(--model "$CODEX_MODEL")
+    elif codex_supports "$help" "-m"; then
+      dest+=(-m "$CODEX_MODEL")
+    fi
+  fi
+}
+
+# ChatGPT 登入在 ~/.codex/auth.json。--ignore-user-config 不讀 config.toml，但登入仍用 CODEX_HOME。
+# 只複製 auth.json 到工作階段裡可寫的目錄，不複製設定，也不把內容印出來。
+codex_login_auth_file() {
+  if [ -n "${PREREG_CODEX_AUTH_FILE:-}" ]; then
+    [ -f "$PREREG_CODEX_AUTH_FILE" ] || die "指定的 Codex 登入檔不存在。"
+    printf '%s\n' "$PREREG_CODEX_AUTH_FILE"
+    return 0
+  fi
+  local origin="${CODEX_HOME:-}"
+  if [ -n "$origin" ] && [ -f "$origin/auth.json" ]; then
+    printf '%s\n' "$origin/auth.json"
+    return 0
+  fi
+  if [ -f "${HOME}/.codex/auth.json" ]; then
+    printf '%s\n' "${HOME}/.codex/auth.json"
+    return 0
+  fi
+  return 1
+}
+
+prepare_session_codex_home() {
+  local session_dir="$1"
+  local dest="$session_dir/codex-home"
+  local src
+  src="$(codex_login_auth_file)" || die "找不到 ~/.codex/auth.json。codex exec 需要 ChatGPT 登入；--ignore-user-config 不會略過 CODEX_HOME 裡的 auth.json。"
+  mkdir -p "$dest"
+  chmod 700 "$dest"
+  cp "$src" "$dest/auth.json"
+  chmod 600 "$dest/auth.json"
+  if [ "${PREREG_BOUNDARY:-}" = "unix-user" ] && [ "${PREREG_ARM:-}" = "B" ]; then
+    as_root chown -R "$SESSION_USER" "$dest"
+    as_root chmod 700 "$dest"
+    as_root chmod 600 "$dest/auth.json"
+  fi
 }
 
 # 工作階段環境允許清單。金標路徑、GOLD_ROOT、state、tasks 都不在裡面。
@@ -398,6 +520,10 @@ EOF
   if [ -n "${CODEX_MODEL:-}" ]; then
     printf 'CODEX_MODEL=%s\n' "$CODEX_MODEL"
   fi
+  if [ -z "${PREREG_SMOKE_CODEX:-}" ]; then
+    # 兩臂用同一份登入。這個目錄在沙盒裡可寫，使用者的 ~/.codex 不是。
+    printf 'CODEX_HOME=%s\n' "${session_dir}/codex-home"
+  fi
 }
 
 capture_intended_patch() {
@@ -431,6 +557,14 @@ PY
 launch_codex() {
   local session_dir="$1" prompt_file="$2" work="$3"
   mkdir -p "$session_dir/home" "$session_dir/tmp"
+  if [ -z "${PREREG_SMOKE_CODEX:-}" ]; then
+    prepare_session_codex_home "$session_dir"
+  fi
+  if [ "${PREREG_ARM:-}" = "B" ] && sandbox_boundary_active; then
+    PREREG_SANDBOX_REPO="$work"
+    export PREREG_SANDBOX_REPO
+    PREREG_SANDBOX_EXTRA_WRITES=("$session_dir")
+  fi
   if [ "${PREREG_BOUNDARY:-}" = "unix-user" ] && [ "${PREREG_ARM:-}" = "B" ]; then
     # 只有工作階段的日誌目錄對 session 可寫。儲存庫工作樹不在這裡。
     chmod 1777 "$session_dir" "$session_dir/home" "$session_dir/tmp"
@@ -464,33 +598,16 @@ launch_codex() {
     command -v codex >/dev/null 2>&1 || die "codex 不在 PATH。請安裝 Codex CLI 0.159.2 並登入，或設定 PREREG_SMOKE_CODEX 使用 stub。"
     local help
     help="$(codex exec --help 2>&1 || true)"
-    local -a args=(exec)
-    codex_supports "$help" "--json" && args+=(--json)
-    codex_supports "$help" "--skip-git-repo-check" && args+=(--skip-git-repo-check)
-    if codex_supports "$help" "--sandbox"; then
-      if [ "${PREREG_ARM:-}" = "B" ]; then
-        args+=(--sandbox read-only)
-      else
-        args+=(--sandbox workspace-write)
-      fi
-    fi
-    if codex_supports "$help" "--cd"; then
-      args+=(--cd "$work")
-    elif codex_supports "$help" "-C"; then
-      args+=(-C "$work")
-    fi
-    if [ -n "${CODEX_MODEL:-}" ]; then
-      if codex_supports "$help" "--model"; then
-        args+=(--model "$CODEX_MODEL")
-      elif codex_supports "$help" "-m"; then
-        args+=(-m "$CODEX_MODEL")
-      fi
-    fi
-    if codex_supports "$help" "--full-auto"; then
-      args+=(--full-auto)
-    fi
+    local -a args=()
+    pinned_codex_exec_args args "$help" "$work"
     printf '%s\n' "$help" > "$session_dir/codex-exec-help.txt"
-    printf '%s\n' "${args[*]}" > "$session_dir/codex-argv.txt"
+    if [ "${PREREG_ARM:-}" = "B" ] && sandbox_boundary_active; then
+      local -a full=()
+      boundary_launch_args full "${env_cmd[@]}" codex "${args[@]}" -
+      printf '%q\n' "${full[@]}" > "$session_dir/codex-argv.txt"
+    else
+      printf '%q\n' "${env_cmd[@]}" codex "${args[@]}" - > "$session_dir/codex-argv.txt"
+    fi
     (
       cd "$work"
       run_as_session "${env_cmd[@]}" codex "${args[@]}" - <"$prompt_file" >"$stdout" 2>"$stderr"
