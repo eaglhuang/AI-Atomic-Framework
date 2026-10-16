@@ -47,6 +47,9 @@ static_launchers() {
   grep -q 'PREREG_STEWARD_SOCK' "$HERE/lib/common.sh"
   grep -q 'PREREG_STEWARD_SOCK' "$HERE/bin/atm-write.mjs"
   grep -q 'read-only' "$HERE/lib/common.sh"
+  grep -q 'codex-landlock' "$HERE/lib/sandbox-boundary.sh"
+  grep -q 'bwrap-ro' "$HERE/lib/sandbox-boundary.sh"
+  grep -q 'dangerously-bypass-approvals-and-sandbox' "$HERE/lib/common.sh"
   test -f "$HERE/bin/steward-daemon.mjs"
   grep -q 'capture_intended_patch' "$HERE/lib/run-arm.sh"
   if grep -n 'exits 3, stop' "$HERE/lib/run-arm.sh"; then

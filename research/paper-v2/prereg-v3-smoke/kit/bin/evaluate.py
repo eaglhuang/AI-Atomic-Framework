@@ -169,6 +169,19 @@ def missing_arm(arm_name, arm_dir, gaps):
     }
 
 
+def read_boundary_file(arm_dir):
+    path = arm_dir / "boundary.txt"
+    found = {}
+    if not path.is_file():
+        return found
+    for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
+        if "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        found[key.strip()] = value.strip()
+    return found
+
+
 def score_arm(arm_name, arm_dir, tasks, base):
     gaps = evidence_gaps(arm_dir)
     if gaps:
@@ -258,8 +271,11 @@ def score_arm(arm_name, arm_dir, tasks, base):
         item = {key: value for key, value in row.items() if key != "currentFileText"}
         item["decision"] = classify_write(row)
         labeled.append(item)
+    boundary = read_boundary_file(arm_dir)
     return {
         "arm": arm_name,
+        "boundary": boundary.get("boundary"),
+        "boundaryMechanism": boundary.get("mechanism"),
         "status": status,
         "work": str(work),
         "head": git(work, "rev-parse", "HEAD", check=False).stdout.strip(),
@@ -412,6 +428,8 @@ def main():
         "status": overall,
         "mode": env.get("PREREG_SMOKE_MODE"),
         "commonBase": base,
+        "boundary": (arms.get("B") or {}).get("boundary"),
+        "boundaryMechanism": (arms.get("B") or {}).get("boundaryMechanism"),
         "arms": arms,
     }
     dest = STATE / "results.json"

@@ -92,8 +92,15 @@ as_root() {
 
 linux_sudo_ok() {
   [ "$(uname -s)" = "Linux" ] || return 1
+  # 測試掛鉤：這台機器有 sudo 時，仍要能走出「完全沒有 sudo」的選擇。
+  if [ "${PREREG_DISABLE_SUDO:-}" = "1" ]; then
+    return 1
+  fi
   as_root true >/dev/null 2>&1
 }
+
+# shellcheck disable=SC1091
+source "$KIT_ROOT/lib/sandbox-boundary.sh"
 
 default_public_cli_root() {
   if [ -n "${PREREG_ATM_CLI_ROOT:-}" ]; then
@@ -198,16 +205,25 @@ require_public_cli() {
   printf '%s\n' "$cli"
 }
 
-# Linux 必須用兩個系統使用者。chmod a-w 可以由擁有者改回來，不能當邊界。
+# Linux 有免密碼 sudo 時用兩個系統使用者。chmod a-w 可以由擁有者改回來，不能當邊界。
+# Linux 沒有 sudo 時改走 Codex sandbox 或 bubblewrap；兩者都不可用就中止，不退回未強制模式。
 # 非 Linux（Windows / macOS 開發機）沒有這兩個使用者時，改由 Codex --sandbox read-only 把模型關在沙盒裡，steward 留在沙盒外。
 ensure_prereg_users() {
+  if [ -n "${PREREG_BOUNDARY:-}" ]; then
+    case "$PREREG_BOUNDARY" in
+      unix-user|codex-landlock|bwrap-ro|codex-sandbox) return 0 ;;
+    esac
+  fi
   if [ "$(uname -s)" != "Linux" ]; then
     PREREG_BOUNDARY=codex-sandbox
     export PREREG_BOUNDARY
     return 0
   fi
   if ! linux_sudo_ok; then
-    die "Linux 上需要免密碼 sudo，才能建立 ${STEWARD_USER} 與 ${SESSION_USER}。拒絕退回 chmod a-w。Windows 或 macOS 請改用 Codex --sandbox read-only。"
+    if resolve_linux_sandbox_mechanism; then
+      return 0
+    fi
+    die "Linux 上沒有免密碼 sudo，而且 Codex sandbox 與 bubblewrap 都不可用。拒絕退回 chmod a-w，也拒絕沒有強制的模式。"
   fi
   local user home shell
   shell=/usr/sbin/nologin
@@ -270,6 +286,12 @@ start_steward_daemon() {
   node_bin="$(command -v node)"
   [ -n "$node_bin" ] || die "找不到 node，無法啟動 steward。"
   ensure_prereg_users
+  if sandbox_boundary_active; then
+    [ -n "${PREREG_SANDBOX_SCRATCH:-}" ] || die "沙盒邊界缺少 PREREG_SANDBOX_SCRATCH。socket 必須放在沙盒允許的 scratch。"
+    [ -n "${PREREG_SANDBOX_REPO:-}" ] || die "沙盒邊界缺少 PREREG_SANDBOX_REPO。"
+    mkdir -p "$PREREG_SANDBOX_SCRATCH"
+    STEWARD_SOCK_DIR="$PREREG_SANDBOX_SCRATCH"
+  fi
   if [ "${PREREG_BOUNDARY}" = "unix-user" ]; then
     ensure_other_can_reach "$node_bin"
     ensure_other_can_reach "$KIT_ROOT/bin/steward-daemon.mjs"
@@ -292,6 +314,9 @@ start_steward_daemon() {
     chmod 755 "$STEWARD_SOCK_DIR"
   fi
   sock="${STEWARD_SOCK_DIR}/s${$}-${RANDOM}.sock"
+  if [ "${#sock}" -gt 100 ]; then
+    die "steward socket 路徑長度 ${#sock} 超過 Unix 上限：${sock}"
+  fi
   if [ "${PREREG_BOUNDARY}" = "unix-user" ]; then
     as_root -u "$STEWARD_USER" -- "$node_bin" "$KIT_ROOT/bin/steward-daemon.mjs" \
       --sock "$sock" --cwd "$work" --script "$KIT_ROOT/bin/atm-write.mjs" \
@@ -338,13 +363,25 @@ release_worktree() {
   fi
 }
 
-# Arm B 的模型行程。Unix 邊界下它不是檔案擁有者，也沒有 sudo。
+# Arm B 的模型行程。Arm A 不套這層邊界，只保留既有的金標隔離。
+# unix-user：行程不是檔案擁有者，也沒有 sudo。
+# codex-landlock / bwrap-ro：行程在沙盒裡，steward 留在外面。
 run_as_session() {
-  if [ "${PREREG_BOUNDARY:-}" = "unix-user" ] && [ "${PREREG_ARM:-}" = "B" ]; then
-    as_root -u "$SESSION_USER" -- bash -c 'umask 022; exec "$@"' bash "$@"
-  else
+  if [ "${PREREG_ARM:-}" != "B" ]; then
     "$@"
+    return
   fi
+  case "${PREREG_BOUNDARY:-}" in
+    unix-user)
+      as_root -u "$SESSION_USER" -- bash -c 'umask 022; exec "$@"' bash "$@"
+      ;;
+    codex-landlock|bwrap-ro)
+      run_sandboxed "$@"
+      ;;
+    *)
+      "$@"
+      ;;
+  esac
 }
 
 codex_supports() {
@@ -431,6 +468,11 @@ PY
 launch_codex() {
   local session_dir="$1" prompt_file="$2" work="$3"
   mkdir -p "$session_dir/home" "$session_dir/tmp"
+  if [ "${PREREG_ARM:-}" = "B" ] && sandbox_boundary_active; then
+    PREREG_SANDBOX_REPO="$work"
+    export PREREG_SANDBOX_REPO
+    PREREG_SANDBOX_EXTRA_WRITES=("$session_dir")
+  fi
   if [ "${PREREG_BOUNDARY:-}" = "unix-user" ] && [ "${PREREG_ARM:-}" = "B" ]; then
     # 只有工作階段的日誌目錄對 session 可寫。儲存庫工作樹不在這裡。
     chmod 1777 "$session_dir" "$session_dir/home" "$session_dir/tmp"
@@ -467,7 +509,12 @@ launch_codex() {
     local -a args=(exec)
     codex_supports "$help" "--json" && args+=(--json)
     codex_supports "$help" "--skip-git-repo-check" && args+=(--skip-git-repo-check)
-    if codex_supports "$help" "--sandbox"; then
+    if [ "${PREREG_ARM:-}" = "B" ] && sandbox_boundary_active; then
+      # 外層 codex sandbox / bwrap 已經是邊界。內層再套 read-only 會關掉 Unix socket。
+      if codex_supports "$help" "--dangerously-bypass-approvals-and-sandbox"; then
+        args+=(--dangerously-bypass-approvals-and-sandbox)
+      fi
+    elif codex_supports "$help" "--sandbox"; then
       if [ "${PREREG_ARM:-}" = "B" ]; then
         args+=(--sandbox read-only)
       else
