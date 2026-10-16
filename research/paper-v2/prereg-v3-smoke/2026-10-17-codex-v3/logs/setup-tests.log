@@ -1,0 +1,20 @@
+Testing against Django installed in '/workspace/atm-311/research/paper-v2/prereg-v3-smoke/kit/state/runs/20261016T193610Z-3094581-28522/template/django' with up to 8 processes
+Skipping setup of unused database(s): default, other.
+System check identified no issues (0 silenced).
+test_loading_package_without__file__ (migrations (unittest.loader._FailedTest) ... ERROR
+
+======================================================================
+ERROR: test_loading_package_without__file__ (migrations (unittest.loader._FailedTest)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: test_loading_package_without__file__ (migrations
+Traceback (most recent call last):
+  File "/home/box/.local/share/uv/python/cpython-3.10-linux-x86_64-gnu/lib/python3.10/unittest/loader.py", line 154, in loadTestsFromName
+    module = __import__(module_name)
+ModuleNotFoundError: No module named 'test_loading_package_without__file__ (migrations'
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.000s
+
+FAILED (errors=1)
+django test runner exit 1
