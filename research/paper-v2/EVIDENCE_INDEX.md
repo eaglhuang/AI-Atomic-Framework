@@ -732,3 +732,4 @@ pilot、主跑、留出集實驗仍不在這次範圍。dev 題沒有 B′ 與 D
 - `node_modules/`：依 `R1/harness/package.json` 安裝；實際版本見 `R1/harness/installed-deps.package-lock.json`（不是正式 lockfile，原 harness 無 `package-lock.json`）。
 | `prereg-v3-smoke/2026-10-16-codex/` | smoke / exploratory, not results — INVALID/superseded (kit-error) | no win claim | mode=django; model=gpt-6-luna; base=98ad327864aed8df245fd19ea9d2743279e11643 |
 | `prereg-v3-smoke/2026-10-17-codex-v2/` | smoke / exploratory, not results — INVALID (kit-error: Django missing from test venv, tests not run) | no win claim | mode=django; model=gpt-6-luna; effort=medium; boundary=unix-user; main=526ba8eea; base=98ad327864aed8df245fd19ea9d2743279e11643 |
+| `prereg-v3-smoke/2026-10-17-codex-v3/` | smoke / exploratory, not results — INVALID (kit-error: test patch not applied / tests unobserved) | no win claim | mode=django; model=gpt-6-luna; base=98ad327864aed8df245fd19ea9d2743279e11643 |
