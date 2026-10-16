@@ -4,7 +4,7 @@
 
 ## 先決條件
 
-- 這個儲存庫的工作目錄。Arm B 寫入只走公開 npm CLI `@ai-atomic-framework/cli@0.1.20` 的 `broker steward apply`。套件裝在 git workspace 外面，Linux 預設是 `/var/cache/prereg-v3-atm-cli-0.1.20`（steward 使用者讀得到；不要裝進家目錄，家目錄通常不可穿越）。不會使用倉庫裡版本較舊的 frozen runner。沒有這支 CLI 就中止 Arm B，沒有 claim 退路，也不改走 TypeScript 直接載入。
+- 這個儲存庫的工作目錄。Arm B 寫入只走公開 npm CLI `@ai-atomic-framework/cli@0.1.21` 的 `broker steward apply-live`。套件裝在 git workspace 外面，Linux 預設是 `/var/cache/prereg-v3-atm-cli-0.1.21`（steward 使用者讀得到；不要裝進家目錄，家目錄通常不可穿越）。不會使用倉庫裡版本較舊的 frozen runner。沒有這支 CLI 就中止 Arm B，沒有 claim 退路，也不改走 TypeScript 直接載入。預先算好的 `broker steward apply --merge-plan-file` 仍留在 CLI，這條即時路徑不使用它。
 - Linux：免密碼 `sudo`（`sudo -n true` 要成功）。套件會自行建立系統使用者 `prereg-steward`（擁有工作樹與 steward 行程）與 `prereg-session`（跑模型，不在 `sudo` 群組，shell 是 `nologin`）。不需要手動 `useradd`。若 `sudo -n` 失敗，Arm B 直接中止，不會退回 `chmod a-w`。工作樹若放在其他人不能進入的家目錄下（GitHub Actions 的 `/home/runner` 常是 `750`），套件會對沿途目錄補上其他人的進入權（`chmod o+x`），不開放寫入，否則這兩個使用者連路徑都走不進去。
 - Windows 或 macOS：這兩個系統使用者通常建不起來。此時邊界改成 Codex `--sandbox read-only`，steward 行程留在沙盒外面。那是另一道控制，不是下面這道 Linux 擁有者邊界。這份套件的擁有者邊界是在 Ubuntu 24.04.5 LTS、Linux 6.12.94+ x86_64 上驗證的；GitHub Actions 的 `ubuntu-latest` 會再跑同一份 preflight。
 - Node.js 22 或更新。24 以上用 `--strip-types`，否則用 `--experimental-strip-types`。
@@ -47,11 +47,11 @@ bash research/paper-v2/prereg-v3-smoke/kit/seal.sh --publish-index
 | 指示 | 提示詞要求只能用 PATH 上的 `atm-write <file> <patch>`。退出碼 3 是 steward 拒絕：stdout 的 JSON 帶 `currentFileText` 與 `reasonCode`。代理要依那個檔案狀態重寫 diff，最多再送 3 次，每次都留下紀錄。重試後仍沒做完必須標成 BLOCKED，不能當成成功。 |
 | 強制（Linux） | 工作樹屬於 `prereg-steward`，模式是擁有者可寫、其他人唯讀。模型行程以 `prereg-session` 執行，不是擁有者，所以 `chmod` 改不回來，`mv` / 直接寫入也會失敗。session 沒有 sudo。寫入只走一支由 steward 身份聽的 Unix socket；`atm-write` 把 patch 送過去，steward 再呼叫公開 CLI。socket 目錄不是 session 可寫的，不能被換掉。 |
 | 強制（Windows / macOS 退路） | 建不起系統使用者時，Codex Arm B 加上 `--sandbox read-only`。steward 在沙盒外。Arm A 仍是 `workspace-write`。 |
-| 強制 | `atm-write` 用 `readlink -f` 找到套件內的 `atm-write.mjs`。session 環境有 `PREREG_STEWARD_SOCK` 時它只當 socket 客戶端；steward 行程才呼叫公開 CLI 0.1.20 的 `broker compose` 與 `broker steward apply`。CLI 缺失或版本不是 0.1.20 時，Arm B 在工作階段開始前中止，沒有 claim 退路。 |
+| 強制 | `atm-write` 用 `readlink -f` 找到套件內的 `atm-write.mjs`。session 環境有 `PREREG_STEWARD_SOCK` 時它只當 socket 客戶端；steward 行程才呼叫公開 CLI 0.1.21 的 `broker steward apply-live`，一次一筆，不先算合併計畫。CLI 缺失或版本不是 0.1.21 時，Arm B 在工作階段開始前中止，沒有 claim 退路。 |
 | 強制 | Arm B 的 `PATH` 把 `git` 換成拒絕 `commit`、`add`、`apply`、`checkout`、`reset`、`merge`、`rebase`、`stash` 的 shim。直接 `git commit` 退出碼 86。 |
 | 隔離 | 工作階段以 `env -i` 與允許清單啟動。`PREREG_GOLD_PATCH`、`GOLD_ROOT` 與金標檔路徑不會進入環境或 workspace。金標只在工作階段結束後由 `evaluate.py` 使用。 |
 | 偵測 | launcher 把工作階段的 unified diff 收成 `session/intended.patch`。缺少這份證據時 `evaluate.py` 以狀態 `evidence_missing` 非 0 退出，遺失修改數是 null，不會記成 0。Django 測試用 `--verbosity 2`，依每一列 `... ok` / `FAIL` / `ERROR` 計數。 |
-| 重疊 | 兩筆同時改到同一行時，公開 CLI 0.1.20 的 compose 判決是 `needs-steward`，steward apply 以 `steward-final-patch-required` 拒絕，不寫檔。這是 `rejected-by-design`。套件或 CLI 崩潰是 `kit-error`，整輪狀態是 `invalid`。拒絕後任務仍沒做完則是 `blocked`，不是成功。 |
+| 重疊 | 第一筆 base 相符的寫入立刻提交。後面的寫入若碰到已經提交的行，在寫檔之前拒絕，原因碼是 `overlapping-write-queued`，並帶回目前內容。工作階段依那個內容重寫後再送。不相交的寫入仍會套上。語意合併不保證。套件或 CLI 崩潰是 `kit-error`，整輪狀態是 `invalid`。拒絕後任務仍沒做完則是 `blocked`，不是成功。 |
 
 ## 在 #311 要回報的內容
 

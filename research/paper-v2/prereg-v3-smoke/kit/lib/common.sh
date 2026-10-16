@@ -3,9 +3,9 @@
 set -euo pipefail
 
 KIT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-PUBLIC_CLI_VERSION="0.1.20"
+PUBLIC_CLI_VERSION="0.1.21"
 PUBLIC_CLI_PACKAGE="@ai-atomic-framework/cli@${PUBLIC_CLI_VERSION}"
-# 安裝位置必須在這個 git workspace 外面，否則 npm 會連到倉庫內的 workspace 套件，而不是 registry 上的 0.1.20。
+# 安裝位置必須在這個 git workspace 外面，否則 npm 會連到倉庫內的 workspace 套件，而不是 registry 上的 0.1.21。
 # Linux 上還必須讓 prereg-steward 讀得到。使用者家目錄通常不可穿越，所以預設放在 /var/cache。
 STEWARD_USER="${PREREG_STEWARD_USER:-prereg-steward}"
 SESSION_USER="${PREREG_SESSION_USER:-prereg-session}"
@@ -99,9 +99,9 @@ default_public_cli_root() {
   if [ -n "${PREREG_ATM_CLI_ROOT:-}" ]; then
     printf '%s\n' "$PREREG_ATM_CLI_ROOT"
   elif linux_sudo_ok; then
-    printf '%s\n' /var/cache/prereg-v3-atm-cli-0.1.20
+    printf '%s\n' /var/cache/prereg-v3-atm-cli-0.1.21
   else
-    printf '%s\n' "${HOME}/.cache/prereg-v3-atm-cli-0.1.20"
+    printf '%s\n' "${HOME}/.cache/prereg-v3-atm-cli-0.1.21"
   fi
 }
 
@@ -154,7 +154,7 @@ publish_cli_tree() {
 seed_cli_from_local() {
   local root="$1"
   local candidate cache
-  for candidate in /tmp/atm-cli-0.1.20 "${HOME}/.cache/prereg-v3-atm-cli-0.1.20"; do
+  for candidate in /tmp/atm-cli-0.1.21 "${HOME}/.cache/prereg-v3-atm-cli-0.1.21"; do
     cache="$(cli_cache_path "$candidate")"
     if cli_is_public_0120 "$cache"; then
       mkdir -p "$root"
@@ -165,7 +165,7 @@ seed_cli_from_local() {
   return 1
 }
 
-# 只接受 npm 上的公開 0.1.20 CLI。倉庫內 frozen runner 與 TypeScript 直接載入都不是這條路徑。
+# 只接受 npm 上的公開 0.1.21 CLI。倉庫內 frozen runner 與 TypeScript 直接載入都不是這條路徑。
 resolve_public_cli() {
   local root cache
   root="$(default_public_cli_root)"
