@@ -156,16 +156,7 @@ if [ "$PUBLISH" -eq 1 ]; then
   fi
   if ! grep -q "prereg-v3-smoke/${DATE_STAMP}-${SUFFIX}" "$INDEX_FILE" 2>/dev/null; then
     mkdir -p "$(dirname "$INDEX_FILE")"
-    {
-      echo
-      echo "## prereg-v3 smoke ${DATE_STAMP}-${SUFFIX}"
-      echo
-      echo "> **smoke / exploratory, not results.** No win claim. Produced by \`kit/seal.sh --publish-index\`."
-      echo
-      echo "| Path | Label | Claim | Notes |"
-      echo "|---|---|---|---|"
-      echo "$ROW"
-    } >> "$INDEX_FILE"
+    printf '%s\n' "$ROW" >> "$INDEX_FILE"
   fi
 fi
 

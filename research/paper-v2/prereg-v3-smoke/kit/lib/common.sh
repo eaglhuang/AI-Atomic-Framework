@@ -276,26 +276,41 @@ require_public_cli() {
   printf '%s\n' "$cli"
 }
 
+# 正式 Arm B 與真實模型探測共用這一個寫入。先確認公開 CLI 正好是 0.1.21，再寫檔。
+# 確認失敗就中止，沒有 claim 退路。unix-user 必須在 own_worktree 之前呼叫：
+# 之後整棵工作樹屬於 steward，session 讀得到這份設定，但不能寫已追蹤檔。
+write_session_write_config() {
+  local work="$1"
+  local cli node_bin dest
+  [ -n "$work" ] || die "write_session_write_config 缺少工作樹。"
+  [ -n "${PREREG_BOUNDARY:-}" ] || die "write_session_write_config 需要已選定的 PREREG_BOUNDARY。"
+  case "$PREREG_BOUNDARY" in
+    unix-user|codex-landlock|bwrap-ro|codex-sandbox) ;;
+    *) die "PREREG_BOUNDARY 只能是 unix-user、codex-landlock、bwrap-ro 或 codex-sandbox。" ;;
+  esac
+  cli="$(require_public_cli)"
+  node_bin="$(dirname "$(command -v node)")"
+  dest="$work/.prereg-smoke/session-write.json"
+  mkdir -p "$(dirname "$dest")"
+  python3 - "$dest" "$work" "$cli" "$node_bin" "$PREREG_BOUNDARY" <<'PY'
+import json, sys
+dest, work, cli, node_bin, boundary = sys.argv[1:]
+payload = {
+    "writableRoot": work,
+    "cli": cli,
+    "cliVersion": "0.1.21",
+    "safePath": f"{node_bin}:/usr/bin:/bin",
+    "composeWindowMs": 4000,
+    "boundary": boundary,
+}
+open(dest, "w", encoding="utf-8").write(json.dumps(payload, indent=2) + "\n")
+PY
+}
+
 # Linux 有免密碼 sudo 時用兩個系統使用者。chmod a-w 可以由擁有者改回來，不能當邊界。
 # Linux 沒有 sudo 時改走 Codex sandbox 或 bubblewrap；兩者都不可用就中止，不退回未強制模式。
 # 非 Linux（Windows / macOS 開發機）沒有這兩個使用者時，改由 Codex --sandbox read-only 把模型關在沙盒裡，steward 留在沙盒外。
-ensure_prereg_users() {
-  if [ -n "${PREREG_BOUNDARY:-}" ]; then
-    case "$PREREG_BOUNDARY" in
-      unix-user|codex-landlock|bwrap-ro|codex-sandbox) return 0 ;;
-    esac
-  fi
-  if [ "$(uname -s)" != "Linux" ]; then
-    PREREG_BOUNDARY=codex-sandbox
-    export PREREG_BOUNDARY
-    return 0
-  fi
-  if ! linux_sudo_ok; then
-    if resolve_linux_sandbox_mechanism; then
-      return 0
-    fi
-    die "Linux 上沒有免密碼 sudo，而且 Codex sandbox 與 bubblewrap 都不可用。拒絕退回 chmod a-w，也拒絕沒有強制的模式。"
-  fi
+install_prereg_users() {
   local user home shell
   shell=/usr/sbin/nologin
   [ -x "$shell" ] || shell=/sbin/nologin
@@ -311,8 +326,63 @@ ensure_prereg_users() {
   if as_root -u "$SESSION_USER" -- sudo -n true >/dev/null 2>&1; then
     die "${SESSION_USER} 可以免密碼 sudo，擁有者邊界無效。"
   fi
+}
+
+ensure_prereg_users() {
+  if [ -n "${PREREG_BOUNDARY:-}" ]; then
+    case "$PREREG_BOUNDARY" in
+      unix-user)
+        install_prereg_users
+        return 0
+        ;;
+      codex-landlock|bwrap-ro|codex-sandbox)
+        return 0
+        ;;
+      *)
+        die "PREREG_BOUNDARY 只能是 unix-user、codex-landlock、bwrap-ro 或 codex-sandbox。"
+        ;;
+    esac
+  fi
+  if [ "$(uname -s)" != "Linux" ]; then
+    PREREG_BOUNDARY=codex-sandbox
+    export PREREG_BOUNDARY
+    return 0
+  fi
+  if ! linux_sudo_ok; then
+    if resolve_linux_sandbox_mechanism; then
+      return 0
+    fi
+    die "Linux 上沒有免密碼 sudo，而且 Codex sandbox 與 bubblewrap 都不可用。拒絕退回 chmod a-w，也拒絕沒有強制的模式。"
+  fi
+  install_prereg_users
   PREREG_BOUNDARY=unix-user
   export PREREG_BOUNDARY
+}
+
+# 正式執行與真實模型探測用同一個選擇。已設定的 PREREG_BOUNDARY 是覆寫，不再改挑別的模式。
+select_run_boundary() {
+  if [ -n "${PREREG_BOUNDARY:-}" ]; then
+    case "$PREREG_BOUNDARY" in
+      unix-user)
+        linux_sudo_ok || die "PREREG_BOUNDARY=unix-user 需要免密碼 sudo。"
+        ;;
+      codex-landlock)
+        codex_sandbox_ready || die "PREREG_BOUNDARY=codex-landlock 起不來。"
+        ;;
+      bwrap-ro)
+        bwrap_ready || die "PREREG_BOUNDARY=bwrap-ro 起不來。"
+        ;;
+      codex-sandbox)
+        ;;
+      *)
+        die "PREREG_BOUNDARY 只能是 unix-user、codex-landlock、bwrap-ro 或 codex-sandbox。"
+        ;;
+    esac
+    export PREREG_BOUNDARY
+    ensure_prereg_users
+    return 0
+  fi
+  ensure_prereg_users
 }
 
 # GitHub Actions 的 /home/runner 常常是 750。steward 與 session 不是擁有者，
@@ -339,6 +409,11 @@ ensure_other_can_reach() {
   done
 }
 
+# Codex 0.159.2 與 0.163.0 在 workspace-write 下保護工作目錄的 .git、.agents、.codex、.aws。
+# 0.163.0 的命令執行器啟動時會 mkdir .agents。工作樹屬於 steward 時這個 mkdir 得到
+# Permission denied，命令還沒跑就失敗。這三個目錄預先交給 session，.git 與已追蹤檔案不交。
+CODEX_SESSION_RUNTIME_DIRS=(.agents .codex .aws)
+
 # 工作樹改由 steward 擁有。目錄對其他人只有讀與進入，沒有寫，所以 session 不能寫、不能改名、也不能 chmod。
 own_worktree() {
   local work="$1"
@@ -348,6 +423,83 @@ own_worktree() {
   fi
   as_root chown -R "$STEWARD_USER" "$work"
   as_root chmod -R u+rwX,go+rX,go-w "$work"
+  prepare_session_codex_runtime_dirs "$work"
+}
+
+# 父目錄仍不可寫，所以 session 不能把這些目錄移走或刪掉。裡面可以寫，因為 Codex 要寫。
+# .git/info/exclude 讓它們不進 diff。評估另略過同一組路徑。
+prepare_session_codex_runtime_dirs() {
+  local work="$1"
+  local name exclude="$work/.git/info/exclude"
+  [ -d "$work/.git" ] || die "工作樹 ${work} 沒有 .git，不能排除 Codex 執行期目錄。"
+  as_root mkdir -p "$work/.git/info"
+  if [ ! -f "$exclude" ]; then
+    as_root touch "$exclude"
+  fi
+  for name in "${CODEX_SESSION_RUNTIME_DIRS[@]}"; do
+    as_root mkdir -p "$work/$name"
+    as_root chown "$SESSION_USER" "$work/$name"
+    as_root chmod 700 "$work/$name"
+    if ! as_root grep -qxF "${name}/" "$exclude"; then
+      printf '%s/\n' "$name" | as_root tee -a "$exclude" >/dev/null
+    fi
+  done
+  # exclude 是 root 寫的。整個 .git 還給 steward，避免 info 目錄落在 root 名下。
+  as_root chown -R "$STEWARD_USER" "$work/.git"
+}
+
+steward_socket_accepts() {
+  local sock="$1"
+  python3 - "$sock" <<'PY'
+import socket, sys
+sock = socket.socket(socket.AF_UNIX)
+sock.settimeout(0.5)
+try:
+    sock.connect(sys.argv[1])
+except OSError:
+    raise SystemExit(1)
+sock.close()
+PY
+}
+
+stop_steward_pid() {
+  local pid="${1:-}"
+  [ -n "$pid" ] || return 0
+  if [ "${PREREG_BOUNDARY:-}" = "unix-user" ]; then
+    as_root kill "$pid" >/dev/null 2>&1 || true
+  else
+    kill "$pid" >/dev/null 2>&1 || true
+  fi
+  wait "$pid" 2>/dev/null || true
+}
+
+remove_steward_socket() {
+  local sock="${1:-}"
+  [ -n "$sock" ] || return 0
+  if [ "${PREREG_BOUNDARY:-}" = "unix-user" ]; then
+    as_root rm -f -- "$sock" || true
+  else
+    rm -f -- "$sock" || true
+  fi
+}
+
+# 等到 socket 真的接受連線。只看到檔案存在不夠：listen 回呼之前連進去會失敗。
+wait_for_steward_accept() {
+  local sock="$1" pid="${2:-}"
+  local timeout="${PREREG_STEWARD_START_TIMEOUT:-30}"
+  local ticks=$((timeout * 5))
+  local i=0
+  while [ "$i" -lt "$ticks" ]; do
+    if steward_socket_accepts "$sock"; then
+      return 0
+    fi
+    if [ -n "$pid" ] && ! kill -0 "$pid" 2>/dev/null; then
+      return 1
+    fi
+    sleep 0.2
+    i=$((i + 1))
+  done
+  return 1
 }
 
 start_steward_daemon() {
@@ -388,27 +540,30 @@ start_steward_daemon() {
   if [ "${#sock}" -gt 100 ]; then
     die "steward socket 路徑長度 ${#sock} 超過 Unix 上限：${sock}"
   fi
+  local daemon_pid
   if [ "${PREREG_BOUNDARY}" = "unix-user" ]; then
     as_root -u "$STEWARD_USER" -- "$node_bin" "$KIT_ROOT/bin/steward-daemon.mjs" \
       --sock "$sock" --cwd "$work" --script "$KIT_ROOT/bin/atm-write.mjs" \
       >"$log" 2>&1 &
+    daemon_pid=$!
   else
     "$node_bin" "$KIT_ROOT/bin/steward-daemon.mjs" \
       --sock "$sock" --cwd "$work" --script "$KIT_ROOT/bin/atm-write.mjs" \
       >"$log" 2>&1 &
+    daemon_pid=$!
   fi
-  local i
-  for i in $(seq 1 50); do
-    if [ -S "$sock" ]; then
-      break
-    fi
-    sleep 0.1
-  done
-  if [ ! -S "$sock" ]; then
-    echo "steward daemon 沒有監聽 $sock" >&2
+  if ! wait_for_steward_accept "$sock" "$daemon_pid"; then
+    echo "steward daemon 沒有在 ${PREREG_STEWARD_START_TIMEOUT:-30}s 內接受連線 ${sock}" >&2
     cat "$log" >&2 || true
+    stop_steward_pid "$daemon_pid"
+    if [ -f "$work/.prereg-smoke/daemon.pid" ]; then
+      stop_steward_pid "$(cat "$work/.prereg-smoke/daemon.pid" 2>/dev/null || true)"
+    fi
+    remove_steward_socket "$sock"
     die "steward daemon 啟動失敗。"
   fi
+  PREREG_STEWARD_PID="$daemon_pid"
+  export PREREG_STEWARD_PID
   PREREG_STEWARD_SOCK="$sock"
   export PREREG_STEWARD_SOCK
 }
@@ -421,13 +576,12 @@ release_worktree() {
     local pid
     pid="$(cat "$pid_file" 2>/dev/null || true)"
     if [ -n "${pid:-}" ]; then
-      if [ "${PREREG_BOUNDARY:-}" = "unix-user" ]; then
-        as_root kill "$pid" >/dev/null 2>&1 || true
-      else
-        kill "$pid" >/dev/null 2>&1 || true
-      fi
-      sleep 0.2
+      stop_steward_pid "$pid"
     fi
+  fi
+  if [ -n "${PREREG_STEWARD_PID:-}" ]; then
+    stop_steward_pid "$PREREG_STEWARD_PID"
+    unset PREREG_STEWARD_PID
   fi
   if [ "${PREREG_BOUNDARY:-}" = "unix-user" ]; then
     as_root chown -R "$(id -u):$(id -g)" "$work" || true
@@ -498,10 +652,9 @@ pinned_codex_exec_args() {
     --ignore-rules
     -c 'approval_policy="never"'
   )
-  if [ "${PREREG_ARM:-}" = "B" ] && sandbox_boundary_active; then
-    # 外層 profile / bwrap 已經讓儲存庫唯讀，並允許連到 scratch 裡的 socket。
-    # 內層若再用 read-only，會把 Unix socket 一起關掉。workspace-write 加上 network
-    # 只讓模型的 shell 連得到 steward；寫入仍被外層沙盒拒絕。
+  if [ "${PREREG_ARM:-}" = "B" ] && { sandbox_boundary_active || [ "${PREREG_BOUNDARY:-}" = "unix-user" ]; }; then
+    # 外層沙盒或擁有者邊界讓儲存庫唯讀。內層若用 read-only，或 workspace-write
+    # 但沒開 network，Unix socket connect 會得到 EPERM。network 只放行 steward socket。
     dest+=(
       --sandbox workspace-write
       -c 'sandbox_workspace_write.network_access=true'
@@ -632,8 +785,11 @@ session_env_assignments() {
   local node_bin path_value
   node_bin="$(dirname "$(command -v node)")"
   path_value="${node_bin}:/usr/bin:/bin"
-  if [ -n "${PREREG_ARM_BIN:-}" ]; then
-    path_value="${PREREG_ARM_BIN}:${path_value}"
+  if [ "${PREREG_ARM:-}" = "B" ]; then
+    path_value="${KIT_ROOT}/bin:${path_value}"
+    if [ -n "${PREREG_ARM_BIN:-}" ]; then
+      path_value="${PREREG_ARM_BIN}:${path_value}"
+    fi
   fi
   if [ -z "${PREREG_SMOKE_CODEX:-}" ] && command -v codex >/dev/null 2>&1; then
     local codex_bin
@@ -697,9 +853,35 @@ capture_intended_patch() {
   local stdout="$session_dir/stdout.jsonl"
   [ -f "$stdout" ] || return 0
   python3 - "$session_dir" "$stdout" <<'PY'
-import pathlib, sys
+import json, pathlib, sys
 session = pathlib.Path(sys.argv[1])
-text = pathlib.Path(sys.argv[2]).read_text(encoding="utf-8", errors="replace")
+raw = pathlib.Path(sys.argv[2]).read_text(encoding="utf-8", errors="replace")
+
+def message_texts(line):
+    try:
+        obj = json.loads(line)
+    except json.JSONDecodeError:
+        return [line]
+    found = []
+    def walk(value):
+        if isinstance(value, dict):
+            kind = value.get("type")
+            text = value.get("text")
+            if kind in {"agent_message", "stub.intended_patch"} and isinstance(text, str):
+                found.append(text)
+            for child in value.values():
+                walk(child)
+        elif isinstance(value, list):
+            for child in value:
+                walk(child)
+    walk(obj)
+    return found
+
+chunks = []
+for line in raw.splitlines():
+    if line.strip():
+        chunks.extend(message_texts(line))
+text = "\n".join(chunks)
 begin = "BEGIN_INTENDED_PATCH\n"
 end = "\nEND_INTENDED_PATCH"
 if begin not in text:
@@ -735,6 +917,10 @@ launch_codex() {
     local node_bin
     node_bin="$(command -v node || true)"
     [ -n "$node_bin" ] && ensure_other_can_reach "$node_bin"
+    ensure_other_can_reach "$KIT_ROOT/bin/atm-write"
+    if [ -n "${PREREG_ARM_BIN:-}" ]; then
+      ensure_other_can_reach "$PREREG_ARM_BIN"
+    fi
   fi
   local start
   start="$(iso_now)"
@@ -757,7 +943,7 @@ launch_codex() {
       run_as_session "${env_cmd[@]}" node "$session_dir/agent.mjs" "$prompt_file" >"$stdout" 2>"$stderr"
     ) || status=$?
   else
-    command -v codex >/dev/null 2>&1 || die "codex 不在 PATH。請安裝 Codex CLI 0.159.2 並登入，或設定 PREREG_SMOKE_CODEX 使用 stub。"
+    command -v codex >/dev/null 2>&1 || die "codex 不在 PATH。請安裝 Codex CLI 0.159.2 或 0.163.0 並登入，或設定 PREREG_SMOKE_CODEX 使用 stub。"
     local help
     help="$(codex exec --help 2>&1 || true)"
     local -a args=()

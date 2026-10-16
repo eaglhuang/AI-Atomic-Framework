@@ -61,18 +61,7 @@ run_unix_user_probe() {
   mkdir -p "$root/.prereg-smoke" "$root/home"
   local node_bin patch log
   node_bin="$(dirname "$(command -v node)")"
-  python3 - "$root/.prereg-smoke/session-write.json" "$root" "$CLI" "$node_bin" <<'PY'
-import json, sys
-dest, work, cli, node_bin = sys.argv[1:]
-open(dest, "w", encoding="utf-8").write(json.dumps({
-    "writableRoot": work,
-    "cli": cli,
-    "cliVersion": "0.1.21",
-    "safePath": f"{node_bin}:/usr/bin:/bin",
-    "composeWindowMs": 200,
-    "boundary": "unix-user",
-}) + "\n")
-PY
+  write_session_write_config "$root"
   patch="$(mktemp)"
   cat > "$patch" <<'EOF'
 diff --git a/shared.py b/shared.py
@@ -91,7 +80,27 @@ EOF
   expect_fail direct-write as_root -u "$SESSION_USER" -- bash -c 'printf leaked >> "$1"' bash "$root/shared.py"
   expect_fail chmod as_root -u "$SESSION_USER" -- chmod u+w "$root/shared.py"
   expect_fail rename as_root -u "$SESSION_USER" -- mv "$root/shared.py" "$root/shared.py.moved"
+  expect_fail rm as_root -u "$SESSION_USER" -- rm -f "$root/shared.py"
   expect_fail sudo as_root -u "$SESSION_USER" -- sudo -n true
+  local runtime
+  for runtime in .agents .codex .aws; do
+    [ "$(stat -c %U "$root/$runtime")" = "$SESSION_USER" ]
+    [ "$(stat -c %a "$root/$runtime")" = "700" ]
+  done
+  [ "$(stat -c %U "$root/.git")" = "$STEWARD_USER" ]
+  as_root -u "$SESSION_USER" -- bash -c 'printf ok > "$1/.agents/probe"' bash "$root"
+  [ "$(as_root -u "$SESSION_USER" -- cat "$root/.agents/probe")" = "ok" ]
+  expect_fail mv-agents as_root -u "$SESSION_USER" -- mv "$root/.agents" "$root/agents-moved"
+  [ -d "$root/.agents" ]
+  [ ! -e "$root/agents-moved" ]
+  local status_out
+  status_out="$(as_root -u "$STEWARD_USER" -- git -C "$root" -c safe.directory='*' status --porcelain --untracked-files=all)"
+  if printf '%s\n' "$status_out" | grep -Eq '(^|[ /])\.(agents|codex|aws)(/|$)'; then
+    echo "Codex runtime dirs leaked into git status" >&2
+    printf '%s\n' "$status_out" >&2
+    exit 1
+  fi
+  as_root -u "$STEWARD_USER" -- git -C "$root" -c safe.directory='*' diff --exit-code >/dev/null
   [ -f "$root/shared.py" ]
   [ ! -e "$root/shared.py.moved" ]
   [ "$(stat -c %U "$root/shared.py")" = "$STEWARD_USER" ]
@@ -143,18 +152,7 @@ run_sandbox_probe() {
   mkdir -p "$SANDBOX_REPO/.prereg-smoke"
   local node_bin patch log
   node_bin="$(dirname "$(command -v node)")"
-  python3 - "$SANDBOX_REPO/.prereg-smoke/session-write.json" "$SANDBOX_REPO" "$CLI" "$node_bin" "$PREREG_BOUNDARY" <<'PY'
-import json, sys
-dest, work, cli, node_bin, boundary = sys.argv[1:]
-open(dest, "w", encoding="utf-8").write(json.dumps({
-    "writableRoot": work,
-    "cli": cli,
-    "cliVersion": "0.1.21",
-    "safePath": f"{node_bin}:/usr/bin:/bin",
-    "composeWindowMs": 200,
-    "boundary": boundary,
-}) + "\n")
-PY
+  write_session_write_config "$SANDBOX_REPO"
   patch="$scratch/beta.patch"
   cat > "$patch" <<'EOF'
 diff --git a/shared.py b/shared.py
@@ -262,7 +260,7 @@ PY
   SANDBOX_REPO=""
 }
 
-CLI="$(require_public_cli)"
+require_public_cli >/dev/null
 ensure_prereg_users
 SELECTED="$PREREG_BOUNDARY"
 
