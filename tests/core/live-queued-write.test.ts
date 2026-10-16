@@ -107,9 +107,10 @@ async function main() {
   const missingPlan = await runBroker(['steward', 'apply', '--cwd', cliRepo, '--proposal-file', 'proposal.json', '--scope-file', 'shared.py']).catch((error) => error);
   assert.match(String(missingPlan?.message ?? missingPlan), /merge-plan-file/);
   const live = await runBroker(['steward', 'apply-live', '--cwd', cliRepo, '--proposal-file', 'proposal.json', '--scope-file', 'shared.py']);
+  const liveEvidence = live.evidence as { planRequired?: boolean; liveWrites?: { decision?: string }[] };
   assert.equal(live.ok, true);
-  assert.equal(live.evidence.planRequired, false);
-  assert.equal(live.evidence.liveWrites[0].decision, 'accepted');
+  assert.equal(liveEvidence.planRequired, false);
+  assert.equal(liveEvidence.liveWrites?.[0]?.decision, 'accepted');
   assert.match(readFileSync(path.join(cliRepo, 'shared.py'), 'utf8'), /beta-cli/);
 
   const stress = await runStress();
@@ -121,7 +122,7 @@ function runStress() {
   const repo = makeRepo('seed\n');
   const workers = 4;
   const iterations = 50;
-  const children = [];
+  const children: Promise<{ status: number | null; stdout: string; stderr: string }>[] = [];
   for (let worker = 0; worker < workers; worker += 1) {
     const child = spawn(process.execPath, [...process.execArgv, fileURLToPath(import.meta.url)], {
       env: {
@@ -132,7 +133,7 @@ function runStress() {
         LIVE_WRITE_ITERATIONS: String(iterations)
       }
     });
-    children.push(new Promise((resolve, reject) => {
+    children.push(new Promise<{ status: number | null; stdout: string; stderr: string }>((resolve, reject) => {
       let stdout = '';
       let stderr = '';
       child.stdout.on('data', (chunk) => { stdout += chunk; });
@@ -185,7 +186,7 @@ function runStressWorker(workerId: string, cwd: string) {
       }
       recomposes += 1;
       assert.equal(write?.decision, 'rejected-by-design', JSON.stringify(write));
-      assert.ok(write?.reasonCode === 'overlapping-write-queued' || write?.reasonCode === 'stale-base', write?.reasonCode);
+      assert.ok(write?.reasonCode === 'overlapping-write-queued' || write?.reasonCode === 'stale-base', String(write?.reasonCode ?? ''));
       assert.equal(write?.queued, true);
       assert.equal(typeof write?.currentFileText, 'string');
       text = write.currentFileText ?? text;
