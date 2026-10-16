@@ -38,31 +38,18 @@ cleanup_arm() {
 trap cleanup_arm EXIT
 
 if [ "$ARM" = "B" ]; then
-  CLI="$(require_public_cli)"
+  require_public_cli >/dev/null
   mkdir -p "$ARM_DIR/bin" "$WORK/.prereg-smoke"
   export PREREG_SANDBOX_REPO="$WORK"
   ln -sfn "$HERE/bin/atm-write" "$ARM_DIR/bin/atm-write"
   ln -sfn "$HERE/bin/git-shim" "$ARM_DIR/bin/git"
   export PREREG_ARM_BIN="$ARM_DIR/bin"
-  NODE_BIN="$(dirname "$(command -v node)")"
-  ensure_prereg_users
+  select_run_boundary
   if sandbox_boundary_active; then
     allocate_sandbox_scratch >/dev/null
     ln -sfn "$PREREG_SANDBOX_SCRATCH" "$ARM_DIR/scratch"
   fi
-  python3 - "$WORK/.prereg-smoke/session-write.json" "$WORK" "$CLI" "$NODE_BIN" "$PREREG_BOUNDARY" <<'PY'
-import json, sys
-dest, work, cli, node_bin, boundary = sys.argv[1:]
-payload = {
-    "writableRoot": work,
-    "cli": cli,
-    "cliVersion": "0.1.21",
-    "safePath": f"{node_bin}:/usr/bin:/bin",
-    "composeWindowMs": 4000,
-    "boundary": boundary,
-}
-open(dest, "w", encoding="utf-8").write(json.dumps(payload, indent=2) + "\n")
-PY
+  write_session_write_config "$WORK"
   # 父目錄維持啟動者所有，session 不能把整個工作樹刪掉再換一棵自己的。
   chmod 755 "$ARM_DIR" "$ARM_DIR/bin"
   own_worktree "$WORK"
@@ -96,12 +83,12 @@ write_prompt() {
     if [ "$ARM" = "A" ]; then
       echo "Edit the repository files directly and commit your own fix with git."
     else
-      cat <<'EOF'
-Every file write and every git commit must go through the steward wrapper on PATH:
+      cat <<EOF
+Every file write and every git commit must go through this exact command:
 
-  atm-write <relative-file> <unified-diff-file>
+  ${HERE}/bin/atm-write <relative-file> <unified-diff-file>
 
-That command is the only writer. It calls the public ATM CLI 0.1.21 steward apply-live. If that CLI is unavailable, the arm has already aborted. Do not write the file yourself.
+That path is also on PATH as atm-write. It is the only writer. It calls the public ATM CLI 0.1.21 steward apply-live. If that CLI is unavailable, the arm has already aborted. Do not write the file yourself.
 
 If atm-write exits 3, the steward rejected this attempt. stdout is one JSON record with decision "rejected-by-design", reasonCode, and currentFileText (the file as it is now). Re-read that state, recompose the diff against it, and resubmit. You may retry at most 3 times. Record every attempt. If the task is still unfinished after those retries, report BLOCKED and do not claim success. A kit or CLI crash is not a rejection: do not paper over it.
 EOF

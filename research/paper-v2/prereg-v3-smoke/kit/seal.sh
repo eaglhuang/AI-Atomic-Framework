@@ -172,14 +172,13 @@ if [ "$PUBLISH" -eq 1 ]; then
   if [ ! -e "$INDEX_FILE" ]; then
     : > "$INDEX_FILE"
   fi
-  if grep -Fq -- "$ROW" "$INDEX_FILE"; then
-    die "index already contains this archive row: $INDEX_REL"
+  if ! grep -Fq -- "$ROW" "$INDEX_FILE"; then
+    # 檔尾沒有換行時先補一行，然後只追加這一列。同一列已在索引裡就不再加。
+    if [ -s "$INDEX_FILE" ] && [ -n "$(tail -c 1 "$INDEX_FILE")" ]; then
+      printf '\n' >> "$INDEX_FILE"
+    fi
+    printf '%s\n' "$ROW" >> "$INDEX_FILE"
   fi
-  # 檔尾沒有換行時先補一行，然後只追加這一列。
-  if [ -s "$INDEX_FILE" ] && [ -n "$(tail -c 1 "$INDEX_FILE")" ]; then
-    printf '\n' >> "$INDEX_FILE"
-  fi
-  printf '%s\n' "$ROW" >> "$INDEX_FILE"
 fi
 
 echo "sealed $DEST"
