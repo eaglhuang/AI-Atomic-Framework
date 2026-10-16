@@ -214,6 +214,161 @@ const result = submitLive({
 process.stdout.write(`${JSON.stringify(result.record)}\n`);
 process.exit(result.exitCode);
 
+function sha256Bytes(bytes) {
+  return `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
+}
+
+function gitBuffer(repo, args, safePath) {
+  return spawnSync('/usr/bin/git', args, {
+    cwd: repo,
+    env: { ...process.env, PATH: safePath, GIT_CONFIG_NOSYSTEM: '1' }
+  });
+}
+
+function parsePatchHunks(patch) {
+  const lines = patch.split(/\r?\n/);
+  if (lines.length > 0 && lines[lines.length - 1] === '') lines.pop();
+  const hunks = [];
+  let current = null;
+  for (const line of lines) {
+    const header = /^@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@/.exec(line);
+    if (header) {
+      if (current) hunks.push(current);
+      current = { oldStart: Number(header[1]), lines: [] };
+      continue;
+    }
+    if (!current) continue;
+    if (line === '\\ No newline at end of file') {
+      current.uncertain = true;
+      continue;
+    }
+    if (line.startsWith(' ') || line.startsWith('-') || line.startsWith('+')) {
+      current.lines.push({ marker: line[0], text: line.slice(1) });
+      continue;
+    }
+    if (line === '') {
+      current.lines.push({ marker: ' ', text: '' });
+      continue;
+    }
+    hunks.push(current);
+    current = null;
+  }
+  if (current) hunks.push(current);
+  return hunks;
+}
+
+function sourceLines(before) {
+  const endsWithNewline = before.endsWith('\n');
+  if (before.length === 0) return [];
+  const lines = before.split(/\r?\n/);
+  if (endsWithNewline) lines.pop();
+  return lines;
+}
+
+function patchLineIndexes(patch) {
+  const covered = [];
+  const changed = [];
+  for (const hunk of parsePatchHunks(patch)) {
+    let cursor = hunk.oldStart <= 0 ? 0 : hunk.oldStart - 1;
+    for (const entry of hunk.lines) {
+      if (entry.marker === '+') {
+        changed.push(cursor);
+        continue;
+      }
+      covered.push(cursor);
+      if (entry.marker === '-') changed.push(cursor);
+      cursor += 1;
+    }
+  }
+  return { covered, changed };
+}
+
+function intersects(left, right) {
+  if (!left?.length || !right?.length) return false;
+  const set = new Set(left);
+  return right.some((value) => set.has(value));
+}
+
+/** true when the hunk context matches, false when it does not, null when the patch uses newline markers this check does not judge. */
+function patchApplicability(before, patch) {
+  const hunks = parsePatchHunks(patch);
+  if (hunks.length === 0) return true;
+  if (hunks.some((hunk) => hunk.uncertain)) return null;
+  const lines = sourceLines(before);
+  let cursor = 0;
+  for (const hunk of hunks) {
+    const start = hunk.oldStart <= 0 ? 0 : hunk.oldStart - 1;
+    if (start < cursor || start > lines.length) return false;
+    let index = start;
+    for (const entry of hunk.lines) {
+      if (entry.marker === '+') continue;
+      if (lines[index] !== entry.text) return false;
+      index += 1;
+    }
+    cursor = index;
+  }
+  return true;
+}
+
+function readJournal(repo) {
+  const file = path.join(repo, '.atm', 'runtime', 'live-write-journal.jsonl');
+  if (!existsSync(file)) return [];
+  const entries = [];
+  for (const line of readFileSync(file, 'utf8').split('\n')) {
+    if (!line.trim()) continue;
+    try {
+      entries.push(JSON.parse(line));
+    } catch {
+      // 壞掉的一列不能拿來判斷 base。
+    }
+  }
+  return entries;
+}
+
+function historicalFileHashes(repo, relativeFile, safePath) {
+  const listed = gitText(repo, ['rev-list', 'HEAD', '--', relativeFile], safePath);
+  if (listed.status !== 0) return [];
+  const found = [];
+  const seen = new Set();
+  for (const sha of listed.stdout.split('\n').map((item) => item.trim()).filter(Boolean)) {
+    const blob = gitBuffer(repo, ['cat-file', '-p', `${sha}:${relativeFile}`], safePath);
+    if (blob.status !== 0 || !blob.stdout) continue;
+    const hash = sha256Bytes(blob.stdout);
+    if (seen.has(hash)) continue;
+    seen.add(hash);
+    found.push({ hash, text: blob.stdout.toString('utf8') });
+  }
+  return found;
+}
+
+function normalizeHash(value) {
+  return String(value || '').replace(/^sha256:/, '');
+}
+
+/**
+ * 沒有 --base-file 時，模型是對著某一個已讀內容寫 diff。
+ * 內容仍是目前檔案就宣告目前雜湊。
+ * 內容對得上 journal 裡某個 base，而且行和那次提交重疊，就宣告那個 base，
+ * 讓公開 CLI 回 overlapping-write-queued 與目前內容。
+ * 對不上任何版本的 hunk 仍宣告目前雜湊，CLI 回 patch-context-mismatch。
+ */
+function chooseDeclaredBaseHash(input, liveBytes) {
+  const liveHash = sha256Bytes(liveBytes);
+  const applicability = patchApplicability(liveBytes.toString('utf8'), input.patch);
+  if (applicability !== false) return liveHash;
+  const lines = patchLineIndexes(input.patch);
+  const versions = historicalFileHashes(input.writableRoot, input.relativeFile, input.safePath);
+  const journal = readJournal(input.writableRoot).filter((entry) => entry.file === input.relativeFile);
+  for (const entry of journal.slice().reverse()) {
+    const version = versions.find((item) => normalizeHash(item.hash) === normalizeHash(entry.baseHash));
+    if (!version) continue;
+    if (patchApplicability(version.text, input.patch) !== true) continue;
+    const changed = Array.isArray(entry.changedLines) ? entry.changedLines : [];
+    if (intersects(changed, lines.covered) || intersects(changed, lines.changed)) return version.hash;
+  }
+  return liveHash;
+}
+
 function submitLive(input) {
   const head = gitText(input.writableRoot, ['rev-parse', 'HEAD'], input.safePath);
   if (head.status !== 0) fail('base', `無法讀取 HEAD：${head.stderr}`);
@@ -221,7 +376,9 @@ function submitLive(input) {
   const liveBytes = input.baseFile
     ? readFileSync(path.resolve(input.baseFile))
     : readFileSync(path.join(input.writableRoot, input.relativeFile));
-  const fileBeforeHash = `sha256:${createHash('sha256').update(liveBytes).digest('hex')}`;
+  const fileBeforeHash = input.baseFile
+    ? sha256Bytes(liveBytes)
+    : chooseDeclaredBaseHash(input, liveBytes);
   const proposalId = `prop-${input.actorId}-a${input.attempt}-${createHash('sha256').update(`${input.relativeFile}\n${input.patch}`).digest('hex').slice(0, 12)}`;
   const proposal = proposalDocument({ ...input, proposalId, baseCommit, fileBeforeHash });
   const inbox = path.join(input.writableRoot, '.prereg-smoke', 'inbox');

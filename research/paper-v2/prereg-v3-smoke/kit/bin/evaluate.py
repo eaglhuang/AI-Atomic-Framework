@@ -419,7 +419,11 @@ def group_summary(labels, tests):
 
 
 def observation_kit_error(parsed, fail_labels, pass_labels):
-    """零筆觀察、測試 patch 沒套上，或任一組分母完全沒被觀察到，都是 kit-error。空清單不是未觀察。"""
+    """零筆觀察、測試 patch 沒套上、任一 id 沒被觀察到，或分母是 0，都是 kit-error。
+
+    空的 FAIL_TO_PASS 與 PASS_TO_PASS 不是未觀察。有 id 卻對不出 Django label，
+    呼叫端要先把 kitError 設成 test-id-unmapped，分數維持 null，不能記成 0/0。
+    """
     if parsed.get("kitError"):
         return parsed["kitError"]
     if parsed.get("testPatchApplied") is False:
@@ -435,8 +439,10 @@ def observation_kit_error(parsed, fail_labels, pass_labels):
         if not labels:
             continue
         summary = group_summary(labels, tests)
-        if summary["denominator"] and summary["passed"] == 0 and summary["failed"] == 0:
+        if summary["denominator"] == 0 or summary["notSeen"] == summary["denominator"]:
             return "denominator-unobserved"
+        if summary["notSeen"]:
+            return "tests-unobserved"
     return None
 
 
@@ -533,12 +539,35 @@ def apply_gold_test_patch(clone, test_patch):
     )
 
 
-def select_django_labels(labels):
+def test_id_map(tasks):
+    """Docstring ids normalize to Django labels. This is id normalization, not a test-content deviation."""
+    block = tasks.get("testIdNormalization") or {}
+    raw = block.get("map") or {}
+    return {str(key): str(value) for key, value in raw.items()}
+
+
+def resolve_test_ids(labels, id_map):
+    """Return (django_labels, unresolved_ids).
+
+    `test_x (module.Class)` becomes `module.Class.test_x`. A docstring id uses the
+    normalization map. Anything else is unresolved and must not be dropped into a 0 denominator.
+    """
     mapped = []
+    unresolved = []
     for label in labels or []:
-        if " (" in label or str(label).startswith("test_"):
-            match = re.match(r"(.+) \((.+)\)", label)
-            mapped.append(f"{match.group(2)}.{match.group(1)}" if match else label)
+        text = str(label)
+        if " (" in text or text.startswith("test_"):
+            match = re.match(r"(.+) \((.+)\)", text)
+            mapped.append(f"{match.group(2)}.{match.group(1)}" if match else text)
+        elif text in id_map:
+            mapped.append(id_map[text])
+        else:
+            unresolved.append(text)
+    return mapped, unresolved
+
+
+def select_django_labels(labels, id_map=None):
+    mapped, _unresolved = resolve_test_ids(labels, id_map or {})
     return mapped
 
 
@@ -562,25 +591,31 @@ def run_tests(work, tasks, env, arm_score):
             results.append(apply_observation_policy(parsed, instance["FAIL_TO_PASS"], instance["PASS_TO_PASS"]))
         return results
     gold_root = Path(env["KIT_ROOT"])
+    id_map = test_id_map(tasks)
     for instance in tasks["primary"]["instances"]:
-        fail_labels = select_django_labels(instance["FAIL_TO_PASS"])
-        pass_labels = select_django_labels(instance["PASS_TO_PASS"])
+        fail_labels, fail_missing = resolve_test_ids(instance["FAIL_TO_PASS"], id_map)
+        pass_labels, pass_missing = resolve_test_ids(instance["PASS_TO_PASS"], id_map)
+        missing = fail_missing + pass_missing
         mapped = fail_labels + pass_labels
-        if (instance["FAIL_TO_PASS"] or instance["PASS_TO_PASS"]) and not mapped:
+        if missing:
             parsed = {
                 "instanceId": instance["instanceId"],
-                "note": "FAIL_TO_PASS is not a Django test id; see tasks.json",
+                "kitError": "test-id-unmapped",
+                "note": "FAIL_TO_PASS or PASS_TO_PASS id has no Django label",
+                "unmappedTestIds": missing,
                 "tests": [],
                 "exitCode": None,
             }
-            results.append(apply_observation_policy(parsed, instance["FAIL_TO_PASS"], instance["PASS_TO_PASS"]))
+            results.append(apply_observation_policy(parsed, fail_labels, pass_labels))
             continue
         if not mapped:
-            results.append({
+            parsed = {
                 "instanceId": instance["instanceId"],
-                "note": "FAIL_TO_PASS is not a Django test id; see tasks.json",
+                "note": "no Django test ids in FAIL_TO_PASS or PASS_TO_PASS",
                 "tests": [],
-            })
+                "exitCode": None,
+            }
+            results.append(apply_observation_policy(parsed, [], []))
             continue
         with tempfile.TemporaryDirectory() as scratch:
             clone = Path(scratch) / "tree"
@@ -659,10 +694,23 @@ def _status_name(raw):
 def parse_verbosity2_results(output):
     """Django 3.2 --verbosity 2 prints the test id, then an optional docstring, then '... ok'.
     The docstring can sit on its own line, and a system-check line can push 'ok' onto the next line.
+    A docstring line is recorded under its own text so a SWE-bench docstring id matches the same result.
     Failures are also summarized as 'FAIL: test_x (module.Class)' / 'ERROR: ...'.
     """
     found = {}
     pending = None
+    pending_docs = []
+
+    def take(status):
+        nonlocal pending, pending_docs
+        if pending:
+            found[pending] = status
+        for doc in pending_docs:
+            if doc:
+                found[doc] = status
+        pending = None
+        pending_docs = []
+
     # verbosity 1 prints dots plus a FAIL: summary. That summary alone is not a verbosity-2 result.
     verbose = re.search(rf"\.\.\. (?:{STATUS_WORD})\b", output) is not None or re.search(r"(?m)^test_\S+ \(.+\)$", output) is not None
     for raw_line in output.splitlines():
@@ -673,6 +721,7 @@ def parse_verbosity2_results(output):
             found[fail.group("head").strip()] = "fail"
             if pending == fail.group("head").strip():
                 pending = None
+                pending_docs = []
             continue
         inline = RESULT_LINE.match(stripped)
         if inline:
@@ -681,20 +730,22 @@ def parse_verbosity2_results(output):
             if DJANGO_TEST.match(head):
                 found[head] = status
                 pending = None
+                pending_docs = []
             else:
-                if pending:
-                    found[pending] = status
                 if head:
-                    found[head] = status
-                pending = None
+                    pending_docs.append(head)
+                take(status)
             continue
         only = STATUS_ONLY.match(stripped)
         if only and pending:
-            found[pending] = _status_name(only.group(1))
-            pending = None
+            take(_status_name(only.group(1)))
             continue
         if DJANGO_TEST.match(stripped):
             pending = stripped
+            pending_docs = []
+            continue
+        if pending and stripped:
+            pending_docs.append(stripped)
     return found
 
 

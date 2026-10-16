@@ -74,6 +74,33 @@ def test_policy_nulls_unobserved_denominators():
     assert empty_scored["kitError"] is None, empty_scored
     assert empty_scored["failToPass"]["denominator"] == 0
 
+    mixed = {
+        "tests": [
+            {"label": "f2p.one", "status": "pass"},
+            {"label": "f2p.two", "status": "not-seen"},
+        ],
+        "passed": 1,
+        "failed": 0,
+        "notSeen": 1,
+    }
+    mixed_scored = evaluate.apply_observation_policy(mixed, ["f2p.one", "f2p.two"], [])
+    assert mixed_scored["kitError"] == "tests-unobserved", mixed_scored
+    assert mixed_scored["failToPass"]["denominator"] is None
+    assert mixed_scored["passed"] is None
+
+    unmapped = {
+        "kitError": "test-id-unmapped",
+        "tests": [],
+        "passed": 0,
+        "failed": 0,
+        "notSeen": 0,
+    }
+    unmapped_scored = evaluate.apply_observation_policy(unmapped, [], ["migrations.test_loader.LoaderTests.test_apply"])
+    assert unmapped_scored["kitError"] == "test-id-unmapped", unmapped_scored
+    assert unmapped_scored["failToPass"]["denominator"] is None
+    assert unmapped_scored["passToPass"]["denominator"] is None
+    assert unmapped_scored["passed"] is None
+
 
 def run_evaluate(root, env_text):
     (root / "env.sh").write_text(env_text, encoding="utf-8")
@@ -321,11 +348,111 @@ def test_model_test_edits_reset_before_gold_patch():
     assert "--parallel" in argv and "1" in argv.split(), argv
 
 
+def test_unmapped_id_invalidates_blocked_arm():
+    """未對到的 docstring 讓分數變 null。未完成的 steward 拒絕不能把整輪留在 blocked。"""
+    root = Path(tempfile.mkdtemp())
+    template = root / "template"
+    template.mkdir()
+    (template / "shared.py").write_text("alpha\n", encoding="utf-8")
+    git(template, "init", "-q")
+    git(template, "add", "shared.py")
+    git(template, "-c", "user.name=prereg", "-c", "user.email=prereg@localhost", "commit", "-q", "-m", "base")
+    base = subprocess.run(["/usr/bin/git", "-C", str(template), "rev-parse", "HEAD"], check=True, text=True, capture_output=True).stdout.strip()
+    tasks = {
+        "primary": {
+            "instances": [
+                {
+                    "instanceId": "django__django-11141",
+                    "problemStatement": "Allow migrations directories without __init__.py",
+                    "FAIL_TO_PASS": ["Migration directories without an __init__.py file are loaded."],
+                    "PASS_TO_PASS": ["test_apply (migrations.test_loader.LoaderTests)"],
+                },
+                {
+                    "instanceId": "django__django-13820",
+                    "problemStatement": "Permit migrations in non-namespace packages",
+                    "FAIL_TO_PASS": [],
+                    "PASS_TO_PASS": [],
+                },
+            ]
+        }
+    }
+    (root / "tasks.json").write_text(json.dumps(tasks), encoding="utf-8")
+    patch = (
+        "diff --git a/shared.py b/shared.py\n"
+        "--- a/shared.py\n"
+        "+++ b/shared.py\n"
+        "@@ -1 +1,2 @@\n"
+        " alpha\n"
+        "+beta-missing\n"
+    )
+    for name in ("arm-a", "arm-b"):
+        arm = root / name
+        work = arm / "work"
+        subprocess.run(["/usr/bin/git", "clone", "--quiet", str(template), str(work)], check=True)
+        for slot in (1, 2):
+            session = arm / f"session-{slot}"
+            session.mkdir(parents=True)
+            (session / "intended.patch").write_text(patch, encoding="utf-8")
+            (session / "prompt.txt").write_text(tasks["primary"]["instances"][slot - 1]["problemStatement"] + "\n", encoding="utf-8")
+            (session / "stdout.jsonl").write_text("{}\n", encoding="utf-8")
+            (session / "exit-code").write_text("0\n", encoding="utf-8")
+        (arm / "start-skew-ms").write_text("0\n", encoding="utf-8")
+    smoke = root / "arm-b" / "work" / ".prereg-smoke"
+    smoke.mkdir(parents=True)
+    rejection = {
+        "file": "shared.py",
+        "decision": "rejected-by-design",
+        "reasonCode": "patch-context-mismatch",
+        "terminal": "blocked",
+        "stopReason": "patch context mismatch",
+        "attempt": 1,
+    }
+    (smoke / "steward-writes.jsonl").write_text(json.dumps(rejection) + "\n", encoding="utf-8")
+    env = "\n".join([
+        f"export KIT_ROOT={root}",
+        f"export STATE_ROOT={root}",
+        f"export TEMPLATE={template}",
+        f"export TASKS_JSON={root / 'tasks.json'}",
+        f"export GOLD_ROOT={root}",
+        f"export COMMON_BASE={base}",
+        "export PREREG_SMOKE_MODE=django",
+        "export PREREG_PYTHON=python3",
+        "",
+    ])
+    code, payload = run_evaluate(root, env)
+    assert code == 4, (code, payload.get("status"))
+    assert payload["status"] == "invalid", payload["status"]
+    arm_b = payload["arms"]["B"]
+    assert arm_b["status"] == "invalid", arm_b["status"]
+    assert any(session["unfinishedEdits"] for session in arm_b["sessions"]), arm_b["sessions"]
+    observed = arm_b["tests"][0]
+    assert observed["kitError"] == "test-id-unmapped", observed
+    assert observed["unmappedTestIds"] == ["Migration directories without an __init__.py file are loaded."]
+    assert observed["passed"] is None
+    assert observed["failToPass"]["denominator"] is None
+    assert observed["failToPass"]["denominator"] != 0
+    index = root / "index.md"
+    index.write_text("# index\n", encoding="utf-8")
+    dest = root / "seal-out"
+    sealed = subprocess.run(
+        ["bash", str(KIT / "seal.sh"), "--index-file", str(index), "--dest", str(dest), "--publish-index"],
+        cwd=root,
+        text=True,
+        capture_output=True,
+        env={**os.environ, "PREREG_SMOKE_STATE": str(root), "PREREG_SMOKE_MODE": "django"},
+    )
+    assert sealed.returncode == 0, sealed.stderr[-500:]
+    row = index.read_text(encoding="utf-8")
+    assert "INVALID" in row, row
+    assert "test-id-unmapped" in row, row
+
+
 def main():
     test_policy_nulls_unobserved_denominators()
     test_zero_tests_invalidate_without_nulling_missing_arm()
     test_unapplied_patch_is_kit_error()
     test_model_test_edits_reset_before_gold_patch()
+    test_unmapped_id_invalidates_blocked_arm()
     print("observation kit-error ok")
 
 
