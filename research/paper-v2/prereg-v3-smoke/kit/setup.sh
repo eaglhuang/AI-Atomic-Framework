@@ -11,26 +11,6 @@ MODE="${PREREG_SMOKE_MODE:-django}"
 new_state_root
 mkdir -p "$STATE_ROOT"
 
-pick_python() {
-  if [ -n "${PREREG_PYTHON:-}" ] && [ -x "${PREREG_PYTHON:-}" ]; then
-    printf '%s\n' "$PREREG_PYTHON"
-    return
-  fi
-  local candidate
-  for candidate in python3.10 python3.9 python3.8; do
-    if command -v "$candidate" >/dev/null 2>&1; then
-      command -v "$candidate"
-      return
-    fi
-  done
-  if command -v uv >/dev/null 2>&1; then
-    uv python install 3.10
-    uv python find 3.10
-    return
-  fi
-  die "Django 3.2 needs CPython 3.8, 3.9, or 3.10. Set PREREG_PYTHON or install uv."
-}
-
 mkdir -p "$STATE_ROOT/template"
 
 git_author() {

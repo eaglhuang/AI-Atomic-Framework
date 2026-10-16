@@ -96,8 +96,15 @@ static_launchers() {
   grep -q 'kit-error' "$HERE/bin/evaluate.py"
   grep -q 'retries-exhausted' "$HERE/bin/stub-codex.mjs"
   grep -q 'install_task_repo_into_venv' "$HERE/setup.sh"
+  grep -q 'pick_python' "$HERE/setup.sh"
   grep -q 'django_venv_preflight' "$HERE/setup.sh"
   grep -q 'django_runner_failed' "$HERE/setup.sh"
+  grep -q 'ensure_setuptools_wheel' "$HERE/lib/django-venv.sh"
+  grep -q 'pick_python' "$HERE/test/test-setup-django-venv.sh"
+  if grep -q 'PREREG_PYTHON="$(command -v python3)"' "$HERE/test/test-setup-django-venv.sh"; then
+    echo "django venv 測試仍把 PREREG_PYTHON 指到系統 python3" >&2
+    return 1
+  fi
   grep -q 'def recompose_or_retry' "$HERE/bin/evaluate.py"
   grep -q 'test-patch-not-applied' "$HERE/bin/evaluate.py"
   grep -q 'tests-unobserved' "$HERE/bin/evaluate.py"
