@@ -13,23 +13,23 @@ import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { appendFileSync, existsSync, mkdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { hashContent } from './adapters/cas.ts';
+import { hashContent } from '../broker/adapters/cas.ts';
 import {
   canonicalCommitLockPath,
   defaultStewardCommitLockRoot
-} from './steward-commit-guard.ts';
+} from '../broker/steward-commit-guard.ts';
 import {
   acquireKernelAdvisoryLock,
   releaseKernelAdvisoryLock,
   StewardLockTimeoutError
-} from './steward-kernel-lock.ts';
-import type { PatchProposal } from './types.ts';
+} from '../broker/steward-kernel-lock.ts';
+import type { PatchProposal } from '../broker/types.ts';
 import {
   UnifiedPatchApplicationError,
   applyUnifiedPatch,
   hunkOldLineIndex,
   parseUnifiedPatchHunks
-} from './unified-patch.ts';
+} from '../broker/unified-patch.ts';
 
 export type LiveWriteDecision = 'accepted' | 'rejected-by-design' | 'kit-error';
 

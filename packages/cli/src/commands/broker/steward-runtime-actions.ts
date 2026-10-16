@@ -14,7 +14,7 @@ import {
 import { cleanupBrokerRuntimeSnapshots } from '../../../../core/src/broker/lifecycle.ts';
 import { calculateBrokerDecision } from '../../../../core/src/broker/decision.ts';
 import { composeBrokerProposals } from '../../../../core/src/broker/compose.ts';
-import { applyLiveQueuedWrites } from '../../../../core/src/broker/live-queued-write.ts';
+import { applyLiveQueuedWrites } from '../../../../core/src/live-write/live-queued-write.ts';
 import { applyStewardPlan, executeBrokerScopedWrite, planStewardApply } from '../../../../core/src/broker/steward.ts';
 import { buildTeamBrokerRuntimeActivationHandshake, buildTeamBrokerRunRecord, buildTeamBrokerRunRecordEnvelope, projectTeamBrokerRearbitrationSnapshot } from '../../../../core/src/broker/team-lane.ts';
 import { defaultBrokerProposalStoreRelativePath, findBrokerProposal, listBrokerProposalSummaries, loadBrokerProposalStore, readBrokerProposalFile, saveBrokerProposalStore, upsertBrokerProposalStore, validateBrokerProposal } from '../../../../core/src/broker/proposal.ts';

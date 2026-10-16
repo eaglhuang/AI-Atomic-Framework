@@ -5,7 +5,7 @@ import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { applyLiveQueuedWrites } from '../../packages/core/src/broker/live-queued-write.ts';
+import { applyLiveQueuedWrites } from '../../packages/core/src/live-write/live-queued-write.ts';
 import type { PatchProposal } from '../../packages/core/src/broker/types.ts';
 import { runBroker } from '../../packages/cli/src/commands/broker.ts';
 
