@@ -25,7 +25,7 @@ sandbox_boundary_active() {
 boundary_mechanism_line() {
   case "${PREREG_BOUNDARY:-}" in
     unix-user)
-      printf '%s\n' "mechanism=unix-user ${STEWARD_USER} owns the worktree; ${SESSION_USER} is not the owner and has no sudo"
+      printf '%s\n' "mechanism=unix-user ${STEWARD_USER} owns the worktree; ${SESSION_USER} is not the owner and has no sudo; codex exec uses --sandbox workspace-write and sandbox_workspace_write.network_access=true so the steward socket can connect"
       ;;
     codex-landlock)
       printf '%s\n' "mechanism=codex sandbox -P prereg-session -C <scratch> -- <cmd> (config profile extends :workspace, network enabled, no model call; repo is not a writable root; steward runs outside; socket is inside scratch)"
