@@ -45,7 +45,7 @@ if [ "$ARM" = "B" ]; then
   ln -sfn "$HERE/bin/git-shim" "$ARM_DIR/bin/git"
   export PREREG_ARM_BIN="$ARM_DIR/bin"
   NODE_BIN="$(dirname "$(command -v node)")"
-  ensure_prereg_users
+  select_run_boundary
   if sandbox_boundary_active; then
     allocate_sandbox_scratch >/dev/null
     ln -sfn "$PREREG_SANDBOX_SCRATCH" "$ARM_DIR/scratch"

@@ -21,6 +21,13 @@ def resolve_state():
 
 STATE = resolve_state()
 ENV = STATE / "env.sh"
+# Codex 0.159.2 and 0.163.0 reserve these workspace directories under workspace-write.
+# unix-user pre-creates them for the session. They are not task edits.
+CODEX_RUNTIME_DIRS = (".agents", ".codex", ".aws")
+
+
+def is_codex_runtime_path(path):
+    return any(part in CODEX_RUNTIME_DIRS for part in Path(path).parts)
 
 
 def read_env():
@@ -236,6 +243,8 @@ def score_arm(arm_name, arm_dir, tasks, base):
         rejected = session_rejected(rows, instance_id)
         unfinished = []
         for file, patch in parts.items():
+            if is_codex_runtime_path(file):
+                continue
             try:
                 base_text = git(work, "show", f"{base}:{file}").stdout
             except RuntimeError:
@@ -270,6 +279,8 @@ def score_arm(arm_name, arm_dir, tasks, base):
     corruption = []
     for path in work.rglob("*"):
         if not path.is_file() or ".git" in path.parts or "venv" in path.parts:
+            continue
+        if is_codex_runtime_path(path):
             continue
         if path.suffix not in {".py", ".txt", ".html"}:
             continue

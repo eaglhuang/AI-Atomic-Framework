@@ -95,6 +95,17 @@ static_launchers() {
   grep -q 'rejected-by-design' "$HERE/bin/evaluate.py"
   grep -q 'kit-error' "$HERE/bin/evaluate.py"
   grep -q 'retries-exhausted' "$HERE/bin/stub-codex.mjs"
+  grep -q 'prepare_session_codex_runtime_dirs' "$HERE/lib/common.sh"
+  grep -q 'select_run_boundary' "$HERE/lib/common.sh"
+  grep -q 'select_run_boundary' "$HERE/lib/run-arm.sh"
+  grep -q 'select_run_boundary' "$HERE/test/test-real-model.sh"
+  grep -q 'is_codex_runtime_path' "$HERE/bin/evaluate.py"
+  grep -q '0.163.0' "$HERE/RUNBOOK.md"
+  grep -q 'PREREG_BOUNDARY' "$HERE/RUNBOOK.md"
+  if grep -q 'each boundary mode' "$HERE/test/test-real-model.sh" "$HERE/RUNBOOK.md"; then
+    echo "真實模型探測仍會跑每一種邊界" >&2
+    return 1
+  fi
 }
 
 echo "== static"

@@ -1,6 +1,7 @@
 #!/bin/bash
 # 選擇性的真實模型探測。預設跳過，不呼叫 Codex。
-# PREFLIGHT_REAL_MODEL=1 時，每個可用邊界都跑一次很小的、與題目無關的 codex exec。
+# PREFLIGHT_REAL_MODEL=1 時，只對這一輪選到的邊界跑一次很小的、與題目無關的 codex exec。
+# PREREG_BOUNDARY 可以覆寫那個選擇。Arm A 一次，Arm B 用同一個模式一次。
 # Arm B 必須經 steward 把 atm-write 叫成功，capture 要從真實 stdout 抽出 patch。
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
@@ -8,7 +9,7 @@ HERE="$(cd "$(dirname "$0")/.." && pwd)"
 source "$HERE/lib/common.sh"
 
 if [ "${PREFLIGHT_REAL_MODEL:-}" != "1" ]; then
-  echo "skipped real-model: set PREFLIGHT_REAL_MODEL=1 to run a real codex exec in each boundary mode"
+  echo "skipped real-model: set PREFLIGHT_REAL_MODEL=1 to run a real codex exec in the selected boundary mode"
   exit 0
 fi
 
@@ -119,14 +120,12 @@ run_real_exec() {
   unset PREREG_SANDBOX_SCRATCH PREREG_SANDBOX_REPO PREREG_STEWARD_SOCK PREREG_STEWARD_PID || true
   export PREREG_ARM="$arm"
   if [ "$arm" = "B" ]; then
+    PREREG_BOUNDARY="$mode"
+    export PREREG_BOUNDARY
+    ensure_prereg_users
     if [ "$mode" = "unix-user" ]; then
-      unset PREREG_BOUNDARY || true
-      ensure_prereg_users
       [ "${PREREG_BOUNDARY}" = "unix-user" ]
       own_worktree "$repo"
-    else
-      PREREG_BOUNDARY="$mode"
-      export PREREG_BOUNDARY
     fi
     if sandbox_boundary_active; then
       allocate_sandbox_scratch >/dev/null
@@ -179,24 +178,10 @@ PY
   echo "real-model ok arm=${arm} mode=${mode:-none}"
 }
 
-modes=()
-if [ "$(uname -s)" != "Linux" ]; then
-  modes+=(codex-sandbox)
-else
-  if linux_sudo_ok; then
-    modes+=(unix-user)
-  fi
-  if codex_sandbox_ready; then
-    modes+=(codex-landlock)
-  fi
-  if bwrap_ready; then
-    modes+=(bwrap-ro)
-  fi
-fi
-[ "${#modes[@]}" -gt 0 ] || die "PREFLIGHT_REAL_MODEL=1 但沒有可用的邊界模式。"
-echo "real-model modes: ${modes[*]}"
+select_run_boundary
+SELECTED_BOUNDARY="${PREREG_BOUNDARY:-}"
+[ -n "$SELECTED_BOUNDARY" ] || die "PREFLIGHT_REAL_MODEL=1 但沒有選到邊界模式。"
+echo "real-model boundary=${SELECTED_BOUNDARY}"
 run_real_exec A ""
-for mode in "${modes[@]}"; do
-  run_real_exec B "$mode"
-done
+run_real_exec B "$SELECTED_BOUNDARY"
 echo "real-model ok"

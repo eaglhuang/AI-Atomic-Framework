@@ -279,23 +279,7 @@ require_public_cli() {
 # Linux 有免密碼 sudo 時用兩個系統使用者。chmod a-w 可以由擁有者改回來，不能當邊界。
 # Linux 沒有 sudo 時改走 Codex sandbox 或 bubblewrap；兩者都不可用就中止，不退回未強制模式。
 # 非 Linux（Windows / macOS 開發機）沒有這兩個使用者時，改由 Codex --sandbox read-only 把模型關在沙盒裡，steward 留在沙盒外。
-ensure_prereg_users() {
-  if [ -n "${PREREG_BOUNDARY:-}" ]; then
-    case "$PREREG_BOUNDARY" in
-      unix-user|codex-landlock|bwrap-ro|codex-sandbox) return 0 ;;
-    esac
-  fi
-  if [ "$(uname -s)" != "Linux" ]; then
-    PREREG_BOUNDARY=codex-sandbox
-    export PREREG_BOUNDARY
-    return 0
-  fi
-  if ! linux_sudo_ok; then
-    if resolve_linux_sandbox_mechanism; then
-      return 0
-    fi
-    die "Linux 上沒有免密碼 sudo，而且 Codex sandbox 與 bubblewrap 都不可用。拒絕退回 chmod a-w，也拒絕沒有強制的模式。"
-  fi
+install_prereg_users() {
   local user home shell
   shell=/usr/sbin/nologin
   [ -x "$shell" ] || shell=/sbin/nologin
@@ -311,8 +295,63 @@ ensure_prereg_users() {
   if as_root -u "$SESSION_USER" -- sudo -n true >/dev/null 2>&1; then
     die "${SESSION_USER} 可以免密碼 sudo，擁有者邊界無效。"
   fi
+}
+
+ensure_prereg_users() {
+  if [ -n "${PREREG_BOUNDARY:-}" ]; then
+    case "$PREREG_BOUNDARY" in
+      unix-user)
+        install_prereg_users
+        return 0
+        ;;
+      codex-landlock|bwrap-ro|codex-sandbox)
+        return 0
+        ;;
+      *)
+        die "PREREG_BOUNDARY 只能是 unix-user、codex-landlock、bwrap-ro 或 codex-sandbox。"
+        ;;
+    esac
+  fi
+  if [ "$(uname -s)" != "Linux" ]; then
+    PREREG_BOUNDARY=codex-sandbox
+    export PREREG_BOUNDARY
+    return 0
+  fi
+  if ! linux_sudo_ok; then
+    if resolve_linux_sandbox_mechanism; then
+      return 0
+    fi
+    die "Linux 上沒有免密碼 sudo，而且 Codex sandbox 與 bubblewrap 都不可用。拒絕退回 chmod a-w，也拒絕沒有強制的模式。"
+  fi
+  install_prereg_users
   PREREG_BOUNDARY=unix-user
   export PREREG_BOUNDARY
+}
+
+# 正式執行與真實模型探測用同一個選擇。已設定的 PREREG_BOUNDARY 是覆寫，不再改挑別的模式。
+select_run_boundary() {
+  if [ -n "${PREREG_BOUNDARY:-}" ]; then
+    case "$PREREG_BOUNDARY" in
+      unix-user)
+        linux_sudo_ok || die "PREREG_BOUNDARY=unix-user 需要免密碼 sudo。"
+        ;;
+      codex-landlock)
+        codex_sandbox_ready || die "PREREG_BOUNDARY=codex-landlock 起不來。"
+        ;;
+      bwrap-ro)
+        bwrap_ready || die "PREREG_BOUNDARY=bwrap-ro 起不來。"
+        ;;
+      codex-sandbox)
+        ;;
+      *)
+        die "PREREG_BOUNDARY 只能是 unix-user、codex-landlock、bwrap-ro 或 codex-sandbox。"
+        ;;
+    esac
+    export PREREG_BOUNDARY
+    ensure_prereg_users
+    return 0
+  fi
+  ensure_prereg_users
 }
 
 # GitHub Actions 的 /home/runner 常常是 750。steward 與 session 不是擁有者，
@@ -339,6 +378,11 @@ ensure_other_can_reach() {
   done
 }
 
+# Codex 0.159.2 與 0.163.0 在 workspace-write 下保護工作目錄的 .git、.agents、.codex、.aws。
+# 0.163.0 的命令執行器啟動時會 mkdir .agents。工作樹屬於 steward 時這個 mkdir 得到
+# Permission denied，命令還沒跑就失敗。這三個目錄預先交給 session，.git 與已追蹤檔案不交。
+CODEX_SESSION_RUNTIME_DIRS=(.agents .codex .aws)
+
 # 工作樹改由 steward 擁有。目錄對其他人只有讀與進入，沒有寫，所以 session 不能寫、不能改名、也不能 chmod。
 own_worktree() {
   local work="$1"
@@ -348,6 +392,29 @@ own_worktree() {
   fi
   as_root chown -R "$STEWARD_USER" "$work"
   as_root chmod -R u+rwX,go+rX,go-w "$work"
+  prepare_session_codex_runtime_dirs "$work"
+}
+
+# 父目錄仍不可寫，所以 session 不能把這些目錄移走或刪掉。裡面可以寫，因為 Codex 要寫。
+# .git/info/exclude 讓它們不進 diff。評估另略過同一組路徑。
+prepare_session_codex_runtime_dirs() {
+  local work="$1"
+  local name exclude="$work/.git/info/exclude"
+  [ -d "$work/.git" ] || die "工作樹 ${work} 沒有 .git，不能排除 Codex 執行期目錄。"
+  as_root mkdir -p "$work/.git/info"
+  if [ ! -f "$exclude" ]; then
+    as_root touch "$exclude"
+  fi
+  for name in "${CODEX_SESSION_RUNTIME_DIRS[@]}"; do
+    as_root mkdir -p "$work/$name"
+    as_root chown "$SESSION_USER" "$work/$name"
+    as_root chmod 700 "$work/$name"
+    if ! as_root grep -qxF "${name}/" "$exclude"; then
+      printf '%s/\n' "$name" | as_root tee -a "$exclude" >/dev/null
+    fi
+  done
+  # exclude 是 root 寫的。整個 .git 還給 steward，避免 info 目錄落在 root 名下。
+  as_root chown -R "$STEWARD_USER" "$work/.git"
 }
 
 steward_socket_accepts() {
@@ -845,7 +912,7 @@ launch_codex() {
       run_as_session "${env_cmd[@]}" node "$session_dir/agent.mjs" "$prompt_file" >"$stdout" 2>"$stderr"
     ) || status=$?
   else
-    command -v codex >/dev/null 2>&1 || die "codex 不在 PATH。請安裝 Codex CLI 0.159.2 並登入，或設定 PREREG_SMOKE_CODEX 使用 stub。"
+    command -v codex >/dev/null 2>&1 || die "codex 不在 PATH。請安裝 Codex CLI 0.159.2 或 0.163.0 並登入，或設定 PREREG_SMOKE_CODEX 使用 stub。"
     local help
     help="$(codex exec --help 2>&1 || true)"
     local -a args=()

@@ -1,6 +1,6 @@
 # prereg-v3 smoke 執行手冊
 
-這是探索性冒煙測試的一鍵套件，不是論文數據，也不宣稱 ATM 勝出。執行者先跑 preflight，再跑下面的指令。預設代理是使用者機器上的 Codex CLI 0.159.2。stub 乾跑與 CI 綠燈不是真實 A/B 結果。
+這是探索性冒煙測試的一鍵套件，不是論文數據，也不宣稱 ATM 勝出。執行者先跑 preflight，再跑下面的指令。預設代理是使用者機器上的 Codex CLI。支援的版本是 0.159.2 與 0.163.0。stub 乾跑與 CI 綠燈不是真實 A/B 結果。
 
 ## 先決條件
 
@@ -11,7 +11,7 @@
 - `node` 必須在 `PATH` 上，而且是 Node.js 22 或更新。24 以上用 `--strip-types`，否則用 `--experimental-strip-types`。
 - `git`、`jq`、`python3`。
 - Django 臂：CPython 3.8、3.9 或 3.10（Django 3.2 的支援範圍）。沒有時可先裝 `uv`，`setup.sh` 會叫 `uv python install 3.10`。SWE-bench 舊的 conda 環境寫的是 Python 3.6，這份套件不使用 3.6。
-- Codex CLI 0.159.2，已用免費 ChatGPT 登入，而且 `codex exec` 在非互動環境跑得起來。
+- Codex CLI 0.159.2 或 0.163.0，已用免費 ChatGPT 登入，而且 `codex exec` 在非互動環境跑得起來。這兩個版本在 `workspace-write` 下都會保護工作目錄裡的 `.git`、`.agents`、`.codex`、`.aws`。
 - 不要設付費 API 金鑰來繞過免費額度。
 
 ## 題目
@@ -20,7 +20,7 @@
 
 ## 指令（依序、各一次）
 
-在儲存庫根目錄。先跑 preflight；任何一項失敗就立刻停止，不繼續後面的檢查，也不要啟動真實 Codex。`PREFLIGHT_REAL_MODEL` 沒設成 `1` 時，preflight 會寫明跳過真實模型探測，不呼叫 Codex。設成 `1` 才會用已經登入的 ChatGPT，在每個這台機器跑得起來的邊界模式各跑一次很小的、與 Django 題目無關的 `codex exec`。Arm B 必須經 steward 把 `atm-write` 叫成功，而且 capture 要從那次真實 stdout 抽出 patch：
+在儲存庫根目錄。先跑 preflight；任何一項失敗就立刻停止，不繼續後面的檢查，也不要啟動真實 Codex。`PREFLIGHT_REAL_MODEL` 沒設成 `1` 時，preflight 會寫明跳過真實模型探測，不呼叫 Codex。設成 `1` 才會用已經登入的 ChatGPT，對這一輪實際選到的邊界模式跑一次很小的、與 Django 題目無關的 `codex exec`（Arm A 一次，Arm B 用同一個模式一次）。不會把每種可用模式都跑過。`PREREG_BOUNDARY` 可以覆寫自動選擇，只能是 `unix-user`、`codex-landlock`、`bwrap-ro` 或 `codex-sandbox`。沒設時與正式的 `run_arm_b.sh` 相同：有免密碼 sudo 的 Linux 用 `unix-user`，否則用 Codex sandbox，再不行用 bubblewrap。Arm B 必須經 steward 把 `atm-write` 叫成功，而且 capture 要從那次真實 stdout 抽出 patch：
 
 ```bash
 bash research/paper-v2/prereg-v3-smoke/kit/preflight.sh
@@ -46,7 +46,7 @@ bash research/paper-v2/prereg-v3-smoke/kit/seal.sh --publish-index
 | 層 | 行為 |
 |---|---|
 | 指示 | 提示詞要求只能用 PATH 上的 `atm-write <file> <patch>`。退出碼 3 是 steward 拒絕：stdout 的 JSON 帶 `currentFileText` 與 `reasonCode`。代理要依那個檔案狀態重寫 diff，最多再送 3 次，每次都留下紀錄。重試後仍沒做完必須標成 BLOCKED，不能當成成功。 |
-| 強制（Linux，有 sudo） | 工作樹屬於 `prereg-steward`，模式是擁有者可寫、其他人唯讀。模型行程以 `prereg-session` 執行，不是擁有者，所以 `chmod` 改不回來，`mv` / 直接寫入也會失敗。session 沒有 sudo。寫入只走一支由 steward 身份聽的 Unix socket；`atm-write` 把 patch 送過去，steward 再呼叫公開 CLI。socket 目錄不是 session 可寫的，不能被換掉。內層 `codex exec` 使用 `--sandbox workspace-write` 與 `sandbox_workspace_write.network_access=true`，否則 Unix socket `connect` 得到 EPERM。儲存庫唯讀仍由擁有者邊界強制，不靠 `--sandbox read-only`。session PATH 包含 `kit/bin`（`arm-b/bin` 的 git shim 仍排在前面）。提示詞寫的是 `kit/bin/atm-write` 的絕對路徑。 | |
+| 強制（Linux，有 sudo） | 工作樹屬於 `prereg-steward`，模式是擁有者可寫、其他人唯讀。模型行程以 `prereg-session` 執行，不是擁有者，所以 `chmod` 改不回來，`mv` / 直接寫入也會失敗。session 沒有 sudo。寫入只走一支由 steward 身份聽的 Unix socket；`atm-write` 把 patch 送過去，steward 再呼叫公開 CLI。socket 目錄不是 session 可寫的，不能被換掉。內層 `codex exec` 使用 `--sandbox workspace-write` 與 `sandbox_workspace_write.network_access=true`，否則 Unix socket `connect` 得到 EPERM。儲存庫唯讀仍由擁有者邊界強制，不靠 `--sandbox read-only`。session PATH 包含 `kit/bin`（`arm-b/bin` 的 git shim 仍排在前面）。提示詞寫的是 `kit/bin/atm-write` 的絕對路徑。Codex 0.163.0 的命令執行器在啟動時會於工作目錄建立 `.agents`；目錄屬於 steward 時這個 mkdir 得到 Permission denied，命令還沒跑就失敗。套件預先建立 `.agents`、`.codex`、`.aws`，擁有者是 `prereg-session`（mode 700），並寫進 `.git/info/exclude`。`.git` 與已追蹤檔案仍屬於 steward，所以直接寫入、`chmod`、`mv`、`rm` 仍然失敗。評估略過這三個目錄。 | |
 | 強制（Linux，沒有 sudo） | 邊界模式是 `codex-landlock` 或 `bwrap-ro`，寫進 `arm-b/boundary.txt`、`arm-b/meta.txt`、`session-write.json` 與 `results.json`。steward 在沙盒外，以一般使用者執行。Arm A 不套這層沙盒，只保留 `env -i` 的金標隔離。優先機制是 Codex CLI 自己的 sandbox，不呼叫模型：`CODEX_HOME` 指向一份暫時設定，內容是 `[permissions.prereg-session] extends = ":workspace"` 加上 `[permissions.prereg-session.network] enabled = true`，然後執行 `codex sandbox -P prereg-session -C <scratch> -- <cmd>`。`<scratch>` 是短目錄 `/tmp/prereg-sbx.*`（`arm-b/scratch` 只是指過去的符號連結）。工作樹 `arm-b/work` 不在 `/tmp`，也不在 scratch 裡面。Unix socket 路徑含結尾 NUL 不能超過 108，所以 socket 放在這個短 scratch，不放在 state 目錄裡。工作階段目錄另列成 filesystem write。profile 打開 network 之後，沙盒裡的行程才連得到那支 socket。真實的 `codex exec`（會呼叫模型的那一層）就是這個外層沙盒的子行程，和 preflight 探測用的是同一條 `codex sandbox -P prereg-session` 或同一條 bwrap。launcher 把旗標釘成 `--ignore-user-config --ignore-rules -c approval_policy="never"`，不讀使用者的 `config.toml`，也不加 `--full-auto` 或 `--dangerously-bypass-approvals-and-sandbox`。兩臂的 `codex exec` 都另外拿到一份可寫的 `CODEX_HOME`：只從 `~/.codex/auth.json` 複製 ChatGPT 登入檔（不複製 `config.toml`，內容不印出）。這個目錄在 `/tmp/prereg-sbx.*/codex-home.*`，Arm B 沙盒則放在 scratch 裡的 `codex-home.*`，mode 700。它不在 session 或 state 樹裡。`XDG_RUNTIME_DIR` 指向其中的 `runtime`，`tmp` 也在同一目錄。工作階段結束就刪掉。`--ignore-user-config` 不略過這個登入。外層沙盒用的 profile 目錄是另一個暫時的 `CODEX_HOME`，裡面沒有登入檔。preflight 在同一個沙盒裡確認登入檔讀得到、工作階段狀態寫得進去，而且不呼叫模型。`seal.sh` 只複製允許清單裡的日誌與 diff，不複製整個 session；封存前掃描登入檔名、token 欄位、JWT 形狀與金鑰前綴，對上就刪掉未完成的封存並中止。`--publish-index` 只在 `EVIDENCE_INDEX.md` 追加剛好一列，不為每一次執行另開小節。`capture_intended_patch` 先把 stdout.jsonl 的事件解析成文字，再找 `BEGIN_INTENDED_PATCH`；JSONL 裡的換行是跳脫字，不能在原始檔上直接搜尋。 |內層另釘 `--sandbox workspace-write` 與 `sandbox_workspace_write.network_access=true`，只為了讓模型的 shell 連得到 socket；儲存庫唯讀是外層沙盒在強制。模型若自己再加上 bypass、把 sandbox 改成 `danger-full-access`、或寫一份要求審批升級的設定，外層沙盒仍會讓寫入得到 `EROFS`。preflight 會把 launcher 實際組出來的整條命令和當下選到的模式對上。若 `codex sandbox` 起不來（例如沒有 bubblewrap），改用這個確實的指令：`bwrap --unshare-user --unshare-pid --die-with-parent --ro-bind / / --bind <scratch> <scratch> --bind <scratch>/daemon-bind /tmp/codex-daemon-<uid> --bind <session> <session> --ro-bind <repo> <repo> --dev /dev --proc /proc --cap-drop ALL -- <cmd>`。Codex 0.159.2 的 app-server socket 固定在 `/tmp/codex-daemon-<uid>`，必須是目前使用者擁有且 mode 0700；它不看 `XDG_RUNTIME_DIR` 或 `CODEX_HOME`。`--ro-bind / /` 會讓宿主上的那個目錄變成唯讀，既有目錄若不是 0700，內層 sandbox helper 會失敗。所以 bwrap 另外把 scratch 裡 mode 0700 的 `daemon-bind` 掛上去，沙盒裡看得到可寫的 0700 目錄。後面的 `--ro-bind <repo>` 蓋過前面的可寫掛載。不用單獨的 `unshare`：使用者命名空間裡的 root 可以把唯讀掛載 remount 成可寫。Codex 的 `:workspace` 仍把整個 `/tmp` 當成可寫根；bubblewrap 只放開 scratch、那個 socket 目錄與工作階段目錄。兩種機制都不讓 session 寫工作樹。 |
 | 強制（Windows / macOS 退路） | 建不起系統使用者時，Codex Arm B 加上 `--sandbox read-only`。steward 在沙盒外。Arm A 仍是 `workspace-write`。 |
 | 強制 | `atm-write` 用 `readlink -f` 找到套件內的 `atm-write.mjs`。session 環境有 `PREREG_STEWARD_SOCK` 時它只當 socket 客戶端；steward 行程才呼叫公開 CLI 0.1.21 的 `broker steward apply-live`，一次一筆，不先算合併計畫。CLI 缺失或版本不是 0.1.21 時，Arm B 在工作階段開始前中止，沒有 claim 退路。 |

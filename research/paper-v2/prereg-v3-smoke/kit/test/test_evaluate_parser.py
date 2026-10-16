@@ -43,6 +43,10 @@ def main():
     quiet = evaluate.parse_test_output("django__django-13820", LABELS, QUIET, 1)
     assert all(item["status"] == "not-seen" for item in quiet["tests"]), quiet
     assert quiet["passed"] == 0, quiet
+    assert evaluate.is_codex_runtime_path(".agents/skills/demo.md")
+    assert evaluate.is_codex_runtime_path(".codex/config.toml")
+    assert evaluate.is_codex_runtime_path(".aws/credentials")
+    assert not evaluate.is_codex_runtime_path("django/db/migrations/loader.py")
     print("parser fixture ok")
 
 

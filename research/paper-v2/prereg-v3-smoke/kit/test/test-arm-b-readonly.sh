@@ -91,7 +91,27 @@ EOF
   expect_fail direct-write as_root -u "$SESSION_USER" -- bash -c 'printf leaked >> "$1"' bash "$root/shared.py"
   expect_fail chmod as_root -u "$SESSION_USER" -- chmod u+w "$root/shared.py"
   expect_fail rename as_root -u "$SESSION_USER" -- mv "$root/shared.py" "$root/shared.py.moved"
+  expect_fail rm as_root -u "$SESSION_USER" -- rm -f "$root/shared.py"
   expect_fail sudo as_root -u "$SESSION_USER" -- sudo -n true
+  local runtime
+  for runtime in .agents .codex .aws; do
+    [ "$(stat -c %U "$root/$runtime")" = "$SESSION_USER" ]
+    [ "$(stat -c %a "$root/$runtime")" = "700" ]
+  done
+  [ "$(stat -c %U "$root/.git")" = "$STEWARD_USER" ]
+  as_root -u "$SESSION_USER" -- bash -c 'printf ok > "$1/.agents/probe"' bash "$root"
+  [ "$(as_root -u "$SESSION_USER" -- cat "$root/.agents/probe")" = "ok" ]
+  expect_fail mv-agents as_root -u "$SESSION_USER" -- mv "$root/.agents" "$root/agents-moved"
+  [ -d "$root/.agents" ]
+  [ ! -e "$root/agents-moved" ]
+  local status_out
+  status_out="$(as_root -u "$STEWARD_USER" -- git -C "$root" -c safe.directory='*' status --porcelain --untracked-files=all)"
+  if printf '%s\n' "$status_out" | grep -Eq '(^|[ /])\.(agents|codex|aws)(/|$)'; then
+    echo "Codex runtime dirs leaked into git status" >&2
+    printf '%s\n' "$status_out" >&2
+    exit 1
+  fi
+  as_root -u "$STEWARD_USER" -- git -C "$root" -c safe.directory='*' diff --exit-code >/dev/null
   [ -f "$root/shared.py" ]
   [ ! -e "$root/shared.py.moved" ]
   [ "$(stat -c %U "$root/shared.py")" = "$STEWARD_USER" ]
