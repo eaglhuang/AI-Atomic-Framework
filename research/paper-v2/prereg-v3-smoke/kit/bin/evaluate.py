@@ -453,34 +453,58 @@ def apply_observation_policy(parsed, fail_labels, pass_labels):
     return updated
 
 
-def test_patch_paths(patch_text):
-    paths = []
-    for match in re.finditer(r"^diff --git a/\S+ b/(\S+)", patch_text, flags=re.M):
+def test_patch_files(patch_text):
+    """Every path a test patch touches. created=True means the patch adds the file."""
+    files = []
+    seen = set()
+    for chunk in re.split(r"(?=^diff --git )", patch_text, flags=re.M):
+        match = re.match(r"diff --git a/\S+ b/(\S+)", chunk)
+        if not match:
+            continue
         path = match.group(1)
-        if path != "/dev/null" and path not in paths:
-            paths.append(path)
-    return paths
+        if path == "/dev/null" or path in seen:
+            continue
+        seen.add(path)
+        created = re.search(r"^new file mode |^--- /dev/null$", chunk, flags=re.M) is not None
+        files.append({"path": path, "created": created})
+    return files
+
+
+def test_patch_paths(patch_text):
+    return [item["path"] for item in test_patch_files(patch_text)]
 
 
 def discard_model_test_edits(clone, base, patch_text):
-    """Reset every file the gold test patch touches to base before apply, as SWE-bench does.
-    Model edits on those test files are discarded so git apply does not conflict.
+    """Reset every path the gold test patch touches before apply.
+
+    Files the patch modifies go back to base. Files the patch creates are deleted,
+    including when they already exist at base, so creation does not hit 'already exists'.
+    The final tree can contain both tasks' edits to shared files; each task is evaluated
+    on its own clone with only its own test patch. Returns paths whose pre-reset content
+    differed from base (model test edits that were discarded).
     """
     discarded = []
     clone = str(clone)
-    for path in test_patch_paths(patch_text):
+    for item in test_patch_files(patch_text):
+        path = item["path"]
+        target = Path(clone) / path
         diff = subprocess.run(
             ["/usr/bin/git", "-C", clone, "diff", "--quiet", str(base), "--", path],
             capture_output=True,
         )
         differed = diff.returncode != 0
+        if item["created"]:
+            if target.exists() or target.is_symlink():
+                target.unlink()
+            if differed:
+                discarded.append(path)
+            continue
         checkout = subprocess.run(
             ["/usr/bin/git", "-C", clone, "checkout", "--force", str(base), "--", path],
             text=True,
             capture_output=True,
         )
         if checkout.returncode != 0:
-            target = Path(clone) / path
             if target.exists() or target.is_symlink():
                 target.unlink()
                 differed = True
@@ -494,6 +518,28 @@ def discard_model_test_edits(clone, base, patch_text):
         if differed:
             discarded.append(path)
     return discarded
+
+
+def apply_gold_test_patch(clone, test_patch):
+    """Apply one task's test patch. git apply first; if the hunk's trailing context has
+    moved on this base, fall back to patch --fuzz=5 the way SWE-bench does.
+    """
+    applied = subprocess.run(
+        ["/usr/bin/git", "-C", str(clone), "apply", str(test_patch)],
+        text=True,
+        capture_output=True,
+    )
+    if applied.returncode == 0:
+        return applied
+    fuzz = subprocess.run(
+        ["patch", "--batch", "--forward", "--fuzz=5", "-p1", "-i", str(test_patch)],
+        cwd=str(clone),
+        text=True,
+        capture_output=True,
+    )
+    if fuzz.returncode == 0:
+        return fuzz
+    return applied
 
 
 def select_django_labels(labels):
@@ -565,7 +611,7 @@ def run_tests(work, tasks, env, arm_score):
             patch_text = test_patch.read_text(encoding="utf-8", errors="replace") if test_patch.is_file() else ""
             base_commit = env.get("COMMON_BASE")
             discarded = discard_model_test_edits(clone, base_commit, patch_text) if patch_text and base_commit else []
-            applied = subprocess.run(["/usr/bin/git", "-C", str(clone), "apply", str(test_patch)], text=True, capture_output=True)
+            applied = apply_gold_test_patch(clone, test_patch)
             env_run = os.environ.copy()
             env_run["PYTHONPATH"] = str(clone) + (os.pathsep + env_run["PYTHONPATH"] if env_run.get("PYTHONPATH") else "")
             proc = subprocess.run(
@@ -587,32 +633,79 @@ def run_tests(work, tasks, env, arm_score):
 
 RESULT_LINE = re.compile(
     r"^(?P<head>.*?)\s+\.\.\. (?P<status>ok|FAIL|ERROR|skipped|expected failure|unexpected success)\s*$",
-    re.M,
 )
+STATUS_WORD = r"ok|FAIL|ERROR|skipped|expected failure|unexpected success"
+STATUS_ONLY = re.compile(rf"^({STATUS_WORD})$")
+FAIL_HEADER = re.compile(r"^(?P<kind>FAIL|ERROR): (?P<head>.+)$")
+DJANGO_TEST = re.compile(r"^test_\S+ \(.+\)$")
+
+
+def _status_name(raw):
+    if raw == "ok":
+        return "pass"
+    if raw in {"FAIL", "ERROR", "unexpected success"}:
+        return "fail"
+    return "not-seen"
 
 
 def parse_verbosity2_results(output):
+    """Django 3.2 --verbosity 2 prints the test id, then an optional docstring, then '... ok'.
+    The docstring can sit on its own line, and a system-check line can push 'ok' onto the next line.
+    Failures are also summarized as 'FAIL: test_x (module.Class)' / 'ERROR: ...'.
+    """
     found = {}
-    for match in RESULT_LINE.finditer(output):
-        head = match.group("head").strip()
-        raw = match.group("status")
-        if raw == "ok":
-            status = "pass"
-        elif raw in {"FAIL", "ERROR", "unexpected success"}:
-            status = "fail"
-        else:
-            status = "not-seen"
-        found[head] = status
+    pending = None
+    # verbosity 1 prints dots plus a FAIL: summary. That summary alone is not a verbosity-2 result.
+    verbose = re.search(rf"\.\.\. (?:{STATUS_WORD})\b", output) is not None or re.search(r"(?m)^test_\S+ \(.+\)$", output) is not None
+    for raw_line in output.splitlines():
+        line = raw_line.rstrip()
+        stripped = line.strip()
+        fail = FAIL_HEADER.match(stripped)
+        if fail and verbose:
+            found[fail.group("head").strip()] = "fail"
+            if pending == fail.group("head").strip():
+                pending = None
+            continue
+        inline = RESULT_LINE.match(stripped)
+        if inline:
+            head = inline.group("head").strip()
+            status = _status_name(inline.group("status"))
+            if DJANGO_TEST.match(head):
+                found[head] = status
+                pending = None
+            else:
+                if pending:
+                    found[pending] = status
+                if head:
+                    found[head] = status
+                pending = None
+            continue
+        only = STATUS_ONLY.match(stripped)
+        if only and pending:
+            found[pending] = _status_name(only.group(1))
+            pending = None
+            continue
+        if DJANGO_TEST.match(stripped):
+            pending = stripped
     return found
 
 
 def match_test_status(label, found):
     if label in found:
         return found[label]
+    if " (" not in label and "." in label:
+        method = label.rsplit(".", 1)[-1]
+        cls = label[: -(len(method) + 1)]
+        direct = f"{method} ({cls})"
+        if direct in found:
+            return found[direct]
     short = label.split(".")[-1]
     method = label.split(" (", 1)[0]
     for head, status in found.items():
         if head == short or head.startswith(f"{method} (") or head.endswith(f"({method})"):
+            return status
+        dotted = re.match(r"(.+) \((.+)\)", head)
+        if dotted and label == f"{dotted.group(2)}.{dotted.group(1)}":
             return status
     return "not-seen"
 
@@ -627,7 +720,7 @@ def parse_test_output(instance_id, labels, output, returncode):
         "failed": sum(1 for test in tests if test["status"] == "fail"),
         "notSeen": sum(1 for test in tests if test["status"] == "not-seen"),
         "tests": tests,
-        "outputTail": output[-1200:],
+        "outputTail": output if len(output) <= 20000 else output[-20000:],
     }
 
 

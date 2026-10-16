@@ -1,0 +1,22 @@
+ plan (#29180). ... ok
+test_run_before (migrations.test_loader.LoaderTests)
+Makes sure the loader uses Migration.run_before. ... ok
+test_invalid (migrations.test_loader.PycLoaderTests)
+MigrationLoader reraises ImportErrors caused by "bad magic number" pyc ... ok
+test_valid (migrations.test_loader.PycLoaderTests)
+To support frozen environments, MigrationLoader loads .pyc migrations. ... ok
+
+======================================================================
+FAIL: test_load_empty_dir (migrations.test_loader.LoaderTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/tmp5o3dikck/tree/tests/migrations/test_loader.py", line 189, in test_load_empty_dir
+    self.assertIn(
+AssertionError: 'migrations' not found in {'staticfiles', 'messages'} : App missing __init__.py in migrations module not in unmigrated apps.
+
+----------------------------------------------------------------------
+Ran 18 tests in 0.065s
+
+FAILED (failures=1)
+Destroying test database for alias 'default' ('file:memorydb_default?mode=memory&cache=shared')...
+Destroying test database for alias 'other' ('file:memorydb_other?mode=memory&cache=shared')...
