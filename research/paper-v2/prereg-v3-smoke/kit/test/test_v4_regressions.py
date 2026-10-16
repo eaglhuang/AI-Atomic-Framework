@@ -95,11 +95,22 @@ def test_gold_patches_apply_to_v4_trees():
     for diff_name in ("arm-a.diff", "arm-b.diff"):
         for patch in GOLD:
             root, base = build_tree(diff_name)
-            bare = git(root, "apply", "--check", str(patch), check=False)
             text = patch.read_text(encoding="utf-8")
-            evaluate.discard_model_test_edits(root, base, text)
+            reset_paths, discarded = evaluate.discard_model_test_edits(root, base, text)
             applied = evaluate.apply_gold_test_patch(root, patch)
-            assert applied.returncode == 0, (diff_name, patch.name, applied.stderr, applied.stdout, bare.stderr)
+            assert applied.returncode == 0, (diff_name, patch.name, applied.stderr)
+            assert "tests/migrations/test_loader.py" in reset_paths, (diff_name, patch.name, reset_paths)
+            if diff_name == "arm-b.diff":
+                assert discarded == ["tests/migrations/test_loader.py"], (patch.name, discarded)
+            else:
+                assert discarded == [], (patch.name, discarded)
+            loaded = (root / "tests/migrations/test_loader.py").read_text(encoding="utf-8")
+            if patch.name.startswith("django__django-11141"):
+                assert loaded.count("def test_loading_namespace_package") == 1, patch.name
+                assert "are loaded" in loaded
+            else:
+                assert "def test_loading_package_without__file__" in loaded
+                assert "are ignored" in loaded
 
 
 def main():

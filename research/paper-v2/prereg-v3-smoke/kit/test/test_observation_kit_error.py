@@ -315,6 +315,7 @@ def test_model_test_edits_reset_before_gold_patch():
     assert observed["testPatchApplied"] is True, observed
     assert observed["modelTestEditsDiscarded"] is True, observed
     assert observed["discardedModelTestFiles"] == ["tests/migrations/test_loader.py"], observed
+    assert observed["resetTestPatchPaths"] == ["tests/migrations/test_loader.py"], observed
     assert observed["kitError"] is None, observed
     argv = argv_path.read_text(encoding="utf-8")
     assert "--parallel" in argv and "1" in argv.split(), argv

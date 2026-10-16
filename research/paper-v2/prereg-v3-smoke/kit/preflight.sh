@@ -106,7 +106,11 @@ static_launchers() {
   grep -q -- '--parallel", "1"' "$HERE/bin/evaluate.py"
   grep -q 'discard_model_test_edits' "$HERE/bin/evaluate.py"
   grep -q 'apply_gold_test_patch' "$HERE/bin/evaluate.py"
-  grep -q -- '--fuzz=5' "$HERE/bin/evaluate.py"
+  grep -q 'resetTestPatchPaths' "$HERE/bin/evaluate.py"
+  if grep -q -- '--fuzz=5' "$HERE/bin/evaluate.py" "$HERE/setup.sh"; then
+    echo "金標測試 patch 仍用 fuzz 套用" >&2
+    return 1
+  fi
   grep -q 'modelTestEditsDiscarded' "$HERE/bin/evaluate.py"
   grep -q 'def session_rejected' "$HERE/bin/evaluate.py"
   grep -q 'INVALID' "$HERE/seal.sh"

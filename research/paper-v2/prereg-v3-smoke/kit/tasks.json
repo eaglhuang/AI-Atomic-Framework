@@ -32,7 +32,7 @@
       "django__django-11141": "clean with offset. verbose: Hunk #1 succeeded at 88 (offset 4 lines); Hunk #2 succeeded at 95 (offset 4 lines).",
       "sequential": "Applying 13820 then 11141 fails: patch failed django/db/migrations/loader.py:84. Applying 11141 then 13820 also fails at loader.py:88.",
       "testPatch13820": "git apply --check clean",
-      "testPatch11141": "does not apply. tests/migrations/test_loader.py hunk context has moved, and tests/migrations/test_migrations_namespace_package/0001_initial.py already exists because PR 11141 is an ancestor of the common base. The code patch still changes loader.py.",
+      "testPatch11141": "The checked-in gold test patch is an exact git apply against the common base. The official SWE-bench hunk does not apply: its context assumed test_loading_namespace_package was absent and 0001_initial.py was a new file, but both already exist because PR 11141 is an ancestor. The retarget updates that existing test in place. 0001_initial.py already matches the official new-file bytes, so it is not in the patch.",
       "django__django-11141_stewardPort": "Official gold patch git-applies with a 4-line offset. The steward unified-patch applicator matches context exactly and rejects that offset. gold/django__django-11141.common-base.patch is git diff after the official apply on the common base. cmp confirms the resulting loader.py bytes match. Sessions should submit this retargeted diff, not the offset patch."
     },
     "overlapEvidence": {

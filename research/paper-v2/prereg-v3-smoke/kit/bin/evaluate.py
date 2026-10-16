@@ -475,14 +475,16 @@ def test_patch_paths(patch_text):
 
 
 def discard_model_test_edits(clone, base, patch_text):
-    """Reset every path the gold test patch touches before apply.
+    """Reset every path the gold test patch touches before an exact git apply.
 
     Files the patch modifies go back to base. Files the patch creates are deleted,
     including when they already exist at base, so creation does not hit 'already exists'.
     The final tree can contain both tasks' edits to shared files; each task is evaluated
-    on its own clone with only its own test patch. Returns paths whose pre-reset content
-    differed from base (model test edits that were discarded).
+    on its own clone with only its own test patch.
+    Returns (reset_paths, discarded_model_edits). reset_paths is every path restored or
+    deleted. discarded_model_edits is the subset whose pre-reset content differed from base.
     """
+    reset_paths = []
     discarded = []
     clone = str(clone)
     for item in test_patch_files(patch_text):
@@ -496,7 +498,8 @@ def discard_model_test_edits(clone, base, patch_text):
         if item["created"]:
             if target.exists() or target.is_symlink():
                 target.unlink()
-            if differed:
+                reset_paths.append(path)
+            if differed and path not in discarded:
                 discarded.append(path)
             continue
         checkout = subprocess.run(
@@ -515,31 +518,19 @@ def discard_model_test_edits(clone, base, patch_text):
                 ).returncode == 0
                 if existed:
                     raise RuntimeError(f"git checkout {base} -- {path} failed: {checkout.stderr}")
+        reset_paths.append(path)
         if differed:
             discarded.append(path)
-    return discarded
+    return reset_paths, discarded
 
 
 def apply_gold_test_patch(clone, test_patch):
-    """Apply one task's test patch. git apply first; if the hunk's trailing context has
-    moved on this base, fall back to patch --fuzz=5 the way SWE-bench does.
-    """
-    applied = subprocess.run(
+    """Apply one task's test patch with git apply only. A mismatch is a kit-error."""
+    return subprocess.run(
         ["/usr/bin/git", "-C", str(clone), "apply", str(test_patch)],
         text=True,
         capture_output=True,
     )
-    if applied.returncode == 0:
-        return applied
-    fuzz = subprocess.run(
-        ["patch", "--batch", "--forward", "--fuzz=5", "-p1", "-i", str(test_patch)],
-        cwd=str(clone),
-        text=True,
-        capture_output=True,
-    )
-    if fuzz.returncode == 0:
-        return fuzz
-    return applied
 
 
 def select_django_labels(labels):
@@ -610,8 +601,24 @@ def run_tests(work, tasks, env, arm_score):
             test_patch = gold_root / instance["testPatch"]
             patch_text = test_patch.read_text(encoding="utf-8", errors="replace") if test_patch.is_file() else ""
             base_commit = env.get("COMMON_BASE")
-            discarded = discard_model_test_edits(clone, base_commit, patch_text) if patch_text and base_commit else []
+            if patch_text and base_commit:
+                reset_paths, discarded = discard_model_test_edits(clone, base_commit, patch_text)
+            else:
+                reset_paths, discarded = [], []
             applied = apply_gold_test_patch(clone, test_patch)
+            if applied.returncode != 0:
+                parsed = {
+                    "instanceId": instance["instanceId"],
+                    "tests": [],
+                    "exitCode": applied.returncode,
+                    "testPatchApplied": False,
+                    "testPatchError": (applied.stderr or "")[-400:],
+                    "modelTestEditsDiscarded": bool(discarded),
+                    "discardedModelTestFiles": discarded,
+                    "resetTestPatchPaths": reset_paths,
+                }
+                results.append(apply_observation_policy(parsed, fail_labels, pass_labels))
+                continue
             env_run = os.environ.copy()
             env_run["PYTHONPATH"] = str(clone) + (os.pathsep + env_run["PYTHONPATH"] if env_run.get("PYTHONPATH") else "")
             proc = subprocess.run(
@@ -622,10 +629,11 @@ def run_tests(work, tasks, env, arm_score):
                 env=env_run,
             )
             parsed = parse_test_output(instance["instanceId"], mapped, proc.stdout + proc.stderr, proc.returncode)
-            parsed["testPatchApplied"] = applied.returncode == 0
-            parsed["testPatchError"] = None if applied.returncode == 0 else (applied.stderr or "")[-400:]
+            parsed["testPatchApplied"] = True
+            parsed["testPatchError"] = None
             parsed["modelTestEditsDiscarded"] = bool(discarded)
             parsed["discardedModelTestFiles"] = discarded
+            parsed["resetTestPatchPaths"] = reset_paths
             results.append(apply_observation_policy(parsed, fail_labels, pass_labels))
     arm_score["tests"] = results
     return results
