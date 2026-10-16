@@ -25,8 +25,8 @@ static_launchers() {
   grep -q 'readlink -f' "$HERE/bin/atm-write"
   grep -q 'evidence_missing' "$HERE/bin/evaluate.py"
   grep -q -- '--verbosity", "2"' "$HERE/bin/evaluate.py"
-  grep -q 'broker steward apply' "$HERE/bin/atm-write.mjs"
-  grep -q '0.1.20' "$HERE/bin/atm-write.mjs"
+  grep -q 'broker steward apply-live' "$HERE/bin/atm-write.mjs"
+  grep -q '0.1.21' "$HERE/bin/atm-write.mjs"
   if grep -nE 'packages/core/src|shared-compose-inbox' "$HERE/bin/atm-write.mjs"; then
     echo "atm-write 仍直接載入 TypeScript" >&2
     return 1

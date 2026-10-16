@@ -55,6 +55,7 @@ const nextLines = lines.lines.slice();
 nextLines[index] = value;
 const next = joinLines(nextLines, lines.endsWithNewline);
 const patch = singleLinePatch(file, index + 1, marker, value);
+const overlapHint = prompt.match(/Include the (\S+) line in the hunk/);
 writeFileSync(path.join(sessionDir, 'agent-output.diff'), patch);
 
 const events = [{ type: 'stub.session.started', at: started, instanceId, arm, slot }];
@@ -79,6 +80,11 @@ if (arm === 'A') {
   let attempt = 1;
   let live = original;
   let activePatch = patch;
+  if (overlapHint) {
+    waitUntilFileChanges(path.join(work, file), original, 20000);
+    const wide = overlappingPatch(file, lines.lines, overlapHint[1], marker, value);
+    if (wide) activePatch = wide;
+  }
   while (attempt <= maxRetries + 1) {
     const patchPath = path.join(sessionDir, `file-${file.replaceAll('/', '_')}.a${attempt}.patch`);
     const basePath = path.join(sessionDir, `base-${file.replaceAll('/', '_')}.a${attempt}`);
@@ -187,6 +193,39 @@ function rebuildPatch(text, marker, value, rel) {
   const index = lines.lines.indexOf(marker);
   if (index < 0) return { error: 'marker-missing' };
   return { patch: singleLinePatch(rel, index + 1, marker, value) };
+}
+
+function waitUntilFileChanges(filePath, baseline, timeoutMs) {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    try {
+      if (readFileSync(filePath, 'utf8') !== baseline) return;
+    } catch {
+      // 檔案暫時讀不到就再等。
+    }
+    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 50);
+  }
+}
+
+function overlappingPatch(rel, sourceLines, contextMarker, targetMarker, value) {
+  const contextIndex = sourceLines.indexOf(contextMarker);
+  const targetIndex = sourceLines.indexOf(targetMarker);
+  if (contextIndex < 0 || targetIndex <= contextIndex) return null;
+  const count = targetIndex - contextIndex + 1;
+  const body = [];
+  for (let cursor = contextIndex; cursor < targetIndex; cursor += 1) {
+    body.push(` ${sourceLines[cursor]}`);
+  }
+  body.push(`-${sourceLines[targetIndex]}`);
+  body.push(`+${value}`);
+  return [
+    `diff --git a/${rel} b/${rel}`,
+    `--- a/${rel}`,
+    `+++ b/${rel}`,
+    `@@ -${contextIndex + 1},${count} +${contextIndex + 1},${count} @@`,
+    ...body,
+    ''
+  ].join('\n');
 }
 
 function singleLinePatch(rel, lineNo, before, after) {

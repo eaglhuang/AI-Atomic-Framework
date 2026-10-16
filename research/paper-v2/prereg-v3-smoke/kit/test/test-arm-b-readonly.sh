@@ -35,7 +35,7 @@ dest, work, cli, node_bin = sys.argv[1:]
 open(dest, "w", encoding="utf-8").write(json.dumps({
     "writableRoot": work,
     "cli": cli,
-    "cliVersion": "0.1.20",
+    "cliVersion": "0.1.21",
     "safePath": f"{node_bin}:/usr/bin:/bin",
     "composeWindowMs": 200,
     "boundary": "steward-owner",
