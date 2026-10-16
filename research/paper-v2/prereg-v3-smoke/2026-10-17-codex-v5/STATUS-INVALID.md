@@ -1,0 +1,4 @@
+# STATUS: INVALID (kit-error, judged by executor) — do not cite
+Run 20261016T220842Z-3157728-17312, main b04e03d69 (#335 merged), unix-user, gpt-6-luna, medium. Kit reported status=blocked (Arm B blocked); this note overrides it to INVALID. Added after seal; not in SHA256SUMS.
+Kit-error: django__django-11141 FAIL_TO_PASS has denominator 0 in both arms. tasks.json lists the FAIL_TO_PASS id as the docstring "Migration directories without an __init__.py file are loaded." (test_loading_namespace_package); evaluation never maps it to a test label, so the one FAIL_TO_PASS test was not evaluated (18 labels evaluated, test_loading_namespace_package absent). Missing evidence must be null, not 0/0.
+The 11141 common-base test patch (sha256 c87a6bde…190d, DEVIATION D-11141-test-patch) was applied in both arms (testPatchApplied=true).
