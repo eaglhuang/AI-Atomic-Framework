@@ -4,22 +4,10 @@
 # PREREG_BOUNDARY 可以覆寫那個選擇。Arm A 一次，Arm B 用同一個模式一次。
 # Arm B 必須經 steward 把 atm-write 叫成功，capture 要從真實 stdout 抽出 patch。
 set -euo pipefail
-HERE="$(cd "$(dirname "$0")/.." && pwd)"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # shellcheck disable=SC1091
 source "$HERE/lib/common.sh"
 
-if [ "${PREFLIGHT_REAL_MODEL:-}" != "1" ]; then
-  echo "skipped real-model: set PREFLIGHT_REAL_MODEL=1 to run a real codex exec in the selected boundary mode"
-  exit 0
-fi
-
-command -v codex >/dev/null 2>&1 || die "PREFLIGHT_REAL_MODEL=1 但 codex 不在 PATH。"
-if ! codex login status >/dev/null 2>&1; then
-  die "PREFLIGHT_REAL_MODEL=1 但 codex 沒有登入。不印出 auth.json。"
-fi
-unset PREREG_SMOKE_CODEX || true
-
-CLEAN_DIRS=()
 cleanup_real() {
   local dir
   for dir in "${CLEAN_DIRS[@]:-}"; do
@@ -33,7 +21,6 @@ cleanup_real() {
     unset PREREG_STEWARD_PID || true
   fi
 }
-trap cleanup_real EXIT
 
 track_dir() {
   CLEAN_DIRS+=("$1")
@@ -74,6 +61,29 @@ prepare_probe_repo() {
   git -C "$repo" add note.txt
   git -C "$repo" -c user.name=prereg-smoke -c user.email=prereg-smoke@localhost commit -q -m base
   mkdir -p "$repo/.prereg-smoke"
+}
+
+# 與正式 Arm B 相同：公開 CLI 0.1.21 確認之後才寫 session-write.json，沒有 claim 退路。
+# unix-user 要等檔案寫完才 own_worktree，session 讀得到設定，但不能寫已追蹤檔。
+prepare_probe_arm_b() {
+  local repo="$1"
+  local mode="$2"
+  case "$mode" in
+    unix-user|codex-landlock|bwrap-ro) ;;
+    *) die "真實模型探測的 Arm B 邊界必須是 unix-user、codex-landlock 或 bwrap-ro。" ;;
+  esac
+  export PREREG_ARM=B
+  PREREG_BOUNDARY="$mode"
+  export PREREG_BOUNDARY
+  ensure_prereg_users
+  if [ "$mode" = "unix-user" ]; then
+    [ "${PREREG_BOUNDARY}" = "unix-user" ]
+  fi
+  require_public_cli >/dev/null
+  write_session_write_config "$repo"
+  if [ "$mode" = "unix-user" ]; then
+    own_worktree "$repo"
+  fi
 }
 
 wait_for_launch() {
@@ -120,19 +130,12 @@ run_real_exec() {
   unset PREREG_SANDBOX_SCRATCH PREREG_SANDBOX_REPO PREREG_STEWARD_SOCK PREREG_STEWARD_PID || true
   export PREREG_ARM="$arm"
   if [ "$arm" = "B" ]; then
-    PREREG_BOUNDARY="$mode"
-    export PREREG_BOUNDARY
-    ensure_prereg_users
-    if [ "$mode" = "unix-user" ]; then
-      [ "${PREREG_BOUNDARY}" = "unix-user" ]
-      own_worktree "$repo"
-    fi
+    prepare_probe_arm_b "$repo" "$mode"
     if sandbox_boundary_active; then
       allocate_sandbox_scratch >/dev/null
       PREREG_SANDBOX_REPO="$repo"
       export PREREG_SANDBOX_REPO
     fi
-    require_public_cli >/dev/null
     start_steward_daemon "$repo" "$session/steward.log"
   else
     unset PREREG_BOUNDARY || true
@@ -177,6 +180,24 @@ PY
   fi
   echo "real-model ok arm=${arm} mode=${mode:-none}"
 }
+
+if [ "${PREREG_PROBE_PREPARE_ONLY:-}" = "1" ]; then
+  return 0 2>/dev/null || exit 0
+fi
+
+if [ "${PREFLIGHT_REAL_MODEL:-}" != "1" ]; then
+  echo "skipped real-model: set PREFLIGHT_REAL_MODEL=1 to run a real codex exec in the selected boundary mode"
+  exit 0
+fi
+
+command -v codex >/dev/null 2>&1 || die "PREFLIGHT_REAL_MODEL=1 但 codex 不在 PATH。"
+if ! codex login status >/dev/null 2>&1; then
+  die "PREFLIGHT_REAL_MODEL=1 但 codex 沒有登入。不印出 auth.json。"
+fi
+unset PREREG_SMOKE_CODEX || true
+
+CLEAN_DIRS=()
+trap cleanup_real EXIT
 
 select_run_boundary
 SELECTED_BOUNDARY="${PREREG_BOUNDARY:-}"

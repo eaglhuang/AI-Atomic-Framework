@@ -61,18 +61,7 @@ run_unix_user_probe() {
   mkdir -p "$root/.prereg-smoke" "$root/home"
   local node_bin patch log
   node_bin="$(dirname "$(command -v node)")"
-  python3 - "$root/.prereg-smoke/session-write.json" "$root" "$CLI" "$node_bin" <<'PY'
-import json, sys
-dest, work, cli, node_bin = sys.argv[1:]
-open(dest, "w", encoding="utf-8").write(json.dumps({
-    "writableRoot": work,
-    "cli": cli,
-    "cliVersion": "0.1.21",
-    "safePath": f"{node_bin}:/usr/bin:/bin",
-    "composeWindowMs": 200,
-    "boundary": "unix-user",
-}) + "\n")
-PY
+  write_session_write_config "$root"
   patch="$(mktemp)"
   cat > "$patch" <<'EOF'
 diff --git a/shared.py b/shared.py
@@ -163,18 +152,7 @@ run_sandbox_probe() {
   mkdir -p "$SANDBOX_REPO/.prereg-smoke"
   local node_bin patch log
   node_bin="$(dirname "$(command -v node)")"
-  python3 - "$SANDBOX_REPO/.prereg-smoke/session-write.json" "$SANDBOX_REPO" "$CLI" "$node_bin" "$PREREG_BOUNDARY" <<'PY'
-import json, sys
-dest, work, cli, node_bin, boundary = sys.argv[1:]
-open(dest, "w", encoding="utf-8").write(json.dumps({
-    "writableRoot": work,
-    "cli": cli,
-    "cliVersion": "0.1.21",
-    "safePath": f"{node_bin}:/usr/bin:/bin",
-    "composeWindowMs": 200,
-    "boundary": boundary,
-}) + "\n")
-PY
+  write_session_write_config "$SANDBOX_REPO"
   patch="$scratch/beta.patch"
   cat > "$patch" <<'EOF'
 diff --git a/shared.py b/shared.py
@@ -282,7 +260,7 @@ PY
   SANDBOX_REPO=""
 }
 
-CLI="$(require_public_cli)"
+require_public_cli >/dev/null
 ensure_prereg_users
 SELECTED="$PREREG_BOUNDARY"
 

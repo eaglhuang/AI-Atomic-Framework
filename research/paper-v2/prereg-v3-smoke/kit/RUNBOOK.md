@@ -20,7 +20,7 @@
 
 ## 指令（依序、各一次）
 
-在儲存庫根目錄。先跑 preflight；任何一項失敗就立刻停止，不繼續後面的檢查，也不要啟動真實 Codex。`PREFLIGHT_REAL_MODEL` 沒設成 `1` 時，preflight 會寫明跳過真實模型探測，不呼叫 Codex。設成 `1` 才會用已經登入的 ChatGPT，對這一輪實際選到的邊界模式跑一次很小的、與 Django 題目無關的 `codex exec`（Arm A 一次，Arm B 用同一個模式一次）。不會把每種可用模式都跑過。`PREREG_BOUNDARY` 可以覆寫自動選擇，只能是 `unix-user`、`codex-landlock`、`bwrap-ro` 或 `codex-sandbox`。沒設時與正式的 `run_arm_b.sh` 相同：有免密碼 sudo 的 Linux 用 `unix-user`，否則用 Codex sandbox，再不行用 bubblewrap。Arm B 必須經 steward 把 `atm-write` 叫成功，而且 capture 要從那次真實 stdout 抽出 patch：
+在儲存庫根目錄。先跑 preflight；任何一項失敗就立刻停止，不繼續後面的檢查，也不要啟動真實 Codex。`PREFLIGHT_REAL_MODEL` 沒設成 `1` 時，preflight 會寫明跳過真實模型探測，不呼叫 Codex。設成 `1` 才會用已經登入的 ChatGPT，對這一輪實際選到的邊界模式跑一次很小的、與 Django 題目無關的 `codex exec`（Arm A 一次，Arm B 用同一個模式一次）。不會把每種可用模式都跑過。`PREREG_BOUNDARY` 可以覆寫自動選擇，只能是 `unix-user`、`codex-landlock`、`bwrap-ro` 或 `codex-sandbox`。沒設時與正式的 `run_arm_b.sh` 相同：有免密碼 sudo 的 Linux 用 `unix-user`，否則用 Codex sandbox，再不行用 bubblewrap。Arm B 的探測倉庫在確認公開 CLI 0.1.21 之後，呼叫與正式 Arm B 相同的 `write_session_write_config` 寫入 `.prereg-smoke/session-write.json`。沒有 claim 退路。`unix-user` 要等這份檔案寫完才把工作樹交給 steward，session 讀得到設定，但不能寫已追蹤檔。Arm B 必須經 steward 把 `atm-write` 叫成功，而且 capture 要從那次真實 stdout 抽出 patch：
 
 ```bash
 bash research/paper-v2/prereg-v3-smoke/kit/preflight.sh

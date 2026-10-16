@@ -276,6 +276,37 @@ require_public_cli() {
   printf '%s\n' "$cli"
 }
 
+# 正式 Arm B 與真實模型探測共用這一個寫入。先確認公開 CLI 正好是 0.1.21，再寫檔。
+# 確認失敗就中止，沒有 claim 退路。unix-user 必須在 own_worktree 之前呼叫：
+# 之後整棵工作樹屬於 steward，session 讀得到這份設定，但不能寫已追蹤檔。
+write_session_write_config() {
+  local work="$1"
+  local cli node_bin dest
+  [ -n "$work" ] || die "write_session_write_config 缺少工作樹。"
+  [ -n "${PREREG_BOUNDARY:-}" ] || die "write_session_write_config 需要已選定的 PREREG_BOUNDARY。"
+  case "$PREREG_BOUNDARY" in
+    unix-user|codex-landlock|bwrap-ro|codex-sandbox) ;;
+    *) die "PREREG_BOUNDARY 只能是 unix-user、codex-landlock、bwrap-ro 或 codex-sandbox。" ;;
+  esac
+  cli="$(require_public_cli)"
+  node_bin="$(dirname "$(command -v node)")"
+  dest="$work/.prereg-smoke/session-write.json"
+  mkdir -p "$(dirname "$dest")"
+  python3 - "$dest" "$work" "$cli" "$node_bin" "$PREREG_BOUNDARY" <<'PY'
+import json, sys
+dest, work, cli, node_bin, boundary = sys.argv[1:]
+payload = {
+    "writableRoot": work,
+    "cli": cli,
+    "cliVersion": "0.1.21",
+    "safePath": f"{node_bin}:/usr/bin:/bin",
+    "composeWindowMs": 4000,
+    "boundary": boundary,
+}
+open(dest, "w", encoding="utf-8").write(json.dumps(payload, indent=2) + "\n")
+PY
+}
+
 # Linux 有免密碼 sudo 時用兩個系統使用者。chmod a-w 可以由擁有者改回來，不能當邊界。
 # Linux 沒有 sudo 時改走 Codex sandbox 或 bubblewrap；兩者都不可用就中止，不退回未強制模式。
 # 非 Linux（Windows / macOS 開發機）沒有這兩個使用者時，改由 Codex --sandbox read-only 把模型關在沙盒裡，steward 留在沙盒外。
