@@ -648,10 +648,9 @@ def path_is_snapshot_skip(path):
     return any(part in SNAPSHOT_SKIP for part in Path(path).parts)
 
 
-def task_dirty_paths(work):
-    result = git(work, "status", "--porcelain", "--untracked-files=all", check=False)
+def parse_status_paths(stdout):
     paths = []
-    for line in result.stdout.splitlines():
+    for line in stdout.splitlines():
         if len(line) < 4:
             continue
         path = line[3:]
@@ -663,6 +662,13 @@ def task_dirty_paths(work):
     return paths
 
 
+def task_dirty_paths(work):
+    result = git(work, "status", "--porcelain", "--untracked-files=all", check=False)
+    if result.returncode != 0:
+        raise RuntimeError(f"evaluator snapshot failed: {result.stderr or result.stdout}")
+    return parse_status_paths(result.stdout)
+
+
 def blob_text(work, rev, file):
     result = git(work, "show", f"{rev}:{file}", check=False)
     if result.returncode != 0:
@@ -671,36 +677,40 @@ def blob_text(work, rev, file):
 
 
 def freeze_worktree_snapshot(work):
-    """把未提交與未追蹤的任務檔收成一個評估用 commit。乾淨的樹就用現在的 HEAD。
+    """把工作樹收成一個評估用 commit。乾淨的樹也做一個空 commit。
 
-    同一份 commit 接著給遺失修改、測試複本與 base..HEAD diff。收不進去就失敗，
-    不能退回仍停在共同 base 的 HEAD。
+    v7 Arm B 的任務檔已經在 steward HEAD 上，只有 .atm 與 .prereg-smoke 未追蹤。
+    舊邏輯因此不建立 commit，snapshotCreated 是 false，未完成的拒絕仍被記成 blocked。
+    那一次沒有留下評估快照。現在每次都寫 `prereg evaluator snapshot`。
+    git status 失敗、或 commit 寫不進 .git，都是失敗，不能假裝樹是乾淨的。
+    同一份 commit 接著給遺失修改、測試複本與 base..snapshot diff。
     """
     head = git(work, "rev-parse", "HEAD", check=False)
     if head.returncode != 0:
-        raise RuntimeError(f"evaluator snapshot failed: {head.stderr}")
+        raise RuntimeError(f"evaluator snapshot failed: {head.stderr or head.stdout}")
     before = head.stdout.strip()
-    if not task_dirty_paths(work):
-        return {"sha": before, "created": False}
-    add = git(work, "add", "-A", "--", ".", *SNAPSHOT_PATHSPEC, check=False)
-    if add.returncode != 0:
-        raise RuntimeError(f"evaluator snapshot failed: {add.stderr or add.stdout}")
-    cached = git(work, "diff", "--cached", "--quiet", check=False)
-    if cached.returncode == 0:
-        still = task_dirty_paths(work)
-        raise RuntimeError("evaluator snapshot did not capture uncommitted edits: " + ", ".join(still[:8]))
-    commit = git(
-        work,
+    dirty = task_dirty_paths(work)
+    commit_args = [
         "-c", "user.name=prereg-evaluator",
         "-c", "user.email=prereg-evaluator@localhost",
         "commit", "-q", "-m", "prereg evaluator snapshot",
-        check=False,
-    )
+    ]
+    if dirty:
+        add = git(work, "add", "-A", "--", ".", *SNAPSHOT_PATHSPEC, check=False)
+        if add.returncode != 0:
+            raise RuntimeError(f"evaluator snapshot failed: {add.stderr or add.stdout}")
+        cached = git(work, "diff", "--cached", "--quiet", check=False)
+        if cached.returncode == 0:
+            still = task_dirty_paths(work)
+            raise RuntimeError("evaluator snapshot did not capture uncommitted edits: " + ", ".join(still[:8]))
+    else:
+        commit_args.insert(5, "--allow-empty")
+    commit = git(work, *commit_args, check=False)
     if commit.returncode != 0:
         raise RuntimeError(f"evaluator snapshot failed: {commit.stderr or commit.stdout}")
     after = git(work, "rev-parse", "HEAD", check=False)
     if after.returncode != 0:
-        raise RuntimeError(f"evaluator snapshot failed: {after.stderr}")
+        raise RuntimeError(f"evaluator snapshot failed: {after.stderr or after.stdout}")
     sha = after.stdout.strip()
     if sha == before:
         raise RuntimeError("evaluator snapshot did not create a commit")
@@ -725,6 +735,7 @@ def snapshot_failure(arm_name, arm_dir, message):
         "indexLockCount": None,
         "lostEditConfidence": "low",
         "rejectionAttribution": "low",
+        "snapshotCreated": False,
         "tests": [{
             "instanceId": None,
             "kitError": "evaluator-snapshot-failed",

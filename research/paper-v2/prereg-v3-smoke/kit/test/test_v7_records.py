@@ -35,16 +35,18 @@ def test_v7_arm_a_index_lock_is_zero():
 
 
 def test_v7_arm_b_resubmissions_follow_rejection():
+    """6 筆 steward 寫入。每個 session 的第一筆 atm-write 不是重送，所以重送數小於 6。"""
     assert evaluate.resubmission_count(V7 / "arm-b") == 4
-    writes = 0
+    steward_writes = 0
     for slot in (1, 2):
         text = (V7 / "arm-b" / f"session-{slot}" / "stdout.jsonl").read_text(encoding="utf-8")
         calls = [item for item in evaluate.completed_commands(text) if item["kind"] == "atm-write"]
-        writes += len(calls)
+        assert calls, slot
+        assert evaluate.is_steward_rejection(calls[0]) is False
         assert evaluate.session_resubmissions(text) == 2, slot
-    # 每個 session 4 次 atm-write（含 command not found）。舊公式 (calls-1)*2 會得到 6，等於全部 steward 寫入。
-    assert writes == 8, writes
-    assert writes - 2 == 6
+        steward_writes += sum(1 for item in calls if evaluate.steward_decision(item["event"]))
+    assert steward_writes == 6, steward_writes
+    assert evaluate.resubmission_count(V7 / "arm-b") < steward_writes
 
 
 def test_other_file_and_missing_log():

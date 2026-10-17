@@ -165,6 +165,7 @@ def main():
     assert arm["lostEditCount"] == 0, arm["lostEditCount"]
     assert unfinished_count(arm) >= 1, arm["sessions"]
     assert arm["status"] == "blocked", arm["status"]
+    assert arm["snapshotCreated"] is True, arm.get("snapshotCreated")
     assert all(session["stewardRejected"] is True for session in arm["sessions"]), arm["sessions"]
     assert code == 3, code
     assert payload["status"] == "blocked"
