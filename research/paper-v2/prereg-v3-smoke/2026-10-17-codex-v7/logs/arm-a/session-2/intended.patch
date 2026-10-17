@@ -1,0 +1,57 @@
+diff --git a/django/db/migrations/loader.py b/django/db/migrations/loader.py
+index 95a5062ec9..587fa770d7 100644
+--- a/django/db/migrations/loader.py
++++ b/django/db/migrations/loader.py
+@@ -88,11 +88,6 @@ class MigrationLoader:
+                     continue
+                 raise
+             else:
+-                # Empty directories are namespaces.
+-                # getattr() needed on PY36 and older (replace w/attribute access).
+-                if getattr(module, '__file__', None) is None:
+-                    self.unmigrated_apps.add(app_config.label)
+-                    continue
+                 # Module is not a package (e.g. migrations.py).
+                 if not hasattr(module, '__path__'):
+                     self.unmigrated_apps.add(app_config.label)
+diff --git a/tests/migrations/test_loader.py b/tests/migrations/test_loader.py
+index 27a052ddac..811aee3453 100644
+--- a/tests/migrations/test_loader.py
++++ b/tests/migrations/test_loader.py
+@@ -1,5 +1,7 @@
+ import compileall
+ import os
++from types import ModuleType
++from unittest import mock
+ 
+ from django.db import connection, connections
+ from django.db.migrations.exceptions import (
+@@ -191,6 +193,14 @@ class LoaderTests(TestCase):
+                 "App missing __init__.py in migrations module not in unmigrated apps."
+             )
+ 
++    @override_settings(INSTALLED_APPS=['migrations'], MIGRATION_MODULES={'migrations': 'migrations.custom'})
++    def test_load_package_without_file(self):
++        module = ModuleType('migrations.custom')
++        module.__path__ = []
++        with mock.patch('django.db.migrations.loader.import_module', return_value=module):
++            loader = MigrationLoader(connection)
++        self.assertIn('migrations', loader.migrated_apps)
++
+     @override_settings(
+         INSTALLED_APPS=['migrations.migrations_test_apps.migrated_app'],
+     )
+@@ -506,11 +516,11 @@ class LoaderTests(TestCase):
+         MIGRATION_MODULES={'migrations': 'migrations.test_migrations_namespace_package'},
+     )
+     def test_loading_namespace_package(self):
+-        """Migration directories without an __init__.py file are ignored."""
++        """Migrations in directories without an __init__.py file are loaded."""
+         loader = MigrationLoader(connection)
+         loader.load_disk()
+         migrations = [name for app, name in loader.disk_migrations if app == 'migrations']
+-        self.assertEqual(migrations, [])
++        self.assertEqual(migrations, ['0001_initial'])
+ 
+ 
+ class PycLoaderTests(TestCase):
