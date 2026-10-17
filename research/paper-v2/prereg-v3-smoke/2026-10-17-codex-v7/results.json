@@ -1,0 +1,1020 @@
+{
+  "schema": "prereg-v3-smoke.results.v1",
+  "label": "smoke/exploratory",
+  "winClaim": false,
+  "status": "blocked",
+  "mode": "django",
+  "commonBase": "98ad327864aed8df245fd19ea9d2743279e11643",
+  "boundary": "unix-user",
+  "boundaryMechanism": "unix-user prereg-steward owns the worktree; prereg-session is not the owner and has no sudo; codex exec uses --sandbox workspace-write and sandbox_workspace_write.network_access=true so the steward socket can connect; prereg-session owns .agents .codex .aws so Codex can create them; tracked files stay prereg-steward-owned",
+  "testIdNormalization": {
+    "kind": "docstring-to-label",
+    "deviation": false,
+    "note": "SWE-bench ids that are docstrings normalize to Django labels. Test identity is unchanged. FAIL_TO_PASS and PASS_TO_PASS strings stay as published. This is id normalization, not a test-content deviation.",
+    "map": {
+      "Files prefixed with underscore, tilde, or dot aren't loaded.": "migrations.test_loader.LoaderTests.test_ignore_files",
+      "Migration directories without an __init__.py file are ignored.": "migrations.test_loader.LoaderTests.test_loading_namespace_package",
+      "Migration directories without an __init__.py file are loaded.": "migrations.test_loader.LoaderTests.test_loading_namespace_package",
+      "Tests loading a squashed migration": "migrations.test_loader.LoaderTests.test_loading_squashed",
+      "Tests loading a complex set of squashed migrations": "migrations.test_loader.LoaderTests.test_loading_squashed_complex",
+      "Tests loading a complex but erroneous set of squashed migrations": "migrations.test_loader.LoaderTests.test_loading_squashed_erroneous",
+      "Tests loading a squashed migration with a new migration referencing it": "migrations.test_loader.LoaderTests.test_loading_squashed_ref_squashed",
+      "Tests prefix name matching": "migrations.test_loader.LoaderTests.test_name_match"
+    }
+  },
+  "overlapCondition": null,
+  "arms": {
+    "A": {
+      "arm": "A",
+      "boundary": null,
+      "boundaryMechanism": null,
+      "status": "ok",
+      "work": "/workspace/atm-311/research/paper-v2/prereg-v3-smoke/kit/state/runs/20261017T004036Z-3207762-31030/arm-a/work",
+      "head": "8189188ef3d65961380c063c4b8bb0fdcd5206e8",
+      "snapshot": "8189188ef3d65961380c063c4b8bb0fdcd5206e8",
+      "snapshotCreated": true,
+      "startSkewMs": 11,
+      "model": "gpt-6-luna",
+      "reasoningEffort": "medium",
+      "sessions": [
+        {
+          "slot": 1,
+          "evidenceStatus": "ok",
+          "instanceId": "django__django-13820",
+          "startedAt": "2026-10-17T08:40:54,441837216+08:00",
+          "endedAt": "2026-10-17T08:41:34,795470100+08:00",
+          "exitCode": 0,
+          "tokens": {
+            "input_tokens": 384033,
+            "output_tokens": 2852,
+            "total_tokens": 0,
+            "events": 1
+          },
+          "lostEdits": [],
+          "unfinishedEdits": [],
+          "keptOrRejected": [
+            {
+              "file": "django/db/migrations/loader.py",
+              "missingCount": 0,
+              "match": "hunk"
+            },
+            {
+              "file": "tests/migrations/test_loader.py",
+              "missingCount": 0,
+              "match": "hunk"
+            }
+          ],
+          "stewardRejected": false,
+          "lostEditConfidence": "hunk",
+          "rejectionAttribution": "none",
+          "quotaStop": false
+        },
+        {
+          "slot": 2,
+          "evidenceStatus": "ok",
+          "instanceId": "django__django-11141",
+          "startedAt": "2026-10-17T08:40:54,447132964+08:00",
+          "endedAt": "2026-10-17T08:41:22,317867018+08:00",
+          "exitCode": 0,
+          "tokens": {
+            "input_tokens": 256573,
+            "output_tokens": 2008,
+            "total_tokens": 0,
+            "events": 1
+          },
+          "lostEdits": [
+            {
+              "file": "django/db/migrations/loader.py",
+              "missingAddedLines": [
+                "                # Empty directories are namespaces.",
+                "                # getattr() needed on PY36 and older (replace w/attribute access).",
+                "                if getattr(module, '__file__', None) is None:",
+                "                    self.unmigrated_apps.add(app_config.label)",
+                "                    continue"
+              ],
+              "missingCount": 5,
+              "match": "hunk"
+            },
+            {
+              "file": "tests/migrations/test_loader.py",
+              "missingAddedLines": [
+                "        \"\"\"Migrations in directories without an __init__.py file are loaded.\"\"\"",
+                "        self.assertEqual(migrations, ['0001_initial'])",
+                "        \"\"\"Migration directories without an __init__.py file are ignored.\"\"\"",
+                "        self.assertEqual(migrations, [])"
+              ],
+              "missingCount": 4,
+              "match": "hunk"
+            }
+          ],
+          "unfinishedEdits": [
+            {
+              "file": "django/db/migrations/loader.py",
+              "missingAddedLines": [
+                "                # Empty directories are namespaces.",
+                "                # getattr() needed on PY36 and older (replace w/attribute access).",
+                "                if getattr(module, '__file__', None) is None:",
+                "                    self.unmigrated_apps.add(app_config.label)",
+                "                    continue"
+              ],
+              "missingCount": 5,
+              "match": "hunk"
+            },
+            {
+              "file": "tests/migrations/test_loader.py",
+              "missingAddedLines": [
+                "        \"\"\"Migrations in directories without an __init__.py file are loaded.\"\"\"",
+                "        self.assertEqual(migrations, ['0001_initial'])",
+                "        \"\"\"Migration directories without an __init__.py file are ignored.\"\"\"",
+                "        self.assertEqual(migrations, [])"
+              ],
+              "missingCount": 4,
+              "match": "hunk"
+            }
+          ],
+          "keptOrRejected": [],
+          "stewardRejected": false,
+          "lostEditConfidence": "hunk",
+          "rejectionAttribution": "none",
+          "quotaStop": false
+        }
+      ],
+      "lostEditCount": 2,
+      "silentLostEditCount": 2,
+      "lostEditConfidence": "hunk",
+      "rejectionAttribution": "none",
+      "corruption": [],
+      "indexLockCount": null,
+      "gitErrors": [],
+      "conflictCount": 0,
+      "resolutionTimeMs": null,
+      "steward": {
+        "writes": 0,
+        "rejected": 0,
+        "resubmissions": 0,
+        "recomposeOrRetry": 0,
+        "queueWaitMs": [],
+        "writeToCommitMs": [],
+        "batchSizes": [],
+        "terminals": [],
+        "decisions": [],
+        "reasonCodes": [],
+        "writesDetail": []
+      },
+      "tests": [
+        {
+          "instanceId": "django__django-13820",
+          "exitCode": 0,
+          "passed": 25,
+          "failed": 0,
+          "notSeen": 0,
+          "tests": [
+            {
+              "label": "migrations.test_loader.LoaderTests.test_loading_package_without__file__",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.RecorderTests.test_apply",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.PycLoaderTests.test_invalid",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.PycLoaderTests.test_valid",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_check_consistent_history",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_check_consistent_history_squashed",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_explicit_missing_module",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_ignore_files",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_load",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_load_empty_dir",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_load_import_error",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_load_module_file",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_load_unmigrated_dependency",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_loading_namespace_package",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_loading_squashed",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_loading_squashed_complex",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_loading_squashed_complex_multi_apps",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_loading_squashed_complex_multi_apps_partially_applied",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_loading_squashed_erroneous",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_loading_squashed_ref_squashed",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_marked_as_migrated",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_marked_as_unmigrated",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_name_match",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_plan_handles_repeated_migrations",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_run_before",
+              "status": "pass"
+            }
+          ],
+          "outputTail": "Testing against Django installed in '/tmp/tmpny36luja/tree/django'\nImporting application migrations\nOperations to perform:\n  Synchronize unmigrated apps: auth, contenttypes, messages, migrations, sessions, staticfiles\n  Apply all migrations: admin, sites\nSynchronizing apps without migrations:\n  Creating tables...\n    Creating table django_content_type\n    Creating table auth_permission\n    Creating table auth_group\n    Creating table auth_user\n    Creating table django_session\n    Creating table migrations_modelwithcustombase\n    Creating table migrations_unmigratedmodel\n    Running deferred SQL...\nRunning migrations:\n  Applying admin.0001_initial... OK\n  Applying admin.0002_logentry_remove_auto_add... OK\n  Applying admin.0003_logentry_add_action_flag_choices... OK\n  Applying sites.0001_initial... OK\n  Applying sites.0002_alter_domain_unique... OK\nOperations to perform:\n  Synchronize unmigrated apps: auth, contenttypes, messages, migrations, sessions, staticfiles\n  Apply all migrations: admin, sites\nSynchronizing apps without migrations:\n  Creating tables...\n    Creating table django_content_type\n    Creating table auth_permission\n    Creating table auth_group\n    Creating table auth_user\n    Creating table django_session\n    Creating table migrations_modelwithcustombase\n    Creating table migrations_unmigratedmodel\n    Running deferred SQL...\nRunning migrations:\n  Applying admin.0001_initial... OK\n  Applying admin.0002_logentry_remove_auto_add... OK\n  Applying admin.0003_logentry_add_action_flag_choices... OK\n  Applying sites.0001_initial... OK\n  Applying sites.0002_alter_domain_unique... OK\nSystem check identified no issues (0 silenced).\nCreating test database for alias 'default' ('file:memorydb_default?mode=memory&cache=shared')...\nCreating test database for alias 'other' ('file:memorydb_other?mode=memory&cache=shared')...\ntest_loading_package_without__file__ (migrations.test_loader.LoaderTests)\nTo support frozen environments, MigrationLoader loads migrations from ... ok\ntest_apply (migrations.test_loader.RecorderTests)\nTests marking migrations as applied/unapplied. ... ok\ntest_check_consistent_history (migrations.test_loader.LoaderTests) ... ok\ntest_check_consistent_history_squashed (migrations.test_loader.LoaderTests)\nMigrationLoader.check_consistent_history() should ignore unapplied ... ok\ntest_explicit_missing_module (migrations.test_loader.LoaderTests)\nIf a MIGRATION_MODULES override points to a missing module, the error ... ok\ntest_ignore_files (migrations.test_loader.LoaderTests)\nFiles prefixed with underscore, tilde, or dot aren't loaded. ... ok\ntest_load (migrations.test_loader.LoaderTests)\nMakes sure the loader can load the migrations for the test apps, ... ok\ntest_load_empty_dir (migrations.test_loader.LoaderTests) ... ok\ntest_load_import_error (migrations.test_loader.LoaderTests) ... ok\ntest_load_module_file (migrations.test_loader.LoaderTests) ... ok\ntest_load_unmigrated_dependency (migrations.test_loader.LoaderTests)\nMakes sure the loader can load migrations with a dependency on an unmigrated app. ... ok\ntest_loading_namespace_package (migrations.test_loader.LoaderTests)\nMigration directories without an __init__.py file are ignored. ... ok\ntest_loading_squashed (migrations.test_loader.LoaderTests)\nTests loading a squashed migration ... ok\ntest_loading_squashed_complex (migrations.test_loader.LoaderTests)\nTests loading a complex set of squashed migrations ... ok\ntest_loading_squashed_complex_multi_apps (migrations.test_loader.LoaderTests) ... ok\ntest_loading_squashed_complex_multi_apps_partially_applied (migrations.test_loader.LoaderTests) ... ok\ntest_loading_squashed_erroneous (migrations.test_loader.LoaderTests)\nTests loading a complex but erroneous set of squashed migrations ... ok\ntest_loading_squashed_ref_squashed (migrations.test_loader.LoaderTests)\nTests loading a squashed migration with a new migration referencing it ... ok\ntest_marked_as_migrated (migrations.test_loader.LoaderTests)\nUndefined MIGRATION_MODULES implies default migration module. ... ok\ntest_marked_as_unmigrated (migrations.test_loader.LoaderTests)\nMIGRATION_MODULES allows disabling of migrations for a particular app. ... ok\ntest_name_match (migrations.test_loader.LoaderTests)\nTests prefix name matching ... ok\ntest_plan_handles_repeated_migrations (migrations.test_loader.LoaderTests)\n_generate_plan() doesn't readd migrations already in the plan (#29180). ... ok\ntest_run_before (migrations.test_loader.LoaderTests)\nMakes sure the loader uses Migration.run_before. ... ok\ntest_invalid (migrations.test_loader.PycLoaderTests)\nMigrationLoader reraises ImportErrors caused by \"bad magic number\" pyc ... ok\ntest_valid (migrations.test_loader.PycLoaderTests)\nTo support frozen environments, MigrationLoader loads .pyc migrations. ... ok\n\n----------------------------------------------------------------------\nRan 25 tests in 0.116s\n\nOK\nDestroying test database for alias 'default' ('file:memorydb_default?mode=memory&cache=shared')...\nDestroying test database for alias 'other' ('file:memorydb_other?mode=memory&cache=shared')...\n",
+          "testPatchApplied": true,
+          "testPatchError": null,
+          "modelTestEditsDiscarded": true,
+          "discardedModelTestFiles": [
+            "tests/migrations/test_loader.py"
+          ],
+          "resetTestPatchPaths": [
+            "tests/migrations/test_loader.py"
+          ],
+          "kitError": null,
+          "failToPass": {
+            "denominator": 1,
+            "passed": 1,
+            "failed": 0,
+            "notSeen": 0
+          },
+          "passToPass": {
+            "denominator": 24,
+            "passed": 24,
+            "failed": 0,
+            "notSeen": 0
+          }
+        },
+        {
+          "instanceId": "django__django-11141",
+          "exitCode": 1,
+          "passed": 24,
+          "failed": 1,
+          "notSeen": 0,
+          "tests": [
+            {
+              "label": "migrations.test_loader.LoaderTests.test_loading_namespace_package",
+              "status": "fail"
+            },
+            {
+              "label": "migrations.test_loader.RecorderTests.test_apply",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.PycLoaderTests.test_invalid",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.PycLoaderTests.test_valid",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_check_consistent_history",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_check_consistent_history_squashed",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_explicit_missing_module",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_first",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_ignore_files",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_load",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_load_empty_dir",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_load_import_error",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_load_module_file",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_load_unmigrated_dependency",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_loading_squashed",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_loading_squashed_complex",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_loading_squashed_complex_multi_apps",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_loading_squashed_complex_multi_apps_partially_applied",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_loading_squashed_erroneous",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_loading_squashed_ref_squashed",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_marked_as_migrated",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_marked_as_unmigrated",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_name_match",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_plan_handles_repeated_migrations",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_run_before",
+              "status": "pass"
+            }
+          ],
+          "outputTail": "Testing against Django installed in '/tmp/tmp9dis0vff/tree/django'\nImporting application migrations\nOperations to perform:\n  Synchronize unmigrated apps: auth, contenttypes, messages, migrations, sessions, staticfiles\n  Apply all migrations: admin, sites\nSynchronizing apps without migrations:\n  Creating tables...\n    Creating table django_content_type\n    Creating table auth_permission\n    Creating table auth_group\n    Creating table auth_user\n    Creating table django_session\n    Creating table migrations_modelwithcustombase\n    Creating table migrations_unmigratedmodel\n    Running deferred SQL...\nRunning migrations:\n  Applying admin.0001_initial... OK\n  Applying admin.0002_logentry_remove_auto_add... OK\n  Applying admin.0003_logentry_add_action_flag_choices... OK\n  Applying sites.0001_initial... OK\n  Applying sites.0002_alter_domain_unique... OK\nOperations to perform:\n  Synchronize unmigrated apps: auth, contenttypes, messages, migrations, sessions, staticfiles\n  Apply all migrations: admin, sites\nSynchronizing apps without migrations:\n  Creating tables...\n    Creating table django_content_type\n    Creating table auth_permission\n    Creating table auth_group\n    Creating table auth_user\n    Creating table django_session\n    Creating table migrations_modelwithcustombase\n    Creating table migrations_unmigratedmodel\n    Running deferred SQL...\nRunning migrations:\n  Applying admin.0001_initial... OK\n  Applying admin.0002_logentry_remove_auto_add... OK\n  Applying admin.0003_logentry_add_action_flag_choices... OK\n  Applying sites.0001_initial... OK\n  Applying sites.0002_alter_domain_unique... OK\nSystem check identified no issues (0 silenced).\nCreating test database for alias 'default' ('file:memorydb_default?mode=memory&cache=shared')...\nCreating test database for alias 'other' ('file:memorydb_other?mode=memory&cache=shared')...\ntest_loading_namespace_package (migrations.test_loader.LoaderTests)\nMigration directories without an __init__.py file are loaded. ... ERROR\ntest_apply (migrations.test_loader.RecorderTests)\nTests marking migrations as applied/unapplied. ... ok\ntest_check_consistent_history (migrations.test_loader.LoaderTests) ... ok\ntest_check_consistent_history_squashed (migrations.test_loader.LoaderTests)\nMigrationLoader.check_consistent_history() should ignore unapplied ... ok\ntest_explicit_missing_module (migrations.test_loader.LoaderTests)\nIf a MIGRATION_MODULES override points to a missing module, the error ... ok\ntest_first (migrations.test_loader.LoaderTests)\nMakes sure the '__first__' migrations build correctly. ... ok\ntest_ignore_files (migrations.test_loader.LoaderTests)\nFiles prefixed with underscore, tilde, or dot aren't loaded. ... ok\ntest_load (migrations.test_loader.LoaderTests)\nMakes sure the loader can load the migrations for the test apps, ... ok\ntest_load_empty_dir (migrations.test_loader.LoaderTests) ... ok\ntest_load_import_error (migrations.test_loader.LoaderTests) ... ok\ntest_load_module_file (migrations.test_loader.LoaderTests) ... ok\ntest_load_unmigrated_dependency (migrations.test_loader.LoaderTests)\nMakes sure the loader can load migrations with a dependency on an unmigrated app. ... ok\ntest_loading_squashed (migrations.test_loader.LoaderTests)\nTests loading a squashed migration ... ok\ntest_loading_squashed_complex (migrations.test_loader.LoaderTests)\nTests loading a complex set of squashed migrations ... ok\ntest_loading_squashed_complex_multi_apps (migrations.test_loader.LoaderTests) ... ok\ntest_loading_squashed_complex_multi_apps_partially_applied (migrations.test_loader.LoaderTests) ... ok\ntest_loading_squashed_erroneous (migrations.test_loader.LoaderTests)\nTests loading a complex but erroneous set of squashed migrations ... ok\ntest_loading_squashed_ref_squashed (migrations.test_loader.LoaderTests)\nTests loading a squashed migration with a new migration referencing it ... ok\ntest_marked_as_migrated (migrations.test_loader.LoaderTests)\nUndefined MIGRATION_MODULES implies default migration module. ... ok\ntest_marked_as_unmigrated (migrations.test_loader.LoaderTests)\nMIGRATION_MODULES allows disabling of migrations for a particular app. ... ok\ntest_name_match (migrations.test_loader.LoaderTests)\nTests prefix name matching ... ok\ntest_plan_handles_repeated_migrations (migrations.test_loader.LoaderTests)\n_generate_plan() doesn't readd migrations already in the plan (#29180). ... ok\ntest_run_before (migrations.test_loader.LoaderTests)\nMakes sure the loader uses Migration.run_before. ... ok\ntest_invalid (migrations.test_loader.PycLoaderTests)\nMigrationLoader reraises ImportErrors caused by \"bad magic number\" pyc ... ok\ntest_valid (migrations.test_loader.PycLoaderTests)\nTo support frozen environments, MigrationLoader loads .pyc migrations. ... ok\n\n======================================================================\nERROR: test_loading_namespace_package (migrations.test_loader.LoaderTests)\nMigration directories without an __init__.py file are loaded.\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/tmp/tmp9dis0vff/tree/django/test/utils.py\", line 382, in inner\n    return func(*args, **kwargs)\n  File \"/tmp/tmp9dis0vff/tree/tests/migrations/test_loader.py\", line 512, in test_loading_namespace_package\n    migration_loader.graph.forwards_plan(('migrations', '0001_initial')),\n  File \"/tmp/tmp9dis0vff/tree/django/db/migrations/graph.py\", line 204, in forwards_plan\n    raise NodeNotFoundError(\"Node %r not a valid node\" % (target,), target)\ndjango.db.migrations.exceptions.NodeNotFoundError: Node ('migrations', '0001_initial') not a valid node\n\n----------------------------------------------------------------------\nRan 25 tests in 0.117s\n\nFAILED (errors=1)\nDestroying test database for alias 'default' ('file:memorydb_default?mode=memory&cache=shared')...\nDestroying test database for alias 'other' ('file:memorydb_other?mode=memory&cache=shared')...\n",
+          "testPatchApplied": true,
+          "testPatchError": null,
+          "modelTestEditsDiscarded": true,
+          "discardedModelTestFiles": [
+            "tests/migrations/test_loader.py"
+          ],
+          "resetTestPatchPaths": [
+            "tests/migrations/test_loader.py"
+          ],
+          "kitError": null,
+          "failToPass": {
+            "denominator": 1,
+            "passed": 0,
+            "failed": 1,
+            "notSeen": 0
+          },
+          "passToPass": {
+            "denominator": 24,
+            "passed": 24,
+            "failed": 0,
+            "notSeen": 0
+          }
+        }
+      ]
+    },
+    "B": {
+      "arm": "B",
+      "boundary": "unix-user",
+      "boundaryMechanism": "unix-user prereg-steward owns the worktree; prereg-session is not the owner and has no sudo; codex exec uses --sandbox workspace-write and sandbox_workspace_write.network_access=true so the steward socket can connect; prereg-session owns .agents .codex .aws so Codex can create them; tracked files stay prereg-steward-owned",
+      "status": "blocked",
+      "work": "/workspace/atm-311/research/paper-v2/prereg-v3-smoke/kit/state/runs/20261017T004036Z-3207762-31030/arm-b/work",
+      "head": "107d5ee7603cb6e18ebb3ebc3df01420f4cf077e",
+      "snapshot": "107d5ee7603cb6e18ebb3ebc3df01420f4cf077e",
+      "snapshotCreated": false,
+      "startSkewMs": 14,
+      "model": "gpt-6-luna",
+      "reasoningEffort": "medium",
+      "sessions": [
+        {
+          "slot": 1,
+          "evidenceStatus": "ok",
+          "instanceId": "django__django-13820",
+          "startedAt": "2026-10-17T08:41:38,473137617+08:00",
+          "endedAt": "2026-10-17T08:42:17,016994026+08:00",
+          "exitCode": 0,
+          "tokens": {
+            "input_tokens": 294906,
+            "output_tokens": 2752,
+            "total_tokens": 0,
+            "events": 1
+          },
+          "lostEdits": [],
+          "unfinishedEdits": [],
+          "keptOrRejected": [
+            {
+              "file": "django/db/migrations/loader.py",
+              "missingCount": 0,
+              "match": "low"
+            }
+          ],
+          "stewardRejected": true,
+          "lostEditConfidence": "low",
+          "rejectionAttribution": "low",
+          "quotaStop": false
+        },
+        {
+          "slot": 2,
+          "evidenceStatus": "ok",
+          "instanceId": "django__django-11141",
+          "startedAt": "2026-10-17T08:41:38,480395836+08:00",
+          "endedAt": "2026-10-17T08:42:03,930716484+08:00",
+          "exitCode": 0,
+          "tokens": {
+            "input_tokens": 268824,
+            "output_tokens": 1810,
+            "total_tokens": 0,
+            "events": 1
+          },
+          "lostEdits": [],
+          "unfinishedEdits": [
+            {
+              "file": "django/db/migrations/loader.py",
+              "missingAddedLines": [
+                "                # Empty directories are namespaces.",
+                "                # getattr() needed on PY36 and older (replace w/attribute access).",
+                "                if getattr(module, '__file__', None) is None:",
+                "                    self.unmigrated_apps.add(app_config.label)",
+                "                    continue"
+              ],
+              "missingCount": 5,
+              "match": "hunk",
+              "classified": "steward-rejected"
+            }
+          ],
+          "keptOrRejected": [
+            {
+              "file": "django/db/migrations/loader.py",
+              "missingAddedLines": [
+                "                # Empty directories are namespaces.",
+                "                # getattr() needed on PY36 and older (replace w/attribute access).",
+                "                if getattr(module, '__file__', None) is None:",
+                "                    self.unmigrated_apps.add(app_config.label)",
+                "                    continue"
+              ],
+              "missingCount": 5,
+              "match": "hunk",
+              "classified": "steward-rejected"
+            }
+          ],
+          "stewardRejected": true,
+          "lostEditConfidence": "hunk",
+          "rejectionAttribution": "low",
+          "quotaStop": false
+        }
+      ],
+      "lostEditCount": 0,
+      "silentLostEditCount": 0,
+      "lostEditConfidence": "low",
+      "rejectionAttribution": "low",
+      "corruption": [],
+      "indexLockCount": null,
+      "gitErrors": [],
+      "conflictCount": 4,
+      "resolutionTimeMs": null,
+      "steward": {
+        "writes": 6,
+        "rejected": 4,
+        "resubmissions": 6,
+        "recomposeOrRetry": 6,
+        "queueWaitMs": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "writeToCommitMs": [
+          299,
+          152
+        ],
+        "batchSizes": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "terminals": [
+          "blocked",
+          "blocked",
+          "blocked",
+          "committed",
+          "blocked",
+          "committed"
+        ],
+        "decisions": [
+          "rejected-by-design",
+          "rejected-by-design",
+          "rejected-by-design",
+          "accepted",
+          "rejected-by-design",
+          "accepted"
+        ],
+        "reasonCodes": [
+          "patch-context-mismatch",
+          "patch-context-mismatch",
+          "patch-context-mismatch",
+          null,
+          "patch-context-mismatch",
+          null
+        ],
+        "writesDetail": [
+          {
+            "schema": "prereg-v3-smoke.stewardWrite.v1",
+            "ok": false,
+            "decision": "rejected-by-design",
+            "reasonCode": "patch-context-mismatch",
+            "messageCode": null,
+            "verdict": "blocked",
+            "phase": "live",
+            "terminal": "blocked",
+            "stopReason": "patch context mismatch at line 87: expected \"                raise\", found \"                    self.unmigrated_apps.add(app_config.label)\"",
+            "proposalId": "prop-prereg-session-a1-d36bd3f8f37c",
+            "taskId": "prereg",
+            "actorId": "prereg-session",
+            "file": "django/db/migrations/loader.py",
+            "declaredBaseHash": "sha256:7dca66d253358f3dfbda3d68ceffb8b9fee4d0f47d8ddef2fa4d25e78ff1b05c",
+            "currentFileHash": "sha256:7dca66d253358f3dfbda3d68ceffb8b9fee4d0f47d8ddef2fa4d25e78ff1b05c",
+            "batchSize": 1,
+            "attempt": 1,
+            "retryCount": 0,
+            "hashDriftCount": 0,
+            "writeToCommitMs": null,
+            "commit": {
+              "gitIndexLockWaitMs": 0,
+              "headMoves": 0
+            },
+            "planRequired": false,
+            "cli": "@ai-atomic-framework/cli@0.1.21",
+            "entry": "broker steward apply-live"
+          },
+          {
+            "schema": "prereg-v3-smoke.stewardWrite.v1",
+            "ok": false,
+            "decision": "rejected-by-design",
+            "reasonCode": "patch-context-mismatch",
+            "messageCode": null,
+            "verdict": "blocked",
+            "phase": "live",
+            "terminal": "blocked",
+            "stopReason": "patch context mismatch at line 87: expected \"                # Empty directories are namespaces.\", found \"                    self.unmigrated_apps.add(app_config.label)\"",
+            "proposalId": "prop-prereg-session-a1-9b16d49053d3",
+            "taskId": "prereg",
+            "actorId": "prereg-session",
+            "file": "django/db/migrations/loader.py",
+            "declaredBaseHash": "sha256:7dca66d253358f3dfbda3d68ceffb8b9fee4d0f47d8ddef2fa4d25e78ff1b05c",
+            "currentFileHash": "sha256:7dca66d253358f3dfbda3d68ceffb8b9fee4d0f47d8ddef2fa4d25e78ff1b05c",
+            "batchSize": 1,
+            "attempt": 1,
+            "retryCount": 0,
+            "hashDriftCount": 0,
+            "writeToCommitMs": null,
+            "commit": {
+              "gitIndexLockWaitMs": 0,
+              "headMoves": 0
+            },
+            "planRequired": false,
+            "cli": "@ai-atomic-framework/cli@0.1.21",
+            "entry": "broker steward apply-live"
+          },
+          {
+            "schema": "prereg-v3-smoke.stewardWrite.v1",
+            "ok": false,
+            "decision": "rejected-by-design",
+            "reasonCode": "patch-context-mismatch",
+            "messageCode": null,
+            "verdict": "blocked",
+            "phase": "live",
+            "terminal": "blocked",
+            "stopReason": "patch context mismatch at line 92: expected \"                # Empty directories are namespaces.\", found \"                # getattr() needed on PY36 and older (replace w/attribute access).\"",
+            "proposalId": "prop-prereg-session-a1-aa6e4111a3ec",
+            "taskId": "prereg",
+            "actorId": "prereg-session",
+            "file": "django/db/migrations/loader.py",
+            "declaredBaseHash": "sha256:7dca66d253358f3dfbda3d68ceffb8b9fee4d0f47d8ddef2fa4d25e78ff1b05c",
+            "currentFileHash": "sha256:7dca66d253358f3dfbda3d68ceffb8b9fee4d0f47d8ddef2fa4d25e78ff1b05c",
+            "batchSize": 1,
+            "attempt": 1,
+            "retryCount": 0,
+            "hashDriftCount": 0,
+            "writeToCommitMs": null,
+            "commit": {
+              "gitIndexLockWaitMs": 0,
+              "headMoves": 0
+            },
+            "planRequired": false,
+            "cli": "@ai-atomic-framework/cli@0.1.21",
+            "entry": "broker steward apply-live"
+          },
+          {
+            "schema": "prereg-v3-smoke.stewardWrite.v1",
+            "ok": true,
+            "decision": "accepted",
+            "reasonCode": null,
+            "messageCode": "ATM_BROKER_LIVE_WRITE_APPLIED",
+            "verdict": "applied",
+            "phase": "commit",
+            "terminal": "committed",
+            "stopReason": null,
+            "proposalId": "prop-prereg-session-a1-a314442532bb",
+            "taskId": "prereg",
+            "actorId": "prereg-session",
+            "file": "django/db/migrations/loader.py",
+            "declaredBaseHash": "sha256:7dca66d253358f3dfbda3d68ceffb8b9fee4d0f47d8ddef2fa4d25e78ff1b05c",
+            "currentFileHash": "sha256:bef47a52075e71c72b32928f175296dd6a4a43eb79ad679aa8eb7ce7bc7a2a8e",
+            "batchSize": 1,
+            "attempt": 1,
+            "retryCount": 0,
+            "hashDriftCount": 0,
+            "writeToCommitMs": 299,
+            "commit": {
+              "gitIndexLockWaitMs": 0,
+              "headMoves": 0
+            },
+            "planRequired": false,
+            "cli": "@ai-atomic-framework/cli@0.1.21",
+            "entry": "broker steward apply-live"
+          },
+          {
+            "schema": "prereg-v3-smoke.stewardWrite.v1",
+            "ok": false,
+            "decision": "rejected-by-design",
+            "reasonCode": "patch-context-mismatch",
+            "messageCode": null,
+            "verdict": "blocked",
+            "phase": "live",
+            "terminal": "blocked",
+            "stopReason": "patch context mismatch at line 94: expected \"                if getattr(module, '__file__', None) is None:\", found \"                    continue\"",
+            "proposalId": "prop-prereg-session-a1-1cac4568d75c",
+            "taskId": "prereg",
+            "actorId": "prereg-session",
+            "file": "django/db/migrations/loader.py",
+            "declaredBaseHash": "sha256:bef47a52075e71c72b32928f175296dd6a4a43eb79ad679aa8eb7ce7bc7a2a8e",
+            "currentFileHash": "sha256:bef47a52075e71c72b32928f175296dd6a4a43eb79ad679aa8eb7ce7bc7a2a8e",
+            "batchSize": 1,
+            "attempt": 1,
+            "retryCount": 0,
+            "hashDriftCount": 0,
+            "writeToCommitMs": null,
+            "commit": {
+              "gitIndexLockWaitMs": 0,
+              "headMoves": 0
+            },
+            "planRequired": false,
+            "cli": "@ai-atomic-framework/cli@0.1.21",
+            "entry": "broker steward apply-live"
+          },
+          {
+            "schema": "prereg-v3-smoke.stewardWrite.v1",
+            "ok": true,
+            "decision": "accepted",
+            "reasonCode": null,
+            "messageCode": "ATM_BROKER_LIVE_WRITE_APPLIED",
+            "verdict": "applied",
+            "phase": "commit",
+            "terminal": "committed",
+            "stopReason": null,
+            "proposalId": "prop-prereg-session-a1-2d6bd14c8772",
+            "taskId": "prereg",
+            "actorId": "prereg-session",
+            "file": "django/db/migrations/loader.py",
+            "declaredBaseHash": "sha256:bef47a52075e71c72b32928f175296dd6a4a43eb79ad679aa8eb7ce7bc7a2a8e",
+            "currentFileHash": "sha256:9d85b779fe198207d6443272ecdf91980dfc18d7df8db0555ab3b02514577d61",
+            "batchSize": 1,
+            "attempt": 1,
+            "retryCount": 0,
+            "hashDriftCount": 0,
+            "writeToCommitMs": 152,
+            "commit": {
+              "gitIndexLockWaitMs": 0,
+              "headMoves": 0
+            },
+            "planRequired": false,
+            "cli": "@ai-atomic-framework/cli@0.1.21",
+            "entry": "broker steward apply-live"
+          }
+        ]
+      },
+      "tests": [
+        {
+          "instanceId": "django__django-13820",
+          "exitCode": 0,
+          "passed": 25,
+          "failed": 0,
+          "notSeen": 0,
+          "tests": [
+            {
+              "label": "migrations.test_loader.LoaderTests.test_loading_package_without__file__",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.RecorderTests.test_apply",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.PycLoaderTests.test_invalid",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.PycLoaderTests.test_valid",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_check_consistent_history",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_check_consistent_history_squashed",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_explicit_missing_module",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_ignore_files",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_load",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_load_empty_dir",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_load_import_error",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_load_module_file",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_load_unmigrated_dependency",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_loading_namespace_package",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_loading_squashed",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_loading_squashed_complex",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_loading_squashed_complex_multi_apps",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_loading_squashed_complex_multi_apps_partially_applied",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_loading_squashed_erroneous",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_loading_squashed_ref_squashed",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_marked_as_migrated",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_marked_as_unmigrated",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_name_match",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_plan_handles_repeated_migrations",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_run_before",
+              "status": "pass"
+            }
+          ],
+          "outputTail": "Testing against Django installed in '/tmp/tmptzo17j5q/tree/django'\nImporting application migrations\nOperations to perform:\n  Synchronize unmigrated apps: auth, contenttypes, messages, migrations, sessions, staticfiles\n  Apply all migrations: admin, sites\nSynchronizing apps without migrations:\n  Creating tables...\n    Creating table django_content_type\n    Creating table auth_permission\n    Creating table auth_group\n    Creating table auth_user\n    Creating table django_session\n    Creating table migrations_modelwithcustombase\n    Creating table migrations_unmigratedmodel\n    Running deferred SQL...\nRunning migrations:\n  Applying admin.0001_initial... OK\n  Applying admin.0002_logentry_remove_auto_add... OK\n  Applying admin.0003_logentry_add_action_flag_choices... OK\n  Applying sites.0001_initial... OK\n  Applying sites.0002_alter_domain_unique... OK\nOperations to perform:\n  Synchronize unmigrated apps: auth, contenttypes, messages, migrations, sessions, staticfiles\n  Apply all migrations: admin, sites\nSynchronizing apps without migrations:\n  Creating tables...\n    Creating table django_content_type\n    Creating table auth_permission\n    Creating table auth_group\n    Creating table auth_user\n    Creating table django_session\n    Creating table migrations_modelwithcustombase\n    Creating table migrations_unmigratedmodel\n    Running deferred SQL...\nRunning migrations:\n  Applying admin.0001_initial... OK\n  Applying admin.0002_logentry_remove_auto_add... OK\n  Applying admin.0003_logentry_add_action_flag_choices... OK\n  Applying sites.0001_initial... OK\n  Applying sites.0002_alter_domain_unique... OK\nSystem check identified no issues (0 silenced).\nCreating test database for alias 'default' ('file:memorydb_default?mode=memory&cache=shared')...\nCreating test database for alias 'other' ('file:memorydb_other?mode=memory&cache=shared')...\ntest_loading_package_without__file__ (migrations.test_loader.LoaderTests)\nTo support frozen environments, MigrationLoader loads migrations from ... ok\ntest_apply (migrations.test_loader.RecorderTests)\nTests marking migrations as applied/unapplied. ... ok\ntest_check_consistent_history (migrations.test_loader.LoaderTests) ... ok\ntest_check_consistent_history_squashed (migrations.test_loader.LoaderTests)\nMigrationLoader.check_consistent_history() should ignore unapplied ... ok\ntest_explicit_missing_module (migrations.test_loader.LoaderTests)\nIf a MIGRATION_MODULES override points to a missing module, the error ... ok\ntest_ignore_files (migrations.test_loader.LoaderTests)\nFiles prefixed with underscore, tilde, or dot aren't loaded. ... ok\ntest_load (migrations.test_loader.LoaderTests)\nMakes sure the loader can load the migrations for the test apps, ... ok\ntest_load_empty_dir (migrations.test_loader.LoaderTests) ... ok\ntest_load_import_error (migrations.test_loader.LoaderTests) ... ok\ntest_load_module_file (migrations.test_loader.LoaderTests) ... ok\ntest_load_unmigrated_dependency (migrations.test_loader.LoaderTests)\nMakes sure the loader can load migrations with a dependency on an unmigrated app. ... ok\ntest_loading_namespace_package (migrations.test_loader.LoaderTests)\nMigration directories without an __init__.py file are ignored. ... ok\ntest_loading_squashed (migrations.test_loader.LoaderTests)\nTests loading a squashed migration ... ok\ntest_loading_squashed_complex (migrations.test_loader.LoaderTests)\nTests loading a complex set of squashed migrations ... ok\ntest_loading_squashed_complex_multi_apps (migrations.test_loader.LoaderTests) ... ok\ntest_loading_squashed_complex_multi_apps_partially_applied (migrations.test_loader.LoaderTests) ... ok\ntest_loading_squashed_erroneous (migrations.test_loader.LoaderTests)\nTests loading a complex but erroneous set of squashed migrations ... ok\ntest_loading_squashed_ref_squashed (migrations.test_loader.LoaderTests)\nTests loading a squashed migration with a new migration referencing it ... ok\ntest_marked_as_migrated (migrations.test_loader.LoaderTests)\nUndefined MIGRATION_MODULES implies default migration module. ... ok\ntest_marked_as_unmigrated (migrations.test_loader.LoaderTests)\nMIGRATION_MODULES allows disabling of migrations for a particular app. ... ok\ntest_name_match (migrations.test_loader.LoaderTests)\nTests prefix name matching ... ok\ntest_plan_handles_repeated_migrations (migrations.test_loader.LoaderTests)\n_generate_plan() doesn't readd migrations already in the plan (#29180). ... ok\ntest_run_before (migrations.test_loader.LoaderTests)\nMakes sure the loader uses Migration.run_before. ... ok\ntest_invalid (migrations.test_loader.PycLoaderTests)\nMigrationLoader reraises ImportErrors caused by \"bad magic number\" pyc ... ok\ntest_valid (migrations.test_loader.PycLoaderTests)\nTo support frozen environments, MigrationLoader loads .pyc migrations. ... ok\n\n----------------------------------------------------------------------\nRan 25 tests in 0.123s\n\nOK\nDestroying test database for alias 'default' ('file:memorydb_default?mode=memory&cache=shared')...\nDestroying test database for alias 'other' ('file:memorydb_other?mode=memory&cache=shared')...\n",
+          "testPatchApplied": true,
+          "testPatchError": null,
+          "modelTestEditsDiscarded": false,
+          "discardedModelTestFiles": [],
+          "resetTestPatchPaths": [
+            "tests/migrations/test_loader.py"
+          ],
+          "kitError": null,
+          "failToPass": {
+            "denominator": 1,
+            "passed": 1,
+            "failed": 0,
+            "notSeen": 0
+          },
+          "passToPass": {
+            "denominator": 24,
+            "passed": 24,
+            "failed": 0,
+            "notSeen": 0
+          }
+        },
+        {
+          "instanceId": "django__django-11141",
+          "exitCode": 1,
+          "passed": 24,
+          "failed": 1,
+          "notSeen": 0,
+          "tests": [
+            {
+              "label": "migrations.test_loader.LoaderTests.test_loading_namespace_package",
+              "status": "fail"
+            },
+            {
+              "label": "migrations.test_loader.RecorderTests.test_apply",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.PycLoaderTests.test_invalid",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.PycLoaderTests.test_valid",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_check_consistent_history",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_check_consistent_history_squashed",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_explicit_missing_module",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_first",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_ignore_files",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_load",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_load_empty_dir",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_load_import_error",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_load_module_file",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_load_unmigrated_dependency",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_loading_squashed",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_loading_squashed_complex",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_loading_squashed_complex_multi_apps",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_loading_squashed_complex_multi_apps_partially_applied",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_loading_squashed_erroneous",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_loading_squashed_ref_squashed",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_marked_as_migrated",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_marked_as_unmigrated",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_name_match",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_plan_handles_repeated_migrations",
+              "status": "pass"
+            },
+            {
+              "label": "migrations.test_loader.LoaderTests.test_run_before",
+              "status": "pass"
+            }
+          ],
+          "outputTail": "Testing against Django installed in '/tmp/tmpix2pxqy1/tree/django'\nImporting application migrations\nOperations to perform:\n  Synchronize unmigrated apps: auth, contenttypes, messages, migrations, sessions, staticfiles\n  Apply all migrations: admin, sites\nSynchronizing apps without migrations:\n  Creating tables...\n    Creating table django_content_type\n    Creating table auth_permission\n    Creating table auth_group\n    Creating table auth_user\n    Creating table django_session\n    Creating table migrations_modelwithcustombase\n    Creating table migrations_unmigratedmodel\n    Running deferred SQL...\nRunning migrations:\n  Applying admin.0001_initial... OK\n  Applying admin.0002_logentry_remove_auto_add... OK\n  Applying admin.0003_logentry_add_action_flag_choices... OK\n  Applying sites.0001_initial... OK\n  Applying sites.0002_alter_domain_unique... OK\nOperations to perform:\n  Synchronize unmigrated apps: auth, contenttypes, messages, migrations, sessions, staticfiles\n  Apply all migrations: admin, sites\nSynchronizing apps without migrations:\n  Creating tables...\n    Creating table django_content_type\n    Creating table auth_permission\n    Creating table auth_group\n    Creating table auth_user\n    Creating table django_session\n    Creating table migrations_modelwithcustombase\n    Creating table migrations_unmigratedmodel\n    Running deferred SQL...\nRunning migrations:\n  Applying admin.0001_initial... OK\n  Applying admin.0002_logentry_remove_auto_add... OK\n  Applying admin.0003_logentry_add_action_flag_choices... OK\n  Applying sites.0001_initial... OK\n  Applying sites.0002_alter_domain_unique... OK\nSystem check identified no issues (0 silenced).\nCreating test database for alias 'default' ('file:memorydb_default?mode=memory&cache=shared')...\nCreating test database for alias 'other' ('file:memorydb_other?mode=memory&cache=shared')...\ntest_loading_namespace_package (migrations.test_loader.LoaderTests)\nMigration directories without an __init__.py file are loaded. ... ERROR\ntest_apply (migrations.test_loader.RecorderTests)\nTests marking migrations as applied/unapplied. ... ok\ntest_check_consistent_history (migrations.test_loader.LoaderTests) ... ok\ntest_check_consistent_history_squashed (migrations.test_loader.LoaderTests)\nMigrationLoader.check_consistent_history() should ignore unapplied ... ok\ntest_explicit_missing_module (migrations.test_loader.LoaderTests)\nIf a MIGRATION_MODULES override points to a missing module, the error ... ok\ntest_first (migrations.test_loader.LoaderTests)\nMakes sure the '__first__' migrations build correctly. ... ok\ntest_ignore_files (migrations.test_loader.LoaderTests)\nFiles prefixed with underscore, tilde, or dot aren't loaded. ... ok\ntest_load (migrations.test_loader.LoaderTests)\nMakes sure the loader can load the migrations for the test apps, ... ok\ntest_load_empty_dir (migrations.test_loader.LoaderTests) ... ok\ntest_load_import_error (migrations.test_loader.LoaderTests) ... ok\ntest_load_module_file (migrations.test_loader.LoaderTests) ... ok\ntest_load_unmigrated_dependency (migrations.test_loader.LoaderTests)\nMakes sure the loader can load migrations with a dependency on an unmigrated app. ... ok\ntest_loading_squashed (migrations.test_loader.LoaderTests)\nTests loading a squashed migration ... ok\ntest_loading_squashed_complex (migrations.test_loader.LoaderTests)\nTests loading a complex set of squashed migrations ... ok\ntest_loading_squashed_complex_multi_apps (migrations.test_loader.LoaderTests) ... ok\ntest_loading_squashed_complex_multi_apps_partially_applied (migrations.test_loader.LoaderTests) ... ok\ntest_loading_squashed_erroneous (migrations.test_loader.LoaderTests)\nTests loading a complex but erroneous set of squashed migrations ... ok\ntest_loading_squashed_ref_squashed (migrations.test_loader.LoaderTests)\nTests loading a squashed migration with a new migration referencing it ... ok\ntest_marked_as_migrated (migrations.test_loader.LoaderTests)\nUndefined MIGRATION_MODULES implies default migration module. ... ok\ntest_marked_as_unmigrated (migrations.test_loader.LoaderTests)\nMIGRATION_MODULES allows disabling of migrations for a particular app. ... ok\ntest_name_match (migrations.test_loader.LoaderTests)\nTests prefix name matching ... ok\ntest_plan_handles_repeated_migrations (migrations.test_loader.LoaderTests)\n_generate_plan() doesn't readd migrations already in the plan (#29180). ... ok\ntest_run_before (migrations.test_loader.LoaderTests)\nMakes sure the loader uses Migration.run_before. ... ok\ntest_invalid (migrations.test_loader.PycLoaderTests)\nMigrationLoader reraises ImportErrors caused by \"bad magic number\" pyc ... ok\ntest_valid (migrations.test_loader.PycLoaderTests)\nTo support frozen environments, MigrationLoader loads .pyc migrations. ... ok\n\n======================================================================\nERROR: test_loading_namespace_package (migrations.test_loader.LoaderTests)\nMigration directories without an __init__.py file are loaded.\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/tmp/tmpix2pxqy1/tree/django/test/utils.py\", line 382, in inner\n    return func(*args, **kwargs)\n  File \"/tmp/tmpix2pxqy1/tree/tests/migrations/test_loader.py\", line 512, in test_loading_namespace_package\n    migration_loader.graph.forwards_plan(('migrations', '0001_initial')),\n  File \"/tmp/tmpix2pxqy1/tree/django/db/migrations/graph.py\", line 204, in forwards_plan\n    raise NodeNotFoundError(\"Node %r not a valid node\" % (target,), target)\ndjango.db.migrations.exceptions.NodeNotFoundError: Node ('migrations', '0001_initial') not a valid node\n\n----------------------------------------------------------------------\nRan 25 tests in 0.114s\n\nFAILED (errors=1)\nDestroying test database for alias 'default' ('file:memorydb_default?mode=memory&cache=shared')...\nDestroying test database for alias 'other' ('file:memorydb_other?mode=memory&cache=shared')...\n",
+          "testPatchApplied": true,
+          "testPatchError": null,
+          "modelTestEditsDiscarded": false,
+          "discardedModelTestFiles": [],
+          "resetTestPatchPaths": [
+            "tests/migrations/test_loader.py"
+          ],
+          "kitError": null,
+          "failToPass": {
+            "denominator": 1,
+            "passed": 0,
+            "failed": 1,
+            "notSeen": 0
+          },
+          "passToPass": {
+            "denominator": 24,
+            "passed": 24,
+            "failed": 0,
+            "notSeen": 0
+          }
+        }
+      ]
+    }
+  }
+}
