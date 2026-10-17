@@ -1,0 +1,6 @@
+#!/bin/bash
+# Arm A git on PATH. Every command is forwarded to the real git.
+# atm-write calls /usr/bin/git directly and is not affected by PATH.
+set -euo pipefail
+REAL="${PREREG_REAL_GIT:-/usr/bin/git}"
+exec "$REAL" "$@"

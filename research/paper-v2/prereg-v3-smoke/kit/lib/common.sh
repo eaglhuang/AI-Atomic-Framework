@@ -817,20 +817,19 @@ expose_evaluator_python() {
   fi
 }
 
-# 工作階段環境允許清單。金標路徑、GOLD_ROOT、state、tasks 都不在裡面。
-session_env_assignments() {
-  local session_dir="$1" work="$2"
+# Codex 用 bash -lc。login shell 會先讀 /etc/profile，那裡可以整段換掉 PATH。
+# 兩臂都把 kit/bin（atm-write）與評估 venv 放上 PATH。PREREG_ARM_BIN 放最前：
+# Arm B 是擋下 commit 的 git shim，Arm A 是轉給真實 git 的 git-forward。
+session_path_value() {
   local node_bin path_value py_bin
   node_bin="$(dirname "$(command -v node)")"
   path_value="${node_bin}:/usr/bin:/bin"
   if py_bin="$(evaluator_python_bin)"; then
     path_value="${py_bin}:${path_value}"
   fi
-  if [ "${PREREG_ARM:-}" = "B" ]; then
-    path_value="${KIT_ROOT}/bin:${path_value}"
-    if [ -n "${PREREG_ARM_BIN:-}" ]; then
-      path_value="${PREREG_ARM_BIN}:${path_value}"
-    fi
+  path_value="${KIT_ROOT}/bin:${path_value}"
+  if [ -n "${PREREG_ARM_BIN:-}" ]; then
+    path_value="${PREREG_ARM_BIN}:${path_value}"
   fi
   if [ -z "${PREREG_SMOKE_CODEX:-}" ] && command -v codex >/dev/null 2>&1; then
     local codex_bin
@@ -840,8 +839,48 @@ session_env_assignments() {
       *) path_value="${codex_bin}:${path_value}" ;;
     esac
   fi
+  printf '%s\n' "$path_value"
+}
+
+install_arm_git_bin() {
+  local arm="$1" dest="$2"
+  mkdir -p "$dest"
+  if [ "$arm" = "B" ]; then
+    ln -sfn "$KIT_ROOT/bin/git-shim" "$dest/git"
+  else
+    ln -sfn "$KIT_ROOT/bin/git-forward" "$dest/git"
+  fi
+  chmod a+rx "$KIT_ROOT/bin/git-shim" "$KIT_ROOT/bin/git-forward" "$dest" 2>/dev/null || true
+}
+
+# login shell 讀完 /etc/profile 之後會讀 HOME 的 bash_profile。
+# 非 login 的 bash 只讀 BASH_ENV。兩條都把 PATH 寫回去。
+install_session_shell_path() {
+  local session_dir="$1" path_value="$2"
+  local home="$session_dir/home"
+  local script="$home/.prereg-path.sh" name
+  mkdir -p "$home"
+  {
+    printf '%s\n' '# prereg session PATH. bash -lc reads /etc/profile first and may replace PATH.'
+    printf 'export PATH=%q\n' "$path_value"
+  } > "$script"
+  chmod a+r "$script"
+  for name in .bash_profile .bash_login .profile .bashrc; do
+    printf '. %q\n' "$script" > "$home/$name"
+    chmod a+r "$home/$name"
+  done
+}
+
+# 工作階段環境允許清單。金標路徑、GOLD_ROOT、state、tasks 都不在裡面。
+session_env_assignments() {
+  local session_dir="$1" work="$2"
+  local path_value
+  path_value="$(session_path_value)"
+  install_session_shell_path "$session_dir" "$path_value"
   cat <<EOF
 PATH=${path_value}
+BASH_ENV=${session_dir}/home/.prereg-path.sh
+ENV=${session_dir}/home/.prereg-path.sh
 HOME=${session_dir}/home
 TMPDIR=${session_dir}/tmp
 LANG=C.UTF-8
@@ -880,6 +919,50 @@ EOF
     printf 'CODEX_HOME=%s\n' "$PREREG_SESSION_CODEX_HOME"
     printf 'XDG_RUNTIME_DIR=%s\n' "$PREREG_SESSION_CODEX_HOME/runtime"
   fi
+}
+
+# bash -lc、以及 PATH 被 /etc/profile 清掉之後再讀 HOME profile，都必須解析到 kit。
+assert_session_login_path() {
+  local session_dir="$1" work="$2"
+  local py_bin atm_real git_real arm report
+  py_bin="$(evaluator_python_bin)" || die "PREREG_PYTHON 不是絕對路徑上的可執行檔，session 不會用到評估 venv。"
+  atm_real="$(readlink -f "$KIT_ROOT/bin/atm-write")"
+  arm="${PREREG_ARM:-A}"
+  if [ "$arm" = "B" ]; then
+    git_real="$(readlink -f "$KIT_ROOT/bin/git-shim")"
+  else
+    git_real="$(readlink -f "$KIT_ROOT/bin/git-forward")"
+  fi
+  [ -n "${PREREG_ARM_BIN:-}" ] || die "arm ${arm} 沒有 PREREG_ARM_BIN，git 不會指到 kit。"
+  mkdir -p "$session_dir"
+  local env_file="$session_dir/login-check.env"
+  session_env_assignments "$session_dir" "$work" > "$env_file"
+  local -a env_cmd=(env -i)
+  local line
+  while IFS= read -r line; do
+    [ -n "$line" ] || continue
+    env_cmd+=("$line")
+  done < "$env_file"
+  report="$("${env_cmd[@]}" bash -lc 'printf "python=%s\natm=%s\ngit=%s\n" "$(command -v python || true)" "$(command -v atm-write || true)" "$(command -v git || true)"')"
+  check_login_report "$report" "bash -lc" "$py_bin" "$atm_real" "$git_real"
+  report="$(HOME="$session_dir/home" bash -c 'PATH=/usr/bin:/bin; . "$HOME/.bash_profile"; printf "python=%s\natm=%s\ngit=%s\n" "$(command -v python || true)" "$(command -v atm-write || true)" "$(command -v git || true)"')"
+  check_login_report "$report" "profile after PATH reset" "$py_bin" "$atm_real" "$git_real"
+  report="$(env -i PATH=/usr/bin:/bin HOME="$session_dir/home" BASH_ENV="$session_dir/home/.prereg-path.sh" bash -c 'printf "python=%s\natm=%s\ngit=%s\n" "$(command -v python || true)" "$(command -v atm-write || true)" "$(command -v git || true)"')"
+  check_login_report "$report" "BASH_ENV" "$py_bin" "$atm_real" "$git_real"
+}
+
+check_login_report() {
+  local report="$1" label="$2" py_bin="$3" atm_real="$4" git_real="$5"
+  local py atm git
+  py="$(printf '%s\n' "$report" | sed -n 's/^python=//p')"
+  atm="$(printf '%s\n' "$report" | sed -n 's/^atm=//p')"
+  git="$(printf '%s\n' "$report" | sed -n 's/^git=//p')"
+  case "$py" in
+    "$py_bin"/python|"$py_bin"/python3) ;;
+    *) die "${label}: command -v python => ${py:-missing}，預期 ${py_bin}/python" ;;
+  esac
+  [ -n "$atm" ] && [ "$(readlink -f "$atm")" = "$atm_real" ] || die "${label}: command -v atm-write => ${atm:-missing}，預期 ${atm_real}"
+  [ -n "$git" ] && [ "$(readlink -f "$git")" = "$git_real" ] || die "${label}: command -v git => ${git:-missing}，預期 ${git_real}"
 }
 
 capture_intended_patch() {

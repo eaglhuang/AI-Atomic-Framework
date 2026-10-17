@@ -30,6 +30,11 @@ export PREREG_ARM="$ARM"
 export PREREG_WRITE_AFTER_MS="$(( $(date +%s%3N) + 1200 ))"
 unset PREREG_GOLD_PATCH || true
 unset PREREG_ARM_BIN || true
+mkdir -p "$ARM_DIR/bin"
+if [ "$ARM" = "A" ]; then
+  install_arm_git_bin A "$ARM_DIR/bin"
+  export PREREG_ARM_BIN="$ARM_DIR/bin"
+fi
 
 cleanup_arm() {
   if [ "${ARM:-}" = "B" ]; then
@@ -44,7 +49,7 @@ if [ "$ARM" = "B" ]; then
   mkdir -p "$ARM_DIR/bin" "$WORK/.prereg-smoke"
   export PREREG_SANDBOX_REPO="$WORK"
   ln -sfn "$HERE/bin/atm-write" "$ARM_DIR/bin/atm-write"
-  ln -sfn "$HERE/bin/git-shim" "$ARM_DIR/bin/git"
+  install_arm_git_bin B "$ARM_DIR/bin"
   export PREREG_ARM_BIN="$ARM_DIR/bin"
   select_run_boundary
   if sandbox_boundary_active; then
