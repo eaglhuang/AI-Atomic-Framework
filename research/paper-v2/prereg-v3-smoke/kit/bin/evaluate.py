@@ -628,10 +628,17 @@ def snapshot_failure(arm_name, arm_dir, message):
 
 def checkout_snapshot(work, destination):
     """複本只含評估快照的 HEAD。呼叫前必須已經 freeze，否則未提交修改不會進來。"""
-    subprocess.run(["/usr/bin/git", "clone", "--quiet", "--shared", str(work), str(destination)], check=True)
     subprocess.run(
-        ["/usr/bin/git", "-C", str(destination), "checkout", "--force", "--detach", "--quiet", "HEAD"],
+        ["/usr/bin/git", "clone", "--quiet", "--shared", str(work), str(destination)],
         check=True,
+        capture_output=True,
+        text=True,
+    )
+    subprocess.run(
+        ["/usr/bin/git", "-c", "advice.detachedHead=false", "-C", str(destination), "checkout", "--force", "--detach", "--quiet", "HEAD"],
+        check=True,
+        capture_output=True,
+        text=True,
     )
 
 
