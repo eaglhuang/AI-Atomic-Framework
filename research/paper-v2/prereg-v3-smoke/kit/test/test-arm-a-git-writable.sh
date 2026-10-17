@@ -78,7 +78,9 @@ head_sha="$(git -C "$WORK" rev-parse HEAD)"
 [ "$head_sha" != "$base_sha" ]
 [ "$(git -C "$WORK" show HEAD:note.txt)" = "new" ]
 
-if command -v bwrap >/dev/null 2>&1; then
+# GitHub Actions 有 bwrap 執行檔，但 user namespace 會是 uid map Permission denied。
+# 那不是 .git 唯讀的證明。bwrap_ready 先跑一次 true；起不來就略過，chmod 證明仍在。
+if bwrap_ready; then
   printf 'bwrap\n' > "$WORK/note.txt"
   mkdir -p "$BASE/scratch"
   set +e
