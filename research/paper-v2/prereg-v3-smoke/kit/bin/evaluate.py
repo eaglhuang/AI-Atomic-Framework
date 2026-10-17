@@ -269,8 +269,58 @@ def iter_log_events(text):
             yield event
 
 
+# Codex 0.163.0 的 exec JSONL 是 item.completed + item.type=command_execution。
+# 同一版也可能把結束事件放在 exec_command_end，欄位名略有不同。模型訊息不是命令。
+COMMAND_ITEM_TYPES = {"command_execution", "exec_command", "local_shell"}
+
+
+def coerce_exit_code(value):
+    if isinstance(value, bool) or value is None:
+        return None
+    if isinstance(value, int):
+        return value
+    if isinstance(value, str) and value.strip().lstrip("-").isdigit():
+        return int(value.strip())
+    return None
+
+
+def command_record(event):
+    """從一筆事件取出命令本體。started / agent_message 回 None。"""
+    if event.get("type") == "item.completed":
+        item = event.get("item") if isinstance(event.get("item"), dict) else None
+        if item and item.get("type") in COMMAND_ITEM_TYPES:
+            return item
+        return None
+    if event.get("type") in {"exec_command_end", "command_execution"}:
+        if event.get("command") or event.get("cmd"):
+            return event
+    return None
+
+
+def command_text(record):
+    return str(record.get("command") or record.get("cmd") or "")
+
+
+def command_output(record):
+    parts = []
+    for key in ("aggregated_output", "output", "stdout", "stderr"):
+        value = record.get(key)
+        if isinstance(value, str) and value:
+            parts.append(value)
+    return "\n".join(parts)
+
+
+def command_failed(record):
+    exit_code = coerce_exit_code(record.get("exit_code"))
+    if exit_code is None:
+        exit_code = coerce_exit_code(record.get("exitCode"))
+    if exit_code is not None:
+        return exit_code != 0
+    return str(record.get("status") or "").lower() in {"failed", "error"}
+
+
 def completed_commands(text):
-    """Codex 一筆命令先 started 再 completed。只算 completed，並用 item id 去重。"""
+    """Codex 一筆命令先 started 再 completed。只算完成的命令，並用 item id 去重。"""
     seen = set()
     for event in iter_log_events(text):
         if event.get("type") == "stub.atm-write":
@@ -279,17 +329,15 @@ def completed_commands(text):
         if event.get("type") == "stub.git":
             yield {"kind": "stub-git", "id": "stub-git", "event": event}
             continue
-        if event.get("type") != "item.completed":
+        item = command_record(event)
+        if not item:
             continue
-        item = event.get("item") if isinstance(event.get("item"), dict) else None
-        if not item or item.get("type") != "command_execution":
-            continue
-        item_id = item.get("id")
+        item_id = item.get("id") or item.get("call_id")
         if item_id in seen:
             continue
         if item_id:
             seen.add(item_id)
-        command = str(item.get("command") or "")
+        command = command_text(item)
         if ATM_WRITE_CALL.search(command):
             yield {"kind": "atm-write", "id": item_id, "event": item, "command": command}
         elif GIT_ADD_OR_COMMIT.search(command):
@@ -311,8 +359,66 @@ def command_log_observed(text):
     return False
 
 
+def steward_decision(record):
+    for line in command_output(record).splitlines():
+        line = line.strip()
+        if not line.startswith("{"):
+            continue
+        try:
+            obj = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(obj, dict) and obj.get("decision") is not None:
+            return str(obj.get("decision"))
+    return ""
+
+
+def intended_edit(item):
+    """同一份意圖修改以 atm-write 的檔案路徑辨認。認不出路徑就不併進別的修改。"""
+    command = item.get("command")
+    if command:
+        match = ATM_WRITE_FILE.search(command)
+        return match.group(1) if match else None
+    target = item["event"].get("file")
+    return str(target) if target else None
+
+
+def is_steward_rejection(item):
+    """steward 拒絕才算。命令找不到、kit-error、以及模型自己的句子都不是拒絕。"""
+    event = item["event"]
+    if item.get("command") is None:
+        return str(event.get("decision") or "").startswith("rejected")
+    decision = steward_decision(event)
+    if decision.startswith("rejected"):
+        return True
+    if decision in {"accepted", "kit-error"}:
+        return False
+    output = command_output(event)
+    exit_code = coerce_exit_code(event.get("exit_code"))
+    if exit_code is None:
+        exit_code = coerce_exit_code(event.get("exitCode"))
+    if exit_code == 127 or "command not found" in output:
+        return False
+    return exit_code == 3
+
+
+def session_resubmissions(text):
+    """同一份意圖修改被拒絕之後，後續的 atm-write 才算重送。第一筆拒絕本身不算。"""
+    rejected = set()
+    count = 0
+    for item in completed_commands(text):
+        if item["kind"] != "atm-write":
+            continue
+        target = intended_edit(item)
+        if target and target in rejected:
+            count += 1
+        if target and is_steward_rejection(item):
+            rejected.add(target)
+    return count
+
+
 def resubmission_count(arm_dir):
-    """每個 session 的 atm-write 完成呼叫減去第一筆。兩支 session 都沒有命令紀錄時回 None。"""
+    """兩支 session 的重送次數相加。都沒有命令紀錄時回 None。"""
     observed = False
     total = 0
     for slot in (1, 2):
@@ -320,15 +426,20 @@ def resubmission_count(arm_dir):
         if not command_log_observed(text):
             continue
         observed = True
-        calls = sum(1 for item in completed_commands(text) if item["kind"] == "atm-write")
-        total += max(calls - 1, 0)
+        total += session_resubmissions(text)
     if not observed:
         return None
     return total
 
 
 def index_lock_count(text):
-    """只算命令紀錄裡真正失敗的 git add / git commit，而且輸出含 index.lock。否則 None。"""
+    """命令紀錄裡失敗的 git add / git commit，而且輸出含 index.lock。
+
+    有命令紀錄但沒有這種失敗時是 0。完全沒有命令紀錄時才是 None。
+    模型訊息裡的 index.lock 不算。
+    """
+    if not command_log_observed(text):
+        return None
     count = 0
     for item in completed_commands(text):
         if item["kind"] == "stub-git":
@@ -344,12 +455,9 @@ def index_lock_count(text):
         if item["kind"] != "git-add-commit":
             continue
         event = item["event"]
-        exit_code = event.get("exit_code")
-        output = f"{event.get('aggregated_output') or ''}\n{event.get('stderr') or ''}"
-        if isinstance(exit_code, int) and exit_code != 0 and "index.lock" in output:
+        output = command_output(event)
+        if command_failed(event) and "index.lock" in output:
             count += 1
-    if count == 0:
-        return None
     return count
 
 
@@ -1234,7 +1342,7 @@ def main():
         "boundary": (arms.get("B") or {}).get("boundary"),
         "boundaryMechanism": (arms.get("B") or {}).get("boundaryMechanism"),
         "testIdNormalization": tasks.get("testIdNormalization"),
-        "overlapCondition": env.get("PREREG_OVERLAP_CONDITION") or None,
+        "overlapCondition": (env.get("PREREG_OVERLAP_CONDITION") or "").strip() or "none",
         "arms": arms,
     }
     dest = STATE / "results.json"

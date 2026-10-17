@@ -111,7 +111,9 @@ def test_index_lock_ignores_prose_and_counts_git_failures():
         "type": "item.completed",
         "item": {"id": "item_2", "type": "agent_message", "text": "cannot create .git/index.lock because it is read-only"},
     })
-    assert evaluate.index_lock_count(prose) is None
+    assert evaluate.index_lock_count(prose) == 0
+    assert evaluate.index_lock_count("") is None
+    assert evaluate.index_lock_count("{}\n") is None
     failed = command_event(
         "item_3",
         "/bin/bash -lc 'git add loader.py && git commit -m fix'",
@@ -125,7 +127,7 @@ def test_v6_archive_counts():
     assert evaluate.resubmission_count(V6 / "logs/arm-b") == 3
     for slot in (1, 2):
         text = (V6 / "logs/arm-a/session-{0}/stdout.jsonl".format(slot)).read_text(encoding="utf-8", errors="replace")
-        assert evaluate.index_lock_count(text) is None, slot
+        assert evaluate.index_lock_count(text) == 0, slot
         assert "index.lock" in text
     rows = [
         json.loads(line)
@@ -253,7 +255,7 @@ def test_uncommitted_arm_a_is_in_tests_and_diff():
     arm = payload["arms"]["A"]
     assert arm["snapshotCreated"] is True, arm.get("snapshotCreated")
     assert arm["snapshot"] != base
-    assert arm["indexLockCount"] is None, arm["indexLockCount"]
+    assert arm["indexLockCount"] == 0, arm["indexLockCount"]
     assert arm["lostEditCount"] == 0, arm
     assert arm["lostEditConfidence"] == "hunk", arm["lostEditConfidence"]
     diff = (root / "arm-a" / "final.diff").read_text(encoding="utf-8")

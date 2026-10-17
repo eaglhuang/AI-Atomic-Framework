@@ -412,6 +412,7 @@ ensure_other_can_reach() {
 # Codex 0.159.2 與 0.163.0 在 workspace-write 下保護工作目錄的 .git、.agents、.codex、.aws。
 # 0.163.0 的命令執行器啟動時會 mkdir .agents。工作樹屬於 steward 時這個 mkdir 得到
 # Permission denied，命令還沒跑就失敗。這三個目錄預先交給 session，.git 與已追蹤檔案不交。
+# Arm A 另把該工作樹的 .git 放進 writable_roots，沙盒才不會把 index.lock 擋成唯讀。
 CODEX_SESSION_RUNTIME_DIRS=(.agents .codex .aws)
 
 # 工作樹改由 steward 擁有。目錄對其他人只有讀與進入，沒有寫，所以 session 不能寫、不能改名、也不能 chmod。
@@ -662,7 +663,17 @@ pinned_codex_exec_args() {
   elif [ "${PREREG_ARM:-}" = "B" ]; then
     dest+=(--sandbox read-only)
   else
-    dest+=(--sandbox workspace-write)
+    # Arm A 是一般共用儲存庫。workspace-write 仍把工作樹裡的 .git 刻成唯讀；
+    # 把這個工作樹的 .git 本身放進 writable_roots，明確規則才蓋過那層保護。
+    # 不開 network。金標路徑不加進可寫根。Arm B 不加這個根。
+    local git_root="${work}/.git"
+    local escaped="${git_root//\\/\\\\}"
+    escaped="${escaped//\"/\\\"}"
+    dest+=(
+      --sandbox workspace-write
+      -c "sandbox_workspace_write.writable_roots=[\"${escaped}\"]"
+      -c 'sandbox_workspace_write.network_access=false'
+    )
   fi
   if [ -z "$help" ] || codex_supports "$help" "--cd"; then
     dest+=(--cd "$work")
@@ -779,12 +790,42 @@ release_session_codex_home() {
   unset PREREG_SESSION_CODEX_HOME PREREG_SESSION_CODEX_ROOT
 }
 
+# 評估 venv 的 python 常常是 symlink。PATH 要放 venv/bin，不能解析到系統解譯器。
+evaluator_python_bin() {
+  case "${PREREG_PYTHON:-}" in
+    /*)
+      if [ -x "${PREREG_PYTHON}" ]; then
+        dirname "${PREREG_PYTHON}"
+        return 0
+      fi
+      ;;
+  esac
+  return 1
+}
+
+# session 要能執行評估 venv，但不能寫它。只補其他人的讀與執行。
+expose_evaluator_python() {
+  local py="${PREREG_PYTHON:-}" bin root
+  bin="$(evaluator_python_bin)" || return 0
+  py="${PREREG_PYTHON}"
+  ensure_other_can_reach "$py"
+  root="$(dirname "$bin")"
+  if [ -f "$root/pyvenv.cfg" ]; then
+    chmod -R a+rX,go-w "$root" 2>/dev/null || as_root chmod -R a+rX,go-w "$root" || true
+  else
+    chmod a+rX "$py" 2>/dev/null || as_root chmod a+rX "$py" || true
+  fi
+}
+
 # 工作階段環境允許清單。金標路徑、GOLD_ROOT、state、tasks 都不在裡面。
 session_env_assignments() {
   local session_dir="$1" work="$2"
-  local node_bin path_value
+  local node_bin path_value py_bin
   node_bin="$(dirname "$(command -v node)")"
   path_value="${node_bin}:/usr/bin:/bin"
+  if py_bin="$(evaluator_python_bin)"; then
+    path_value="${py_bin}:${path_value}"
+  fi
   if [ "${PREREG_ARM:-}" = "B" ]; then
     path_value="${KIT_ROOT}/bin:${path_value}"
     if [ -n "${PREREG_ARM_BIN:-}" ]; then
@@ -909,6 +950,7 @@ launch_codex() {
     export PREREG_SANDBOX_REPO
     PREREG_SANDBOX_EXTRA_WRITES=("$session_dir")
   fi
+  expose_evaluator_python
   if [ "${PREREG_BOUNDARY:-}" = "unix-user" ] && [ "${PREREG_ARM:-}" = "B" ]; then
     # 只有工作階段的日誌目錄對 session 可寫。儲存庫工作樹不在這裡。
     chmod 1777 "$session_dir" "$session_dir/home" "$session_dir/tmp"
