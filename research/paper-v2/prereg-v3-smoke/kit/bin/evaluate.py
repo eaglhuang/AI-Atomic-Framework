@@ -269,8 +269,58 @@ def iter_log_events(text):
             yield event
 
 
+# Codex 0.163.0 的 exec JSONL 是 item.completed + item.type=command_execution。
+# 同一版也可能把結束事件放在 exec_command_end，欄位名略有不同。模型訊息不是命令。
+COMMAND_ITEM_TYPES = {"command_execution", "exec_command", "local_shell"}
+
+
+def coerce_exit_code(value):
+    if isinstance(value, bool) or value is None:
+        return None
+    if isinstance(value, int):
+        return value
+    if isinstance(value, str) and value.strip().lstrip("-").isdigit():
+        return int(value.strip())
+    return None
+
+
+def command_record(event):
+    """從一筆事件取出命令本體。started / agent_message 回 None。"""
+    if event.get("type") == "item.completed":
+        item = event.get("item") if isinstance(event.get("item"), dict) else None
+        if item and item.get("type") in COMMAND_ITEM_TYPES:
+            return item
+        return None
+    if event.get("type") in {"exec_command_end", "command_execution"}:
+        if event.get("command") or event.get("cmd"):
+            return event
+    return None
+
+
+def command_text(record):
+    return str(record.get("command") or record.get("cmd") or "")
+
+
+def command_output(record):
+    parts = []
+    for key in ("aggregated_output", "output", "stdout", "stderr"):
+        value = record.get(key)
+        if isinstance(value, str) and value:
+            parts.append(value)
+    return "\n".join(parts)
+
+
+def command_failed(record):
+    exit_code = coerce_exit_code(record.get("exit_code"))
+    if exit_code is None:
+        exit_code = coerce_exit_code(record.get("exitCode"))
+    if exit_code is not None:
+        return exit_code != 0
+    return str(record.get("status") or "").lower() in {"failed", "error"}
+
+
 def completed_commands(text):
-    """Codex 一筆命令先 started 再 completed。只算 completed，並用 item id 去重。"""
+    """Codex 一筆命令先 started 再 completed。只算完成的命令，並用 item id 去重。"""
     seen = set()
     for event in iter_log_events(text):
         if event.get("type") == "stub.atm-write":
@@ -279,17 +329,15 @@ def completed_commands(text):
         if event.get("type") == "stub.git":
             yield {"kind": "stub-git", "id": "stub-git", "event": event}
             continue
-        if event.get("type") != "item.completed":
+        item = command_record(event)
+        if not item:
             continue
-        item = event.get("item") if isinstance(event.get("item"), dict) else None
-        if not item or item.get("type") != "command_execution":
-            continue
-        item_id = item.get("id")
+        item_id = item.get("id") or item.get("call_id")
         if item_id in seen:
             continue
         if item_id:
             seen.add(item_id)
-        command = str(item.get("command") or "")
+        command = command_text(item)
         if ATM_WRITE_CALL.search(command):
             yield {"kind": "atm-write", "id": item_id, "event": item, "command": command}
         elif GIT_ADD_OR_COMMIT.search(command):
@@ -311,8 +359,66 @@ def command_log_observed(text):
     return False
 
 
+def steward_decision(record):
+    for line in command_output(record).splitlines():
+        line = line.strip()
+        if not line.startswith("{"):
+            continue
+        try:
+            obj = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(obj, dict) and obj.get("decision") is not None:
+            return str(obj.get("decision"))
+    return ""
+
+
+def intended_edit(item):
+    """同一份意圖修改以 atm-write 的檔案路徑辨認。認不出路徑就不併進別的修改。"""
+    command = item.get("command")
+    if command:
+        match = ATM_WRITE_FILE.search(command)
+        return match.group(1) if match else None
+    target = item["event"].get("file")
+    return str(target) if target else None
+
+
+def is_steward_rejection(item):
+    """steward 拒絕才算。命令找不到、kit-error、以及模型自己的句子都不是拒絕。"""
+    event = item["event"]
+    if item.get("command") is None:
+        return str(event.get("decision") or "").startswith("rejected")
+    decision = steward_decision(event)
+    if decision.startswith("rejected"):
+        return True
+    if decision in {"accepted", "kit-error"}:
+        return False
+    output = command_output(event)
+    exit_code = coerce_exit_code(event.get("exit_code"))
+    if exit_code is None:
+        exit_code = coerce_exit_code(event.get("exitCode"))
+    if exit_code == 127 or "command not found" in output:
+        return False
+    return exit_code == 3
+
+
+def session_resubmissions(text):
+    """同一份意圖修改被拒絕之後，後續的 atm-write 才算重送。第一筆拒絕本身不算。"""
+    rejected = set()
+    count = 0
+    for item in completed_commands(text):
+        if item["kind"] != "atm-write":
+            continue
+        target = intended_edit(item)
+        if target and target in rejected:
+            count += 1
+        if target and is_steward_rejection(item):
+            rejected.add(target)
+    return count
+
+
 def resubmission_count(arm_dir):
-    """每個 session 的 atm-write 完成呼叫減去第一筆。兩支 session 都沒有命令紀錄時回 None。"""
+    """兩支 session 的重送次數相加。都沒有命令紀錄時回 None。"""
     observed = False
     total = 0
     for slot in (1, 2):
@@ -320,15 +426,20 @@ def resubmission_count(arm_dir):
         if not command_log_observed(text):
             continue
         observed = True
-        calls = sum(1 for item in completed_commands(text) if item["kind"] == "atm-write")
-        total += max(calls - 1, 0)
+        total += session_resubmissions(text)
     if not observed:
         return None
     return total
 
 
 def index_lock_count(text):
-    """只算命令紀錄裡真正失敗的 git add / git commit，而且輸出含 index.lock。否則 None。"""
+    """命令紀錄裡失敗的 git add / git commit，而且輸出含 index.lock。
+
+    有命令紀錄但沒有這種失敗時是 0。完全沒有命令紀錄時才是 None。
+    模型訊息裡的 index.lock 不算。
+    """
+    if not command_log_observed(text):
+        return None
     count = 0
     for item in completed_commands(text):
         if item["kind"] == "stub-git":
@@ -344,12 +455,9 @@ def index_lock_count(text):
         if item["kind"] != "git-add-commit":
             continue
         event = item["event"]
-        exit_code = event.get("exit_code")
-        output = f"{event.get('aggregated_output') or ''}\n{event.get('stderr') or ''}"
-        if isinstance(exit_code, int) and exit_code != 0 and "index.lock" in output:
+        output = command_output(event)
+        if command_failed(event) and "index.lock" in output:
             count += 1
-    if count == 0:
-        return None
     return count
 
 
@@ -540,10 +648,9 @@ def path_is_snapshot_skip(path):
     return any(part in SNAPSHOT_SKIP for part in Path(path).parts)
 
 
-def task_dirty_paths(work):
-    result = git(work, "status", "--porcelain", "--untracked-files=all", check=False)
+def parse_status_paths(stdout):
     paths = []
-    for line in result.stdout.splitlines():
+    for line in stdout.splitlines():
         if len(line) < 4:
             continue
         path = line[3:]
@@ -555,6 +662,13 @@ def task_dirty_paths(work):
     return paths
 
 
+def task_dirty_paths(work):
+    result = git(work, "status", "--porcelain", "--untracked-files=all", check=False)
+    if result.returncode != 0:
+        raise RuntimeError(f"evaluator snapshot failed: {result.stderr or result.stdout}")
+    return parse_status_paths(result.stdout)
+
+
 def blob_text(work, rev, file):
     result = git(work, "show", f"{rev}:{file}", check=False)
     if result.returncode != 0:
@@ -563,36 +677,40 @@ def blob_text(work, rev, file):
 
 
 def freeze_worktree_snapshot(work):
-    """把未提交與未追蹤的任務檔收成一個評估用 commit。乾淨的樹就用現在的 HEAD。
+    """把工作樹收成一個評估用 commit。乾淨的樹也做一個空 commit。
 
-    同一份 commit 接著給遺失修改、測試複本與 base..HEAD diff。收不進去就失敗，
-    不能退回仍停在共同 base 的 HEAD。
+    v7 Arm B 的任務檔已經在 steward HEAD 上，只有 .atm 與 .prereg-smoke 未追蹤。
+    舊邏輯因此不建立 commit，snapshotCreated 是 false，未完成的拒絕仍被記成 blocked。
+    那一次沒有留下評估快照。現在每次都寫 `prereg evaluator snapshot`。
+    git status 失敗、或 commit 寫不進 .git，都是失敗，不能假裝樹是乾淨的。
+    同一份 commit 接著給遺失修改、測試複本與 base..snapshot diff。
     """
     head = git(work, "rev-parse", "HEAD", check=False)
     if head.returncode != 0:
-        raise RuntimeError(f"evaluator snapshot failed: {head.stderr}")
+        raise RuntimeError(f"evaluator snapshot failed: {head.stderr or head.stdout}")
     before = head.stdout.strip()
-    if not task_dirty_paths(work):
-        return {"sha": before, "created": False}
-    add = git(work, "add", "-A", "--", ".", *SNAPSHOT_PATHSPEC, check=False)
-    if add.returncode != 0:
-        raise RuntimeError(f"evaluator snapshot failed: {add.stderr or add.stdout}")
-    cached = git(work, "diff", "--cached", "--quiet", check=False)
-    if cached.returncode == 0:
-        still = task_dirty_paths(work)
-        raise RuntimeError("evaluator snapshot did not capture uncommitted edits: " + ", ".join(still[:8]))
-    commit = git(
-        work,
+    dirty = task_dirty_paths(work)
+    commit_args = [
         "-c", "user.name=prereg-evaluator",
         "-c", "user.email=prereg-evaluator@localhost",
         "commit", "-q", "-m", "prereg evaluator snapshot",
-        check=False,
-    )
+    ]
+    if dirty:
+        add = git(work, "add", "-A", "--", ".", *SNAPSHOT_PATHSPEC, check=False)
+        if add.returncode != 0:
+            raise RuntimeError(f"evaluator snapshot failed: {add.stderr or add.stdout}")
+        cached = git(work, "diff", "--cached", "--quiet", check=False)
+        if cached.returncode == 0:
+            still = task_dirty_paths(work)
+            raise RuntimeError("evaluator snapshot did not capture uncommitted edits: " + ", ".join(still[:8]))
+    else:
+        commit_args.insert(5, "--allow-empty")
+    commit = git(work, *commit_args, check=False)
     if commit.returncode != 0:
         raise RuntimeError(f"evaluator snapshot failed: {commit.stderr or commit.stdout}")
     after = git(work, "rev-parse", "HEAD", check=False)
     if after.returncode != 0:
-        raise RuntimeError(f"evaluator snapshot failed: {after.stderr}")
+        raise RuntimeError(f"evaluator snapshot failed: {after.stderr or after.stdout}")
     sha = after.stdout.strip()
     if sha == before:
         raise RuntimeError("evaluator snapshot did not create a commit")
@@ -617,6 +735,7 @@ def snapshot_failure(arm_name, arm_dir, message):
         "indexLockCount": None,
         "lostEditConfidence": "low",
         "rejectionAttribution": "low",
+        "snapshotCreated": False,
         "tests": [{
             "instanceId": None,
             "kitError": "evaluator-snapshot-failed",
@@ -1234,7 +1353,7 @@ def main():
         "boundary": (arms.get("B") or {}).get("boundary"),
         "boundaryMechanism": (arms.get("B") or {}).get("boundaryMechanism"),
         "testIdNormalization": tasks.get("testIdNormalization"),
-        "overlapCondition": env.get("PREREG_OVERLAP_CONDITION") or None,
+        "overlapCondition": (env.get("PREREG_OVERLAP_CONDITION") or "").strip() or "none",
         "arms": arms,
     }
     dest = STATE / "results.json"

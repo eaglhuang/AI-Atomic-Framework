@@ -32,6 +32,7 @@ write_probe_prompt() {
     cat > "$dest" <<'EOF'
 This is a preflight probe, not a software task. Do not mention django or any issue.
 Edit note.txt so that its only line is new.
+Then run git add note.txt and git commit so that commit succeeds and HEAD contains that line.
 Then emit the unified diff between these markers:
 BEGIN_INTENDED_PATCH
 diff --git a/note.txt b/note.txt
@@ -141,6 +142,10 @@ run_real_exec() {
     unset PREREG_BOUNDARY || true
   fi
   write_probe_prompt "$arm" "$session/prompt.txt"
+  local base_sha=""
+  if [ "$arm" = "A" ]; then
+    base_sha="$(git -C "$repo" rev-parse HEAD)"
+  fi
   echo "real-model arm=${arm} mode=${mode:-none}"
   (
     launch_codex "$session" "$session/prompt.txt" "$repo"
@@ -171,11 +176,19 @@ PY
     release_sandbox_scratch "${PREREG_SANDBOX_SCRATCH:-}" || true
     unset PREREG_SANDBOX_SCRATCH PREREG_SANDBOX_REPO || true
   else
-    python3 - "$repo/note.txt" <<'PY'
-import pathlib, sys
-text = pathlib.Path(sys.argv[1]).read_text(encoding="utf-8")
+    python3 - "$repo" "$base_sha" <<'PY'
+import pathlib, subprocess, sys
+repo = pathlib.Path(sys.argv[1])
+base = sys.argv[2]
+text = (repo / "note.txt").read_text(encoding="utf-8")
 if text != "new\n":
     raise SystemExit(f"arm A did not edit note.txt: {text!r}")
+head = subprocess.check_output(["git", "-C", str(repo), "rev-parse", "HEAD"], text=True).strip()
+if not head or head == base:
+    raise SystemExit(f"arm A git commit did not move HEAD ({base} -> {head})")
+shown = subprocess.check_output(["git", "-C", str(repo), "show", "HEAD:note.txt"], text=True)
+if shown != "new\n":
+    raise SystemExit(f"arm A commit does not contain note.txt: {shown!r}")
 PY
   fi
   echo "real-model ok arm=${arm} mode=${mode:-none}"

@@ -129,7 +129,7 @@ def test_results_record_normalization():
     )
     assert proc.returncode == 2, proc.returncode
     recorded = json.loads((plain / "results.json").read_text(encoding="utf-8"))
-    assert recorded["overlapCondition"] is None
+    assert recorded["overlapCondition"] == "none"
     assert recorded["testIdNormalization"]["map"][DOC_LOADED] == NAMESPACE
 
 

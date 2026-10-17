@@ -111,7 +111,9 @@ def test_index_lock_ignores_prose_and_counts_git_failures():
         "type": "item.completed",
         "item": {"id": "item_2", "type": "agent_message", "text": "cannot create .git/index.lock because it is read-only"},
     })
-    assert evaluate.index_lock_count(prose) is None
+    assert evaluate.index_lock_count(prose) == 0
+    assert evaluate.index_lock_count("") is None
+    assert evaluate.index_lock_count("{}\n") is None
     failed = command_event(
         "item_3",
         "/bin/bash -lc 'git add loader.py && git commit -m fix'",
@@ -125,7 +127,7 @@ def test_v6_archive_counts():
     assert evaluate.resubmission_count(V6 / "logs/arm-b") == 3
     for slot in (1, 2):
         text = (V6 / "logs/arm-a/session-{0}/stdout.jsonl".format(slot)).read_text(encoding="utf-8", errors="replace")
-        assert evaluate.index_lock_count(text) is None, slot
+        assert evaluate.index_lock_count(text) == 0, slot
         assert "index.lock" in text
     rows = [
         json.loads(line)
@@ -253,7 +255,7 @@ def test_uncommitted_arm_a_is_in_tests_and_diff():
     arm = payload["arms"]["A"]
     assert arm["snapshotCreated"] is True, arm.get("snapshotCreated")
     assert arm["snapshot"] != base
-    assert arm["indexLockCount"] is None, arm["indexLockCount"]
+    assert arm["indexLockCount"] == 0, arm["indexLockCount"]
     assert arm["lostEditCount"] == 0, arm
     assert arm["lostEditConfidence"] == "hunk", arm["lostEditConfidence"]
     diff = (root / "arm-a" / "final.diff").read_text(encoding="utf-8")
@@ -269,8 +271,41 @@ def test_uncommitted_arm_a_is_in_tests_and_diff():
     assert MARKER in (clone / "marker.txt").read_text(encoding="utf-8")
     assert "beta-from-a" in (clone / "shared.py").read_text(encoding="utf-8")
     other = payload["arms"]["B"]
-    assert other["snapshotCreated"] is False
+    assert other["snapshotCreated"] is True
+    assert "prereg evaluator snapshot" in (root / "arm-b" / "git-log.txt").read_text(encoding="utf-8")
     assert MARKER in (root / "arm-b" / "final.diff").read_text(encoding="utf-8")
+
+
+def test_snapshot_failure_overrides_blocked():
+    """本來會是 blocked 的臂，快照寫不進去時必須是 invalid，不能留在 blocked。"""
+    root, _base = build_tree()
+    work = root / "arm-b" / "work"
+    (work / "shared.py").write_text("alpha\nbeta-from-a\nstill-dirty\n", encoding="utf-8")
+    smoke = work / ".prereg-smoke"
+    smoke.mkdir(exist_ok=True)
+    row = {
+        "ok": False,
+        "decision": "rejected-by-design",
+        "reasonCode": "patch-context-mismatch",
+        "terminal": "blocked",
+        "file": "shared.py",
+        "attempt": 1,
+    }
+    (smoke / "steward-writes.jsonl").write_text(json.dumps(row) + "\n", encoding="utf-8")
+    git_dir = work / ".git"
+    mode = git_dir.stat().st_mode
+    git_dir.chmod(mode & ~stat.S_IWUSR & ~stat.S_IWGRP & ~stat.S_IWOTH)
+    try:
+        proc, payload = run_evaluate(root)
+    finally:
+        git_dir.chmod(mode)
+    assert proc.returncode == 4, (proc.returncode, proc.stderr[-500:], payload.get("status"))
+    assert payload["status"] == "invalid", payload["status"]
+    arm = payload["arms"]["B"]
+    assert arm["status"] == "invalid", arm["status"]
+    assert arm["snapshotCreated"] is False
+    assert arm["tests"][0]["kitError"] == "evaluator-snapshot-failed", arm["tests"]
+    assert not (root / "arm-b" / "final.diff").exists()
 
 
 def test_snapshot_failure_is_invalid():
@@ -295,6 +330,7 @@ def main():
     test_index_lock_ignores_prose_and_counts_git_failures()
     test_v6_archive_counts()
     test_uncommitted_arm_a_is_in_tests_and_diff()
+    test_snapshot_failure_overrides_blocked()
     test_snapshot_failure_is_invalid()
     print("snapshot uncommitted ok")
 
