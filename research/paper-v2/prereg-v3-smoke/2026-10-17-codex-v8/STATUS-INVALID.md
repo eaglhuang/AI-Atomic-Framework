@@ -1,0 +1,9 @@
+# STATUS: INVALID (executor judgment) — do not cite
+Run on main cee511a3e17c032979b8ff5fce9ebd8a317ef977 (#341 merged), unix-user, gpt-6-luna, medium. Sessions started 2026-10-17T11:46+08. Kit status=blocked. Added after seal; not in SHA256SUMS.
+
+Snapshot commits exist. Arm A snapshot 4d63f22712 sits on the session commits 5f58a4de89 and 3e4dd8c376. Arm B snapshot 50bb6dc8cf sits on steward commit 9496c39caf (`prop-prereg-session-a1-d4030f3b7969` only).
+
+Reasons for INVALID:
+1. Codex runs session commands as `bash -lc`. `/etc/profile` replaces PATH, so the `env -i` session PATH does not survive. Arm A session 2 reports `python: command not found` and then runs `python3`, which is the system interpreter (`/usr/bin/python3` 3.13) rather than the evaluator venv (3.10). Arm B session 1: `command -v atm-write` fails and `atm-write: command not found`. The Arm B git shim is on that same PATH prefix, so it disappears with it. The later write used the absolute `kit/bin/atm-write` path.
+2. Arm B session 1 write `prop-prereg-session-a1-42f989d6ea50` returned ok / accepted / `ATM_BROKER_LIVE_WRITE_APPLIED` / terminal committed. `declaredBaseHash` and `currentFileHash` are both `sha256:7dca66d253358f3dfbda3d68ceffb8b9fee4d0f47d8ddef2fa4d25e78ff1b05c`. The archived git log has no commit for that proposal. The patch was malformed: the hunk header was a bare `@@`, and the added lines were not prefixed with `+`. Public CLI `@ai-atomic-framework/cli@0.1.21` treats an apply that does not change the file as accepted (`detail`: patch 沒有改變檔案), returns the current HEAD as `commitSha`, and does not append `.atm/runtime/live-write-journal.jsonl`.
+3. The evaluator classified session 1's missing lines as `steward-rejected` by filename. The rejection in the steward log is session 2's proposal `prop-prereg-session-a1-bd3b193b64b5`. The false accept is a silent loss, not a steward rejection.
