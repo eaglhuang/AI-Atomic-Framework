@@ -1,0 +1,43 @@
+diff --git a/django/db/migrations/loader.py b/django/db/migrations/loader.py
+index 95a5062ec9..00b194ab9b 100644
+--- a/django/db/migrations/loader.py
++++ b/django/db/migrations/loader.py
+@@ -90,7 +90,10 @@ class MigrationLoader:
+             else:
+                 # Empty directories are namespaces.
+                 # getattr() needed on PY36 and older (replace w/attribute access).
+-                if getattr(module, '__file__', None) is None:
++                if (
++                    getattr(module, '__file__', None) is None and
++                    not isinstance(getattr(module, '__path__', None), list)
++                ):
+                     self.unmigrated_apps.add(app_config.label)
+                     continue
+                 # Module is not a package (e.g. migrations.py).
+diff --git a/tests/migrations/test_loader.py b/tests/migrations/test_loader.py
+index 27a052ddac..a776bcba50 100644
+--- a/tests/migrations/test_loader.py
++++ b/tests/migrations/test_loader.py
+@@ -1,5 +1,7 @@
+ import compileall
+ import os
++from types import ModuleType
++from unittest import mock
+ 
+ from django.db import connection, connections
+ from django.db.migrations.exceptions import (
+@@ -191,6 +193,14 @@ class LoaderTests(TestCase):
+                 "App missing __init__.py in migrations module not in unmigrated apps."
+             )
+ 
++    @override_settings(INSTALLED_APPS=['migrations'], MIGRATION_MODULES={'migrations': 'migrations.custom'})
++    def test_load_package_without_file(self):
++        module = ModuleType('migrations.custom')
++        module.__path__ = []
++        with mock.patch('django.db.migrations.loader.import_module', return_value=module):
++            loader = MigrationLoader(connection)
++        self.assertIn('migrations', loader.migrated_apps)
++
+     @override_settings(
+         INSTALLED_APPS=['migrations.migrations_test_apps.migrated_app'],
+     )
