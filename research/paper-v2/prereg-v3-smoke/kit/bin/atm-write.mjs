@@ -404,7 +404,7 @@ function submitLive(input) {
     ok,
     decision,
     reasonCode,
-    messageCode: payload?.messages?.[0]?.code || null,
+    messageCode: recordMessageCode(payload?.messages?.[0]?.code || null, reasonCode),
     verdict: live?.verdict || null,
     phase: ok ? 'commit' : 'live',
     terminal: ok ? 'committed' : (decision === 'kit-error' ? 'kit-error' : 'blocked'),
@@ -431,6 +431,12 @@ function submitLive(input) {
   appendFileSync(logPath, `${JSON.stringify(record)}\n`);
   const exitCode = decision === 'accepted' ? 0 : (decision === 'rejected-by-design' ? 3 : 1);
   return { record, exitCode };
+}
+
+function recordMessageCode(code, reasonCode) {
+  // 公開 CLI 0.1.21 把每一筆非接受都標成 QUEUED。只有 overlapping-write-queued 才是排隊。
+  if (code === 'ATM_BROKER_LIVE_WRITE_QUEUED' && reasonCode !== 'overlapping-write-queued') return null;
+  return code || null;
 }
 
 function currentFileText(input) {

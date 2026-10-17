@@ -90,7 +90,8 @@ write_env "$STATE_ROOT/env.sh" \
   "GOLD_ROOT=$(printf '%q' "$GOLD")" \
   "COMMON_BASE=$(printf '%q' "$BASE")" \
   "PREREG_SMOKE_MODE=$(printf '%q' "$MODE")" \
-  "PREREG_PYTHON=$(printf '%q' "${PYBIN:-python3}")"
+  "PREREG_PYTHON=$(printf '%q' "${PYBIN:-python3}")" \
+  "PREREG_OVERLAP_CONDITION=$(printf '%q' "${PREREG_OVERLAP_CONDITION:-}")"
 
 mkdir -p "$KIT_ROOT/state"
 printf '%s\n' "${PREREG_RUN_ID:-explicit}" > "$STATE_ROOT/run-id"

@@ -73,7 +73,7 @@ def removed_lines(patch_text):
 
 
 def missing_edit_lines(patch_text, final_text, final_diff_text):
-    """意圖修改對照最終 diff。新增行不在最終檔，或刪除行仍留在最終檔且 diff 沒有刪掉它，都算沒落地。"""
+    """行文字比對。新增行出現在檔案別處也會算落地，所以只當 hunk 對不上時的低信心退路。"""
     final_lines = set(final_text.splitlines())
     missing = [line for line in added_lines(patch_text) if line not in final_lines]
     deleted_in_final = set(removed_lines(final_diff_text))
@@ -81,6 +81,84 @@ def missing_edit_lines(patch_text, final_text, final_diff_text):
         if line in final_lines and line not in deleted_in_final:
             missing.append(line)
     return missing
+
+
+HUNK_HEADER = re.compile(r"^@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@")
+
+
+def structured_hunks(patch_text):
+    """每個 hunk 拆成仍可 git apply 的單 hunk patch。任一 @@ 對不上標準標頭就回 None。"""
+    if "@@" not in patch_text:
+        return None
+    parts = split_patch(patch_text)
+    if not parts:
+        return None
+    hunks = []
+    for chunk in parts.values():
+        header = []
+        current = None
+        for line in chunk.splitlines(keepends=True):
+            if line.startswith("@@"):
+                if HUNK_HEADER.match(line.rstrip("\n")) is None:
+                    return None
+                if current:
+                    hunks.append("".join(header) + "".join(current))
+                current = [line]
+                continue
+            if current is None:
+                header.append(line)
+            else:
+                current.append(line)
+        if current:
+            hunks.append("".join(header) + "".join(current))
+    return hunks or None
+
+
+def rewrite_patch_paths(patch_text):
+    normalised = re.sub(r"^diff --git a/\S+ b/\S+\n", "diff --git a/target b/target\n", patch_text, count=1, flags=re.M)
+    normalised = re.sub(r"^--- a/\S+\n", "--- a/target\n", normalised, count=1, flags=re.M)
+    normalised = re.sub(r"^\+\+\+ b/\S+\n", "+++ b/target\n", normalised, count=1, flags=re.M)
+    return normalised
+
+
+def hunk_present(final_text, hunk_patch):
+    """hunk 的修改後內容就在最終檔裡時，git apply --reverse --check 會過。"""
+    with tempfile.TemporaryDirectory() as directory:
+        target = Path(directory) / "target"
+        target.write_text(final_text, encoding="utf-8")
+        patch = Path(directory) / "p.diff"
+        patch.write_text(rewrite_patch_paths(hunk_patch), encoding="utf-8")
+        result = subprocess.run(
+            ["/usr/bin/git", "apply", "--reverse", "--check", "--unsafe-paths", str(patch)],
+            cwd=directory,
+            text=True,
+            capture_output=True,
+        )
+        return result.returncode == 0
+
+
+def score_patch_lines(patch_text, final_text, final_diff_text):
+    """回傳 (沒落地的行, confidence)。
+
+    hunk 能整段 reverse-apply 到最終檔才算高信心落地。行文字也說沒落地時，用 hunk 的缺行。
+    兩者不一致（例如兩臂都改了同一區，行在檔裡但原 hunk 已經對不上）標成 low，
+    不把還在檔裡的行記成遺失。沒有標準 hunk 時也是 low，退回行文字比對。
+    """
+    line_missing = missing_edit_lines(patch_text, final_text, final_diff_text)
+    hunks = structured_hunks(patch_text)
+    if hunks is None:
+        return line_missing, "low"
+    hunk_missing = []
+    for hunk in hunks:
+        if hunk_present(final_text, hunk):
+            continue
+        hunk_missing.extend(added_lines(hunk))
+        hunk_missing.extend(removed_lines(hunk))
+    if not hunk_missing:
+        return [], "hunk"
+    if not line_missing:
+        return [], "low"
+    return hunk_missing, "hunk"
 
 
 def split_patch(text):
@@ -165,22 +243,179 @@ def blocked_steward_write(row):
     return row.get("terminal") in {"blocked", "queued"} and bool(reason)
 
 
-def recompose_or_retry(rows):
-    """從 steward 紀錄派生。被拒絕的寫入就是一次重寫或重送，即使 retryCount 仍是 0。"""
-    total = 0
-    for row in rows:
-        explicit = int(row.get("retryCount") or 0) + int(row.get("hashDriftCount") or 0) + int((row.get("commit") or {}).get("headMoves") or 0)
-        if blocked_steward_write(row):
-            total += max(explicit, 1)
+def recompose_or_retry(arm_dir):
+    """重送次數是 session 呼叫紀錄裡、每個 session 第一筆 atm-write 之後的呼叫。
+    沒有命令紀錄時是 None。拒絕次數另外記在 steward.rejected，不從拒絕列推重送。
+    """
+    return resubmission_count(arm_dir)
+
+
+GIT_ADD_OR_COMMIT = re.compile(
+    r"(?:^|[\s'\"`=])(?:\S*/)?git(?:\s+-c\s+\S+|\s+-C\s+\S+)*\s+(?:add|commit)\b"
+)
+ATM_WRITE_CALL = re.compile(r"(?:^|[\s'\"`=])(?:\S*/)?atm-write(?:\s|$)")
+ATM_WRITE_FILE = re.compile(r"(?:^|[\s'\"`=])(?:\S*/)?atm-write\s+(\S+)")
+
+
+def iter_log_events(text):
+    for line in text.splitlines():
+        if not line.strip():
+            continue
+        try:
+            event = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(event, dict):
+            yield event
+
+
+def completed_commands(text):
+    """Codex 一筆命令先 started 再 completed。只算 completed，並用 item id 去重。"""
+    seen = set()
+    for event in iter_log_events(text):
+        if event.get("type") == "stub.atm-write":
+            yield {"kind": "atm-write", "id": f"stub-{event.get('attempt')}-{event.get('file')}", "event": event}
+            continue
+        if event.get("type") == "stub.git":
+            yield {"kind": "stub-git", "id": "stub-git", "event": event}
+            continue
+        if event.get("type") != "item.completed":
+            continue
+        item = event.get("item") if isinstance(event.get("item"), dict) else None
+        if not item or item.get("type") != "command_execution":
+            continue
+        item_id = item.get("id")
+        if item_id in seen:
+            continue
+        if item_id:
+            seen.add(item_id)
+        command = str(item.get("command") or "")
+        if ATM_WRITE_CALL.search(command):
+            yield {"kind": "atm-write", "id": item_id, "event": item, "command": command}
+        elif GIT_ADD_OR_COMMIT.search(command):
+            yield {"kind": "git-add-commit", "id": item_id, "event": item, "command": command}
         else:
-            total += explicit
+            yield {"kind": "command", "id": item_id, "event": item, "command": command}
+
+
+def session_stdout(session):
+    path = session / "stdout.jsonl"
+    if not path.is_file():
+        return ""
+    return path.read_text(encoding="utf-8", errors="replace")
+
+
+def command_log_observed(text):
+    for item in completed_commands(text):
+        return True
+    return False
+
+
+def resubmission_count(arm_dir):
+    """每個 session 的 atm-write 完成呼叫減去第一筆。兩支 session 都沒有命令紀錄時回 None。"""
+    observed = False
+    total = 0
+    for slot in (1, 2):
+        text = session_stdout(arm_dir / f"session-{slot}")
+        if not command_log_observed(text):
+            continue
+        observed = True
+        calls = sum(1 for item in completed_commands(text) if item["kind"] == "atm-write")
+        total += max(calls - 1, 0)
+    if not observed:
+        return None
     return total
 
 
-def session_rejected(rows, session_files):
-    """Steward rows have no session id. taskId/actorId stay prereg / prereg-session for every session.
-    A session is rejected when the log has a blocked or rejected write for a file in that session's intended patch.
-    """
+def index_lock_count(text):
+    """只算命令紀錄裡真正失敗的 git add / git commit，而且輸出含 index.lock。否則 None。"""
+    count = 0
+    for item in completed_commands(text):
+        if item["kind"] == "stub-git":
+            event = item["event"]
+            err = str(event.get("stderr") or "")
+            if "index.lock" not in err:
+                continue
+            if event.get("addStatus") not in (0, None):
+                count += 1
+            if event.get("commitStatus") not in (0, None):
+                count += 1
+            continue
+        if item["kind"] != "git-add-commit":
+            continue
+        event = item["event"]
+        exit_code = event.get("exit_code")
+        output = f"{event.get('aggregated_output') or ''}\n{event.get('stderr') or ''}"
+        if isinstance(exit_code, int) and exit_code != 0 and "index.lock" in output:
+            count += 1
+    if count == 0:
+        return None
+    return count
+
+
+def arm_index_lock_count(arm_dir):
+    count = 0
+    found = False
+    for slot in (1, 2):
+        session_count = index_lock_count(session_stdout(arm_dir / f"session-{slot}"))
+        if session_count is None:
+            continue
+        found = True
+        count += session_count
+    if not found:
+        return None
+    return count
+
+
+def hunk_spans(patch_text):
+    spans = []
+    for line in patch_text.splitlines():
+        match = HUNK_HEADER.match(line)
+        if not match:
+            continue
+        start = int(match.group(1))
+        count = int(match.group(2) or "1")
+        if count <= 0:
+            spans.append((start, start))
+        else:
+            spans.append((start, start + count - 1))
+    return spans
+
+
+def spans_overlap(left, right):
+    return left[0] <= right[1] and right[0] <= left[1]
+
+
+def rejected_command_patches(text):
+    """從失敗的 atm-write 命令取出 (file, patch)。stub 事件沒有 patch 本文。"""
+    found = []
+    saw_unparsed = False
+    for item in completed_commands(text):
+        if item["kind"] != "atm-write":
+            continue
+        event = item["event"]
+        if item.get("command") is None:
+            status = event.get("status")
+            decision = str(event.get("decision") or "")
+            if status not in (0, None) or decision.startswith("rejected"):
+                saw_unparsed = True
+            continue
+        exit_code = event.get("exit_code")
+        output = str(event.get("aggregated_output") or "")
+        failed = (isinstance(exit_code, int) and exit_code != 0) or '"ok": false' in output or '"ok":false' in output
+        if not failed:
+            continue
+        command = item["command"]
+        file_match = ATM_WRITE_FILE.search(command)
+        diff_at = command.find("diff --git ")
+        if not file_match or diff_at < 0:
+            saw_unparsed = True
+            continue
+        found.append((file_match.group(1), command[diff_at:]))
+    return found, saw_unparsed
+
+
+def filename_rejected(rows, session_files):
     files = {path for path in (session_files or []) if path}
     if not files:
         return False
@@ -192,6 +427,43 @@ def session_rejected(rows, session_files):
         if blocked_steward_write(row) or decision.startswith("rejected") or row.get("terminal") not in (None, "committed"):
             return True
     return False
+
+
+def session_rejected(rows, session_files, intended_parts=None, stdout=""):
+    """有命令裡的 hunk 時，只在行範圍和該 session 的意圖 patch 重疊才算這支 session 被拒絕。
+    沒有 hunk 時退回檔名，呼叫端把信心標成 low。
+    """
+    rejected, _confidence = rejection_for_session(rows, session_files, intended_parts, stdout)
+    return rejected
+
+
+def rejection_for_session(rows, session_files, intended_parts=None, stdout=""):
+    files = {path for path in (session_files or []) if path}
+    if not files:
+        return False, "none"
+    submitted, saw_unparsed = rejected_command_patches(stdout or "")
+    if not submitted and not saw_unparsed:
+        if not filename_rejected(rows, files):
+            return False, "none"
+        return True, "low"
+    intended_parts = intended_parts or {}
+    overlapped = False
+    low = saw_unparsed
+    for path, patch in submitted:
+        if path not in files:
+            continue
+        spans = hunk_spans(patch)
+        intended = hunk_spans(intended_parts.get(path, ""))
+        if not spans or not intended:
+            low = True
+            if filename_rejected(rows, [path]):
+                overlapped = True
+            continue
+        if any(spans_overlap(left, right) for left in spans for right in intended):
+            overlapped = True
+    if low:
+        return overlapped or filename_rejected(rows, files), "low"
+    return overlapped, "hunk"
 
 
 def evidence_gaps(arm_dir):
@@ -260,23 +532,135 @@ def read_boundary_file(arm_dir):
     return found
 
 
+SNAPSHOT_SKIP = {".git", "venv", ".prereg-smoke", ".atm", ".agents", ".codex", ".aws"}
+SNAPSHOT_PATHSPEC = (":!venv", ":!.prereg-smoke", ":!.atm", ":!.agents", ":!.codex", ":!.aws")
+
+
+def path_is_snapshot_skip(path):
+    return any(part in SNAPSHOT_SKIP for part in Path(path).parts)
+
+
+def task_dirty_paths(work):
+    result = git(work, "status", "--porcelain", "--untracked-files=all", check=False)
+    paths = []
+    for line in result.stdout.splitlines():
+        if len(line) < 4:
+            continue
+        path = line[3:]
+        if " -> " in path:
+            path = path.split(" -> ", 1)[1]
+        if path_is_snapshot_skip(path):
+            continue
+        paths.append(path)
+    return paths
+
+
+def blob_text(work, rev, file):
+    result = git(work, "show", f"{rev}:{file}", check=False)
+    if result.returncode != 0:
+        return ""
+    return result.stdout
+
+
+def freeze_worktree_snapshot(work):
+    """把未提交與未追蹤的任務檔收成一個評估用 commit。乾淨的樹就用現在的 HEAD。
+
+    同一份 commit 接著給遺失修改、測試複本與 base..HEAD diff。收不進去就失敗，
+    不能退回仍停在共同 base 的 HEAD。
+    """
+    head = git(work, "rev-parse", "HEAD", check=False)
+    if head.returncode != 0:
+        raise RuntimeError(f"evaluator snapshot failed: {head.stderr}")
+    before = head.stdout.strip()
+    if not task_dirty_paths(work):
+        return {"sha": before, "created": False}
+    add = git(work, "add", "-A", "--", ".", *SNAPSHOT_PATHSPEC, check=False)
+    if add.returncode != 0:
+        raise RuntimeError(f"evaluator snapshot failed: {add.stderr or add.stdout}")
+    cached = git(work, "diff", "--cached", "--quiet", check=False)
+    if cached.returncode == 0:
+        still = task_dirty_paths(work)
+        raise RuntimeError("evaluator snapshot did not capture uncommitted edits: " + ", ".join(still[:8]))
+    commit = git(
+        work,
+        "-c", "user.name=prereg-evaluator",
+        "-c", "user.email=prereg-evaluator@localhost",
+        "commit", "-q", "-m", "prereg evaluator snapshot",
+        check=False,
+    )
+    if commit.returncode != 0:
+        raise RuntimeError(f"evaluator snapshot failed: {commit.stderr or commit.stdout}")
+    after = git(work, "rev-parse", "HEAD", check=False)
+    if after.returncode != 0:
+        raise RuntimeError(f"evaluator snapshot failed: {after.stderr}")
+    sha = after.stdout.strip()
+    if sha == before:
+        raise RuntimeError("evaluator snapshot did not create a commit")
+    still = task_dirty_paths(work)
+    if still:
+        raise RuntimeError("evaluator snapshot left uncommitted edits: " + ", ".join(still[:8]))
+    return {"sha": sha, "created": True}
+
+
+def snapshot_failure(arm_name, arm_dir, message):
+    fields = arm_model_fields(arm_dir)
+    return {
+        "arm": arm_name,
+        "status": "invalid",
+        "snapshotError": message,
+        "work": str(arm_dir / "work"),
+        "model": fields["model"],
+        "reasoningEffort": fields["reasoningEffort"],
+        "sessions": [],
+        "lostEditCount": None,
+        "silentLostEditCount": None,
+        "indexLockCount": None,
+        "lostEditConfidence": "low",
+        "rejectionAttribution": "low",
+        "tests": [{
+            "instanceId": None,
+            "kitError": "evaluator-snapshot-failed",
+            "note": message,
+            "tests": [],
+        }],
+    }
+
+
+def checkout_snapshot(work, destination):
+    """複本只含評估快照的 HEAD。呼叫前必須已經 freeze，否則未提交修改不會進來。"""
+    subprocess.run(
+        ["/usr/bin/git", "clone", "--quiet", "--shared", str(work), str(destination)],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    subprocess.run(
+        ["/usr/bin/git", "-c", "advice.detachedHead=false", "-C", str(destination), "checkout", "--force", "--detach", "--quiet", "HEAD"],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+
 def score_arm(arm_name, arm_dir, tasks, base):
     gaps = evidence_gaps(arm_dir)
     if gaps:
         return missing_arm(arm_name, arm_dir, gaps)
     work = arm_dir / "work"
+    try:
+        snapshot = freeze_worktree_snapshot(work)
+    except RuntimeError as exc:
+        return snapshot_failure(arm_name, arm_dir, str(exc))
     rows = steward_rows(work)
     final_diff_text = git(work, "diff", f"{base}..HEAD", check=False).stdout
     final_parts = split_patch(final_diff_text)
     blocked_files = {row.get("file") for row in rows if row.get("file") and blocked_steward_write(row)}
     sessions = []
-    index_lock = 0
     git_errors = []
     for slot in (1, 2):
         session = arm_dir / f"session-{slot}"
         stderr = (session / "stderr.txt").read_text(encoding="utf-8", errors="replace") if (session / "stderr.txt").exists() else ""
-        stdout = (session / "stdout.jsonl").read_text(encoding="utf-8", errors="replace") if (session / "stdout.jsonl").exists() else ""
-        index_lock += stderr.count("index.lock") + stdout.count("index.lock")
+        stdout = session_stdout(session)
         exit_code = int((session / "exit-code").read_text().strip()) if (session / "exit-code").exists() else None
         if exit_code not in (0, None, 3):
             git_errors.append({"session": slot, "exitCode": exit_code, "stderrTail": stderr[-500:]})
@@ -292,21 +676,28 @@ def score_arm(arm_name, arm_dir, tasks, base):
                 break
         if instance_id is None and slot - 1 < len(tasks["primary"]["instances"]):
             instance_id = tasks["primary"]["instances"][slot - 1]["instanceId"]
-        rejected = session_rejected(rows, parts.keys())
+        rejected, rejection_confidence = rejection_for_session(rows, parts.keys(), parts, stdout)
         unfinished = []
+        session_match = "hunk"
         for file, patch in parts.items():
             if is_codex_runtime_path(file):
                 continue
-            try:
-                base_text = git(work, "show", f"{base}:{file}").stdout
-            except RuntimeError:
-                base_text = ""
-            final = work / file
-            final_text = final.read_text(encoding="utf-8") if final.exists() else ""
-            missing = missing_edit_lines(patch, final_text, final_parts.get(file, ""))
-            item = {"file": file, "missingAddedLines": missing[:12], "missingCount": len(missing)}
-            # 被 steward 擋住的意圖修改，只要最終 diff 沒有它，就是未完成，不是沉默遺失。
-            blocked = rejected or file in blocked_files
+            final_text = blob_text(work, "HEAD", file)
+            missing, match = score_patch_lines(patch, final_text, final_parts.get(file, ""))
+            if match == "low":
+                session_match = "low"
+            item = {
+                "file": file,
+                "missingAddedLines": missing[:12],
+                "missingCount": len(missing),
+                "match": match,
+            }
+            # 被 steward 擋住的意圖修改，只要最終快照沒有它，就是未完成，不是沉默遺失。
+            # hunk 歸因只算這支 session；低信心才退回檔名。
+            if rejection_confidence == "hunk":
+                blocked = rejected
+            else:
+                blocked = rejected or file in blocked_files
             if missing and not blocked:
                 lost.append(item)
                 unfinished.append(item)
@@ -315,7 +706,7 @@ def score_arm(arm_name, arm_dir, tasks, base):
                 kept.append(item)
                 unfinished.append(item)
             else:
-                kept.append({"file": file, "missingCount": 0})
+                kept.append({"file": file, "missingCount": 0, "match": match})
         sessions.append({
             "slot": slot,
             "evidenceStatus": "ok",
@@ -328,6 +719,8 @@ def score_arm(arm_name, arm_dir, tasks, base):
             "unfinishedEdits": unfinished,
             "keptOrRejected": kept,
             "stewardRejected": rejected,
+            "lostEditConfidence": session_match,
+            "rejectionAttribution": rejection_confidence,
             "quotaStop": (session / "QUOTA_STOP").exists(),
         })
     corruption = []
@@ -360,28 +753,45 @@ def score_arm(arm_name, arm_dir, tasks, base):
         labeled.append(item)
     boundary = read_boundary_file(arm_dir)
     fields = arm_model_fields(arm_dir)
+    index_lock = arm_index_lock_count(arm_dir)
+    resubmissions = recompose_or_retry(arm_dir)
+    match_values = [session["lostEditConfidence"] for session in sessions]
+    lost_confidence = "low" if "low" in match_values else "hunk"
+    attributions = [session["rejectionAttribution"] for session in sessions]
+    if "low" in attributions:
+        attribution = "low"
+    elif "hunk" in attributions:
+        attribution = "hunk"
+    else:
+        attribution = "none"
+    rejected_count = sum(1 for row in rows if row.get("terminal") not in (None, "committed"))
     return {
         "arm": arm_name,
         "boundary": boundary.get("boundary"),
         "boundaryMechanism": boundary.get("mechanism"),
         "status": status,
         "work": str(work),
-        "head": git(work, "rev-parse", "HEAD", check=False).stdout.strip(),
+        "head": snapshot["sha"],
+        "snapshot": snapshot["sha"],
+        "snapshotCreated": snapshot["created"],
         "startSkewMs": int((arm_dir / "start-skew-ms").read_text().strip()) if (arm_dir / "start-skew-ms").exists() else None,
         "model": fields["model"],
         "reasoningEffort": fields["reasoningEffort"],
         "sessions": sessions,
         "lostEditCount": sum(len(session["lostEdits"]) for session in sessions),
         "silentLostEditCount": sum(len(session["lostEdits"]) for session in sessions),
+        "lostEditConfidence": lost_confidence,
+        "rejectionAttribution": attribution,
         "corruption": corruption,
         "indexLockCount": index_lock,
         "gitErrors": git_errors,
-        "conflictCount": index_lock + sum(1 for row in rows if row.get("terminal") not in (None, "committed")),
+        "conflictCount": (index_lock or 0) + rejected_count,
         "resolutionTimeMs": None,
         "steward": {
             "writes": len(rows),
-            "rejected": sum(1 for row in rows if row.get("terminal") not in (None, "committed")),
-            "recomposeOrRetry": recompose_or_retry(rows),
+            "rejected": rejected_count,
+            "resubmissions": resubmissions,
+            "recomposeOrRetry": resubmissions,
             "queueWaitMs": [int((row.get("commit") or {}).get("gitIndexLockWaitMs") or 0) for row in rows],
             "writeToCommitMs": latencies,
             "batchSizes": [row.get("batchSize") for row in rows],
@@ -584,11 +994,14 @@ def run_tests(work, tasks, env, arm_score):
     python = env.get("PREREG_PYTHON") or "python3"
     results = []
     if mode == "fixture":
-        for instance in tasks["primary"]["instances"]:
-            labels = instance["FAIL_TO_PASS"] + instance["PASS_TO_PASS"]
-            proc = subprocess.run([python, "runtests.py", "--verbosity", "2", *labels], cwd=work, text=True, capture_output=True)
-            parsed = parse_test_output(instance["instanceId"], labels, proc.stdout + proc.stderr, proc.returncode)
-            results.append(apply_observation_policy(parsed, instance["FAIL_TO_PASS"], instance["PASS_TO_PASS"]))
+        with tempfile.TemporaryDirectory() as scratch:
+            clone = Path(scratch) / "tree"
+            checkout_snapshot(work, clone)
+            for instance in tasks["primary"]["instances"]:
+                labels = instance["FAIL_TO_PASS"] + instance["PASS_TO_PASS"]
+                proc = subprocess.run([python, "runtests.py", "--verbosity", "2", *labels], cwd=clone, text=True, capture_output=True)
+                parsed = parse_test_output(instance["instanceId"], labels, proc.stdout + proc.stderr, proc.returncode)
+                results.append(apply_observation_policy(parsed, instance["FAIL_TO_PASS"], instance["PASS_TO_PASS"]))
         return results
     gold_root = Path(env["KIT_ROOT"])
     id_map = test_id_map(tasks)
@@ -619,8 +1032,7 @@ def run_tests(work, tasks, env, arm_score):
             continue
         with tempfile.TemporaryDirectory() as scratch:
             clone = Path(scratch) / "tree"
-            subprocess.run(["/usr/bin/git", "clone", "--quiet", "--shared", str(work), str(clone)], check=True)
-            subprocess.run(["/usr/bin/git", "-C", str(clone), "checkout", "--force", "--detach", "--quiet", "HEAD"], check=True)
+            checkout_snapshot(work, clone)
             installed = install_task_repo(python, clone)
             if installed.returncode != 0:
                 parsed = {
@@ -794,13 +1206,13 @@ def main():
             arms[name] = {"arm": name, "missing": True, "status": "evidence_missing", "lostEditCount": None, "silentLostEditCount": None}
             continue
         score = score_arm(name, arm_dir, tasks, base)
-        if score.get("status") != "evidence_missing":
+        if score.get("status") != "evidence_missing" and not score.get("snapshotError"):
             score["tests"] = run_tests(arm_dir / "work", tasks, env, score)
             if any(item.get("kitError") for item in score.get("tests") or []):
                 score["status"] = "invalid"
-            diff = git(arm_dir / "work", "diff", f"{base}..HEAD", check=False)
+            diff = git(arm_dir / "work", "diff", f"{base}..{score.get('snapshot') or 'HEAD'}", check=False)
             (arm_dir / "final.diff").write_text(diff.stdout, encoding="utf-8")
-            log = git(arm_dir / "work", "log", "--oneline", f"{base}..HEAD", check=False)
+            log = git(arm_dir / "work", "log", "--oneline", f"{base}..{score.get('snapshot') or 'HEAD'}", check=False)
             (arm_dir / "git-log.txt").write_text(log.stdout, encoding="utf-8")
         arms[name] = score
     statuses = [arm.get("status") for arm in arms.values()]
@@ -821,6 +1233,8 @@ def main():
         "commonBase": base,
         "boundary": (arms.get("B") or {}).get("boundary"),
         "boundaryMechanism": (arms.get("B") or {}).get("boundaryMechanism"),
+        "testIdNormalization": tasks.get("testIdNormalization"),
+        "overlapCondition": env.get("PREREG_OVERLAP_CONDITION") or None,
         "arms": arms,
     }
     dest = STATE / "results.json"

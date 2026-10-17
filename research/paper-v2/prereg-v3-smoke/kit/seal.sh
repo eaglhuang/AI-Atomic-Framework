@@ -171,6 +171,13 @@ if [ "$RESULT_STATUS" = "invalid" ]; then
   else
     ROW_LABEL="smoke / exploratory, not results — INVALID"
   fi
+elif [ "$RESULT_STATUS" = "blocked" ]; then
+  BLOCKED_ARMS="$(jq -r '[.arms | to_entries[] | select(.value.status == "blocked") | "arm \(.key)"] | join(", ")' "$STATE_ROOT/results.json" 2>/dev/null || true)"
+  if [ -n "$BLOCKED_ARMS" ]; then
+    ROW_LABEL="smoke / exploratory, not results — blocked (${BLOCKED_ARMS})"
+  else
+    ROW_LABEL="smoke / exploratory, not results — blocked"
+  fi
 fi
 ROW="| \`$INDEX_REL\` | ${ROW_LABEL} | no win claim | mode=${PREREG_SMOKE_MODE:-django}; model=${MODEL}; base=${COMMON_BASE} |"
 printf '%s\n' "$ROW" > "$DEST/EVIDENCE_INDEX_ROW.md"

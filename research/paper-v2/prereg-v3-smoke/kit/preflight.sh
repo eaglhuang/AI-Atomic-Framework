@@ -122,6 +122,12 @@ static_launchers() {
     return 1
   fi
   grep -q 'def recompose_or_retry' "$HERE/bin/evaluate.py"
+  grep -q 'def freeze_worktree_snapshot' "$HERE/bin/evaluate.py"
+  grep -q 'evaluator-snapshot-failed' "$HERE/bin/evaluate.py"
+  if grep -q 'stdout.count("index.lock")' "$HERE/bin/evaluate.py"; then
+    echo "index.lock 仍用 stdout 字串計數" >&2
+    return 1
+  fi
   grep -q 'test-patch-not-applied' "$HERE/bin/evaluate.py"
   grep -q 'tests-unobserved' "$HERE/bin/evaluate.py"
   grep -q 'denominator-unobserved' "$HERE/bin/evaluate.py"
@@ -172,9 +178,11 @@ check disposition python3 "$HERE/test/test_write_disposition.py"
 check django-venv bash "$HERE/test/test-setup-django-venv.sh"
 check observation python3 "$HERE/test/test_observation_kit_error.py"
 check blocked-edits python3 "$HERE/test/test_blocked_edits.py"
+check snapshot-uncommitted python3 "$HERE/test/test_snapshot_uncommitted.py"
 check seal-index bash "$HERE/test/test-seal-index.sh"
 check overlap bash "$HERE/test/test-overlap-decision.sh"
 check stale-overlap bash "$HERE/test/test-stale-overlap.sh"
+check overlap-condition bash "$HERE/test/test-overlap-condition.sh"
 check stub-dry-run bash "$HERE/self-check.sh"
 check capture-intended bash "$HERE/test/test-capture-intended.sh"
 check seal-one-row bash "$HERE/test/test-seal-one-row.sh"

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""被擋住的意圖修改要對照最終 diff 計入未完成；recomposeOrRetry 從 steward 紀錄派生。"""
+"""被擋住的意圖修改要對照最終快照計入未完成。重送次數不從拒絕列派生。"""
 import json
 import os
 import subprocess
@@ -39,7 +39,7 @@ def test_session_flag_comes_from_steward_file():
     assert evaluate.session_rejected(accepted, ["shared.py"]) is False
 
 
-def test_recompose_counts_blocked_rows_with_zero_retry_fields():
+def test_rejections_are_not_resubmissions():
     rows = []
     for _ in range(4):
         rows.append({
@@ -50,16 +50,7 @@ def test_recompose_counts_blocked_rows_with_zero_retry_fields():
             "hashDriftCount": 0,
             "commit": {"headMoves": 0},
         })
-    rows.append({
-        "decision": "accepted",
-        "terminal": "committed",
-        "retryCount": 0,
-        "hashDriftCount": 0,
-        "commit": {"headMoves": 0},
-    })
-    assert evaluate.recompose_or_retry(rows) == 4, evaluate.recompose_or_retry(rows)
-    rows[0]["retryCount"] = 2
-    assert evaluate.recompose_or_retry(rows) == 5
+    assert sum(1 for row in rows if row.get("terminal") not in (None, "committed")) == 4
 
 
 def write_session(arm, slot, patch):
@@ -164,10 +155,13 @@ def unfinished_count(arm):
 
 def main():
     test_session_flag_comes_from_steward_file()
-    test_recompose_counts_blocked_rows_with_zero_retry_fields()
+    test_rejections_are_not_resubmissions()
     code, payload = build("alpha\nbeta\n")
     arm = payload["arms"]["B"]
-    assert arm["steward"]["recomposeOrRetry"] == 4, arm["steward"]
+    assert arm["steward"]["rejected"] == 4, arm["steward"]
+    assert arm["steward"]["resubmissions"] is None, arm["steward"]
+    assert arm["steward"]["recomposeOrRetry"] is None, arm["steward"]
+    assert arm["rejectionAttribution"] == "low", arm["rejectionAttribution"]
     assert arm["lostEditCount"] == 0, arm["lostEditCount"]
     assert unfinished_count(arm) >= 1, arm["sessions"]
     assert arm["status"] == "blocked", arm["status"]
@@ -176,7 +170,8 @@ def main():
     assert payload["status"] == "blocked"
     code, payload = build("alpha\n")
     arm = payload["arms"]["B"]
-    assert arm["steward"]["recomposeOrRetry"] == 4, arm["steward"]
+    assert arm["steward"]["rejected"] == 4, arm["steward"]
+    assert arm["steward"]["recomposeOrRetry"] is None, arm["steward"]
     assert arm["lostEditCount"] == 0, arm
     assert unfinished_count(arm) == 0, arm["sessions"]
     assert arm["status"] == "ok", arm["status"]
