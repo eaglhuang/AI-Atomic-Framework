@@ -202,6 +202,12 @@
     3. `test_load_unmigrated_dependency`：多行 `["id", "user"]` 斷言換成 `self.assertEqual(list(book_state.fields), ['id', 'user'])`。
   - 離線測試 `research/paper-v2/prereg-v3-smoke/kit/test/test_v4_regressions.py` 會把上游原檔套到該題自己的 base、把 rebase 檔套到共同 base，並鎖定上述位元組與這三處差異。
 
+#### D-v6-evaluator-snapshot（2026-10-17）：v6 的 A/B 比較無效
+
+- **為什麼**：獨立審查指出 `2026-10-17-codex-v6` 的評估器對每個臂 `git clone` 後 `checkout HEAD`。Arm A 沒有提交，HEAD 仍是共同 base，所以 A 的測試跑在未修改的 base 上，封存 diff 只用 `base..HEAD`，A 的 diff 是空的。遺失修改卻讀工作樹。這是 kit-error（evaluator snapshot mismatch），不是 A/B 結果，不可引用。
+- **封存**：`research/paper-v2/prereg-v3-smoke/2026-10-17-codex-v6/` 的既有檔案與 `SHA256SUMS` 不改。說明寫在同目錄的 `ERRATA.md`，該檔不在 `SHA256SUMS` 裡。`EVIDENCE_INDEX.md` 這一列改為 INVALID。
+- **後續套件**：計分、測試與封存 diff 改為同一份工作樹快照，包含未提交與未追蹤修改。快照收不進去就以 kit-error 結束，不再把空 diff 當成 Arm A 的結果。
+
 ## 11. 成本估算（公式）
 令：
 - `G` 為題組數；

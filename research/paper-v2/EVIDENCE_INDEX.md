@@ -704,7 +704,7 @@ pilot、主跑、留出集實驗仍不在這次範圍。dev 題沒有 B′ 與 D
 | 範圍邊界 | ATM 只處理同一台機器、同一個 repo 裡代理之間的衝突，因為 CAS、鎖和佇列在本機 `.atm/runtime/`。別台機器的 push、其他 clone 與遠端 PR 仍走一般的 git merge 或 rebase。正文 §2、§9 寫這條邊界；附錄 C 的 push 前檢查不把邊界往外推。不主張超出這條邊界 |
 | HIST-v2 | 維持凍結，未修改 |
 | 檔案數 | 3（不含 SHA256SUMS） |
-| SHA256SUMS sha256 | `1104710bac3a3d620f6bdd7417be814af7851e8f098f164b3d0853b6b78eff44` |
+| SHA256SUMS sha256 | `06f370642eeb649e36c29db1c03265d6107dc1c7540eff8647ea349ba1271a70` |
 | 驗證 | `sh research/paper-v2/prereg-v3-draft/2026-10-15/verify.sh` |
 
 在作者批准並把文本凍結成新的預先登記目錄之前，不從這份草稿跑 smoke、pilot、main 或 held-out。
@@ -735,4 +735,4 @@ pilot、主跑、留出集實驗仍不在這次範圍。dev 題沒有 B′ 與 D
 | `prereg-v3-smoke/2026-10-17-codex-v3/` | smoke / exploratory, not results — INVALID (kit-error: test patch not applied / tests unobserved) | no win claim | mode=django; model=gpt-6-luna; base=98ad327864aed8df245fd19ea9d2743279e11643 |
 | `prereg-v3-smoke/2026-10-17-codex-v4/` | smoke / exploratory, not results — INVALID (kit-error: test-patch-not-applied, tests-unobserved) | no win claim | mode=django; model=gpt-6-luna; base=98ad327864aed8df245fd19ea9d2743279e11643 |
 | `prereg-v3-smoke/2026-10-17-codex-v5/` | smoke / exploratory, not results — INVALID (kit-error: 11141 FAIL_TO_PASS not evaluated, denominator 0) | no win claim | mode=django; model=gpt-6-luna; base=98ad327864aed8df245fd19ea9d2743279e11643 |
-| `prereg-v3-smoke/2026-10-17-codex-v6/` | VALID smoke/exploratory, n=2 sessions/arm, Arm B blocked on 11141, not citable as a win | no win claim | mode=django; model=gpt-6-luna; base=98ad327864aed8df245fd19ea9d2743279e11643 |
+| `prereg-v3-smoke/2026-10-17-codex-v6/` | INVALID (kit-error: evaluator snapshot mismatch, per independent review), not citable | no win claim | mode=django; model=gpt-6-luna; base=98ad327864aed8df245fd19ea9d2743279e11643 |
