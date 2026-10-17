@@ -386,6 +386,7 @@ function submitLive(input) {
   const proposalPath = path.join(inbox, `${proposalId}.proposal.json`);
   writeFileSync(proposalPath, `${JSON.stringify(proposal, null, 2)}\n`);
   const relativeProposal = path.relative(input.writableRoot, proposalPath).split(path.sep).join('/');
+  const beforeBytes = existsSync(input.targetPath) ? readFileSync(input.targetPath) : null;
   const applied = runCli(input.cli, [
     'broker', 'steward', 'apply-live',
     '--cwd', input.writableRoot,
@@ -395,8 +396,14 @@ function submitLive(input) {
   ], input.writableRoot, input.safePath);
   const payload = parseCli(applied);
   const live = payload?.evidence?.liveWrites?.[0] || null;
-  const decision = live?.decision || 'kit-error';
-  const reasonCode = decision === 'accepted' ? null : (live?.reasonCode || null);
+  let decision = live?.decision || 'kit-error';
+  let appliedCheck = null;
+  if (decision === 'accepted') {
+    appliedCheck = confirmLiveWrite(input, beforeBytes, baseCommit, proposalId);
+    if (!appliedCheck.ok) decision = 'kit-error';
+  }
+  const falseAccept = Boolean(appliedCheck && !appliedCheck.ok);
+  const reasonCode = decision === 'accepted' ? null : (falseAccept ? 'write-not-applied' : (live?.reasonCode || null));
   const ok = decision === 'accepted';
   const elapsedMs = Date.now() - input.started;
   const record = {
@@ -404,11 +411,11 @@ function submitLive(input) {
     ok,
     decision,
     reasonCode,
-    messageCode: recordMessageCode(payload?.messages?.[0]?.code || null, reasonCode),
-    verdict: live?.verdict || null,
+    messageCode: falseAccept ? null : recordMessageCode(payload?.messages?.[0]?.code || null, reasonCode),
+    verdict: falseAccept ? 'blocked' : (live?.verdict || null),
     phase: ok ? 'commit' : 'live',
     terminal: ok ? 'committed' : (decision === 'kit-error' ? 'kit-error' : 'blocked'),
-    stopReason: ok ? null : (live?.detail || payload?.messages?.[0]?.text || applied.stderr || applied.stdout || ''),
+    stopReason: ok ? null : (falseAccept ? appliedCheck.reason : (live?.detail || payload?.messages?.[0]?.text || applied.stderr || applied.stdout || '')),
     proposalId,
     taskId: input.taskId,
     actorId: input.actorId,
@@ -431,6 +438,27 @@ function submitLive(input) {
   appendFileSync(logPath, `${JSON.stringify(record)}\n`);
   const exitCode = decision === 'accepted' ? 0 : (decision === 'rejected-by-design' ? 3 : 1);
   return { record, exitCode };
+}
+
+function confirmLiveWrite(input, beforeBytes, beforeHead, proposalId) {
+  if (!beforeBytes || !existsSync(input.targetPath)) {
+    return { ok: false, reason: 'accepted write left no target file' };
+  }
+  const afterBytes = readFileSync(input.targetPath);
+  if (sha256Bytes(afterBytes) === sha256Bytes(beforeBytes)) {
+    return { ok: false, reason: 'accepted write left the file hash unchanged and created no commit' };
+  }
+  const head = gitText(input.writableRoot, ['rev-parse', 'HEAD'], input.safePath);
+  const afterHead = head.status === 0 ? head.stdout.trim() : '';
+  if (!afterHead || afterHead === beforeHead) {
+    return { ok: false, reason: 'accepted write changed the file but did not create a commit' };
+  }
+  // 另一支 session 可能已經再提交。提案 id 只要出現在這次之前到現在的 commit 訊息裡即可。
+  const subjects = gitText(input.writableRoot, ['log', '--format=%s', `${beforeHead}..${afterHead}`], input.safePath);
+  if (subjects.status !== 0 || !subjects.stdout.includes(proposalId)) {
+    return { ok: false, reason: 'accepted write commit does not record the proposal' };
+  }
+  return { ok: true };
 }
 
 function recordMessageCode(code, reasonCode) {

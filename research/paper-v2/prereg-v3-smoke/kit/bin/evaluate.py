@@ -545,10 +545,58 @@ def session_rejected(rows, session_files, intended_parts=None, stdout=""):
     return rejected
 
 
+def normalize_hash(value):
+    return str(value or "").replace("sha256:", "")
+
+
+def false_accept_row(row):
+    """CLI 說 accepted，但檔案雜湊沒有變。那一筆沒有落地，不是 steward 拒絕。"""
+    if classify_write(row) != "accepted":
+        return False
+    declared = normalize_hash(row.get("declaredBaseHash"))
+    current = normalize_hash(row.get("currentFileHash"))
+    return bool(declared) and declared == current
+
+
+def write_receipts(text):
+    receipts = []
+    for item in completed_commands(text):
+        if item["kind"] != "atm-write" or item.get("command") is None:
+            continue
+        for line in command_output(item["event"]).splitlines():
+            line = line.strip()
+            if not line.startswith("{"):
+                continue
+            try:
+                obj = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if isinstance(obj, dict) and (obj.get("proposalId") or obj.get("decision") is not None):
+                receipts.append(obj)
+                break
+    return receipts
+
+
+def session_rows_by_proposal(rows, text):
+    """用 session 寫入紀錄裡的 proposalId 對上 steward log。沒有 id 時回 None，呼叫端改走 hunk。"""
+    ids = [receipt.get("proposalId") for receipt in write_receipts(text) if receipt.get("proposalId")]
+    if not ids:
+        return None
+    wanted = set(ids)
+    return [row for row in rows if row.get("proposalId") in wanted]
+
+
 def rejection_for_session(rows, session_files, intended_parts=None, stdout=""):
     files = {path for path in (session_files or []) if path}
     if not files:
         return False, "none"
+    linked = session_rows_by_proposal(rows, stdout or "")
+    if linked is not None:
+        real = [
+            row for row in linked
+            if blocked_steward_write(row) and not false_accept_row(row)
+        ]
+        return bool(real), "proposal"
     submitted, saw_unparsed = rejected_command_patches(stdout or "")
     if not submitted and not saw_unparsed:
         if not filename_rejected(rows, files):
@@ -813,7 +861,12 @@ def score_arm(arm_name, arm_dir, tasks, base):
             }
             # 被 steward 擋住的意圖修改，只要最終快照沒有它，就是未完成，不是沉默遺失。
             # hunk 歸因只算這支 session；低信心才退回檔名。
-            if rejection_confidence == "hunk":
+            if rejection_confidence == "proposal":
+                blocked = any(
+                    row.get("file") == file and blocked_steward_write(row) and not false_accept_row(row)
+                    for row in (session_rows_by_proposal(rows, stdout) or [])
+                )
+            elif rejection_confidence == "hunk":
                 blocked = rejected
             else:
                 blocked = rejected or file in blocked_files
@@ -879,6 +932,8 @@ def score_arm(arm_name, arm_dir, tasks, base):
     attributions = [session["rejectionAttribution"] for session in sessions]
     if "low" in attributions:
         attribution = "low"
+    elif "proposal" in attributions:
+        attribution = "proposal"
     elif "hunk" in attributions:
         attribution = "hunk"
     else:

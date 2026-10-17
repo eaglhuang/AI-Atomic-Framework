@@ -130,6 +130,8 @@ run_real_exec() {
   prepare_probe_repo "$repo"
   unset PREREG_SANDBOX_SCRATCH PREREG_SANDBOX_REPO PREREG_STEWARD_SOCK PREREG_STEWARD_PID || true
   export PREREG_ARM="$arm"
+  install_arm_git_bin "$arm" "$session/bin"
+  export PREREG_ARM_BIN="$session/bin"
   if [ "$arm" = "B" ]; then
     prepare_probe_arm_b "$repo" "$mode"
     if sandbox_boundary_active; then
@@ -142,6 +144,10 @@ run_real_exec() {
     unset PREREG_BOUNDARY || true
   fi
   write_probe_prompt "$arm" "$session/prompt.txt"
+  # Codex 的 bash -lc 會吃掉 env -i 的 PATH。探測在呼叫模型之前先確認兩臂的 python、
+  # atm-write 與 git 仍解析到 kit。對不上就失敗，不繼續。
+  PREREG_SMOKE_CODEX=1 assert_session_login_path "$session" "$repo"
+  unset PREREG_SMOKE_CODEX || true
   local base_sha=""
   if [ "$arm" = "A" ]; then
     base_sha="$(git -C "$repo" rev-parse HEAD)"
