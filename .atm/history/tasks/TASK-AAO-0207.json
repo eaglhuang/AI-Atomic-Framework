@@ -1,0 +1,387 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0207",
+  "title": "Opt-in host-neutral atomic task close projections",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [],
+  "deliverables": [
+    "packages/cli/src/commands/taskflow/profile-loader.ts",
+    "packages/cli/src/commands/taskflow/closeback-orchestration.ts",
+    "packages/cli/src/commands/taskflow/close-orchestration.ts",
+    "packages/cli/src/commands/taskflow/implementation.ts",
+    "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+    "packages/cli/src/commands/taskflow/host-close-projection.ts",
+    "tests/cli/taskflow-host-close-projection.test.ts",
+    "packages/cli/src/commands/taskflow/__tests__/profile-loader.spec.ts",
+    "packages/cli/src/commands/taskflow/__tests__/closeback-orchestration.spec.ts",
+    "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+    "packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/taskflow/profile-loader.ts",
+    "packages/cli/src/commands/taskflow/closeback-orchestration.ts",
+    "packages/cli/src/commands/taskflow/close-orchestration.ts",
+    "packages/cli/src/commands/taskflow/implementation.ts",
+    "packages/cli/src/commands/taskflow/host-close-projection.ts",
+    "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+    "tests/cli/taskflow-host-close-projection.test.ts",
+    "packages/cli/src/commands/taskflow/__tests__/profile-loader.spec.ts",
+    "packages/cli/src/commands/taskflow/__tests__/closeback-orchestration.spec.ts",
+    "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+    "packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+    ".atm/history/evidence/TASK-AAO-0207.*",
+    ".atm/history/task-events/TASK-AAO-0207/**",
+    ".atm/history/tasks/TASK-AAO-0207.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli-evidence-taskflow.json",
+    ".atm/catalog/registry/actors.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/taskflow-host-close-projection.test.ts",
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/profile-loader.spec.ts",
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/closeback-orchestration.spec.ts",
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
+    "npm run typecheck",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.taskflow-command-map",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/commands/taskflow/profile-loader.ts",
+        "packages/cli/src/commands/taskflow/closeback-orchestration.ts",
+        "packages/cli/src/commands/taskflow/close-orchestration.ts",
+        "packages/cli/src/commands/taskflow/implementation.ts",
+        "packages/cli/src/commands/taskflow/host-close-projection.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "tests/cli/taskflow-host-close-projection.test.ts",
+        "packages/cli/src/commands/taskflow/__tests__/profile-loader.spec.ts",
+        "packages/cli/src/commands/taskflow/__tests__/closeback-orchestration.spec.ts",
+        "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+        "packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+      ]
+    },
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 7 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../.codex/worktrees/web-verification/3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0207-host-close-projection.task.md",
+    "sectionTitle": "TASK-AAO-0207",
+    "headingLine": 58,
+    "hash": "90d20a348c61bdc6",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/.codex/worktrees/web-verification/3KLife",
+      "taskCardPath": "../.codex/worktrees/web-verification/3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0207-host-close-projection.task.md",
+      "planningCommitSha": "cb8cd9a7479ec8f376ff7b58937e08fe7be4a999",
+      "contentDigest": "sha256:90d20a348c61bdc6a930b9a96567cc32841d7f376b5bb943cdf43b76d78f969d",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-10-17T01:18:29.419Z"
+    }
+  },
+  "importedAt": "2026-10-17T01:18:29.419Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.taskflow.host.close.projection.test.ts",
+      "command": "node --strip-types tests/cli/taskflow-host-close-projection.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.packages.cli.src.commands.taskflow.tests.profile.loader.spec.ts",
+      "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/profile-loader.spec.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.packages.cli.src.commands.taskflow.tests.closeback.orchestration.spec.ts",
+      "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/closeback-orchestration.spec.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.packages.cli.src.commands.taskflow.tests.commit.bundle.assembly.spec.ts",
+      "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.packages.cli.src.commands.taskflow.tests.taskflow.close.atomicity.test.ts",
+      "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck",
+      "command": "npm run typecheck",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_git.diff.check",
+      "command": "git diff --check",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "atomizationImpact"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-10-18T07-49-03-736Z-renew-7b3675cd97de",
+  "lastTransitionAt": "2026-10-18T07:49:03.736Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-6",
+  "reservedAt": "2026-10-17T01:18:42.875Z",
+  "promotedAt": "2026-10-17T01:18:42.879Z",
+  "claim": {
+    "actorId": "codex-gpt-6",
+    "leaseId": "lease-2a7f0bdcc079",
+    "claimedAt": "2026-10-17T01:18:42.884Z",
+    "heartbeatAt": "2026-10-18T07:49:02.745Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/catalog/registry/actors.json",
+      ".atm/history/evidence/TASK-AAO-0207.*",
+      ".atm/history/task-events/TASK-AAO-0207/**",
+      ".atm/history/tasks/TASK-AAO-0207.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli-evidence-taskflow.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/taskflow/__tests__/closeback-orchestration.spec.ts",
+      "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+      "packages/cli/src/commands/taskflow/__tests__/profile-loader.spec.ts",
+      "packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/taskflow/closeback-orchestration.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/taskflow/host-close-projection.ts",
+      "packages/cli/src/commands/taskflow/implementation.ts",
+      "packages/cli/src/commands/taskflow/profile-loader.ts",
+      "tests/cli/taskflow-host-close-projection.test.ts"
+    ],
+    "state": "active",
+    "laneSession": {
+      "laneSessionId": "lane-20261018072421-codex-gpt-6-942217f823",
+      "status": "active",
+      "source": "option",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261018072421-codex-gpt-6-942217f823\""
+    }
+  },
+  "startedAt": "2026-10-17T01:18:42.884Z",
+  "startedByActor": "codex-gpt-6",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-9891ccf0946bf874",
+    "ticketDigest": "sha256:9891ccf0946bf874b26f0afc7f91260a280e1c3db75220e1abc8c38ea666049a",
+    "taskId": "TASK-AAO-0207",
+    "origin": "claim",
+    "actorId": "codex-gpt-6",
+    "laneSessionId": "lane-20261018072421-codex-gpt-6-942217f823",
+    "claimGeneration": "lease-2a7f0bdcc079",
+    "issuedAt": "2026-10-18T07:49:02.745Z",
+    "expiresAt": "2026-10-18T08:19:02.745Z",
+    "scopeDigest": "sha256:ce1d11b9c16a2b57333c099d6f69b520fd7e6729c2f051cafceb1baed24bda66",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-10-18T07:49:02.745Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/catalog/registry/actors.json",
+          ".atm/history/evidence/TASK-AAO-0207.*",
+          ".atm/history/task-events/TASK-AAO-0207/**",
+          ".atm/history/tasks/TASK-AAO-0207.json",
+          "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli-evidence-taskflow.json",
+          "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+          "packages/cli/src/commands/taskflow/__tests__/closeback-orchestration.spec.ts",
+          "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+          "packages/cli/src/commands/taskflow/__tests__/profile-loader.spec.ts",
+          "packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
+          "packages/cli/src/commands/taskflow/close-orchestration.ts",
+          "packages/cli/src/commands/taskflow/closeback-orchestration.ts",
+          "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+          "packages/cli/src/commands/taskflow/host-close-projection.ts",
+          "packages/cli/src/commands/taskflow/implementation.ts",
+          "packages/cli/src/commands/taskflow/profile-loader.ts",
+          "tests/cli/taskflow-host-close-projection.test.ts"
+        ],
+        "digest": "sha256:6d6ed1f3a06ad646fa98435804e45816b548ea1f0c1bd0f6ef997a2e4a8350dd"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
+    }
+  },
+  "startedBySessionId": "session-20261017011842-codex-gpt-6-TASK-AAO-0207-df469c1012",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0207",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/catalog/registry/actors.json",
+      ".atm/history/evidence/TASK-AAO-0207.*",
+      ".atm/history/task-events/TASK-AAO-0207/**",
+      ".atm/history/tasks/TASK-AAO-0207.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli-evidence-taskflow.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/taskflow/__tests__/closeback-orchestration.spec.ts",
+      "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+      "packages/cli/src/commands/taskflow/__tests__/profile-loader.spec.ts",
+      "packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/taskflow/closeback-orchestration.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/taskflow/host-close-projection.ts",
+      "packages/cli/src/commands/taskflow/implementation.ts",
+      "packages/cli/src/commands/taskflow/profile-loader.ts",
+      "tests/cli/taskflow-host-close-projection.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/.codex/worktrees/web-verification/3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0207-host-close-projection.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/atm-agent-first-operability/",
+      "docs/ai_atomic_framework/atm-agent-first-operability/tasks/",
+      "docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0207-host-close-projection.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "24a2f573d9b41471c28316e855fd5487ce0739082f7ee5e456c1f1c72a42687f",
+    "actorId": "codex-gpt-6",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20261018072421-codex-gpt-6-942217f823",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261018072421-codex-gpt-6-942217f823\""
+    },
+    "createdAt": "2026-10-18T07:24:23.215Z",
+    "status": "active"
+  }
+}

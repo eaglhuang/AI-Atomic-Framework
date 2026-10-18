@@ -1,0 +1,147 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-AAO-0207",
+  "updatedAt": "2026-10-18T07:42:25.735Z",
+  "updatedBy": "codex-gpt-6",
+  "freshValidationPasses": [
+    "git diff --check",
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/closeback-orchestration.spec.ts",
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/profile-loader.spec.ts",
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
+    "node --strip-types tests/cli/taskflow-host-close-projection.test.ts",
+    "typecheck"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/taskflow-host-close-projection.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2aece2d2654138dfc43f211016ca77d8474f1566f5d90bb22d2cbe42325390d7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/taskflow-host-close-projection.test.ts"
+      ],
+      "generatedAt": "2026-10-18T07:25:42.244Z",
+      "startedAt": "2026-10-18T07:25:04.959Z",
+      "finishedAt": "2026-10-18T07:25:42.244Z",
+      "durationMs": 37285,
+      "runnerKind": "dev-source",
+      "sourceCommit": "52e0d1049e583c7cdc4eec01f9c126a7dd767488",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/profile-loader.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7c1144edd862c3987ab68d6be2eb4a352090c6707720f7df136262996fd86a76",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/taskflow/__tests__/profile-loader.spec.ts"
+      ],
+      "generatedAt": "2026-10-18T07:38:29.161Z",
+      "startedAt": "2026-10-18T07:38:28.673Z",
+      "finishedAt": "2026-10-18T07:38:29.161Z",
+      "durationMs": 488,
+      "runnerKind": "dev-source",
+      "sourceCommit": "52e0d1049e583c7cdc4eec01f9c126a7dd767488",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/closeback-orchestration.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5d044601268e96293af8e996fe87eb902cb1a669ee24aca0f6bb1f12d05373bb",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/taskflow/__tests__/closeback-orchestration.spec.ts"
+      ],
+      "generatedAt": "2026-10-18T07:38:37.374Z",
+      "startedAt": "2026-10-18T07:38:34.308Z",
+      "finishedAt": "2026-10-18T07:38:37.374Z",
+      "durationMs": 3066,
+      "runnerKind": "dev-source",
+      "sourceCommit": "52e0d1049e583c7cdc4eec01f9c126a7dd767488",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:47cd1acfc6ff6c4636fcb9332c7745d057b1a1aa275c6a24f2d77cc66fb44b12",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts"
+      ],
+      "generatedAt": "2026-10-18T07:38:54.193Z",
+      "startedAt": "2026-10-18T07:38:42.248Z",
+      "finishedAt": "2026-10-18T07:38:54.193Z",
+      "durationMs": 11945,
+      "runnerKind": "dev-source",
+      "sourceCommit": "52e0d1049e583c7cdc4eec01f9c126a7dd767488",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d95f62e0e8800cd53b0f3b2f9f6c880a24314cc33ab3c08381514b45e9d75343",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts"
+      ],
+      "generatedAt": "2026-10-18T07:39:09.434Z",
+      "startedAt": "2026-10-18T07:38:58.049Z",
+      "finishedAt": "2026-10-18T07:39:09.434Z",
+      "durationMs": 11385,
+      "runnerKind": "dev-source",
+      "sourceCommit": "52e0d1049e583c7cdc4eec01f9c126a7dd767488",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bdd7d877cb37bbd2436832dbd121e88117a469d33fb730cfbae413344415ff36",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-10-18T07:39:25.677Z",
+      "startedAt": "2026-10-18T07:39:13.401Z",
+      "finishedAt": "2026-10-18T07:39:25.677Z",
+      "durationMs": 12276,
+      "runnerKind": "dev-source",
+      "sourceCommit": "52e0d1049e583c7cdc4eec01f9c126a7dd767488",
+      "cached": false
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e171800469873c37c6435132b7b54a03eec9071c84fe3f322325945ab2b9ea1f",
+      "validators": [
+        "git diff --check"
+      ],
+      "generatedAt": "2026-10-18T07:39:30.258Z",
+      "startedAt": "2026-10-18T07:39:29.769Z",
+      "finishedAt": "2026-10-18T07:39:30.258Z",
+      "durationMs": 489,
+      "runnerKind": "dev-source",
+      "sourceCommit": "52e0d1049e583c7cdc4eec01f9c126a7dd767488",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/taskflow-host-close-projection.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2aece2d2654138dfc43f211016ca77d8474f1566f5d90bb22d2cbe42325390d7",
+      "stderrSha256": "sha256:d8f134eb259b395b0b470d0c6094940e93523995c76310b610fb059193dd009a",
+      "validators": [
+        "node --strip-types tests/cli/taskflow-host-close-projection.test.ts"
+      ],
+      "generatedAt": "2026-10-18T07:42:25.734Z",
+      "startedAt": "2026-10-18T07:41:27.691Z",
+      "finishedAt": "2026-10-18T07:42:25.734Z",
+      "durationMs": 58043,
+      "runnerKind": "dev-source",
+      "sourceCommit": "52e0d1049e583c7cdc4eec01f9c126a7dd767488",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
