@@ -1,0 +1,97 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-AAO-0211",
+  "updatedAt": "2026-10-18T23:24:10.239Z",
+  "updatedBy": "codex-gpt-6",
+  "freshValidationPasses": [
+    "git diff --check",
+    "lint",
+    "node --strip-types tests/cli/taskflow-host-close-projection.test.ts",
+    "npx eslint packages/cli/src/commands/taskflow/implementation.ts tests/cli/taskflow-host-close-projection.test.ts",
+    "typecheck"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "npx eslint packages/cli/src/commands/taskflow/implementation.ts tests/cli/taskflow-host-close-projection.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "npx eslint packages/cli/src/commands/taskflow/implementation.ts tests/cli/taskflow-host-close-projection.test.ts"
+      ],
+      "generatedAt": "2026-10-18T23:22:44.183Z",
+      "startedAt": "2026-10-18T23:22:42.178Z",
+      "finishedAt": "2026-10-18T23:22:44.183Z",
+      "durationMs": 2005,
+      "runnerKind": "dev-source",
+      "sourceCommit": "e71659655852548f6f0a4b530e5c562975a3c083",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/taskflow-host-close-projection.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2aece2d2654138dfc43f211016ca77d8474f1566f5d90bb22d2cbe42325390d7",
+      "stderrSha256": "sha256:d8f134eb259b395b0b470d0c6094940e93523995c76310b610fb059193dd009a",
+      "validators": [
+        "node --strip-types tests/cli/taskflow-host-close-projection.test.ts"
+      ],
+      "generatedAt": "2026-10-18T23:23:36.604Z",
+      "startedAt": "2026-10-18T23:22:47.646Z",
+      "finishedAt": "2026-10-18T23:23:36.604Z",
+      "durationMs": 48958,
+      "runnerKind": "dev-source",
+      "sourceCommit": "e71659655852548f6f0a4b530e5c562975a3c083",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bdd7d877cb37bbd2436832dbd121e88117a469d33fb730cfbae413344415ff36",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-10-18T23:23:50.556Z",
+      "startedAt": "2026-10-18T23:23:40.008Z",
+      "finishedAt": "2026-10-18T23:23:50.556Z",
+      "durationMs": 10548,
+      "runnerKind": "dev-source",
+      "sourceCommit": "e71659655852548f6f0a4b530e5c562975a3c083",
+      "cached": false
+    },
+    {
+      "command": "npm run lint",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4206e510bd4353ad8208eccc790e981039a89491d27449a99ce59ff0a2109074",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "lint"
+      ],
+      "generatedAt": "2026-10-18T23:24:06.498Z",
+      "startedAt": "2026-10-18T23:23:54.095Z",
+      "finishedAt": "2026-10-18T23:24:06.498Z",
+      "durationMs": 12403,
+      "runnerKind": "dev-source",
+      "sourceCommit": "e71659655852548f6f0a4b530e5c562975a3c083",
+      "cached": false
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "git diff --check"
+      ],
+      "generatedAt": "2026-10-18T23:24:10.238Z",
+      "startedAt": "2026-10-18T23:24:09.949Z",
+      "finishedAt": "2026-10-18T23:24:10.238Z",
+      "durationMs": 289,
+      "runnerKind": "dev-source",
+      "sourceCommit": "e71659655852548f6f0a4b530e5c562975a3c083",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
