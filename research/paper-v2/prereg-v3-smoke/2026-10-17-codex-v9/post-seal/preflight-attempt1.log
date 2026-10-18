@@ -1,0 +1,253 @@
+== static
+ok static
+== parser
+parser fixture ok
+ok parser
+== v4-regressions
+v4 regressions ok
+ok v4-regressions
+== v5-regressions
+v5 regressions ok
+ok v5-regressions
+== evidence
+evidence_missing ok
+ok evidence
+== seal-secrets
+sealed /tmp/tmp.KFRgsnA2jH/sealed-clean
+row: | `prereg-v3-smoke/sealed-clean/` | smoke / exploratory, not results | no win claim | mode=fixture; model=unrecorded; base=abc123 |
+seal allowlist and secret scan ok
+ok seal-secrets
+== public-cli
+public cli selection ok
+ok public-cli
+== fail-fast
+preflight fail-fast ok
+ok fail-fast
+== reasoning-effort
+results.json reasoningEffort ok
+reasoning effort ok
+ok reasoning-effort
+== no-rm
+no-rm state ok
+ok no-rm
+== gold
+gold isolation ok
+ok gold
+== atm-write-path
+atm-write path ok
+ok atm-write-path
+== readonly-steward
+blocked direct-write (exit 1)
+blocked chmod (exit 1)
+blocked rename (exit 1)
+blocked rm (exit 1)
+blocked sudo (exit 1)
+blocked mv-agents (exit 1)
+{"schema":"prereg-v3-smoke.stewardWrite.v1","ok":true,"decision":"accepted","reasonCode":null,"messageCode":"ATM_BROKER_LIVE_WRITE_APPLIED","verdict":"applied","phase":"commit","terminal":"committed","stopReason":null,"proposalId":"prop-session-b-a1-5341c925595c","taskId":"fixture-b","actorId":"session-b","file":"shared.py","declaredBaseHash":"sha256:4fdbc441ea7b546100e086ac1e4fc5ae6749b7314311c99db05be450eca12996","currentFileText":"alpha\nbeta-one\ngamma\n","currentFileHash":"sha256:e2b2cefcdb151e53eed2a74e62406191a63d332968eed686c4ebec90d1d25ff5","batchSize":1,"attempt":1,"retryCount":0,"hashDriftCount":0,"writeToCommitMs":169,"commit":{"gitIndexLockWaitMs":0,"headMoves":0},"planRequired":false,"cli":"@ai-atomic-framework/cli@0.1.21","entry":"broker steward apply-live"}
+blocked direct-write-after (exit 1)
+blocked chmod-after (exit 1)
+unix-user boundary verified on Debian GNU/Linux 13 (trixie) Linux 6.12.94+ x86_64
+unprivileged mechanism=codex-landlock
+sandbox probe codex-landlock:
+write:1
+chmod:1
+mv:1
+rm:1
+remount:32
+scratch:0
+session:0
+sandbox codex-landlock: direct write, chmod, mv, rm blocked; steward write ok
+readonly steward ok
+ok readonly-steward
+== exec-boundary
+launcher argv matches codex-landlock
+WARNING: proceeding, even though we could not create PATH aliases: Refusing to create helper binaries under temporary dir "/tmp" (codex_home: AbsolutePathBuf("/tmp/prereg-codex-home.iouz1f"))
+bash: line 3: /home/box/prereg-exec-boundary.Ri7BSH/repo/shared.py: Read-only file system
+chmod: changing permissions of '/home/box/prereg-exec-boundary.Ri7BSH/repo/shared.py': Read-only file system
+mv: cannot move '/home/box/prereg-exec-boundary.Ri7BSH/repo/shared.py' to '/home/box/prereg-exec-boundary.Ri7BSH/repo/shared.py.moved': Read-only file system
+rm: cannot remove '/home/box/prereg-exec-boundary.Ri7BSH/repo/shared.py': Read-only file system
+same wrapper blocks write chmod mv rm
+nested danger-full-access still blocked
+daemon socket dir is writable mode 0700 inside wrapper
+pinned codex exec started inside codex-landlock; bypass could not write
+auth readable inside wrapper; session state writable; login not dropped
+exec boundary ok (codex-landlock)
+ok exec-boundary
+== disposition
+write disposition ok
+ok disposition
+== django-venv
+/tmp/tmp.hwNR7AxZuo/only-setup/setuptools-79.0.1-py3-none-any.whl
+/tmp/tmp.hwNR7AxZuo/broken/wheel-0.46.1-py3-none-any.whl
+
+[notice] A new release of pip is available: 23.0.1 -> 26.2.1
+[notice] To update, run: /tmp/tmp.hwNR7AxZuo/bare/bin/python -m pip install --upgrade pip
+django venv preflight ok
+ok django-venv
+== observation
+observation kit-error ok
+ok observation
+== blocked-edits
+blocked edits ok
+ok blocked-edits
+== snapshot-uncommitted
+snapshot uncommitted ok
+ok snapshot-uncommitted
+== v7-records
+v7 records ok
+ok v7-records
+== v8-records
+v8 records ok
+ok v8-records
+== arm-a-git
+arm A git writable ok
+ok arm-a-git
+== login-path
+session login path ok
+ok login-path
+== false-accept
+noop downgraded
+apply kept
+false accept guard ok
+ok false-accept
+== seal-index
+seal index path ok
+ok seal-index
+== overlap
+setup ok mode=fixture base=7b7c2b525422905055deabb6c36842e43541aee2 run=overlap-20261017T045259Z-3248830-13580
+state: /workspace/atm-311/research/paper-v2/prereg-v3-smoke/kit/state/runs/overlap-20261017T045259Z-3248830-13580
+test log: /workspace/atm-311/research/paper-v2/prereg-v3-smoke/kit/state/runs/overlap-20261017T045259Z-3248830-13580/setup-tests.log
+arm A finished skew_ms=10 model=gpt-6-luna reasoning_effort=medium
+arm B finished skew_ms=12 model=gpt-6-luna reasoning_effort=medium
+{
+  "status": "ok",
+  "evalExit": 0,
+  "armBExit": 0,
+  "decisions": [
+    "accepted",
+    "rejected-by-design",
+    "accepted"
+  ],
+  "reasonCodes": [
+    "overlapping-write-queued"
+  ],
+  "lostEdits": 0,
+  "writes": 3,
+  "recomposeOrRetry": 1,
+  "attempts": [
+    1,
+    2
+  ],
+  "file": [
+    "alpha",
+    "beta-one",
+    "gamma",
+    "delta-two",
+    "epsilon",
+    "zeta"
+  ]
+}
+overlap decision ok
+ok overlap
+== stale-overlap
+stale overlap ok
+ok stale-overlap
+== overlap-condition
+overlap condition ok
+ok overlap-condition
+== stub-dry-run
+setup ok mode=fixture base=670f8fbd24599f7346d40f2bd9212e1250d5e60d run=selfcheck-20261017T045310Z-3250208-4784
+state: /workspace/atm-311/research/paper-v2/prereg-v3-smoke/kit/state/runs/selfcheck-20261017T045310Z-3250208-4784
+test log: /workspace/atm-311/research/paper-v2/prereg-v3-smoke/kit/state/runs/selfcheck-20261017T045310Z-3250208-4784/setup-tests.log
+arm A finished skew_ms=11 model=gpt-6-luna reasoning_effort=medium
+arm B finished skew_ms=35 model=gpt-6-luna reasoning_effort=medium
+wrote /workspace/atm-311/research/paper-v2/prereg-v3-smoke/kit/state/runs/selfcheck-20261017T045310Z-3250208-4784/results.json
+{"status": "ok", "A_lost": 1, "B_lost": 0, "B_rejected": 0, "B_writes": 2, "B_decisions": ["accepted", "accepted"]}
+results: /workspace/atm-311/research/paper-v2/prereg-v3-smoke/kit/state/runs/selfcheck-20261017T045310Z-3250208-4784/results.json
+self-check assertions ok
+{
+  "A_lost": 1,
+  "B_lost": 0,
+  "B_writes": 2,
+  "B_latency": [
+    136,
+    152
+  ]
+}
+sealed /tmp/tmp.Y8w2eR3MFZ/2026-10-15-codex-stub
+row: | `prereg-v3-smoke/2026-10-15-codex-stub/` | smoke / exploratory, not results | no win claim | mode=fixture; model=gpt-6-luna; base=670f8fbd24599f7346d40f2bd9212e1250d5e60d |
+README.md: OK
+RUNBOOK.md: OK
+diffs/arm-a.diff: OK
+diffs/arm-a.git-log.txt: OK
+diffs/arm-b.diff: OK
+diffs/arm-b.git-log.txt: OK
+logs/arm-a/meta.txt: OK
+logs/arm-a/model.txt: OK
+logs/arm-a/session-1/agent-output.diff: OK
+logs/arm-a/session-1/ended-at: OK
+logs/arm-a/session-1/exit-code: OK
+logs/arm-a/session-1/intended.patch: OK
+logs/arm-a/session-1/launch-env.txt: OK
+logs/arm-a/session-1/prompt.txt: OK
+logs/arm-a/session-1/started-at: OK
+logs/arm-a/session-1/stderr.txt: OK
+logs/arm-a/session-1/stdout.jsonl: OK
+logs/arm-a/session-2/agent-output.diff: OK
+logs/arm-a/session-2/ended-at: OK
+logs/arm-a/session-2/exit-code: OK
+logs/arm-a/session-2/intended.patch: OK
+logs/arm-a/session-2/launch-env.txt: OK
+logs/arm-a/session-2/prompt.txt: OK
+logs/arm-a/session-2/started-at: OK
+logs/arm-a/session-2/stderr.txt: OK
+logs/arm-a/session-2/stdout.jsonl: OK
+logs/arm-b/boundary.txt: OK
+logs/arm-b/meta.txt: OK
+logs/arm-b/model.txt: OK
+logs/arm-b/session-1/agent-output.diff: OK
+logs/arm-b/session-1/ended-at: OK
+logs/arm-b/session-1/exit-code: OK
+logs/arm-b/session-1/intended.patch: OK
+logs/arm-b/session-1/launch-env.txt: OK
+logs/arm-b/session-1/prompt.txt: OK
+logs/arm-b/session-1/started-at: OK
+logs/arm-b/session-1/stderr.txt: OK
+logs/arm-b/session-1/stdout.jsonl: OK
+logs/arm-b/session-2/agent-output.diff: OK
+logs/arm-b/session-2/ended-at: OK
+logs/arm-b/session-2/exit-code: OK
+logs/arm-b/session-2/intended.patch: OK
+logs/arm-b/session-2/launch-env.txt: OK
+logs/arm-b/session-2/prompt.txt: OK
+logs/arm-b/session-2/started-at: OK
+logs/arm-b/session-2/stderr.txt: OK
+logs/arm-b/session-2/stdout.jsonl: OK
+logs/arm-b/session-write.json: OK
+logs/arm-b/steward-writes.jsonl: OK
+logs/setup-tests.log: OK
+results.json: OK
+tasks.json: OK
+self-check seal ok: /tmp/tmp.Y8w2eR3MFZ/2026-10-15-codex-stub
+ok stub-dry-run
+== capture-intended
+capture intended patch ok
+ok capture-intended
+== seal-one-row
+seal one row ok
+ok seal-one-row
+== steward-ready
+steward ready ok
+ok steward-ready
+== probe-session-write
+probe session-write ok unix-user
+probe session-write ok codex-landlock
+probe session-write ok bwrap-ro
+probe session-write ok
+ok probe-session-write
+== real-model
+real-model boundary=unix-user
+prereg-v3-smoke: PREREG_PYTHON 不是絕對路徑上的可執行檔，session 不會用到評估 venv。
+FAIL real-model
+preflight failed
+pre=1
