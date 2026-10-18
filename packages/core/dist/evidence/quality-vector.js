@@ -1,0 +1,12 @@
+import { createHash } from 'node:crypto';
+export const QUALITY_VECTOR_SCHEMA_ID = 'atm.qualityVector.v1';
+export function compileQualityVector(input) { const dimensions = Object.fromEntries(Object.entries(input.dimensions ?? {}).sort(([a], [b]) => a.localeCompare(b)).map(([k, v]) => [k, Number(v)])), blockers = [...(input.blockers ?? [])].map(String).sort(), d = []; if (!input.authorityDigest)
+    d.push('authority-incomplete'); if (!Object.keys(dimensions).length)
+    d.push('dimensions-incomplete'); for (const [key, value] of Object.entries(dimensions))
+    if (!key || !Number.isFinite(value) || value < 0 || value > 1)
+        d.push(`invalid-dimension:${key}`); for (const blocker of blockers)
+    if (!blocker)
+        d.push('invalid-blocker'); if (blockers.length)
+    d.push('release-blocked'); const status = d.some(x => x.startsWith('invalid-') || x === 'dimensions-incomplete') ? 'contradictory' : d.length ? 'blocked' : 'proven', nonClaims = [...(input.nonClaims ?? []).map(String), ...(blockers.length ? ['does-not-authorize-release-with-blockers'] : [])].sort(), unsigned = { schemaId: QUALITY_VECTOR_SCHEMA_ID, specVersion: '0.1.0', authorityDigest: String(input.authorityDigest ?? '').trim(), dimensions, blockers, nonClaims, status, diagnostics: d, repairCommand: status === 'proven' ? null : 'resolve blockers, normalize independent dimensions, and reseal authority' }; return { ...unsigned, resultDigest: digest(unsigned) }; }
+export function validateQualityVector(r) { const { resultDigest, ...unsigned } = r, actual = digest(unsigned); return { ok: actual === resultDigest && r.status === 'proven', diagnostics: actual === resultDigest ? [] : ['result-digest-mismatch'] }; }
+function digest(v) { return `sha256:${createHash('sha256').update(JSON.stringify(v, (_, x) => x && typeof x === 'object' && !Array.isArray(x) ? Object.fromEntries(Object.entries(x).sort(([a], [b]) => a.localeCompare(b))) : x)).digest('hex')}`; }

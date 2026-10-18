@@ -2626,6 +2626,7 @@
     "release/atm-root-drop/packages/cli/dist/commands/taskflow/dirty-blockers.js",
     "release/atm-root-drop/packages/cli/dist/commands/taskflow/governance-dirty-deferral.js",
     "release/atm-root-drop/packages/cli/dist/commands/taskflow/historical-close-preflight.js",
+    "release/atm-root-drop/packages/cli/dist/commands/taskflow/host-close-projection.js",
     "release/atm-root-drop/packages/cli/dist/commands/taskflow/host-opener-policy.js",
     "release/atm-root-drop/packages/cli/dist/commands/taskflow/implementation.js",
     "release/atm-root-drop/packages/cli/dist/commands/taskflow/markdown-paths.js",
@@ -3547,6 +3548,7 @@
     "release/atm-root-drop/packages/cli/src/commands/taskflow/dirty-blockers.ts",
     "release/atm-root-drop/packages/cli/src/commands/taskflow/governance-dirty-deferral.ts",
     "release/atm-root-drop/packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+    "release/atm-root-drop/packages/cli/src/commands/taskflow/host-close-projection.ts",
     "release/atm-root-drop/packages/cli/src/commands/taskflow/host-opener-policy.ts",
     "release/atm-root-drop/packages/cli/src/commands/taskflow/implementation.ts",
     "release/atm-root-drop/packages/cli/src/commands/taskflow/markdown-paths.ts",
@@ -6499,6 +6501,7 @@
     "release/atm-root-drop/tests/cli/pending-task-artifact-scope.test.ts",
     "release/atm-root-drop/tests/cli/phase-suite-promotion-gate.test.ts",
     "release/atm-root-drop/tests/cli/physical-line-budget-gate.test.ts",
+    "release/atm-root-drop/tests/cli/physical-line-budget-unchanged-legacy.test.ts",
     "release/atm-root-drop/tests/cli/plan-3x-4x-validator-profile-coverage.test.ts",
     "release/atm-root-drop/tests/cli/plan-closeout-dashboard-rebuild.test.ts",
     "release/atm-root-drop/tests/cli/plan-level-executor-live-loop.test.ts",
@@ -6782,6 +6785,7 @@
     "release/atm-root-drop/tests/cli/taskflow-deferred-derived-manifest-closeback.test.ts",
     "release/atm-root-drop/tests/cli/taskflow-emergency-approval-forwarding.test.ts",
     "release/atm-root-drop/tests/cli/taskflow-final-600.test.ts",
+    "release/atm-root-drop/tests/cli/taskflow-host-close-projection.test.ts",
     "release/atm-root-drop/tests/cli/taskflow-host-policy.test.ts",
     "release/atm-root-drop/tests/cli/taskflow-non-delivery-readiness.test.ts",
     "release/atm-root-drop/tests/cli/taskflow-open-names-missing-flags.test.ts",
@@ -7211,7 +7215,7 @@
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
     "copied": 0,
-    "unchanged": 7175,
+    "unchanged": 7179,
     "removed": 0
   },
   "buildMode": "full",
@@ -7398,7 +7402,7 @@
       },
       {
         "path": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli-evidence-taskflow.json",
-        "digest": "50e15fa5b7b3143ad789c0f9d8043f4da70087b653665e7d7a66d5277dcbf67c",
+        "digest": "b3babbf5f9d34136fe4e34f53e9c7b9d814d77f48addff40536837d206a64503",
         "origin": "source",
         "inputPaths": [
           "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli-evidence-taskflow.json"
@@ -7497,7 +7501,7 @@
       },
       {
         "path": "atomic_workbench/atomization-coverage/path-to-atom-map.json",
-        "digest": "4d2b77a1b496b30be4b4074bb5c143429babd9a5ed6faa0e65e774b481723422",
+        "digest": "c05122cf695c53e257d4a158bcfc42db3879c8649edb262e917aebecfe625d9b",
         "origin": "source",
         "inputPaths": [
           "atomic_workbench/atomization-coverage/path-to-atom-map.json"
@@ -26235,7 +26239,7 @@
       },
       {
         "path": "packages/cli/dist/build-identity.json",
-        "digest": "cf6f20705e6afa27c804f15925b08d3ffefe8f01659b86926209300f337e286f",
+        "digest": "d623e30c5e60f3236915513a5dbfc9b077300d20feec88ec5569e4f599b5975f",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/build-identity.json"
@@ -28161,7 +28165,7 @@
       },
       {
         "path": "packages/cli/dist/commands/git-governance/commit-scope-policy.js",
-        "digest": "22e9a62490b2af94688a4f861a96bb52a8bef698ba788f9c37f90461f4da7092",
+        "digest": "fd74a9ee4c484d0fe7edb696bdecab7fc177276de7ad089e856a9caf33ba5569",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/git-governance/commit-scope-policy.js"
@@ -30438,7 +30442,7 @@
       },
       {
         "path": "packages/cli/dist/commands/taskflow/close-orchestration.js",
-        "digest": "2878e7e956f1f144fa38be36b2bf685d712c1e631365d44e2461726ca3ebb009",
+        "digest": "d8ed16b67d2c671a72538c2f4930897f1646c566c64c6eb6dd46f7d198c21a46",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/taskflow/close-orchestration.js"
@@ -30501,7 +30505,7 @@
       },
       {
         "path": "packages/cli/dist/commands/taskflow/closeback-orchestration.js",
-        "digest": "46d9e96c2579e8cb1f7540596957dc0bdc0275e823f375df3ece04fb74da8fee",
+        "digest": "b08979abc30052ec6f00226872c0e6d83c3a071e8743d77b020b279f62871983",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/taskflow/closeback-orchestration.js"
@@ -30510,7 +30514,7 @@
       },
       {
         "path": "packages/cli/dist/commands/taskflow/commit-bundle-assembly.js",
-        "digest": "fe3221d7a88ea8ef78d3a1122c61ca663f975868a741adbac3c970257252c6a6",
+        "digest": "6a6a12960137dc0bb73d4fc8c8f638b673078e81596933fd7a3897a34b721bcc",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/taskflow/commit-bundle-assembly.js"
@@ -30572,6 +30576,15 @@
         "replaceable": true
       },
       {
+        "path": "packages/cli/dist/commands/taskflow/host-close-projection.js",
+        "digest": "d253ff98016c48a402a8f44db9566aab8ac58f9539ca29cfe50e1d303caa3634",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/commands/taskflow/host-close-projection.js"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/cli/dist/commands/taskflow/host-opener-policy.js",
         "digest": "a932891df8b2e1ed40466c3273b05de686b03c818de28087c2bcb45de78afa92",
         "origin": "source",
@@ -30582,7 +30595,7 @@
       },
       {
         "path": "packages/cli/dist/commands/taskflow/implementation.js",
-        "digest": "f7291e67a6da191e80a0cc0d65975d6ca7f3564c9e1f29d5071d8928cb125776",
+        "digest": "aa86f00d40846c318fc3a25b641879670fb2e09a6546b64fc8b872e31e10674e",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/taskflow/implementation.js"
@@ -30609,7 +30622,7 @@
       },
       {
         "path": "packages/cli/dist/commands/taskflow/profile-loader.js",
-        "digest": "7141d0a299d2a5a3d39c4722dfcf68cadd27ebe3ad9cbaaf50f62ec8d0922582",
+        "digest": "d7462c4eb99e49f98421afe5ffc82f16abe4d8161a8a54724f01bf50958c846c",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/taskflow/profile-loader.js"
@@ -32301,7 +32314,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/build-identity.json",
-        "digest": "65c24360097e186842470c98566d160d397fdb71e0db5e397b22e587529a8ecd",
+        "digest": "033587294bce560acdc9226c2d1b80f62fbce9aebb0e985a40b086de605fd469",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/build-identity.json"
@@ -33030,7 +33043,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/manifest.json",
-        "digest": "e1590fdaa7fba182ce1480f6d24bc2e421aed7eb9a031970770f854e71f5f97f",
+        "digest": "29246b5a23783a9d5efc81bec189a5861c165a59b90041ec1619a55b072ebaeb",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/manifest.json"
@@ -33039,7 +33052,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/runtime.mjs",
-        "digest": "d7b79947aa6e907ef4f6f2298232a547a0b3aa80764a8add6cb71095b0c6687e",
+        "digest": "065682edfab350df493917c1d00922f15dc4d69d9f0d54324fe95d4795d9085f",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/runtime.mjs"
@@ -35703,7 +35716,7 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
-        "digest": "24f2e819c3853954c4d6fabbc5c04ef9c08674e1300f57d84d2aa74d135eb4e0",
+        "digest": "d7aaaf6c8845c37900bb466a857f97884c76e1390a1b301d2a0a5412a9eac4cb",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/commit-scope-policy.ts"
@@ -38457,7 +38470,7 @@
       },
       {
         "path": "packages/cli/src/commands/taskflow/__tests__/closeback-orchestration.spec.ts",
-        "digest": "a7222ec594607c94fc79bd7a1c5809e3fa59ad3bbe4731413c4dc4c2776a1562",
+        "digest": "a70881ddea3ef2e52561e8f947ec7a3cca5d57dbd9764bd52bfba312b5a479fa",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/taskflow/__tests__/closeback-orchestration.spec.ts"
@@ -38601,7 +38614,7 @@
       },
       {
         "path": "packages/cli/src/commands/taskflow/__tests__/profile-loader.spec.ts",
-        "digest": "71231a9cf690c43f8452b38c373a94e2b4fd081dfc13f83cf559809b30cfa1fa",
+        "digest": "2fd6955e0ce1f2677c74fafdf85c563d14a3d4ab1572b921ce5a0fb48ba2313e",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/taskflow/__tests__/profile-loader.spec.ts"
@@ -38628,7 +38641,7 @@
       },
       {
         "path": "packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
-        "digest": "15b04ff8151efe19a1c1a9f743f6ee2ac814e801d20abdc38a68bd215d710e5c",
+        "digest": "125c8028f000cba690b3a36b44ea34210f330cd7f0b57c441bd43a6620de68ba",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts"
@@ -38718,7 +38731,7 @@
       },
       {
         "path": "packages/cli/src/commands/taskflow/close-orchestration.ts",
-        "digest": "1a283459293b4fe3e93a6562a7be5d1bc26a0ad24f06f752960fc4ca5fbd3896",
+        "digest": "1f66f3ef414e3098ba2360b100971ed5f622ca6099e1fe7b5acd70a3ea7781b1",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/taskflow/close-orchestration.ts"
@@ -38790,7 +38803,7 @@
       },
       {
         "path": "packages/cli/src/commands/taskflow/closeback-orchestration.ts",
-        "digest": "65899611692f8616b9e2c210e69f685b67e5a88da30130ea36777f94761c73b6",
+        "digest": "63c133600925ecf2232f8dea0a80ddc7828613f84bd18588321607719927e53e",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/taskflow/closeback-orchestration.ts"
@@ -38799,7 +38812,7 @@
       },
       {
         "path": "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
-        "digest": "376bc32e6470cbfc45ae53e47ffe153b02b27ef84ab1ea2e8520d5e307a78dcb",
+        "digest": "34a23ee7fffa5c34c4c2183cae99b7c4491bb693d19e2583cec23b674a6c7a10",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts"
@@ -38861,6 +38874,15 @@
         "replaceable": true
       },
       {
+        "path": "packages/cli/src/commands/taskflow/host-close-projection.ts",
+        "digest": "38388d7a90a0f5defd842107fa16d67631d3071f2e1075b2209b43359e5e3a1a",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/src/commands/taskflow/host-close-projection.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/cli/src/commands/taskflow/host-opener-policy.ts",
         "digest": "5d7f93c9100666bf3df9ee8f904209b3c0122281c34222fceb6e6ea3d6e95e9c",
         "origin": "source",
@@ -38871,7 +38893,7 @@
       },
       {
         "path": "packages/cli/src/commands/taskflow/implementation.ts",
-        "digest": "8a1769fb828f1d62a3e39ed2253d2394ae7a4954e367dbcceb959fc1fa16ac1e",
+        "digest": "746a7a22755ace656db2b4226b985421a6cb5c75402ee96537205e3ca1c2bf76",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/taskflow/implementation.ts"
@@ -38898,7 +38920,7 @@
       },
       {
         "path": "packages/cli/src/commands/taskflow/profile-loader.ts",
-        "digest": "3acd16bfd2ea9869f8c835184c78ea8d54d2a799a42b9f17b6d4911b21c77992",
+        "digest": "0d3a9cd5eb98826e139a7d5b52ce739947e646d333a96eec85f62d3a62f532e4",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/taskflow/profile-loader.ts"
@@ -50553,7 +50575,7 @@
       },
       {
         "path": "packages/create-atm/dist/build-identity.json",
-        "digest": "392f00e75014109bd42d46045efe78a42f652fcb7e35c7d3f3344dc6bc3388e9",
+        "digest": "19156fe4d2c982e3155b01c3d4593e176eba1e78d3b13dd34e29a1ee23c867ae",
         "origin": "source",
         "inputPaths": [
           "packages/create-atm/dist/build-identity.json"
@@ -65420,6 +65442,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/cli/physical-line-budget-unchanged-legacy.test.ts",
+        "digest": "d0be4a09c0cb0f7c1c411376ab9eeb30804ffe7014352f8f4ee84ce75f520f70",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/physical-line-budget-unchanged-legacy.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/cli/plan-3x-4x-validator-profile-coverage.test.ts",
         "digest": "6fbd41d9d625f95abe6076617d324f3766dafd0d95edd0d4035b63780c758c7b",
         "origin": "source",
@@ -67963,6 +67994,15 @@
         "origin": "source",
         "inputPaths": [
           "tests/cli/taskflow-final-600.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "tests/cli/taskflow-host-close-projection.test.ts",
+        "digest": "8abae8f7604e1c6ece7f738fce7866c39448d48928b7ca12127b3144044728cf",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/taskflow-host-close-projection.test.ts"
         ],
         "replaceable": true
       },
@@ -71792,7 +71832,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:6e770a59cd6861e6107efc71f2ae9bdf7ce5f62c8392ee4e20ad8e62a4d5974b"
+    "treeDigest": "sha256:509c2eb38dcf5d62349d42c3597f9cf200706bf50ddf80e3f2fca22c9eaaf583"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -72437,6 +72477,7 @@
       "packages/cli/src/commands/taskflow/dirty-blockers.ts",
       "packages/cli/src/commands/taskflow/governance-dirty-deferral.ts",
       "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+      "packages/cli/src/commands/taskflow/host-close-projection.ts",
       "packages/cli/src/commands/taskflow/host-opener-policy.ts",
       "packages/cli/src/commands/taskflow/implementation.ts",
       "packages/cli/src/commands/taskflow/markdown-paths.ts",
@@ -73403,7 +73444,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:ba639e759f7bc16dbfa234adce905f7d1c8df6071f39c5d135dfd3aff373bb69"
+    "digest": "sha256:5bb564eebaefb28acb017ff920b8de861de0d99636f3c42b3927153fc4d7903d"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -76003,6 +76044,7 @@
       "release/atm-root-drop/packages/cli/dist/commands/taskflow/dirty-blockers.js",
       "release/atm-root-drop/packages/cli/dist/commands/taskflow/governance-dirty-deferral.js",
       "release/atm-root-drop/packages/cli/dist/commands/taskflow/historical-close-preflight.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/host-close-projection.js",
       "release/atm-root-drop/packages/cli/dist/commands/taskflow/host-opener-policy.js",
       "release/atm-root-drop/packages/cli/dist/commands/taskflow/implementation.js",
       "release/atm-root-drop/packages/cli/dist/commands/taskflow/markdown-paths.js",
@@ -76924,6 +76966,7 @@
       "release/atm-root-drop/packages/cli/src/commands/taskflow/dirty-blockers.ts",
       "release/atm-root-drop/packages/cli/src/commands/taskflow/governance-dirty-deferral.ts",
       "release/atm-root-drop/packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/host-close-projection.ts",
       "release/atm-root-drop/packages/cli/src/commands/taskflow/host-opener-policy.ts",
       "release/atm-root-drop/packages/cli/src/commands/taskflow/implementation.ts",
       "release/atm-root-drop/packages/cli/src/commands/taskflow/markdown-paths.ts",
@@ -79876,6 +79919,7 @@
       "release/atm-root-drop/tests/cli/pending-task-artifact-scope.test.ts",
       "release/atm-root-drop/tests/cli/phase-suite-promotion-gate.test.ts",
       "release/atm-root-drop/tests/cli/physical-line-budget-gate.test.ts",
+      "release/atm-root-drop/tests/cli/physical-line-budget-unchanged-legacy.test.ts",
       "release/atm-root-drop/tests/cli/plan-3x-4x-validator-profile-coverage.test.ts",
       "release/atm-root-drop/tests/cli/plan-closeout-dashboard-rebuild.test.ts",
       "release/atm-root-drop/tests/cli/plan-level-executor-live-loop.test.ts",
@@ -80159,6 +80203,7 @@
       "release/atm-root-drop/tests/cli/taskflow-deferred-derived-manifest-closeback.test.ts",
       "release/atm-root-drop/tests/cli/taskflow-emergency-approval-forwarding.test.ts",
       "release/atm-root-drop/tests/cli/taskflow-final-600.test.ts",
+      "release/atm-root-drop/tests/cli/taskflow-host-close-projection.test.ts",
       "release/atm-root-drop/tests/cli/taskflow-host-policy.test.ts",
       "release/atm-root-drop/tests/cli/taskflow-non-delivery-readiness.test.ts",
       "release/atm-root-drop/tests/cli/taskflow-open-names-missing-flags.test.ts",
@@ -80590,22 +80635,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:b0893376153e5e2007efb3ccde833239c4baae2d1e1876b14faa9785013564fe",
-  "sealedSourceCommit": "e0fac1e1035887ea41a2ae8f4d1b8a7a9eff9a83",
-  "buildDecision": "incrementalBuild",
-  "buildDecisionReason": "diff planner selected 1 affected package(s)",
-  "incrementalPlanDigest": "sha256:9481a6d32b43c46387d19ccd68b515fc8903f3f4b07401bfe1921218a19354d4",
-  "tsBuildCacheDigest": "sha256:340ed60ccb1d2d078d94c2c60cc45eaae38fa095795b7947e7cf5b431bf6c210",
+  "buildInputsTreeHash": "sha256:6049cd0fdab40a47f60ed74bd361b5334aede0160132c34a4f9828828d5daa34",
+  "sealedSourceCommit": "e63860b8548b166e0f157b029d9cbf8e81a91758",
+  "buildDecision": "fullRebuild",
+  "buildDecisionReason": "release artifacts are dirty or missing",
+  "incrementalPlanDigest": "sha256:2f32c106e1565b1027f7cae6620679d08f6e7de41bed35e3d47fba73cc62a5ec",
+  "tsBuildCacheDigest": "sha256:9f27fa25573b74ba4061fca0dc54e6eede7c80febaa22941b0e121f574f436bb",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 53,
-    "skipDecision": 67,
-    "worktreeSetup": 17876,
-    "typescriptBuild": 31722,
-    "rootDropReleaseAssembly": 61914,
-    "onefileReleaseAssembly": 60141,
-    "artifactSync": 9868,
+    "inputHashCalculation": 36,
+    "skipDecision": 197,
+    "worktreeSetup": 15563,
+    "typescriptBuild": 40787,
+    "rootDropReleaseAssembly": 64965,
+    "onefileReleaseAssembly": 48657,
+    "artifactSync": 6937,
     "cleanup": 0,
-    "totalElapsed": 212742
+    "totalElapsed": 189117
   }
 }

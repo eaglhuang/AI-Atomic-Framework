@@ -6,8 +6,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { runNext } from '../../next.ts';
 import { runTaskflow } from '../../taskflow.ts';
+import { runTasks } from '../../tasks/public-surface.ts';
 
-async function withLaneCapability<T>(laneSessionId: string, callback: () => Promise<T>): Promise<T> {
+export async function withLaneCapability<T>(laneSessionId: string, callback: () => Promise<T>): Promise<T> {
   const previous = process.env.ATM_LANE_SESSION_ID;
   process.env.ATM_LANE_SESSION_ID = laneSessionId;
   try {
@@ -39,12 +40,12 @@ function initGitRepo(repoRoot: string) {
   execFileSync('git', ['config', 'user.email', 'fixture@example.invalid'], { cwd: repoRoot, stdio: 'ignore' });
 }
 
-async function makeCloseAtomicityFixture(label: string) {
+export async function makeCloseAtomicityFixture(label: string, projections = false, targetOwned = false, sameRepo = false) {
   const tempRoot = mkdtempSync(path.join(os.tmpdir(), `atm-taskflow-atomicity-${label}-`));
   const targetRepo = path.join(tempRoot, 'target');
-  const planningRepo = path.join(tempRoot, 'planning');
+  const planningRepo = sameRepo ? targetRepo : path.join(tempRoot, 'planning');
   initGitRepo(targetRepo);
-  initGitRepo(planningRepo);
+  if (!sameRepo) initGitRepo(planningRepo);
   writeJson(path.join(targetRepo, 'package.json'), { name: `target-atomicity-${label}`, type: 'module' });
   writeJson(path.join(targetRepo, '.atm/config.json'), {
     schemaVersion: 'atm.config.v0.1',
@@ -61,6 +62,7 @@ async function makeCloseAtomicityFixture(label: string) {
 
   const taskId = `TASK-ATOMIC-${label.toUpperCase()}`;
   const planPath = path.join(planningRepo, 'docs', 'tasks', `${taskId}.task.md`);
+  const hostMarkdown = sameRepo ? `docs/tasks/${taskId}.task.md` : 'host/card.md';
   writeText(planPath, [
     '---',
     `task_id: ${taskId}`,
@@ -80,6 +82,10 @@ async function makeCloseAtomicityFixture(label: string) {
     taskId: { format: 'TASK-ATOMIC-NNNN' },
     template: { defaultMarkdown: '# ${taskId} ${title}' },
     capabilities: { supportsDryRun: true, supportsWrite: false },
+    ...(projections ? { hostCloseProjections: [
+      { kind: 'json', file: 'host/tasks.json', array: ['tasks'], idField: 'id', fields: { status: { value: 'done' }, completed_at: { source: 'completedAt' } }, summary: { path: ['summary'], totalField: 'total', statusField: 'status', buckets: { done: ['done', 'closed', 'completed'], in_progress: ['in-progress', 'in_progress', 'in progress'], open: [] }, fallbackBucket: 'open' } },
+      { kind: 'markdown', file: hostMarkdown, section: '## Details', headers: ['Field', 'Value'], labelColumn: 'Field', valueColumn: 'Value', rows: { Status: { value: 'done' }, Completion: { value: '100%' }, Time: { source: 'completedAt' } } }
+    ] } : {}),
     delegation: {
       hint: 'hint',
       openerPath: 'tools/task-card-opener.js',
@@ -98,25 +104,30 @@ async function makeCloseAtomicityFixture(label: string) {
     workItemId: taskId,
     title: 'Close atomicity fixture',
     status: 'ready',
-    scopePaths: ['src/deliver.txt'],
-    deliverables: ['src/deliver.txt'],
-    targetAllowedFiles: ['src/deliver.txt'],
+    scopePaths: ['src/deliver.txt', ...(projections ? ['host/tasks.json', hostMarkdown] : [])],
+    deliverables: ['src/deliver.txt', ...(projections ? ['host/tasks.json', 'host/card.md'] : [])],
+    targetAllowedFiles: ['src/deliver.txt', ...(projections ? ['host/tasks.json', 'host/card.md'] : [])],
     planningRepo: 'planning',
     targetRepo: 'target',
-    closureAuthority: 'target_repo',
+    ...(targetOwned ? { closureAuthority: 'target_repo' } : {}),
     source: { planPath: planPath }
   };
   writeJson(path.join(targetRepo, '.atm/history/tasks', `${taskId}.json`), taskDoc);
   writeText(path.join(targetRepo, 'src/deliver.txt'), 'baseline\n');
+  if (projections) {
+    writeText(path.join(targetRepo, 'host/tasks.json'), JSON.stringify({ tasks: [{ id: taskId, status: 'in-progress', completed_at: '', unknown: '繁中\\\\\"字' }, { id: 'OTHER', status: 'blocked', untouched: true }], summary: { total: 2, done: 0, in_progress: 1, open: 1 }, unknown: 'preserve' }, null, 2).replace(/\n/g, '\r\n') + '\r\n');
+    writeText(path.join(targetRepo, hostMarkdown), (sameRepo ? readFileSync(planPath, 'utf8') + '\n' : '') + ['# Host', '## Details', '| Field | Value |', '| --- | --- |', '| Status | in-progress |', '| Completion | 0% |', '| Time | pending |', '## Other', 'unrelated original', ''].join('\r\n'));
+  }
   execFileSync('git', ['add', '.'], { cwd: targetRepo, stdio: 'ignore' });
   execFileSync('git', ['commit', '-m', 'base target'], { cwd: targetRepo, stdio: 'ignore' });
-  execFileSync('git', ['add', '.'], { cwd: planningRepo, stdio: 'ignore' });
-  execFileSync('git', ['commit', '-m', 'base planning'], { cwd: planningRepo, stdio: 'ignore' });
+  if (!sameRepo) { execFileSync('git', ['add', '.'], { cwd: planningRepo, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'base planning'], { cwd: planningRepo, stdio: 'ignore' }); }
 
   const claim = await runNext(['--cwd', targetRepo, '--claim', '--actor', 'validator', '--task', taskId, '--claim-intent', 'write']);
   assert.equal(claim.ok, true);
   const laneSessionId = (claim.evidence as { laneSession?: { laneSessionId?: unknown } }).laneSession?.laneSessionId;
   if (typeof laneSessionId !== 'string') throw new Error('claim must mint an owner lane capability');
+  if (sameRepo) { const scoped = await withLaneCapability(laneSessionId, async () => runTasks(['scope', 'add', '--cwd', targetRepo, '--task', taskId, '--actor', 'validator', '--add', hostMarkdown, '--json'])); assert.equal(scoped.ok, true, 'same-repo planning projection needs explicit normal scope amendment'); }
 
   writeText(path.join(targetRepo, 'src/deliver.txt'), 'delivery content\n');
   writeJson(path.join(targetRepo, '.atm/history/evidence', `${taskId}.json`), {
@@ -141,6 +152,7 @@ async function makeCloseAtomicityFixture(label: string) {
   });
 
   return {
+    hostMarkdown,
     tempRoot,
     targetRepo,
     planningRepo,

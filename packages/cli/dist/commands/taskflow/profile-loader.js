@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { CliError } from '../shared.js';
+import { validateHostCloseProjections } from './host-close-projection.js';
 /** `openerPath: "atm:builtin"` selects ATM's own opener: taskflow open
  * generates the card with tasks new and imports it, exactly as it does for a
  * declared host opener, so a single-repository adopter needs no opener script. */
@@ -236,6 +237,8 @@ export function loadProfile(profilePath) {
 /** Validate an already-read snapshot without reopening its source path. */
 export function validateProfile(value) {
     const raw = value;
+    if (raw?.hostCloseProjections !== undefined)
+        validateHostCloseProjections(raw.hostCloseProjections);
     if (!raw || typeof raw !== 'object') {
         throw new CliError('ATM_TASKFLOW_PROFILE_SCHEMA_INVALID', 'Taskflow profile must be a valid JSON object.', { exitCode: 1 });
     }

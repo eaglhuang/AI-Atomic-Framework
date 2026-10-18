@@ -1,0 +1,65 @@
+import { createHash } from 'node:crypto';
+export const SANDBOXED_TEST_PATCH_SCHEMA_ID = 'atm.sandboxedTestPatch.v1';
+export function compileSandboxedTestPatch(input) {
+    const n = normalize(input);
+    const diagnostics = [];
+    if (!n.authority.authorityId || !n.authority.baseDigest || n.authority.sealed !== true)
+        diagnostics.push('authority-incomplete');
+    if (!n.patchId || !n.sourceDigest || n.operations.length === 0)
+        diagnostics.push('patch-incomplete');
+    const seen = new Set();
+    for (const operation of n.operations) {
+        if (seen.has(operation.operationId))
+            diagnostics.push(`duplicate-operation:${operation.operationId}`);
+        seen.add(operation.operationId);
+        if (!operation.path || operation.start < 0 || operation.end < operation.start)
+            diagnostics.push(`invalid-operation:${operation.operationId}`);
+    }
+    for (const [path, operations] of Object.entries(groupOperationsByPath(n.operations))) {
+        const ordered = [...operations].sort((left, right) => left.start - right.start || left.end - right.end || compareOperation(left, right));
+        for (let index = 1; index < ordered.length; index += 1) {
+            if (ordered[index].start < ordered[index - 1].end)
+                diagnostics.push(`overlapping-operation:${path}:${ordered[index - 1].operationId}:${ordered[index].operationId}`);
+        }
+    }
+    const passing = new Set(n.passingTestIds);
+    for (const id of n.requiredTestIds)
+        if (!passing.has(id))
+            diagnostics.push(`missing-test:${id}`);
+    if (n.sourceDigest !== n.authority.baseDigest)
+        diagnostics.push('source-authority-drift');
+    const minimized = minimize(n.operations);
+    const status = diagnostics.some((entry) => entry.startsWith('duplicate-') || entry.startsWith('invalid-') || entry.startsWith('overlapping-operation:') || entry === 'authority-incomplete' || entry === 'patch-incomplete') ? 'contradictory' : diagnostics.some((entry) => entry === 'source-authority-drift') ? 'stale' : diagnostics.length ? 'blocked' : 'proven';
+    const repairCommand = status === 'proven' ? null : 'restore the sealed source authority, repair patch/test evidence, then recompile in the sandbox';
+    const result = {
+        schemaId: SANDBOXED_TEST_PATCH_SCHEMA_ID,
+        specVersion: '0.1.0',
+        patchId: n.patchId,
+        authority: n.authority,
+        sourceDigest: n.sourceDigest,
+        operations: n.operations,
+        minimizedOperationIds: minimized.map((operation) => operation.operationId),
+        requiredTestIds: n.requiredTestIds,
+        passingTestIds: n.passingTestIds,
+        provenance: n.provenance,
+        status,
+        diagnostics,
+        repairCommand,
+        resultDigest: digest({ patchId: n.patchId, authority: n.authority, sourceDigest: n.sourceDigest, operations: n.operations, minimizedOperationIds: minimized.map((operation) => operation.operationId), requiredTestIds: n.requiredTestIds, passingTestIds: n.passingTestIds, provenance: n.provenance, status, diagnostics, repairCommand })
+    };
+    return result;
+}
+export const createSandboxedTestPatch = compileSandboxedTestPatch;
+export function replaySandboxedTestPatch(result) { return compileSandboxedTestPatch({ authority: result.authority, patchId: result.patchId, operations: result.operations, requiredTestIds: result.requiredTestIds, passingTestIds: result.passingTestIds, sourceDigest: result.sourceDigest, provenance: result.provenance }); }
+export function validateSandboxedTestPatch(result) { const replay = replaySandboxedTestPatch(result); const diagnostics = [...result.diagnostics]; if (result.resultDigest !== replay.resultDigest)
+    diagnostics.push('result-digest-mismatch'); if (result.status !== replay.status)
+    diagnostics.push('status-mismatch'); return { ok: diagnostics.length === 0 && result.status === 'proven', diagnostics: [...new Set(diagnostics)] }; }
+function normalize(input) { return { authority: { authorityId: text(input.authority?.authorityId), baseDigest: text(input.authority?.baseDigest), sealed: input.authority?.sealed === true }, patchId: text(input.patchId), operations: [...(input.operations ?? [])].map((operation) => ({ operationId: text(operation.operationId), path: text(operation.path), start: Number(operation.start), end: Number(operation.end), replacement: String(operation.replacement ?? '') })).sort(compareOperation), requiredTestIds: [...(input.requiredTestIds ?? [])].map(text).filter(Boolean).sort(), passingTestIds: [...(input.passingTestIds ?? [])].map(text).filter(Boolean).sort(), sourceDigest: text(input.sourceDigest), provenance: input.provenance ?? {} }; }
+function minimize(operations) { return [...operations].sort((a, b) => (a.end - a.start) - (b.end - b.start) || compareOperation(a, b)); }
+function groupOperationsByPath(operations) { return operations.reduce((grouped, operation) => { (grouped[operation.path] ??= []).push(operation); return grouped; }, {}); }
+function compareOperation(a, b) { return [a.path, a.start, a.end, a.replacement, a.operationId].join('\u001f').localeCompare([b.path, b.start, b.end, b.replacement, b.operationId].join('\u001f')); }
+function text(value) { return String(value ?? '').trim(); }
+function digest(value) { return `sha256:${createHash('sha256').update(stableStringify(value)).digest('hex')}`; }
+function stableStringify(value) { if (value === null || typeof value !== 'object')
+    return JSON.stringify(value); if (Array.isArray(value))
+    return `[${value.map(stableStringify).join(',')}]`; const record = value; return `{${Object.keys(record).sort().map((key) => `${JSON.stringify(key)}:${stableStringify(record[key])}`).join(',')}}`; }

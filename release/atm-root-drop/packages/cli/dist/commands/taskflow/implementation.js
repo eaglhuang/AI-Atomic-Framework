@@ -1,3 +1,7 @@
+import { buildPartialPlanningCardContent } from './closeback-orchestration.js';
+import { getCanonicalAllowedFilesForTask } from '../task-direction.js';
+import { prepareHostCloseProjections, projectHostContent, assertHostProjectionCas, applyHostCloseProjections, authorizeHostProjectionWrite, captureProjectionTransaction } from './host-close-projection.js';
+import { rollbackCloseWriteTransaction } from './close-orchestration.js';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
@@ -429,8 +433,13 @@ async function runTaskflowClose(parsed, cwd, surface = 'close') {
     }
     const closebackPlan = buildClosebackPlan({ taskId, actorId: actorId || '<actor>', historicalDeliveryRefs, historicalBatchRef,
         waiverOutOfScopeDelivery: waiver.waiverOutOfScopeDelivery, waiverReason: waiver.waiverReason, planningAuthorityDeliveryGate, delegationContract, diagnosis: { bucket: enrichedDiagnosis.bucket, truth: enrichedDiagnosis.truth, residue: enrichedDiagnosis.residue, reason: enrichedDiagnosis.reason, nextCommand: enrichedDiagnosis.nextCommand, triangulation: enrichedDiagnosis.triangulation }, closebackPathResolution, cwd, taskDocument, targetFiles: [...resolveTaskflowDeclaredFiles(cwd, taskId, taskDocument)], planningFiles: closebackPathResolution.planningMirrorPath ? [closebackPathResolution.planningMirrorPath] : [] });
+    const existingProjectionCompletedAt = (() => { const source = closebackPlan.writerBoundary.planningMirrorPath; const text = source && existsSync(path.resolve(cwd, source)) ? readFileSync(path.resolve(cwd, source), 'utf8') : ''; const candidate = text.match(/^completed_at:\s*"?([^"\r\n]+)"?\s*$/m)?.[1] ?? taskDocument.completed_at ?? taskDocument.closedAt; return typeof candidate === 'string' && Number.isFinite(Date.parse(candidate)) ? candidate : null; })();
+    const projectionValues = { taskId, actorId, status: 'done', completedAt: existingProjectionCompletedAt ?? new Date().toISOString() };
+    const closedPreviewPaths = !writeRequested && ['done', 'completed', 'closed'].includes(String(taskDocument.status)) && Array.isArray(taskDocument.scopePaths) ? taskDocument.scopePaths.filter((file) => typeof file === 'string' && !/[?*]/.test(file)) : [];
+    const hostProjections = prepareHostCloseProjections({ root: cwd, configs: profileData?.hostCloseProjections, values: projectionValues, allowedFiles: getCanonicalAllowedFilesForTask(cwd, taskId) ?? [...resolveTaskflowDeclaredFiles(cwd, taskId, taskDocument), ...closedPreviewPaths], baseline: file => execFileSync('git', ['show', `HEAD:${file}`], { cwd, encoding: 'utf8' }) });
+    const projectionStageContent = Object.fromEntries(hostProjections.map(p => [p.file, p.stagedContent]));
     const diagnostics = buildTaskflowCloseDiagnostics({ closeMode: closebackPlan.closeMode, writeRequested, actorSupplied: actorId.length > 0, taskIdSupplied: taskId.length > 0 });
-    const previewCommitBundle = buildTaskflowCommitBundle({ cwd, taskId, actorId: actorId || null, commitMode, planningMirrorPath: closebackPlan.writerBoundary.planningMirrorPath,
+    const previewCommitBundle = buildTaskflowCommitBundle({ cwd, taskId, actorId: actorId || null, commitMode, projectionStageContent, planningMirrorPath: closebackPlan.writerBoundary.planningMirrorPath,
         rosterIndexPath: closebackPlan.writerBoundary.rosterSyncPolicy === 'inline' ? closebackPlan.writerBoundary.rosterIndexPath : null, historicalDeliveryRefs, historicalBatchRef, planningAuthorityDeliveryOk: planningAuthorityDeliveryGate.ok });
     const hasUncommittedDeliverables = previewCommitBundle.targetDeliveryFiles.length > 0;
     const declaredFiles = [...resolveTaskflowDeclaredFiles(cwd, taskId, taskDocument)];
@@ -482,6 +491,7 @@ async function runTaskflowClose(parsed, cwd, surface = 'close') {
     }
     if (writeRequested && writeSupport.allowed) {
         authorizeLaneCapability({ cwd, taskId, actorId, commandClass: 'taskflow-close-write' });
+        authorizeHostProjectionWrite(taskDocument, projectionValues, hostProjections);
     }
     if (writeRequested) {
         assertCommitBundleReady(previewCommitBundle);
@@ -511,6 +521,10 @@ async function runTaskflowClose(parsed, cwd, surface = 'close') {
         let closeWindowLockReleased = false;
         let deferredGovernanceDirty = deferGovernanceDirtyFiles(cwd, deferGovernanceDirty, taskId);
         let deferredGovernanceDirtyRestored = false;
+        let projectionTransaction = null;
+        let planningProjectionTransaction = null;
+        let transactionSucceeded = false;
+        let activeRollbackSnapshot = null;
         try {
             closeWindowLock = acquireCloseWindowStagedIndexLock({ cwd, taskId, actorId, expectedStageFiles: expectedCloseWindowStageFiles, deferForeignStaged, waitForHandoff: true });
             if (!closeWindowLock.ok) {
@@ -526,13 +540,49 @@ async function runTaskflowClose(parsed, cwd, surface = 'close') {
                 backendArgv.push(...buildTaskflowRunnerRecoveryArgs({ runnerPublicationAccepted: runnerReceiptPublicationClosure.status === 'accepted', emergencyApproval: parsed.options.emergencyApproval }));
             }
             const ledgerAlreadyClosedHistoricalCloseback = closebackPlan.backendSurface === 'tasks-close' && closebackPlan.closeMode === 'historical-delivery-close' && enrichedDiagnosis.triangulation.liveLedger.status === 'done' && effectiveHistoricalDeliveryRefs.length > 0;
+            projectionTransaction = hostProjections.length ? captureProjectionTransaction(cwd, hostProjections, [taskLedgerPath, `.atm/history/evidence/${taskId}.closure-packet.json`, `.atm/history/evidence/${taskId}.bundle-manifest.json`, `.atm/history/evidence/${taskId}.seal-and-commit.json`].map(file => path.resolve(cwd, file))) : null;
+            if (hostProjections.length && planningCardSnapshot) {
+                const roster = resolvePlanningRosterPaths({ cwd, planningMirrorPath: closebackPlan.writerBoundary.planningMirrorPath, rosterIndexPath: closebackPlan.writerBoundary.rosterIndexPath });
+                if (roster.repoRoot)
+                    planningProjectionTransaction = captureProjectionTransaction(roster.repoRoot, [], [planningCardSnapshot.absolutePath, ...(roster.indexPath ? [path.resolve(roster.repoRoot, roster.indexPath)] : [])]);
+            }
+            if (hostProjections.length)
+                activeRollbackSnapshot = { ...buildCloseWriteRollbackSnapshot({ cwd, taskId, previousTaskContent, backendEvidence: {}, planningCard: planningCardSnapshot, preCloseStagedFiles }), transitionPath: null };
             const backendResult = ledgerAlreadyClosedHistoricalCloseback ? makeResult({ ok: true, command: 'tasks close', cwd, mode: 'taskflow-closeback-reconcile', messages: [message('info', 'ATM_TASKFLOW_CLOSE_LEDGER_ALREADY_DONE', 'Live task ledger is already done; taskflow is reconciling planning closeback only.', { taskId, historicalDeliveryRefs: effectiveHistoricalDeliveryRefs })], evidence: {
                     action: 'closeback-reconcile', taskId, actorId, ledgerAlreadyDone: true, historicalDeliveryRefs: effectiveHistoricalDeliveryRefs
                 } }) : await withTaskflowOperatorLane(() => runTasks(backendArgv));
             const rollbackSnapshot = buildCloseWriteRollbackSnapshot({ cwd, taskId, previousTaskContent, backendEvidence: backendResult.evidence, planningCard: planningCardSnapshot,
                 closeWindowStagedIndexLockActive: closeWindowLock?.ok === true, preCloseStagedFiles });
-            const planningCardCloseback = closebackPlan.backendSurface === 'tasks-close' && backendResult.ok ? applyPlanningCardCloseback({ cwd, planningMirrorPath: closebackPlan.writerBoundary.planningMirrorPath, actorId, historicalDeliveryRefs: effectiveHistoricalDeliveryRefs }) : null;
+            activeRollbackSnapshot = rollbackSnapshot;
+            if (hostProjections.length && backendResult.ok) {
+                const closed = loadTaskDocumentOrThrow(cwd, taskId).taskDocument;
+                const time = existingProjectionCompletedAt ?? closed.completed_at ?? closed.closedAt;
+                if (typeof time === 'string' && Number.isFinite(Date.parse(time)))
+                    projectionValues.completedAt = time;
+                for (let i = 0; i < hostProjections.length; i++) {
+                    const patch = hostProjections[i];
+                    const config = profileData.hostCloseProjections[i];
+                    patch.after = projectHostContent(patch.before, config, projectionValues);
+                    patch.stagedContent = projectHostContent(execFileSync('git', ['show', `HEAD:${patch.file}`], { cwd, encoding: 'utf8' }), config, projectionValues);
+                    projectionStageContent[patch.file] = patch.stagedContent;
+                }
+            }
+            assertHostProjectionCas(hostProjections);
+            const planningCardCloseback = closebackPlan.backendSurface === 'tasks-close' && backendResult.ok ? applyPlanningCardCloseback({ cwd, planningMirrorPath: closebackPlan.writerBoundary.planningMirrorPath, actorId, historicalDeliveryRefs: effectiveHistoricalDeliveryRefs, ...(hostProjections.length ? { completedAt: projectionValues.completedAt } : {}) }) : null;
             const rollbackSnapshotWithPlanning = planningCardCloseback?.transitionPath && rollbackSnapshot.planningCard ? { ...rollbackSnapshot, planningCard: { ...rollbackSnapshot.planningCard, transitionPath: planningCardCloseback.transitionPath }, stagedArtifacts: [...rollbackSnapshot.stagedArtifacts, planningCardCloseback.transitionPath] } : rollbackSnapshot;
+            activeRollbackSnapshot = rollbackSnapshotWithPlanning;
+            if (planningCardCloseback)
+                for (let i = 0; i < hostProjections.length; i++) {
+                    const patch = hostProjections[i];
+                    if (path.resolve(patch.absolutePath) === path.resolve(planningCardCloseback.repoRoot, planningCardCloseback.relativePath)) {
+                        const config = profileData.hostCloseProjections[i];
+                        const before = readFileSync(patch.absolutePath, 'utf8');
+                        const stagedContent = projectHostContent(planningCardCloseback.stagedContent ?? patch.stagedContent, config, projectionValues);
+                        hostProjections[i] = { ...patch, before, after: projectHostContent(before, config, projectionValues), stagedContent };
+                        projectionStageContent[patch.file] = stagedContent;
+                    }
+                }
+            applyHostCloseProjections(hostProjections);
             let rosterCloseback = null;
             const closeMessages = [];
             const planningRosterPaths = closebackPlan.writerBoundary.rosterClosebackCommand && closebackPlan.writerBoundary.rosterIndexPath && closebackPlan.writerBoundary.planningMirrorPath ? resolvePlanningRosterPaths({ cwd, planningMirrorPath: closebackPlan.writerBoundary.planningMirrorPath, rosterIndexPath: closebackPlan.writerBoundary.rosterIndexPath }) : null;
@@ -553,18 +603,28 @@ async function runTaskflowClose(parsed, cwd, surface = 'close') {
                     rosterCloseback = await runRosterSyncFollowUp({ command, cwd: planningRosterPaths.repoRoot, indexPath: planningRosterPaths.indexPath, fromPath: planningRosterPaths.fromPath, messages: closeMessages });
                 }
             }
+            if (hostProjections.length && rosterCloseback?.result && rosterCloseback.result.ok === false)
+                throw new CliError('ATM_TASKFLOW_CLOSE_WRITE_FAILED', 'Roster synchronization failed; host projections cannot commit.', { exitCode: 1 });
             const planningIndexAdvisory = buildTaskflowPlanningIndexAdvisory({ taskId,
                 planningRosterPaths, rosterCloseback, rosterCommand: closebackPlan.writerBoundary.rosterClosebackCommand ?? null });
             if (planningIndexAdvisory) {
                 closeMessages.push(message(planningIndexAdvisory.status === 'follow-up-required' ? 'warn' : 'info', planningIndexAdvisory.status === 'follow-up-required' ? 'ATM_TASKFLOW_CLOSE_PLANNING_INDEX_FOLLOWUP_REQUIRED' : 'ATM_TASKFLOW_CLOSE_PLANNING_INDEX_SYNCED', planningIndexAdvisory.status === 'follow-up-required' ? 'taskflow close succeeded; planning roster/index sync still needs an explicit follow-up command.' : 'taskflow close synced the planning roster/index and recorded the closeback fields.', planningIndexAdvisory));
             }
             promoteTaskRuntimeHandoffs(cwd, taskId, 'completed');
-            const commitBundleInput = buildTaskflowCommitBundle({ cwd, taskId, actorId, commitMode,
+            const commitBundleInput = buildTaskflowCommitBundle({ cwd, taskId, actorId, commitMode, projectionStageContent,
                 planningMirrorPath: closebackPlan.writerBoundary.planningMirrorPath, rosterIndexPath: closebackPlan.writerBoundary.rosterSyncPolicy === 'inline' ? closebackPlan.writerBoundary.rosterIndexPath : null, extraPlanningStageFiles: planningCardCloseback?.transitionPath ? [planningCardCloseback.transitionPath] : [], planningStageContent: planningCardCloseback?.stagedContent && planningCardCloseback.relativePath ? { [planningCardCloseback.relativePath]: planningCardCloseback.stagedContent } : undefined, backendResult: backendResult,
                 historicalDeliveryRefs: effectiveHistoricalDeliveryRefs, historicalBatchRef, planningAuthorityDeliveryOk: planningAuthorityDeliveryGate.ok });
             const { bundle: governedCommitBundle, transaction: closeWriteTransaction } = backendResult.ok ? await executeCloseWriteCommitPhase({ cwd, taskId, actorId, snapshot: rollbackSnapshotWithPlanning, commit: () => finalizeTaskflowCommitBundle({ bundle: commitBundleInput, actorId,
                     taskId }) }) : { bundle: commitBundleInput, transaction: { schemaId: 'atm.closeWriteTransaction.v1', taskId, phase: 'pending', ok: false, failureStep: 'backend-close', failureCode: 'ATM_TASKFLOW_CLOSE_WRITE_FAILED', failureReason: 'backend close did not complete', rolledBackArtifacts: [], recoveryCommand: diagnosis.nextCommand, backendCloseApplied: false, commitBundleApplied: false } };
             const writeOk = backendResult.ok && closeWriteTransaction.ok && !governedCommitBundle.failClosed;
+            transactionSucceeded = writeOk;
+            if (writeOk && hostProjections.length)
+                projectionTransaction?.finish(profileData.hostCloseProjections, projectionValues, (file, content) => { if (planningCardCloseback?.repoRoot && path.resolve(planningCardCloseback.repoRoot) === path.resolve(cwd) && planningCardCloseback.relativePath === file) {
+                    const rebased = buildPartialPlanningCardContent(content, readFileSync(path.resolve(cwd, file), 'utf8'), planningCardCloseback.updatedFields);
+                    if (rebased === null)
+                        throw new CliError('ATM_TASKFLOW_PROFILE_SCHEMA_INVALID', `Cannot rebase staged planning frontmatter: ${file}`, { exitCode: 1 });
+                    return rebased;
+                } return content; });
             const brokerRuntimeCleanup = writeOk ? clearBrokerRuntimeStateForTask({ cwd, taskId }).runtimeCleanup ?? null : null;
             const residueAdvisory = writeOk ? buildTaskflowCloseResidueAdvisory(enrichedDiagnosis) : null;
             if (residueAdvisory) {
@@ -577,10 +637,19 @@ async function runTaskflowClose(parsed, cwd, surface = 'close') {
             deferredGovernanceDirty = restoreDeferredGovernanceDirtyFiles(cwd, deferredGovernanceDirty);
             deferredGovernanceDirtyRestored = true;
             return { ...makeResult({ ok: writeOk,
-                    command: 'taskflow close', cwd, mode: 'write', messages: closeMessages, evidence: { closeMode: closebackPlan.closeMode, writeSupport, commitMode, runnerGateDecision: runnerGateEvidence.runnerGateDecision, runnerGateIntersectingFiles: runnerGateEvidence.runnerGateIntersectingFiles, runnerGateScopeClass: runnerGateEvidence.scopeClass, delegationContract, diagnostics, closebackPlan, backendResult, preCloseDeliveryCommit, planningCardCloseback, rosterCloseback, governedCommitBundle, closeWriteTransaction, closeWindowLock, releasedCloseWindowLock, brokerRuntimeCleanup, deferredGovernanceDirty,
+                    command: 'taskflow close', cwd, mode: 'write', messages: closeMessages, evidence: { closeMode: closebackPlan.closeMode, writeSupport, commitMode, runnerGateDecision: runnerGateEvidence.runnerGateDecision, runnerGateIntersectingFiles: runnerGateEvidence.runnerGateIntersectingFiles, runnerGateScopeClass: runnerGateEvidence.scopeClass, delegationContract, diagnostics, closebackPlan, ...(hostProjections.length ? { hostProjections } : {}), backendResult, preCloseDeliveryCommit, planningCardCloseback, rosterCloseback, governedCommitBundle, closeWriteTransaction, closeWindowLock, releasedCloseWindowLock, brokerRuntimeCleanup, deferredGovernanceDirty,
                         residueDiagnosis: enrichedDiagnosis, residueAdvisory, planningIndexAdvisory, closebackPathResolution, ...(autoEvidenceExecution ? { autoEvidenceExecution, autoEvidencePlan: autoEvidenceExecution.plan } : {}), ...(profileData ? { profile: profileData } : {}) } }), schemaId: 'atm.taskflowCloseResult.v1', writeEnabled: true };
         }
+        catch (error) {
+            if (!transactionSucceeded && hostProjections.length && activeRollbackSnapshot)
+                rollbackCloseWriteTransaction({ cwd, taskId, actorId, snapshot: activeRollbackSnapshot, failureStep: 'close-projections', failureCode: error instanceof CliError ? error.code : 'ATM_TASKFLOW_CLOSE_WRITE_FAILED', failureReason: error instanceof Error ? error.message : String(error) });
+            throw error;
+        }
         finally {
+            if (!transactionSucceeded) {
+                projectionTransaction?.restore();
+                planningProjectionTransaction?.restore();
+            }
             if (closeWindowLock?.ok && !closeWindowLockReleased) {
                 releaseCloseWindowStagedIndexLock({ cwd, taskId, actorId, outcome: 'aborted' });
             }
@@ -591,7 +660,7 @@ async function runTaskflowClose(parsed, cwd, surface = 'close') {
     }
     return { ...makeResult({ ok: !writeReadinessHint.blockers.some((blocker) => blocker.code === 'ATM_TASKFLOW_CLOSE_COMMIT_BUNDLE_INCOMPLETE'), command: 'taskflow close', cwd, mode: 'dry-run', messages: [message(closebackPlan.closeMode === 'ambiguous-manual-review' || writeReadinessHint.status === 'blocked' ? 'warn' : 'info', closebackPlan.closeMode === 'ambiguous-manual-review' ? 'ATM_TASKFLOW_CLOSE_AMBIGUOUS_RESIDUE' : writeReadinessHint.status === 'blocked' ? 'ATM_TASKFLOW_CLOSE_WRITE_NOT_READY' : 'ATM_TASKFLOW_CLOSE_ORCHESTRATION_READY', closebackPlan.closeMode === 'ambiguous-manual-review' ? 'taskflow close dry-run blocked on ambiguous residue; operator review required.' : writeReadinessHint.status === 'blocked'
                     ? `taskflow close dry-run found known write blockers (${closebackPlan.closeMode}); inspect writeReadinessHint before --write.` : `taskflow close dry-run plan is ready (${closebackPlan.closeMode}).`, { taskId, closeMode: closebackPlan.closeMode })], evidence: { closeMode: closebackPlan.closeMode, commitMode, writeSupport, writeReadinessHint, delegationContract, diagnostics, closebackPlan,
-                governedCommitBundle: previewCommitBundle, historicalClosePreflight, runnerGateDecision: runnerGateEvidence.runnerGateDecision, runnerGateIntersectingFiles: runnerGateEvidence.runnerGateIntersectingFiles, runnerGateScopeClass: runnerGateEvidence.scopeClass, runnerReceiptPublicationClosure, residueDiagnosis: enrichedDiagnosis, closebackPathResolution, ...(autoEvidencePlan ? { autoEvidencePlan } : {}), ...(profileData ? { profile: profileData } : {}) } }), schemaId: 'atm.taskflowCloseResult.v1', writeEnabled: false };
+                governedCommitBundle: previewCommitBundle, ...(hostProjections.length ? { hostProjections } : {}), historicalClosePreflight, runnerGateDecision: runnerGateEvidence.runnerGateDecision, runnerGateIntersectingFiles: runnerGateEvidence.runnerGateIntersectingFiles, runnerGateScopeClass: runnerGateEvidence.scopeClass, runnerReceiptPublicationClosure, residueDiagnosis: enrichedDiagnosis, closebackPathResolution, ...(autoEvidencePlan ? { autoEvidencePlan } : {}), ...(profileData ? { profile: profileData } : {}) } }), schemaId: 'atm.taskflowCloseResult.v1', writeEnabled: false };
 }
 function promoteTaskRuntimeHandoffs(cwd, taskId, runOutcome) {
     const root = path.join(cwd, '.atm', 'runtime', 'handoff', taskId.replace(/[^A-Za-z0-9._-]/g, '_'));
