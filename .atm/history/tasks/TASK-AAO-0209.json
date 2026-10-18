@@ -1,0 +1,302 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0209",
+  "title": "Ticket directory glob parity",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [],
+  "deliverables": [
+    "packages/core/src/broker/write-scope-policy.ts",
+    "tests/cli/work-admission-ticket-scope-glob-parity.test.ts",
+    "tests/cli/scope-amendment-work-admission-ticket.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/write-scope-policy.ts",
+    "tests/cli/work-admission-ticket-scope-glob-parity.test.ts",
+    "tests/cli/scope-amendment-work-admission-ticket.test.ts",
+    ".atm/history/tasks/TASK-AAO-0209.json",
+    ".atm/history/evidence/TASK-AAO-0209.*",
+    ".atm/history/task-events/TASK-AAO-0209/**"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/work-admission-ticket-scope-glob-parity.test.ts",
+    "node --strip-types tests/cli/scope-amendment-work-admission-ticket.test.ts",
+    "node --strip-types tests/cli/work-admission-ticket-claim.test.ts",
+    "node --strip-types tests/cli/work-admission-coverage-gates.test.ts",
+    "npm run typecheck",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "contextMap": {
+    "primary": [],
+    "secondary": []
+  },
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 6 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../.codex/worktrees/web-verification/3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0209-ticket-directory-glob-parity.task.md",
+    "sectionTitle": "TASK-AAO-0209",
+    "headingLine": 1,
+    "hash": "e85f8e6835240509",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/.codex/worktrees/web-verification/3KLife",
+      "taskCardPath": "../.codex/worktrees/web-verification/3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0209-ticket-directory-glob-parity.task.md",
+      "planningCommitSha": "567411d5416744bd1d18a8af2b0aeebdfcf54264",
+      "contentDigest": "sha256:ba0fbd163e62fd59eef45c07a4b11fdaa186fd7dfafbdb104bed2913903c4570",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-10-18T14:00:22.201Z"
+    }
+  },
+  "importedAt": "2026-10-18T14:00:22.201Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.work.admission.ticket.scope.glob.parity.test.ts",
+      "command": "node --strip-types tests/cli/work-admission-ticket-scope-glob-parity.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.scope.amendment.work.admission.ticket.test.ts",
+      "command": "node --strip-types tests/cli/scope-amendment-work-admission-ticket.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.work.admission.ticket.claim.test.ts",
+      "command": "node --strip-types tests/cli/work-admission-ticket-claim.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.work.admission.coverage.gates.test.ts",
+      "command": "node --strip-types tests/cli/work-admission-coverage-gates.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck",
+      "command": "npm run typecheck",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_git.diff.check",
+      "command": "git diff --check",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [],
+    "findings": []
+  },
+  "lastTransitionId": "2026-10-18T23-09-29-392Z-close-9249ae16fc48",
+  "lastTransitionAt": "2026-10-18T23:09:29.392Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-6",
+  "reservedAt": "2026-10-18T14:00:29.004Z",
+  "promotedAt": "2026-10-18T14:00:29.008Z",
+  "claim": {
+    "actorId": "codex-gpt-6",
+    "leaseId": "lease-3df71e5b4f27",
+    "claimedAt": "2026-10-18T14:00:29.013Z",
+    "heartbeatAt": "2026-10-18T23:09:29.324Z",
+    "ttlSeconds": 3600,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0209.json",
+      ".atm/history/evidence/TASK-AAO-0209.*",
+      ".atm/history/task-events/TASK-AAO-0209/**",
+      "packages/core/src/broker/write-scope-policy.ts",
+      "tests/cli/scope-amendment-work-admission-ticket.test.ts",
+      "tests/cli/work-admission-ticket-scope-glob-parity.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20261018140029-codex-gpt-6-41d4901c62",
+      "status": "adopted",
+      "source": "option",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261018140029-codex-gpt-6-41d4901c62\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-10-18T14:00:29.013Z",
+  "startedByActor": "codex-gpt-6",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-665a41dcdbc8a611",
+    "ticketDigest": "sha256:665a41dcdbc8a611b22c5a817c4ad5457e73808877707404ee886f077e719d62",
+    "taskId": "TASK-AAO-0209",
+    "origin": "claim",
+    "actorId": "codex-gpt-6",
+    "laneSessionId": "lane-20261018140029-codex-gpt-6-41d4901c62",
+    "claimGeneration": "lease-3df71e5b4f27",
+    "issuedAt": "2026-10-18T23:06:54.211Z",
+    "expiresAt": "2026-10-19T00:06:54.211Z",
+    "scopeDigest": "sha256:da39a7f574cefea6e1f773231aac962a91ef908308ed73e4ba9482b7ac5232fb",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-10-18T23:06:54.211Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-AAO-0209.*",
+          ".atm/history/evidence/git-head.json",
+          ".atm/history/task-events/TASK-AAO-0209/**",
+          ".atm/history/tasks/TASK-AAO-0209.json",
+          "packages/core/src/broker/write-scope-policy.ts",
+          "tests/cli/scope-amendment-work-admission-ticket.test.ts",
+          "tests/cli/work-admission-ticket-scope-glob-parity.test.ts"
+        ],
+        "digest": "sha256:274f11cb9fbd0334288cdcf51fa0375db84b5afd8e5bfcc45988325dc22ae60e"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    }
+  },
+  "startedBySessionId": "session-20261018140029-codex-gpt-6-TASK-AAO-0209-9a560e8ceb",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0209",
+    "batchId": "batch-b4225de6ed1a",
+    "scopeKey": "TASK-PRF",
+    "queueId": "queue-227469bd783a478c",
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0209.*",
+      ".atm/history/task-events/TASK-AAO-0209/**",
+      ".atm/history/tasks/TASK-AAO-0209.json",
+      "packages/core/src/broker/write-scope-policy.ts",
+      "tests/cli/scope-amendment-work-admission-ticket.test.ts",
+      "tests/cli/work-admission-ticket-scope-glob-parity.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "6d233bab8d1e990ac3b81c1fb91d196e09bc96d6b79d54918aa1c976f5d77b58",
+    "actorId": "codex-gpt-6",
+    "sessionId": "session-20261018140029-codex-gpt-6-TASK-AAO-0209-9a560e8ceb",
+    "laneSession": {
+      "laneSessionId": "lane-20261018140029-codex-gpt-6-41d4901c62",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261018140029-codex-gpt-6-41d4901c62\""
+    },
+    "createdAt": "2026-10-18T14:00:35.664Z",
+    "status": "active"
+  },
+  "closedAt": "2026-10-18T23:09:29.324Z",
+  "closedByActor": "codex-gpt-6",
+  "closedBySessionId": "session-20261018140029-codex-gpt-6-TASK-AAO-0209-9a560e8ceb",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0209.closure-packet.json"
+}

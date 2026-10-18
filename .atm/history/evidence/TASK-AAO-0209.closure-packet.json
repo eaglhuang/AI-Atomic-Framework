@@ -1,0 +1,328 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-AAO-0209",
+  "targetRepoIdentity": {
+    "kind": "framework",
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "5ee27096097dfeafd3bf6d5592ee67e4e2744279",
+  "governedTreeSha": "16777b67675e36a1d42d6e63bc7bcf87e6393f1f",
+  "targetCommitDelta": {
+    "currentCommitSha": "5ee27096097dfeafd3bf6d5592ee67e4e2744279",
+    "parentCommitShas": [
+      "5ee27096097dfeafd3bf6d5592ee67e4e2744279"
+    ],
+    "governedTreeSha": "16777b67675e36a1d42d6e63bc7bcf87e6393f1f",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-6.runner-sync-receipt.json",
+      ".atm/history/evidence/TASK-AAO-0209.bundle-manifest.json",
+      ".atm/history/task-events/TASK-AAO-0209/2026-10-18T23-06-55-365Z-renew-c78623c3cf23.json",
+      ".atm/history/tasks/TASK-AAO-0209.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/dist/_vendor/core/dist/broker/write-scope-policy.js",
+      "packages/cli/dist/build-identity.json",
+      "packages/cli/dist/npm-runtime/build-identity.json",
+      "packages/cli/dist/npm-runtime/manifest.json",
+      "packages/cli/dist/npm-runtime/runtime.mjs",
+      "packages/core/dist/broker/write-scope-policy.js",
+      "packages/core/src/broker/write-scope-policy.ts",
+      "packages/create-atm/dist/build-identity.json",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/write-scope-policy.js",
+      "release/atm-root-drop/packages/cli/dist/build-identity.json",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/build-identity.json",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/manifest.json",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/runtime.mjs",
+      "release/atm-root-drop/packages/core/dist/broker/write-scope-policy.js",
+      "release/atm-root-drop/packages/core/src/broker/write-scope-policy.ts",
+      "release/atm-root-drop/packages/create-atm/dist/build-identity.json",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/tests/cli/scope-amendment-work-admission-ticket.test.ts",
+      "release/atm-root-drop/tests/cli/work-admission-ticket-scope-glob-parity.test.ts",
+      "tests/cli/scope-amendment-work-admission-ticket.test.ts",
+      "tests/cli/task-close-cleanup-rollback.test.ts",
+      "tests/cli/work-admission-ticket-scope-glob-parity.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/work-admission-ticket-scope-glob-parity.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b3c67f5b6f0940c92c0ea439ab19a672660314b4453bc5e0a0cb53dc0d96b0bc",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --strip-types tests/cli/scope-amendment-work-admission-ticket.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:977f8733ea5b46e94e0ec28e384cc33be19d335d4a739925f0a89555c2bda2bb",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --strip-types tests/cli/work-admission-ticket-claim.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:34dbc6f4f6c6ddca4be494ba31b49adba1209694b464d2d0c71ac064145990b1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --strip-types tests/cli/work-admission-coverage-gates.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bdd7d877cb37bbd2436832dbd121e88117a469d33fb730cfbae413344415ff36",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e171800469873c37c6435132b7b54a03eec9071c84fe3f322325945ab2b9ea1f",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --strip-types tests/cli/work-admission-ticket-scope-glob-parity.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b3c67f5b6f0940c92c0ea439ab19a672660314b4453bc5e0a0cb53dc0d96b0bc",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --strip-types tests/cli/scope-amendment-work-admission-ticket.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:977f8733ea5b46e94e0ec28e384cc33be19d335d4a739925f0a89555c2bda2bb",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --strip-types tests/cli/work-admission-ticket-claim.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:34dbc6f4f6c6ddca4be494ba31b49adba1209694b464d2d0c71ac064145990b1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --strip-types tests/cli/work-admission-coverage-gates.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bdd7d877cb37bbd2436832dbd121e88117a469d33fb730cfbae413344415ff36",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e171800469873c37c6435132b7b54a03eec9071c84fe3f322325945ab2b9ea1f",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --strip-types tests/cli/work-admission-ticket-scope-glob-parity.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b3c67f5b6f0940c92c0ea439ab19a672660314b4453bc5e0a0cb53dc0d96b0bc",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --strip-types tests/cli/scope-amendment-work-admission-ticket.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:977f8733ea5b46e94e0ec28e384cc33be19d335d4a739925f0a89555c2bda2bb",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --strip-types tests/cli/work-admission-ticket-claim.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:34dbc6f4f6c6ddca4be494ba31b49adba1209694b464d2d0c71ac064145990b1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --strip-types tests/cli/work-admission-coverage-gates.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bdd7d877cb37bbd2436832dbd121e88117a469d33fb730cfbae413344415ff36",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e171800469873c37c6435132b7b54a03eec9071c84fe3f322325945ab2b9ea1f",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --strip-types tests/cli/work-admission-ticket-scope-glob-parity.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b3c67f5b6f0940c92c0ea439ab19a672660314b4453bc5e0a0cb53dc0d96b0bc",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --strip-types tests/cli/scope-amendment-work-admission-ticket.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:977f8733ea5b46e94e0ec28e384cc33be19d335d4a739925f0a89555c2bda2bb",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --strip-types tests/cli/work-admission-ticket-claim.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:34dbc6f4f6c6ddca4be494ba31b49adba1209694b464d2d0c71ac064145990b1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --strip-types tests/cli/work-admission-coverage-gates.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bdd7d877cb37bbd2436832dbd121e88117a469d33fb730cfbae413344415ff36",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e171800469873c37c6435132b7b54a03eec9071c84fe3f322325945ab2b9ea1f",
+      "runnerVersion": "0.1.2"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "node --strip-types tests/cli/scope-amendment-work-admission-ticket.test.ts",
+    "node --strip-types tests/cli/work-admission-coverage-gates.test.ts",
+    "node --strip-types tests/cli/work-admission-ticket-claim.test.ts",
+    "node --strip-types tests/cli/work-admission-ticket-scope-glob-parity.test.ts",
+    "typecheck"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "git diff --check",
+    "node --strip-types tests/cli/scope-amendment-work-admission-ticket.test.ts",
+    "node --strip-types tests/cli/work-admission-coverage-gates.test.ts",
+    "node --strip-types tests/cli/work-admission-ticket-claim.test.ts",
+    "node --strip-types tests/cli/work-admission-ticket-scope-glob-parity.test.ts",
+    "typecheck"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-10-18T23:09:29.311Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-AAO-0209.*",
+      ".atm/history/task-events/TASK-AAO-0209/**",
+      ".atm/history/tasks/TASK-AAO-0209.json",
+      "packages/core/src/broker/write-scope-policy.ts",
+      "tests/cli/scope-amendment-work-admission-ticket.test.ts",
+      "tests/cli/work-admission-ticket-scope-glob-parity.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/core/src/broker/write-scope-policy.ts",
+      "tests/cli/scope-amendment-work-admission-ticket.test.ts",
+      "tests/cli/work-admission-ticket-scope-glob-parity.test.ts"
+    ],
+    "requiredGates": [
+      "git diff --check",
+      "node --strip-types tests/cli/scope-amendment-work-admission-ticket.test.ts",
+      "node --strip-types tests/cli/work-admission-coverage-gates.test.ts",
+      "node --strip-types tests/cli/work-admission-ticket-claim.test.ts",
+      "node --strip-types tests/cli/work-admission-ticket-scope-glob-parity.test.ts",
+      "typecheck"
+    ]
+  },
+  "evidencePath": ".atm/runtime/evidence-ledger/bundles/TASK-AAO-0209.json",
+  "closedAt": "2026-10-18T23:09:29.311Z",
+  "closedByActor": "codex-gpt-6",
+  "sessionId": "session-20261018140029-codex-gpt-6-TASK-AAO-0209-9a560e8ceb",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "5ee27096097dfeafd3bf6d5592ee67e4e2744279",
+    "taskMatchedFiles": [
+      "packages/core/src/broker/write-scope-policy.ts",
+      "tests/cli/scope-amendment-work-admission-ticket.test.ts",
+      "tests/cli/work-admission-ticket-scope-glob-parity.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/task-events/TASK-AAO-0209/2026-10-18T14-00-22-343Z-import-dd6027ef7381.json",
+      ".atm/history/task-events/TASK-AAO-0209/2026-10-18T14-00-29-004Z-reserve-405b0d8472be.json",
+      ".atm/history/task-events/TASK-AAO-0209/2026-10-18T14-00-29-008Z-promote-665f54de6326.json",
+      ".atm/history/task-events/TASK-AAO-0209/2026-10-18T14-00-35-665Z-claim-2b1f65538e3a.json",
+      ".atm/history/task-events/TASK-AAO-0209/2026-10-18T22-53-36-261Z-adopt-2d3d8c3406d2.json",
+      ".atm/history/task-events/TASK-AAO-0209/2026-10-18T22-53-38-731Z-renew-f3de5240da19.json",
+      ".atm/history/tasks/TASK-AAO-0209.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

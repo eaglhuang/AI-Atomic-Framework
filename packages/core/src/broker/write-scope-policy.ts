@@ -69,6 +69,13 @@ export function pathMatchesWriteScope(file: string, scope: string): boolean {
   if (normalizedScope === normalizedFile) return true;
   if (normalizedScope.endsWith('/**')) {
     const prefix = normalizedScope.slice(0, -3);
+    if (prefix.includes('*')) {
+      if (/^[a-z]:/i.test(normalizedFile) || /^[a-z]:/i.test(prefix)) return false;
+      if ([normalizedFile, prefix].some((value) => value.split('/').some((segment) =>
+        segment.length === 0 || segment === '.' || segment === '..'))) return false;
+      // Directory roots and their descendants share the same glob semantics.
+      return globToRegExp(prefix).test(normalizedFile) || globToRegExp(normalizedScope).test(normalizedFile);
+    }
     return normalizedFile === prefix || normalizedFile.startsWith(`${prefix}/`);
   }
   if (normalizedScope.includes('*')) {

@@ -1,0 +1,67 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-10-18T23-09-29-392Z-close-9249ae16fc48",
+  "taskId": "TASK-AAO-0209",
+  "action": "close",
+  "actorId": "codex-gpt-6",
+  "sessionId": "session-20261018140029-codex-gpt-6-TASK-AAO-0209-9a560e8ceb",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0209.json",
+  "taskSha256": "sha256:0a2e4c68d6234a53f0901cec49e8622a6ec3ba830a69b495e8afa2162031d61d",
+  "createdAt": "2026-10-18T23:09:29.392Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0209 --actor codex-gpt-6 --status done --historical-delivery 5ee27096097dfeafd3bf6d5592ee67e4e2744279",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20261018140029-codex-gpt-6-TASK-AAO-0209-9a560e8ceb",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0209.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types tests/cli/scope-amendment-work-admission-ticket.test.ts",
+      "node --strip-types tests/cli/work-admission-coverage-gates.test.ts",
+      "node --strip-types tests/cli/work-admission-ticket-claim.test.ts",
+      "node --strip-types tests/cli/work-admission-ticket-scope-glob-parity.test.ts",
+      "typecheck"
+    ],
+    "requiredGates": [
+      "git diff --check",
+      "node --strip-types tests/cli/scope-amendment-work-admission-ticket.test.ts",
+      "node --strip-types tests/cli/work-admission-coverage-gates.test.ts",
+      "node --strip-types tests/cli/work-admission-ticket-claim.test.ts",
+      "node --strip-types tests/cli/work-admission-ticket-scope-glob-parity.test.ts",
+      "typecheck"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-10-18T23:09:29.311Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-AAO-0209.*",
+        ".atm/history/task-events/TASK-AAO-0209/**",
+        ".atm/history/tasks/TASK-AAO-0209.json",
+        "packages/core/src/broker/write-scope-policy.ts",
+        "tests/cli/scope-amendment-work-admission-ticket.test.ts",
+        "tests/cli/work-admission-ticket-scope-glob-parity.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/broker/write-scope-policy.ts",
+        "tests/cli/scope-amendment-work-admission-ticket.test.ts",
+        "tests/cli/work-admission-ticket-scope-glob-parity.test.ts"
+      ],
+      "requiredGates": [
+        "git diff --check",
+        "node --strip-types tests/cli/scope-amendment-work-admission-ticket.test.ts",
+        "node --strip-types tests/cli/work-admission-coverage-gates.test.ts",
+        "node --strip-types tests/cli/work-admission-ticket-claim.test.ts",
+        "node --strip-types tests/cli/work-admission-ticket-scope-glob-parity.test.ts",
+        "typecheck"
+      ]
+    }
+  }
+}
