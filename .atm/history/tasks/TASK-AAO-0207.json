@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-AAO-0207",
   "title": "Opt-in host-neutral atomic task close projections",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [],
@@ -219,23 +219,23 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-10-18T07-49-03-736Z-renew-7b3675cd97de",
-  "lastTransitionAt": "2026-10-18T07:49:03.736Z",
+  "lastTransitionId": "2026-10-18T13-40-17-289Z-close-0afc10769df0",
+  "lastTransitionAt": "2026-10-18T13:40:17.289Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-6",
-  "reservedAt": "2026-10-17T01:18:42.875Z",
-  "promotedAt": "2026-10-17T01:18:42.879Z",
+  "reservedAt": "2026-10-18T13:37:03.578Z",
+  "promotedAt": "2026-10-18T13:37:03.583Z",
   "claim": {
     "actorId": "codex-gpt-6",
-    "leaseId": "lease-2a7f0bdcc079",
-    "claimedAt": "2026-10-17T01:18:42.884Z",
-    "heartbeatAt": "2026-10-18T07:49:02.745Z",
+    "leaseId": "lease-864eb5ca1557",
+    "claimedAt": "2026-10-18T13:37:03.587Z",
+    "heartbeatAt": "2026-10-18T13:40:17.178Z",
     "ttlSeconds": 1800,
     "files": [
+      ".atm/history/tasks/TASK-AAO-0207.json",
       ".atm/catalog/registry/actors.json",
       ".atm/history/evidence/TASK-AAO-0207.*",
       ".atm/history/task-events/TASK-AAO-0207/**",
-      ".atm/history/tasks/TASK-AAO-0207.json",
       "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli-evidence-taskflow.json",
       "atomic_workbench/atomization-coverage/path-to-atom-map.json",
       "packages/cli/src/commands/taskflow/__tests__/closeback-orchestration.spec.ts",
@@ -250,33 +250,34 @@
       "packages/cli/src/commands/taskflow/profile-loader.ts",
       "tests/cli/taskflow-host-close-projection.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
-      "laneSessionId": "lane-20261018072421-codex-gpt-6-942217f823",
+      "laneSessionId": "lane-20261018133703-codex-gpt-6-2a798233f7",
       "status": "active",
       "source": "option",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261018072421-codex-gpt-6-942217f823\""
-    }
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261018133703-codex-gpt-6-2a798233f7\""
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-10-17T01:18:42.884Z",
   "startedByActor": "codex-gpt-6",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-9891ccf0946bf874",
-    "ticketDigest": "sha256:9891ccf0946bf874b26f0afc7f91260a280e1c3db75220e1abc8c38ea666049a",
+    "ticketId": "wat-328c80321eaf79c7",
+    "ticketDigest": "sha256:328c80321eaf79c7f3b88606312b7be0872a0422e986278d50d828453dfe4328",
     "taskId": "TASK-AAO-0207",
     "origin": "claim",
     "actorId": "codex-gpt-6",
-    "laneSessionId": "lane-20261018072421-codex-gpt-6-942217f823",
-    "claimGeneration": "lease-2a7f0bdcc079",
-    "issuedAt": "2026-10-18T07:49:02.745Z",
-    "expiresAt": "2026-10-18T08:19:02.745Z",
-    "scopeDigest": "sha256:ce1d11b9c16a2b57333c099d6f69b520fd7e6729c2f051cafceb1baed24bda66",
+    "laneSessionId": "lane-20261018133703-codex-gpt-6-2a798233f7",
+    "claimGeneration": "lease-864eb5ca1557",
+    "issuedAt": "2026-10-18T13:38:22.229Z",
+    "expiresAt": "2026-10-18T14:08:22.229Z",
+    "scopeDigest": "sha256:85df9a839923687701bc742a6d4c1dae3dbed4026f0460d562420cafeec3333e",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-10-18T07:49:02.745Z"
+      "selectedAt": "2026-10-18T13:38:22.229Z"
     },
     "grants": [
       {
@@ -284,6 +285,7 @@
         "values": [
           ".atm/catalog/registry/actors.json",
           ".atm/history/evidence/TASK-AAO-0207.*",
+          ".atm/history/evidence/git-head.json",
           ".atm/history/task-events/TASK-AAO-0207/**",
           ".atm/history/tasks/TASK-AAO-0207.json",
           "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli-evidence-taskflow.json",
@@ -300,7 +302,7 @@
           "packages/cli/src/commands/taskflow/profile-loader.ts",
           "tests/cli/taskflow-host-close-projection.test.ts"
         ],
-        "digest": "sha256:6d6ed1f3a06ad646fa98435804e45816b548ea1f0c1bd0f6ef997a2e4a8350dd"
+        "digest": "sha256:e0e669c428c07ffc8ce75d0c074d21417046d3730459f60ea9902968c3ca683d"
       },
       {
         "kind": "lifecycle-operation",
@@ -334,14 +336,14 @@
       "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
     }
   },
-  "startedBySessionId": "session-20261017011842-codex-gpt-6-TASK-AAO-0207-df469c1012",
+  "startedBySessionId": "session-20261018133703-codex-gpt-6-TASK-AAO-0207-63d6c80633",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
     "taskId": "TASK-AAO-0207",
-    "batchId": null,
-    "scopeKey": null,
-    "queueId": null,
+    "batchId": "batch-b4225de6ed1a",
+    "scopeKey": "TASK-PRF",
+    "queueId": "queue-227469bd783a478c",
     "queueIndex": null,
     "allowedFiles": [
       ".atm/catalog/registry/actors.json",
@@ -362,26 +364,23 @@
       "packages/cli/src/commands/taskflow/profile-loader.ts",
       "tests/cli/taskflow-host-close-projection.test.ts"
     ],
-    "planningReadOnlyPaths": [
-      "C:/Users/User/.codex/worktrees/web-verification/3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0207-host-close-projection.task.md"
-    ],
-    "planningMirrorPaths": [
-      "docs/ai_atomic_framework/",
-      "docs/ai_atomic_framework/atm-agent-first-operability/",
-      "docs/ai_atomic_framework/atm-agent-first-operability/tasks/",
-      "docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0207-host-close-projection.task.md"
-    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
     "allowPlanningMirror": false,
-    "promptHash": "24a2f573d9b41471c28316e855fd5487ce0739082f7ee5e456c1f1c72a42687f",
+    "promptHash": "f3267018006ef0d3e8b33ad70cbdd11b8db645290199ab3b369fa0a54fab1611",
     "actorId": "codex-gpt-6",
-    "sessionId": null,
+    "sessionId": "session-20261018133703-codex-gpt-6-TASK-AAO-0207-63d6c80633",
     "laneSession": {
-      "laneSessionId": "lane-20261018072421-codex-gpt-6-942217f823",
+      "laneSessionId": "lane-20261018133703-codex-gpt-6-2a798233f7",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261018072421-codex-gpt-6-942217f823\""
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261018133703-codex-gpt-6-2a798233f7\""
     },
-    "createdAt": "2026-10-18T07:24:23.215Z",
+    "createdAt": "2026-10-18T13:37:10.895Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-10-18T13:40:17.178Z",
+  "closedByActor": "codex-gpt-6",
+  "closedBySessionId": "session-20261018133703-codex-gpt-6-TASK-AAO-0207-63d6c80633",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0207.closure-packet.json"
 }

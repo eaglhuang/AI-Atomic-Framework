@@ -1,0 +1,313 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-AAO-0207",
+  "targetRepoIdentity": {
+    "kind": "framework",
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "e63860b8548b166e0f157b029d9cbf8e81a91758",
+  "governedTreeSha": "7c15ca9bb90d23e865143e263daabd978ad84625",
+  "targetCommitDelta": {
+    "currentCommitSha": "e63860b8548b166e0f157b029d9cbf8e81a91758",
+    "parentCommitShas": [
+      "e63860b8548b166e0f157b029d9cbf8e81a91758"
+    ],
+    "governedTreeSha": "7c15ca9bb90d23e865143e263daabd978ad84625",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-6.runner-sync-receipt.json",
+      ".atm/history/evidence/TASK-AAO-0207.bundle-manifest.json",
+      ".atm/history/task-events/TASK-AAO-0207/2026-10-18T13-16-44-037Z-adopt-9059efd74ac4.json",
+      ".atm/history/task-events/TASK-AAO-0207/2026-10-18T13-16-58-985Z-release-cd8011bc5e91.json",
+      ".atm/history/task-events/TASK-AAO-0207/2026-10-18T13-37-03-578Z-reserve-d72e2d65d9b1.json",
+      ".atm/history/task-events/TASK-AAO-0207/2026-10-18T13-37-03-583Z-promote-a026b241fa6c.json",
+      ".atm/history/task-events/TASK-AAO-0207/2026-10-18T13-37-10-896Z-claim-d87067012329.json",
+      ".atm/history/task-events/TASK-AAO-0207/2026-10-18T13-38-23-389Z-renew-c325ecd82720.json",
+      ".atm/history/tasks/TASK-AAO-0207.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli-evidence-taskflow.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/dist/commands/git-governance/commit-scope-policy.js",
+      "packages/cli/dist/commands/taskflow/close-orchestration.js",
+      "packages/cli/dist/commands/taskflow/closeback-orchestration.js",
+      "packages/cli/dist/commands/taskflow/commit-bundle-assembly.js",
+      "packages/cli/dist/commands/taskflow/implementation.js",
+      "packages/cli/dist/commands/taskflow/profile-loader.js",
+      "packages/cli/dist/npm-runtime/manifest.json",
+      "packages/cli/dist/npm-runtime/runtime.mjs",
+      "packages/cli/src/commands/taskflow/__tests__/closeback-orchestration.spec.ts",
+      "packages/cli/src/commands/taskflow/__tests__/profile-loader.spec.ts",
+      "packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/taskflow/closeback-orchestration.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/taskflow/host-close-projection.ts",
+      "packages/cli/src/commands/taskflow/implementation.ts",
+      "packages/cli/src/commands/taskflow/profile-loader.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli-evidence-taskflow.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/commit-scope-policy.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/close-orchestration.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/closeback-orchestration.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/commit-bundle-assembly.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/implementation.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/profile-loader.js",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/manifest.json",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/runtime.mjs",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/closeback-orchestration.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/profile-loader.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/closeback-orchestration.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/implementation.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/profile-loader.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "tests/cli/task-close-cleanup-rollback.test.ts",
+      "tests/cli/taskflow-host-close-projection.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/taskflow-host-close-projection.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2aece2d2654138dfc43f211016ca77d8474f1566f5d90bb22d2cbe42325390d7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/profile-loader.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7c1144edd862c3987ab68d6be2eb4a352090c6707720f7df136262996fd86a76",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/closeback-orchestration.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5d044601268e96293af8e996fe87eb902cb1a669ee24aca0f6bb1f12d05373bb",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:47cd1acfc6ff6c4636fcb9332c7745d057b1a1aa275c6a24f2d77cc66fb44b12",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d95f62e0e8800cd53b0f3b2f9f6c880a24314cc33ab3c08381514b45e9d75343",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bdd7d877cb37bbd2436832dbd121e88117a469d33fb730cfbae413344415ff36",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e171800469873c37c6435132b7b54a03eec9071c84fe3f322325945ab2b9ea1f",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --strip-types tests/cli/taskflow-host-close-projection.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2aece2d2654138dfc43f211016ca77d8474f1566f5d90bb22d2cbe42325390d7",
+      "stderrSha256": "sha256:d8f134eb259b395b0b470d0c6094940e93523995c76310b610fb059193dd009a",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --strip-types tests/cli/taskflow-host-close-projection.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2aece2d2654138dfc43f211016ca77d8474f1566f5d90bb22d2cbe42325390d7",
+      "stderrSha256": "sha256:d8f134eb259b395b0b470d0c6094940e93523995c76310b610fb059193dd009a",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/profile-loader.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7c1144edd862c3987ab68d6be2eb4a352090c6707720f7df136262996fd86a76",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/closeback-orchestration.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5d044601268e96293af8e996fe87eb902cb1a669ee24aca0f6bb1f12d05373bb",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:47cd1acfc6ff6c4636fcb9332c7745d057b1a1aa275c6a24f2d77cc66fb44b12",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d95f62e0e8800cd53b0f3b2f9f6c880a24314cc33ab3c08381514b45e9d75343",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bdd7d877cb37bbd2436832dbd121e88117a469d33fb730cfbae413344415ff36",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e171800469873c37c6435132b7b54a03eec9071c84fe3f322325945ab2b9ea1f",
+      "runnerVersion": "0.1.2"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/closeback-orchestration.spec.ts",
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/profile-loader.spec.ts",
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
+    "node --strip-types tests/cli/taskflow-host-close-projection.test.ts",
+    "typecheck"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "git diff --check",
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/closeback-orchestration.spec.ts",
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/profile-loader.spec.ts",
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
+    "node --strip-types tests/cli/taskflow-host-close-projection.test.ts",
+    "typecheck"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-10-18T13:40:17.165Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/catalog/registry/actors.json",
+      ".atm/history/evidence/TASK-AAO-0207.*",
+      ".atm/history/task-events/TASK-AAO-0207/**",
+      ".atm/history/tasks/TASK-AAO-0207.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli-evidence-taskflow.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/taskflow/__tests__/closeback-orchestration.spec.ts",
+      "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+      "packages/cli/src/commands/taskflow/__tests__/profile-loader.spec.ts",
+      "packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/taskflow/closeback-orchestration.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/taskflow/host-close-projection.ts",
+      "packages/cli/src/commands/taskflow/implementation.ts",
+      "packages/cli/src/commands/taskflow/profile-loader.ts",
+      "tests/cli/taskflow-host-close-projection.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/taskflow/__tests__/closeback-orchestration.spec.ts",
+      "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+      "packages/cli/src/commands/taskflow/__tests__/profile-loader.spec.ts",
+      "packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/taskflow/closeback-orchestration.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/taskflow/host-close-projection.ts",
+      "packages/cli/src/commands/taskflow/implementation.ts",
+      "packages/cli/src/commands/taskflow/profile-loader.ts",
+      "tests/cli/taskflow-host-close-projection.test.ts"
+    ],
+    "requiredGates": [
+      "git diff --check",
+      "node --strip-types packages/cli/src/commands/taskflow/__tests__/closeback-orchestration.spec.ts",
+      "node --strip-types packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+      "node --strip-types packages/cli/src/commands/taskflow/__tests__/profile-loader.spec.ts",
+      "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
+      "node --strip-types tests/cli/taskflow-host-close-projection.test.ts",
+      "typecheck"
+    ]
+  },
+  "evidencePath": ".atm/runtime/evidence-ledger/bundles/TASK-AAO-0207.json",
+  "closedAt": "2026-10-18T13:40:17.166Z",
+  "closedByActor": "codex-gpt-6",
+  "sessionId": "session-20261018133703-codex-gpt-6-TASK-AAO-0207-63d6c80633",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "e63860b8548b166e0f157b029d9cbf8e81a91758",
+    "taskMatchedFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli-evidence-taskflow.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/taskflow/__tests__/closeback-orchestration.spec.ts",
+      "packages/cli/src/commands/taskflow/__tests__/profile-loader.spec.ts",
+      "packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/taskflow/closeback-orchestration.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/taskflow/host-close-projection.ts",
+      "packages/cli/src/commands/taskflow/implementation.ts",
+      "packages/cli/src/commands/taskflow/profile-loader.ts",
+      "tests/cli/taskflow-host-close-projection.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/task-events/TASK-AAO-0207/2026-10-17T01-18-29-582Z-import-549321bab12c.json",
+      ".atm/history/task-events/TASK-AAO-0207/2026-10-17T01-18-42-875Z-reserve-da7889b707ff.json",
+      ".atm/history/task-events/TASK-AAO-0207/2026-10-17T01-18-42-879Z-promote-d77ed840c3d0.json",
+      ".atm/history/task-events/TASK-AAO-0207/2026-10-17T01-18-50-845Z-claim-ba2542adf1e2.json",
+      ".atm/history/task-events/TASK-AAO-0207/2026-10-17T01-19-31-636Z-scope-amendment-feaecc835587.json",
+      ".atm/history/task-events/TASK-AAO-0207/2026-10-18T07-24-23-116Z-renew-1ed05e10a2fb.json",
+      ".atm/history/task-events/TASK-AAO-0207/2026-10-18T07-44-07-719Z-scope-amendment-a6a0ec3791c4.json",
+      ".atm/history/task-events/TASK-AAO-0207/2026-10-18T07-49-03-736Z-renew-7b3675cd97de.json",
+      ".atm/history/tasks/TASK-AAO-0207.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
