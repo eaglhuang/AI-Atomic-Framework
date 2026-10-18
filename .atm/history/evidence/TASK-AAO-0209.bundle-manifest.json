@@ -1,7 +1,7 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-AAO-0209",
-  "updatedAt": "2026-10-18T22:54:57.820Z",
+  "updatedAt": "2026-10-18T22:57:43.027Z",
   "updatedBy": "codex-gpt-6",
   "freshValidationPasses": [
     "git diff --check",
@@ -299,6 +299,102 @@
       "durationMs": 283,
       "runnerKind": "dev-source",
       "sourceCommit": "ce689eeb05ad77cb7995ed8235e2b6ab6f73863d",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/work-admission-ticket-scope-glob-parity.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b3c67f5b6f0940c92c0ea439ab19a672660314b4453bc5e0a0cb53dc0d96b0bc",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/work-admission-ticket-scope-glob-parity.test.ts"
+      ],
+      "generatedAt": "2026-10-18T22:57:12.779Z",
+      "startedAt": "2026-10-18T22:57:12.338Z",
+      "finishedAt": "2026-10-18T22:57:12.779Z",
+      "durationMs": 441,
+      "runnerKind": "dev-source",
+      "sourceCommit": "5ee27096097dfeafd3bf6d5592ee67e4e2744279",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/scope-amendment-work-admission-ticket.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:977f8733ea5b46e94e0ec28e384cc33be19d335d4a739925f0a89555c2bda2bb",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/scope-amendment-work-admission-ticket.test.ts"
+      ],
+      "generatedAt": "2026-10-18T22:57:16.992Z",
+      "startedAt": "2026-10-18T22:57:16.050Z",
+      "finishedAt": "2026-10-18T22:57:16.992Z",
+      "durationMs": 942,
+      "runnerKind": "dev-source",
+      "sourceCommit": "5ee27096097dfeafd3bf6d5592ee67e4e2744279",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/work-admission-ticket-claim.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:34dbc6f4f6c6ddca4be494ba31b49adba1209694b464d2d0c71ac064145990b1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/work-admission-ticket-claim.test.ts"
+      ],
+      "generatedAt": "2026-10-18T22:57:20.501Z",
+      "startedAt": "2026-10-18T22:57:20.208Z",
+      "finishedAt": "2026-10-18T22:57:20.501Z",
+      "durationMs": 293,
+      "runnerKind": "dev-source",
+      "sourceCommit": "5ee27096097dfeafd3bf6d5592ee67e4e2744279",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/work-admission-coverage-gates.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/work-admission-coverage-gates.test.ts"
+      ],
+      "generatedAt": "2026-10-18T22:57:24.781Z",
+      "startedAt": "2026-10-18T22:57:23.994Z",
+      "finishedAt": "2026-10-18T22:57:24.781Z",
+      "durationMs": 787,
+      "runnerKind": "dev-source",
+      "sourceCommit": "5ee27096097dfeafd3bf6d5592ee67e4e2744279",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bdd7d877cb37bbd2436832dbd121e88117a469d33fb730cfbae413344415ff36",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-10-18T22:57:38.910Z",
+      "startedAt": "2026-10-18T22:57:28.157Z",
+      "finishedAt": "2026-10-18T22:57:38.910Z",
+      "durationMs": 10753,
+      "runnerKind": "dev-source",
+      "sourceCommit": "5ee27096097dfeafd3bf6d5592ee67e4e2744279",
+      "cached": false
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e171800469873c37c6435132b7b54a03eec9071c84fe3f322325945ab2b9ea1f",
+      "validators": [
+        "git diff --check"
+      ],
+      "generatedAt": "2026-10-18T22:57:43.026Z",
+      "startedAt": "2026-10-18T22:57:42.333Z",
+      "finishedAt": "2026-10-18T22:57:43.026Z",
+      "durationMs": 693,
+      "runnerKind": "dev-source",
+      "sourceCommit": "5ee27096097dfeafd3bf6d5592ee67e4e2744279",
       "cached": false
     }
   ],

@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-AAO-0209",
   "title": "Ticket directory glob parity",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [],
@@ -168,8 +168,8 @@
     "checkedFields": [],
     "findings": []
   },
-  "lastTransitionId": "2026-10-18T22-53-38-731Z-renew-f3de5240da19",
-  "lastTransitionAt": "2026-10-18T22:53:38.731Z",
+  "lastTransitionId": "2026-10-18T23-09-29-392Z-close-9249ae16fc48",
+  "lastTransitionAt": "2026-10-18T23:09:29.392Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-6",
   "reservedAt": "2026-10-18T14:00:29.004Z",
@@ -178,8 +178,8 @@
     "actorId": "codex-gpt-6",
     "leaseId": "lease-3df71e5b4f27",
     "claimedAt": "2026-10-18T14:00:29.013Z",
-    "heartbeatAt": "2026-10-18T22:53:37.585Z",
-    "ttlSeconds": 1800,
+    "heartbeatAt": "2026-10-18T23:09:29.324Z",
+    "ttlSeconds": 3600,
     "files": [
       ".atm/history/tasks/TASK-AAO-0209.json",
       ".atm/history/evidence/TASK-AAO-0209.*",
@@ -188,46 +188,48 @@
       "tests/cli/scope-amendment-work-admission-ticket.test.ts",
       "tests/cli/work-admission-ticket-scope-glob-parity.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20261018140029-codex-gpt-6-41d4901c62",
       "status": "adopted",
       "source": "option",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261018140029-codex-gpt-6-41d4901c62\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-10-18T14:00:29.013Z",
   "startedByActor": "codex-gpt-6",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-95bcb83fc997a1c0",
-    "ticketDigest": "sha256:95bcb83fc997a1c014c69956ff3db4d2658d2e501b03dd8b7dddbe3055135251",
+    "ticketId": "wat-665a41dcdbc8a611",
+    "ticketDigest": "sha256:665a41dcdbc8a611b22c5a817c4ad5457e73808877707404ee886f077e719d62",
     "taskId": "TASK-AAO-0209",
     "origin": "claim",
     "actorId": "codex-gpt-6",
     "laneSessionId": "lane-20261018140029-codex-gpt-6-41d4901c62",
     "claimGeneration": "lease-3df71e5b4f27",
-    "issuedAt": "2026-10-18T22:53:37.585Z",
-    "expiresAt": "2026-10-18T23:23:37.585Z",
-    "scopeDigest": "sha256:4e4cfd73e4aa6666e815cb08dc631b1589253ba6ab5f89075bf9e37653925738",
+    "issuedAt": "2026-10-18T23:06:54.211Z",
+    "expiresAt": "2026-10-19T00:06:54.211Z",
+    "scopeDigest": "sha256:da39a7f574cefea6e1f773231aac962a91ef908308ed73e4ba9482b7ac5232fb",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-10-18T22:53:37.585Z"
+      "selectedAt": "2026-10-18T23:06:54.211Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/TASK-AAO-0209.*",
+          ".atm/history/evidence/git-head.json",
           ".atm/history/task-events/TASK-AAO-0209/**",
           ".atm/history/tasks/TASK-AAO-0209.json",
           "packages/core/src/broker/write-scope-policy.ts",
           "tests/cli/scope-amendment-work-admission-ticket.test.ts",
           "tests/cli/work-admission-ticket-scope-glob-parity.test.ts"
         ],
-        "digest": "sha256:cc76fc950aee34be21a6d782d5956a9cce37b2d61de123636c553dd92601d911"
+        "digest": "sha256:274f11cb9fbd0334288cdcf51fa0375db84b5afd8e5bfcc45988325dc22ae60e"
       },
       {
         "kind": "lifecycle-operation",
@@ -292,5 +294,9 @@
     },
     "createdAt": "2026-10-18T14:00:35.664Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-10-18T23:09:29.324Z",
+  "closedByActor": "codex-gpt-6",
+  "closedBySessionId": "session-20261018140029-codex-gpt-6-TASK-AAO-0209-9a560e8ceb",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0209.closure-packet.json"
 }
