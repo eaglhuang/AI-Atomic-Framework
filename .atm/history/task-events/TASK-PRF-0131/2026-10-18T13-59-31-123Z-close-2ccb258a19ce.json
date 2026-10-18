@@ -1,0 +1,47 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-10-18T13-59-31-123Z-close-2ccb258a19ce",
+  "taskId": "TASK-PRF-0131",
+  "action": "close",
+  "actorId": "cursor-captain",
+  "sessionId": "session-20261018135645-cursor-captain-TASK-PRF-0131-6a8c2e62c2",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0131.json",
+  "taskSha256": "sha256:65ecd6288752e21660e31e90e5f3fd7cd47ed918501ca1c57e9b6ac6f961e639",
+  "createdAt": "2026-10-18T13:59:31.123Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0131 --actor cursor-captain --status done --historical-delivery 2f729f13ddbc5e35c583085c5d50f0db8fd6e041",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20261018135645-cursor-captain-TASK-PRF-0131-6a8c2e62c2",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0131.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "bash research/paper-v2/prereg-v3-smoke/kit/test/test-arm-a-git-writable.sh"
+    ],
+    "requiredGates": [
+      "bash research/paper-v2/prereg-v3-smoke/kit/test/test-arm-a-git-writable.sh"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-10-18T13:59:31.115Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "suspected",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0131.*",
+        ".atm/history/task-events/TASK-PRF-0131/**",
+        ".atm/history/tasks/TASK-PRF-0131.json",
+        ".atm/task-plans/TASK-PRF-0131.md",
+        "research/paper-v2/prereg-v3-smoke/kit/test/test-arm-a-git-writable.sh"
+      ],
+      "criticalChangedFiles": [],
+      "requiredGates": [
+        "bash research/paper-v2/prereg-v3-smoke/kit/test/test-arm-a-git-writable.sh"
+      ]
+    }
+  }
+}

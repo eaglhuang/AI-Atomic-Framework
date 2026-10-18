@@ -1,0 +1,261 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0131",
+  "title": "Fix stale arm A no-commit matcher in prereg smoke kit test (PR #347; #345)",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [
+    "TASK-PRF-0130"
+  ],
+  "acceptance": [
+    "Line 18 greps `reason = \"a-no-commit\"` in `test/test-real-model.sh`; no other line changes.",
+    "`bash research/paper-v2/prereg-v3-smoke/kit/test/test-arm-a-git-writable.sh` exits 0 as command-backed evidence.",
+    "The full `kit/preflight.sh` exits 0 on the delivery HEAD, including readonly-steward, without lowering assertions."
+  ],
+  "deliverables": [
+    "research/paper-v2/prereg-v3-smoke/kit/test/test-arm-a-git-writable.sh"
+  ],
+  "scopePaths": [
+    ".atm/history/evidence/TASK-PRF-0131.*",
+    ".atm/history/task-events/TASK-PRF-0131/**",
+    ".atm/history/tasks/TASK-PRF-0131.json",
+    ".atm/task-plans/TASK-PRF-0131.md",
+    "research/paper-v2/prereg-v3-smoke/kit/test/test-arm-a-git-writable.sh"
+  ],
+  "validators": [
+    "bash research/paper-v2/prereg-v3-smoke/kit/test/test-arm-a-git-writable.sh"
+  ],
+  "planningRepo": "AI-Atomic-Framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [
+    "Do not weaken any assertion, skip readonly-steward, or change sandbox/security settings.",
+    "Do not run the formal #311 experiment or real model probes.",
+    "Do not merge, tag, publish npm, access credentials or use paid APIs."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert only the one-line test change and this task closeout.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 1 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": ".atm/task-plans/TASK-PRF-0131.md",
+    "sectionTitle": "TASK-PRF-0131",
+    "headingLine": 34,
+    "hash": "15fbe6b22c795c43",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/AI-Atomic-Framework.git",
+      "repoRoot": "/workspace/pr347/AI-Atomic-Framework",
+      "taskCardPath": ".atm/task-plans/TASK-PRF-0131.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:15fbe6b22c795c43e06e678edb512d448b37a0b9e52d811891f9070d35701af7",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-10-18T13:56:43.499Z"
+    }
+  },
+  "importedAt": "2026-10-18T13:56:43.499Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_bash.research.paper.v2.prereg.v3.smoke.kit.test.test.arm.a.git.writable.sh",
+      "command": "bash research/paper-v2/prereg-v3-smoke/kit/test/test-arm-a-git-writable.sh",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": [
+      {
+        "taskId": "TASK-PRF-0130",
+        "relation": "legacy-untyped",
+        "admissionMode": "legacy-status-gate",
+        "provenFacts": [],
+        "missingFacts": [],
+        "contradictions": [],
+        "producerOutput": null,
+        "producerOutputSatisfied": false,
+        "negativeControlCommand": null,
+        "blockingCandidate": false
+      }
+    ]
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "dependencies"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-10-18T13-59-31-123Z-close-2ccb258a19ce",
+  "lastTransitionAt": "2026-10-18T13:59:31.123Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "cursor-captain",
+  "reservedAt": "2026-10-18T13:56:45.676Z",
+  "promotedAt": "2026-10-18T13:56:45.677Z",
+  "claim": {
+    "actorId": "cursor-captain",
+    "leaseId": "lease-d992be736eac",
+    "claimedAt": "2026-10-18T13:56:45.681Z",
+    "heartbeatAt": "2026-10-18T13:59:31.121Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-PRF-0131.json",
+      ".atm/history/evidence/TASK-PRF-0131.*",
+      ".atm/history/task-events/TASK-PRF-0131/**",
+      ".atm/task-plans/TASK-PRF-0131.md",
+      "research/paper-v2/prereg-v3-smoke/kit/test/test-arm-a-git-writable.sh"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20261018135645-cursor-captain-5350ef2c02",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261018135645-cursor-captain-5350ef2c02\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-10-18T13:56:45.681Z",
+  "startedByActor": "cursor-captain",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-98bb17b42ef71731",
+    "ticketDigest": "sha256:98bb17b42ef71731f409469763c030634637bcb650026f50d462a21f1d60af6a",
+    "taskId": "TASK-PRF-0131",
+    "origin": "claim",
+    "actorId": "cursor-captain",
+    "laneSessionId": "lane-20261018135645-cursor-captain-5350ef2c02",
+    "claimGeneration": "lease-d992be736eac",
+    "issuedAt": "2026-10-18T13:56:45.681Z",
+    "expiresAt": "2026-10-18T14:26:45.681Z",
+    "scopeDigest": "sha256:d7e019e2a04909a2aa5a4073e344a9b70d92e10e8753ee47c118455b45bf5069",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-10-18T13:56:45.681Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0131.*",
+          ".atm/history/task-events/TASK-PRF-0131/**",
+          ".atm/history/tasks/TASK-PRF-0131.json",
+          ".atm/task-plans/TASK-PRF-0131.md",
+          "research/paper-v2/prereg-v3-smoke/kit/test/test-arm-a-git-writable.sh"
+        ],
+        "digest": "sha256:dc37f0a94a9d46868a9c2b111739f3d9fc00a6c02c76344260f46df351733a32"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20261018135645-cursor-captain-TASK-PRF-0131-6a8c2e62c2",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0131",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0131.*",
+      ".atm/history/task-events/TASK-PRF-0131/**",
+      ".atm/history/tasks/TASK-PRF-0131.json",
+      ".atm/task-plans/TASK-PRF-0131.md",
+      "research/paper-v2/prereg-v3-smoke/kit/test/test-arm-a-git-writable.sh"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "35b0d70ef3a1876ee904f864a4b93fd5c0f2e7adbda5b3f7d95a584168bc0ca6",
+    "actorId": "cursor-captain",
+    "sessionId": "session-20261018135645-cursor-captain-TASK-PRF-0131-6a8c2e62c2",
+    "laneSession": {
+      "laneSessionId": "lane-20261018135645-cursor-captain-5350ef2c02",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261018135645-cursor-captain-5350ef2c02\""
+    },
+    "createdAt": "2026-10-18T13:56:46.464Z",
+    "status": "active"
+  },
+  "closedAt": "2026-10-18T13:59:31.121Z",
+  "closedByActor": "cursor-captain",
+  "closedBySessionId": "session-20261018135645-cursor-captain-TASK-PRF-0131-6a8c2e62c2",
+  "closurePacket": ".atm/history/evidence/TASK-PRF-0131.closure-packet.json"
+}
