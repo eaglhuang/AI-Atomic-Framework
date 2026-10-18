@@ -81,7 +81,8 @@ export function buildClosebackPlan(input) {
         planningStatus: input.diagnosis.triangulation.planningFrontmatter.status, historicalDeliveryRefs: input.historicalDeliveryRefs, planningAuthorityDeliveryOk: input.planningAuthorityDeliveryGate?.ok === true, divergenceCount: input.diagnosis.triangulation.divergence.length });
     const backendSurface = input.planningAuthorityDeliveryGate?.ok === true ? 'tasks-close'
         : resolveTaskflowCloseBackend(input.diagnosis.bucket, closeMode);
-    const planningMirrorPath = input.diagnosis.triangulation.planningFrontmatter.source;
+    const targetOwned = String(input.taskDocument?.closureAuthority ?? input.taskDocument?.closure_authority ?? '').replace(/-/g, '_') === 'target_repo';
+    const planningMirrorPath = targetOwned ? null : input.diagnosis.triangulation.planningFrontmatter.source;
     const rosterIndexPath = input.delegationContract.policy.rosterSync.indexPath;
     const rosterClosebackCommand = rosterIndexPath && planningMirrorPath ? buildRosterClosebackCommand({ indexPath: rosterIndexPath, fromPath: planningMirrorPath }) : null;
     let backendCommand = buildTasksStatusCommand(input.taskId);

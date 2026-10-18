@@ -1,0 +1,432 @@
+import crypto from 'node:crypto';
+import { mkdirSync, writeFileSync } from 'node:fs';
+import path from 'node:path';
+import { spawnSync } from 'node:child_process';
+import { buildStewardApplyEvidence } from './apply-evidence.js';
+import { sortProposalsForCompose } from './merge-plan.js';
+import { validateStewardInputs } from './steward-input-validation.js';
+import { formatStewardCompositionBlock } from './steward-base-composer.js';
+import { applyTransactionalStewardPlan, buildPatchProposalComposition, buildStewardSemanticValidationReceipt } from './steward-transactional-apply.js';
+import { waitStewardRecomposeBackoff } from './steward-commit-guard.js';
+import { resolveStewardCommitControls, withStewardApplyQueue } from './steward-apply-queue.js';
+/**
+ * Validates that a steward identity is well-formed and authorised.
+ * Derived-artifact writers must declare a route or task authorisation.
+ */
+export function checkStewardPermission(identity) {
+    const issues = [];
+    if (!identity.stewardId || identity.stewardId.trim().length === 0) {
+        issues.push({ code: 'invalid-steward-identity', detail: 'stewardId must be a non-empty string.' });
+    }
+    if (identity.kind === 'derived-artifact-writer') {
+        if (!identity.authorisedByRouteId && !identity.authorisedByTaskId) {
+            issues.push({
+                code: 'invalid-steward-identity',
+                detail: 'Derived-artifact writer steward must declare authorisedByRouteId or authorisedByTaskId.'
+            });
+        }
+    }
+    return { ok: issues.length === 0, stewardId: identity.stewardId, kind: identity.kind, issues };
+}
+export function planStewardApply(input) {
+    const issues = validateStewardInputs(input);
+    const sorted = sortProposalsForCompose(input.proposals);
+    const steps = issues.length === 0
+        ? sorted.map((proposal) => ({
+            proposalId: proposal.proposalId,
+            targetFile: proposal.targetFile,
+            applyMethod: input.mergePlan.applyMethod
+        }))
+        : [];
+    const plan = {
+        schemaId: 'atm.stewardPlan.v1',
+        specVersion: '0.1.0',
+        stewardId: input.stewardId,
+        mergePlanId: input.mergePlan.mergePlanId,
+        ok: issues.length === 0,
+        steps,
+        targetFiles: [...new Set(sorted.map((proposal) => proposal.targetFile))].sort((left, right) => left.localeCompare(right)),
+        issues
+    };
+    return { ok: plan.ok, plan };
+}
+export function applyStewardPlan(input) {
+    const planResult = planStewardApply(input);
+    const controls = resolveStewardCommitControls(input);
+    const attemptBudget = controls.maxRecomposeAttempts + 1;
+    const outcome = planResult.ok
+        ? withStewardApplyQueue({
+            cwd: input.cwd,
+            targetPaths: planResult.plan.targetFiles.map((file) => path.resolve(input.cwd, file)),
+            enabled: controls.applyQueue,
+            queueRoot: controls.applyQueueRoot,
+            waitMs: controls.applyQueueWaitMs,
+            pollMs: controls.lockPollMs
+        }, () => {
+            let transactional = buildPatchProposalComposition({ cwd: input.cwd, mergePlan: input.mergePlan, proposals: input.proposals });
+            let apply = null;
+            let attemptsUsed = 0;
+            if (!transactional.blocked) {
+                const baseHead = readGitHeadCommit(input.cwd);
+                for (let attempt = 0; attempt < attemptBudget; attempt += 1) {
+                    attemptsUsed = attempt + 1;
+                    if (attempt > 0) {
+                        waitStewardRecomposeBackoff(attempt, controls.recomposeBackoffMs, controls.recomposeJitterMs);
+                        transactional = buildPatchProposalComposition({ cwd: input.cwd, mergePlan: input.mergePlan, proposals: input.proposals });
+                        if (transactional.blocked)
+                            break;
+                    }
+                    const semanticValidation = buildStewardSemanticValidationReceipt({
+                        plan: transactional.plan,
+                        outputFiles: transactional.outputFiles
+                    });
+                    apply = applyTransactionalStewardPlan({
+                        cwd: input.cwd,
+                        stewardId: input.stewardId,
+                        writerRole: 'neutral-steward',
+                        plan: transactional.plan,
+                        outputFiles: transactional.outputFiles,
+                        scopeFiles: input.scopeFiles,
+                        semanticValidation,
+                        baseHead,
+                        commitLockRoot: controls.lockRoot,
+                        commitHooks: input.commitHooks
+                    });
+                    if (apply.ok || apply.receipt.verdict !== 're-compose')
+                        break;
+                }
+            }
+            return { transactional, apply, attemptsUsed };
+        })
+        : null;
+    const transactional = outcome?.transactional ?? null;
+    const apply = outcome?.apply ?? null;
+    const attemptsUsed = outcome?.attemptsUsed ?? 0;
+    if (!planResult.ok || transactional?.blocked) {
+        const brokerOperationRun = buildStewardBrokerOperationRun({
+            mergePlan: input.mergePlan,
+            proposals: input.proposals,
+            appliedFiles: [],
+            evidencePath: input.evidenceOutPath ?? null
+        });
+        const evidence = buildStewardApplyEvidence({
+            stewardId: input.stewardId,
+            mergePlan: input.mergePlan,
+            proposalIds: input.mergePlan.inputProposals,
+            targetFiles: planResult.plan.targetFiles,
+            appliedFiles: [],
+            fileBeforeHashes: {},
+            fileAfterHashes: {},
+            verdict: 'blocked',
+            blockedReasons: transactional?.blocked
+                ? [formatStewardCompositionBlock(transactional.blocked), ...input.mergePlan.conflicts.map((conflict) => `conflict: ${conflict.detail}`)]
+                : planResult.plan.issues.map((issue) => `${issue.code}: ${issue.detail}`),
+            brokerOperationRun
+        });
+        if (input.evidenceOutPath)
+            writeEvidenceFile(input.evidenceOutPath, evidence);
+        return { ok: false, evidence };
+    }
+    if (!transactional || !apply)
+        throw new Error('steward composition missing after a successful plan');
+    const fileBeforeHashes = Object.fromEntries(apply.receipt.files.map((file) => [file.filePath, stripShaPrefix(file.beforeHash)]));
+    const fileAfterHashes = Object.fromEntries(apply.receipt.files.map((file) => [file.filePath, stripShaPrefix(file.afterHash)]));
+    const appliedFiles = apply.ok ? apply.receipt.files.map((file) => file.filePath).sort((left, right) => left.localeCompare(right)) : [];
+    appliedFiles.sort((left, right) => left.localeCompare(right));
+    const brokerOperationRun = buildStewardBrokerOperationRun({
+        mergePlan: input.mergePlan,
+        proposals: input.proposals,
+        appliedFiles,
+        evidencePath: input.evidenceOutPath ?? null
+    });
+    const evidence = buildStewardApplyEvidence({
+        stewardId: input.stewardId,
+        mergePlan: input.mergePlan,
+        proposalIds: input.mergePlan.inputProposals,
+        targetFiles: planResult.plan.targetFiles,
+        appliedFiles,
+        fileBeforeHashes,
+        fileAfterHashes,
+        verdict: apply.ok ? 'applied' : 'blocked',
+        blockedReasons: apply.ok ? undefined : recomposeTerminalReasons(apply, attemptsUsed, attemptBudget),
+        brokerOperationRun
+    });
+    if (input.evidenceOutPath)
+        writeEvidenceFile(input.evidenceOutPath, evidence);
+    return { ok: apply.ok, evidence };
+}
+export function executeBrokerScopedWrite(input) {
+    const allowedFiles = [...new Set(input.handshake.scopedWriteExecution.allowedFiles.map((entry) => entry.replace(/\\/g, '/')).filter(Boolean))]
+        .sort((left, right) => left.localeCompare(right));
+    const scopeFiles = [...new Set(input.scopeFiles.map((entry) => entry.replace(/\\/g, '/')).filter(Boolean))]
+        .sort((left, right) => left.localeCompare(right));
+    const decompositionRequest = input.handshake.brokerLane.decision.decompositionRequest ?? null;
+    if (!input.handshake.scopedWriteExecution.approved) {
+        return {
+            ok: false,
+            evidence: {
+                schemaId: 'atm.brokerScopedWriteExecution.v1',
+                specVersion: '0.1.0',
+                stewardId: input.stewardId,
+                mergePlanId: input.mergePlan.mergePlanId,
+                allowedFiles,
+                handshake: input.handshake,
+                decompositionRequest,
+                virtualAtomInUseRegistry: input.handshake.brokerLane.virtualAtomInUseRegistry,
+                applyEvidence: null,
+                verdict: 'blocked',
+                blockedReasons: input.handshake.blockedReasons.length > 0
+                    ? input.handshake.blockedReasons
+                    : ['Broker runtime activation handshake is not approved.']
+            }
+        };
+    }
+    if (allowedFiles.length !== scopeFiles.length || allowedFiles.some((entry, index) => entry !== scopeFiles[index])) {
+        return {
+            ok: false,
+            evidence: {
+                schemaId: 'atm.brokerScopedWriteExecution.v1',
+                specVersion: '0.1.0',
+                stewardId: input.stewardId,
+                mergePlanId: input.mergePlan.mergePlanId,
+                allowedFiles,
+                handshake: input.handshake,
+                decompositionRequest,
+                virtualAtomInUseRegistry: input.handshake.brokerLane.virtualAtomInUseRegistry,
+                applyEvidence: null,
+                verdict: 'blocked',
+                blockedReasons: ['Scoped write request does not match broker-approved allowed files.']
+            }
+        };
+    }
+    const applyResult = applyStewardPlan({
+        cwd: input.cwd,
+        stewardId: input.stewardId,
+        mergePlan: input.mergePlan,
+        proposals: input.proposals,
+        scopeFiles,
+        evidenceOutPath: input.evidenceOutPath
+    });
+    return {
+        ok: applyResult.ok,
+        evidence: {
+            schemaId: 'atm.brokerScopedWriteExecution.v1',
+            specVersion: '0.1.0',
+            stewardId: input.stewardId,
+            mergePlanId: input.mergePlan.mergePlanId,
+            allowedFiles,
+            handshake: input.handshake,
+            decompositionRequest,
+            virtualAtomInUseRegistry: input.handshake.brokerLane.virtualAtomInUseRegistry,
+            applyEvidence: applyResult.evidence,
+            verdict: applyResult.ok ? 'applied' : 'blocked',
+            blockedReasons: applyResult.ok ? [] : (applyResult.evidence.blockedReasons ?? ['Broker scoped write apply was blocked.'])
+        }
+    };
+}
+// Top-level steward arbitration entry point (TASK-MAO-0009).
+// Wraps planning, identity checks, and verdict production. Records
+// route/task/evidence links as required by the acceptance criteria.
+export function arbitrateStewardRequest(input) {
+    const owningRouteId = input.owningRouteId ?? input.identity.authorisedByRouteId ?? null;
+    const owningTaskId = input.owningTaskId ?? input.identity.authorisedByTaskId ?? null;
+    // 1. Identity / permission gate
+    const permResult = checkStewardPermission(input.identity);
+    if (!permResult.ok) {
+        return {
+            schemaId: 'atm.stewardArbitrationResult.v1',
+            specVersion: '0.1.0',
+            stewardId: input.identity.stewardId,
+            verdict: 'blocked',
+            owningRouteId,
+            owningTaskId,
+            plan: null,
+            applyEvidence: null,
+            issues: permResult.issues
+        };
+    }
+    // 2. Human-required verdict: fail closed, steward cannot auto-resolve
+    if (input.mergePlan.verdict === 'human-required') {
+        return {
+            schemaId: 'atm.stewardArbitrationResult.v1',
+            specVersion: '0.1.0',
+            stewardId: input.identity.stewardId,
+            verdict: 'human-required',
+            owningRouteId,
+            owningTaskId,
+            plan: null,
+            applyEvidence: null,
+            issues: [{ code: 'human-review-required', detail: 'Merge plan verdict is human-required; steward cannot auto-resolve.' }]
+        };
+    }
+    // 3. Plan the apply
+    const planResult = planStewardApply({
+        cwd: input.cwd,
+        stewardId: input.identity.stewardId,
+        mergePlan: input.mergePlan,
+        proposals: input.proposals,
+        scopeFiles: input.scopeFiles
+    });
+    if (!planResult.ok) {
+        // Determine if this is a merge-required or hard-blocked situation
+        const hasBlockingConflict = planResult.plan.issues.some((issue) => issue.code === 'blocked-merge-plan' || issue.code === 'out-of-scope-target' || issue.code === 'invalid-steward-identity');
+        const verdict = hasBlockingConflict ? 'blocked' : 'merge-required';
+        return {
+            schemaId: 'atm.stewardArbitrationResult.v1',
+            specVersion: '0.1.0',
+            stewardId: input.identity.stewardId,
+            verdict,
+            owningRouteId,
+            owningTaskId,
+            plan: planResult.plan,
+            applyEvidence: null,
+            issues: planResult.plan.issues
+        };
+    }
+    // 4. Apply the plan
+    const applyResult = applyStewardPlan({
+        cwd: input.cwd,
+        stewardId: input.identity.stewardId,
+        mergePlan: input.mergePlan,
+        proposals: input.proposals,
+        scopeFiles: input.scopeFiles,
+        evidenceOutPath: input.evidenceOutPath
+    });
+    return {
+        schemaId: 'atm.stewardArbitrationResult.v1',
+        specVersion: '0.1.0',
+        stewardId: input.identity.stewardId,
+        verdict: applyResult.ok ? 'apply' : 'blocked',
+        owningRouteId,
+        owningTaskId,
+        plan: planResult.plan,
+        applyEvidence: applyResult.evidence,
+        issues: applyResult.ok ? [] : (applyResult.evidence.blockedReasons ?? []).map((reason) => ({ code: 'blocked-merge-plan', detail: reason }))
+    };
+}
+export function applyUnifiedPatch(content, patch) {
+    const lines = content.split(/\r?\n/);
+    const patchLines = patch.split(/\r?\n/);
+    let lineIndex = 0;
+    let output = [];
+    let hunkIndex = 0;
+    while (hunkIndex < patchLines.length) {
+        const header = patchLines[hunkIndex];
+        const match = /^@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@/.exec(header.trim());
+        if (!match) {
+            hunkIndex += 1;
+            continue;
+        }
+        const oldStart = Number.parseInt(match[1], 10) - 1;
+        output.push(...lines.slice(lineIndex, oldStart));
+        lineIndex = oldStart;
+        hunkIndex += 1;
+        while (hunkIndex < patchLines.length && !patchLines[hunkIndex].startsWith('@@')) {
+            const patchLine = patchLines[hunkIndex];
+            if (patchLine.startsWith('--- ') || patchLine.startsWith('+++ ')) {
+                hunkIndex += 1;
+                continue;
+            }
+            if (patchLine.startsWith('-')) {
+                lineIndex += 1;
+            }
+            else if (patchLine.startsWith('+')) {
+                output.push(patchLine.slice(1));
+            }
+            else if (patchLine.startsWith(' ')) {
+                output.push(lines[lineIndex] ?? '');
+                lineIndex += 1;
+            }
+            else if (patchLine.length === 0) {
+                // skip blank separator lines inside patch text
+            }
+            else {
+                output.push(patchLine);
+                lineIndex += 1;
+            }
+            hunkIndex += 1;
+        }
+    }
+    output.push(...lines.slice(lineIndex));
+    return output.join('\n');
+}
+function writeEvidenceFile(filePath, evidence) {
+    mkdirSync(path.dirname(path.resolve(filePath)), { recursive: true });
+    writeFileSync(filePath, `${JSON.stringify(evidence, null, 2)}\n`, 'utf8');
+}
+function buildStewardBrokerOperationRun(input) {
+    const sortedProposals = sortProposalsForCompose(input.proposals);
+    const proposalIds = [...new Set(sortedProposals.map((proposal) => proposal.proposalId).concat(input.mergePlan.inputProposals))]
+        .sort((left, right) => left.localeCompare(right));
+    const actorIds = [...new Set(sortedProposals.map((proposal) => proposal.actorId).filter(Boolean))]
+        .sort((left, right) => left.localeCompare(right));
+    const requestFiles = [...new Set(sortedProposals.map((proposal) => proposal.targetFile).filter(Boolean))]
+        .sort((left, right) => left.localeCompare(right));
+    const taskIds = [...new Set(sortedProposals.map((proposal) => proposal.taskId).filter(Boolean))]
+        .sort((left, right) => left.localeCompare(right));
+    const commitShas = [...new Set(sortedProposals.map((proposal) => proposal.baseCommit).filter(Boolean))]
+        .sort((left, right) => left.localeCompare(right));
+    const transactionIds = [...new Set(sortedProposals.flatMap((proposal) => extractProposalTransactionIds(proposal)))]
+        .sort((left, right) => left.localeCompare(right));
+    const appliedFiles = [...new Set(input.appliedFiles)].sort((left, right) => left.localeCompare(right));
+    const mergeVerdict = mapStewardMergeVerdict(input.mergePlan.verdict);
+    const record = {
+        schemaId: 'atm.brokerOperationRunRecord.v1',
+        specVersion: '0.1.0',
+        migration: input.mergePlan.migration,
+        runId: `steward-${input.mergePlan.mergePlanId}`,
+        planId: input.mergePlan.mergePlanId,
+        request_identity: proposalIds,
+        actor_ids: actorIds,
+        request_files: requestFiles,
+        adapter_choice: `steward.${input.mergePlan.applyMethod}`,
+        applied_files: appliedFiles,
+        lane_decision: 'neutral-steward',
+        merge_verdict: mergeVerdict,
+        evidence_path: input.evidencePath ?? 'inline:steward-apply-evidence',
+        ...(taskIds.length > 0 ? { task_ids: taskIds } : {}),
+        ...(commitShas.length === 1 ? { commit_sha: commitShas[0] } : {}),
+        ...(transactionIds.length > 0 ? { transaction_ids: transactionIds } : {})
+    };
+    return {
+        schemaId: 'atm.brokerOperationRunRecordEnvelope.v1',
+        specVersion: '0.1.0',
+        migration: input.mergePlan.migration,
+        runId: record.runId,
+        planId: input.mergePlan.mergePlanId,
+        records: [record]
+    };
+}
+function extractProposalTransactionIds(proposal) {
+    const values = [
+        proposal.transactionId,
+        ...(proposal.transactionIds ?? []),
+        ...(proposal.transaction_ids ?? [])
+    ];
+    return values
+        .map((value) => typeof value === 'string' ? value.trim() : '')
+        .filter(Boolean);
+}
+function mapStewardMergeVerdict(verdict) {
+    if (verdict === 'parallel-safe' || verdict === 'needs-steward')
+        return 'mergeable';
+    return 'conflict';
+}
+function hashText(value) {
+    return crypto.createHash('sha256').update(value).digest('hex');
+}
+function stripShaPrefix(value) {
+    return value.replace(/^sha256:/, '');
+}
+function recomposeTerminalReasons(apply, attemptsUsed, attemptBudget) {
+    if (apply.receipt.verdict !== 're-compose' || attemptsUsed < attemptBudget)
+        return apply.receipt.blockedReasons;
+    return apply.receipt.blockedReasons.map((reason) => `re-compose attempts exhausted after ${attemptsUsed} of ${attemptBudget}: ${reason}`);
+}
+export function readGitHeadCommit(cwd) {
+    const result = spawnSync('git', ['-C', cwd, 'rev-parse', '--verify', 'HEAD'], { encoding: 'utf8' });
+    if (result.status !== 0)
+        return null;
+    const head = String(result.stdout ?? '').trim();
+    return head.length > 0 ? head : null;
+}

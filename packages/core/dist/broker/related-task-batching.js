@@ -1,0 +1,34 @@
+export function buildRelatedTaskBatchEvidence(input) {
+    const candidate = input.candidate;
+    if (!candidate?.waveId)
+        return null;
+    const compatible = input.candidates.filter((entry) => entry.waveId === candidate.waveId && entry.surfaceFamily === candidate.surfaceFamily);
+    if (compatible.length < 2)
+        return null;
+    return {
+        schemaId: 'atm.brokerBatchEvidence.v1',
+        batchId: `${candidate.waveId}:${candidate.surfaceFamily}:${input.batchId}`,
+        waveId: candidate.waveId,
+        taskIds: sortedUnique(compatible.map((entry) => entry.taskId)),
+        ticketIds: sortedUnique(compatible.map((entry) => entry.ticketId)),
+        sharedSurfaceFamily: candidate.surfaceFamily,
+        validators: sortedUnique(compatible.flatMap((entry) => entry.validators ?? [])),
+        batchRate: 1,
+        buildsPerWave: 1
+    };
+}
+export function inferBrokerSurfaceFamily(values, fallback = 'broker') {
+    const surfaces = sortedUnique(values.map(normalizePath).filter(Boolean));
+    if (surfaces.some((surface) => surface.startsWith('release/') || surface.startsWith('packages/cli/dist/'))) {
+        return 'runner-sync:release';
+    }
+    const first = surfaces[0] ?? fallback;
+    return first.split('/').slice(0, 2).join('/') || fallback;
+}
+export function sortedUnique(values) {
+    return [...new Set(values.map((value) => String(value ?? '').trim()).filter(Boolean))]
+        .sort((left, right) => left.localeCompare(right));
+}
+function normalizePath(value) {
+    return String(value ?? '').trim().replace(/\\/g, '/').replace(/^\.\//, '');
+}

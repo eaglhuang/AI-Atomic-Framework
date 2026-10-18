@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "date": "2026-10-05",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Focused and complete Linux hook validation passed; remote integration pending",
+  "id": "ATM-BUG-2026-10-05-001",
+  "area": "Release validation / hook fixture dependency closure",
+  "finding": "The closure-cross-check fixture runs the fast CLI regression suite but omits docs/ATM_AI_FIRST_5_MIN.md, which normal-close-operator-convergence reads. The v0.1.14 release fails with ATM_EVIDENCE_VALIDATION_PASS_FAILED_COMMAND; rerunning the inner validator reveals ENOENT for the omitted document.",
+  "expectedBehavior": "Every selected regression runs against a fixture containing its runtime dependencies. Preserve the focused test list and hook enforcement; do not quarantine the failing test or weaken validation.",
+  "evidenceOrRepro": "Reproduced exact v0.1.14 (6f16fcadac2ad6ad674aa05b2375b33c4c6f5d75) on WSL native Linux Node v24.21.0. scripts/validate-git-hooks-enforcement.ts failed at validate:cli. Running node --experimental-strip-types scripts/validate-cli.ts --mode fast inside its preserved closure-cross-check fixture exposed the missing document. Adding only that document made all focused regressions and 42 CLI commands pass in approximately eight seconds.",
+  "followUp": "Run the complete hook validator and remote CI before claiming delivery. Historical release failure remains a failure. This fixture repair does not prove every public user path is unaffected, does not alter npm versions, and does not authorize another release. Nearby failure family: selected regressions reading assets omitted from reduced fixtures; expose inner failed-command output when diagnosing this family."
+}

@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "date": "2026-10-10",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Windows dangling-junction regression verified; remote validation pending",
+  "id": "ATM-BUG-2026-10-10-003",
+  "area": "Sealed build non-following tree cleanup",
+  "finding": "removeTreeWithoutFollowingLinks returned early when existsSync was false. existsSync follows the target, so dangling junctions/symlinks were skipped although their directory entries existed. This can leave build residue and cause parent removal to fail. A Windows isolated regression reproduced the skipped link.",
+  "expectedBehavior": "Inspect the directory entry with lstat before deciding it is absent. Unlink symlinks without following targets; only ENOENT means there is no entry to remove.",
+  "evidenceOrRepro": "node --strip-types tests/cli/sealed-runner-build-junction-cleanup.test.ts failed before repair at dangling link must be removed. Removing the redundant existsSync precheck allows the existing lstat ENOENT handling to work. Coverage retains host node_modules survival, regular trees and unlink-before-remove; adds dangling target and fixture cleanup.",
+  "followUp": "Remote CI remains required. Hard process termination, permission-denied unlink, queue recovery and registered worktree metadata are not proven by this test. No historical foreign worktree deletion is authorized. The first diagnostic fixture left its own temporary root when its cleanup hit the same dangling-link bug; preserve ownership and clean only that exact root. No new gate or registry."
+}

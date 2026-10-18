@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "date": "2026-10-05",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Source repair validated; remote integration pending",
+  "id": "ATM-BUG-2026-10-05-002",
+  "area": "Product CI burn-in lifecycle evaluation",
+  "finding": "validateLifecycle assumed every successful run with retryCount > 0 must contain a failed Product CI attempt and accepted repair. Fully successful manual reruns were rejected as unrepaired-retry despite complete successful-attempt provenance.",
+  "expectedBehavior": "Distinguish reruns from Product CI failures. Accept a no-failure rerun only with validated provenance for every consecutive attempt, a count matching retryCount + 1, and successful Product CI conclusions throughout. Retain rejection for missing attempts, actual hidden failures, and failed-but-unrepaired lifecycle records.",
+  "evidenceOrRepro": "GitHub run 35698733701 has two successful Product CI attempts, verified through both attempt jobs APIs. A focused successful-rerun regression failed before repair and passed afterward; missing-provenance, missing-earlier-attempt and hidden-real-failure controls remain rejected. The existing collector regression passed. Replaying the same current receipt changed invalid-input to unexplained-failure: 116 successful and 7 failed eligible runs over 13.422755 days; no long-term-green claim is made.",
+  "followUp": "Merge with required CI; preserve raw attempts and failed historical runs. Do not modify the 90-run/30-day policy or infer root causes from later green runs. This evaluator-only change does not change npm runtime, public commands, or release versions."
+}

@@ -57,7 +57,7 @@ function parseTaskMarkdownFrontmatter(text) {
     }
     return result;
 }
-function buildPartialPlanningCardContent(baseline, updated, fields) {
+export function buildPartialPlanningCardContent(baseline, updated, fields) {
     const baselineMatch = baseline.match(/^---\r?\n([\s\S]*?)\r?\n---(\r?\n)?/);
     const updatedMatch = updated.match(/^---\r?\n([\s\S]*?)\r?\n---(\r?\n)?/);
     if (!baselineMatch || !updatedMatch)
@@ -130,7 +130,8 @@ export function applyPlanningCardCloseback(input) {
         ? previousDocument.task_id
         : (typeof previousDocument.taskId === 'string' ? previousDocument.taskId : path.basename(absolutePath).replace(/\.task\.md$/, ''));
     const previousStatus = typeof previousDocument.status === 'string' ? previousDocument.status : null;
-    const completedAt = new Date().toISOString();
+    const completedAt = input.completedAt !== undefined && typeof previousDocument.completed_at === 'string' && Number.isFinite(Date.parse(previousDocument.completed_at))
+        ? previousDocument.completed_at : input.completedAt ?? new Date().toISOString();
     const updatedFields = [
         'status',
         'completed_at',

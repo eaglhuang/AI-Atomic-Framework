@@ -88,9 +88,12 @@ function stageGitPathspecs(cwd, paths, env) { for (const chunk of chunkGitPathsp
     else
         runGitOrThrow(cwd, args);
 } }
-function stageGitFileContents(cwd, contents, env) { for (const [file, content] of Object.entries(contents)) {
+function stageGitFileContents(cwd, contents, env, preserveModeFiles = []) { for (const [file, content] of Object.entries(contents)) {
     const blob = execFileSync('git', ['hash-object', '-w', '--stdin'], { cwd, input: content, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'], env }).trim();
-    runGitWithEnv(cwd, ['update-index', '--add', '--cacheinfo', `100644,${blob},${file}`], env);
+    const mode = preserveModeFiles.includes(file) ? (execFileSync('git', ['ls-tree', 'HEAD', '--', file], { cwd, encoding: 'utf8', env }).split(' ')[0] || execFileSync('git', ['ls-files', '-s', '--', file], { cwd, encoding: 'utf8', env }).split(' ')[0] || '100644') : '100644';
+    if (!['100644', '100755'].includes(mode))
+        throw new CliError('ATM_TASKFLOW_PROFILE_SCHEMA_INVALID', `Unsupported projected file mode ${mode}: ${file}`, { exitCode: 1 });
+    runGitWithEnv(cwd, ['update-index', '--add', '--cacheinfo', `${mode},${blob},${file}`], env);
 } }
 function resolveTaskflowCommitLaneSessionId(input) { const session = input.actorId && input.taskId ? resolveActorWorkSession(input.repoRoot, { actorId: input.actorId, taskId: input.taskId, includeNonActive: true }) : null; return resolveCommitLaneSessionId({ session }); }
 function readGitRoot(startPath) {
@@ -103,13 +106,13 @@ function sha256Json(value) {
     return `sha256:${sha256Text(`${JSON.stringify(value, null, 2)}\n`)}`;
 }
 function taskflowSealManifestPath(taskId) { return `.atm/history/evidence/${taskId}.seal-and-commit.json`; }
-function readPayloadEntries(repoRoot, stageFiles, excludeFiles = []) {
+function readPayloadEntries(repoRoot, stageFiles, excludeFiles = [], contents = {}) {
     if (!repoRoot)
         return [];
     const excluded = new Set(excludeFiles.map((entry) => entry.replace(/\\/g, '/')));
-    return uniqueSorted(stageFiles).filter((file) => !excluded.has(file)).filter((file) => existsSync(path.resolve(repoRoot, file))).map((file) => { const absolutePath = path.resolve(repoRoot, file); return { path: file, sha256: `sha256:${sha256Text(readFileSync(absolutePath, 'utf8'))}` }; });
+    return uniqueSorted(stageFiles).filter((file) => !excluded.has(file)).filter((file) => existsSync(path.resolve(repoRoot, file))).map((file) => { const absolutePath = path.resolve(repoRoot, file); return { path: file, sha256: `sha256:${sha256Text(contents[file] ?? readFileSync(absolutePath, 'utf8'))}` }; });
 }
-function payloadDigest(repoRoot, stageFiles, excludeFiles = []) { return sha256Json(readPayloadEntries(repoRoot, stageFiles, excludeFiles)); }
+function payloadDigest(repoRoot, stageFiles, excludeFiles = [], contents = {}) { return sha256Json(readPayloadEntries(repoRoot, stageFiles, excludeFiles, contents)); }
 function evidenceDigest(repoRoot, stageFiles, excludeFiles = []) {
     return payloadDigest(repoRoot, stageFiles.filter((file) => file.startsWith('.atm/history/evidence/')), excludeFiles);
 }
@@ -117,9 +120,9 @@ function buildSealAndCommitReceipt(input) {
     const manifestPath = taskflowSealManifestPath(input.taskId);
     const targetStageFiles = uniqueSorted(input.targetStageFiles);
     const planningStageFiles = uniqueSorted(input.planningStageFiles);
-    const targetPayload = payloadDigest(input.targetRepoRoot, targetStageFiles, [manifestPath]);
+    const targetPayload = payloadDigest(input.targetRepoRoot, targetStageFiles, [manifestPath], input.targetContents);
     const targetEvidence = evidenceDigest(input.targetRepoRoot, targetStageFiles, [manifestPath]);
-    const planningPayload = payloadDigest(input.planningRepoRoot, planningStageFiles);
+    const planningPayload = payloadDigest(input.planningRepoRoot, planningStageFiles, [], input.planningContents);
     const planningEvidence = evidenceDigest(input.planningRepoRoot, planningStageFiles);
     const withoutSeal = { schemaId: 'atm.taskflowSealAndCommitReceipt.v1', taskId: input.taskId, actorId: input.actorId, createdAt: input.createdAt ?? new Date().toISOString(),
         targetHeadBeforeCommit: input.targetRepoRoot ? tryGitScalar(input.targetRepoRoot, ['rev-parse', '--verify', 'HEAD']) : null, planningHeadBeforeCommit: input.planningRepoRoot ? tryGitScalar(input.planningRepoRoot, ['rev-parse', '--verify', 'HEAD']) : null, historicalDeliveryRefs: uniqueSorted(input.historicalDeliveryRefs), historicalBatchRef: input.historicalBatchRef ?? null, manifestPath,
@@ -375,6 +378,7 @@ export function buildTaskflowCommitBundle(input) {
     if (allowed.length === 0) {
         allowed = scopePaths;
     }
+    const projectionFiles = Object.keys(input.projectionStageContent ?? {});
     const targetDeliveryFiles = [];
     const historicalBatchStageFile = resolveExistingHistoricalBatchStageFile(targetRepoRoot, input.historicalBatchRef);
     const backendGovernanceFiles = [...listCurrentTaskGovernanceFiles(targetRepoRoot, input.taskId), ...listCurrentTaskCloseEvidenceFiles(targetRepoRoot, input.taskId), ...(input.backendResult ? extractBackendStageFiles(input.backendResult) : []),
@@ -411,6 +415,10 @@ export function buildTaskflowCommitBundle(input) {
     for (const file of dirtyFiles) {
         if (file.startsWith('.atm/'))
             continue;
+        if (projectionFiles.includes(file)) {
+            targetDeliveryFiles.push(file);
+            continue;
+        }
         const inScope = scopePaths.some((sp) => taskflowPathMatches(file, sp));
         const isDeclared = effectiveDeliverables.some((del) => taskflowPathMatches(file, del));
         const isExplicitlyDeclaredFile = effectiveDeliverables.some((del) => normalizeTaskflowRelativePath(del) === file);
@@ -447,18 +455,19 @@ export function buildTaskflowCommitBundle(input) {
         metadataFailClosed = true;
         failClosedReason = `Touched-file physical line budget failed: ${lineBudgetReport.hardViolations.map((entry) => `${entry.file}:${entry.lines}`).join(', ')}. Reproduce: ${lineBudgetReport.reproduceCommand}`;
     }
-    const targetStageFiles = uniqueSorted([...finalDeliveryFiles, ...targetGovernanceFiles, ...runnerPublicationFiles]);
-    const planning = resolvePlanningPath(targetRepoRoot, input.planningMirrorPath);
-    const planningStageFiles = planning.repoRoot && planning.relativePath ? uniqueSorted([planning.relativePath,
+    const targetStageFiles = uniqueSorted([...finalDeliveryFiles, ...targetGovernanceFiles, ...runnerPublicationFiles, ...projectionFiles]);
+    const targetOwned = String(taskDocument.closureAuthority ?? taskDocument.closure_authority ?? '').replace(/-/g, '_') === 'target_repo';
+    const planning = targetOwned ? { repoRoot: targetRepoRoot, relativePath: `.atm/history/tasks/${input.taskId}.json`, reason: null } : resolvePlanningPath(targetRepoRoot, input.planningMirrorPath);
+    const planningStageFiles = targetOwned ? targetStageFiles : planning.repoRoot && planning.relativePath ? uniqueSorted([planning.relativePath,
         ...(input.extraPlanningStageFiles ?? []), ...(input.rosterIndexPath ? [normalizeRepoRelativePath(planning.repoRoot, path.isAbsolute(input.rosterIndexPath) ? input.rosterIndexPath : path.resolve(planning.repoRoot, input.rosterIndexPath))] : [])]) : [];
     const targetMessage = buildTaskflowCommitMessage('target', { taskId: input.taskId });
     const planningMessage = buildTaskflowCommitMessage('planning', { taskId: input.taskId });
     const failClosed = metadataFailClosed || targetStageFiles.length === 0 || !planning.repoRoot || planningStageFiles.length === 0;
     const sealAndCommitReceipt = buildSealAndCommitReceipt({ taskId: input.taskId, actorId: input.actorId, targetRepoRoot, targetStageFiles, planningRepoRoot: planning.repoRoot, planningStageFiles,
-        historicalDeliveryRefs: input.historicalDeliveryRefs ?? [], historicalBatchRef: input.historicalBatchRef ?? null });
+        historicalDeliveryRefs: input.historicalDeliveryRefs ?? [], historicalBatchRef: input.historicalBatchRef ?? null, targetContents: input.projectionStageContent, planningContents: { ...input.planningStageContent, ...(planning.repoRoot && path.resolve(planning.repoRoot) === targetRepoRoot ? input.projectionStageContent : {}) } });
     return { schemaId: 'atm.taskflowGovernedCommitBundle.v1', taskId: input.taskId, actorId: input.actorId, targetRepo: { repoRoot: targetRepoRoot, stageFiles: targetStageFiles, commitMessage: targetMessage, commitCommand: commitCommandFor({ repoRoot: targetRepoRoot, taskId: input.taskId,
-                actorId: input.actorId, commitMessage: targetMessage, repoKind: 'target' }), commitSha: null, status: input.commitMode === 'dry-run' ? 'preview' : 'uncomputed', reason: failClosedReason || (targetStageFiles.length > 0 ? null : 'target close artifact paths could not be computed') }, planningRepo: { repoRoot: planning.repoRoot, stageFiles: planningStageFiles, commitMessage: planningMessage,
-            commitCommand: commitCommandFor({ repoRoot: planning.repoRoot, taskId: input.taskId, actorId: input.actorId, commitMessage: planningMessage, repoKind: 'planning' }), commitSha: null, status: input.commitMode === 'dry-run' ? 'preview' : 'uncomputed', reason: planning.reason, stageFileContents: input.planningStageContent }, commitMode: input.commitMode, failClosed, recoveryCommand: null, targetDeliveryFiles: finalDeliveryFiles, targetGovernanceFiles,
+                actorId: input.actorId, commitMessage: targetMessage, repoKind: 'target' }), commitSha: null, status: input.commitMode === 'dry-run' ? 'preview' : 'uncomputed', stageFileContents: input.projectionStageContent, ...(projectionFiles.length ? { preserveModeFiles: projectionFiles } : {}), reason: failClosedReason || (targetStageFiles.length > 0 ? null : 'target close artifact paths could not be computed') }, planningRepo: { repoRoot: planning.repoRoot, stageFiles: planningStageFiles, commitMessage: planningMessage,
+            commitCommand: commitCommandFor({ repoRoot: planning.repoRoot, taskId: input.taskId, actorId: input.actorId, commitMessage: planningMessage, repoKind: 'planning' }), commitSha: null, status: input.commitMode === 'dry-run' ? 'preview' : 'uncomputed', reason: planning.reason, stageFileContents: { ...input.planningStageContent, ...(planning.repoRoot && path.resolve(planning.repoRoot) === targetRepoRoot ? input.projectionStageContent : {}) }, ...(projectionFiles.length && planning.repoRoot && path.resolve(planning.repoRoot) === targetRepoRoot ? { preserveModeFiles: projectionFiles } : {}) }, commitMode: input.commitMode, failClosed, recoveryCommand: null, targetDeliveryFiles: finalDeliveryFiles, targetGovernanceFiles,
         planningFiles: planningStageFiles, excludedDirtyFiles, excludedReasons, scopeAmendment, sealAndCommitReceipt };
 }
 function isTaskflowScratchBackupFile(file) {
@@ -485,7 +494,7 @@ export function reconcileTeamContributionCompositionWithCommitBundle(bundle, com
 }
 function refreshSealAndCommitReceipt(bundle) {
     const receipt = buildSealAndCommitReceipt({ taskId: bundle.taskId, actorId: bundle.actorId,
-        targetRepoRoot: bundle.targetRepo.repoRoot, targetStageFiles: bundle.targetRepo.stageFiles, planningRepoRoot: bundle.planningRepo.repoRoot, planningStageFiles: bundle.planningRepo.stageFiles, historicalDeliveryRefs: bundle.sealAndCommitReceipt.historicalDeliveryRefs, historicalBatchRef: bundle.sealAndCommitReceipt.historicalBatchRef });
+        targetRepoRoot: bundle.targetRepo.repoRoot, targetStageFiles: bundle.targetRepo.stageFiles, planningRepoRoot: bundle.planningRepo.repoRoot, planningStageFiles: bundle.planningRepo.stageFiles, targetContents: bundle.targetRepo.stageFileContents, planningContents: bundle.planningRepo.stageFileContents, historicalDeliveryRefs: bundle.sealAndCommitReceipt.historicalDeliveryRefs, historicalBatchRef: bundle.sealAndCommitReceipt.historicalBatchRef });
     return { ...bundle,
         sealAndCommitReceipt: writeSealAndCommitReceipt(bundle.targetRepo.repoRoot, receipt) };
 }
@@ -501,6 +510,8 @@ function stageRepoBundle(repo, taskId) {
         return { ...repo, stageFiles: existingFiles, status: 'skipped', reason: 'no existing bundle files to stage', indexIsolation: buildIndexIsolation(repo, readStagedFiles(repo.repoRoot), taskId) };
     }
     stageGitPathspecs(repo.repoRoot, existingFiles);
+    if (repo.stageFileContents)
+        stageGitFileContents(repo.repoRoot, repo.stageFileContents, process.env, repo.preserveModeFiles);
     return { ...repo, stageFiles: existingFiles, status: 'staged' };
 }
 function commitRepoWithTaskScopedIndexLease(input) { executeTaskScopedCommitTransaction({ taskId: input.taskId, leaseId: input.leaseId, foreignEntries: input.indexLease.parkEntries.map((entry) => ({ path: entry.path, mode: String(entry.stagedMode ?? ''), blobId: String(entry.stagedBlobId ?? '') })) }, { park: () => { parkGitIndexLease(input.repoRoot, input.indexLease); }, commitCurrentTaskBundle: () => { input.commit(); return null; }, restore: () => { restoreGitIndexLease(input.repoRoot, input.indexLease); }, recordRestoreFailure: (failure) => { recordGitIndexRestoreFailure(input.repoRoot, failure); } }); }
@@ -511,7 +522,7 @@ async function commitTaskflowBundle(input) {
     const laneSessionId = input.bundle.targetRepo.repoRoot ? resolveTaskflowCommitLaneSessionId({ repoRoot: input.bundle.targetRepo.repoRoot, actorId: input.actorId, taskId: input.taskId }) : null;
     if (input.bundle.targetRepo.repoRoot && targetPreflight) {
         commitRepoWithTaskScopedIndexLease({ repoRoot: input.bundle.targetRepo.repoRoot, taskId: input.taskId, leaseId: targetPreflight.indexLease.leaseId, indexLease: targetPreflight.indexLease, commit: () => commitRepoWithTemporaryIndex({ repoRoot: input.bundle.targetRepo.repoRoot ?? '', stageFiles: targetStageFiles,
-                args: ['commit', '-m', appendSealTrailers(input.bundle.targetRepo.commitMessage, input.bundle.sealAndCommitReceipt, 'target', laneSessionId)], actorId: input.actorId, taskId: input.taskId, laneSessionId, stageFileContents: input.bundle.targetRepo.stageFileContents }) });
+                args: ['commit', '-m', appendSealTrailers(input.bundle.targetRepo.commitMessage, input.bundle.sealAndCommitReceipt, 'target', laneSessionId)], actorId: input.actorId, taskId: input.taskId, laneSessionId, stageFileContents: input.bundle.targetRepo.stageFileContents, preserveModeFiles: input.bundle.targetRepo.preserveModeFiles }) });
     }
     const targetCommitSha = input.bundle.targetRepo.repoRoot
         ? tryGitScalar(input.bundle.targetRepo.repoRoot, ['rev-parse', '--verify', 'HEAD']) : null;
@@ -528,7 +539,7 @@ async function commitTaskflowBundle(input) {
         const planningMessage = [
             appendSealTrailers(planningRepo.commitMessage, input.bundle.sealAndCommitReceipt, 'planning', laneSessionId), '', `ATM-Actor: ${input.actorId}`, `ATM-Task: ${input.taskId}`, 'ATM-Surface: taskflow-close-planning-bundle'
         ].join('\n');
-        commitRepoWithTaskScopedIndexLease({ repoRoot: planningRepoRoot, taskId: input.taskId, leaseId: planningPreflight.indexLease.leaseId, indexLease: planningPreflight.indexLease, commit: () => commitRepoWithTemporaryIndex({ repoRoot: planningRepoRoot, stageFiles: planningStageFiles, args: ['commit', '-m', planningMessage], actorId: input.actorId, taskId: input.taskId, laneSessionId, stageFileContents: planningRepo.stageFileContents }) });
+        commitRepoWithTaskScopedIndexLease({ repoRoot: planningRepoRoot, taskId: input.taskId, leaseId: planningPreflight.indexLease.leaseId, indexLease: planningPreflight.indexLease, commit: () => commitRepoWithTemporaryIndex({ repoRoot: planningRepoRoot, stageFiles: planningStageFiles, args: ['commit', '-m', planningMessage], actorId: input.actorId, taskId: input.taskId, laneSessionId, stageFileContents: planningRepo.stageFileContents, preserveModeFiles: planningRepo.preserveModeFiles }) });
         planningRepo = { ...planningRepo, commitSha: tryGitScalar(planningRepoRoot, ['rev-parse', '--verify', 'HEAD']), status: 'committed', indexIsolation: planningPreflight };
     }
     catch (error) {
@@ -551,7 +562,7 @@ export function commitRepoWithTemporaryIndex(input) {
             stageGitPathspecs(input.repoRoot, input.stageFiles, env);
         }
         if (input.stageFileContents)
-            stageGitFileContents(input.repoRoot, input.stageFileContents, env);
+            stageGitFileContents(input.repoRoot, input.stageFileContents, env, input.preserveModeFiles);
         const closeWindowLock = input.taskId ? readCloseWindowStagedIndexLockReport(input.repoRoot) : null;
         const isGovernanceFollowUp = Boolean(input.taskId && closeWindowLock?.status === 'active' && closeWindowLock.taskId === input.taskId && isImmediateTaskflowDeliveryParent(input.repoRoot, input.taskId) && input.stageFiles.some((filePath) => filePath === `.atm/history/tasks/${input.taskId}.json` || filePath === `.atm/history/evidence/${input.taskId}.bundle-manifest.json`));
         if (isGovernanceFollowUp && input.taskId && input.actorId && closeWindowLock) {
@@ -574,7 +585,7 @@ export function commitRepoWithTemporaryIndex(input) {
 export async function commitTaskflowDeliveryFiles(input) {
     const repoRoot = input.bundle.targetRepo.repoRoot;
     const deliveryPrerequisiteGovernanceFiles = input.bundle.targetGovernanceFiles.filter((file) => file === '.atm/catalog/registry/actors.json');
-    const stageFiles = uniqueSorted([...input.bundle.targetDeliveryFiles, ...deliveryPrerequisiteGovernanceFiles]);
+    const stageFiles = uniqueSorted([...input.bundle.targetDeliveryFiles.filter(file => !Object.hasOwn(input.bundle.targetRepo.stageFileContents ?? {}, file)), ...deliveryPrerequisiteGovernanceFiles]);
     if (!repoRoot || stageFiles.length === 0) {
         return null;
     }
@@ -607,7 +618,7 @@ async function finalizeTaskflowCommitBundleWithSeal(input) {
     const sharedRepoMode = input.sharedRepoMode;
     if (sharedRepoMode) {
         const repoRoot = sealedInputBundle.targetRepo.repoRoot;
-        const sharedRepo = buildSharedRepoBundle(repoRoot, [...sealedInputBundle.targetRepo.stageFiles, ...sealedInputBundle.planningRepo.stageFiles]);
+        const sharedRepo = { ...buildSharedRepoBundle(repoRoot, [...sealedInputBundle.targetRepo.stageFiles, ...sealedInputBundle.planningRepo.stageFiles]), stageFileContents: { ...sealedInputBundle.targetRepo.stageFileContents, ...sealedInputBundle.planningRepo.stageFileContents }, preserveModeFiles: uniqueSorted([...(sealedInputBundle.targetRepo.preserveModeFiles ?? []), ...(sealedInputBundle.planningRepo.preserveModeFiles ?? [])]) };
         const preflightShared = verifyRepoIndexIsolation(sharedRepo, 'pre-stage', strictIsolation, input.taskId);
         if (sealedInputBundle.commitMode === 'stage-only') {
             const stagedShared = verifyRepoIndexIsolation(stageRepoBundle(preflightShared, input.taskId), 'post-stage', true, input.taskId);
@@ -619,7 +630,7 @@ async function finalizeTaskflowCommitBundleWithSeal(input) {
         const preStagedFiles = readStagedFiles(repoRoot);
         const sharedIndexIsolation = buildIndexIsolation(preflightShared, preStagedFiles, input.taskId);
         const sharedMessage = [appendSealTrailers(sealedInputBundle.targetRepo.commitMessage, sealedInputBundle.sealAndCommitReceipt, 'shared', laneSessionId), '', `ATM-Actor: ${input.actorId}`, `ATM-Task: ${input.taskId}`, 'ATM-Surface: taskflow-close-shared-repo-bundle', `ATM-Planning-Commit-Message: ${sealedInputBundle.planningRepo.commitMessage}`].join('\n');
-        commitRepoWithTaskScopedIndexLease({ repoRoot, taskId: input.taskId, leaseId: sharedIndexIsolation.indexLease.leaseId, indexLease: sharedIndexIsolation.indexLease, commit: () => commitRepoWithTemporaryIndex({ repoRoot, stageFiles: sharedStageFiles, args: ['commit', '-m', sharedMessage], actorId: input.actorId, taskId: input.taskId, laneSessionId, stageFileContents: sealedInputBundle.planningRepo.stageFileContents }) });
+        commitRepoWithTaskScopedIndexLease({ repoRoot, taskId: input.taskId, leaseId: sharedIndexIsolation.indexLease.leaseId, indexLease: sharedIndexIsolation.indexLease, commit: () => commitRepoWithTemporaryIndex({ repoRoot, stageFiles: sharedStageFiles, args: ['commit', '-m', sharedMessage], actorId: input.actorId, taskId: input.taskId, laneSessionId, stageFileContents: sharedRepo.stageFileContents, preserveModeFiles: sharedRepo.preserveModeFiles }) });
         const commitSha = tryGitScalar(repoRoot, ['rev-parse', '--verify', 'HEAD']);
         return { ...sealedInputBundle, targetRepo: { ...sealedInputBundle.targetRepo, commitSha,
                 status: 'committed', indexIsolation: sharedIndexIsolation }, planningRepo: { ...sealedInputBundle.planningRepo, commitSha, status: 'committed', indexIsolation: sharedIndexIsolation }, failClosed: false, recoveryCommand: null };

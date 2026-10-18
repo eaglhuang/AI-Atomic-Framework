@@ -1,10 +1,12 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { CliError } from '../shared.ts';
+import { validateHostCloseProjections, type HostCloseProjection } from './host-close-projection.ts';
 
 export type TaskflowOpenerMode = 'delegated-governed' | 'template-only-fallback';
 
 export interface TaskflowProfileV1 {
+  hostCloseProjections?: HostCloseProjection[];
   schemaId: 'taskflow.profile.v1';
   id: string;
   name: string;
@@ -372,6 +374,7 @@ export function loadProfile(profilePath: string): TaskflowProfileV1 {
 /** Validate an already-read snapshot without reopening its source path. */
 export function validateProfile(value: unknown): TaskflowProfileV1 {
   const raw = value as TaskflowProfileV1 | null;
+  if (raw?.hostCloseProjections !== undefined) validateHostCloseProjections(raw.hostCloseProjections);
 
   if (!raw || typeof raw !== 'object') {
     throw new CliError(

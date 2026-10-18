@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import path from 'node:path';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { buildDelegationContract, loadProfile } from '../profile-loader.ts';
+import { buildDelegationContract, loadProfile, validateProfile } from '../profile-loader.ts';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, '../../../../../../');
@@ -86,4 +86,7 @@ assert.throws(() => {
   return err.code === 'ATM_TASKFLOW_PROFILE_NOT_FOUND';
 });
 
+assert.throws(() => validateProfile({ ...valid, hostCloseProjections: [] }), /nonempty array/);
+assert.throws(() => validateProfile({ ...valid, hostCloseProjections: [{ kind: 'shell', file: 'host.md' }] }), /unsupported kind/);
+assert.equal(validateProfile({ ...valid }).hostCloseProjections, undefined);
 console.log('[taskflow-profile-loader:test] ok');

@@ -1,0 +1,85 @@
+import { existsSync, readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { resolveShippedSchemaPath } from '../../schema-location.js';
+export const repoRoot = resolveFrameworkRoot();
+export const defaultRegistrySchemaPath = resolveShippedSchemaPath(import.meta.url, 'registry.schema.json', repoRoot);
+function resolveFrameworkRoot(moduleUrl = import.meta.url) {
+    let cursor = path.dirname(fileURLToPath(moduleUrl));
+    let bundledCliRoot = null;
+    while (true) {
+        const packagePath = path.join(cursor, 'package.json');
+        if (existsSync(packagePath)) {
+            try {
+                const manifest = JSON.parse(readFileSync(packagePath, 'utf8'));
+                if (manifest.name === 'ai-atomic-framework')
+                    return cursor;
+                if (manifest.name === '@ai-atomic-framework/cli')
+                    bundledCliRoot ??= cursor;
+            }
+            catch {
+                // Keep walking; malformed manifests cannot define the framework root.
+            }
+        }
+        const parent = path.dirname(cursor);
+        if (parent === cursor)
+            return bundledCliRoot ?? path.resolve(path.dirname(fileURLToPath(moduleUrl)), '../../../../../');
+        cursor = parent;
+    }
+}
+export function normalizeProjectPath(repositoryRoot, value) {
+    if (!value) {
+        return value;
+    }
+    return toProjectPath(repositoryRoot, resolveProjectPath(repositoryRoot, value));
+}
+export function normalizeSchemaPath(repositoryRoot, value) {
+    if (!value) {
+        return value;
+    }
+    const resolvedPath = resolveProjectPath(repositoryRoot, value);
+    const repositoryRelative = toProjectPath(repositoryRoot, resolvedPath);
+    if (repositoryRelative.startsWith('schemas/')) {
+        return repositoryRelative;
+    }
+    const frameworkRelative = path.relative(repoRoot, resolvedPath).replace(/\\/g, '/');
+    if (frameworkRelative && !frameworkRelative.startsWith('..') && frameworkRelative.startsWith('schemas/')) {
+        return frameworkRelative;
+    }
+    // A frozen CLI bundle resolves its schema relative to the bundled package.
+    // Preserve the portable repository contract when the same schema exists in
+    // the adopter/framework repository, without leaking the bundle's temp path.
+    const schemaMarker = `${path.sep}schemas${path.sep}`;
+    const markerIndex = resolvedPath.lastIndexOf(schemaMarker);
+    if (markerIndex >= 0) {
+        const suffix = resolvedPath.slice(markerIndex + 1).replace(/\\/g, '/');
+        const repositorySchemaPath = path.resolve(repositoryRoot, suffix);
+        // A schema shipped inside the framework distribution (for example the CLI
+        // bundle's own schemas/ copy) has the same portable identity even when the
+        // adopter repository has no copy of it.
+        const frameworkRelativePath = path.relative(repoRoot, resolvedPath);
+        const shippedByFramework = !frameworkRelativePath.startsWith('..') && !path.isAbsolute(frameworkRelativePath);
+        if (shippedByFramework || existsSync(repositorySchemaPath)) {
+            return suffix;
+        }
+    }
+    return toPortablePath(resolvedPath);
+}
+export function resolveProjectPath(repositoryRoot, value) {
+    return path.isAbsolute(value)
+        ? path.normalize(value)
+        : path.resolve(repositoryRoot, value);
+}
+export function toProjectPath(repositoryRoot, filePath) {
+    const relative = path.relative(repositoryRoot, filePath).replace(/\\/g, '/');
+    if (!relative || relative.startsWith('..')) {
+        return toPortablePath(filePath);
+    }
+    return relative;
+}
+export function normalizeStringArray(values) {
+    return Array.from(new Set(values.filter(Boolean)));
+}
+export function toPortablePath(value) {
+    return value.replace(/\\/g, '/');
+}
