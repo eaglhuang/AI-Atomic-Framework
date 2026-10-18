@@ -13,6 +13,7 @@ VENV="$BASE/venv"
 mkdir -p "$VENV/bin"
 printf '#!/bin/sh\nexit 0\n' > "$VENV/bin/python"
 chmod a+rx "$VENV/bin/python"
+ln -s python "$VENV/bin/python3"
 export PREREG_PYTHON="$VENV/bin/python"
 export PREREG_SMOKE_CODEX=1
 export PREREG_REAL_GIT=/usr/bin/git
@@ -24,6 +25,13 @@ printf 'old\n' > "$REPO/note.txt"
 git -C "$REPO" add note.txt
 git -C "$REPO" -c user.name=prereg-smoke -c user.email=prereg-smoke@localhost commit -q -m base
 
+# The operator's Codex directory must not become a session PATH prefix.
+mkdir -p "$BASE/operator"
+for tool in git python3 codex; do
+  printf '#!/bin/sh\nexit 97\n' > "$BASE/operator/$tool"
+  chmod +x "$BASE/operator/$tool"
+done
+export PATH="$BASE/operator:$PATH"
 for arm in A B; do
   session="$BASE/session-$arm"
   bin="$BASE/bin-$arm"
@@ -31,6 +39,15 @@ for arm in A B; do
   export PREREG_ARM="$arm"
   export PREREG_ARM_BIN="$bin"
   assert_session_login_path "$session" "$REPO"
+  probe_path="$(session_path_value)"
+  unset PREREG_SMOKE_CODEX
+  PREREG_SESSION_CODEX_HOME="$BASE/empty-codex-home" session_env_assignments "$session" "$REPO" > "$session/launch-env.txt"
+  export PREREG_SMOKE_CODEX=1
+  expected="$bin:$HERE/bin:$VENV/bin:$(dirname "$(command -v node)"):/usr/bin:/bin"
+  [ "$probe_path" = "$expected" ]
+  grep -Fx "PATH=$expected" "$session/launch-env.txt"
+  actual="$(bash -c '. "$1"; printf "%s" "$PATH"' _ "$session/home/.prereg-path.sh")"
+  [ "$actual" = "$expected" ]
 done
 
 run_login() {
@@ -45,6 +62,8 @@ run_login() {
   "${env_cmd[@]}" bash -lc "cd $(printf '%q' "$REPO") && $*"
 }
 
+PATH="${PATH#"$BASE/operator:"}"
+export PATH
 export PREREG_ARM=A
 export PREREG_ARM_BIN="$BASE/bin-A"
 printf 'new\n' > "$REPO/note.txt"

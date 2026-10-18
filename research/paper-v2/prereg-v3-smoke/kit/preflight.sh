@@ -3,6 +3,22 @@
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 
+# Fail before any checks that could prepare a model session.
+if [ "${PREFLIGHT_REAL_MODEL:-}" = "1" ]; then
+  source "$HERE/lib/common.sh"
+  init_preflight_evidence
+  exec {PREFLIGHT_STDOUT}>&1
+  exec >> "$PREREG_PREFLIGHT_RUN_DIR/preflight.log" 2>&1
+  flush_preflight_log() {
+    local status=$?
+    cat "$PREREG_PREFLIGHT_RUN_DIR/preflight.log" >&"$PREFLIGHT_STDOUT"
+    exec {PREFLIGHT_STDOUT}>&-
+    return "$status"
+  }
+  trap flush_preflight_log EXIT
+  require_probe_python
+fi
+
 check() {
   local name="$1"
   shift
@@ -148,7 +164,7 @@ static_launchers() {
   grep -q '0.163.0' "$HERE/RUNBOOK.md"
   grep -q 'writable_roots' "$HERE/lib/common.sh"
   grep -q 'evaluator_python_bin' "$HERE/lib/common.sh"
-  grep -q 'git commit did not move HEAD' "$HERE/test/test-real-model.sh"
+  grep -q 'a-no-commit' "$HERE/test/test-real-model.sh"
   grep -q 'or "none"' "$HERE/bin/evaluate.py"
   grep -q 'BASH_ENV' "$HERE/lib/common.sh"
   grep -q 'git-forward' "$HERE/lib/common.sh"
@@ -203,6 +219,10 @@ check capture-intended bash "$HERE/test/test-capture-intended.sh"
 check seal-one-row bash "$HERE/test/test-seal-one-row.sh"
 check steward-ready bash "$HERE/test/test-steward-ready.sh"
 check probe-session-write bash "$HERE/test/test-probe-session-write.sh"
+check probe-retry bash "$HERE/test/test-probe-retry.sh"
+check metrics-evidence python3 "$HERE/test/test_metrics_evidence.py"
+check session-slot bash "$HERE/test/test-session-slot.sh"
+check preflight-archive bash "$HERE/test/test-preflight-archive.sh"
 check real-model bash "$HERE/test/test-real-model.sh"
 check real-model-skip bash "$HERE/test/test-real-model-skip.sh"
 echo "preflight ok"

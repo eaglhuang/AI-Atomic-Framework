@@ -42,6 +42,14 @@ if (!fileArg || !patchArg) {
   fail('usage', 'usage: atm-write <file> <patch> [--base-file path] [--actor id] [--task id] [--message text]');
 }
 
+const sessionSlot = argValue('--session-slot') || process.env.PREREG_SESSION_SLOT || null;
+if (sessionSlot !== null && !/^[A-Za-z0-9_-]+$/.test(sessionSlot)) {
+  fail('session-slot', 'Invalid session slot');
+}
+function sessionActor(actor) {
+  return sessionSlot === null ? actor : `${actor}-slot-${sessionSlot}`;
+}
+
 if (process.env.PREREG_STEWARD_SOCK) {
   await runStewardClient();
 }
@@ -52,6 +60,7 @@ async function runStewardClient() {
   const payload = {
     file: fileArg,
     patch,
+    sessionSlot,
     actor: argValue('--actor') || process.env.ATM_ACTOR || 'prereg-session',
     task: argValue('--task') || process.env.ATM_TASK || 'prereg',
     message: argValue('--message') || 'prereg-v3-smoke',
@@ -188,7 +197,7 @@ const relativeCheck = path.relative(writableRoot, targetPath);
 if (relativeCheck.startsWith('..') || path.isAbsolute(relativeCheck)) {
   fail('path', '目標檔超出工作樹', { file: relativeFile });
 }
-const actorId = argValue('--actor') || process.env.ATM_ACTOR || 'prereg-session';
+const actorId = sessionActor(argValue('--actor') || process.env.ATM_ACTOR || 'prereg-session');
 const taskId = argValue('--task') || process.env.ATM_TASK || `prereg-${actorId}`;
 const message = argValue('--message') || `prereg-v3-smoke: ${taskId} ${relativeFile}`;
 const baseFile = argValue('--base-file');
@@ -419,6 +428,7 @@ function submitLive(input) {
     proposalId,
     taskId: input.taskId,
     actorId: input.actorId,
+    sessionSlot,
     file: input.relativeFile,
     declaredBaseHash: fileBeforeHash,
     currentFileText: typeof live?.currentFileText === 'string' ? live.currentFileText : currentFileText(input),

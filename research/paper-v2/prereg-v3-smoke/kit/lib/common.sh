@@ -22,6 +22,17 @@ else
   STATE_ROOT=""
 fi
 
+# Preflight precedes setup; use a dedicated root shared with seal.sh. Each
+# invocation owns a fresh directory, so failed attempts cannot be overwritten.
+init_preflight_evidence() {
+  if [ -n "${PREREG_PREFLIGHT_RUN_DIR:-}" ]; then return 0; fi
+  local root="${PREREG_PREFLIGHT_LOG_ROOT:-$KIT_ROOT/state/preflight}"
+  mkdir -p "$root"
+  PREREG_PREFLIGHT_RUN_DIR="$(mktemp -d "$root/run-$(date -u +%Y%m%dT%H%M%S)-XXXXXX")"
+  export PREREG_PREFLIGHT_RUN_DIR
+  printf '%s\n' '{"schema":"prereg.preflightRetryPolicy.v1","maxAttemptsPerArm":2,"retryOnly":"missing-begin-marker","neverRetry":["path-resolution","a-no-commit","b-no-accepted-write","quota","model-exit","malformed-patch","steward-cleanup-failed"]}' > "$PREREG_PREFLIGHT_RUN_DIR/retry-policy.json"
+}
+
 iso_now() { date -Ins; }
 
 die() { echo "prereg-v3-smoke: $*" >&2; exit 1; }
@@ -803,6 +814,14 @@ evaluator_python_bin() {
   return 1
 }
 
+# Preflight runs before setup, so its Python must be supplied explicitly.
+require_probe_python() {
+  local bin
+  bin="$(evaluator_python_bin)" || die 'PREFLIGHT_REAL_MODEL=1 requires PREREG_PYTHON=/absolute/path/to/CPython-3.8-3.10-venv/bin/python before preflight (setup has not run).'
+  [ -x "$bin/python" ] && [ -x "$bin/python3" ] || die 'PREREG_PYTHON must name a venv with executable bin/python and bin/python3.'
+  "$PREREG_PYTHON" -c 'import sys; sys.exit(0 if sys.implementation.name == "cpython" and (3, 8) <= sys.version_info[:2] <= (3, 10) else 1)' >/dev/null 2>&1 || die 'PREREG_PYTHON must use CPython 3.8–3.10; set it before preflight.'
+}
+
 # session 要能執行評估 venv，但不能寫它。只補其他人的讀與執行。
 expose_evaluator_python() {
   local py="${PREREG_PYTHON:-}" bin root
@@ -830,14 +849,6 @@ session_path_value() {
   path_value="${KIT_ROOT}/bin:${path_value}"
   if [ -n "${PREREG_ARM_BIN:-}" ]; then
     path_value="${PREREG_ARM_BIN}:${path_value}"
-  fi
-  if [ -z "${PREREG_SMOKE_CODEX:-}" ] && command -v codex >/dev/null 2>&1; then
-    local codex_bin
-    codex_bin="$(dirname "$(command -v codex)")"
-    case "$codex_bin" in
-      *"/gold"*) ;;
-      *) path_value="${codex_bin}:${path_value}" ;;
-    esac
   fi
   printf '%s\n' "$path_value"
 }
@@ -943,18 +954,20 @@ assert_session_login_path() {
     [ -n "$line" ] || continue
     env_cmd+=("$line")
   done < "$env_file"
-  report="$("${env_cmd[@]}" bash -lc 'printf "python=%s\natm=%s\ngit=%s\n" "$(command -v python || true)" "$(command -v atm-write || true)" "$(command -v git || true)"')"
+  report="$("${env_cmd[@]}" bash -lc 'printf "python=%s\npython3=%s\natm=%s\ngit=%s\n" "$(command -v python || true)" "$(command -v python3 || true)" "$(command -v atm-write || true)" "$(command -v git || true)"')"
   check_login_report "$report" "bash -lc" "$py_bin" "$atm_real" "$git_real"
-  report="$(HOME="$session_dir/home" bash -c 'PATH=/usr/bin:/bin; . "$HOME/.bash_profile"; printf "python=%s\natm=%s\ngit=%s\n" "$(command -v python || true)" "$(command -v atm-write || true)" "$(command -v git || true)"')"
+  report="$(HOME="$session_dir/home" bash -c 'PATH=/usr/bin:/bin; . "$HOME/.bash_profile"; printf "python=%s\npython3=%s\natm=%s\ngit=%s\n" "$(command -v python || true)" "$(command -v python3 || true)" "$(command -v atm-write || true)" "$(command -v git || true)"')"
   check_login_report "$report" "profile after PATH reset" "$py_bin" "$atm_real" "$git_real"
-  report="$(env -i PATH=/usr/bin:/bin HOME="$session_dir/home" BASH_ENV="$session_dir/home/.prereg-path.sh" bash -c 'printf "python=%s\natm=%s\ngit=%s\n" "$(command -v python || true)" "$(command -v atm-write || true)" "$(command -v git || true)"')"
+  report="$(env -i PATH=/usr/bin:/bin HOME="$session_dir/home" BASH_ENV="$session_dir/home/.prereg-path.sh" bash -c 'printf "python=%s\npython3=%s\natm=%s\ngit=%s\n" "$(command -v python || true)" "$(command -v python3 || true)" "$(command -v atm-write || true)" "$(command -v git || true)"')"
   check_login_report "$report" "BASH_ENV" "$py_bin" "$atm_real" "$git_real"
 }
 
 check_login_report() {
   local report="$1" label="$2" py_bin="$3" atm_real="$4" git_real="$5"
-  local py atm git
+  local py py3 atm git
   py="$(printf '%s\n' "$report" | sed -n 's/^python=//p')"
+  py3="$(printf '%s\n' "$report" | sed -n 's/^python3=//p')"
+  [ "$py3" = "$py_bin/python3" ] || die "${label}: command -v python3 => ${py3:-missing}，預期 ${py_bin}/python3"
   atm="$(printf '%s\n' "$report" | sed -n 's/^atm=//p')"
   git="$(printf '%s\n' "$report" | sed -n 's/^git=//p')"
   case "$py" in
@@ -1069,21 +1082,23 @@ launch_codex() {
     ) || status=$?
   else
     command -v codex >/dev/null 2>&1 || die "codex 不在 PATH。請安裝 Codex CLI 0.159.2 或 0.163.0 並登入，或設定 PREREG_SMOKE_CODEX 使用 stub。"
-    local help
-    help="$(codex exec --help 2>&1 || true)"
+    local help codex_executable
+    codex_executable="$(command -v codex)"
+    case "$codex_executable" in /*) ;; *) die "codex must resolve to an absolute executable path" ;; esac
+    help="$("$codex_executable" exec --help 2>&1 || true)"
     local -a args=()
     pinned_codex_exec_args args "$help" "$work"
     printf '%s\n' "$help" > "$session_dir/codex-exec-help.txt"
     if [ "${PREREG_ARM:-}" = "B" ] && sandbox_boundary_active; then
       local -a full=()
-      boundary_launch_args full "${env_cmd[@]}" codex "${args[@]}" -
+      boundary_launch_args full "${env_cmd[@]}" "$codex_executable" "${args[@]}" -
       printf '%q\n' "${full[@]}" > "$session_dir/codex-argv.txt"
     else
-      printf '%q\n' "${env_cmd[@]}" codex "${args[@]}" - > "$session_dir/codex-argv.txt"
+      printf '%q\n' "${env_cmd[@]}" "$codex_executable" "${args[@]}" - > "$session_dir/codex-argv.txt"
     fi
     (
       cd "$work"
-      run_as_session "${env_cmd[@]}" codex "${args[@]}" - <"$prompt_file" >"$stdout" 2>"$stderr"
+      run_as_session "${env_cmd[@]}" "$codex_executable" "${args[@]}" - <"$prompt_file" >"$stdout" 2>"$stderr"
     ) || status=$?
   fi
   local end

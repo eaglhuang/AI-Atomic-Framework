@@ -93,6 +93,26 @@ for arm in a b; do
   fi
 done
 
+# Preflight can run before setup. Copy only explicit evidence names from the
+# same configured root; never copy homes, sockets or arbitrary session files.
+preflight_root="${PREREG_PREFLIGHT_LOG_ROOT:-$KIT_ROOT/state/preflight}"
+if [ -d "$preflight_root" ]; then
+  for preflight_run in "$preflight_root"/run-*; do
+    [ -d "$preflight_run" ] || continue
+    preflight_dest="$DEST/logs/preflight/$(basename "$preflight_run")"
+    for name in retry-policy.json preflight.log; do
+      copy_file "$preflight_run/$name" "$preflight_dest/$name"
+    done
+    for arm in A B; do
+      for attempt in 1 2; do
+        for name in prompt.txt stdout.jsonl stderr.txt intended.patch probe-result.json started-at ended-at exit-code launch-env.txt codex-argv.txt QUOTA_STOP WAIT_FAILED attempt.log; do
+          copy_file "$preflight_run/arm-$arm/attempt-$attempt/$name" "$preflight_dest/arm-$arm/attempt-$attempt/$name"
+        done
+      done
+    done
+  done
+fi
+
 reject_seal_secrets() {
   python3 - "$DEST" <<'PY'
 import re, sys

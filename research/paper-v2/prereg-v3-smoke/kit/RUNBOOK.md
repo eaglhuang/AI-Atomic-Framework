@@ -4,6 +4,38 @@
 
 ## 先決條件
 
+### Python, session PATH, and bounded probe attempts (#345)
+
+Preflight runs **before setup**. With `PREFLIGHT_REAL_MODEL=1`, explicitly set
+`PREREG_PYTHON=/absolute/path/to/a/CPython-3.8-3.10-venv/bin/python` before
+running preflight. The venv must have executable `bin/python` and `bin/python3`.
+An unset, relative, non-executable or incompatible interpreter fails at the
+start of preflight, before Codex login checks or model calls. Preflight does
+not create or download Python. Offline preflight does not require this setting.
+
+Setup independently uses `pick_python`: an executable `PREREG_PYTHON`, then
+`python3.10`, `python3.9`, `python3.8`, then the existing `uv` installation path.
+It creates the evaluation venv in the new run state and saves that venv's Python
+in `env.sh`. A preflight setting does not replace setup's evaluation venv.
+
+Both probe and formal sessions use this exact PATH order:
+`PREREG_ARM_BIN:kit/bin:evaluation-venv/bin:node-bin:/usr/bin:/bin`.
+The Codex executable is resolved to an absolute path outside the session;
+its directory and the operator's PATH prefixes are not inserted into session
+PATH. `.prereg-path.sh` and `launch-env.txt` use the same path builder.
+The login-shell check verifies `git`, `python`, `python3`, and `atm-write`.
+
+Each arm's probe permits at most **two total attempts**. Only a missing
+`BEGIN_INTENDED_PATCH`, after successful model exit and verified arm-specific
+write/commit evidence, permits the second attempt. Each attempt starts with a
+fresh repository and session. `probe-result` lines in preflight stdout record
+arm, attempt, reason, file changes, HEAD advancement and steward acceptance;
+retain the complete stdout/stderr in the preflight log. PATH resolution failure,
+Arm A without a valid commit, Arm B without an accepted committed steward write,
+quota exhaustion, nonzero model exit and malformed patches never retry. Missing
+the marker twice fails; there is no third attempt and no paid fallback.
+
+
 - 這個儲存庫的工作目錄。Arm B 寫入只走公開 npm CLI `@ai-atomic-framework/cli@0.1.21` 的 `broker steward apply-live`。套件裝在 git workspace 外面，Linux 預設是 `/var/cache/prereg-v3-atm-cli-0.1.21`（steward 使用者讀得到；不要裝進家目錄，家目錄通常不可穿越）。不會使用倉庫裡版本較舊的 frozen runner。沒有這支 CLI 就中止 Arm B，沒有 claim 退路，也不改走 TypeScript 直接載入。preflight 先找已經裝好、版本正好是 0.1.21 的 CLI（環境變數、安裝前綴、全域 npm，或本機 cache 的 `npm install --prefer-offline`）。連不上 registry（例如 `getaddrinfo EAI_AGAIN`）會退避重試；仍然失敗就報網路錯誤並中止，不會改用其他版本。本機 npm cache 如果還留著舊索引，安裝 0.1.21 可能出現 `ETARGET`。這時執行 `npm cache clean`，或刪掉 npm 的 cache 目錄，再重跑 preflight。不要改用其他版本。預先算好的 `broker steward apply --merge-plan-file` 仍留在 CLI，這條即時路徑不使用它。
 - Linux，而且 `sudo -n true` 成功：套件會自行建立系統使用者 `prereg-steward`（擁有工作樹與 steward 行程）與 `prereg-session`（跑模型，不在 `sudo` 群組，shell 是 `nologin`）。不需要手動 `useradd`。工作樹若放在其他人不能進入的家目錄下（GitHub Actions 的 `/home/runner` 常是 `750`），套件會對沿途目錄補上其他人的進入權（`chmod o+x`），不開放寫入，否則這兩個使用者連路徑都走不進去。
 - Linux，而且沒有 `sudo`（`sudo -n true` 結束碼 127，或任何免密碼 sudo 失敗）：Arm B 自動改用下面的無 sudo 沙盒。preflight 會用同一個機制跑一個真實的沙盒行程，確認對儲存庫的直接寫入、`chmod`、`mv`、`rm` 都失敗，而 steward 寫入成功。Codex sandbox 與 bubblewrap 都起不來時，preflight 直接中止。不退回 `chmod a-w`，也不退回沒有強制的模式。工作樹不能放在 `/tmp`（Codex `:workspace` 把 `/tmp` 當可寫根），也不能放在 scratch 裡面。
@@ -76,3 +108,37 @@ Codex 0.163.0 的命令是 `bash -lc`。login shell 會先讀 `/etc/profile`，�
 - 各臂遺失寫入數、衝突或 index.lock 數、steward 拒絕數、FAIL_TO_PASS / PASS_TO_PASS 通過數。
 - 模型名稱、`CODEX_REASONING_EFFORT`（未設定就寫未設定）、Codex 版本、是否觸發免費額度停止。
 - 任何反例（包含 Arm B 仍遺失寫入）照實寫，不要寫成勝出。
+
+
+### Evidence completeness and preflight archives
+
+Token fields are measurements: absent `total_tokens` stays JSON `null`, even when
+input and output counts exist. Explicit zero remains zero. Cached input and
+reasoning output counts are retained when reported. Aggregates with a missing
+contribution remain `null`; the kit does not estimate totals.
+
+Steward rejection is reported separately in `steward.rejected` and
+`steward.reasonCodes`. A `patch-context-mismatch` against the same base hash is
+not a conflict. `conflictCount` counts evidenced overlapping-write contention
+and failed Git index-lock commands; absent observations remain `null`. A changed
+hash alone does not establish a concurrent conflict.
+
+Each session supplies `PREREG_SESSION_SLOT`. The writer includes the slot in its
+actor/proposal identity and `sessionSlot` record, including socket requests.
+Probe slots include arm and attempt. An absent slot on a standalone legacy
+invocation remains explicitly unrecorded, rather than borrowing a daemon slot.
+
+For a new run, set `PREREG_PREFLIGHT_LOG_ROOT` to a dedicated directory and keep
+that setting for preflight and seal. The default is `kit/state/preflight`; all
+retained `run-*` directories in that root are included, so a dedicated root
+keeps unrelated preflights separate. Preflight creates a fresh directory with
+`retry-policy.json`, its log, and per-arm/per-attempt evidence. Temporary probe
+worktrees can be cleaned after those allowlisted logs are retained. Seal copies
+only explicit evidence names, applies the existing credential rejection, and hashes
+the archived files. Homes, login files and sockets are excluded. Old archives,
+including v9, are never updated by this workflow.
+
+Offline checks: `test_metrics_evidence.py`, `test-session-slot.sh`, and
+`test-preflight-archive.sh`. The archive test retains diagnostics on failure;
+`KEEP_TMP=1 bash -x test/test-preflight-archive.sh` also retains successful runs.
+No real model or formal A/B run is needed for these checks.
