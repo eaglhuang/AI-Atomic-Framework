@@ -10,6 +10,9 @@ import path from 'node:path';
 // explicitly; otherwise `atomize inventory|backfill` cannot start in adopter
 // repositories (ERR_MODULE_NOT_FOUND on scripts/src/atomize-*.js).
 export const onefilePayloadAtomizeHelperFiles = new Set([
+  // Backfill uses the canonical core CID implementation. Its only imports are
+  // Node builtins, so this is the complete additional workspace closure.
+  'packages/core/src/registry/atom-capsule.ts',
   'docs/ATOMIZATION_COVERAGE_TAXONOMY.md',
   'scripts/src/atomization-register-receipt.js',
   'scripts/src/atomize-backfill.js',
