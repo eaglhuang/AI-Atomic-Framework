@@ -40,6 +40,10 @@ export const adopterRuntimeIgnorePatterns = [
     // ATM classifies task-import reports as transient (auto-clean-safe);
     // the framework repository ignores .atm/history/reports/ as well.
     '.atm/history/reports/task-import/',
+    // Guidance sessions and the welcome lineage are rewritten during ordinary
+    // next/close/welcome and must not leave a fresh adopter worktree dirty.
+    '.atm/history/guidance/',
+    '.atm/runtime/welcome.lineage.json',
     '.atm-temp/',
     // create-atm installs the ATM CLI into the project; an unignored
     // node_modules turns the first `git add -A` into a dependency commit
@@ -51,9 +55,15 @@ export function ensureAdopterGitignore(cwd) {
         return { status: 'framework-repository' };
     const gitignorePath = path.join(cwd, '.gitignore');
     const current = existsSync(gitignorePath) ? readFileSync(gitignorePath, 'utf8') : '';
-    if (current.includes(startMarker))
-        return { status: 'existing', path: '.gitignore' };
     const eol = current.includes('\r\n') ? '\r\n' : '\n';
+    if (current.includes(startMarker) && current.includes(endMarker)) {
+        const lines = new Set(current.split(/\r?\n/));
+        const missing = adopterRuntimeIgnorePatterns.filter((pattern) => !lines.has(pattern));
+        if (missing.length === 0)
+            return { status: 'existing', path: '.gitignore' };
+        writeFileSync(gitignorePath, current.replace(endMarker, `${missing.join(eol)}${eol}${endMarker}`), 'utf8');
+        return { status: 'updated', path: '.gitignore' };
+    }
     const block = [startMarker, ...adopterRuntimeIgnorePatterns, endMarker].join(eol);
     const separator = current.length === 0 ? '' : current.endsWith('\n') ? eol : eol + eol;
     writeFileSync(gitignorePath, `${current}${separator}${block}${eol}`, 'utf8');

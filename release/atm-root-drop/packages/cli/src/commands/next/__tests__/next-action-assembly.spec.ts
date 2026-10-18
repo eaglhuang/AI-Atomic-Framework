@@ -49,7 +49,16 @@ assert.equal(
     queuePrompt: '請完成 "RFT" queue',
     planningCardImportCommand: null
   }),
-  'node atm.mjs next --claim --actor <id> --prompt "請完成 \\"RFT\\" queue" --auto-intent --json'
+  'node atm.mjs next --claim --actor ATM_ACTOR_ID --prompt "請完成 \\"RFT\\" queue" --auto-intent --json'
+);
+assert.equal(
+  buildPromptScopedQueueClaimCommand({
+    queueHeadTaskPresent: true,
+    queuePrompt: '請完成 "RFT" queue',
+    planningCardImportCommand: null,
+    actorId: 'ai-a'
+  }),
+  'node atm.mjs next --claim --actor ai-a --prompt "請完成 \\"RFT\\" queue" --auto-intent --json'
 );
 assert.equal(
   buildPromptScopedQueueClaimCommand({
@@ -64,7 +73,7 @@ assert.equal(
     queueHeadTaskPresent: false,
     queuePrompt: 'ignored'
   }),
-  'node atm.mjs next --prompt "<current user prompt>" --json'
+  'node atm.mjs next --prompt "ATM_USER_PROMPT" --json'
 );
 
 const emptyHint = {

@@ -7,7 +7,8 @@ import { buildPromptScopedQueueClaimCommand } from './prompt-scope-resolution.js
 import { buildTeamKnowledgeSummary } from '../team-knowledge.js';
 import { buildAgentPackHint, buildChannelPlaybook, buildGovernanceReadinessHint, buildNextMessages, buildTaskDeliveryPrinciple, embedTeamRecommendation } from './playbook-projection.js';
 import { findActiveBatchRunForIntent, findActiveTaskQueueForIntent } from './route-resolution.js';
-import { quoteCliValue } from './view-projections.js';
+import { resolvePasteActor } from './paste-actor.js';
+import { quoteCliToken, quoteCliValue } from './view-projections.js';
 import { diagnoseClaimReadinessForTasks } from './claim-readiness.js';
 import { normalizeTaskRouteStatus } from './intent-normalizers.js';
 export function createNextProfiler(header = 'ATM_NEXT_PROFILE') {
@@ -60,6 +61,8 @@ export function isReadOnlyPromptScopeMiss(taskIntent) {
 }
 export function buildPromptScopeQueueResult(input) {
     const requestedQueuePrompt = input.taskIntent?.userPrompt ?? input.queueHeadTask?.workItemId ?? 'prompt-scoped task queue';
+    const pasteActor = resolvePasteActor(input.actor, input.cwd);
+    const actorSlot = pasteActor ? quoteCliToken(pasteActor) : '<id>';
     const activeQueue = findActiveTaskQueueForIntent(input.cwd, input.taskIntent, {
         sourcePromptFallback: requestedQueuePrompt,
         taskId: input.queueHeadTask?.workItemId ?? null
@@ -78,18 +81,19 @@ export function buildPromptScopeQueueResult(input) {
     if (!consistency.ok) {
         const nextAction = {
             status: 'batch-state-repair-required',
-            command: activeBatch ? `node atm.mjs batch repair --actor <id> --batch ${activeBatch.batchId} --json` : 'node atm.mjs batch repair --actor <id> --json',
+            command: activeBatch ? `node atm.mjs batch repair --actor ${actorSlot} --batch ${activeBatch.batchId} --json` : `node atm.mjs batch repair --actor ${actorSlot} --json`,
             reason: 'active batch runtime is inconsistent; repair it before claiming, editing, closing, or committing',
             recommendedChannel: 'batch',
             riskLevel: 'high',
-            requiredCommand: activeBatch ? `node atm.mjs batch repair --actor <id> --batch ${activeBatch.batchId} --json` : 'node atm.mjs batch repair --actor <id> --json',
+            requiredCommand: activeBatch ? `node atm.mjs batch repair --actor ${actorSlot} --batch ${activeBatch.batchId} --json` : `node atm.mjs batch repair --actor ${actorSlot} --json`,
             playbook: buildChannelPlaybook({
                 channel: 'batch',
                 taskId: input.queueHeadTask?.workItemId ?? null,
                 queueHeadTaskId: input.queueHeadTask?.workItemId ?? null,
                 originalPrompt: queuePrompt,
                 batchId: activeBatch?.batchId ?? null,
-                batchState: 'repair-required'
+                batchState: 'repair-required',
+                actorPlaceholder: pasteActor ?? undefined
             }),
             blockedCommands: blockedMutationCommands()
         };
@@ -137,7 +141,7 @@ export function buildPromptScopeQueueResult(input) {
         && queueHeadTaskId === input.queueHeadTask.workItemId
         && normalizeTaskRouteStatus(input.queueHeadTask.status ?? '') === 'running';
     const claimReadiness = input.queueHeadTask && !queueHeadImport && !queueHeadInFlight
-        ? diagnoseClaimReadinessForTasks(input.cwd, [input.queueHeadTask], 'write')
+        ? diagnoseClaimReadinessForTasks(input.cwd, [input.queueHeadTask], 'write', { actorId: input.actor })
         : null;
     if (claimReadiness?.primaryBlocker) {
         const blocker = claimReadiness.primaryBlocker;
@@ -163,7 +167,8 @@ export function buildPromptScopeQueueResult(input) {
                 queueHeadTaskId,
                 originalPrompt: queuePrompt,
                 batchId: activeBatch?.batchId ?? null,
-                batchState: 'repair-required'
+                batchState: 'repair-required',
+                actorPlaceholder: pasteActor ?? undefined
             }),
             governanceReadiness: buildGovernanceReadinessHint(input.cwd, {
                 channel: 'batch',
@@ -206,7 +211,8 @@ export function buildPromptScopeQueueResult(input) {
     const queueClaimCommand = buildPromptScopedQueueClaimCommand({
         queueHeadTaskPresent: Boolean(input.queueHeadTask),
         queuePrompt,
-        planningCardImportCommand: queueHeadImport?.requiredCommand ?? null
+        planningCardImportCommand: queueHeadImport?.requiredCommand ?? null,
+        actorId: pasteActor
     });
     const nextAction = embedTeamRecommendation({
         status: 'task-queue-ready',
@@ -223,7 +229,8 @@ export function buildPromptScopeQueueResult(input) {
             queueHeadTaskId,
             originalPrompt: queuePrompt,
             batchId: activeBatch?.batchId ?? null,
-            batchState: activeBatch ? 'queue-head-active' : 'queue-preview'
+            batchState: activeBatch ? 'queue-head-active' : 'queue-preview',
+            actorPlaceholder: pasteActor ?? undefined
         }),
         deliveryPrinciple: buildTaskDeliveryPrinciple({
             channel: 'batch',
@@ -265,7 +272,7 @@ export function buildPromptScopeQueueResult(input) {
             queueHeadTaskId,
             firstTask: input.queueHeadTask ? input.queueHeadTask : null,
             requiredCommand: nextAction.command,
-            batchCheckpointCommand: 'node atm.mjs batch checkpoint --actor <id> --json',
+            batchCheckpointCommand: `node atm.mjs batch checkpoint --actor ${actorSlot} --json`,
             blockedPattern: 'manual tasks claim/close loop',
             planningCardImport: queueHeadImport
         })),

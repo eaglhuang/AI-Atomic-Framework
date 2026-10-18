@@ -14,7 +14,14 @@ export function loadCompatibilityMatrixBundle(root = frameworkRoot) {
         ? path.resolve(overridePath)
         : path.join(root, 'compatibility-matrix.json');
     if (!existsSync(matrixPath)) {
-        const matrix = mergeCompatibilityMatrices(fallbackCompatibilityMatrix, fallbackLegacyCompatibilityMatrix);
+        const merged = mergeCompatibilityMatrices(fallbackCompatibilityMatrix, fallbackLegacyCompatibilityMatrix);
+        const matrix = {
+            ...merged,
+            releaseTrain: {
+                ...merged.releaseTrain,
+                frameworkVersion: readFrameworkVersion(root)
+            }
+        };
         const lastUpdated = matrix.lastUpdated ?? fallbackLegacyCompatibilityMatrix.lastUpdated ?? null;
         return {
             matrix,

@@ -1,0 +1,70 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-10-18T11-21-33-163Z-close-4b902fdf2dc7",
+  "taskId": "TASK-PRF-0130",
+  "action": "close",
+  "actorId": "codex-issue345",
+  "sessionId": "session-20261018013129-codex-issue345-TASK-PRF-0130-47af003167",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0130.json",
+  "taskSha256": "sha256:3688a05037cbcf126586ab5c6525e081a536abe85345655b0a8899c5dc94f370",
+  "createdAt": "2026-10-18T11:21:33.163Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0130 --actor codex-issue345 --status done --historical-delivery 3ef4389991b6a83a68522a5c45c026381df15589",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20261018013129-codex-issue345-TASK-PRF-0130-47af003167",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0130.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "bash research/paper-v2/prereg-v3-smoke/kit/test/test-preflight-archive.sh",
+      "bash research/paper-v2/prereg-v3-smoke/kit/test/test-probe-retry.sh",
+      "bash research/paper-v2/prereg-v3-smoke/kit/test/test-session-login-path.sh",
+      "bash research/paper-v2/prereg-v3-smoke/kit/test/test-session-slot.sh",
+      "python3 research/paper-v2/prereg-v3-smoke/kit/test/test_metrics_evidence.py"
+    ],
+    "requiredGates": [
+      "bash research/paper-v2/prereg-v3-smoke/kit/test/test-preflight-archive.sh",
+      "bash research/paper-v2/prereg-v3-smoke/kit/test/test-probe-retry.sh",
+      "bash research/paper-v2/prereg-v3-smoke/kit/test/test-session-login-path.sh",
+      "bash research/paper-v2/prereg-v3-smoke/kit/test/test-session-slot.sh",
+      "python3 research/paper-v2/prereg-v3-smoke/kit/test/test_metrics_evidence.py"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-10-18T11:21:33.017Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "suspected",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0130.*",
+        ".atm/history/task-events/TASK-PRF-0130/**",
+        ".atm/history/tasks/TASK-PRF-0130.json",
+        "research/paper-v2/prereg-v3-smoke/kit/bin/atm-write.mjs",
+        "research/paper-v2/prereg-v3-smoke/kit/bin/evaluate.py",
+        "research/paper-v2/prereg-v3-smoke/kit/bin/steward-daemon.mjs",
+        "research/paper-v2/prereg-v3-smoke/kit/lib/common.sh",
+        "research/paper-v2/prereg-v3-smoke/kit/preflight.sh",
+        "research/paper-v2/prereg-v3-smoke/kit/RUNBOOK.md",
+        "research/paper-v2/prereg-v3-smoke/kit/seal.sh",
+        "research/paper-v2/prereg-v3-smoke/kit/test/test_metrics_evidence.py",
+        "research/paper-v2/prereg-v3-smoke/kit/test/test-preflight-archive.sh",
+        "research/paper-v2/prereg-v3-smoke/kit/test/test-probe-retry.sh",
+        "research/paper-v2/prereg-v3-smoke/kit/test/test-real-model.sh",
+        "research/paper-v2/prereg-v3-smoke/kit/test/test-session-login-path.sh",
+        "research/paper-v2/prereg-v3-smoke/kit/test/test-session-slot.sh"
+      ],
+      "criticalChangedFiles": [],
+      "requiredGates": [
+        "bash research/paper-v2/prereg-v3-smoke/kit/test/test-preflight-archive.sh",
+        "bash research/paper-v2/prereg-v3-smoke/kit/test/test-probe-retry.sh",
+        "bash research/paper-v2/prereg-v3-smoke/kit/test/test-session-login-path.sh",
+        "bash research/paper-v2/prereg-v3-smoke/kit/test/test-session-slot.sh",
+        "python3 research/paper-v2/prereg-v3-smoke/kit/test/test_metrics_evidence.py"
+      ]
+    }
+  }
+}

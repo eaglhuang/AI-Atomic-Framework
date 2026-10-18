@@ -109,7 +109,7 @@ export async function runPublicCli(argv = process.argv.slice(2), io = { stdout: 
             }
         }));
         recordCommandGateTelemetry(result.cwd || process.cwd(), commandName, commandStartedAt, result, commandArgs);
-        writeResult(result, io.stderr, outputFormat);
+        writeResult(result, outputFormat === 'json' ? io.stdout : io.stderr, outputFormat);
         return result.exitCode;
     }
     if (commandArgs.includes('--help') || commandArgs.includes('-h')) {
@@ -126,7 +126,7 @@ export async function runPublicCli(argv = process.argv.slice(2), io = { stdout: 
                 evidence: { trustIntegrity }
             }));
             recordCommandGateTelemetry(result.cwd || process.cwd(), commandName, commandStartedAt, result, commandArgs);
-            writeResult(result, io.stderr, outputFormat);
+            writeResult(result, outputFormat === 'json' ? io.stdout : io.stderr, outputFormat);
             return result.exitCode;
         }
     }
@@ -146,14 +146,14 @@ export async function runPublicCli(argv = process.argv.slice(2), io = { stdout: 
             evidence: { knownBadStatus }
         }));
         recordCommandGateTelemetry(result.cwd || process.cwd(), commandName, commandStartedAt, result, commandArgs);
-        writeResult(result, io.stderr, outputFormat);
+        writeResult(result, outputFormat === 'json' ? io.stdout : io.stderr, outputFormat);
         return result.exitCode;
     }
     try {
         const rawResult = await runner(commandArgs);
         const result = enrichCommandResult(rawResult);
         recordCommandGateTelemetry(result.cwd || process.cwd(), commandName, commandStartedAt, result, commandArgs);
-        writeResult(result, result.ok ? io.stdout : io.stderr, outputFormat);
+        writeResult(result, outputFormat === 'json' || result.ok ? io.stdout : io.stderr, outputFormat);
         return result.exitCode;
     }
     catch (error) {
@@ -170,7 +170,7 @@ export async function runPublicCli(argv = process.argv.slice(2), io = { stdout: 
             evidence: { publicSurface: 'adopter-core' }
         }), { cliErrorExitCode: cliError.exitCode });
         recordCommandGateTelemetry(result.cwd || process.cwd(), commandName, commandStartedAt, result, commandArgs);
-        writeResult(result, io.stderr, outputFormat);
+        writeResult(result, outputFormat === 'json' ? io.stdout : io.stderr, outputFormat);
         return result.exitCode;
     }
 }
@@ -187,7 +187,7 @@ function writeHelp(commandName, commandArgs, io, outputFormat) {
             messages: [message('error', 'ATM_CLI_UNKNOWN_COMMAND', `Command ${commandName} is not part of the published adopter runtime.`)],
             evidence: { publicSurface: 'adopter-core', availableCommands: [...publicCliCommandNames].sort() }
         }));
-    writeResult(result, result.ok ? io.stdout : io.stderr, outputFormat);
+    writeResult(result, outputFormat === 'json' || result.ok ? io.stdout : io.stderr, outputFormat);
     return result.exitCode;
 }
 function createPublicHelpResult(cwd, argv = []) {

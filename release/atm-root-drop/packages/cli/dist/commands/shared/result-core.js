@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { sealPublishedCommands } from './paste-command.js';
 let outputJsonPath = null;
 let globalSummaryProjection = false;
 let globalFieldsProjection = null;
@@ -302,7 +303,10 @@ export async function resolveValue(value) {
     return await Promise.resolve(value);
 }
 export function makeResult({ ok, command, cwd, mode = 'standalone', messages = [], evidence = {} }) {
-    return { ok, command, mode, cwd, messages, evidence: evidence };
+    const result = { ok, command, mode, cwd, messages, evidence: evidence };
+    if (command === 'next' || command === 'hook' || command === 'integration')
+        sealPublishedCommands(result);
+    return result;
 }
 export function setSummaryProjection(enabled) {
     globalSummaryProjection = enabled;

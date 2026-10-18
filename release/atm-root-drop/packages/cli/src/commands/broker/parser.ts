@@ -42,7 +42,7 @@ export interface ParsedBrokerOptions {
   readonly action: 'register' | 'heartbeat' | 'decision' | 'status' | 'release' | 'acknowledge' | 'cleanup' | 'proposal' | 'compose' | 'steward' | 'runtime' | 'runner-sync' | 'projection' | 'plan-batch' | 'schedule' | 'batch' | 'parallel-admission' | 'replay' | 'heat-status' | 'heat-reset' | 'post-compose-semantic-validation' | null;
   readonly candidateFile: string | null;
   readonly proposalAction: 'create' | 'list' | 'show' | 'validate' | null;
-  readonly stewardAction: 'plan' | 'apply' | null;
+  readonly stewardAction: 'plan' | 'apply' | 'apply-live' | null;
   readonly runtimeAction: 'activate' | null;
   readonly runnerSyncAction: 'enqueue' | 'supersede' | 'status' | 'cleanup' | 'release' | 'reconcile-receipt' | 'takeover-publication' | null;
   readonly projectionAction: 'enqueue' | 'status' | 'cleanup' | null;

@@ -49,3 +49,7 @@ export function dedupeStrings(values) {
 export function quoteCliValue(value) {
     return `"${value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
 }
+/** Leave shell-safe tokens bare so a pasted command does not gain extra quotes. */
+export function quoteCliToken(value) {
+    return /^[A-Za-z0-9_./:@+-]+$/.test(value) ? value : quoteCliValue(value);
+}

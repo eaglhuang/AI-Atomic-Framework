@@ -24,29 +24,75 @@ The best part is that humans do not need to drive the machinery. In an ATM-enabl
 ATM is not another chat agent or workflow app. It is the operating contract for the multi-agent era: a way for people and agents to produce stable, reviewable software together instead of relying on prompt memory, ad hoc conventions, or merge-time cleanup.
 ATM is not just an atom runner. It is the route, scope, evidence, close, and handoff contract around AI-assisted work.
 
-> New AI agent? Read [`docs/ATM_AI_FIRST_5_MIN.md`](docs/ATM_AI_FIRST_5_MIN.md) only: `welcome --json`, then `next --prompt "<user request>" --json`. The rest of `docs/` is advanced material.
->
-> For AI agents: use the repo-local ATM skill or integration when available. The skill should translate the user's request into the governed ATM route and preserve the returned playbook, scope, validation, and evidence.
+## Day 1 install
 
-Captain/dispatch entry gate: if the user asks for Captain, Coordinator, dispatch, task cards, sidecars, subagents, delegation, condition review, or closeout work, route the request through `ai-role-router` when available, then through `atm-dispatch` before drafting instructions, delegating work, or reviewing another agent. State `Skill used: atm-dispatch` and the chosen `Delegation mode`. Internal sidecar is the default; External dispatch is opt-in; external write is forbidden unless the user explicitly grants write authority and scope.
+New project, Node 20+. This is the single newcomer command (checked on npm `latest` = 0.1.20):
 
-## Quick Start
+```bash
+npx --yes create-atm@latest my-app --agent cursor --json
+```
 
-Three commands, from inside the project you want ATM to govern (Node 20+):
+`create-atm` runs `git init` and the first commit (`chore: initialize ATM project`). Git needs `user.name` and `user.email` before that commit. Set them once for the machine:
+
+```bash
+git config --global user.name "Your Name"
+git config --global user.email "you@example.com"
+```
+
+If create-atm already failed at `initial commit` (`ok: false`, `ATM_CREATE_FAILED`), the generated files are kept. Finish the commit inside that directory, then continue:
+
+```bash
+cd my-app
+git config user.name "Your Name"
+git config user.email "you@example.com"
+git add -A
+git commit -m "chore: initialize ATM project"
+```
+
+Other `--agent` ids: `claude-code`, `codex`, `copilot`, `gemini`, `antigravity`. Omit `--agent` for a CLI-only project.
+
+Existing repository: install the CLI at a stable path and run `setup`. The generated `atm.mjs` stores that path; do not move or delete the install.
 
 ```bash
 npm install --prefix ~/atm-runner @ai-atomic-framework/cli@latest
-cd /path/to/your/project
-node ~/atm-runner/node_modules/@ai-atomic-framework/cli/dist/npm-runtime/atm.mjs setup --agents none
+node ~/atm-runner/node_modules/@ai-atomic-framework/cli/dist/npm-runtime/atm.mjs setup --cwd /absolute/path/to/existing-repo --agents cursor --json
 ```
 
-`setup` uses the current directory when it is a project root (a git repository or one with a `package.json`). Replace `none` with your editor (`claude-code`, `codex`, `copilot`, `cursor`, `gemini`, `antigravity`), then open the project in that editor and say:
+> **Version pin.** Pin the npm version that `node atm.mjs welcome --json` reports at `evidence.versions.frameworkVersion`. On 2026-10-11 that field was `0.1.20` for both `create-atm` and `@ai-atomic-framework/cli`. `evidence.versions.releaseTrain.frameworkVersion` was `0.0.0` on that release; do not pin to it. A git tag such as `v0.9.0-alpha.1` is a paper snapshot, not the npm package.
 
-```text
-Use ATM governance to inspect this repo and suggest the next safe improvement.
+Day-1 commands are only `welcome`, `next`, `taskflow`, `evidence`, and `doctor`. Details for agents: [`docs/ATM_AI_FIRST_5_MIN.md`](docs/ATM_AI_FIRST_5_MIN.md).
+
+## First governed write
+
+Run this from the new project (`cd my-app`). It is the short path checked on 0.1.20: open, claim, write, evidence, close. Adapt the title, goal, scope file, and validator to the real task.
+
+**Empty queue: skip `guide`, `orient`, and `start`.** `next --prompt` on an empty project returns a prefilled `taskflow open`. Until `--actor`, `--scope-path`, and `--validator` are known, that command is a dry-run and names the missing flags. Do not follow `guide`.
+
+**Trust the playbook.** After claim, `nextAction.command` is `implement-deliverables`, the same sentinel as `playbook.commandSequence[0]`. It means edit the declared files. It is not a shell command, and it is not `start`. Run the playbook's `evidence run` line and its `taskflow close --write` line. The playbook also lists `pre-close` and a dry-run `close`; this hello.txt path closes without them.
+
+**Replace every `<...>` placeholder before pasting.** An unquoted `<id>` is a shell redirect. This block has none.
+
+**Do not dump the JSON.** Claim, evidence, and close envelopes are tens of kilobytes. Write them to a file and read fields with `jq`.
+
+```bash
+node atm.mjs taskflow open --write --actor newcomer-ai --title "Add hello.txt" --goal "Create hello.txt with one line of text." --scope-path hello.txt --validator "test -f hello.txt" --json > /tmp/atm-open.json
+TASK=$(jq -r '.evidence.generation.taskId' /tmp/atm-open.json)
+node atm.mjs next --claim --actor newcomer-ai --task "$TASK" --json > /tmp/atm-claim.json
+printf 'hello\n' > hello.txt
+EVIDENCE=$(jq -r '.evidence.nextAction.playbook.commandSequence[] | select(startswith("node atm.mjs evidence run"))' /tmp/atm-claim.json)
+CLOSE=$(jq -r '.evidence.nextAction.playbook.commandSequence[] | select(startswith("node atm.mjs taskflow close") and contains(" --write "))' /tmp/atm-claim.json)
+bash -c "$EVIDENCE" > /tmp/atm-evidence.json
+bash -c "$CLOSE" > /tmp/atm-close.json
+jq -r '.ok, .messages[0].code' /tmp/atm-close.json
 ```
 
-Starting a brand-new project instead? Run `npx create-atm my-app --agent <editor-id>`. Everything below is optional detail.
+`close --write` needs the playbook's `--lane-session`. Without it, 0.1.20 returns `ATM_LANE_BORROWED_ACTOR_BLOCKED`. A missing Git author fails the same close with `ATM_CLI_UNHANDLED` and a raw `git commit` error. That JSON does not contain an `identity set` hint. Git `user.name` / `user.email` and ATM `identity set` are different; set the Git author (commands above) and retry the same close line. `doctor --json` is the health check. On an empty project its `evidence.recommendedAction` is `next --json`, which is not this write. A successful close can still leave `.atm/runtime/welcome.lineage.json` untracked if you ran `welcome`.
+
+## Day 2+
+
+Captain, dispatch, wave, batch, and team flows are not the first write.
+
+Captain/dispatch entry gate: if the user asks for Captain, Coordinator, dispatch, task cards, sidecars, subagents, delegation, condition review, or closeout work, route the request through `ai-role-router` when available, then through `atm-dispatch` before drafting instructions, delegating work, or reviewing another agent. State `Skill used: atm-dispatch` and the chosen `Delegation mode`. Internal sidecar is the default; External dispatch is opt-in; external write is forbidden unless the user explicitly grants write authority and scope.
 
 ## Why ATM Exists
 
@@ -76,7 +122,7 @@ That matters more as teams move from one AI helper to many cooperating agents. A
 
 ## 60-Second Start
 
-Start with the project you want ATM to govern. One shared ATM runner can serve multiple existing repositories through `--cwd`; each target keeps its own governance state and evidence.
+A new project uses the [Day-1 install](#day-1-install) above. This section is `setup` for a repository that already exists. One shared ATM runner can serve multiple existing repositories through `--cwd`; each target keeps its own governance state and evidence.
 
 The `setup` command combines project selection, bootstrap, integration discovery, installation, verification, and welcome. It ships in `@ai-atomic-framework/cli` 0.1.8 and later. Install the CLI once at a stable location outside your projects; each project's generated `atm.mjs` points back to that runner, so moving or deleting it breaks the projects it set up:
 
@@ -131,7 +177,7 @@ Create a new ATM-enabled repository named test-app for my editor, then show me t
 The agent can use the starter behind the scenes, install the selected agent integration, and make the local ATM skill visible. If you want the underlying command, it is:
 
 ```bash
-npx create-atm test-app --agent <editor-id>
+npx --yes create-atm@latest test-app --agent cursor --json
 ```
 
 Replace `<editor-id>` with a supported integration ID. This new-project starter is separate from the `setup` flow for existing projects.
@@ -194,7 +240,7 @@ Use one official distribution:
 | `release/atm-onefile/atm.mjs` | You want a single-file embedded runtime (copy it, then `node atm.mjs bootstrap --json`). |
 | `release/atm-root-drop/` | You want the portable multi-file bundle. |
 
-Which version to pin: pin the npm package version (`@ai-atomic-framework/cli`, `create-atm`); `welcome --json` reports the same `frameworkVersion`. Git tags such as `v0.9.0-alpha.1` mark paper snapshots, not the installable product.
+Which version to pin: pin `evidence.versions.frameworkVersion` from `welcome --json` (npm `create-atm` and `@ai-atomic-framework/cli`). On 0.1.20, `evidence.versions.releaseTrain.frameworkVersion` is `0.0.0`; do not pin to that field. Git tags such as `v0.9.0-alpha.1` mark paper snapshots, not the installable product.
 
 The bootstrap pattern is consistent: place an official ATM distribution in the target repository, make the ATM entry route visible to agents, and let the local skill or integration call `node atm.mjs next --prompt "<current user prompt>" --json` for user-requested governed work.
 

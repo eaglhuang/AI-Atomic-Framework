@@ -89,13 +89,22 @@ export function runCreateAtm(argv = process.argv.slice(2)) {
   if (steps.every((step) => step.exitCode === 0)) steps.push(createInitialCommit(targetRoot));
 
   const failedStep = steps.find((step) => step.exitCode !== 0);
+  const gitAuthorMissing = failedStep?.name === 'initial commit' && /user\.name/.test(failedStep.stderr);
+  const gitAuthorCommands = [
+    'git config user.name "Your Name"',
+    'git config user.email "you@example.com"',
+    'git add -A',
+    'git commit -m "chore: initialize ATM project"'
+  ];
   const payload = {
     ok: failedStep === undefined,
     command: 'create-atm',
     cwd: options.cwd,
     messages: [
       failedStep
-        ? { level: 'error', code: 'ATM_CREATE_FAILED', text: `create-atm failed at step: ${failedStep.name}${failedStep.name === 'initial commit' ? `. ${failedStep.stderr.trim()}` : ''}` }
+        ? gitAuthorMissing
+          ? { level: 'warning', code: 'ATM_CREATE_GIT_AUTHOR_MISSING', text: 'create-atm kept the generated files, but the initial commit needs a Git author. Run evidence.requiredFollowUp inside the new project.' }
+          : { level: 'error', code: 'ATM_CREATE_FAILED', text: `create-atm failed at step: ${failedStep.name}${failedStep.name === 'initial commit' ? `. ${failedStep.stderr.trim()}` : ''}` }
         : { level: 'info', code: 'ATM_CREATE_READY', text: `ATM governance project created at ${targetRoot}` }
     ],
     evidence: {
@@ -110,7 +119,14 @@ export function runCreateAtm(argv = process.argv.slice(2)) {
         name: step.name,
         exitCode: step.exitCode,
         durationMs: step.durationMs
-      }))
+      })),
+      ...(gitAuthorMissing ? {
+        requiredFollowUp: gitAuthorCommands,
+        nextAction: {
+          command: gitAuthorCommands.join(' && '),
+          reason: 'Generated files are preserved. Set a repo-local Git author, then create the initial commit.'
+        }
+      } : {})
     }
   };
 

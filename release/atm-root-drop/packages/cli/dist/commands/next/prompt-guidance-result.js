@@ -7,25 +7,33 @@ import { isJournalingPrompt } from './intent-normalizers.js';
 import { isQuickfixPrompt } from '../work-channels.js';
 import { isFrameworkMaintenancePrompt } from './route-predicates.js';
 import { buildAgentPackHint, buildChannelPlaybook, buildGovernanceReadinessHint, buildNextMessages } from './playbook-projection.js';
-import { quoteCliValue, toTaskCandidateView } from './view-projections.js';
+import { resolvePasteActor } from './paste-actor.js';
+import { quoteCliToken, quoteCliValue, toTaskCandidateView } from './view-projections.js';
 export function buildPromptGuidanceNextResult(input) {
     const prompt = input.taskIntent?.userPrompt?.trim();
     if (!prompt || input.taskIntent?.taskScopeMentioned === true)
         return null;
     const commandPrefix = input.commandPrefix ?? 'node atm.mjs';
+    const actorId = resolvePasteActor(input.actor, input.cwd);
     if (isJournalingPrompt(prompt))
         return buildJournalingPromptResult(input, prompt);
     const quickfixScope = resolveQuickfixScope(prompt);
     if (isQuickfixPrompt(prompt) && quickfixScope.length > 0) {
+        const actorKnown = Boolean(actorId);
+        const claimCommand = `${commandPrefix} next --claim --actor ${actorKnown ? quoteCliToken(actorId) : '<id>'} --prompt ${quoteCliValue(prompt)} --json`;
         const nextAction = {
-            status: 'quickfix-ready',
-            command: `${commandPrefix} next --claim --actor <id> --prompt ${quoteCliValue(prompt)} --json`,
-            reason: 'the prompt looks like a small targeted fix with path-like scope, so ATM can use the fast quickfix channel',
+            status: actorKnown ? 'quickfix-ready' : 'quickfix-actor-required',
+            command: claimCommand,
+            reason: actorKnown
+                ? 'the prompt looks like a small targeted fix with path-like scope, so ATM can use the fast quickfix channel'
+                : 'the prompt looks like a small targeted fix, but --actor is missing so this is not a one-step claim',
             recommendedChannel: 'fast',
             riskLevel: 'low',
             playbook: buildChannelPlaybook({
                 channel: 'fast',
-                originalPrompt: prompt
+                originalPrompt: prompt,
+                actorPlaceholder: actorId ?? undefined,
+                fastClaimCommand: claimCommand
             }),
             governanceReadiness: buildGovernanceReadinessHint(input.cwd, {
                 channel: 'fast',
@@ -41,8 +49,10 @@ export function buildPromptGuidanceNextResult(input) {
             ok: true,
             command: 'next',
             cwd: input.cwd,
-            messages: buildNextMessages(nextAction, null, input.integrationBootstrap, input.runtimeAdapterReadiness, message('info', 'ATM_NEXT_QUICKFIX_ROUTE_READY', 'ATM routed this prompt to the fast quickfix channel.', {
-                requiredCommand: nextAction.command,
+            messages: buildNextMessages(nextAction, null, input.integrationBootstrap, input.runtimeAdapterReadiness, message('info', 'ATM_NEXT_QUICKFIX_ROUTE_READY', actorKnown
+                ? 'ATM routed this prompt to the fast quickfix channel.'
+                : 'ATM routed this prompt to the fast quickfix channel, but --actor is missing so the claim command is not ready.', {
+                ...(actorKnown ? { requiredCommand: claimCommand } : { missing: ['--actor'] }),
                 allowedFiles: quickfixScope
             })),
             evidence: {
@@ -149,12 +159,12 @@ function buildJournalingPromptResult(input, prompt) {
 }
 function buildGeneralPromptGuidanceResult(input, prompt) {
     const commandPrefix = input.commandPrefix ?? 'node atm.mjs';
-    const guideCommand = `${commandPrefix} guide --goal ${quoteCliValue(prompt)} --cwd . --json`;
-    const suggestedRoutes = buildPromptSuggestedRoutes(prompt, commandPrefix);
+    const suggestedRoutes = buildPromptSuggestedRoutes(prompt, commandPrefix, resolvePasteActor(input.actor, input.cwd));
+    const openRoute = suggestedRoutes.find((route) => route.channel === 'task-card') ?? suggestedRoutes[suggestedRoutes.length - 1];
     const nextAction = {
         status: 'prompt-guidance-required',
-        command: guideCommand,
-        reason: 'the user supplied a prompt that is not task-scoped, so ATM routes guidance from that prompt instead of reusing stale global guidance; for a small change with known files, suggestedRoutes[0] claims the fast quickfix channel directly; for larger work, suggestedRoutes[2] opens a task card to claim',
+        command: openRoute.command,
+        reason: 'the user supplied a prompt that is not task-scoped, so the next action is taskflow open with the flags ATM can already fill; add any flags named by the task-card route before writing',
         suggestedRoutes,
         recommendedChannel: null,
         riskLevel: 'medium',
@@ -172,7 +182,7 @@ function buildGeneralPromptGuidanceResult(input, prompt) {
         ok: true,
         command: 'next',
         cwd: input.cwd,
-        messages: buildNextMessages(nextAction, userNotice, input.integrationBootstrap, input.runtimeAdapterReadiness, message('info', 'ATM_NEXT_PROMPT_GUIDANCE_REQUIRED', 'ATM routed next-action guidance from the current prompt instead of stale global state. For a small change with known files, use suggestedRoutes[0] to claim the fast quickfix channel; for larger work, suggestedRoutes[2] opens a task card.', {
+        messages: buildNextMessages(nextAction, userNotice, input.integrationBootstrap, input.runtimeAdapterReadiness, message('info', 'ATM_NEXT_PROMPT_GUIDANCE_REQUIRED', 'ATM routed next-action guidance from the current prompt instead of stale global state. The next action opens a task card; a fast claim is listed only when the prompt already names files.', {
             command: nextAction.command,
             suggestedRoutes
         })),

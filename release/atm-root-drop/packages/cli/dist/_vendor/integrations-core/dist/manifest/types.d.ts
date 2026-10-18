@@ -1,0 +1,114 @@
+/**
+ * manifest/types.ts
+ *
+ * TASK-ASR-0013 — integrations-core complete split
+ *
+ * All integration install manifest interface types, shared adapter
+ * ID / format / placeholder aliases, and the IntegrationAdapter interface.
+ * Imports verify result types from verify/types.ts to avoid circular deps.
+ */
+import type { IntegrationVerifyResult, IntegrationUninstallResult } from '../verify/types.js';
+export type { IntegrationVerifyResult, IntegrationUninstallResult };
+export type KnownIntegrationAdapterId = 'claude-code' | 'copilot' | 'cursor' | 'gemini' | 'windsurf' | 'goose' | 'codex';
+export type IntegrationAdapterId = KnownIntegrationAdapterId | (string & {});
+export type IntegrationFileFormat = 'skill' | 'agent-md' | 'prompt-md' | 'instructions-md' | 'toml' | 'yaml' | 'markdown';
+export type IntegrationPlaceholderStyle = '$ARGUMENTS' | '{{vars}}' | 'toml-fields' | 'none';
+export type InstallManifestFileSource = 'template' | 'generated' | 'copied';
+export type Sha256Digest = `sha256:${string}`;
+export interface IntegrationInstallContext {
+    readonly repositoryRoot: string;
+    readonly actor?: string;
+    readonly now?: string;
+    readonly dryRun?: boolean;
+    readonly manifestPath?: string;
+    /** Preserve user files and reconcile only digest-verified ATM content. */
+    readonly merge?: boolean;
+}
+export interface IntegrationSourceFile {
+    readonly relativePath: string;
+    readonly content: string | Uint8Array;
+    readonly fileFormat?: IntegrationFileFormat;
+    readonly source?: InstallManifestFileSource;
+    readonly skillId?: string;
+    readonly sourceDigest?: Sha256Digest;
+    readonly sourceCatalogDigest?: Sha256Digest;
+    readonly installProfileId?: string;
+    readonly managed?: boolean;
+}
+export interface InstallManifestFile {
+    readonly path: string;
+    readonly sha256: Sha256Digest;
+    readonly sizeBytes: number;
+    readonly source: InstallManifestFileSource;
+    readonly fileFormat: IntegrationFileFormat;
+}
+export interface InstallManifest {
+    readonly schemaId: 'atm.integrationInstallManifest';
+    readonly schemaVersion: 'atm.installManifest.v0.1';
+    readonly specVersion: '0.1.0';
+    readonly migration: {
+        readonly strategy: 'none' | 'additive' | 'breaking';
+        readonly fromVersion: string | null;
+        readonly notes: string;
+    };
+    readonly adapterId: string;
+    readonly adapterVersion: string;
+    readonly installedAt: string;
+    readonly installedBy?: string;
+    readonly targetDir: string;
+    readonly files: readonly InstallManifestFile[];
+    readonly metadata?: Readonly<Record<string, string | number | boolean | null>>;
+    readonly hookContractVersion?: 'atm.integration-hooks/v1';
+    readonly hookProvider?: 'atm-framework-development-hooks/v1';
+    readonly supportedHookEvents?: readonly string[];
+    readonly installedHookFiles?: readonly string[];
+    readonly frameworkDevelopmentWakeMode?: 'auto';
+    readonly mandatoryForFrameworkRepo?: boolean;
+}
+export interface CreateInstallManifestInput {
+    readonly adapterId: string;
+    readonly adapterVersion: string;
+    readonly installedAt: string;
+    readonly installedBy?: string;
+    readonly targetDir: string;
+    readonly files: readonly InstallManifestFile[];
+    readonly metadata?: Readonly<Record<string, string | number | boolean | null>>;
+}
+export interface IntegrationInstallResult {
+    readonly ok: boolean;
+    readonly dryRun: boolean;
+    readonly adapterId: string;
+    readonly manifestPath: string;
+    readonly writtenFiles: readonly string[];
+    readonly manifest: InstallManifest;
+}
+export interface IntegrationAdapter {
+    readonly id: IntegrationAdapterId;
+    readonly displayName: string;
+    readonly adapterVersion: string;
+    readonly fileFormat: IntegrationFileFormat;
+    readonly placeholderStyle: IntegrationPlaceholderStyle;
+    targetDir(context?: IntegrationInstallContext): string;
+    install(context: IntegrationInstallContext): Promise<IntegrationInstallResult> | IntegrationInstallResult;
+    readonly sourceCoverage?: (context: IntegrationInstallContext) => IntegrationSourceCoverage;
+    verify(context: IntegrationInstallContext, manifest: InstallManifest): Promise<IntegrationVerifyResult> | IntegrationVerifyResult;
+    uninstall(context: IntegrationInstallContext, manifest: InstallManifest): Promise<IntegrationUninstallResult> | IntegrationUninstallResult;
+}
+export interface StaticIntegrationAdapterInput {
+    readonly id: IntegrationAdapterId;
+    readonly displayName: string;
+    readonly adapterVersion: string;
+    readonly targetDir: string;
+    readonly fileFormat: IntegrationFileFormat;
+    readonly placeholderStyle: IntegrationPlaceholderStyle;
+    readonly sourceFiles: readonly IntegrationSourceFile[] | ((context: IntegrationInstallContext) => readonly IntegrationSourceFile[]);
+    readonly sourceCoverage?: (context: IntegrationInstallContext) => IntegrationSourceCoverage;
+}
+export interface IntegrationSourceCoverage {
+    readonly sourceFileCount: number;
+    readonly sourceCatalogDigest?: Sha256Digest | null;
+}
+export interface CodexSkillsAdapterOptions {
+    readonly adapterVersion?: string;
+    readonly targetDir?: string;
+}

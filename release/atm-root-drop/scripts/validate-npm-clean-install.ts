@@ -1,6 +1,7 @@
 import { resolveNpmDistTag } from './validate-dist-tag.ts';
 import { readReleaseManifest, verifyArtifact, digest } from './release-artifact-manifest.ts';
 import { governanceCommandPrefix } from '../packages/cli/src/commands/shared/atm-cli-entrypoint.ts';
+import { resolveFirstUseArguments } from './lib/npm-first-use.ts';
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import os from 'node:os';
@@ -148,9 +149,17 @@ function runEmittedNpmCommand(command: string, expectedArgs: string[], packageIn
   const runtime = installedCliEntrypoint(packageInstallRoot);
   const expectedCommand = `${governanceCommandPrefix(runtime)} ${expectedArgs.map(arg => /\s/.test(arg) ? JSON.stringify(arg) : arg).join(' ')}`;
   if (command !== expectedCommand) fail(`${label} emitted ${JSON.stringify(command)} instead of ${JSON.stringify(expectedCommand)}`);
-  const result = spawnCliCapture(process.execPath, [runtime, ...expectedArgs], {
+  return runInstalledJson(packageInstallRoot, cwd, expectedArgs, label);
+}
+
+function installedCliBin(packageInstallRoot: string): string {
+  return path.join(packageInstallRoot, 'node_modules', '.bin', process.platform === 'win32' ? 'atm.cmd' : 'atm');
+}
+
+function runInstalledJson(packageInstallRoot: string, cwd: string, args: string[], label: string): any {
+  const result = spawnCliCapture(process.execPath, [installedCliEntrypoint(packageInstallRoot), ...args], {
     cwd,
-    label: `installed-cli ${expectedArgs.join(' ')}`
+    label: `installed-cli ${args.join(' ')}`
   });
   const output = `${result.stdout ?? ''}${result.stderr ?? ''}`;
   if (result.status !== 0) fail(`${label} failed with exit ${result.status}: ${output.split('\n').slice(0, 8).join(' ')}`);
@@ -162,6 +171,25 @@ function runEmittedNpmCommand(command: string, expectedArgs: string[], packageIn
   } catch (error) {
     fail(`${label} did not emit JSON: ${String(error)}; ${output.split('\n').slice(0, 8).join(' ')}`);
   }
+}
+
+// An empty adopter's next action is the bounded command next emits. That is
+// taskflow open when the day-1 path can already fill a dry-run, and guide
+// only when next still chooses it. Execute that command, then one bounded
+// follow-up (guide still emits orient). Do not require a precomputed guide.
+function runEmittedFirstUse(nextResult: { evidence?: { nextAction?: { command?: string } } }, packageInstallRoot: string, cwd: string, label: string, guideGoal: string): void {
+  const command = nextResult.evidence?.nextAction?.command;
+  if (typeof command !== 'string' || command.length === 0) fail(`${label} did not emit a next command`);
+  const bin = installedCliBin(packageInstallRoot);
+  if (!existsSync(bin)) fail(`${label} has no installed atm bin`);
+  const args = resolveFirstUseArguments(command, bin, guideGoal);
+  if (!args) fail(`${label} emitted a command outside the bounded first-use set: ${JSON.stringify(command)}`);
+  const opened = runInstalledJson(packageInstallRoot, cwd, args, label);
+  const follow = opened?.evidence?.nextCommand;
+  if (typeof follow !== 'string') return;
+  const followArgs = resolveFirstUseArguments(follow, bin, guideGoal);
+  if (!followArgs) return;
+  runInstalledJson(packageInstallRoot, cwd, followArgs, `${label} follow-up`);
 }
 
 function assertDefaultAdoptionRecoverySucceeds(installRoot: string, tarball: string): void {
@@ -217,20 +245,7 @@ function assertDefaultAdoptionRecoverySucceeds(installRoot: string, tarball: str
   if (nextResult.evidence?.runnerMode?.mode !== 'npm-package') {
     fail(`default adopter next did not recognize the npm entrypoint: ${JSON.stringify(nextResult.evidence?.runnerMode)}`);
   }
-  const guide = runEmittedNpmCommand(
-    nextResult.evidence?.nextAction?.command,
-    ['guide', '--goal', goal, '--cwd', '.', '--json'],
-    adoptionRoot,
-    adoptionRoot,
-    'default adopter atm next -> guide'
-  );
-  runEmittedNpmCommand(
-    guide.evidence?.nextCommand,
-    ['orient', '--cwd', '.', '--json'],
-    adoptionRoot,
-    adoptionRoot,
-    'default adopter atm guide -> orient'
-  );
+  runEmittedFirstUse(nextResult, adoptionRoot, adoptionRoot, 'default adopter atm next -> first use', goal);
 }
 
 function assertAdoptionSucceeds(installRoot: string, expectedVersion: string, tarball: string): void {
@@ -290,9 +305,10 @@ function assertAdoptionSucceeds(installRoot: string, expectedVersion: string, ta
     fail(`atm integration add codex omitted required router companion file ${path.relative(adoptionRoot, routerReference).replace(/\\/g, '/')}`);
   }
 
-  // The public npm first-run path must remain executable from an adopter repo:
-  // next emits guide, guide emits orient, and both commands must resolve from
-  // the installed package without relying on a repository-local atm.mjs.
+  // The public npm first-run path must remain executable from an adopter repo.
+  // next emits the bounded day-1 command (taskflow open, or guide when that
+  // is still the selected action). Both must resolve from the installed
+  // package without relying on a repository-local atm.mjs.
   const goal = 'Show a minimal first-run workflow.';
   const next = runInstalledCli(installRoot, adoptionRoot, ['next', '--prompt', goal, '--json']);
   const nextText = `${next.stdout ?? ''}${next.stderr ?? ''}`;
@@ -301,20 +317,7 @@ function assertAdoptionSucceeds(installRoot: string, expectedVersion: string, ta
   if (nextResult.evidence?.runnerMode?.mode !== 'npm-package') {
     fail(`atm next did not recognize the installed npm runner: ${JSON.stringify(nextResult.evidence?.runnerMode)}`);
   }
-  const guide = runEmittedNpmCommand(
-    nextResult.evidence?.nextAction?.command,
-    ['guide', '--goal', goal, '--cwd', '.', '--json'],
-    installRoot,
-    adoptionRoot,
-    'atm next -> guide'
-  );
-  runEmittedNpmCommand(
-    guide.evidence?.nextCommand,
-    ['orient', '--cwd', '.', '--json'],
-    installRoot,
-    adoptionRoot,
-    'atm guide -> orient'
-  );
+  runEmittedFirstUse(nextResult, installRoot, adoptionRoot, 'atm next -> first use', goal);
   assertDefaultAdoptionRecoverySucceeds(installRoot, tarball);
 }
 

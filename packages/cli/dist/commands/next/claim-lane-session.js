@@ -1,5 +1,6 @@
 import { resolveActorWorkSession } from '../actor-session.js';
 import { message } from '../shared.js';
+import { quoteCliToken } from './view-projections.js';
 export function buildClaimedMessage(input) {
     return message('info', 'ATM_NEXT_CLAIMED', 'Claimed the next imported work item.', {
         taskId: input.taskId,
@@ -9,7 +10,7 @@ export function buildClaimedMessage(input) {
         recommendedChannel: input.recommendedChannel,
         claimIntent: input.claimIntent,
         batchCheckpointCommand: input.recommendedChannel === 'batch'
-            ? 'node atm.mjs batch checkpoint --actor <id> --json'
+            ? `node atm.mjs batch checkpoint --actor ${quoteCliToken(input.actorId)} --json`
             : null,
         blockedPattern: input.recommendedChannel === 'batch' ? 'manual tasks claim/close loop' : null,
         ignoredUntrackedFiles: input.ignoredUntrackedFiles,

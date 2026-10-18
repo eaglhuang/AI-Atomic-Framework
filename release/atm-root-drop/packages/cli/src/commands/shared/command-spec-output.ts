@@ -3,7 +3,10 @@ import path from 'node:path';
 import { normalizeCommandHelpMetadata } from '../help.ts';
 import { projectFields, projectSummary } from '../output-projection.ts';
 import { carryLaneSessionIntoPrintedCommands } from './lane-session-flag.ts';
+import { compactPrintedGovernanceJson, printedGovernanceJsonIsCompact } from './governance-json-compact.ts';
 import { CliError, type CommandMessage, type CommandResult, type EnrichedCommandResult, enrichCommandResult, getOutputProjectionState, makeResult, message, setFieldsProjection, setOutputJsonPath, setSummaryProjection } from './result-core.ts';
+
+const LITERAL_PLACEHOLDER_FLAGS = new Set(['--actor', '--validator', '--scope-path', '--task', '--task-id', '--command', '--id']);
 
 export interface CommandOption {
   readonly flag: string;
@@ -204,6 +207,12 @@ export function parseArgsForCommand(
             }
           });
         }
+        if (LITERAL_PLACEHOLDER_FLAGS.has(optionSpec.flag) && /<[^>\r\n]+>/.test(value)) {
+          throw new CliError('ATM_CLI_PLACEHOLDER_VALUE', `${optionSpec.flag} is the literal placeholder ${JSON.stringify(value)}. Replace it with a real value; angle-bracket samples are not accepted.`, {
+            exitCode: 2,
+            details: { flag: optionSpec.flag, value }
+          });
+        }
         if (optionSpec.repeatable) {
           state.options[key] = Array.isArray(state.options[key]) ? [...state.options[key], value] : [value];
         } else {
@@ -348,7 +357,9 @@ export function writeResult(
     stream.write(formatPrettyResult(projectedResult));
     return;
   }
-  stream.write(`${JSON.stringify(projectedResult, null, 2)}\n`);
+  const compact = outputFormat === 'json' && printedGovernanceJsonIsCompact(String(projectedResult.command ?? ''));
+  const body = compact ? compactPrintedGovernanceJson(projectedResult) : projectedResult;
+  stream.write(`${JSON.stringify(body, null, compact ? undefined : 2)}\n`);
 }
 
 export function formatPrettyResult(result: CommandResult) {

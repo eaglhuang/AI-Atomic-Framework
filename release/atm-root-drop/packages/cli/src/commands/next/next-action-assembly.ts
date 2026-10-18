@@ -18,6 +18,12 @@ export type NextActionTeamRecommendationLike = {
 export type NextActionLike = {
   status: string;
   command?: string;
+  /** Shell-safe command that is not ready to paste. Present only when slots are missing. */
+  commandTemplate?: string;
+  /** Flags that must be filled before `command` is runnable. */
+  missing?: readonly string[];
+  /** False means `command` is a template, not a one-step paste. */
+  pasteReady?: boolean;
   reason?: string;
   recommendedChannel?: string | null;
   riskLevel?: string;
@@ -36,7 +42,14 @@ export type NextActionLike = {
   teamRecommendation?: NextActionTeamRecommendationLike | null;
   allowedCommands?: readonly string[];
   blockedCommands?: readonly string[];
-  suggestedRoutes?: readonly { readonly when: string; readonly channel: string | null; readonly command: string }[];
+  suggestedRoutes?: readonly {
+    readonly when: string;
+    readonly channel: string | null;
+    readonly command: string;
+    readonly commandTemplate?: string;
+    readonly missing?: readonly string[];
+    readonly pasteReady?: boolean;
+  }[];
   missingEvidence?: readonly string[];
   requiredCommand?: string | null;
   closure?: {

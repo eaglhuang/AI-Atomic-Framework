@@ -21,7 +21,7 @@ export function ensureAdopterTaskflowProfile(cwd) {
         taskIdPrefix: prefix,
         taskId: { format },
         template: { defaultMarkdown: '# ${taskId} ${title}' },
-        capabilities: { supportsDryRun: true, supportsWrite: false },
+        capabilities: { supportsDryRun: true, supportsWrite: true },
         delegation: {
             hint: 'Task cards live in docs/tasks of this repository and are opened by ATM\'s built-in opener.',
             openerPath: 'atm:builtin',

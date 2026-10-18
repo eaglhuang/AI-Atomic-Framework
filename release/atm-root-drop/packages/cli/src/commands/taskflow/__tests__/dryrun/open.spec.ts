@@ -46,7 +46,7 @@ assert.equal(res3.evidence.writeSupport.allowed, false);
 // TASK-CID-0073: delegated-governed dry-run reports writeReadinessHint.status = ready
 assert.equal(res3.writeReadinessHint.status, 'ready', 'delegated-governed dry-run must report writeReadinessHint.status = ready');
 assert.equal(res3.writeReadinessHint.missingPrerequisites.length, 0, 'ready hint must not list any missing prerequisites');
-assert.equal(res3.writeReadinessHint.nextCommand, 'node atm.mjs taskflow open --write --json');
+assert.equal(res3.writeReadinessHint.nextCommand, `node atm.mjs taskflow open --write --profile '${governedProfilePath}' --json`);
 assert.equal(res3.writeReadinessHint.fallbackSurface, null);
 assert.equal(res3.evidence.hostPolicyDecision.taskId, 'TASK-GOVERNED-0001');
 assert.equal(res3.evidence.hostPolicyDecision.outputPath, 'docs/tasks/TASK-GOVERNED-0001.task.md');

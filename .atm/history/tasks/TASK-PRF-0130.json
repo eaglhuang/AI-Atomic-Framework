@@ -1,0 +1,362 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0130",
+  "title": "Repair prereg smoke kit preflight Python, session PATH and bounded probe retry (#345; related #311)",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "Issue #345: real-model preflight rejects missing or invalid PREREG_PYTHON before Codex; RUNBOOK distinguishes preflight and setup.",
+    "Issue #345: both probe and formal session PATH put PREREG_ARM_BIN first, then kit, evaluation venv, node and system bins; operator prefixes are excluded.",
+    "Issue #345: missing BEGIN_INTENDED_PATCH alone permits at most two attempts per arm, with full attempt outcomes; PATH, commit, steward and quota failures never retry.",
+    "Offline fake Codex and poisoned operator git/python3 tests pass; no real #311 A/B experiment, core repair, historical result rewrite, paid API, tag or npm publication.",
+    "Reject reversed or duplicate patch markers as malformed without retry.",
+    "Verify attempt-owned steward worker and launcher exit before a retry; stop without another model call if teardown fails."
+  ],
+  "deliverables": [
+    "research/paper-v2/prereg-v3-smoke/kit/lib/common.sh",
+    "research/paper-v2/prereg-v3-smoke/kit/preflight.sh",
+    "research/paper-v2/prereg-v3-smoke/kit/RUNBOOK.md",
+    "research/paper-v2/prereg-v3-smoke/kit/test/test-probe-retry.sh",
+    "research/paper-v2/prereg-v3-smoke/kit/test/test-real-model.sh",
+    "research/paper-v2/prereg-v3-smoke/kit/test/test-session-login-path.sh",
+    "research/paper-v2/prereg-v3-smoke/kit/bin/evaluate.py",
+    "research/paper-v2/prereg-v3-smoke/kit/bin/atm-write.mjs",
+    "research/paper-v2/prereg-v3-smoke/kit/bin/steward-daemon.mjs",
+    "research/paper-v2/prereg-v3-smoke/kit/seal.sh",
+    "research/paper-v2/prereg-v3-smoke/kit/test/test_metrics_evidence.py",
+    "research/paper-v2/prereg-v3-smoke/kit/test/test-session-slot.sh",
+    "research/paper-v2/prereg-v3-smoke/kit/test/test-preflight-archive.sh"
+  ],
+  "scopePaths": [
+    ".atm/history/evidence/TASK-PRF-0130.*",
+    ".atm/history/task-events/TASK-PRF-0130/**",
+    ".atm/history/tasks/TASK-PRF-0130.json",
+    "research/paper-v2/prereg-v3-smoke/kit/lib/common.sh",
+    "research/paper-v2/prereg-v3-smoke/kit/preflight.sh",
+    "research/paper-v2/prereg-v3-smoke/kit/RUNBOOK.md",
+    "research/paper-v2/prereg-v3-smoke/kit/test/test-probe-retry.sh",
+    "research/paper-v2/prereg-v3-smoke/kit/test/test-real-model.sh",
+    "research/paper-v2/prereg-v3-smoke/kit/test/test-session-login-path.sh",
+    "research/paper-v2/prereg-v3-smoke/kit/bin/evaluate.py",
+    "research/paper-v2/prereg-v3-smoke/kit/bin/atm-write.mjs",
+    "research/paper-v2/prereg-v3-smoke/kit/bin/steward-daemon.mjs",
+    "research/paper-v2/prereg-v3-smoke/kit/seal.sh",
+    "research/paper-v2/prereg-v3-smoke/kit/test/test_metrics_evidence.py",
+    "research/paper-v2/prereg-v3-smoke/kit/test/test-session-slot.sh",
+    "research/paper-v2/prereg-v3-smoke/kit/test/test-preflight-archive.sh"
+  ],
+  "validators": [
+    "bash research/paper-v2/prereg-v3-smoke/kit/test/test-session-login-path.sh",
+    "bash research/paper-v2/prereg-v3-smoke/kit/test/test-probe-retry.sh",
+    "python3 research/paper-v2/prereg-v3-smoke/kit/test/test_metrics_evidence.py",
+    "bash research/paper-v2/prereg-v3-smoke/kit/test/test-session-slot.sh",
+    "bash research/paper-v2/prereg-v3-smoke/kit/test/test-preflight-archive.sh"
+  ],
+  "planningRepo": "AI-Atomic-Framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [
+    "Do not fix #343 or alter ATM core.",
+    "Do not run the formal #311 experiment or real model probes.",
+    "Do not merge, tag, publish npm, access credentials or use paid APIs."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert only the scoped kit and this task closeout; retain historical experiment results.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 5 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    },
+    {
+      "code": "ATM_TASK_IMPORT_EXTRACTION_FIRST_CANDIDATE",
+      "severity": "warning",
+      "field": "atomizationImpact",
+      "message": "Scope touches 2 module(s) over 600 lines but the card declares no atomizationImpact.extractionCandidates. Extraction-first is the ATM default: propose an atom/atom-map extraction (see .agents/skills/atm-atom-map-refactor), or record disposition \"inline\" with an inlineReason approved by a human.",
+      "candidates": [
+        "research/paper-v2/prereg-v3-smoke/kit/lib/common.sh (1127 lines)",
+        "research/paper-v2/prereg-v3-smoke/kit/bin/evaluate.py (1441 lines)"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "ATM_TASK_IMPORT_PLANNING_IN_PROGRESS_CLAIMABLE",
+      "message": "Task TASK-PRF-0130 declared planning status in-progress; imported target ledger status as ready so an agent can claim it through next --claim."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": ".atm/task-plans/TASK-PRF-0130.md",
+    "sectionTitle": "TASK-PRF-0130",
+    "headingLine": 60,
+    "hash": "4442b9cd9344cb27",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/AI-Atomic-Framework.git",
+      "repoRoot": "/workspace/AI-Atomic-Framework",
+      "taskCardPath": ".atm/task-plans/TASK-PRF-0130.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:4442b9cd9344cb27cf29f23a2878875b0f0984acbc838cfd19a386e4c74f80ec",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-10-18T01:31:22.105Z"
+    }
+  },
+  "importedAt": "2026-10-18T01:31:22.105Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_bash.research.paper.v2.prereg.v3.smoke.kit.test.test.session.login.path.sh",
+      "command": "bash research/paper-v2/prereg-v3-smoke/kit/test/test-session-login-path.sh",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_bash.research.paper.v2.prereg.v3.smoke.kit.test.test.probe.retry.sh",
+      "command": "bash research/paper-v2/prereg-v3-smoke/kit/test/test-probe-retry.sh",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_python3.research.paper.v2.prereg.v3.smoke.kit.test.test.metrics.evidence.py",
+      "command": "python3 research/paper-v2/prereg-v3-smoke/kit/test/test_metrics_evidence.py",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_bash.research.paper.v2.prereg.v3.smoke.kit.test.test.session.slot.sh",
+      "command": "bash research/paper-v2/prereg-v3-smoke/kit/test/test-session-slot.sh",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_bash.research.paper.v2.prereg.v3.smoke.kit.test.test.preflight.archive.sh",
+      "command": "bash research/paper-v2/prereg-v3-smoke/kit/test/test-preflight-archive.sh",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "dependencies"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-10-18T11-21-33-163Z-close-4b902fdf2dc7",
+  "lastTransitionAt": "2026-10-18T11:21:33.163Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "claim": {
+    "actorId": "codex-issue345",
+    "leaseId": "lease-21b99ddeee64",
+    "claimedAt": "2026-10-18T01:31:29.594Z",
+    "heartbeatAt": "2026-10-18T11:21:33.160Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-PRF-0130.*",
+      ".atm/history/task-events/TASK-PRF-0130/**",
+      ".atm/history/tasks/TASK-PRF-0130.json",
+      "research/paper-v2/prereg-v3-smoke/kit/lib/common.sh",
+      "research/paper-v2/prereg-v3-smoke/kit/preflight.sh",
+      "research/paper-v2/prereg-v3-smoke/kit/RUNBOOK.md",
+      "research/paper-v2/prereg-v3-smoke/kit/test/test-probe-retry.sh",
+      "research/paper-v2/prereg-v3-smoke/kit/test/test-real-model.sh",
+      "research/paper-v2/prereg-v3-smoke/kit/test/test-session-login-path.sh",
+      "research/paper-v2/prereg-v3-smoke/kit/bin/evaluate.py",
+      "research/paper-v2/prereg-v3-smoke/kit/bin/atm-write.mjs",
+      "research/paper-v2/prereg-v3-smoke/kit/bin/steward-daemon.mjs",
+      "research/paper-v2/prereg-v3-smoke/kit/seal.sh",
+      "research/paper-v2/prereg-v3-smoke/kit/test/test_metrics_evidence.py",
+      "research/paper-v2/prereg-v3-smoke/kit/test/test-session-slot.sh",
+      "research/paper-v2/prereg-v3-smoke/kit/test/test-preflight-archive.sh"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20261018111128-codex-issue345-0949cba6d3",
+      "status": "active",
+      "source": "option",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261018111128-codex-issue345-0949cba6d3\""
+    },
+    "reason": "closed"
+  },
+  "owner": "codex-issue345",
+  "startedAt": "2026-10-18T01:31:29.594Z",
+  "startedByActor": "codex-issue345",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-af2ad59e325562e9",
+    "ticketDigest": "sha256:af2ad59e325562e969e95edcfeb1a60d0575479b3357126d0571b12533b53521",
+    "taskId": "TASK-PRF-0130",
+    "origin": "claim",
+    "actorId": "codex-issue345",
+    "laneSessionId": "lane-20261018111128-codex-issue345-0949cba6d3",
+    "claimGeneration": "lease-21b99ddeee64",
+    "issuedAt": "2026-10-18T11:16:18.366Z",
+    "expiresAt": "2026-10-18T11:46:18.366Z",
+    "scopeDigest": "sha256:046eb0c5fb32fa1798749d75d609e6620eff0dd3f239c5b3e92d7801769eb78d",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-10-18T11:16:18.366Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0130.*",
+          ".atm/history/task-events/TASK-PRF-0130/**",
+          ".atm/history/tasks/TASK-PRF-0130.json",
+          "research/paper-v2/prereg-v3-smoke/kit/RUNBOOK.md",
+          "research/paper-v2/prereg-v3-smoke/kit/bin/atm-write.mjs",
+          "research/paper-v2/prereg-v3-smoke/kit/bin/evaluate.py",
+          "research/paper-v2/prereg-v3-smoke/kit/bin/steward-daemon.mjs",
+          "research/paper-v2/prereg-v3-smoke/kit/lib/common.sh",
+          "research/paper-v2/prereg-v3-smoke/kit/preflight.sh",
+          "research/paper-v2/prereg-v3-smoke/kit/seal.sh",
+          "research/paper-v2/prereg-v3-smoke/kit/test/test-preflight-archive.sh",
+          "research/paper-v2/prereg-v3-smoke/kit/test/test-probe-retry.sh",
+          "research/paper-v2/prereg-v3-smoke/kit/test/test-real-model.sh",
+          "research/paper-v2/prereg-v3-smoke/kit/test/test-session-login-path.sh",
+          "research/paper-v2/prereg-v3-smoke/kit/test/test-session-slot.sh",
+          "research/paper-v2/prereg-v3-smoke/kit/test/test_metrics_evidence.py"
+        ],
+        "digest": "sha256:16550b4b2c8f24014fa3d4a1099fe8abeeaeca30f81364a679699fd9a0c59af9"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
+    }
+  },
+  "startedBySessionId": "session-20261018013129-codex-issue345-TASK-PRF-0130-47af003167",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0130",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0130.*",
+      ".atm/history/task-events/TASK-PRF-0130/**",
+      ".atm/history/tasks/TASK-PRF-0130.json",
+      "research/paper-v2/prereg-v3-smoke/kit/bin/atm-write.mjs",
+      "research/paper-v2/prereg-v3-smoke/kit/bin/evaluate.py",
+      "research/paper-v2/prereg-v3-smoke/kit/bin/steward-daemon.mjs",
+      "research/paper-v2/prereg-v3-smoke/kit/lib/common.sh",
+      "research/paper-v2/prereg-v3-smoke/kit/preflight.sh",
+      "research/paper-v2/prereg-v3-smoke/kit/RUNBOOK.md",
+      "research/paper-v2/prereg-v3-smoke/kit/seal.sh",
+      "research/paper-v2/prereg-v3-smoke/kit/test/test_metrics_evidence.py",
+      "research/paper-v2/prereg-v3-smoke/kit/test/test-preflight-archive.sh",
+      "research/paper-v2/prereg-v3-smoke/kit/test/test-probe-retry.sh",
+      "research/paper-v2/prereg-v3-smoke/kit/test/test-real-model.sh",
+      "research/paper-v2/prereg-v3-smoke/kit/test/test-session-login-path.sh",
+      "research/paper-v2/prereg-v3-smoke/kit/test/test-session-slot.sh"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "e49c312fc24287da54c940aa8e02f041098f947b3ac48ffa29bc0dccfd7ce9de",
+    "actorId": "codex-issue345",
+    "sessionId": "session-20261018013129-codex-issue345-TASK-PRF-0130-47af003167",
+    "laneSession": {
+      "laneSessionId": "lane-20261017142038-codex-issue345-014a6fb52c",
+      "status": "adopted",
+      "source": "env",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261017142038-codex-issue345-014a6fb52c\""
+    },
+    "createdAt": "2026-10-18T01:31:31.227Z",
+    "status": "active"
+  },
+  "closedAt": "2026-10-18T11:21:33.160Z",
+  "closedByActor": "codex-issue345",
+  "closedBySessionId": "session-20261018013129-codex-issue345-TASK-PRF-0130-47af003167",
+  "closurePacket": ".atm/history/evidence/TASK-PRF-0130.closure-packet.json"
+}

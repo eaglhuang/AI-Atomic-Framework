@@ -15,6 +15,7 @@ import { resolveTaskflowDeclaredFiles, resolveTaskflowEffectiveDeliverables } fr
 import { isCurrentTaskCloseEvidenceFile } from './current-task-close-evidence.js';
 import { applyExplicitGovernanceDirtyDeferral } from './governance-dirty-deferral.js';
 import { buildGovernanceDirtyBlocker, buildScopeDirtyBlocker } from './dirty-blockers.js';
+import { inspectTaskflowGitAuthorGap, TASKFLOW_GIT_AUTHOR_MISSING } from './git-author-guard.js';
 function uniqueStrings(values) {
     return [...new Set(values.map((entry) => entry.trim()).filter(Boolean))];
 }
@@ -396,6 +397,20 @@ export function buildHistoricalClosePreflight(input) {
             waiverReason: input.waiverReason
         })
     ].filter((entry) => entry !== null);
+    const gitAuthorGap = inspectTaskflowGitAuthorGap(input.cwd, input.actorId);
+    if (gitAuthorGap) {
+        operationalBlockers.unshift({
+            id: 'gitAuthor',
+            code: TASKFLOW_GIT_AUTHOR_MISSING,
+            summary: gitAuthorGap.summary,
+            remediationChoices: [{
+                    id: 'configure-git-author',
+                    summary: 'Set repo-local Git user.name and user.email, then retry the same close.',
+                    requiredCommand: gitAuthorGap.requiredCommand
+                }],
+            requiredCommand: gitAuthorGap.requiredCommand
+        });
+    }
     const staleBlocker = buildStaleEvidenceBlocker({
         findings: missingReport?.blockingFindings.filter((entry) => entry.category === 'stale' || entry.category === 'absent' || entry.category === 'failed-run' || entry.category === 'diagnostic-only') ?? []
     });

@@ -7,7 +7,7 @@ import { selectQuickfixChannel } from './channel-strategy.js';
 import { buildChannelPlaybook, buildNextMessages } from './playbook-projection.js';
 import { diagnoseClaimReadinessForTasks } from './claim-readiness.js';
 import { normalizeTaskRouteStatus } from './intent-normalizers.js';
-import { quoteCliValue } from './view-projections.js';
+import { quoteCliToken, quoteCliValue } from './view-projections.js';
 import { editDistance } from '../shared/usage-error-hints.js';
 import { requireGitRepository } from '../shared/git-base-remediation.js';
 export function tryBuildQuickfixClaimResult(input) {
@@ -64,15 +64,22 @@ export function tryBuildQuickfixClaimResult(input) {
     }
     return null;
 }
+function claimActorFlag(actorId) {
+    const actor = actorId?.trim() ?? '';
+    if (actor && !/<[^>\r\n]+>/.test(actor))
+        return ` --actor ${quoteCliToken(actor)}`;
+    return ' --actor <id>';
+}
 export function buildNoClaimableTaskResult(input) {
-    const claimReadiness = diagnoseClaimReadinessForTasks(input.cwd, input.importedTaskQueue.promptScope?.selectedTasks ?? input.importedTaskQueue.tasks, input.claimIntent, { dependencyMode: input.importedTaskQueue.claimableTask ? 'claim-files' : 'hard' });
+    const actorFlag = claimActorFlag(input.actorId);
+    const claimReadiness = diagnoseClaimReadinessForTasks(input.cwd, input.importedTaskQueue.promptScope?.selectedTasks ?? input.importedTaskQueue.tasks, input.claimIntent, { dependencyMode: input.importedTaskQueue.claimableTask ? 'claim-files' : 'hard', actorId: input.actorId });
     const primaryBlocker = claimReadiness.primaryBlocker;
     const selectedReviewTask = input.importedTaskQueue.selectedTask
         && normalizeTaskRouteStatus(input.importedTaskQueue.selectedTask.status) === 'review'
         ? input.importedTaskQueue.selectedTask
         : null;
     if (selectedReviewTask && input.claimIntent !== 'closeout-only') {
-        const requiredCommand = `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(selectedReviewTask.workItemId)} --claim-intent closeout-only --json`;
+        const requiredCommand = `node atm.mjs next --claim${actorFlag} --prompt ${quoteCliValue(selectedReviewTask.workItemId)} --claim-intent closeout-only --json`;
         return makeResult({
             ok: false,
             command: 'next',
@@ -107,8 +114,8 @@ export function buildNoClaimableTaskResult(input) {
                     taskId: unknownTaskId,
                     knownTaskIds,
                     requiredCommand: knownTaskIds[0]
-                        ? `node atm.mjs next --claim --actor <id> --task ${knownTaskIds[0]} --auto-intent --json`
-                        : 'node atm.mjs taskflow open --write --actor <id> --title "<title>" --goal "<goal>" --json'
+                        ? `node atm.mjs next --claim${actorFlag} --task ${knownTaskIds[0]} --auto-intent --json`
+                        : `node atm.mjs taskflow open --write${actorFlag} --json`
                 })],
             evidence: { taskIntent: input.taskIntent, importedTaskQueue: input.importedTaskQueue }
         });
@@ -134,11 +141,11 @@ export function buildNoClaimableTaskResult(input) {
         messages: [message('error', claimCode, claimText, {
                 requiredCommand: primaryBlocker?.requiredCommand
                     ?? (promptScopeMiss
-                        ? `node atm.mjs next --claim --actor <id> --task ${singleVisibleTask.workItemId} --auto-intent --json`
+                        ? `node atm.mjs next --claim${actorFlag} --task ${singleVisibleTask.workItemId} --auto-intent --json`
                         : null)
                     ?? (input.importedTaskQueue.promptScope?.selectedTasks[0]?.sourcePlanPath
                         ? `node atm.mjs tasks import --from ${quoteCliValue(input.importedTaskQueue.promptScope.selectedTasks[0].sourcePlanPath ?? '')} --dry-run --cwd . --json`
-                        : 'node atm.mjs tasks import --from <plan.md> --dry-run --cwd . --json'),
+                        : 'node atm.mjs tasks import --dry-run --cwd . --json'),
                 primaryBlocker,
                 claimReadiness
             })],
