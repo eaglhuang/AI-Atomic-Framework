@@ -1,0 +1,89 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-10-18T13-40-17-289Z-close-0afc10769df0",
+  "taskId": "TASK-AAO-0207",
+  "action": "close",
+  "actorId": "codex-gpt-6",
+  "sessionId": "session-20261018133703-codex-gpt-6-TASK-AAO-0207-63d6c80633",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0207.json",
+  "taskSha256": "sha256:9b4755123a78b663d9f7f78a87df327d287f32278a65c8f581ba9e7c2d55692b",
+  "createdAt": "2026-10-18T13:40:17.289Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0207 --actor codex-gpt-6 --status done --historical-delivery e63860b8548b166e0f157b029d9cbf8e81a91758",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20261018133703-codex-gpt-6-TASK-AAO-0207-63d6c80633",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0207.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types packages/cli/src/commands/taskflow/__tests__/closeback-orchestration.spec.ts",
+      "node --strip-types packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+      "node --strip-types packages/cli/src/commands/taskflow/__tests__/profile-loader.spec.ts",
+      "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
+      "node --strip-types tests/cli/taskflow-host-close-projection.test.ts",
+      "typecheck"
+    ],
+    "requiredGates": [
+      "git diff --check",
+      "node --strip-types packages/cli/src/commands/taskflow/__tests__/closeback-orchestration.spec.ts",
+      "node --strip-types packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+      "node --strip-types packages/cli/src/commands/taskflow/__tests__/profile-loader.spec.ts",
+      "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
+      "node --strip-types tests/cli/taskflow-host-close-projection.test.ts",
+      "typecheck"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-10-18T13:40:17.165Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/catalog/registry/actors.json",
+        ".atm/history/evidence/TASK-AAO-0207.*",
+        ".atm/history/task-events/TASK-AAO-0207/**",
+        ".atm/history/tasks/TASK-AAO-0207.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli-evidence-taskflow.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/cli/src/commands/taskflow/__tests__/closeback-orchestration.spec.ts",
+        "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+        "packages/cli/src/commands/taskflow/__tests__/profile-loader.spec.ts",
+        "packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
+        "packages/cli/src/commands/taskflow/close-orchestration.ts",
+        "packages/cli/src/commands/taskflow/closeback-orchestration.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "packages/cli/src/commands/taskflow/host-close-projection.ts",
+        "packages/cli/src/commands/taskflow/implementation.ts",
+        "packages/cli/src/commands/taskflow/profile-loader.ts",
+        "tests/cli/taskflow-host-close-projection.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/taskflow/__tests__/closeback-orchestration.spec.ts",
+        "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+        "packages/cli/src/commands/taskflow/__tests__/profile-loader.spec.ts",
+        "packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
+        "packages/cli/src/commands/taskflow/close-orchestration.ts",
+        "packages/cli/src/commands/taskflow/closeback-orchestration.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "packages/cli/src/commands/taskflow/host-close-projection.ts",
+        "packages/cli/src/commands/taskflow/implementation.ts",
+        "packages/cli/src/commands/taskflow/profile-loader.ts",
+        "tests/cli/taskflow-host-close-projection.test.ts"
+      ],
+      "requiredGates": [
+        "git diff --check",
+        "node --strip-types packages/cli/src/commands/taskflow/__tests__/closeback-orchestration.spec.ts",
+        "node --strip-types packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+        "node --strip-types packages/cli/src/commands/taskflow/__tests__/profile-loader.spec.ts",
+        "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
+        "node --strip-types tests/cli/taskflow-host-close-projection.test.ts",
+        "typecheck"
+      ]
+    }
+  }
+}
