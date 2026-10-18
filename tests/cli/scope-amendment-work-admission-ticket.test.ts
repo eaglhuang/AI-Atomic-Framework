@@ -15,6 +15,36 @@ const ORIGINAL = 'packages/cli/src/example.ts';
 const ADDED = 'packages/cli/src/added.ts';
 const LIFECYCLE = `.atm/history/tasks/${TASK_ID}.json`;
 
+{
+  const document = claimedDocument();
+  const outerLock: Record<string, unknown> = {
+    files: [ORIGINAL, LIFECYCLE], taskDirectionLock: { allowedFiles: [ORIGINAL, LIFECYCLE] }
+  };
+  const directoryGrant = 'packages/*/dist/**';
+  const result = applyAtomicScopeAmendment({
+    taskDocument: document, outerLock,
+    embeddedLockRecord: outerLock.taskDirectionLock as Record<string, unknown>,
+    mergedAllowed: [ORIGINAL, LIFECYCLE, directoryGrant],
+    taskId: TASK_ID, actorId: ACTOR_ID,
+    ports: {
+      resealTicket: (next) => resealWorkAdmissionTicketForRenewal({
+        cwd: process.cwd(), taskId: TASK_ID, actorId: ACTOR_ID,
+        taskDocument: next, claim: next.claim as TaskClaimRecord,
+        nowIso: '2026-08-14T12:00:02.000Z'
+      }),
+      writeLock: () => {}, persistLedger: () => {}
+    }
+  });
+  assert.ok(readTicketWriteGrant(result.ticket).includes(directoryGrant));
+  const accepted = 'packages/cli/dist/nested/index.js';
+  const denied = 'packages/cli/dist-private/index.js';
+  assert.deepEqual(
+    selectTicketValidatedCommitFiles([accepted, denied], result.ticket, false, true),
+    [accepted],
+    'amending a directory glob must admit real descendants without sibling-prefix leakage'
+  );
+}
+
 function claimedDocument(): Record<string, unknown> {
   const claim = {
     leaseId: 'lease-seq',
