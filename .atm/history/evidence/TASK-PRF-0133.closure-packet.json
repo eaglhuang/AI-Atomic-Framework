@@ -1,0 +1,114 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-PRF-0133",
+  "targetRepoIdentity": {
+    "kind": "framework",
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "/workspace/prf-0133/b/AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "6e8c939d3d04e74f444a0609f70c1573144e02bc",
+  "governedTreeSha": "247541a69eb14c532a5fc092eeedff273e312fa4",
+  "targetCommitDelta": {
+    "currentCommitSha": "6e8c939d3d04e74f444a0609f70c1573144e02bc",
+    "parentCommitShas": [
+      "6e8c939d3d04e74f444a0609f70c1573144e02bc"
+    ],
+    "governedTreeSha": "247541a69eb14c532a5fc092eeedff273e312fa4",
+    "changedFiles": [
+      ".atm/history/task-events/TASK-PRF-0133/2026-10-19T09-10-51-378Z-import-cf98447bb274.json",
+      ".atm/history/task-events/TASK-PRF-0133/2026-10-19T09-10-53-563Z-reserve-1f7586814b41.json",
+      ".atm/history/task-events/TASK-PRF-0133/2026-10-19T09-10-53-566Z-promote-237d1c459d02.json",
+      ".atm/history/task-events/TASK-PRF-0133/2026-10-19T09-10-54-678Z-claim-f801e5370c9d.json",
+      ".atm/history/tasks/TASK-PRF-0133.json",
+      ".atm/task-plans/TASK-PRF-0133.md",
+      "research/paper-v2/prereg-v3-smoke/kit/preflight.sh",
+      "research/paper-v2/prereg-v3-smoke/kit/test/test-preflight-real-mode-isolation.sh"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "bash research/paper-v2/prereg-v3-smoke/kit/preflight.sh",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9f460f15dfd427355b132aef651accdefd286f789113447947cf1980e278c14d",
+      "stderrSha256": "sha256:36ec14f301b9a479e401ead55e35f99951e4e2b7f1fc65de7bdfc1cd0f68b455",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "bash research/paper-v2/prereg-v3-smoke/kit/test/test-preflight-real-mode-isolation.sh",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9626b116d7c9d7ea74a5232cbc1bdf4a81c1f271f8a4334643e0be3d715e0276",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "bash research/paper-v2/prereg-v3-smoke/kit/test/test-preflight-real-mode-isolation.sh",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9626b116d7c9d7ea74a5232cbc1bdf4a81c1f271f8a4334643e0be3d715e0276",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    }
+  ],
+  "validationPasses": [
+    "bash research/paper-v2/prereg-v3-smoke/kit/preflight.sh",
+    "bash research/paper-v2/prereg-v3-smoke/kit/test/test-preflight-real-mode-isolation.sh"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "bash research/paper-v2/prereg-v3-smoke/kit/preflight.sh",
+    "bash research/paper-v2/prereg-v3-smoke/kit/test/test-preflight-real-mode-isolation.sh"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-10-19T09:22:29.845Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "suspected",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-PRF-0133.*",
+      ".atm/history/task-events/TASK-PRF-0133/**",
+      ".atm/history/tasks/TASK-PRF-0133.json",
+      ".atm/task-plans/TASK-PRF-0133.md",
+      "research/paper-v2/prereg-v3-smoke/kit/preflight.sh",
+      "research/paper-v2/prereg-v3-smoke/kit/test/test-preflight-real-mode-isolation.sh"
+    ],
+    "criticalChangedFiles": [],
+    "requiredGates": [
+      "bash research/paper-v2/prereg-v3-smoke/kit/preflight.sh",
+      "bash research/paper-v2/prereg-v3-smoke/kit/test/test-preflight-real-mode-isolation.sh"
+    ]
+  },
+  "evidencePath": ".atm/runtime/evidence-ledger/bundles/TASK-PRF-0133.json",
+  "closedAt": "2026-10-19T09:22:29.846Z",
+  "closedByActor": "grok-bot",
+  "sessionId": "session-20261019091053-grok-bot-TASK-PRF-0133-c0de02c8d0",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "6e8c939d3d04e74f444a0609f70c1573144e02bc",
+    "taskMatchedFiles": [
+      "research/paper-v2/prereg-v3-smoke/kit/preflight.sh",
+      "research/paper-v2/prereg-v3-smoke/kit/test/test-preflight-real-mode-isolation.sh"
+    ],
+    "governanceFiles": [],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
