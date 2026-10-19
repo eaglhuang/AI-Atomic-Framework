@@ -1,0 +1,187 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-AAO-0213",
+  "targetRepoIdentity": {
+    "kind": "framework",
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "6aa05a85651085f85da8aa09c73591ed98c4b8ed",
+  "governedTreeSha": "55d29a31b1ed7402e2f95842cb82dc85b0372d02",
+  "targetCommitDelta": {
+    "currentCommitSha": "6aa05a85651085f85da8aa09c73591ed98c4b8ed",
+    "parentCommitShas": [
+      "6aa05a85651085f85da8aa09c73591ed98c4b8ed"
+    ],
+    "governedTreeSha": "55d29a31b1ed7402e2f95842cb82dc85b0372d02",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-6.runner-sync-receipt.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/create-atm/dist/index.js",
+      "tests/cli/ci-product-lane-contract.test.ts",
+      "tests/cli/task-close-cleanup-rollback.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b41cd8e11144bfb101335f1339066c7e6c9da2dc1de5433c2fa88f793e137149",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "npx eslint tests/cli/ci-product-lane-contract.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts",
+      "cwd": ".",
+      "exitCode": 1,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:0b3613c5c982d872f0450bc63fcadacb4fbb789e543227599c942796a3b15e44",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bdd7d877cb37bbd2436832dbd121e88117a469d33fb730cfbae413344415ff36",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b41cd8e11144bfb101335f1339066c7e6c9da2dc1de5433c2fa88f793e137149",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "npx eslint tests/cli/ci-product-lane-contract.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2954f51d2fb279fa76b460201b5a0ef8e7d6c29190ab719bb9675fd6d51c950f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bdd7d877cb37bbd2436832dbd121e88117a469d33fb730cfbae413344415ff36",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "node --strip-types packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts",
+    "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+    "npx eslint tests/cli/ci-product-lane-contract.test.ts",
+    "typecheck"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "git diff --check",
+    "node --strip-types packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts",
+    "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+    "npx eslint tests/cli/ci-product-lane-contract.test.ts",
+    "typecheck"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-10-19T23:09:07.110Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-AAO-0213.*",
+      ".atm/history/task-events/TASK-AAO-0213/**",
+      ".atm/history/tasks/TASK-AAO-0213.json",
+      "packages/create-atm/dist/index.js",
+      "tests/cli/ci-product-lane-contract.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/create-atm/dist/index.js",
+      "tests/cli/ci-product-lane-contract.test.ts"
+    ],
+    "requiredGates": [
+      "git diff --check",
+      "node --strip-types packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts",
+      "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+      "npx eslint tests/cli/ci-product-lane-contract.test.ts",
+      "typecheck"
+    ]
+  },
+  "evidencePath": ".atm/runtime/evidence-ledger/bundles/TASK-AAO-0213.json",
+  "closedAt": "2026-10-19T23:09:07.111Z",
+  "closedByActor": "codex-gpt-6",
+  "sessionId": "session-20261019135209-codex-gpt-6-TASK-AAO-0213-d1a94fc036",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "6aa05a85651085f85da8aa09c73591ed98c4b8ed",
+    "taskMatchedFiles": [
+      "packages/create-atm/dist/index.js",
+      "tests/cli/ci-product-lane-contract.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/task-events/TASK-AAO-0213/2026-10-19T13-52-02-628Z-import-c5caf4287015.json",
+      ".atm/history/task-events/TASK-AAO-0213/2026-10-19T13-52-09-206Z-reserve-951e43491ab9.json",
+      ".atm/history/task-events/TASK-AAO-0213/2026-10-19T13-52-09-211Z-promote-91a4b6483b09.json",
+      ".atm/history/task-events/TASK-AAO-0213/2026-10-19T13-52-15-646Z-claim-1ae4f24610cf.json",
+      ".atm/history/task-events/TASK-AAO-0213/2026-10-19T14-19-52-585Z-renew-d2255c193371.json",
+      ".atm/history/task-events/TASK-AAO-0213/2026-10-19T23-00-01-679Z-renew-ff6d49a2013c.json",
+      ".atm/history/task-events/TASK-AAO-0213/2026-10-19T23-00-13-607Z-adopt-dc245be513a2.json",
+      ".atm/history/tasks/TASK-AAO-0213.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
