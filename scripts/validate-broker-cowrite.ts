@@ -127,8 +127,13 @@ function checkComposerUnits() {
   }
   // CRLF and a missing trailing newline survive composition.
   const crlf = BASE.replace(/\n/g, '\r\n').replace(/\r\n$/, '');
-  const crlfResult = composeTextPatchesAgainstBase(TARGET, crlf, [fixture('crlf', editPatch({ line: 3, remove: 1, add: ['three'] }))]);
-  check(crlfResult.ok && crlfResult.content.includes('\r\nthree\r\n') && !crlfResult.content.endsWith('\n'), 'composition must keep CRLF and the missing trailing newline');
+  // Body lines of a CRLF-aware patch carry their own CR (#362); headers do not.
+  const crlfPatch = editPatch({ line: 3, remove: 1, add: ['three'] }).split('\n').map((line) => (/^[ +-]/.test(line) && !/^(?:--- |\+\+\+ )/.test(line) ? `${line}\r` : line)).join('\n');
+  const crlfResult = composeTextPatchesAgainstBase(TARGET, crlf, [fixture('crlf', crlfPatch)]);
+  check(crlfResult.ok && crlfResult.content.includes('\r\nthree\r\n') && !crlfResult.content.endsWith('\n') && crlfResult.content === applyUnifiedPatch(crlf, crlfPatch), 'composition must keep CRLF and the missing trailing newline');
+  // An LF patch does not match CRLF lines; a CR-only difference is a context mismatch.
+  const lfOnCrlf = composeTextPatchesAgainstBase(TARGET, crlf, [fixture('lf-on-crlf', editPatch({ line: 3, remove: 1, add: ['three'] }))]);
+  check(!lfOnCrlf.ok, 'an LF patch must not compose onto CRLF lines');
   // Two inserts at the same gap are ambiguous and must fail closed.
   const sameGap = composeTextPatchesAgainstBase(TARGET, BASE, [
     fixture('gap-a', '@@ -4,1 +4,2 @@\n line-4\n+from-a\n'),

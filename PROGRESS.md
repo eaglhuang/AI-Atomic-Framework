@@ -47,3 +47,10 @@ Both validators pass locally. ATM: TASK-PRF-0136 imported and claimed (lane lane
 ## 2026-10-20 06:50 Asia/Taipei — start
 - Base: main 119158900 (PR #370 merged). Codex is logged in on the box and GH_ATM_PUSH_TOKEN is set.
 - ATM: TASK-PRF-0139 imported and claimed (grok-bot, lane lane-20261019224956-grok-bot-70b5fb0cd6). Its scope includes the leftover closed card .atm/task-plans/TASK-PRF-0138.md.
+
+## 2026-10-20 (Asia/Taipei) — #362 source + tests milestone
+- unified-patch.ts: split on LF only, each line keeps its CR; CR-sensitive context (git-exact); headers/markers tolerate a trailing CR; patches carrying CR applied verbatim; CR-free pure insertions follow the neighbouring line's EOL (documented divergence from git apply).
+- steward-base-composer.ts uses the same new-side rule (newSideLineTexts).
+- Updated old CRLF-normalisation assertions (application L105, locator L51, validate-broker-cowrite CRLF fixture) to CR-carrying patches plus LF-patch refusal checks.
+- New tests/cli/unified-patch-eol.test.ts incl. seeded git-apply differential (own base + EOL-flipped base): 711 equal, 579 both-refuse, 0 divergences.
+- Kit generated copy regenerated; 8 CR parity cases added (447 cases ok).
