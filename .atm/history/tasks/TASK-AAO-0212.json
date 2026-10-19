@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-AAO-0212",
   "title": "Sealed runner sync for host projection import cleanup",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -147,8 +147,8 @@
     "checkedFields": [],
     "findings": []
   },
-  "lastTransitionId": "2026-10-19T13-45-12-852Z-renew-7d8eec96af2c",
-  "lastTransitionAt": "2026-10-19T13:45:12.852Z",
+  "lastTransitionId": "2026-10-19T13-47-44-275Z-close-7166e4f7fb41",
+  "lastTransitionAt": "2026-10-19T13:47:44.275Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-6",
   "reservedAt": "2026-10-18T23:27:21.676Z",
@@ -157,7 +157,7 @@
     "actorId": "codex-gpt-6",
     "leaseId": "lease-da7e5152eb32",
     "claimedAt": "2026-10-18T23:27:21.691Z",
-    "heartbeatAt": "2026-10-19T13:45:11.717Z",
+    "heartbeatAt": "2026-10-19T13:47:44.196Z",
     "ttlSeconds": 3600,
     "files": [
       ".atm/history/tasks/TASK-AAO-0212.json",
@@ -167,46 +167,48 @@
       "release/atm-onefile/**",
       "release/atm-root-drop/**"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20261018232721-codex-gpt-6-6035b668be",
       "status": "adopted",
       "source": "option",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261018232721-codex-gpt-6-6035b668be\""
-    }
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-10-18T23:27:21.691Z",
   "startedByActor": "codex-gpt-6",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-9bab45d2ae6f8af6",
-    "ticketDigest": "sha256:9bab45d2ae6f8af61ac21bd84d60a86cd956a70a2ff02eb04fb01d3a285221ea",
+    "ticketId": "wat-76f1383aaa325c53",
+    "ticketDigest": "sha256:76f1383aaa325c5397228b76534634e325fbdc6cd6bb0b5f1f02d9ba84fab9fb",
     "taskId": "TASK-AAO-0212",
     "origin": "claim",
     "actorId": "codex-gpt-6",
     "laneSessionId": "lane-20261018232721-codex-gpt-6-6035b668be",
     "claimGeneration": "lease-da7e5152eb32",
-    "issuedAt": "2026-10-19T13:45:11.717Z",
-    "expiresAt": "2026-10-19T14:45:11.717Z",
-    "scopeDigest": "sha256:f6ce8a0b83ee5fcea0002084314398fc9e556e8ea1715e619771b47fe4bfb718",
+    "issuedAt": "2026-10-19T13:46:05.502Z",
+    "expiresAt": "2026-10-19T14:46:05.502Z",
+    "scopeDigest": "sha256:789a53d20746b517a7b5bb3c623edd4efb4750b68ab737f070e2fc3a98315889",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-10-19T13:45:11.717Z"
+      "selectedAt": "2026-10-19T13:46:05.502Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/TASK-AAO-0212.*",
+          ".atm/history/evidence/git-head.json",
           ".atm/history/task-events/TASK-AAO-0212/**",
           ".atm/history/tasks/TASK-AAO-0212.json",
           "packages/*/dist/**",
           "release/atm-onefile/**",
           "release/atm-root-drop/**"
         ],
-        "digest": "sha256:d3283e4a5a57522f36819a0c908de65d7306c83eced5aef9af3e9a937d62ec00"
+        "digest": "sha256:e5090f05676b1eba8fae7595262aeb41534da2078399a7ee450ea69a7495af37"
       },
       {
         "kind": "lifecycle-operation",
@@ -271,5 +273,9 @@
     },
     "createdAt": "2026-10-18T23:27:24.036Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-10-19T13:47:44.196Z",
+  "closedByActor": "codex-gpt-6",
+  "closedBySessionId": "session-20261018232721-codex-gpt-6-TASK-AAO-0212-eadf811d7d",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0212.closure-packet.json"
 }
