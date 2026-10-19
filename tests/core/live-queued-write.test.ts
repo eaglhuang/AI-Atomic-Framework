@@ -176,6 +176,21 @@ async function main() {
     assert.equal(result.writes[1]?.hunkOffsets?.[0]?.offset, 2);
   }
   {
+    // Stale overlap check: an offset header that really edits a committed line is
+    // classified at its located base position, so it queues instead of stale-base.
+    const overlapRepo = makeRepo(BASE);
+    const head = git(overlapRepo, ['rev-parse', 'HEAD']);
+    const result = applyLiveQueuedWrites({ cwd: overlapRepo, proposals: [
+      proposal({ id: 'beta-one', actor: 'a', hash: hashText(BASE), head, patch: replaceLine(BASE, 'beta', 'beta-one') }),
+      proposal({ id: 'beta-two-offset', actor: 'b', hash: hashText(BASE), head,
+        patch: replaceLine(BASE, 'beta', 'beta-two').replace('@@ -2,1 +2,1 @@', '@@ -3,1 +3,1 @@') })
+    ] });
+    assert.equal(result.writes[0]?.decision, 'accepted');
+    assert.equal(result.writes[1]?.reasonCode, 'overlapping-write-queued');
+    assert.equal(result.writes[1]?.queued, true);
+    assert.match(readFileSync(path.join(overlapRepo, 'shared.py'), 'utf8'), /beta-one/);
+  }
+  {
     // A stale write journals current coordinates and the current preimage hash.
     const shiftedRepo = makeRepo(BASE);
     const head = git(shiftedRepo, ['rev-parse', 'HEAD']);
