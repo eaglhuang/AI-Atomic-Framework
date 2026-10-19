@@ -74,6 +74,16 @@ END_INTENDED_PATCH
 EOF
 }
 
+# Launcher-side git on a probe repo. Under unix-user, Arm B's repo is owned by
+# prereg-steward from own_worktree until finish_probe_steward releases it. Plain
+# git as the launcher then refuses it ("dubious ownership"); the session env's
+# safe.directory does not reach launcher-side calls. Trust exactly this repo, for
+# this one command only; never write global git config.
+probe_git() {
+  local repo="$1"; shift
+  git -c safe.directory="$repo" -C "$repo" "$@"
+}
+
 prepare_probe_repo() {
   local repo="$1"
   git init -q "$repo"
@@ -196,7 +206,7 @@ run_real_attempt() {
   fi
   unset PREREG_SMOKE_CODEX || true
   local base_sha=""
-  base_sha="$(git -C "$repo" rev-parse HEAD)"
+  base_sha="$(probe_git "$repo" rev-parse HEAD)"
   echo "real-model arm=${arm} mode=${mode:-none}"
   (
     launch_codex "$session" "$session/prompt.txt" "$repo"
@@ -226,8 +236,10 @@ inspect_probe_attempt() {
 import json, pathlib, subprocess, sys
 arm, repo, session, base, attempt = sys.argv[1:]
 repo, session = pathlib.Path(repo), pathlib.Path(session)
+# The repo may still be owned by prereg-steward (unix-user); trust only this path, only per call.
+GIT = ["git", "-c", f"safe.directory={repo}", "-C", str(repo)]
 def git(*args):
-    return subprocess.check_output(["git", "-C", str(repo), *args], text=True).strip()
+    return subprocess.check_output([*GIT, *args], text=True).strip()
 try: head = git("rev-parse", "HEAD")
 except subprocess.CalledProcessError: head = None
 changed = not (repo / "note.txt").is_file() or (repo / "note.txt").read_text() != "old\n"
@@ -265,7 +277,7 @@ elif arm == "A" and (not committed or git("show", "HEAD:note.txt") != "new"): re
 elif arm == "B" and (evidence_error or not accepted): reason = "b-no-accepted-write"
 elif "BEGIN_INTENDED_PATCH" not in text: reason = "missing-begin-marker"
 elif not ordered_pair or not (session / "intended.patch").is_file(): reason = "malformed-patch"
-elif subprocess.run(["git", "-C", str(repo), "apply", "--reverse", "--check", str(session / "intended.patch")], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode != 0: reason = "malformed-patch"
+elif subprocess.run([*GIT, "apply", "--reverse", "--check", str(session / "intended.patch")], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode != 0: reason = "malformed-patch"
 else: reason = "ok"
 record = dict(attempt=int(attempt), arm=arm, reason=reason, changed=changed, committed=committed, steward_accepted=accepted, model_started=True)
 (session / "probe-result.json").write_text(json.dumps(record) + "\n")

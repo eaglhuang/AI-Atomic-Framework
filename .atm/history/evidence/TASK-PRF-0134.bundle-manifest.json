@@ -1,0 +1,46 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0134",
+  "updatedAt": "2026-10-19T10:26:54.015Z",
+  "updatedBy": "grok-bot",
+  "freshValidationPasses": [
+    "bash research/paper-v2/prereg-v3-smoke/kit/preflight.sh",
+    "bash research/paper-v2/prereg-v3-smoke/kit/test/test-probe-cross-owner-git.sh"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "bash research/paper-v2/prereg-v3-smoke/kit/test/test-probe-cross-owner-git.sh",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6c8eabf3c0d53fb4f5689c9189fd54a8954cea3133208d1fa90abb10c29e46db",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "bash research/paper-v2/prereg-v3-smoke/kit/test/test-probe-cross-owner-git.sh"
+      ],
+      "generatedAt": "2026-10-19T10:24:02.378Z",
+      "startedAt": "2026-10-19T10:24:02.021Z",
+      "finishedAt": "2026-10-19T10:24:02.378Z",
+      "durationMs": 357,
+      "runnerKind": "dev-source",
+      "sourceCommit": "6f64fa320a4c677e3883d55b7986054ba84a5fe8",
+      "cached": false
+    },
+    {
+      "command": "bash research/paper-v2/prereg-v3-smoke/kit/preflight.sh",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f0e9cbfb718d42dde99ae3e8f9b8695b10201f180f1f0e16e3da2379b1baef86",
+      "stderrSha256": "sha256:4b9fb0bfe1cb747694cdd3bea2fe33fddc5514f052693c82057b12206d50f651",
+      "validators": [
+        "bash research/paper-v2/prereg-v3-smoke/kit/preflight.sh"
+      ],
+      "generatedAt": "2026-10-19T10:26:54.012Z",
+      "startedAt": "2026-10-19T10:24:03.463Z",
+      "finishedAt": "2026-10-19T10:26:54.012Z",
+      "durationMs": 170549,
+      "runnerKind": "dev-source",
+      "sourceCommit": "6f64fa320a4c677e3883d55b7986054ba84a5fe8",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
