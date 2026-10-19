@@ -1,0 +1,110 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-PRF-0134",
+  "targetRepoIdentity": {
+    "kind": "framework",
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "/workspace/prf-0134/AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "135cebb4b77106af5569049f9b951b919ff1a11e",
+  "governedTreeSha": "8b8dcbd79bd3433deea39f03fc40c582e62bb0b5",
+  "targetCommitDelta": {
+    "currentCommitSha": "135cebb4b77106af5569049f9b951b919ff1a11e",
+    "parentCommitShas": [
+      "135cebb4b77106af5569049f9b951b919ff1a11e"
+    ],
+    "governedTreeSha": "8b8dcbd79bd3433deea39f03fc40c582e62bb0b5",
+    "changedFiles": [
+      ".atm/history/task-events/TASK-PRF-0134/2026-10-19T10-23-46-916Z-import-f5178337d2cb.json",
+      ".atm/history/task-events/TASK-PRF-0134/2026-10-19T10-23-49-306Z-reserve-01fdd2d5c4e4.json",
+      ".atm/history/task-events/TASK-PRF-0134/2026-10-19T10-23-49-309Z-promote-90acc5ad48cf.json",
+      ".atm/history/task-events/TASK-PRF-0134/2026-10-19T10-23-50-537Z-claim-5eb84e6ee39c.json",
+      ".atm/history/tasks/TASK-PRF-0134.json",
+      ".atm/task-plans/TASK-PRF-0134.md",
+      "research/paper-v2/prereg-v3-smoke/kit/preflight.sh",
+      "research/paper-v2/prereg-v3-smoke/kit/test/test-probe-cross-owner-git.sh",
+      "research/paper-v2/prereg-v3-smoke/kit/test/test-real-model.sh"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "bash research/paper-v2/prereg-v3-smoke/kit/test/test-probe-cross-owner-git.sh",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6c8eabf3c0d53fb4f5689c9189fd54a8954cea3133208d1fa90abb10c29e46db",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "bash research/paper-v2/prereg-v3-smoke/kit/preflight.sh",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f0e9cbfb718d42dde99ae3e8f9b8695b10201f180f1f0e16e3da2379b1baef86",
+      "stderrSha256": "sha256:4b9fb0bfe1cb747694cdd3bea2fe33fddc5514f052693c82057b12206d50f651",
+      "runnerVersion": "0.1.2"
+    }
+  ],
+  "validationPasses": [
+    "bash research/paper-v2/prereg-v3-smoke/kit/preflight.sh",
+    "bash research/paper-v2/prereg-v3-smoke/kit/test/test-probe-cross-owner-git.sh"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "bash research/paper-v2/prereg-v3-smoke/kit/preflight.sh",
+    "bash research/paper-v2/prereg-v3-smoke/kit/test/test-probe-cross-owner-git.sh"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-10-19T10:32:28.201Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "suspected",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-PRF-0134.*",
+      ".atm/history/task-events/TASK-PRF-0134/**",
+      ".atm/history/tasks/TASK-PRF-0134.json",
+      ".atm/task-plans/TASK-PRF-0134.md",
+      "research/paper-v2/prereg-v3-smoke/kit/**",
+      "research/paper-v2/prereg-v3-smoke/kit/preflight.sh",
+      "research/paper-v2/prereg-v3-smoke/kit/test/test-probe-cross-owner-git.sh",
+      "research/paper-v2/prereg-v3-smoke/kit/test/test-real-model.sh"
+    ],
+    "criticalChangedFiles": [],
+    "requiredGates": [
+      "bash research/paper-v2/prereg-v3-smoke/kit/preflight.sh",
+      "bash research/paper-v2/prereg-v3-smoke/kit/test/test-probe-cross-owner-git.sh"
+    ]
+  },
+  "evidencePath": ".atm/runtime/evidence-ledger/bundles/TASK-PRF-0134.json",
+  "closedAt": "2026-10-19T10:32:28.202Z",
+  "closedByActor": "grok-bot",
+  "sessionId": "session-20261019102349-grok-bot-TASK-PRF-0134-6525819fb7",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "135cebb4b77106af5569049f9b951b919ff1a11e",
+    "taskMatchedFiles": [
+      "research/paper-v2/prereg-v3-smoke/kit/preflight.sh",
+      "research/paper-v2/prereg-v3-smoke/kit/test/test-probe-cross-owner-git.sh",
+      "research/paper-v2/prereg-v3-smoke/kit/test/test-real-model.sh"
+    ],
+    "governanceFiles": [],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
