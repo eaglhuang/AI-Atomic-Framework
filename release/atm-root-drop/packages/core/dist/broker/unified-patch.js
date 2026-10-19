@@ -36,11 +36,16 @@ export function hunkOldLineIndex(oldStart, oldCount = 1) {
 function normalizePatchPath(value) {
     return value.replace(/\\/g, '/').replace(/^(?:\.\/)+/, '').replace(/^[ab]\//, '').replace(/^(?:\.\/)+/, '');
 }
+function stripCr(line) {
+    return line.endsWith('\r') ? line.slice(0, -1) : line;
+}
 const FILE_HEADER = /^(?:diff --git |index |--- |\+\+\+ |new file mode|deleted file mode|old mode|new mode|similarity index|rename from|rename to|copy from|copy to)/;
 /** Parse one file's unified diff, rejecting incomplete or overlong bodies. */
 export function parseUnifiedPatch(patchText, options) {
     const malformed = (message) => { throw new UnifiedPatchApplicationError(message, 'malformed'); };
-    const lines = patchText.split(/\r?\n/);
+    // Split on LF only: a body line's own CR is part of its content (#362).
+    // Header and marker lines tolerate a CR so a CRLF-saved patch still parses.
+    const lines = patchText.split('\n');
     if (lines.at(-1) === '')
         lines.pop();
     const hunks = [];
@@ -55,7 +60,7 @@ export function parseUnifiedPatch(patchText, options) {
         }
     };
     for (let i = 0; i < lines.length;) {
-        const line = lines[i];
+        const line = stripCr(lines[i]);
         const header = HUNK_HEADER.exec(line);
         if (header) {
             started = true;
@@ -72,7 +77,7 @@ export function parseUnifiedPatch(patchText, options) {
             i += 1;
             while (i < lines.length) {
                 const entry = lines[i];
-                if (entry === NO_NEWLINE_AT_EOF_MARKER) {
+                if (stripCr(entry) === NO_NEWLINE_AT_EOF_MARKER) {
                     if (!markerAllowed)
                         malformed('no-newline marker must directly follow a body line');
                     body[body.length - 1] = { ...body[body.length - 1], noNewline: true };
@@ -211,16 +216,27 @@ export function splitSourceText(before) {
     const endsWithNewline = before.endsWith('\n');
     if (before.length === 0)
         return { lineEnding, endsWithNewline: false, lines: [] };
-    const lines = before.split(/\r?\n/);
+    const lines = before.split('\n');
     if (endsWithNewline)
         lines.pop();
     return { lineEnding, endsWithNewline, lines };
 }
-export function joinSourceText(lines, lineEnding, endsWithNewline) {
+/** The terminator a split line carries: CRLF when its text ends in CR. */
+export function lineEol(line, isLast, endsWithNewline) {
+    if (isLast && !endsWithNewline)
+        return '';
+    return line.endsWith('\r') ? '\r\n' : '\n';
+}
+/**
+ * Join lines split by `splitSourceText`. Each line already carries its own CR,
+ * so the separator is always LF; `_lineEnding` is kept for call-site
+ * compatibility and does not rewrite any line.
+ */
+export function joinSourceText(lines, _lineEnding, endsWithNewline) {
     if (lines.length === 0)
         return '';
-    const joined = lines.join(lineEnding);
-    return endsWithNewline ? `${joined}${lineEnding}` : joined;
+    const joined = lines.join('\n');
+    return endsWithNewline ? `${joined}\n` : joined;
 }
 /** True when the patch line's newline flag matches the source line git would require. */
 export function oldSideNewlineAgrees(input) {
@@ -286,6 +302,30 @@ export function resolveEofNewline(decision, fileEndsWithNewline) {
         return fileEndsWithNewline;
     return decision === 'present';
 }
+/** True when any hunk body line carries its own CR (a CRLF-aware patch). */
+export function patchCarriesCr(hunks) {
+    return hunks.some((hunk) => hunk.lines.some((line) => line.text.endsWith('\r')));
+}
+/**
+ * New-side lines of a hunk (context and added, in order) as they land in the
+ * file (#362 AC3). Context lines are the exact matched text.
+ * - A patch that carries CR anywhere is applied verbatim: each added line keeps
+ *   exactly the terminator written in the patch, as `git apply` does.
+ * - A CR-free patch states no line-ending intent. Its added lines follow the
+ *   nearest old line: inside a hunk with context that is a matched LF line, so
+ *   the result equals git's; a pure insertion (no old lines) takes the EOL of
+ *   the file line before the insertion point (else the one after it). This
+ *   pure-insertion case is the only place the result can differ from
+ *   `git apply`, which would insert a bare LF line into a CRLF run.
+ * A line that ends the file without a newline never gains a CR.
+ */
+export function newSideLineTexts(hunk, sourceLines, index, carriesCr) {
+    const newSide = newLinesOf(hunk);
+    const pureInsertion = oldLinesOf(hunk).length === 0;
+    const neighbour = index > 0 ? sourceLines[index - 1] : sourceLines[index];
+    const takeCrlf = !carriesCr && pureInsertion && neighbour !== undefined && neighbour.endsWith('\r');
+    return newSide.map((entry) => (takeCrlf && entry.marker === '+' && !entry.noNewline ? `${entry.text}\r` : entry.text));
+}
 /** Parse, locate with exact context, and apply one file's unified patch. */
 export function applyUnifiedPatchDetailed(before, patchText, options) {
     return applyParsedUnifiedPatchDetailed(before, parseUnifiedPatch(patchText, options), options);
@@ -298,10 +338,11 @@ export function applyParsedUnifiedPatchDetailed(before, hunks, options) {
     if (markerError)
         throw new UnifiedPatchApplicationError(markerError, 'eof-marker');
     const output = [];
+    const carriesCr = patchCarriesCr(hunks);
     let cursor = 0;
     for (const { hunk, index } of located) {
         output.push(...source.lines.slice(cursor, index));
-        output.push(...newLinesOf(hunk).map((entry) => entry.text));
+        output.push(...newSideLineTexts(hunk, source.lines, index, carriesCr));
         cursor = index + oldLinesOf(hunk).length;
     }
     output.push(...source.lines.slice(cursor));

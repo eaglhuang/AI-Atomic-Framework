@@ -13,6 +13,8 @@ import {
   eofMarkerViolation,
   eofNewlineDecision,
   locateUnifiedPatchHunks,
+  newSideLineTexts,
+  patchCarriesCr,
   type LocatedHunk,
   joinSourceText,
   parseUnifiedPatchHunks,
@@ -131,12 +133,16 @@ function resolveProposalEdit(
   }
   const markerError = eofMarkerViolation(located, baseLines.length);
   if (markerError) return { detail: `proposal '${proposal.proposalId}' ${markerError}` };
+  const carriesCr = patchCarriesCr(located.map(({ hunk }) => hunk));
   for (const { hunk, index } of located) {
     let cursor = index;
+    const newSide = newSideLineTexts(hunk, baseLines, index, carriesCr);
+    let newIndex = 0;
     for (const entry of hunk.lines) {
+      if (entry.marker !== '-') newIndex += 1;
       if (entry.marker === '+') {
         const gap = inserts.get(cursor) ?? [];
-        gap.push(entry.text);
+        gap.push(newSide[newIndex - 1]!);
         inserts.set(cursor, gap);
         continue;
       }

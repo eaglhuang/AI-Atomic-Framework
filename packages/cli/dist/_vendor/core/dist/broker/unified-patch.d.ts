@@ -22,6 +22,13 @@ export interface UnifiedPatchHunk {
 }
 /** How a patch treats the final newline relative to the base file. */
 export type EofNewlineDecision = 'preserve' | 'present' | 'absent';
+/**
+ * Lines split on LF only. A line keeps its own `\r`, so a CRLF line's text
+ * ends in `\r` and an LF line's does not (`lineEol`). Untouched lines therefore
+ * round-trip byte for byte, and context matching compares the CR the way
+ * `git apply` does by default. `lineEnding` is informational only (CRLF when
+ * any line ends in CRLF); joining never rewrites a line's terminator.
+ */
 export interface SourceTextLines {
     readonly lineEnding: '\n' | '\r\n';
     readonly endsWithNewline: boolean;
@@ -56,7 +63,14 @@ export declare function locatedLineIndexes(located: readonly LocatedHunk[]): {
     changed: number[];
 };
 export declare function splitSourceText(before: string): SourceTextLines;
-export declare function joinSourceText(lines: readonly string[], lineEnding: string, endsWithNewline: boolean): string;
+/** The terminator a split line carries: CRLF when its text ends in CR. */
+export declare function lineEol(line: string, isLast: boolean, endsWithNewline: boolean): '' | '\n' | '\r\n';
+/**
+ * Join lines split by `splitSourceText`. Each line already carries its own CR,
+ * so the separator is always LF; `_lineEnding` is kept for call-site
+ * compatibility and does not rewrite any line.
+ */
+export declare function joinSourceText(lines: readonly string[], _lineEnding: string, endsWithNewline: boolean): string;
 /** True when the patch line's newline flag matches the source line git would require. */
 export declare function oldSideNewlineAgrees(input: {
     readonly noNewline: boolean;
@@ -72,6 +86,22 @@ export declare function eofMarkerViolation(hunks: readonly LocatedHunk[], baseLi
 /** Final-newline decision for hunks already known to apply to a base of `baseLineCount` lines. */
 export declare function eofNewlineDecision(hunks: readonly LocatedHunk[], baseLineCount: number): EofNewlineDecision;
 export declare function resolveEofNewline(decision: EofNewlineDecision, fileEndsWithNewline: boolean): boolean;
+/** True when any hunk body line carries its own CR (a CRLF-aware patch). */
+export declare function patchCarriesCr(hunks: readonly UnifiedPatchHunk[]): boolean;
+/**
+ * New-side lines of a hunk (context and added, in order) as they land in the
+ * file (#362 AC3). Context lines are the exact matched text.
+ * - A patch that carries CR anywhere is applied verbatim: each added line keeps
+ *   exactly the terminator written in the patch, as `git apply` does.
+ * - A CR-free patch states no line-ending intent. Its added lines follow the
+ *   nearest old line: inside a hunk with context that is a matched LF line, so
+ *   the result equals git's; a pure insertion (no old lines) takes the EOL of
+ *   the file line before the insertion point (else the one after it). This
+ *   pure-insertion case is the only place the result can differ from
+ *   `git apply`, which would insert a bare LF line into a CRLF run.
+ * A line that ends the file without a newline never gains a CR.
+ */
+export declare function newSideLineTexts(hunk: UnifiedPatchHunk, sourceLines: readonly string[], index: number, carriesCr: boolean): string[];
 /** Parse, locate with exact context, and apply one file's unified patch. */
 export declare function applyUnifiedPatchDetailed(before: string, patchText: string, options?: {
     targetFile?: string;

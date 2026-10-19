@@ -21,9 +21,10 @@ if ((install.status ?? 1) !== 0) {
 
 // The sealed runbook refuses to run unless its pinned core paths equal the
 // pinned core merge. main keeps evolving the broker, so the tests run against a
-// throwaway detached worktree of HEAD whose pinned core paths are restored to
-// that merge. The runbook bytes, the harness and the prereg are not touched;
-// a real smoke run still needs a checkout that satisfies the pins by itself.
+// throwaway shared clone of HEAD whose pinned core paths are restored to that
+// merge. It is a separate repository (not a linked worktree of this one), it is
+// deleted afterwards, and the runbook bytes, the harness and the prereg are not
+// touched; a real smoke run still needs a checkout that satisfies the pins.
 const pins = JSON.parse(readFileSync(path.join(runbook, 'pins.json'), 'utf8')) as { core_merge_sha: string; core_paths: string[] };
 const pinnedRoot = path.join(mkdtempSync(path.join(tmpdir(), 'hist-v2-smoke-pinned-')), 'repo');
 function git(cwd: string, args: string[]): void {
@@ -33,14 +34,21 @@ function git(cwd: string, args: string[]): void {
     process.exit(done.status ?? 1);
   }
 }
-git(root, ['worktree', 'add', '--detach', '--quiet', pinnedRoot, 'HEAD']);
+const headSha = spawnSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).stdout.trim();
 let status = 1;
 try {
+  // --shared borrows this repository's object store, so detached CI heads and
+  // the pinned merge resolve without fetching.
+  // CI checks out with --filter=blob:none, so the pinned blobs may not be local
+  // yet and the clone cannot fetch them lazily. A content diff in this
+  // repository batch-fetches both sides of the pinned paths first.
+  git(root, ['-c', 'core.pager=cat', 'diff', '--no-ext-diff', '--no-textconv', '--binary', '--output=/dev/null', pins.core_merge_sha, headSha, '--', ...pins.core_paths]);
+  git(root, ['clone', '--quiet', '--shared', '--no-checkout', root, pinnedRoot]);
+  git(pinnedRoot, ['checkout', '--quiet', '--detach', headSha]);
   git(pinnedRoot, ['checkout', pins.core_merge_sha, '--', ...pins.core_paths]);
   git(pinnedRoot, ['-c', 'user.name=hist-v2-smoke-validator', '-c', 'user.email=hist-v2-smoke-validator@atm.local', '-c', 'commit.gpgsign=false', 'commit', '--quiet', '--no-verify', '--allow-empty', '-m', 'validator: pinned core paths']);
   status = runTests(pinnedRoot);
 } finally {
-  spawnSync('git', ['worktree', 'remove', '--force', pinnedRoot], { cwd: root, stdio: 'ignore' });
   rmSync(path.dirname(pinnedRoot), { recursive: true, force: true });
 }
 if (status !== 0) {
