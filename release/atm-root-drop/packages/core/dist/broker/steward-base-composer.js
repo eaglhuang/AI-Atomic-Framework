@@ -82,7 +82,7 @@ function resolveProposalEdit(proposal, baseLines, fileEndsWithNewline) {
     const carriesCr = patchCarriesCr(located.map(({ hunk }) => hunk));
     for (const { hunk, index } of located) {
         let cursor = index;
-        const newSide = newSideLineTexts(hunk, baseLines, index, carriesCr);
+        const newSide = newSideLineTexts(hunk, baseLines, index, carriesCr, fileEndsWithNewline);
         let newIndex = 0;
         for (const entry of hunk.lines) {
             if (entry.marker !== '-')

@@ -86,7 +86,7 @@ export declare function eofMarkerViolation(hunks: readonly LocatedHunk[], baseLi
 /** Final-newline decision for hunks already known to apply to a base of `baseLineCount` lines. */
 export declare function eofNewlineDecision(hunks: readonly LocatedHunk[], baseLineCount: number): EofNewlineDecision;
 export declare function resolveEofNewline(decision: EofNewlineDecision, fileEndsWithNewline: boolean): boolean;
-/** True when any hunk body line carries its own CR (a CRLF-aware patch). */
+/** True when any hunk body line contains a CR (a CR-aware patch). */
 export declare function patchCarriesCr(hunks: readonly UnifiedPatchHunk[]): boolean;
 /**
  * New-side lines of a hunk (context and added, in order) as they land in the
@@ -96,12 +96,13 @@ export declare function patchCarriesCr(hunks: readonly UnifiedPatchHunk[]): bool
  * - A CR-free patch states no line-ending intent. Its added lines follow the
  *   nearest old line: inside a hunk with context that is a matched LF line, so
  *   the result equals git's; a pure insertion (no old lines) takes the EOL of
- *   the file line before the insertion point (else the one after it). This
+ *   the file line before the insertion point (else the one after it); a CR on
+ *   a final line without a newline is content, not an EOL, and is ignored. This
  *   pure-insertion case is the only place the result can differ from
  *   `git apply`, which would insert a bare LF line into a CRLF run.
  * A line that ends the file without a newline never gains a CR.
  */
-export declare function newSideLineTexts(hunk: UnifiedPatchHunk, sourceLines: readonly string[], index: number, carriesCr: boolean): string[];
+export declare function newSideLineTexts(hunk: UnifiedPatchHunk, sourceLines: readonly string[], index: number, carriesCr: boolean, endsWithNewline: boolean): string[];
 /** Parse, locate with exact context, and apply one file's unified patch. */
 export declare function applyUnifiedPatchDetailed(before: string, patchText: string, options?: {
     targetFile?: string;
