@@ -1,0 +1,276 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0213",
+  "title": "Workspace bin executable mode contract",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [],
+  "deliverables": [
+    "packages/create-atm/dist/index.js",
+    "tests/cli/ci-product-lane-contract.test.ts"
+  ],
+  "scopePaths": [
+    "packages/create-atm/dist/index.js",
+    "tests/cli/ci-product-lane-contract.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+    "npx eslint tests/cli/ci-product-lane-contract.test.ts",
+    "node --strip-types packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts",
+    "npm run typecheck",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 5 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../.codex/worktrees/web-verification/3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0213-workspace-bin-executable-modes.task.md",
+    "sectionTitle": "TASK-AAO-0213",
+    "headingLine": 1,
+    "hash": "1375d0aee3c3ac75",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/.codex/worktrees/web-verification/3KLife",
+      "taskCardPath": "../.codex/worktrees/web-verification/3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0213-workspace-bin-executable-modes.task.md",
+      "planningCommitSha": "2c9e24212d2691d64393a4bdd01722a9a60faf70",
+      "contentDigest": "sha256:fc932f4f09f6c51412f5d55ca563366401fe14124aa13f10445f66a79a27c7df",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-10-19T13:52:02.478Z"
+    }
+  },
+  "importedAt": "2026-10-19T13:52:02.478Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.ci.product.lane.contract.test.ts",
+      "command": "node --strip-types tests/cli/ci-product-lane-contract.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npx.eslint.tests.cli.ci.product.lane.contract.test.ts",
+      "command": "npx eslint tests/cli/ci-product-lane-contract.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.packages.cli.src.commands.git.governance.implementation.sealed.commit.attribution.test.ts",
+      "command": "node --strip-types packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck",
+      "command": "npm run typecheck",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_git.diff.check",
+      "command": "git diff --check",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [],
+    "findings": []
+  },
+  "lastTransitionId": "2026-10-19T23-09-07-202Z-close-1b03a1754d5b",
+  "lastTransitionAt": "2026-10-19T23:09:07.202Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-6",
+  "reservedAt": "2026-10-19T13:52:09.206Z",
+  "promotedAt": "2026-10-19T13:52:09.211Z",
+  "claim": {
+    "actorId": "codex-gpt-6",
+    "leaseId": "lease-500f2d147d8b",
+    "claimedAt": "2026-10-19T13:52:09.216Z",
+    "heartbeatAt": "2026-10-19T23:09:07.123Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0213.json",
+      "packages/create-atm/dist/index.js",
+      "tests/cli/ci-product-lane-contract.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20261019230000-codex-gpt-6-f9d3cacb1f",
+      "status": "adopted",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261019230000-codex-gpt-6-f9d3cacb1f\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-10-19T13:52:09.216Z",
+  "startedByActor": "codex-gpt-6",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-581bcab691996d10",
+    "ticketDigest": "sha256:581bcab691996d1040e8696c8840dc27bead55618bbd79b3da45843b3818f444",
+    "taskId": "TASK-AAO-0213",
+    "origin": "claim",
+    "actorId": "codex-gpt-6",
+    "laneSessionId": "lane-20261019230000-codex-gpt-6-f9d3cacb1f",
+    "claimGeneration": "lease-500f2d147d8b",
+    "issuedAt": "2026-10-19T23:00:00.611Z",
+    "expiresAt": "2026-10-19T23:30:00.611Z",
+    "scopeDigest": "sha256:b466a2d58858b49fe16a7efac9a80fc48abcb0ec3aa0fa430c008b66d8e04947",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-10-19T23:00:00.611Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-AAO-0213.*",
+          ".atm/history/task-events/TASK-AAO-0213/**",
+          ".atm/history/tasks/TASK-AAO-0213.json",
+          "packages/create-atm/dist/index.js",
+          "tests/cli/ci-product-lane-contract.test.ts"
+        ],
+        "digest": "sha256:7a0973fa86eef327fe671eb8beeb3c2157996341350f9aba30eb2b495f7ec763"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20261019135209-codex-gpt-6-TASK-AAO-0213-d1a94fc036",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0213",
+    "batchId": "batch-b4225de6ed1a",
+    "scopeKey": "TASK-PRF",
+    "queueId": "queue-227469bd783a478c",
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0213.*",
+      ".atm/history/task-events/TASK-AAO-0213/**",
+      ".atm/history/tasks/TASK-AAO-0213.json",
+      "packages/create-atm/dist/index.js",
+      "tests/cli/ci-product-lane-contract.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "5b877990b561fdc385c487cdccd3edb958a7bd43e57096decacffc58ae85995f",
+    "actorId": "codex-gpt-6",
+    "sessionId": "session-20261019135209-codex-gpt-6-TASK-AAO-0213-d1a94fc036",
+    "laneSession": {
+      "laneSessionId": "lane-20261019135209-codex-gpt-6-5e7f35c521",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261019135209-codex-gpt-6-5e7f35c521\""
+    },
+    "createdAt": "2026-10-19T13:52:15.645Z",
+    "status": "active"
+  },
+  "closedAt": "2026-10-19T23:09:07.123Z",
+  "closedByActor": "codex-gpt-6",
+  "closedBySessionId": "session-20261019135209-codex-gpt-6-TASK-AAO-0213-d1a94fc036",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0213.closure-packet.json"
+}
