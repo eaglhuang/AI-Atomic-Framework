@@ -1,0 +1,21 @@
+diff --git a/django/db/migrations/loader.py b/django/db/migrations/loader.py
+index 587fa770d7..f2e952c6ee 100644
+--- a/django/db/migrations/loader.py
++++ b/django/db/migrations/loader.py
+@@ -92,6 +92,16 @@ class MigrationLoader:
+                 if not hasattr(module, '__path__'):
+                     self.unmigrated_apps.add(app_config.label)
+                     continue
++                # Empty directories are namespaces. Namespace packages use a
++                # non-list __path__, while regular packages may not have
++                # __file__ in frozen environments.
++                # getattr() is needed on Python 3.6 and older.
++                if (
++                    getattr(module, '__file__', None) is None and
++                    not isinstance(module.__path__, list)
++                ):
++                    self.unmigrated_apps.add(app_config.label)
++                    continue
+                 # Force a reload if it's already loaded (tests need this)
+                 if was_loaded:
+                     reload(module)

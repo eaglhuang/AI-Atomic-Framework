@@ -1,0 +1,309 @@
+== static
+ok static
+== parser
+parser fixture ok
+ok parser
+== v4-regressions
+v4 regressions ok
+ok v4-regressions
+== v5-regressions
+v5 regressions ok
+ok v5-regressions
+== evidence
+evidence_missing ok
+ok evidence
+== seal-secrets
+sealed /tmp/tmp.VzVG72XNtS/sealed-clean
+row: | `prereg-v3-smoke/sealed-clean/` | smoke / exploratory, not results | no win claim | mode=fixture; model=unrecorded; base=abc123 |
+seal allowlist and secret scan ok
+ok seal-secrets
+== public-cli
+public cli selection ok
+ok public-cli
+== fail-fast
+preflight fail-fast ok
+ok fail-fast
+== reasoning-effort
+results.json reasoningEffort ok
+reasoning effort ok
+ok reasoning-effort
+== no-rm
+no-rm state ok
+ok no-rm
+== gold
+gold isolation ok
+ok gold
+== atm-write-path
+atm-write path ok
+ok atm-write-path
+== readonly-steward
+blocked direct-write (exit 1)
+blocked chmod (exit 1)
+blocked rename (exit 1)
+blocked rm (exit 1)
+blocked sudo (exit 1)
+blocked mv-agents (exit 1)
+{"schema":"prereg-v3-smoke.stewardWrite.v1","ok":true,"decision":"accepted","reasonCode":null,"messageCode":"ATM_BROKER_LIVE_WRITE_APPLIED","verdict":"applied","phase":"commit","terminal":"committed","stopReason":null,"proposalId":"prop-session-b-a1-5341c925595c","taskId":"fixture-b","actorId":"session-b","sessionSlot":null,"file":"shared.py","declaredBaseHash":"sha256:4fdbc441ea7b546100e086ac1e4fc5ae6749b7314311c99db05be450eca12996","currentFileText":"alpha\nbeta-one\ngamma\n","currentFileHash":"sha256:e2b2cefcdb151e53eed2a74e62406191a63d332968eed686c4ebec90d1d25ff5","batchSize":1,"attempt":1,"retryCount":0,"hashDriftCount":0,"writeToCommitMs":154,"commit":{"gitIndexLockWaitMs":0,"headMoves":0},"planRequired":false,"cli":"@ai-atomic-framework/cli@0.1.21","entry":"broker steward apply-live"}
+blocked direct-write-after (exit 1)
+blocked chmod-after (exit 1)
+unix-user boundary verified on Debian GNU/Linux 13 (trixie) Linux 6.12.94+ x86_64
+unprivileged mechanism=codex-landlock
+sandbox probe codex-landlock:
+write:1
+chmod:1
+mv:1
+rm:1
+remount:32
+scratch:0
+session:0
+sandbox codex-landlock: direct write, chmod, mv, rm blocked; steward write ok
+readonly steward ok
+ok readonly-steward
+== exec-boundary
+launcher argv matches codex-landlock
+WARNING: proceeding, even though we could not create PATH aliases: Refusing to create helper binaries under temporary dir "/tmp" (codex_home: AbsolutePathBuf("/tmp/prereg-codex-home.Uc3PK9"))
+bash: line 3: /home/box/prereg-exec-boundary.64dyV4/repo/shared.py: Read-only file system
+chmod: changing permissions of '/home/box/prereg-exec-boundary.64dyV4/repo/shared.py': Read-only file system
+mv: cannot move '/home/box/prereg-exec-boundary.64dyV4/repo/shared.py' to '/home/box/prereg-exec-boundary.64dyV4/repo/shared.py.moved': Read-only file system
+rm: cannot remove '/home/box/prereg-exec-boundary.64dyV4/repo/shared.py': Read-only file system
+same wrapper blocks write chmod mv rm
+nested danger-full-access still blocked
+daemon socket dir is writable mode 0700 inside wrapper
+pinned codex exec started inside codex-landlock; bypass could not write
+auth readable inside wrapper; session state writable; login not dropped
+exec boundary ok (codex-landlock)
+ok exec-boundary
+== disposition
+write disposition ok
+ok disposition
+== django-venv
+/tmp/tmp.5lr7SnzR5g/only-setup/setuptools-79.0.1-py3-none-any.whl
+/tmp/tmp.5lr7SnzR5g/broken/wheel-0.46.1-py3-none-any.whl
+
+[notice] A new release of pip is available: 23.0.1 -> 26.2.1
+[notice] To update, run: /tmp/tmp.5lr7SnzR5g/bare/bin/python -m pip install --upgrade pip
+django venv preflight ok
+ok django-venv
+== observation
+observation kit-error ok
+ok observation
+== blocked-edits
+blocked edits ok
+ok blocked-edits
+== snapshot-uncommitted
+snapshot uncommitted ok
+ok snapshot-uncommitted
+== v7-records
+v7 records ok
+ok v7-records
+== v8-records
+v8 records ok
+ok v8-records
+== arm-a-git
+arm A git writable ok
+ok arm-a-git
+== login-path
+PATH=/tmp/tmp.N1mkFwDc8J/bin-A:/workspace/v10-run/2026-10-19-codex-v10c/AI-Atomic-Framework/research/paper-v2/prereg-v3-smoke/kit/bin:/tmp/tmp.N1mkFwDc8J/venv/bin:/home/box/.local/node22/bin:/usr/bin:/bin
+PATH=/tmp/tmp.N1mkFwDc8J/bin-B:/workspace/v10-run/2026-10-19-codex-v10c/AI-Atomic-Framework/research/paper-v2/prereg-v3-smoke/kit/bin:/tmp/tmp.N1mkFwDc8J/venv/bin:/home/box/.local/node22/bin:/usr/bin:/bin
+session login path ok
+ok login-path
+== false-accept
+noop downgraded
+apply kept
+false accept guard ok
+ok false-accept
+== seal-index
+seal index path ok
+ok seal-index
+== overlap
+setup ok mode=fixture base=e48d27020b8fa024543783570b464bd3eda90b33 run=overlap-20261019T111135Z-908059-2955
+state: /workspace/v10-run/2026-10-19-codex-v10c/AI-Atomic-Framework/research/paper-v2/prereg-v3-smoke/kit/state/runs/overlap-20261019T111135Z-908059-2955
+test log: /workspace/v10-run/2026-10-19-codex-v10c/AI-Atomic-Framework/research/paper-v2/prereg-v3-smoke/kit/state/runs/overlap-20261019T111135Z-908059-2955/setup-tests.log
+arm A finished skew_ms=11 model=gpt-6-luna reasoning_effort=medium
+arm B finished skew_ms=13 model=gpt-6-luna reasoning_effort=medium
+{
+  "status": "ok",
+  "evalExit": 0,
+  "armBExit": 0,
+  "decisions": [
+    "accepted",
+    "rejected-by-design",
+    "accepted"
+  ],
+  "reasonCodes": [
+    "overlapping-write-queued"
+  ],
+  "lostEdits": 0,
+  "writes": 3,
+  "recomposeOrRetry": 1,
+  "attempts": [
+    1,
+    2
+  ],
+  "file": [
+    "alpha",
+    "beta-one",
+    "gamma",
+    "delta-two",
+    "epsilon",
+    "zeta"
+  ]
+}
+overlap decision ok
+ok overlap
+== stale-overlap
+stale overlap ok
+ok stale-overlap
+== overlap-condition
+overlap condition ok
+ok overlap-condition
+== stub-dry-run
+setup ok mode=fixture base=6828e5d38c782f70660d9e19bebfc81f9e1fa45a run=selfcheck-20261019T111147Z-909539-27476
+state: /workspace/v10-run/2026-10-19-codex-v10c/AI-Atomic-Framework/research/paper-v2/prereg-v3-smoke/kit/state/runs/selfcheck-20261019T111147Z-909539-27476
+test log: /workspace/v10-run/2026-10-19-codex-v10c/AI-Atomic-Framework/research/paper-v2/prereg-v3-smoke/kit/state/runs/selfcheck-20261019T111147Z-909539-27476/setup-tests.log
+arm A finished skew_ms=11 model=gpt-6-luna reasoning_effort=medium
+arm B finished skew_ms=14 model=gpt-6-luna reasoning_effort=medium
+wrote /workspace/v10-run/2026-10-19-codex-v10c/AI-Atomic-Framework/research/paper-v2/prereg-v3-smoke/kit/state/runs/selfcheck-20261019T111147Z-909539-27476/results.json
+{"status": "ok", "A_lost": 1, "B_lost": 0, "B_rejected": 0, "B_writes": 2, "B_decisions": ["accepted", "accepted"]}
+results: /workspace/v10-run/2026-10-19-codex-v10c/AI-Atomic-Framework/research/paper-v2/prereg-v3-smoke/kit/state/runs/selfcheck-20261019T111147Z-909539-27476/results.json
+self-check assertions ok
+{
+  "A_lost": 1,
+  "B_lost": 0,
+  "B_writes": 2,
+  "B_latency": [
+    162,
+    196
+  ]
+}
+sealed /tmp/tmp.ZG8NYOS0oG/2026-10-15-codex-stub
+row: | `prereg-v3-smoke/2026-10-15-codex-stub/` | smoke / exploratory, not results | no win claim | mode=fixture; model=gpt-6-luna; base=6828e5d38c782f70660d9e19bebfc81f9e1fa45a |
+README.md: OK
+RUNBOOK.md: OK
+diffs/arm-a.diff: OK
+diffs/arm-a.git-log.txt: OK
+diffs/arm-b.diff: OK
+diffs/arm-b.git-log.txt: OK
+logs/arm-a/meta.txt: OK
+logs/arm-a/model.txt: OK
+logs/arm-a/session-1/agent-output.diff: OK
+logs/arm-a/session-1/ended-at: OK
+logs/arm-a/session-1/exit-code: OK
+logs/arm-a/session-1/intended.patch: OK
+logs/arm-a/session-1/launch-env.txt: OK
+logs/arm-a/session-1/prompt.txt: OK
+logs/arm-a/session-1/started-at: OK
+logs/arm-a/session-1/stderr.txt: OK
+logs/arm-a/session-1/stdout.jsonl: OK
+logs/arm-a/session-2/agent-output.diff: OK
+logs/arm-a/session-2/ended-at: OK
+logs/arm-a/session-2/exit-code: OK
+logs/arm-a/session-2/intended.patch: OK
+logs/arm-a/session-2/launch-env.txt: OK
+logs/arm-a/session-2/prompt.txt: OK
+logs/arm-a/session-2/started-at: OK
+logs/arm-a/session-2/stderr.txt: OK
+logs/arm-a/session-2/stdout.jsonl: OK
+logs/arm-b/boundary.txt: OK
+logs/arm-b/meta.txt: OK
+logs/arm-b/model.txt: OK
+logs/arm-b/session-1/agent-output.diff: OK
+logs/arm-b/session-1/ended-at: OK
+logs/arm-b/session-1/exit-code: OK
+logs/arm-b/session-1/intended.patch: OK
+logs/arm-b/session-1/launch-env.txt: OK
+logs/arm-b/session-1/prompt.txt: OK
+logs/arm-b/session-1/started-at: OK
+logs/arm-b/session-1/stderr.txt: OK
+logs/arm-b/session-1/stdout.jsonl: OK
+logs/arm-b/session-2/agent-output.diff: OK
+logs/arm-b/session-2/ended-at: OK
+logs/arm-b/session-2/exit-code: OK
+logs/arm-b/session-2/intended.patch: OK
+logs/arm-b/session-2/launch-env.txt: OK
+logs/arm-b/session-2/prompt.txt: OK
+logs/arm-b/session-2/started-at: OK
+logs/arm-b/session-2/stderr.txt: OK
+logs/arm-b/session-2/stdout.jsonl: OK
+logs/arm-b/session-write.json: OK
+logs/arm-b/steward-writes.jsonl: OK
+logs/setup-tests.log: OK
+results.json: OK
+tasks.json: OK
+self-check seal ok: /tmp/tmp.ZG8NYOS0oG/2026-10-15-codex-stub
+ok stub-dry-run
+== capture-intended
+capture intended patch ok
+ok capture-intended
+== seal-one-row
+seal one row ok
+ok seal-one-row
+== steward-ready
+steward ready ok
+ok steward-ready
+== probe-session-write
+probe session-write ok unix-user
+probe session-write ok codex-landlock
+probe session-write ok bwrap-ro
+probe session-write ok
+ok probe-session-write
+== probe-retry
+offline probe A missing-first ok (calls=2)
+offline probe A always-missing ok (calls=2)
+offline probe A quota ok (calls=1)
+offline probe A model-exit ok (calls=1)
+offline probe A malformed ok (calls=1)
+offline probe A reversed-markers ok (calls=1)
+offline probe A duplicate-markers ok (calls=1)
+offline probe A malformed-body ok (calls=1)
+offline probe B missing-first ok (calls=2)
+offline probe B always-missing ok (calls=2)
+offline probe B quota ok (calls=1)
+offline probe B model-exit ok (calls=1)
+offline probe B malformed ok (calls=1)
+offline probe B reversed-markers ok (calls=1)
+offline probe B duplicate-markers ok (calls=1)
+offline probe B malformed-body ok (calls=1)
+offline probe A no-commit ok (calls=1)
+offline probe B no-accepted ok (calls=1)
+offline failed steward stop blocks retry ok
+probe retry offline ok
+ok probe-retry
+== metrics-evidence
+metrics evidence null/zero, partial usage, rejection and conflict tests passed
+ok metrics-evidence
+== session-slot
+direct/socket session slot attribution passed
+ok session-slot
+== preflight-archive
+complete before return
+real-model ok arm=A mode=none attempt=1
+every offline attempt and policy retained
+archive preserves preflight attempts/policies with checksums and excludes auth
+preflight archive secret negative passed
+ok preflight-archive
+== cross-owner-git
+negative control: plain launcher git refuses the steward-owned repo
+  inspect_probe_attempt: {"arm": "A", "attempt": 1, "changed": true, "committed": true, "model_started": true, "reason": "ok", "steward_accepted": false}
+probe_git reads the steward-owned repo
+cross-owner git ok: inspect_probe_attempt reads a prereg-steward-owned repo; no global git config
+ok cross-owner-git
+== real-mode-isolation
+real-mode isolation ok: offline checks pass, stopped at real-model gate, no probe
+ok real-mode-isolation
+== real-model
+real-model boundary=unix-user
+probe attempt=1 arm=A phase=path-check model_started=false
+real-model arm=A mode=none
+probe-result {"arm": "A", "attempt": 1, "changed": true, "committed": true, "model_started": true, "reason": "ok", "steward_accepted": false}
+real-model ok arm=A mode=none attempt=1
+probe attempt=1 arm=B phase=path-check model_started=false
+real-model arm=B mode=unix-user
+probe-result {"arm": "B", "attempt": 1, "changed": true, "committed": true, "model_started": true, "reason": "ok", "steward_accepted": true}
+real-model ok arm=B mode=unix-user attempt=1
+real-model ok
+ok real-model
+== real-model-skip
+real-model skip ok
+ok real-model-skip
+preflight ok
