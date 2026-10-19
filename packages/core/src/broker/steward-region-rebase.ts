@@ -114,7 +114,12 @@ function planProposalSplice(
   lines: readonly string[],
   fileEndsWithNewline: boolean
 ): PlannedSplice[] | { readonly code: StewardCompositionBlock['code']; readonly detail: string } {
-  const hunks = parseUnifiedPatchHunks(proposal.patch);
+  let hunks: ReturnType<typeof parseUnifiedPatchHunks>;
+  try {
+    hunks = parseUnifiedPatchHunks(proposal.patch);
+  } catch (error) {
+    return { code: 'compose-context-mismatch', detail: error instanceof Error ? error.message : String(error) };
+  }
   if (hunks.length === 0) {
     return { code: 'compose-context-mismatch', detail: `proposal '${proposal.proposalId}' has no hunk to rebase onto region '${region.regionId}'` };
   }
