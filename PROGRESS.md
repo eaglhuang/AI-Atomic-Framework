@@ -27,3 +27,7 @@ Both validators pass locally. ATM: TASK-PRF-0136 imported and claimed (lane lane
 ## 2026-10-20 00:36 Asia/Taipei — TASK-PRF-0136 closed
 - Full rebuild c6d375a50 (receipt sealed at 11cedf46b). Evidence for both validators recorded. `taskflow close --historical-delivery c6d375a50 --write` → close commit 68dd06d88.
 - The full rebuild drops the ~469 stale vendored .d.ts files that the earlier incremental build had re-added, so dist again matches main for those files.
+
+## 2026-10-20 00:55 Asia/Taipei — CI on 52b5a811d
+- ATM Dogfood: success. All 5 other jobs: success. Product CI failed, but only on `worktree-callsite-census.test.ts`: the new `git worktree add` in validate-hist-v2-smoke-runbook.ts is an unclassified production worktree call site, and the production classes are a closed set.
+- Fix (follow-up task TASK-PRF-0137, lane lane-20261019165542-grok-bot-b6f2c9fc27): the validator uses a throwaway `git clone --shared --no-checkout` instead of a linked worktree. Runbook validator (26 tests) and census test pass locally.
