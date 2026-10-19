@@ -1,0 +1,5 @@
+boundary=unix-user
+mechanism=unix-user prereg-steward owns the worktree; prereg-session is not the owner and has no sudo; codex exec uses --sandbox workspace-write and sandbox_workspace_write.network_access=true so the steward socket can connect; prereg-session owns .agents .codex .aws so Codex can create them; tracked files stay prereg-steward-owned
+Linux 6.12.94+ x86_64
+os=Debian GNU/Linux 13 (trixie)
+sock=/tmp/prereg-steward-sockets/s942604-3378.sock

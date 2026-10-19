@@ -1,0 +1,21 @@
+diff --git a/django/db/migrations/loader.py b/django/db/migrations/loader.py
+--- a/django/db/migrations/loader.py
++++ b/django/db/migrations/loader.py
+@@ -93,9 +93,5 @@
+-                if getattr(module, '__file__', None) is None and not isinstance(getattr(module, '__path__', None), list):
+-                    self.unmigrated_apps.add(app_config.label)
+-                    continue
+                 # Module is not a package (e.g. migrations.py).
+                 if not hasattr(module, '__path__'):
+                     self.unmigrated_apps.add(app_config.label)
+diff --git a/tests/migrations/test_loader.py b/tests/migrations/test_loader.py
+--- a/tests/migrations/test_loader.py
++++ b/tests/migrations/test_loader.py
+@@ -509,5 +509,5 @@
+-        """Migration directories without an __init__.py file are ignored."""
++        """Migration directories without an __init__.py file are loaded."""
+         loader = MigrationLoader(connection)
+         loader.load_disk()
+         migrations = [name for app, name in loader.disk_migrations if app == 'migrations']
+-        self.assertEqual(migrations, [])
++        self.assertEqual(migrations, ['0001_initial'])
