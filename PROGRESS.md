@@ -41,3 +41,9 @@ Both validators pass locally. ATM: TASK-PRF-0136 imported and claimed (lane lane
 - The `taskflow close --write` run was interrupted after phase `ledger-written`: the ledger said done, the bundle was partly staged, no commit was made, and the owner pid was gone. A rerun was blocked by `ATM_PLANNING_SOURCE_IDENTITY_DRIFT`, because close had already appended its metadata to the md. With the sealed md restored, the planner instead offered a planning-mirror re-import, which would have conflicted with the done ledger. I took neither path, so there was no double close.
 - Finished the commit step through ATM's own surfaces. `atm git commit --task TASK-PRF-0138` created 6eeb4ce70 with the 9 ledger, event, bundle and closure files, carrying the sealed receipt's ATM-Seal-Digest/Manifest/Target-Head-Before trailers and an ATM-Close-Recovery trailer. `atm git record-commit` created 9a6f1699e for the seal-and-commit receipt.
 - .atm/task-plans/TASK-PRF-0138.md (the closed mirror) is left untracked: the governed commit surfaces refuse it after close, and I did not commit it with raw git.
+
+# #362: per-line EOL preservation (branch fix/362-eol-preserving-patch)
+
+## 2026-10-20 06:50 Asia/Taipei — start
+- Base: main 119158900 (PR #370 merged). Codex is logged in on the box and GH_ATM_PUSH_TOKEN is set.
+- ATM: TASK-PRF-0139 imported and claimed (grok-bot, lane lane-20261019224956-grok-bot-70b5fb0cd6). Its scope includes the leftover closed card .atm/task-plans/TASK-PRF-0138.md.
