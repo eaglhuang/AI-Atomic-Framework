@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-AAO-0214",
   "title": "Runtime-only Git HEAD evidence test contract",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [],
@@ -146,8 +146,8 @@
     "checkedFields": [],
     "findings": []
   },
-  "lastTransitionId": "2026-10-19T14-04-23-232Z-adopt-4b2f78a99674",
-  "lastTransitionAt": "2026-10-19T14:04:23.232Z",
+  "lastTransitionId": "2026-10-19T22-58-42-593Z-close-2ee8cb66fe2a",
+  "lastTransitionAt": "2026-10-19T22:58:42.593Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-6",
   "reservedAt": "2026-10-19T14:04:07.574Z",
@@ -156,51 +156,52 @@
     "actorId": "codex-gpt-6",
     "leaseId": "lease-a62d2c8aa05b",
     "claimedAt": "2026-10-19T14:04:07.583Z",
-    "heartbeatAt": "2026-10-19T14:04:07.583Z",
+    "heartbeatAt": "2026-10-19T22:58:42.525Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-AAO-0214.json",
       "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
-      "laneSessionId": "lane-20261019140407-codex-gpt-6-b02090d71e",
+      "laneSessionId": "lane-20261019225609-codex-gpt-6-7276060640",
       "status": "adopted",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261019140407-codex-gpt-6-b02090d71e\""
-    }
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261019225609-codex-gpt-6-7276060640\""
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-10-19T14:04:07.583Z",
   "startedByActor": "codex-gpt-6",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-9b26f5d9942605d5",
-    "ticketDigest": "sha256:9b26f5d9942605d58fbafce76462e2d11abca0a55a61e1854829487e0d8bd6db",
+    "ticketId": "wat-1710c34073793d3d",
+    "ticketDigest": "sha256:1710c34073793d3d63d4e73de25f376fd09e9cb56f6a6fbc9f34dc8802008843",
     "taskId": "TASK-AAO-0214",
     "origin": "claim",
     "actorId": "codex-gpt-6",
-    "laneSessionId": "lane-20261019140407-codex-gpt-6-b02090d71e",
+    "laneSessionId": "lane-20261019225609-codex-gpt-6-7276060640",
     "claimGeneration": "lease-a62d2c8aa05b",
-    "issuedAt": "2026-10-19T14:04:07.583Z",
-    "expiresAt": "2026-10-19T14:34:07.583Z",
-    "scopeDigest": "sha256:f416b9a178c0ce35285fdde3a4832a3355565bae1ab20b32c13af4db1f826015",
+    "issuedAt": "2026-10-19T22:56:09.143Z",
+    "expiresAt": "2026-10-19T23:26:09.143Z",
+    "scopeDigest": "sha256:b4ef631fe5caed703e7ed71a15af6b228a9ca75077a86ba15e0fe6bef4c9b095",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-10-19T14:04:07.583Z"
+      "selectedAt": "2026-10-19T22:56:09.143Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/TASK-AAO-0214.*",
+          ".atm/history/evidence/git-head.json",
           ".atm/history/task-events/TASK-AAO-0214/**",
           ".atm/history/tasks/TASK-AAO-0214.json",
           "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts"
         ],
-        "digest": "sha256:1361ea65ff4582ce4765d52baf3b7cb1f314834cefe55f0c373258d97d9ac12a"
+        "digest": "sha256:13864682adaeaf7f1e5e55d8c53dc63eb0593aff68b9add0115a058ca25d37cd"
       },
       {
         "kind": "lifecycle-operation",
@@ -263,5 +264,9 @@
     },
     "createdAt": "2026-10-19T14:04:14.199Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-10-19T22:58:42.525Z",
+  "closedByActor": "codex-gpt-6",
+  "closedBySessionId": "session-20261019140407-codex-gpt-6-TASK-AAO-0214-30924bb9dd",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0214.closure-packet.json"
 }
