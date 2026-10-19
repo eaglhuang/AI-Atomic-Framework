@@ -1,0 +1,280 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0215",
+  "title": "Sealed runner sync for runtime test contract",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "A published receipt proves source SHA, equivalent input tree where applicable, build-input hash, output inventory/digests, exact authority, publication disposition and steward release. recovery-retained is incomplete, never success.",
+    "Compare all foreign/source snapshots before and after: no foreign loss or unrelated source/game writes. Only authorized generated AAF outputs and this card's managed evidence/ledger/events may change.",
+    "AAF only: no adopter installation, no TypeScript source edits, no master changes, no original acceptance-card edits and no TASK-AAO-0214 lifecycle/status mirroring.",
+    "Forbidden: emergency, force, no-verify, manual runner copying, moving/stashing/overwriting foreign WIP, stale-runner/source-first bypass. Needed scope changes require normal amendment before writes; new product fixes require another card."
+  ],
+  "deliverables": [
+    "release/atm-onefile/**",
+    "release/atm-root-drop/**",
+    "packages/*/dist/**"
+  ],
+  "scopePaths": [
+    "release/atm-onefile/**",
+    "release/atm-root-drop/**",
+    "packages/*/dist/**",
+    ".atm/history/tasks/TASK-AAO-0215.json",
+    ".atm/history/evidence/TASK-AAO-0215.*",
+    ".atm/history/task-events/TASK-AAO-0215/**"
+  ],
+  "validators": [
+    "ATM_RUNNER_PUBLICATION_TASK=TASK-AAO-0215 ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build",
+    "node atm.mjs doctor --json",
+    "node atm.mjs taskflow close --task TASK-AAO-0214 --actor codex-gpt-6 --dry-run --json",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 4 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../.codex/worktrees/web-verification/3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0215-runtime-test-sealed-runner-sync.task.md",
+    "sectionTitle": "TASK-AAO-0215",
+    "headingLine": 1,
+    "hash": "5f55c2e24f3857ad",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/.codex/worktrees/web-verification/3KLife",
+      "taskCardPath": "../.codex/worktrees/web-verification/3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0215-runtime-test-sealed-runner-sync.task.md",
+      "planningCommitSha": "80367dafe4b01fc84f727dd68394fa11c266af5f",
+      "contentDigest": "sha256:fd94b9d8f493cd35c6d1f8a53169b56ec087df501442130b69eb9cc46dbfa532",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-10-19T14:09:42.246Z"
+    }
+  },
+  "importedAt": "2026-10-19T14:09:42.246Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_atm.runner.publication.task.task.aao.0215.atm.retain.release.artifacts.1.npm.run.build",
+      "command": "ATM_RUNNER_PUBLICATION_TASK=TASK-AAO-0215 ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.atm.mjs.doctor.json",
+      "command": "node atm.mjs doctor --json",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.atm.mjs.taskflow.close.task.task.aao.0214.actor.codex.gpt.6.dry.run.json",
+      "command": "node atm.mjs taskflow close --task TASK-AAO-0214 --actor codex-gpt-6 --dry-run --json",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_git.diff.check",
+      "command": "git diff --check",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [],
+    "findings": []
+  },
+  "lastTransitionId": "2026-10-19T14-23-17-031Z-close-95ae86a94506",
+  "lastTransitionAt": "2026-10-19T14:23:17.031Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-6",
+  "reservedAt": "2026-10-19T14:09:50.718Z",
+  "promotedAt": "2026-10-19T14:09:50.731Z",
+  "claim": {
+    "actorId": "codex-gpt-6",
+    "leaseId": "lease-88bf0a31ad2a",
+    "claimedAt": "2026-10-19T14:09:50.739Z",
+    "heartbeatAt": "2026-10-19T14:23:16.924Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0215.json",
+      ".atm/history/evidence/TASK-AAO-0215.*",
+      ".atm/history/task-events/TASK-AAO-0215/**",
+      "packages/*/dist/**",
+      "release/atm-onefile/**",
+      "release/atm-root-drop/**"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20261019140950-codex-gpt-6-f086c3fa10",
+      "status": "adopted",
+      "source": "option",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261019140950-codex-gpt-6-f086c3fa10\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-10-19T14:09:50.739Z",
+  "startedByActor": "codex-gpt-6",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-8421b766aae6e5a0",
+    "ticketDigest": "sha256:8421b766aae6e5a0bd1db1c6f9b2b9aa1a7cf542f722a64bbd5e72ea75f2b3d0",
+    "taskId": "TASK-AAO-0215",
+    "origin": "claim",
+    "actorId": "codex-gpt-6",
+    "laneSessionId": "lane-20261019140950-codex-gpt-6-f086c3fa10",
+    "claimGeneration": "lease-88bf0a31ad2a",
+    "issuedAt": "2026-10-19T14:20:06.304Z",
+    "expiresAt": "2026-10-19T14:50:06.304Z",
+    "scopeDigest": "sha256:e0250c79d0c332914d8cb2f88ceaf74f550b01349af2d4836cd60ca0f959762c",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-10-19T14:20:06.304Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-AAO-0215.*",
+          ".atm/history/task-events/TASK-AAO-0215/**",
+          ".atm/history/tasks/TASK-AAO-0215.json",
+          "packages/*/dist/**",
+          "release/atm-onefile/**",
+          "release/atm-root-drop/**"
+        ],
+        "digest": "sha256:58bb8ae51956f087eb9cee9225611ee4de3878391c73395e2ceb548eeee7d339"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20261019140950-codex-gpt-6-TASK-AAO-0215-61a79b7549",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0215",
+    "batchId": "batch-b4225de6ed1a",
+    "scopeKey": "TASK-PRF",
+    "queueId": "queue-227469bd783a478c",
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0215.*",
+      ".atm/history/task-events/TASK-AAO-0215/**",
+      ".atm/history/tasks/TASK-AAO-0215.json",
+      "packages/*/dist/**",
+      "release/atm-onefile/**",
+      "release/atm-root-drop/**"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "fe2ebc1c0d3bc5b952fc3b6e9d89904360d1d415406f85fad985fbb797d1538a",
+    "actorId": "codex-gpt-6",
+    "sessionId": "session-20261019140950-codex-gpt-6-TASK-AAO-0215-61a79b7549",
+    "laneSession": {
+      "laneSessionId": "lane-20261019140950-codex-gpt-6-f086c3fa10",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261019140950-codex-gpt-6-f086c3fa10\""
+    },
+    "createdAt": "2026-10-19T14:09:53.493Z",
+    "status": "active"
+  },
+  "closedAt": "2026-10-19T14:23:16.924Z",
+  "closedByActor": "codex-gpt-6",
+  "closedBySessionId": "session-20261019140950-codex-gpt-6-TASK-AAO-0215-61a79b7549",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0215.closure-packet.json"
+}

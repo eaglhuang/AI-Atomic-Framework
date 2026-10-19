@@ -1,0 +1,59 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-10-19T14-23-17-031Z-close-95ae86a94506",
+  "taskId": "TASK-AAO-0215",
+  "action": "close",
+  "actorId": "codex-gpt-6",
+  "sessionId": "session-20261019140950-codex-gpt-6-TASK-AAO-0215-61a79b7549",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0215.json",
+  "taskSha256": "sha256:daff76610cf0392b93c9b7b50ab25d15eba03722992fa8edff4bdb471f469d6a",
+  "createdAt": "2026-10-19T14:23:17.031Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0215 --actor codex-gpt-6 --status done --historical-delivery 01c85399cb3f60eb168918daccb33102722efe19",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20261019140950-codex-gpt-6-TASK-AAO-0215-61a79b7549",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0215.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "build",
+      "doctor",
+      "git diff --check",
+      "node atm.mjs taskflow close --task TASK-AAO-0214 --actor codex-gpt-6 --dry-run --json"
+    ],
+    "requiredGates": [
+      "build",
+      "doctor",
+      "git diff --check",
+      "node atm.mjs taskflow close --task TASK-AAO-0214 --actor codex-gpt-6 --dry-run --json"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-10-19T14:23:16.904Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-AAO-0215.*",
+        ".atm/history/task-events/TASK-AAO-0215/**",
+        ".atm/history/tasks/TASK-AAO-0215.json",
+        "packages/*/dist/**",
+        "release/atm-onefile/**",
+        "release/atm-root-drop/**"
+      ],
+      "criticalChangedFiles": [
+        "packages/*/dist/**"
+      ],
+      "requiredGates": [
+        "build",
+        "doctor",
+        "git diff --check",
+        "node atm.mjs taskflow close --task TASK-AAO-0214 --actor codex-gpt-6 --dry-run --json"
+      ]
+    }
+  }
+}

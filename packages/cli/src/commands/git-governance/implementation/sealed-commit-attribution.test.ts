@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { sealCommitBundle } from '../../../../../core/src/commit-attribution/sealed-commit-bundle.ts';
@@ -68,9 +68,8 @@ assert.notEqual(
   'fixture must prove that the transaction detects a post-commit mismatch after HEAD advances'
 );
 
-// Transaction-produced governance evidence is intentionally ignored by the
-// live worktree. Its producer must force-stage it into the sealed candidate,
-// otherwise the consumer seals a path that Git never commits.
+// Git-head observations describe the candidate but remain local telemetry.
+// They must not become entries in the tree they describe.
 writeFileSync(path.join(repo, '.gitignore'), '.atm/\n');
 execFileSync('git', ['add', '.gitignore'], { cwd: repo, stdio: 'ignore' });
 execFileSync('git', ['commit', '-m', 'ignore runtime'], { cwd: repo, stdio: 'ignore' });
@@ -80,21 +79,37 @@ const candidateDir = mkdtempSync(path.join(os.tmpdir(), 'atm-sealed-candidate-')
 const candidateEnv = { ...process.env, GIT_INDEX_FILE: path.join(candidateDir, 'index') };
 execFileSync('git', ['read-tree', 'HEAD'], { cwd: repo, env: candidateEnv, stdio: 'ignore' });
 execFileSync('git', ['add', '--', 'packages/core/example.ts'], { cwd: repo, env: candidateEnv, stdio: 'ignore' });
-assert.ok(ensureGovernedGitHeadEvidenceStagedForTaskScopedCommit(
+const candidateTree = execFileSync('git', ['write-tree'], { cwd: repo, env: candidateEnv, encoding: 'utf8' }).trim();
+const candidateParent = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repo, encoding: 'utf8' }).trim();
+const observation = ensureGovernedGitHeadEvidenceStagedForTaskScopedCommit(
   repo,
   'validator',
   'ATM-GOV-0371',
   ['packages/core/example.ts'],
   candidateEnv
-));
-assert.doesNotThrow(
-  () => execFileSync('git', ['ls-files', '--error-unmatch', '.atm/history/evidence/git-head.jsonl'], { cwd: repo, env: candidateEnv, stdio: 'ignore' }),
-  'ignored transaction-produced git-head evidence must be force-staged in the candidate index'
+);
+assert.ok(observation);
+assert.equal(observation.evidencePath, null);
+assert.equal(observation.runtimeEvidencePath, '.atm/runtime/telemetry/git-head.jsonl');
+assert.equal(observation.treeSha, candidateTree);
+assert.deepEqual(observation.parentCommitShas, [candidateParent]);
+const runtimeObservationPath = path.join(repo, observation.runtimeEvidencePath);
+assert.ok(existsSync(runtimeObservationPath));
+const latestObservation = () => JSON.parse(readFileSync(runtimeObservationPath, 'utf8').trim().split(/\r?\n/).at(-1)!);
+const candidateDetails = latestObservation().evidence[0].details;
+assert.equal(candidateDetails.taskId, 'ATM-GOV-0371');
+assert.equal(candidateDetails.actorId, 'validator');
+assert.equal(candidateDetails.git.treeSha, candidateTree);
+assert.deepEqual(candidateDetails.git.parentCommitShas, [candidateParent]);
+const observationPaths = ['.atm/history/evidence/git-head.jsonl', observation.runtimeEvidencePath];
+assert.equal(
+  execFileSync('git', ['ls-files', '--', ...observationPaths], { cwd: repo, env: candidateEnv, encoding: 'utf8' }).trim(),
+  '',
+  'neither legacy nor runtime git-head observations belong in the candidate index'
 );
 
-// The public transaction boundary must commit the producer-generated evidence,
-// not merely stage it in the ephemeral candidate index. This catches frozen
-// runner drift where a producer and its post-commit consumer disagree.
+// The public transaction boundary commits the governed source while retaining
+// its observation locally, outside the final commit tree.
 const governedSourceBlob = execFileSync('git', ['hash-object', 'packages/core/example.ts'], { cwd: repo, encoding: 'utf8' }).trim();
 const governedSeal = sealCommitBundle({
   entries: [{ path: 'packages/core/example.ts', mode: '100644', blobId: governedSourceBlob, provenance: 'task-scope', disposition: 'present' }]
@@ -110,9 +125,17 @@ withTaskScopedCommitIndex(
 const provenanceCommitFiles = execFileSync('git', ['show', '--format=', '--name-only', 'HEAD'], { cwd: repo, encoding: 'utf8' });
 assert.match(
   provenanceCommitFiles,
-  /\.atm\/history\/evidence\/git-head\.jsonl/,
-  'a governed transaction must include its generated git-head evidence in the final commit tree'
+  /packages\/core\/example\.ts/,
+  'the governed source must reach the final commit'
 );
+assert.equal(
+  execFileSync('git', ['ls-tree', '-r', '--name-only', 'HEAD', '--', ...observationPaths], { cwd: repo, encoding: 'utf8' }).trim(),
+  '',
+  'neither legacy nor runtime git-head observations belong in the final commit tree'
+);
+assert.ok(existsSync(runtimeObservationPath));
+assert.equal(latestObservation().evidence[0].details.git.treeSha, candidateTree);
+assert.deepEqual(latestObservation().evidence[0].details.git.parentCommitShas, [candidateParent]);
 
 // Task-scoped cleanup commonly carries ignored governance evidence.  It must
 // survive candidate-index assembly just like an ordinary source path; otherwise

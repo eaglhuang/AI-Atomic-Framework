@@ -1,0 +1,272 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0214",
+  "title": "Runtime-only Git HEAD evidence test contract",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [],
+  "deliverables": [
+    "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts"
+  ],
+  "validators": [
+    "node --strip-types packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts",
+    "node --strip-types tests/cli/git-head-runtime-only-receipt.test.ts",
+    "npx eslint packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts",
+    "npm run typecheck",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 5 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../.codex/worktrees/web-verification/3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0214-runtime-git-head-test-contract.task.md",
+    "sectionTitle": "TASK-AAO-0214",
+    "headingLine": 1,
+    "hash": "5a695ade8194d8b5",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/.codex/worktrees/web-verification/3KLife",
+      "taskCardPath": "../.codex/worktrees/web-verification/3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0214-runtime-git-head-test-contract.task.md",
+      "planningCommitSha": "774f0322c5013f281907536ef7c992690edd7b61",
+      "contentDigest": "sha256:e560cce54d88edcdd226fa436412300838a2ddc8cce626f7f28e64d651d6f61d",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-10-19T14:04:00.715Z"
+    }
+  },
+  "importedAt": "2026-10-19T14:04:00.715Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.packages.cli.src.commands.git.governance.implementation.sealed.commit.attribution.test.ts",
+      "command": "node --strip-types packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.git.head.runtime.only.receipt.test.ts",
+      "command": "node --strip-types tests/cli/git-head-runtime-only-receipt.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npx.eslint.packages.cli.src.commands.git.governance.implementation.sealed.commit.attribution.test.ts",
+      "command": "npx eslint packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck",
+      "command": "npm run typecheck",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_git.diff.check",
+      "command": "git diff --check",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [],
+    "findings": []
+  },
+  "lastTransitionId": "2026-10-19T22-58-42-593Z-close-2ee8cb66fe2a",
+  "lastTransitionAt": "2026-10-19T22:58:42.593Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-6",
+  "reservedAt": "2026-10-19T14:04:07.574Z",
+  "promotedAt": "2026-10-19T14:04:07.578Z",
+  "claim": {
+    "actorId": "codex-gpt-6",
+    "leaseId": "lease-a62d2c8aa05b",
+    "claimedAt": "2026-10-19T14:04:07.583Z",
+    "heartbeatAt": "2026-10-19T22:58:42.525Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0214.json",
+      "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20261019225609-codex-gpt-6-7276060640",
+      "status": "adopted",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261019225609-codex-gpt-6-7276060640\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-10-19T14:04:07.583Z",
+  "startedByActor": "codex-gpt-6",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-1710c34073793d3d",
+    "ticketDigest": "sha256:1710c34073793d3d63d4e73de25f376fd09e9cb56f6a6fbc9f34dc8802008843",
+    "taskId": "TASK-AAO-0214",
+    "origin": "claim",
+    "actorId": "codex-gpt-6",
+    "laneSessionId": "lane-20261019225609-codex-gpt-6-7276060640",
+    "claimGeneration": "lease-a62d2c8aa05b",
+    "issuedAt": "2026-10-19T22:56:09.143Z",
+    "expiresAt": "2026-10-19T23:26:09.143Z",
+    "scopeDigest": "sha256:b4ef631fe5caed703e7ed71a15af6b228a9ca75077a86ba15e0fe6bef4c9b095",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-10-19T22:56:09.143Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-AAO-0214.*",
+          ".atm/history/evidence/git-head.json",
+          ".atm/history/task-events/TASK-AAO-0214/**",
+          ".atm/history/tasks/TASK-AAO-0214.json",
+          "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts"
+        ],
+        "digest": "sha256:13864682adaeaf7f1e5e55d8c53dc63eb0593aff68b9add0115a058ca25d37cd"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20261019140407-codex-gpt-6-TASK-AAO-0214-30924bb9dd",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0214",
+    "batchId": "batch-b4225de6ed1a",
+    "scopeKey": "TASK-PRF",
+    "queueId": "queue-227469bd783a478c",
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0214.*",
+      ".atm/history/task-events/TASK-AAO-0214/**",
+      ".atm/history/tasks/TASK-AAO-0214.json",
+      "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "ca4a5cc1b95d6a715e39bc16fe053da1d24fce444a645a97dc387fe60afde550",
+    "actorId": "codex-gpt-6",
+    "sessionId": "session-20261019140407-codex-gpt-6-TASK-AAO-0214-30924bb9dd",
+    "laneSession": {
+      "laneSessionId": "lane-20261019140407-codex-gpt-6-b02090d71e",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261019140407-codex-gpt-6-b02090d71e\""
+    },
+    "createdAt": "2026-10-19T14:04:14.199Z",
+    "status": "active"
+  },
+  "closedAt": "2026-10-19T22:58:42.525Z",
+  "closedByActor": "codex-gpt-6",
+  "closedBySessionId": "session-20261019140407-codex-gpt-6-TASK-AAO-0214-30924bb9dd",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0214.closure-packet.json"
+}

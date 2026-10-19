@@ -1,0 +1,60 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-10-19T22-58-42-593Z-close-2ee8cb66fe2a",
+  "taskId": "TASK-AAO-0214",
+  "action": "close",
+  "actorId": "codex-gpt-6",
+  "sessionId": "session-20261019140407-codex-gpt-6-TASK-AAO-0214-30924bb9dd",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0214.json",
+  "taskSha256": "sha256:780bfdc5dace74f44df9b93f3c9c23d2754336a59a2cde46601aefdf36c0fbbd",
+  "createdAt": "2026-10-19T22:58:42.593Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0214 --actor codex-gpt-6 --status done --historical-delivery 4414aa1710a337ec1834486158607ce50024350d",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20261019140407-codex-gpt-6-TASK-AAO-0214-30924bb9dd",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0214.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts",
+      "node --strip-types tests/cli/git-head-runtime-only-receipt.test.ts",
+      "npx eslint packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts",
+      "typecheck"
+    ],
+    "requiredGates": [
+      "git diff --check",
+      "node --strip-types packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts",
+      "node --strip-types tests/cli/git-head-runtime-only-receipt.test.ts",
+      "npx eslint packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts",
+      "typecheck"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-10-19T22:58:42.514Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-AAO-0214.*",
+        ".atm/history/task-events/TASK-AAO-0214/**",
+        ".atm/history/tasks/TASK-AAO-0214.json",
+        "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts"
+      ],
+      "requiredGates": [
+        "git diff --check",
+        "node --strip-types packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts",
+        "node --strip-types tests/cli/git-head-runtime-only-receipt.test.ts",
+        "npx eslint packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts",
+        "typecheck"
+      ]
+    }
+  }
+}
