@@ -17,10 +17,23 @@ import {
   workerJob
 } from './shared-compose-inbox.fixture.ts';
 
+function assertEmptyPatchMemberIsIdentity(): void {
+  // A rename-only member submits an empty patch; it must materialize to the
+  // declared base, while a non-empty patch without hunks still fails closed.
+  for (const patch of ['', '\n', '  \n']) {
+    const made = materializeMember({ proposalId: 'rename', arrivedAt: 0, baseBytes: BASE, patch });
+    assert.equal(made.ok, true);
+    if (made.ok) assert.equal(made.ready.mine, BASE);
+  }
+  const prose = materializeMember({ proposalId: 'prose', arrivedAt: 0, baseBytes: BASE, patch: 'please rename the file\n' });
+  assert.equal(prose.ok, false);
+}
+
 async function main(): Promise<void> {
   const root = mkdtempSync(path.join(tmpdir(), 'atm-compose-inbox-'));
   try {
     assertDisjointComposeStillParallelSafe();
+    assertEmptyPatchMemberIsIdentity();
     await testImmediateWindowRecomputesOnNewBase(root);
     await testWindowExpiryRecomputesLateProposal(root);
     await testTwoProcessBarrier(root);

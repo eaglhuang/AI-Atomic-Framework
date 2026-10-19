@@ -13,3 +13,13 @@ Append-only log. Times are Asia/Taipei (UTC+8).
 - `taskflow close --historical-delivery 2096a8664 --write` → deliver f31d938a9 + close f5cb2aaea (ATM_TASKFLOW_CLOSE_WRITE_ORCHESTRATED).
 - Deliver bundle re-adds ~470 vendored .d.ts files present in the runner-sync receipt inventory (same churn as TASK-PRF-0130 add / TASK-PRF-0132 delete) and root-drop mirrors of the new tests/fixtures.
 - Next: clean sweep in detached worktree, PR, CI.
+
+## 2026-10-19 23:40 Asia/Taipei — sweep + PR
+- Clean sweep in detached worktree sweep-e787598db3: PASS (npm ci, typecheck, 6 test files, broker-cowrite, broker-steward, kit parity, offline kit preflight all ok, git clean).
+- PR #370 opened (Closes #359, #361). Waiting for CI on e787598db.
+
+## 2026-10-20 00:31 Asia/Taipei — CI on e787598db: Product CI + ATM Dogfood failed
+Both jobs failed on the same two validators:
+1. `validate-hist-v2-harness`: fixture `rename`, arm `atm` → "rename left the source path in place". Root cause: the harness submits an empty patch for a rename, and the shared compose inbox relied on the old `applyUnifiedPatch` returning the base when there were no hunks. The strict parser now refuses it, so the member failed and the rename never happened. Fix (follow-up task TASK-PRF-0136): `materializeMember` treats a whitespace-only patch as identity. The parser stays strict, and prose without hunks still fails. New case added to shared-compose-inbox.test.ts.
+2. `validate-hist-v2-smoke-runbook`: PIN_MISMATCH, because `packages/core/src/broker` now differs from the pinned core merge cb2524243. The sealed runbook checks the live checkout, and this is the first PR since the pin to touch the broker. Fix: the (unsealed) validator runs the runbook tests in a throwaway detached worktree of HEAD with the pinned core paths restored to cb2524243. No sealed bytes changed.
+Both validators pass locally. ATM: TASK-PRF-0136 imported and claimed (lane lane-20261019162919-grok-bot-66c3111f2d); the scope was amended to add scripts/validate-hist-v2-smoke-runbook.ts.
