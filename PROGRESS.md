@@ -58,3 +58,11 @@ Both validators pass locally. ATM: TASK-PRF-0136 imported and claimed (lane lane
 - 0138 card committed under TASK-PRF-0139 via governed `atm git commit` (0ca7b168d) after `tasks renew` (ticket had expired).
 - Clean sweep at 0ca7b168d: PASS (plus unified-patch-eol in the sweep worktree).
 - BLOCKED: `taskflow close` for TASK-PRF-0139 is refused with ATM_CLOSE_WINDOW_STAGED_INDEX_LOCKED: the staged-index lock is still held by the interrupted TASK-PRF-0138 close (acquired 2026-10-20 01:18 Asia/Taipei, close transaction stuck at phase ledger-written). No governed release surface exists; manual .atm edits are forbidden. Awaiting user decision; PR not opened yet.
+
+## 2026-10-20 07:27 (Asia/Taipei) — one-time manual close-window lock recovery
+- Approved by the user (文一) in chat; approval relayed 2026-10-20 07:27 Asia/Taipei.
+- Original holder: TASK-PRF-0138 (actor grok-bot), lock acquired 2026-10-20 01:18:45 Asia/Taipei (2026-10-19T17:18:45.018Z); its close transaction was interrupted and stuck at phase `ledger-written` (outcome in-progress).
+- The 0138 close had already been completed with governed commits 6eeb4ce70 (`atm git commit --task TASK-PRF-0138`, ATM-Close-Recovery) and 9a6f1699e (`atm git record-commit`, seal receipt).
+- Backup of the original: /workspace/close-window-staged-index.lock.TASK-PRF-0138.20261020T072724+0800.json (box).
+- Exact edit, in `.atm/runtime/locks/close-window-staged-index.lock.json` only (gitignored runtime file; no other `.atm` file touched):
+  `"status": "active"` → `"released"`, `"releasedAt": null` → `"2026-10-19T23:27:24.000Z"`, `"releaseOutcome": null` → `"aborted"`.
