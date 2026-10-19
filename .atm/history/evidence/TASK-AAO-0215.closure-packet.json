@@ -1,0 +1,157 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-AAO-0215",
+  "targetRepoIdentity": {
+    "kind": "framework",
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "01c85399cb3f60eb168918daccb33102722efe19",
+  "governedTreeSha": "64dda37bb6d93828eedecc0b95e59b17ce335d46",
+  "targetCommitDelta": {
+    "currentCommitSha": "01c85399cb3f60eb168918daccb33102722efe19",
+    "parentCommitShas": [
+      "01c85399cb3f60eb168918daccb33102722efe19"
+    ],
+    "governedTreeSha": "64dda37bb6d93828eedecc0b95e59b17ce335d46",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-6.runner-sync-receipt.json",
+      ".atm/history/task-events/TASK-AAO-0215/2026-10-19T14-09-42-382Z-import-dd31867837a4.json",
+      ".atm/history/task-events/TASK-AAO-0215/2026-10-19T14-09-50-719Z-reserve-177a921dcaf2.json",
+      ".atm/history/task-events/TASK-AAO-0215/2026-10-19T14-09-50-731Z-promote-3f603827f43a.json",
+      ".atm/history/task-events/TASK-AAO-0215/2026-10-19T14-09-53-494Z-claim-8e4a939fb0bb.json",
+      ".atm/history/task-events/TASK-AAO-0215/2026-10-19T14-10-15-572Z-adopt-81dde3e464b8.json",
+      ".atm/history/task-events/TASK-AAO-0215/2026-10-19T14-20-04-710Z-adopt-0615ecba6692.json",
+      ".atm/history/task-events/TASK-AAO-0215/2026-10-19T14-20-07-585Z-renew-85975eb0522c.json",
+      ".atm/history/tasks/TASK-AAO-0215.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/dist/build-identity.json",
+      "packages/cli/dist/npm-runtime/build-identity.json",
+      "packages/cli/dist/npm-runtime/manifest.json",
+      "packages/create-atm/dist/build-identity.json",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/build-identity.json",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/build-identity.json",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/manifest.json",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts",
+      "release/atm-root-drop/packages/create-atm/dist/build-identity.json",
+      "release/atm-root-drop/release-manifest.json",
+      "tests/cli/ci-product-lane-contract.test.ts",
+      "tests/cli/task-close-cleanup-rollback.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run build",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9c204858652445e261a0625cf97d0afae3a941dbd02d2b2a89732217e2af8f55",
+      "stderrSha256": "sha256:7c8fc0902b8127d11d212f080759999e7deb31408e35139cf76ea0408a16b28a",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node atm.mjs doctor --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:470c9fb36e642ea6c9ccdd3b91e3c2d6e4d5482b32058f704087b59021ac7e2e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node atm.mjs taskflow close --task TASK-AAO-0214 --actor codex-gpt-6 --dry-run --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:22875be24618f680630e8f34521c8715591b8c97d033d54c791df0f6d148d3c8",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    }
+  ],
+  "validationPasses": [
+    "build",
+    "doctor",
+    "git diff --check",
+    "node atm.mjs taskflow close --task TASK-AAO-0214 --actor codex-gpt-6 --dry-run --json"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "build",
+    "doctor",
+    "git diff --check",
+    "node atm.mjs taskflow close --task TASK-AAO-0214 --actor codex-gpt-6 --dry-run --json"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-10-19T14:23:16.904Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-AAO-0215.*",
+      ".atm/history/task-events/TASK-AAO-0215/**",
+      ".atm/history/tasks/TASK-AAO-0215.json",
+      "packages/*/dist/**",
+      "release/atm-onefile/**",
+      "release/atm-root-drop/**"
+    ],
+    "criticalChangedFiles": [
+      "packages/*/dist/**"
+    ],
+    "requiredGates": [
+      "build",
+      "doctor",
+      "git diff --check",
+      "node atm.mjs taskflow close --task TASK-AAO-0214 --actor codex-gpt-6 --dry-run --json"
+    ]
+  },
+  "evidencePath": ".atm/runtime/evidence-ledger/bundles/TASK-AAO-0215.json",
+  "closedAt": "2026-10-19T14:23:16.905Z",
+  "closedByActor": "codex-gpt-6",
+  "sessionId": "session-20261019140950-codex-gpt-6-TASK-AAO-0215-61a79b7549",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "01c85399cb3f60eb168918daccb33102722efe19",
+    "taskMatchedFiles": [
+      "packages/cli/dist/build-identity.json",
+      "packages/cli/dist/npm-runtime/build-identity.json",
+      "packages/cli/dist/npm-runtime/manifest.json",
+      "packages/create-atm/dist/build-identity.json"
+    ],
+    "governanceFiles": [],
+    "allowedRunnerOutputFiles": [
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/build-identity.json",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/build-identity.json",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/manifest.json",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.test.ts",
+      "release/atm-root-drop/packages/create-atm/dist/build-identity.json",
+      "release/atm-root-drop/release-manifest.json"
+    ],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
