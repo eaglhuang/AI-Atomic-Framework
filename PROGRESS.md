@@ -54,3 +54,4 @@ Both validators pass locally. ATM: TASK-PRF-0136 imported and claimed (lane lane
 - Updated old CRLF-normalisation assertions (application L105, locator L51, validate-broker-cowrite CRLF fixture) to CR-carrying patches plus LF-patch refusal checks.
 - New tests/cli/unified-patch-eol.test.ts incl. seeded git-apply differential (own base + EOL-flipped base): 711 equal, 579 both-refuse, 0 divergences.
 - Kit generated copy regenerated; 8 CR parity cases added (447 cases ok).
+- Codex read-only review (567,530 in / 511,104 cached / 6,140 out): fixed 2 regressions it found — a CR anywhere in a body line now marks the patch CR-aware (was endsWith only), and a bare CR on an unterminated final line is no longer copied as an EOL by pure insertions. 4 pre-existing issues (EOF-insertion marker, per-hunk marker validation, region-fallback marker bypass, relocated-offset not carried to later pure insertions) left out of scope for follow-up issues.

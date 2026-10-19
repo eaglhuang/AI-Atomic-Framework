@@ -334,9 +334,9 @@ export function resolveEofNewline(decision: EofNewlineDecision, fileEndsWithNewl
   return decision === 'present';
 }
 
-/** True when any hunk body line carries its own CR (a CRLF-aware patch). */
+/** True when any hunk body line contains a CR (a CR-aware patch). */
 export function patchCarriesCr(hunks: readonly UnifiedPatchHunk[]): boolean {
-  return hunks.some((hunk) => hunk.lines.some((line) => line.text.endsWith('\r')));
+  return hunks.some((hunk) => hunk.lines.some((line) => line.text.includes('\r')));
 }
 
 /**
@@ -347,16 +347,19 @@ export function patchCarriesCr(hunks: readonly UnifiedPatchHunk[]): boolean {
  * - A CR-free patch states no line-ending intent. Its added lines follow the
  *   nearest old line: inside a hunk with context that is a matched LF line, so
  *   the result equals git's; a pure insertion (no old lines) takes the EOL of
- *   the file line before the insertion point (else the one after it). This
+ *   the file line before the insertion point (else the one after it); a CR on
+ *   a final line without a newline is content, not an EOL, and is ignored. This
  *   pure-insertion case is the only place the result can differ from
  *   `git apply`, which would insert a bare LF line into a CRLF run.
  * A line that ends the file without a newline never gains a CR.
  */
-export function newSideLineTexts(hunk: UnifiedPatchHunk, sourceLines: readonly string[], index: number, carriesCr: boolean): string[] {
+export function newSideLineTexts(hunk: UnifiedPatchHunk, sourceLines: readonly string[], index: number, carriesCr: boolean, endsWithNewline: boolean): string[] {
   const newSide = newLinesOf(hunk);
   const pureInsertion = oldLinesOf(hunk).length === 0;
-  const neighbour = index > 0 ? sourceLines[index - 1] : sourceLines[index];
-  const takeCrlf = !carriesCr && pureInsertion && neighbour !== undefined && neighbour.endsWith('\r');
+  const neighbourIndex = index > 0 ? index - 1 : index;
+  const neighbour = sourceLines[neighbourIndex];
+  const neighbourTerminated = neighbourIndex < sourceLines.length - 1 || endsWithNewline;
+  const takeCrlf = !carriesCr && pureInsertion && neighbour !== undefined && neighbourTerminated && neighbour.endsWith('\r');
   return newSide.map((entry) => (takeCrlf && entry.marker === '+' && !entry.noNewline ? `${entry.text}\r` : entry.text));
 }
 
@@ -376,7 +379,7 @@ export function applyParsedUnifiedPatchDetailed(before: string, hunks: readonly 
   let cursor = 0;
   for (const { hunk, index } of located) {
     output.push(...source.lines.slice(cursor, index));
-    output.push(...newSideLineTexts(hunk, source.lines, index, carriesCr));
+    output.push(...newSideLineTexts(hunk, source.lines, index, carriesCr, source.endsWithNewline));
     cursor = index + oldLinesOf(hunk).length;
   }
   output.push(...source.lines.slice(cursor));

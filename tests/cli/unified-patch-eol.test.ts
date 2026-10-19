@@ -55,6 +55,11 @@ assert.equal(applyUnifiedPatch('a\r\nb\r\n', '@@ -0,0 +1 @@\n+X\n'), 'X\r\na\r\n
 assert.equal(applyUnifiedPatch('a\nb\r\n', '@@ -1,0 +2 @@\n+X\n'), 'a\nX\nb\r\n', 'after an LF line it stays LF');
 // A patch that carries CR anywhere is verbatim, even for a pure insertion.
 assert.equal(applyUnifiedPatch('a\r\nb\r\n', '@@ -1,0 +2 @@\n+X\n@@ -2 +3 @@\n-b\r\n+B\r\n'), 'a\r\nX\nB\r\n');
+// A CR inside an added line also marks the patch as CR-aware (verbatim).
+assert.equal(applyUnifiedPatch('a\r\nb\r\n', '@@ -1,0 +2 @@\n+x\ry\n'), 'a\r\nx\ry\nb\r\n');
+// A bare CR on a final line without a newline is content, not an EOL to copy.
+assert.equal(applyUnifiedPatch('a\r', '@@ -1,0 +2 @@\n+x\n'), applyUnifiedPatch('a', '@@ -1,0 +2 @@\n+x\n').replace(/^a/, 'a\r'));
+assert.ok(!applyUnifiedPatch('a\r', '@@ -1,0 +2 @@\n+x\n').endsWith('x\r'));
 // A CRLF-saved patch (headers end in CR too) still parses and applies.
 assert.equal(applyUnifiedPatch('a\r\nb\r\n', '--- a/f\r\n+++ b/f\r\n@@ -1,2 +1,2 @@\r\n a\r\n-b\r\n+B\r\n'), 'a\r\nB\r\n');
 
