@@ -1,0 +1,291 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0138",
+  "title": "Smoke-runbook validator: prefetch pinned blobs in partial clones (#359 follow-up)",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [
+    "TASK-PRF-0137"
+  ],
+  "acceptance": [
+    "`validate-hist-v2-smoke-runbook` passes in a full checkout and in a `--filter=blob:none` clone.",
+    "`worktree-callsite-census` still passes."
+  ],
+  "deliverables": [
+    "scripts/validate-hist-v2-smoke-runbook.ts"
+  ],
+  "scopePaths": [
+    ".atm/history/evidence/TASK-PRF-0138.*",
+    ".atm/history/task-events/TASK-PRF-0138/**",
+    ".atm/history/tasks/TASK-PRF-0138.json",
+    ".atm/task-plans/TASK-PRF-0138.md",
+    "PROGRESS.md",
+    "scripts/validate-hist-v2-smoke-runbook.ts",
+    "packages/cli/dist",
+    "packages/cli/dist/**",
+    "release/atm-onefile/**",
+    "release/atm-root-drop/**"
+  ],
+  "validators": [
+    "node --strip-types scripts/validate-hist-v2-smoke-runbook.ts",
+    "node --strip-types tests/cli/worktree-callsite-census.test.ts"
+  ],
+  "planningRepo": "AI-Atomic-Framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [
+    "Do not add a new production worktree class to the worktree call-site census.",
+    "Do not modify the sealed hist-v2 smoke runbook, harness, or prereg bytes.",
+    "Do not tag or publish npm."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the delivery commit; the validator goes back to the TASK-PRF-0137 form without the prefetch.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 2 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": ".atm/task-plans/TASK-PRF-0138.md",
+    "sectionTitle": "TASK-PRF-0138",
+    "headingLine": 40,
+    "hash": "66d993cfa90513ab",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/AI-Atomic-Framework.git",
+      "repoRoot": "/workspace/AI-Atomic-Framework-359/AI-Atomic-Framework",
+      "taskCardPath": ".atm/task-plans/TASK-PRF-0138.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:66d993cfa90513abcb1d5d63265afb2d8cbe0917611a540f951e63c77d8793f4",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-10-19T17:17:34.635Z"
+    }
+  },
+  "importedAt": "2026-10-19T17:17:34.635Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.scripts.validate.hist.v2.smoke.runbook.ts",
+      "command": "node --strip-types scripts/validate-hist-v2-smoke-runbook.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.worktree.callsite.census.test.ts",
+      "command": "node --strip-types tests/cli/worktree-callsite-census.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": [
+      {
+        "taskId": "TASK-PRF-0137",
+        "relation": "legacy-untyped",
+        "admissionMode": "legacy-status-gate",
+        "provenFacts": [],
+        "missingFacts": [],
+        "contradictions": [],
+        "producerOutput": null,
+        "producerOutputSatisfied": false,
+        "negativeControlCommand": null,
+        "blockingCandidate": false
+      }
+    ]
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "dependencies"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-10-19T17-19-34-634Z-close-73d1cd5a31e2",
+  "lastTransitionAt": "2026-10-19T17:19:34.634Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "grok-bot",
+  "reservedAt": "2026-10-19T17:17:37.922Z",
+  "promotedAt": "2026-10-19T17:17:37.925Z",
+  "claim": {
+    "actorId": "grok-bot",
+    "leaseId": "lease-c48f789c9bd2",
+    "claimedAt": "2026-10-19T17:17:37.927Z",
+    "heartbeatAt": "2026-10-19T17:19:34.632Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-PRF-0138.json",
+      ".atm/history/evidence/TASK-PRF-0138.*",
+      ".atm/history/task-events/TASK-PRF-0138/**",
+      ".atm/task-plans/TASK-PRF-0138.md",
+      "packages/cli/dist",
+      "packages/cli/dist/**",
+      "PROGRESS.md",
+      "release/atm-onefile/**",
+      "release/atm-root-drop/**",
+      "scripts/validate-hist-v2-smoke-runbook.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20261019171738-grok-bot-69c0e384a1",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261019171738-grok-bot-69c0e384a1\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-10-19T17:17:37.927Z",
+  "startedByActor": "grok-bot",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-b24b9a5da49cf17a",
+    "ticketDigest": "sha256:b24b9a5da49cf17ade604f98e1631bb51e130fdc52c44dd4ecb0a2a26a4d4e0f",
+    "taskId": "TASK-PRF-0138",
+    "origin": "claim",
+    "actorId": "grok-bot",
+    "laneSessionId": "lane-20261019171738-grok-bot-69c0e384a1",
+    "claimGeneration": "lease-c48f789c9bd2",
+    "issuedAt": "2026-10-19T17:17:37.927Z",
+    "expiresAt": "2026-10-19T17:47:37.927Z",
+    "scopeDigest": "sha256:d10e4b67356f062b923d5f01dd3051f7a71aecdb89cd6b2f2312dd91e1d14226",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-10-19T17:17:37.927Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0138.*",
+          ".atm/history/task-events/TASK-PRF-0138/**",
+          ".atm/history/tasks/TASK-PRF-0138.json",
+          ".atm/task-plans/TASK-PRF-0138.md",
+          "PROGRESS.md",
+          "packages/cli/dist",
+          "packages/cli/dist/**",
+          "release/atm-onefile/**",
+          "release/atm-root-drop/**",
+          "scripts/validate-hist-v2-smoke-runbook.ts"
+        ],
+        "digest": "sha256:6665991e922f62703bba23b126495ed1565f7df443d3a9cee5d957e2c187e42e"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20261019171737-grok-bot-TASK-PRF-0138-6286fbf314",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0138",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0138.*",
+      ".atm/history/task-events/TASK-PRF-0138/**",
+      ".atm/history/tasks/TASK-PRF-0138.json",
+      ".atm/task-plans/TASK-PRF-0138.md",
+      "packages/cli/dist",
+      "packages/cli/dist/**",
+      "PROGRESS.md",
+      "release/atm-onefile/**",
+      "release/atm-root-drop/**",
+      "scripts/validate-hist-v2-smoke-runbook.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "4cbc798b8f30e010b1b54e80d10ace5e6b91d5a748e0dcb66c9e278ea4fc77fd",
+    "actorId": "grok-bot",
+    "sessionId": "session-20261019171737-grok-bot-TASK-PRF-0138-6286fbf314",
+    "laneSession": {
+      "laneSessionId": "lane-20261019171738-grok-bot-69c0e384a1",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261019171738-grok-bot-69c0e384a1\""
+    },
+    "createdAt": "2026-10-19T17:17:39.845Z",
+    "status": "active"
+  },
+  "closedAt": "2026-10-19T17:19:34.632Z",
+  "closedByActor": "grok-bot",
+  "closedBySessionId": "session-20261019171737-grok-bot-TASK-PRF-0138-6286fbf314",
+  "closurePacket": ".atm/history/evidence/TASK-PRF-0138.closure-packet.json"
+}

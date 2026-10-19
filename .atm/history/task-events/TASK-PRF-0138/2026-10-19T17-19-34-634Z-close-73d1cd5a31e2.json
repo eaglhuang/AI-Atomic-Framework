@@ -1,0 +1,59 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-10-19T17-19-34-634Z-close-73d1cd5a31e2",
+  "taskId": "TASK-PRF-0138",
+  "action": "close",
+  "actorId": "grok-bot",
+  "sessionId": "session-20261019171737-grok-bot-TASK-PRF-0138-6286fbf314",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0138.json",
+  "taskSha256": "sha256:537a6d0769ba7531d4b38dc02978998a0f066cc694bec2bf36f7a7f33ec0a3ce",
+  "createdAt": "2026-10-19T17:19:34.634Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0138 --actor grok-bot --status done --historical-delivery 825542424",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20261019171737-grok-bot-TASK-PRF-0138-6286fbf314",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0138.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/worktree-callsite-census.test.ts",
+      "validate:hist-v2-smoke-runbook"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/worktree-callsite-census.test.ts",
+      "validate:hist-v2-smoke-runbook"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-10-19T17:19:34.625Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0138.*",
+        ".atm/history/task-events/TASK-PRF-0138/**",
+        ".atm/history/tasks/TASK-PRF-0138.json",
+        ".atm/task-plans/TASK-PRF-0138.md",
+        "packages/cli/dist",
+        "packages/cli/dist/**",
+        "PROGRESS.md",
+        "release/atm-onefile/**",
+        "release/atm-root-drop/**",
+        "scripts/validate-hist-v2-smoke-runbook.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/dist",
+        "packages/cli/dist/**",
+        "scripts/validate-hist-v2-smoke-runbook.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types tests/cli/worktree-callsite-census.test.ts",
+        "validate:hist-v2-smoke-runbook"
+      ]
+    }
+  }
+}
