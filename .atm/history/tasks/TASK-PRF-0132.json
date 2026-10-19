@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-PRF-0132",
   "title": "Repair onefile atom capsule runtime closure",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -23,11 +23,16 @@
     "scripts/onefile-runtime-closure.ts",
     "packages/cli/dist",
     "release/atm-onefile",
-    "release/atm-root-drop"
+    "release/atm-root-drop",
+    ".atm/history/evidence/TASK-PRF-0132.*",
+    ".atm/history/task-events/TASK-PRF-0132/**",
+    ".atm/history/tasks/TASK-PRF-0132.json",
+    "packages/cli/dist/**",
+    "release/atm-onefile/**",
+    "release/atm-root-drop/**"
   ],
   "validators": [
-    "node --strip-types tests/cli/onefile-adopter-atomize-proposal.test.ts",
-    "node --strip-types scripts/run-cli-test-sweep.ts"
+    "node --strip-types tests/cli/onefile-adopter-atomize-proposal.test.ts"
   ],
   "planningRepo": "AI-Atomic-Framework",
   "targetRepo": "AI-Atomic-Framework",
@@ -67,9 +72,9 @@
       "repoRoot": "/workspace/AI-Atomic-Framework",
       "taskCardPath": ".atm/task-plans/TASK-PRF-0132.md",
       "planningCommitSha": null,
-      "contentDigest": "sha256:402bd178412e87e3b7f6e06834269dd9a045ab5d538510fb66ce7652294c2db6",
-      "amendmentEpoch": 0,
-      "sealedAt": "2026-10-18T15:08:07.169Z"
+      "contentDigest": "sha256:952ee0a0ab4845a8a896a7a4b2054c25f881cdb200d7d92aaeca392ebe10145e",
+      "amendmentEpoch": 1,
+      "sealedAt": "2026-10-18T22:48:59.825Z"
     }
   },
   "importedAt": "2026-10-18T15:08:07.169Z",
@@ -128,8 +133,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-10-18T16-50-29-382Z-renew-58bb1be1eb6d",
-  "lastTransitionAt": "2026-10-18T16:50:29.382Z",
+  "lastTransitionId": "2026-10-19T00-47-14-617Z-close-9f1bb8c43797",
+  "lastTransitionAt": "2026-10-19T00:47:14.617Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-issue345",
   "reservedAt": "2026-10-18T15:08:17.238Z",
@@ -138,60 +143,70 @@
     "actorId": "codex-issue345",
     "leaseId": "lease-c82c5a006463",
     "claimedAt": "2026-10-18T15:08:17.243Z",
-    "heartbeatAt": "2026-10-18T16:50:29.147Z",
+    "heartbeatAt": "2026-10-19T00:47:14.608Z",
     "ttlSeconds": 1800,
     "files": [
+      ".atm/history/evidence/TASK-PRF-0132.*",
+      ".atm/history/task-events/TASK-PRF-0132/**",
       ".atm/history/tasks/TASK-PRF-0132.json",
       "packages/cli/dist",
+      "packages/cli/dist/**",
       "release/atm-onefile",
+      "release/atm-onefile/**",
       "release/atm-root-drop",
+      "release/atm-root-drop/**",
       "scripts/onefile-runtime-closure.ts",
       "scripts/src/atomize-backfill.js",
       "tests/cli/onefile-adopter-atomize-proposal.test.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
-      "laneSessionId": "lane-20261018165016-codex-issue345-1300aff11d",
+      "laneSessionId": "lane-20261019004331-codex-issue345-d11f520d8b",
       "status": "active",
-      "source": "option",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261018165016-codex-issue345-1300aff11d\""
-    }
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261019004331-codex-issue345-d11f520d8b\""
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-10-18T15:08:17.243Z",
   "startedByActor": "codex-issue345",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-4fa71f23d0c190c2",
-    "ticketDigest": "sha256:4fa71f23d0c190c2990e9f64dc881306678328a33c80a550084bcb84a135f028",
+    "ticketId": "wat-658c12975d8d0948",
+    "ticketDigest": "sha256:658c12975d8d0948d31aecedf5943aba7a30a36a917bf86f4907961c3f348889",
     "taskId": "TASK-PRF-0132",
     "origin": "claim",
     "actorId": "codex-issue345",
-    "laneSessionId": "lane-20261018165016-codex-issue345-1300aff11d",
+    "laneSessionId": "lane-20261019004331-codex-issue345-d11f520d8b",
     "claimGeneration": "lease-c82c5a006463",
-    "issuedAt": "2026-10-18T16:50:29.147Z",
-    "expiresAt": "2026-10-18T17:20:29.147Z",
-    "scopeDigest": "sha256:798b60b6ae3ad4f2694b022112544a017eb2f174f6549e1a084d5b53d858aff6",
+    "issuedAt": "2026-10-19T00:43:42.077Z",
+    "expiresAt": "2026-10-19T01:13:42.077Z",
+    "scopeDigest": "sha256:2c32aa4df0d0ada54dc027331f0e32fd3cbb40921310f92ddb6498db20f5af74",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-10-18T16:50:29.147Z"
+      "selectedAt": "2026-10-19T00:43:42.077Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/TASK-PRF-0132.*",
+          ".atm/history/evidence/git-head.json",
           ".atm/history/task-events/TASK-PRF-0132/**",
           ".atm/history/tasks/TASK-PRF-0132.json",
           "packages/cli/dist",
+          "packages/cli/dist/**",
           "release/atm-onefile",
+          "release/atm-onefile/**",
           "release/atm-root-drop",
+          "release/atm-root-drop/**",
           "scripts/onefile-runtime-closure.ts",
           "scripts/src/atomize-backfill.js",
           "tests/cli/onefile-adopter-atomize-proposal.test.ts"
         ],
-        "digest": "sha256:92804e2ef78be6e9ede4d0210f1c9d525836c9fc7e875dd3e79a228d84edb342"
+        "digest": "sha256:f8630128b29ab29e0faba18f8bb3d25a02cfac8d32fa3ab00c233d59493299d4"
       },
       {
         "kind": "lifecycle-operation",
@@ -239,25 +254,34 @@
       ".atm/history/task-events/TASK-PRF-0132/**",
       ".atm/history/tasks/TASK-PRF-0132.json",
       "packages/cli/dist",
+      "packages/cli/dist/**",
       "release/atm-onefile",
+      "release/atm-onefile/**",
       "release/atm-root-drop",
+      "release/atm-root-drop/**",
       "scripts/onefile-runtime-closure.ts",
       "scripts/src/atomize-backfill.js",
       "tests/cli/onefile-adopter-atomize-proposal.test.ts"
     ],
-    "planningReadOnlyPaths": [],
+    "planningReadOnlyPaths": [
+      "/workspace/AI-Atomic-Framework/.atm/task-plans/TASK-PRF-0132.md"
+    ],
     "planningMirrorPaths": [],
     "allowPlanningMirror": false,
     "promptHash": "175d2385bf15288780ef845ecc7eb3dfaed866eb8708d28795762f19830a2455",
     "actorId": "codex-issue345",
-    "sessionId": "session-20261018150817-codex-issue345-TASK-PRF-0132-dea75af3a4",
+    "sessionId": null,
     "laneSession": {
-      "laneSessionId": "lane-20261018150817-codex-issue345-63c33f8e2b",
+      "laneSessionId": "lane-20261018224912-codex-issue345-ffd10957ad",
       "status": "active",
-      "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261018150817-codex-issue345-63c33f8e2b\""
+      "source": "option",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261018224912-codex-issue345-ffd10957ad\""
     },
-    "createdAt": "2026-10-18T15:08:19.794Z",
+    "createdAt": "2026-10-18T22:49:50.263Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-10-19T00:47:14.608Z",
+  "closedByActor": "codex-issue345",
+  "closedBySessionId": "session-20261018150817-codex-issue345-TASK-PRF-0132-dea75af3a4",
+  "closurePacket": ".atm/history/evidence/TASK-PRF-0132.closure-packet.json"
 }
