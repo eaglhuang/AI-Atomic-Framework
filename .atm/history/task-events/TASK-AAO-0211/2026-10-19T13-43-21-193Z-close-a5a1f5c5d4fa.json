@@ -1,0 +1,62 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-10-19T13-43-21-193Z-close-a5a1f5c5d4fa",
+  "taskId": "TASK-AAO-0211",
+  "action": "close",
+  "actorId": "codex-gpt-6",
+  "sessionId": "session-20261018232208-codex-gpt-6-TASK-AAO-0211-7ed246e29b",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0211.json",
+  "taskSha256": "sha256:dd6222706160eb327a63a223c14038c623285e400f252eb29b35149bcb1573ac",
+  "createdAt": "2026-10-19T13:43:21.193Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0211 --actor codex-gpt-6 --status done --historical-delivery 70874859cc79731319a5d24fb4384ede4ea12f52",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20261018232208-codex-gpt-6-TASK-AAO-0211-7ed246e29b",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0211.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "lint",
+      "node --strip-types tests/cli/taskflow-host-close-projection.test.ts",
+      "npx eslint packages/cli/src/commands/taskflow/implementation.ts tests/cli/taskflow-host-close-projection.test.ts",
+      "typecheck"
+    ],
+    "requiredGates": [
+      "git diff --check",
+      "lint",
+      "node --strip-types tests/cli/taskflow-host-close-projection.test.ts",
+      "npx eslint packages/cli/src/commands/taskflow/implementation.ts tests/cli/taskflow-host-close-projection.test.ts",
+      "typecheck"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-10-19T13:43:21.109Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-AAO-0211.*",
+        ".atm/history/task-events/TASK-AAO-0211/**",
+        ".atm/history/tasks/TASK-AAO-0211.json",
+        "packages/cli/src/commands/taskflow/implementation.ts",
+        "tests/cli/taskflow-host-close-projection.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/taskflow/implementation.ts",
+        "tests/cli/taskflow-host-close-projection.test.ts"
+      ],
+      "requiredGates": [
+        "git diff --check",
+        "lint",
+        "node --strip-types tests/cli/taskflow-host-close-projection.test.ts",
+        "npx eslint packages/cli/src/commands/taskflow/implementation.ts tests/cli/taskflow-host-close-projection.test.ts",
+        "typecheck"
+      ]
+    }
+  }
+}

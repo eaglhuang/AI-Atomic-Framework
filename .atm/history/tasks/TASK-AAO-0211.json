@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-AAO-0211",
   "title": "Deduplicate host close projection imports",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -153,8 +153,8 @@
     "checkedFields": [],
     "findings": []
   },
-  "lastTransitionId": "2026-10-18T23-22-15-066Z-claim-98970df148e3",
-  "lastTransitionAt": "2026-10-18T23:22:15.066Z",
+  "lastTransitionId": "2026-10-19T13-43-21-193Z-close-a5a1f5c5d4fa",
+  "lastTransitionAt": "2026-10-19T13:43:21.193Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-6",
   "reservedAt": "2026-10-18T23:22:08.580Z",
@@ -163,53 +163,54 @@
     "actorId": "codex-gpt-6",
     "leaseId": "lease-c496175eeddf",
     "claimedAt": "2026-10-18T23:22:08.590Z",
-    "heartbeatAt": "2026-10-18T23:22:08.590Z",
-    "ttlSeconds": 1800,
+    "heartbeatAt": "2026-10-19T13:43:21.120Z",
+    "ttlSeconds": 3600,
     "files": [
       ".atm/history/tasks/TASK-AAO-0211.json",
       "packages/cli/src/commands/taskflow/implementation.ts",
       "tests/cli/taskflow-host-close-projection.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
-      "laneSessionId": "lane-20261018232208-codex-gpt-6-c8025acb13",
-      "status": "active",
-      "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261018232208-codex-gpt-6-c8025acb13\""
-    }
+      "laneSessionId": "lane-20261019134023-codex-gpt-6-e8e3bd44d2",
+      "status": "adopted",
+      "source": "option",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261019134023-codex-gpt-6-e8e3bd44d2\""
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-10-18T23:22:08.590Z",
   "startedByActor": "codex-gpt-6",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-4d1f9da9e1b1d97b",
-    "ticketDigest": "sha256:4d1f9da9e1b1d97b0e12e412c15485d62347dc97ca6d97e81de929b7e6654253",
+    "ticketId": "wat-7fcaaefdad25feb0",
+    "ticketDigest": "sha256:7fcaaefdad25feb020fd36fa7b0f2a2281fb8c4c26ff0b7d602116157efdc7e5",
     "taskId": "TASK-AAO-0211",
     "origin": "claim",
     "actorId": "codex-gpt-6",
-    "laneSessionId": "lane-20261018232208-codex-gpt-6-c8025acb13",
+    "laneSessionId": "lane-20261019134023-codex-gpt-6-e8e3bd44d2",
     "claimGeneration": "lease-c496175eeddf",
-    "issuedAt": "2026-10-18T23:22:08.590Z",
-    "expiresAt": "2026-10-18T23:52:08.590Z",
-    "scopeDigest": "sha256:5d3046266d1efecc8a4c1744a1d8be7ec56af8f826b1ae108cda0298c7d5eb8c",
+    "issuedAt": "2026-10-19T13:41:53.921Z",
+    "expiresAt": "2026-10-19T14:41:53.921Z",
+    "scopeDigest": "sha256:e07136ee1fe9249367d6f5f5afe2269b412744796af9a7363aaa091733c04443",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-10-18T23:22:08.590Z"
+      "selectedAt": "2026-10-19T13:41:53.921Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/TASK-AAO-0211.*",
+          ".atm/history/evidence/git-head.json",
           ".atm/history/task-events/TASK-AAO-0211/**",
           ".atm/history/tasks/TASK-AAO-0211.json",
           "packages/cli/src/commands/taskflow/implementation.ts",
           "tests/cli/taskflow-host-close-projection.test.ts"
         ],
-        "digest": "sha256:56be21c1a3075ad7ce427b7718e2cf66c3707593677581bfc2d7198cbd3f1b09"
+        "digest": "sha256:b91d2e82fe814eb497039b1927961bd7cbfbdb8d5731b514a35f6f59273bfc16"
       },
       {
         "kind": "lifecycle-operation",
@@ -273,5 +274,9 @@
     },
     "createdAt": "2026-10-18T23:22:15.065Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-10-19T13:43:21.120Z",
+  "closedByActor": "codex-gpt-6",
+  "closedBySessionId": "session-20261018232208-codex-gpt-6-TASK-AAO-0211-7ed246e29b",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0211.closure-packet.json"
 }
