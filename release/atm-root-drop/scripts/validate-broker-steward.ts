@@ -383,6 +383,15 @@ try {
   });
   check(eofNewline.status === 0, `end-of-file newline regression must pass:\n${eofNewline.stdout}\n${eofNewline.stderr}`);
 
+  // #359 / #361: strict parser, exact-context offset locator, v10c replay.
+  for (const [label, test] of [
+    ['unified-patch locator', 'tests/cli/unified-patch-locator.test.ts'],
+    ['unified-patch v10c replay', 'tests/cli/unified-patch-v10c-replay.test.ts']
+  ] as const) {
+    const run = spawnSync(process.execPath, ['--strip-types', path.join(root, test)], { cwd: root, encoding: 'utf8' });
+    check(run.status === 0, `${label} regression must pass:\n${run.stdout}\n${run.stderr}`);
+  }
+
   const kernelLock = spawnSync(process.execPath, ['--strip-types', path.join(root, 'tests/core/steward-kernel-lock.test.ts')], {
     cwd: root,
     encoding: 'utf8'

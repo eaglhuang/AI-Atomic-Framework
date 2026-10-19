@@ -75,13 +75,15 @@ path.write_text(json.dumps(payload) + "\n")
 PY
 }
 
+# A well-formed, context-only hunk: it parses, so atm-write hands it to the CLI,
+# but it changes nothing. Malformed patches no longer reach the CLI (#361); see
+# test-atm-write-malformed.sh.
 cat > "$BASE/noop.diff" <<'EOF'
 --- a/note.txt
 +++ b/note.txt
-@@
+@@ -1,2 +1,2 @@
  alpha
--beta
- new-line-without-plus
+ beta
 EOF
 
 prepare_repo "$BASE/noop"

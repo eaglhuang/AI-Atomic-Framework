@@ -16,7 +16,7 @@ import path from 'node:path';
 import { hashContent } from '../broker/adapters/cas.js';
 import { canonicalCommitLockPath, defaultStewardCommitLockRoot } from '../broker/steward-commit-guard.js';
 import { acquireKernelAdvisoryLock, releaseKernelAdvisoryLock, StewardLockTimeoutError } from '../broker/steward-kernel-lock.js';
-import { UnifiedPatchApplicationError, applyUnifiedPatch, hunkOldLineIndex, parseUnifiedPatchHunks } from '../broker/unified-patch.js';
+import { UnifiedPatchApplicationError, applyParsedUnifiedPatchDetailed, locateUnifiedPatchHunks, locatedLineIndexes, splitSourceText, hunkOldLineIndex, parseUnifiedPatchHunks } from '../broker/unified-patch.js';
 const LOCK_WAIT_MS = 30_000;
 const LOCK_POLL_MS = 5;
 export function applyLiveQueuedWrites(input) {
@@ -78,59 +78,79 @@ function applyOneLocked(cwd, file, targetPath, proposal) {
     const current = readCurrent(targetPath);
     const declared = normalizeHash(proposal.fileBeforeHash);
     const observed = normalizeHash(current.hash);
-    const lines = patchLineIndexes(proposal.patch);
+    let hunks;
+    try {
+        hunks = parseUnifiedPatchHunks(proposal.patch, { targetFile: file });
+    }
+    catch (error) {
+        if (!(error instanceof UnifiedPatchApplicationError))
+            throw error;
+        return rejected(proposal, file, 'patch-malformed', false, current.text, current.hash, error.message);
+    }
     if (declared === observed) {
-        return commitPatch(cwd, file, targetPath, proposal, current.text, current.hash, lines.changed);
+        try {
+            const applied = applyParsedUnifiedPatchDetailed(current.text, hunks, { mode: 'nearest' });
+            return commitPrepared(cwd, file, targetPath, proposal, current.text, applied.text, locatedLineIndexes(applied.located).changed, applied.hunkOffsets);
+        }
+        catch (error) {
+            if (!(error instanceof UnifiedPatchApplicationError))
+                throw error;
+            return rejected(proposal, file, 'patch-context-mismatch', false, current.text, current.hash, error.message);
+        }
+    }
+    let lines = locatedLineIndexes(hunks.map((hunk) => {
+        const index = hunkOldLineIndex(hunk.oldStart, hunk.oldCount);
+        return { hunk, index, declaredIndex: index, offset: 0 };
+    }));
+    const base = findBaseText(cwd, file, declared);
+    if (base !== null) {
+        try {
+            lines = locatedLineIndexes(locateUnifiedPatchHunks(splitSourceText(base), hunks, { mode: 'nearest' }));
+        }
+        catch (error) {
+            if (!(error instanceof UnifiedPatchApplicationError))
+                throw error;
+        }
     }
     const prior = readJournal(cwd).filter((entry) => entry.file === file && normalizeHash(entry.baseHash) === declared);
     const overlaps = prior.some((entry) => intersects(entry.changedLines, lines.covered) || intersects(entry.changedLines, lines.changed));
     if (overlaps) {
         return queueRejection(cwd, proposal, file, 'overlapping-write-queued', current, '這筆寫入和已經提交的行重疊，檔案沒有被改');
     }
-    let applied = null;
     try {
-        applied = applyUnifiedPatch(current.text, proposal.patch);
+        const applied = applyParsedUnifiedPatchDetailed(current.text, hunks, { mode: 'unique' });
+        if (applied.text === current.text)
+            return rejected(proposal, file, 'no-op-patch', false, current.text, current.hash, 'patch 沒有改變檔案');
+        if (prior.length > 0) {
+            return commitPrepared(cwd, file, targetPath, proposal, current.text, applied.text, locatedLineIndexes(applied.located).changed, applied.hunkOffsets);
+        }
     }
     catch (error) {
         if (!(error instanceof UnifiedPatchApplicationError))
             throw error;
-    }
-    if (applied !== null && prior.length > 0) {
-        return commitPrepared(cwd, file, targetPath, proposal, current.text, applied, lines.changed);
     }
     const detail = prior.length > 0
         ? 'base 已經前進，這份 patch 對不上現在的內容'
         : '宣告的 base 不是目前檔案，而且沒有可套用的不相交提交';
     return queueRejection(cwd, proposal, file, 'stale-base', current, detail);
 }
-function commitPatch(cwd, file, targetPath, proposal, before, beforeHash, changedLines) {
-    let next;
-    try {
-        next = applyUnifiedPatch(before, proposal.patch);
+function findBaseText(cwd, file, declared) {
+    const history = spawnSync('git', ['-C', cwd, 'rev-list', '--max-count=200', 'HEAD', '--', file], { encoding: 'utf8' });
+    if (history.status !== 0)
+        return null;
+    for (const sha of history.stdout.trim().split('\n').filter(Boolean)) {
+        const result = spawnSync('git', ['-C', cwd, 'cat-file', '-p', `${sha}:${file}`]);
+        if (result.status !== 0)
+            continue;
+        const text = result.stdout.toString('utf8');
+        if (normalizeHash(hashContent(text)) === declared)
+            return text;
     }
-    catch (error) {
-        if (error instanceof UnifiedPatchApplicationError) {
-            return rejected(proposal, file, 'patch-context-mismatch', false, before, beforeHash, error.message);
-        }
-        throw error;
-    }
-    return commitPrepared(cwd, file, targetPath, proposal, before, next, changedLines, beforeHash);
+    return null;
 }
-function commitPrepared(cwd, file, targetPath, proposal, before, next, changedLines, baseHash = hashContent(before)) {
-    if (next === before) {
-        return {
-            proposalId: proposal.proposalId,
-            file,
-            decision: 'accepted',
-            reasonCode: null,
-            verdict: 'applied',
-            queued: false,
-            currentFileText: before,
-            currentFileHash: hashContent(before),
-            commitSha: headSha(cwd),
-            detail: 'patch 沒有改變檔案'
-        };
-    }
+function commitPrepared(cwd, file, targetPath, proposal, before, next, changedLines, hunkOffsets, baseHash = hashContent(before)) {
+    if (next === before)
+        return rejected(proposal, file, 'no-op-patch', false, before, hashContent(before), 'patch 沒有改變檔案');
     try {
         replaceFileAtomically(targetPath, next);
         const sha = gitCommit(cwd, file, proposal.proposalId);
@@ -151,6 +171,7 @@ function commitPrepared(cwd, file, targetPath, proposal, before, next, changedLi
             currentFileText: next,
             currentFileHash: hashContent(next),
             commitSha: sha,
+            hunkOffsets,
             detail: '已寫入並提交'
         };
     }
@@ -169,24 +190,6 @@ function queueRejection(cwd, proposal, file, reason, current, detail) {
         queuedAt: new Date().toISOString()
     });
     return rejected(proposal, file, reason, true, current.text, current.hash, detail);
-}
-function patchLineIndexes(patch) {
-    const covered = [];
-    const changed = [];
-    for (const hunk of parseUnifiedPatchHunks(patch)) {
-        let cursor = hunkOldLineIndex(hunk.oldStart);
-        for (const entry of hunk.lines) {
-            if (entry.marker === '+') {
-                changed.push(cursor);
-                continue;
-            }
-            covered.push(cursor);
-            if (entry.marker === '-')
-                changed.push(cursor);
-            cursor += 1;
-        }
-    }
-    return { covered, changed };
 }
 function intersects(left, right) {
     if (left.length === 0 || right.length === 0)
@@ -295,6 +298,7 @@ function rejected(proposal, file, reasonCode, queued, text, hash, detail) {
         currentFileText: text,
         currentFileHash: hash,
         commitSha: null,
+        hunkOffsets: null,
         detail
     };
 }
@@ -309,6 +313,7 @@ function kitError(proposal, file, reasonCode, text, hash, detail) {
         currentFileText: text,
         currentFileHash: hash,
         commitSha: null,
+        hunkOffsets: null,
         detail
     };
 }

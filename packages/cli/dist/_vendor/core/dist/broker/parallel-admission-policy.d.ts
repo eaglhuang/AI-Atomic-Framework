@@ -94,4 +94,4 @@ export declare function buildParallelAdmissionReceipt(input: {
     readonly actorId: string | null;
     readonly policy: ParallelAdmissionPolicy;
 }): ParallelAdmissionPolicyReceipt;
-export declare function resolveGatePolicy(gateId: ParallelAdmissionGateId, policy?: ParallelAdmissionPolicy): ParallelAdmissionGatePolicy;
+export declare function resolveGatePolicy(gateId: ParallelAdmissionGateId, policy?: ParallelAdmissionPolicy): ParallelAdmissionGatePolicy | null;
