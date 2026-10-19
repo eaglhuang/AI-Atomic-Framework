@@ -11,6 +11,6 @@ export declare const executeAgentTaskApplyFlag = "--apply";
 export declare const defaultProposalDelegatedTo = "ATM-2-0020";
 export declare const defaultExecutionEvidenceMigration: Readonly<{
     strategy: "additive";
-    fromVersion: null;
+    fromVersion: any;
     notes: "Initial ExecuteAgentTask effect node evidence contract.";
 }>;

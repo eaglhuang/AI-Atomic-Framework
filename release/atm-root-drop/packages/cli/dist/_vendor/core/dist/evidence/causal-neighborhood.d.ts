@@ -44,5 +44,5 @@ export declare function replayCausalNeighborhood(input: CausalInput, expected: C
 };
 export declare function validateCausalNeighborhood(result: CausalResult): {
     ok: boolean;
-    diagnostics: string[];
+    diagnostics: any[];
 };

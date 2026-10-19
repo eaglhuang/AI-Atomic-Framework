@@ -5,6 +5,9 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { gunzipSync } from 'node:zlib';
+import { computeAtomCid } from '../../packages/core/src/registry/atom-capsule.ts';
+import { buildResolvedAtomBundle } from '../../scripts/lib/atom-id-to-cid.ts';
 
 // Behavioral regression: the embedded onefile runner, executed from an empty
 // adopter repository (no node_modules, no framework checkout), must be able to
@@ -12,6 +15,22 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const onefile = path.join(root, 'release', 'atm-onefile', 'atm.mjs');
 assert.ok(existsSync(onefile), 'committed onefile runner must exist for the adopter smoke test');
+// Check the actual embedded payload, not just the builder allowlist. This
+// fails on the pre-fix runner even when the host checkout contains core.
+const encoded = /const payloadBase64 = ("[^"]+");/.exec(readFileSync(onefile, 'utf8'));
+assert.ok(encoded, 'runner must expose its embedded payload');
+const payload = JSON.parse(gunzipSync(Buffer.from(JSON.parse(encoded[1]), 'base64')).toString('utf8'));
+const capsule = payload.files.find((file: { path: string }) => file.path === 'packages/core/src/registry/atom-capsule.ts');
+assert.ok(capsule, 'onefile must carry the canonical atom capsule runtime dependency');
+const capsuleSource = Buffer.from(capsule.dataBase64, 'base64').toString('utf8');
+assert.equal(capsuleSource, readFileSync(path.join(root, 'packages/core/src/registry/atom-capsule.ts'), 'utf8'));
+// Any future non-builtin dependency must extend the packaged closure too.
+for (const match of capsuleSource.matchAll(/from\s+['"]([^'"]+)['"]/g)) {
+  if (match[1].startsWith('node:')) continue;
+  assert.ok(match[1].startsWith('.'), 'capsule bare dependencies require explicit packaging');
+  const dependency = path.posix.normalize(path.posix.join('packages/core/src/registry', match[1]));
+  assert.ok(payload.files.some((file: { path: string }) => file.path === dependency), `missing capsule dependency ${dependency}`);
+}
 
 const adopter = mkdtempSync(path.join(tmpdir(), 'atm-adopter-smoke-'));
 try {
@@ -31,7 +50,7 @@ try {
     const result = spawnSync(process.execPath, [onefile, ...args, '--cwd', adopter, '--json'], { cwd: adopter, encoding: 'utf8', timeout: 120_000 });
     const stdout = result.stdout.trim();
     assert.ok(stdout.startsWith('{'), `onefile ${args.join(' ')} must emit JSON, got stderr: ${result.stderr}`);
-    return JSON.parse(stdout) as { ok: boolean; messages: { code: string; text: string }[] };
+    return JSON.parse(stdout) as { ok: boolean; messages: { code: string; text: string }[]; evidence: { proposalSample: { path: string; atomId: string; atomCid: string; atomRefs: unknown[] }[] } };
   };
 
   const inventory = run(['atomize', 'inventory']);
@@ -39,6 +58,13 @@ try {
 
   const backfill = run(['atomize', 'backfill']);
   assert.equal(backfill.ok, true, `atomize backfill must succeed in an adopter repo: ${JSON.stringify(backfill.messages)}`);
+  assert.ok(backfill.evidence.proposalSample.length > 0, 'fixture must exercise source CID generation');
+  for (const proposal of backfill.evidence.proposalSample) {
+    const source = readFileSync(path.join(adopter, proposal.path), 'utf8');
+    const expected = computeAtomCid(buildResolvedAtomBundle(source));
+    assert.equal(proposal.atomCid, expected, 'packaged CID must match the source/core helper');
+    assert.deepEqual(proposal.atomRefs, [{ atomId: proposal.atomId, atomCid: expected }]);
+  }
 
   const targetFile = path.join(adopter, 'packages', 'app', 'src', 'greet.ts');
   const head = spawnSync('git', ['-C', adopter, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).stdout.trim();
