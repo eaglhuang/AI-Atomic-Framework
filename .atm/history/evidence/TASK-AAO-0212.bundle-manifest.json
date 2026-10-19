@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-AAO-0212",
+  "updatedAt": "2026-10-18T23:34:43.786Z",
+  "updatedBy": "codex-gpt-6",
+  "freshValidationPasses": [
+    "build",
+    "doctor",
+    "git diff --check",
+    "node atm.mjs taskflow close --task TASK-AAO-0211 --actor codex-gpt-6 --dry-run --json"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "npm run build",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7eb515bce95f451155fd9de4d7a851aa2a0a3b7589ecca1f97e5f80eb9a12266",
+      "stderrSha256": "sha256:a05af86ac7a35be4e556e48e5d86fd26b816c615e99b2ba5a098679ed3a79132",
+      "validators": [
+        "build"
+      ],
+      "generatedAt": "2026-10-18T23:31:27.586Z",
+      "startedAt": "2026-10-18T23:27:49.310Z",
+      "finishedAt": "2026-10-18T23:31:27.586Z",
+      "durationMs": 218276,
+      "runnerKind": "dev-source",
+      "sourceCommit": "70874859cc79731319a5d24fb4384ede4ea12f52",
+      "cached": false
+    },
+    {
+      "command": "node atm.mjs doctor --json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:da08aadc56caf708a2a7cdffa08f7b3b7d5339f54a5559a2731733ed82373ea7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "doctor"
+      ],
+      "generatedAt": "2026-10-18T23:34:02.512Z",
+      "startedAt": "2026-10-18T23:33:43.012Z",
+      "finishedAt": "2026-10-18T23:34:02.512Z",
+      "durationMs": 19500,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "70874859cc79731319a5d24fb4384ede4ea12f52",
+      "cached": false
+    },
+    {
+      "command": "node atm.mjs taskflow close --task TASK-AAO-0211 --actor codex-gpt-6 --dry-run --json --historical-delivery 70874859cc79731319a5d24fb4384ede4ea12f52 --lane-session lane-20261018232208-codex-gpt-6-c8025acb13",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d263c35269d5f2b6ee1dadfac75d479b0b986aa3f9336f42e792f96c38bc1849",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node atm.mjs taskflow close --task TASK-AAO-0211 --actor codex-gpt-6 --dry-run --json"
+      ],
+      "generatedAt": "2026-10-18T23:34:40.190Z",
+      "startedAt": "2026-10-18T23:34:14.708Z",
+      "finishedAt": "2026-10-18T23:34:40.190Z",
+      "durationMs": 25482,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "70874859cc79731319a5d24fb4384ede4ea12f52",
+      "cached": false
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "git diff --check"
+      ],
+      "generatedAt": "2026-10-18T23:34:43.785Z",
+      "startedAt": "2026-10-18T23:34:43.307Z",
+      "finishedAt": "2026-10-18T23:34:43.785Z",
+      "durationMs": 478,
+      "runnerKind": "dev-source",
+      "sourceCommit": "70874859cc79731319a5d24fb4384ede4ea12f52",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
