@@ -231,6 +231,7 @@ check probe-retry bash "$HERE/test/test-probe-retry.sh"
 check metrics-evidence python3 "$HERE/test/test_metrics_evidence.py"
 check session-slot bash "$HERE/test/test-session-slot.sh"
 check preflight-archive bash "$HERE/test/test-preflight-archive.sh"
+check cross-owner-git bash "$HERE/test/test-probe-cross-owner-git.sh"
 # #354 regression: runs preflight in real-model mode with an empty CODEX_HOME (no model call).
 # The nested run sets PREREG_REAL_MODE_ISOLATION_TEST, so it does not recurse.
 if [ -z "${PREREG_REAL_MODE_ISOLATION_TEST:-}" ]; then
