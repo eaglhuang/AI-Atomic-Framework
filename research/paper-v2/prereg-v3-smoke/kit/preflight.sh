@@ -11,12 +11,20 @@ if [ "${PREFLIGHT_REAL_MODEL:-}" = "1" ]; then
   exec >> "$PREREG_PREFLIGHT_RUN_DIR/preflight.log" 2>&1
   flush_preflight_log() {
     local status=$?
-    cat "$PREREG_PREFLIGHT_RUN_DIR/preflight.log" >&"$PREFLIGHT_STDOUT"
+    cat "${REAL_PREFLIGHT_RUN_DIR:-$PREREG_PREFLIGHT_RUN_DIR}/preflight.log" >&"$PREFLIGHT_STDOUT"
     exec {PREFLIGHT_STDOUT}>&-
     return "$status"
   }
   trap flush_preflight_log EXIT
   require_probe_python
+  # Offline checks must not inherit the live real-model run: nested preflight/seal tests
+  # would otherwise write into, or archive, this run's preflight.log (v10 launch, 2026-10-19).
+  REAL_PREFLIGHT_RUN_DIR="$PREREG_PREFLIGHT_RUN_DIR"
+  REAL_PREFLIGHT_LOG_ROOT="${PREREG_PREFLIGHT_LOG_ROOT:-$KIT_ROOT/state/preflight}"
+  OFFLINE_PREFLIGHT_SCRATCH="$(mktemp -d)"
+  unset PREFLIGHT_REAL_MODEL PREREG_PREFLIGHT_RUN_DIR
+  export PREREG_PREFLIGHT_LOG_ROOT="$OFFLINE_PREFLIGHT_SCRATCH/offline-checks"
+  REAL_MODEL_REQUESTED=1
 fi
 
 check() {
@@ -223,6 +231,15 @@ check probe-retry bash "$HERE/test/test-probe-retry.sh"
 check metrics-evidence python3 "$HERE/test/test_metrics_evidence.py"
 check session-slot bash "$HERE/test/test-session-slot.sh"
 check preflight-archive bash "$HERE/test/test-preflight-archive.sh"
-check real-model bash "$HERE/test/test-real-model.sh"
+# #354 regression: runs preflight in real-model mode with an empty CODEX_HOME (no model call).
+# The nested run sets PREREG_REAL_MODE_ISOLATION_TEST, so it does not recurse.
+if [ -z "${PREREG_REAL_MODE_ISOLATION_TEST:-}" ]; then
+  check real-mode-isolation bash "$HERE/test/test-preflight-real-mode-isolation.sh"
+fi
+if [ "${REAL_MODEL_REQUESTED:-}" = "1" ]; then
+  check real-model env PREFLIGHT_REAL_MODEL=1 PREREG_PREFLIGHT_RUN_DIR="$REAL_PREFLIGHT_RUN_DIR" PREREG_PREFLIGHT_LOG_ROOT="$REAL_PREFLIGHT_LOG_ROOT" bash "$HERE/test/test-real-model.sh"
+else
+  check real-model bash "$HERE/test/test-real-model.sh"
+fi
 check real-model-skip bash "$HERE/test/test-real-model-skip.sh"
 echo "preflight ok"
