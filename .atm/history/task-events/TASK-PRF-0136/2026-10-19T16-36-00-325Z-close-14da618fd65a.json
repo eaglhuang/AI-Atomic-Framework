@@ -1,0 +1,63 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-10-19T16-36-00-325Z-close-14da618fd65a",
+  "taskId": "TASK-PRF-0136",
+  "action": "close",
+  "actorId": "grok-bot",
+  "sessionId": "session-20261019162919-grok-bot-TASK-PRF-0136-d4daf599a5",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0136.json",
+  "taskSha256": "sha256:32947a37a378db3aaabe8eb7b7813a8d30c0da30ea5e21eb6a6eb45491b37a11",
+  "createdAt": "2026-10-19T16:36:00.325Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0136 --actor grok-bot --status done --historical-delivery c6d375a50",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20261019162919-grok-bot-TASK-PRF-0136-d4daf599a5",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0136.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types packages/core/src/broker/__tests__/shared-compose-inbox.test.ts",
+      "validate:hist-v2-harness"
+    ],
+    "requiredGates": [
+      "node --strip-types packages/core/src/broker/__tests__/shared-compose-inbox.test.ts",
+      "validate:hist-v2-harness"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-10-19T16:36:00.315Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0136.*",
+        ".atm/history/task-events/TASK-PRF-0136/**",
+        ".atm/history/tasks/TASK-PRF-0136.json",
+        ".atm/task-plans/TASK-PRF-0136.md",
+        "packages/cli/dist",
+        "packages/cli/dist/**",
+        "packages/core/src/broker/__tests__/shared-compose-inbox.test.ts",
+        "packages/core/src/broker/shared-compose-inbox-merge.ts",
+        "PROGRESS.md",
+        "release/atm-onefile/**",
+        "release/atm-root-drop/**",
+        "scripts/validate-hist-v2-smoke-runbook.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/dist",
+        "packages/cli/dist/**",
+        "packages/core/src/broker/__tests__/shared-compose-inbox.test.ts",
+        "packages/core/src/broker/shared-compose-inbox-merge.ts",
+        "scripts/validate-hist-v2-smoke-runbook.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types packages/core/src/broker/__tests__/shared-compose-inbox.test.ts",
+        "validate:hist-v2-harness"
+      ]
+    }
+  }
+}
