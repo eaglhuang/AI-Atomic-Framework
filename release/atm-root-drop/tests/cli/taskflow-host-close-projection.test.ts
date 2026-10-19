@@ -1,9 +1,7 @@
 import assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
-import childProcess from 'node:child_process';
-import { chmodSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import childProcess, { execFileSync } from 'node:child_process';
+import fs, { chmodSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import fs from 'node:fs';
 import { syncBuiltinESMExports } from 'node:module';
 import { projectHostContent, validateHostCloseProjections, prepareHostCloseProjections, applyHostCloseProjections, type HostCloseProjection } from '../../packages/cli/src/commands/taskflow/host-close-projection.ts';
 import { runTaskflow } from '../../packages/cli/src/commands/taskflow.ts';

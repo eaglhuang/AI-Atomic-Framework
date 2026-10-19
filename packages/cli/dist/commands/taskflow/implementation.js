@@ -1,4 +1,3 @@
-import { buildPartialPlanningCardContent } from './closeback-orchestration.js';
 import { getCanonicalAllowedFilesForTask } from '../task-direction.js';
 import { prepareHostCloseProjections, projectHostContent, assertHostProjectionCas, applyHostCloseProjections, authorizeHostProjectionWrite, captureProjectionTransaction } from './host-close-projection.js';
 import { rollbackCloseWriteTransaction } from './close-orchestration.js';
@@ -11,7 +10,7 @@ import { buildResidueDiagnosisEvidence, generateTaskCard, loadTaskDocumentOrThro
 import { authorizeLaneCapability } from '../lane-session/capability-authority.js';
 import { describeMissingGitBase } from '../shared/git-base-remediation.js';
 import { buildTaskflowOpenCommand } from './open-command.js';
-import { assertClosebackPlanningPathReady, buildCloseBackendArgv, buildClosebackPlan, buildCloseWriteRollbackSnapshot, buildTaskflowCloseDiagnostics, executeCloseWriteCommitPhase, inspectObservedTaskEvidence, resolveClosebackPlanningPath, resolveCloseWriteSupport, capturePlanningCardSnapshot, applyPlanningCardCloseback, resolvePlanningRosterPaths } from './closeback-orchestration.js';
+import { buildPartialPlanningCardContent, assertClosebackPlanningPathReady, buildCloseBackendArgv, buildClosebackPlan, buildCloseWriteRollbackSnapshot, buildTaskflowCloseDiagnostics, executeCloseWriteCommitPhase, inspectObservedTaskEvidence, resolveClosebackPlanningPath, resolveCloseWriteSupport, capturePlanningCardSnapshot, applyPlanningCardCloseback, resolvePlanningRosterPaths } from './closeback-orchestration.js';
 import { buildAutoEvidencePlan, executeAutoEvidencePlan } from '../evidence.js';
 import { mapAutoEvidenceCommand } from './auto-evidence-mapper.js';
 import { CliError, makeResult, message, parseArgsForCommand, quoteCliValue, relativePathFrom } from '../shared.js';
