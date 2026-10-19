@@ -72,7 +72,13 @@ export function rebaseProposalsByRegionIdentity(filePath, before, proposals) {
     };
 }
 function planProposalSplice(proposal, region, lines, fileEndsWithNewline) {
-    const hunks = parseUnifiedPatchHunks(proposal.patch);
+    let hunks;
+    try {
+        hunks = parseUnifiedPatchHunks(proposal.patch);
+    }
+    catch (error) {
+        return { code: 'compose-context-mismatch', detail: error instanceof Error ? error.message : String(error) };
+    }
     if (hunks.length === 0) {
         return { code: 'compose-context-mismatch', detail: `proposal '${proposal.proposalId}' has no hunk to rebase onto region '${region.regionId}'` };
     }

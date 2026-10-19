@@ -7,9 +7,8 @@
 // the end of the file and could not fail, which is what let a write that never
 // happened produce an applied receipt.
 //
-// Matching is exact. A steward write is arbitrated, not guessed: if a proposal's
-// context no longer matches the base it was authored against, the right outcome
-// is a refusal that sends the proposal back for rebase, not a fuzzy placement.
+// Matching is exact (zero fuzz). Positions are located by exact context within
+// a bounded window, with a whole-file fallback; ambiguous placement refuses.
 //
 // `\ No newline at end of file` is part of that contract. Git attaches the
 // marker to the preceding hunk line. On a context line it describes both sides;
@@ -21,11 +20,18 @@ export const UNIFIED_PATCH_APPLICATION_SCHEMA_ID = 'atm.unifiedPatchApplication.
 
 export const NO_NEWLINE_AT_EOF_MARKER = '\\ No newline at end of file';
 
+/** Bounded outward search window, in lines either side of the declared start. */
+export const HUNK_LOCATOR_WINDOW = 50;
+
+export type UnifiedPatchErrorReason = 'malformed' | 'context-not-found' | 'context-ambiguous' | 'hunk-overlap' | 'out-of-range' | 'newline-mismatch' | 'eof-marker' | 'context-mismatch';
+
 export class UnifiedPatchApplicationError extends Error {
   readonly code = 'ATM_UNIFIED_PATCH_CONTEXT_MISMATCH';
-  constructor(message: string) {
+  readonly reason: UnifiedPatchErrorReason;
+  constructor(message: string, reason: UnifiedPatchErrorReason = 'context-mismatch') {
     super(message);
     this.name = 'UnifiedPatchApplicationError';
+    this.reason = reason;
   }
 }
 
@@ -37,6 +43,9 @@ export interface UnifiedPatchHunkLine {
 
 export interface UnifiedPatchHunk {
   readonly oldStart: number;
+  readonly oldCount: number;
+  readonly newStart: number;
+  readonly newCount: number;
   readonly lines: readonly UnifiedPatchHunkLine[];
 }
 
@@ -51,55 +60,171 @@ export interface SourceTextLines {
 
 const HUNK_HEADER = /^@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@/;
 
-/** Old-file line index of a hunk. Unified diffs use 0 only for an empty preimage. */
-export function hunkOldLineIndex(oldStart: number): number {
-  return oldStart <= 0 ? 0 : oldStart - 1;
+/** Zero-count hunks insert after oldStart; other hunks start on oldStart. */
+export function hunkOldLineIndex(oldStart: number, oldCount = 1): number {
+  return oldCount === 0 ? Math.max(0, oldStart) : oldStart <= 0 ? 0 : oldStart - 1;
 }
 
-/** Parse the hunks of a unified diff; shared with the steward base composer. */
-export function parseUnifiedPatchHunks(patchText: string): readonly UnifiedPatchHunk[] {
+function normalizePatchPath(value: string): string {
+  return value.replace(/\\/g, '/').replace(/^(?:\.\/)+/, '').replace(/^[ab]\//, '').replace(/^(?:\.\/)+/, '');
+}
+
+const FILE_HEADER = /^(?:diff --git |index |--- |\+\+\+ |new file mode|deleted file mode|old mode|new mode|similarity index|rename from|rename to|copy from|copy to)/;
+
+/** Parse one file's unified diff, rejecting incomplete or overlong bodies. */
+export function parseUnifiedPatch(patchText: string, options?: { targetFile?: string }): readonly UnifiedPatchHunk[] {
+  const malformed = (message: string): never => { throw new UnifiedPatchApplicationError(message, 'malformed'); };
   const lines = patchText.split(/\r?\n/);
-  // A patch normally ends with a newline, which split() turns into a trailing
-  // empty element. That element is punctuation, not a blank context line, and
-  // treating it as one demands an empty line the source does not have.
-  if (lines.length > 0 && lines[lines.length - 1] === '') lines.pop();
+  if (lines.at(-1) === '') lines.pop();
   const hunks: UnifiedPatchHunk[] = [];
-  let current: { oldStart: number; lines: UnifiedPatchHunkLine[] } | null = null;
-  for (const line of lines) {
+  let diffSeen = false;
+  let oldPath: string | null = null;
+  let newPath: string | null = null;
+  let diffPath: string | null = null;
+  let started = false;
+  const checkTarget = (value: string) => {
+    if (options?.targetFile !== undefined && normalizePatchPath(value) !== normalizePatchPath(options.targetFile)) {
+      malformed(`patch file ${value} differs from target ${options.targetFile}`);
+    }
+  };
+  for (let i = 0; i < lines.length;) {
+    const line = lines[i]!;
     const header = HUNK_HEADER.exec(line);
     if (header) {
-      if (current) hunks.push(current);
-      current = { oldStart: Number.parseInt(header[1]!, 10), lines: [] };
+      started = true;
+      const oldStart = Number(header[1]);
+      const oldCount = Number(header[2] ?? 1);
+      const newStart = Number(header[3]);
+      const newCount = Number(header[4] ?? 1);
+      if (![oldStart, oldCount, newStart, newCount].every(Number.isSafeInteger)) malformed('invalid hunk range');
+      const body: UnifiedPatchHunkLine[] = [];
+      let oldRead = 0;
+      let newRead = 0;
+      let markerAllowed = false;
+      i += 1;
+      while (i < lines.length) {
+        const entry = lines[i]!;
+        if (entry === NO_NEWLINE_AT_EOF_MARKER) {
+          if (!markerAllowed) malformed('no-newline marker must directly follow a body line');
+          body[body.length - 1] = { ...body[body.length - 1]!, noNewline: true };
+          markerAllowed = false;
+          i += 1;
+          continue;
+        }
+        if (oldRead === oldCount && newRead === newCount) break;
+        if (entry !== '' && !/^[ +\-]/.test(entry)) malformed('hunk body shorter than its header counts');
+        const marker = (entry === '' ? ' ' : entry[0]) as UnifiedPatchHunkLine['marker'];
+        oldRead += marker === '+' ? 0 : 1;
+        newRead += marker === '-' ? 0 : 1;
+        if (oldRead > oldCount || newRead > newCount) malformed('hunk body longer than its header counts');
+        body.push({ marker, text: entry === '' ? '' : entry.slice(1), noNewline: false });
+        markerAllowed = true;
+        i += 1;
+      }
+      if (oldRead !== oldCount || newRead !== newCount) malformed('hunk body shorter than its header counts');
+      hunks.push({ oldStart, oldCount, newStart, newCount, lines: body });
       continue;
     }
-    if (!current) continue;
-    if (line === NO_NEWLINE_AT_EOF_MARKER) {
-      const previous = current.lines[current.lines.length - 1];
-      if (previous) current.lines[current.lines.length - 1] = { ...previous, noNewline: true };
-      continue;
+    if (line.startsWith('@@')) malformed('malformed hunk header');
+    if (line.startsWith('diff --git ')) {
+      if (diffSeen || oldPath !== null || hunks.length > 0) malformed('multiple file sections');
+      diffSeen = true;
+      started = true;
+      const match = /^diff --git (?:".*?"|\S+) (.+)$/.exec(line);
+      if (!match) malformed('malformed file section');
+      diffPath = match![1]!;
+    } else if (line.startsWith('--- ')) {
+      if (oldPath !== null || newPath !== null || hunks.length > 0) malformed('multiple file sections');
+      started = true;
+      oldPath = line.slice(4).split('\t')[0]!;
+    } else if (line.startsWith('+++ ')) {
+      if (newPath !== null || oldPath === null || hunks.length > 0) malformed('multiple or incomplete file sections');
+      newPath = line.slice(4).split('\t')[0]!;
+    } else if (started && !FILE_HEADER.test(line)) {
+      if (line !== '' || lines.slice(i).some((remaining) => remaining !== '')) {
+        malformed('hunk body longer than its header counts');
+      }
     }
-    // File headers can only appear before the first hunk; inside a hunk a
-    // leading '---'/'+++' is ordinary content and must be kept.
-    if (line.startsWith(' ') || line.startsWith('-') || line.startsWith('+')) {
-      current.lines.push({
-        marker: line[0] as UnifiedPatchHunkLine['marker'],
-        text: line.slice(1),
-        noNewline: false
-      });
-      continue;
-    }
-    if (line === '') {
-      // A bare empty line inside a hunk is an unprefixed context line for an
-      // empty source line; some emitters strip the trailing space.
-      current.lines.push({ marker: ' ', text: '', noNewline: false });
-      continue;
-    }
-    // Anything else ends the hunk body.
-    hunks.push(current);
-    current = null;
+    i += 1;
   }
-  if (current) hunks.push(current);
+  if (hunks.length === 0) malformed('patch has no parsable hunks');
+  const sectionPath = newPath === '/dev/null' ? oldPath : newPath ?? diffPath;
+  if (sectionPath !== null) checkTarget(sectionPath);
   return hunks;
+}
+
+export const parseUnifiedPatchHunks = parseUnifiedPatch;
+
+export interface LocatedHunk {
+  readonly hunk: UnifiedPatchHunk;
+  readonly declaredIndex: number;
+  readonly index: number;
+  readonly offset: number;
+}
+
+export type HunkLocateMode = 'nearest' | 'unique';
+
+export function locateUnifiedPatchHunks(source: SourceTextLines, hunks: readonly UnifiedPatchHunk[], options?: { mode?: HunkLocateMode; window?: number }): LocatedHunk[] {
+  const located: LocatedHunk[] = [];
+  let minStart = 0;
+  const window = options?.window ?? HUNK_LOCATOR_WINDOW;
+  if (!Number.isSafeInteger(window) || window < 0) throw new UnifiedPatchApplicationError('invalid locator window', 'out-of-range');
+  for (const hunk of hunks) {
+    const declaredIndex = hunkOldLineIndex(hunk.oldStart, hunk.oldCount);
+    const old = oldLinesOf(hunk);
+    const overlap = (): never => { throw new UnifiedPatchApplicationError(`hunk @@ -${hunk.oldStart} overlaps an earlier hunk`, 'hunk-overlap'); };
+    const ambiguous = (hits: number[]): never => { throw new UnifiedPatchApplicationError(`ambiguous patch context for hunk @@ -${hunk.oldStart}: ${hits.length} exact matches at lines ${hits.map((p) => p + 1).join(', ')}`, 'context-ambiguous'); };
+    const matches = (p: number) => p >= 0 && p + old.length <= source.lines.length && old.every((entry, i) => entry.text === source.lines[p + i] && oldSideNewlineAgrees({ noNewline: entry.noNewline, lineIndex: p + i, lineCount: source.lines.length, fileEndsWithNewline: source.endsWithNewline }));
+    let index: number | undefined;
+    if (old.length === 0) {
+      if (declaredIndex > source.lines.length) throw new UnifiedPatchApplicationError(`hunk @@ -${hunk.oldStart} starts past the end of file`, 'out-of-range');
+      index = declaredIndex;
+    } else {
+      if (options?.mode !== 'unique') {
+        for (let d = 0; d <= window; d += 1) {
+          const hits = [...new Set([declaredIndex - d, declaredIndex + d])].filter((p) => p >= minStart && matches(p));
+          if (hits.length > 1) ambiguous(hits);
+          if (hits.length === 1) { index = hits[0]!; break; }
+        }
+      }
+      if (index === undefined) {
+        const hits: number[] = [];
+        for (let p = 0; p <= source.lines.length - old.length; p += 1) if (matches(p)) hits.push(p);
+        if (hits.length > 1) ambiguous(hits);
+        if (hits.length === 0) throw new UnifiedPatchApplicationError(`patch context not found for hunk @@ -${hunk.oldStart}`, 'context-not-found');
+        index = hits[0]!;
+      }
+    }
+    if (index < minStart) overlap();
+    located.push({ hunk, declaredIndex, index, offset: index - declaredIndex });
+    minStart = index + old.length;
+  }
+  return located;
+}
+
+export interface HunkOffset {
+  declaredOldStart: number;
+  appliedOldStart: number;
+  offset: number;
+}
+
+export function hunkOffsetsOf(located: readonly LocatedHunk[]): HunkOffset[] {
+  return located.map(({ hunk, offset }) => ({ declaredOldStart: hunk.oldStart, appliedOldStart: hunk.oldStart + offset, offset }));
+}
+
+export function locatedLineIndexes(located: readonly LocatedHunk[]): { covered: number[]; changed: number[] } {
+  const covered: number[] = [];
+  const changed: number[] = [];
+  for (const { hunk, index } of located) {
+    let cursor = index;
+    for (const entry of hunk.lines) {
+      if (entry.marker === '+') { changed.push(cursor); continue; }
+      covered.push(cursor);
+      if (entry.marker === '-') changed.push(cursor);
+      cursor += 1;
+    }
+  }
+  return { covered, changed };
 }
 
 export function splitSourceText(before: string): SourceTextLines {
@@ -140,11 +265,10 @@ function newLinesOf(hunk: UnifiedPatchHunk): readonly UnifiedPatchHunkLine[] {
  * Reject a marker that is not on the final line of its side. Git only emits
  * `\ No newline at end of file` for the last line of the old or new file.
  */
-export function eofMarkerViolation(hunks: readonly UnifiedPatchHunk[], baseLineCount: number): string | null {
-  for (const hunk of hunks) {
+export function eofMarkerViolation(hunks: readonly LocatedHunk[], baseLineCount: number): string | null {
+  for (const { hunk, index: start } of hunks) {
     const oldLines = oldLinesOf(hunk);
     const newLines = newLinesOf(hunk);
-    const start = hunkOldLineIndex(hunk.oldStart);
     for (let index = 0; index < oldLines.length; index += 1) {
       if (!oldLines[index]!.noNewline) continue;
       if (baseLineCount === 0 || start + index !== baseLineCount - 1) {
@@ -161,13 +285,12 @@ export function eofMarkerViolation(hunks: readonly UnifiedPatchHunk[], baseLineC
 }
 
 /** Final-newline decision for hunks already known to apply to a base of `baseLineCount` lines. */
-export function eofNewlineDecision(hunks: readonly UnifiedPatchHunk[], baseLineCount: number): EofNewlineDecision {
+export function eofNewlineDecision(hunks: readonly LocatedHunk[], baseLineCount: number): EofNewlineDecision {
   let present = false;
   let absent = false;
-  for (const hunk of hunks) {
+  for (const { hunk, index: start } of hunks) {
     const oldLines = oldLinesOf(hunk);
     const newLines = newLinesOf(hunk);
-    const start = hunkOldLineIndex(hunk.oldStart);
     const reachesEof = baseLineCount === 0
       ? newLines.length > 0 || oldLines.length > 0
       : oldLines.length > 0 && start + oldLines.length >= baseLineCount;
@@ -187,65 +310,29 @@ export function resolveEofNewline(decision: EofNewlineDecision, fileEndsWithNewl
   return decision === 'present';
 }
 
-/**
- * Apply a unified diff to `before`, returning the exact resulting text.
- *
- * Throws {@link UnifiedPatchApplicationError} when a hunk's context or removed
- * lines do not match the source at the position the hunk declares. Callers must
- * surface that as a blocked apply; they must not fall back to any other write.
- */
-export function applyUnifiedPatch(before: string, patchText: string): string {
-  const hunks = parseUnifiedPatchHunks(patchText);
-  if (hunks.length === 0) return before;
+/** Parse, locate with exact context, and apply one file's unified patch. */
+export function applyUnifiedPatchDetailed(before: string, patchText: string, options?: { targetFile?: string; mode?: HunkLocateMode; window?: number }): { text: string; hunkOffsets: HunkOffset[]; located: LocatedHunk[] } {
+  return applyParsedUnifiedPatchDetailed(before, parseUnifiedPatch(patchText, options), options);
+}
 
+/** Apply already parsed hunks so callers can validate once before overlap checks. */
+export function applyParsedUnifiedPatchDetailed(before: string, hunks: readonly UnifiedPatchHunk[], options?: { mode?: HunkLocateMode; window?: number }): { text: string; hunkOffsets: HunkOffset[]; located: LocatedHunk[] } {
   const source = splitSourceText(before);
-  const markerError = eofMarkerViolation(hunks, source.lines.length);
-  if (markerError) throw new UnifiedPatchApplicationError(markerError);
-
+  const located = locateUnifiedPatchHunks(source, hunks, options);
+  const markerError = eofMarkerViolation(located, source.lines.length);
+  if (markerError) throw new UnifiedPatchApplicationError(markerError, 'eof-marker');
   const output: string[] = [];
   let cursor = 0;
-
-  for (const hunk of hunks) {
-    const start = hunkOldLineIndex(hunk.oldStart);
-    if (start < cursor) {
-      throw new UnifiedPatchApplicationError(
-        `hunk at old line ${hunk.oldStart} overlaps an earlier hunk`
-      );
-    }
-    if (start > source.lines.length) {
-      throw new UnifiedPatchApplicationError(
-        `hunk at old line ${hunk.oldStart} starts past the end of a ${source.lines.length}-line file`
-      );
-    }
-    output.push(...source.lines.slice(cursor, start));
-    cursor = start;
-
-    for (const entry of hunk.lines) {
-      if (entry.marker === '+') {
-        output.push(entry.text);
-        continue;
-      }
-      const actual = source.lines[cursor];
-      if (actual === undefined || actual !== entry.text) {
-        throw new UnifiedPatchApplicationError(
-          `patch context mismatch at line ${cursor + 1}: expected ${JSON.stringify(entry.text)}, found ${JSON.stringify(actual ?? null)}`
-        );
-      }
-      if (!oldSideNewlineAgrees({
-        noNewline: entry.noNewline,
-        lineIndex: cursor,
-        lineCount: source.lines.length,
-        fileEndsWithNewline: source.endsWithNewline
-      })) {
-        throw new UnifiedPatchApplicationError(
-          `patch newline mismatch at line ${cursor + 1}: the ${entry.noNewline ? 'old side omits' : 'old side keeps'} the end-of-file newline`
-        );
-      }
-      cursor += 1;
-      if (entry.marker === ' ') output.push(entry.text);
-    }
+  for (const { hunk, index } of located) {
+    output.push(...source.lines.slice(cursor, index));
+    output.push(...newLinesOf(hunk).map((entry) => entry.text));
+    cursor = index + oldLinesOf(hunk).length;
   }
   output.push(...source.lines.slice(cursor));
-  const endsWithNewline = resolveEofNewline(eofNewlineDecision(hunks, source.lines.length), source.endsWithNewline);
-  return joinSourceText(output, source.lineEnding, endsWithNewline);
+  const endsWithNewline = resolveEofNewline(eofNewlineDecision(located, source.lines.length), source.endsWithNewline);
+  return { text: joinSourceText(output, source.lineEnding, endsWithNewline), hunkOffsets: hunkOffsetsOf(located), located };
+}
+
+export function applyUnifiedPatch(before: string, patchText: string, options?: { targetFile?: string; mode?: HunkLocateMode; window?: number }): string {
+  return applyUnifiedPatchDetailed(before, patchText, options).text;
 }

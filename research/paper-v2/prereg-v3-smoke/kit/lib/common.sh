@@ -531,6 +531,7 @@ start_steward_daemon() {
     ensure_other_can_reach "$node_bin"
     ensure_other_can_reach "$KIT_ROOT/bin/steward-daemon.mjs"
     ensure_other_can_reach "$KIT_ROOT/bin/atm-write.mjs"
+    ensure_other_can_reach "$KIT_ROOT/bin/unified-patch.generated.mjs"
     ensure_other_can_reach "$KIT_ROOT/bin/atm-write"
     ensure_other_can_reach "$work"
     if ! as_root -u "$STEWARD_USER" -- test -r "$KIT_ROOT/bin/steward-daemon.mjs"; then
@@ -1056,6 +1057,8 @@ launch_codex() {
     node_bin="$(command -v node || true)"
     [ -n "$node_bin" ] && ensure_other_can_reach "$node_bin"
     ensure_other_can_reach "$KIT_ROOT/bin/atm-write"
+    # atm-write.mjs imports this module statically, even on the socket-client path.
+    ensure_other_can_reach "$KIT_ROOT/bin/unified-patch.generated.mjs"
     if [ -n "${PREREG_ARM_BIN:-}" ]; then
       ensure_other_can_reach "$PREREG_ARM_BIN"
     fi

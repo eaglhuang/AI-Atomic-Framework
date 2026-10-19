@@ -1,0 +1,114 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-PRF-0138",
+  "targetRepoIdentity": {
+    "kind": "framework",
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "/workspace/AI-Atomic-Framework-359/AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "825542424734dc4701933dbdc89f1984234ca677",
+  "governedTreeSha": "9472316974dd34098886513c459402f06125ba5e",
+  "targetCommitDelta": {
+    "currentCommitSha": "825542424734dc4701933dbdc89f1984234ca677",
+    "parentCommitShas": [
+      "825542424734dc4701933dbdc89f1984234ca677"
+    ],
+    "governedTreeSha": "9472316974dd34098886513c459402f06125ba5e",
+    "changedFiles": [
+      ".atm/history/task-events/TASK-PRF-0138/2026-10-19T17-17-34-783Z-import-c1e4f24b0ba9.json",
+      ".atm/history/task-events/TASK-PRF-0138/2026-10-19T17-17-37-923Z-reserve-b2d2be472010.json",
+      ".atm/history/task-events/TASK-PRF-0138/2026-10-19T17-17-37-925Z-promote-6a566e5463a2.json",
+      ".atm/history/task-events/TASK-PRF-0138/2026-10-19T17-17-39-845Z-claim-913b874dd3a7.json",
+      ".atm/history/tasks/TASK-PRF-0138.json",
+      ".atm/task-plans/TASK-PRF-0138.md",
+      "PROGRESS.md",
+      "scripts/validate-hist-v2-smoke-runbook.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types scripts/validate-hist-v2-smoke-runbook.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a79fe9cfd91634c2e28546d5bf1d6ff16469bddc3089abe6326584704827316f",
+      "stderrSha256": "sha256:8420fe5f89e71edf9c280dd82f1d1b6e1a1b5af4a38ce1934e497ca0d67a9310",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --strip-types tests/cli/worktree-callsite-census.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:155111bc46227e6ae0cb8701a1ca11ab317c8c620ea676050b86eef13deca8d9",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/worktree-callsite-census.test.ts",
+    "validate:hist-v2-smoke-runbook"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "node --strip-types tests/cli/worktree-callsite-census.test.ts",
+    "validate:hist-v2-smoke-runbook"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-10-19T17:19:34.625Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-PRF-0138.*",
+      ".atm/history/task-events/TASK-PRF-0138/**",
+      ".atm/history/tasks/TASK-PRF-0138.json",
+      ".atm/task-plans/TASK-PRF-0138.md",
+      "packages/cli/dist",
+      "packages/cli/dist/**",
+      "PROGRESS.md",
+      "release/atm-onefile/**",
+      "release/atm-root-drop/**",
+      "scripts/validate-hist-v2-smoke-runbook.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/dist",
+      "packages/cli/dist/**",
+      "scripts/validate-hist-v2-smoke-runbook.ts"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/worktree-callsite-census.test.ts",
+      "validate:hist-v2-smoke-runbook"
+    ]
+  },
+  "evidencePath": ".atm/runtime/evidence-ledger/bundles/TASK-PRF-0138.json",
+  "closedAt": "2026-10-19T17:19:34.626Z",
+  "closedByActor": "grok-bot",
+  "sessionId": "session-20261019171737-grok-bot-TASK-PRF-0138-6286fbf314",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "825542424734dc4701933dbdc89f1984234ca677",
+    "taskMatchedFiles": [
+      "PROGRESS.md",
+      "scripts/validate-hist-v2-smoke-runbook.ts"
+    ],
+    "governanceFiles": [],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

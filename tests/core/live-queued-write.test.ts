@@ -113,6 +113,98 @@ async function main() {
   assert.equal(liveEvidence.liveWrites?.[0]?.decision, 'accepted');
   assert.match(readFileSync(path.join(cliRepo, 'shared.py'), 'utf8'), /beta-cli/);
 
+  // Strict parser failures never write or queue a malformed proposal.
+  for (const patch of [
+    '@@ -1 +1 @@\n-alpha\nunprefixed\n+ALPHA\n',
+    '', '--- a/shared.py\n+++ b/shared.py\n',
+    '--- a/other.py\n+++ b/other.py\n@@ -1 +1 @@\n-alpha\n+ALPHA\n',
+    replaceLine(BASE, 'alpha', 'ALPHA') + '--- a/second.py\n+++ b/second.py\n@@ -1 +1 @@\n-x\n+y\n'
+  ]) {
+    const malformedRepo = makeRepo(BASE);
+    const result = applyLiveQueuedWrites({ cwd: malformedRepo, proposals: [proposal({
+      id: 'malformed', actor: 'a', hash: hashText(BASE), head: git(malformedRepo, ['rev-parse', 'HEAD']), patch
+    })] });
+    assert.equal(result.writes[0]?.reasonCode, 'patch-malformed');
+    assert.equal(result.writes[0]?.queued, false);
+    assert.equal(result.writes[0]?.hunkOffsets, null);
+    assert.equal(readFileSync(path.join(malformedRepo, 'shared.py'), 'utf8'), BASE);
+  }
+  {
+    const noopRepo = makeRepo(BASE);
+    const result = applyLiveQueuedWrites({ cwd: noopRepo, proposals: [proposal({
+      id: 'noop', actor: 'a', hash: hashText(BASE), head: git(noopRepo, ['rev-parse', 'HEAD']), patch: '@@ -1 +1 @@\n alpha\n'
+    })] });
+    assert.equal(result.writes[0]?.reasonCode, 'no-op-patch');
+    assert.equal(result.writes[0]?.decision, 'rejected-by-design');
+    assert.equal(readFileSync(path.join(noopRepo, 'shared.py'), 'utf8'), BASE);
+  }
+  {
+    const offsetRepo = makeRepo(BASE);
+    const result = applyLiveQueuedWrites({ cwd: offsetRepo, proposals: [proposal({
+      id: 'offset', actor: 'a', hash: hashText(BASE), head: git(offsetRepo, ['rev-parse', 'HEAD']),
+      patch: replaceLine(BASE, 'beta', 'BETA').replace('@@ -2,1 +2,1 @@', '@@ -1,1 +1,1 @@')
+    })] });
+    assert.equal(result.writes[0]?.decision, 'accepted');
+    assert.deepEqual(result.writes[0]?.hunkOffsets, [{ declaredOldStart: 1, appliedOldStart: 2, offset: 1 }]);
+    const entry = JSON.parse(readFileSync(path.join(offsetRepo, '.atm/runtime/live-write-journal.jsonl'), 'utf8').trim());
+    assert.deepEqual(entry.changedLines, [1, 2]);
+  }
+  {
+    const repeated = 'a\nb\nb\nc\n';
+    const repeatedRepo = makeRepo(repeated);
+    const head = git(repeatedRepo, ['rev-parse', 'HEAD']);
+    const result = applyLiveQueuedWrites({ cwd: repeatedRepo, proposals: [
+      proposal({ id: 'top', actor: 'a', hash: hashText(repeated), head, patch: '@@ -0,0 +1 @@\n+top\n' }),
+      proposal({ id: 'stale-repeated', actor: 'b', hash: hashText(repeated), head, patch: '@@ -2 +2 @@\n-b\n+B\n' })
+    ] });
+    assert.equal(result.writes[0]?.decision, 'accepted');
+    assert.equal(result.writes[1]?.reasonCode, 'stale-base');
+    assert.equal(result.writes[1]?.hunkOffsets, null);
+    assert.equal(readFileSync(path.join(repeatedRepo, 'shared.py'), 'utf8'), `top\n${repeated}`);
+  }
+
+  {
+    // Overlap is measured in the declared base after locating offset headers.
+    const baseRepo = makeRepo(BASE);
+    const head = git(baseRepo, ['rev-parse', 'HEAD']);
+    const result = applyLiveQueuedWrites({ cwd: baseRepo, proposals: [
+      proposal({ id: 'base-beta', actor: 'a', hash: hashText(BASE), head, patch: replaceLine(BASE, 'beta', 'BETA') }),
+      proposal({ id: 'offset-delta', actor: 'b', hash: hashText(BASE), head,
+        patch: replaceLine(BASE, 'delta', 'DELTA').replace('@@ -4,1 +4,1 @@', '@@ -2,1 +2,1 @@') })
+    ] });
+    assert.deepEqual(result.writes.map((write) => write.decision), ['accepted', 'accepted']);
+    assert.equal(result.writes[1]?.hunkOffsets?.[0]?.offset, 2);
+  }
+  {
+    // Stale overlap check: an offset header that really edits a committed line is
+    // classified at its located base position, so it queues instead of stale-base.
+    const overlapRepo = makeRepo(BASE);
+    const head = git(overlapRepo, ['rev-parse', 'HEAD']);
+    const result = applyLiveQueuedWrites({ cwd: overlapRepo, proposals: [
+      proposal({ id: 'beta-one', actor: 'a', hash: hashText(BASE), head, patch: replaceLine(BASE, 'beta', 'beta-one') }),
+      proposal({ id: 'beta-two-offset', actor: 'b', hash: hashText(BASE), head,
+        patch: replaceLine(BASE, 'beta', 'beta-two').replace('@@ -2,1 +2,1 @@', '@@ -3,1 +3,1 @@') })
+    ] });
+    assert.equal(result.writes[0]?.decision, 'accepted');
+    assert.equal(result.writes[1]?.reasonCode, 'overlapping-write-queued');
+    assert.equal(result.writes[1]?.queued, true);
+    assert.match(readFileSync(path.join(overlapRepo, 'shared.py'), 'utf8'), /beta-one/);
+  }
+  {
+    // A stale write journals current coordinates and the current preimage hash.
+    const shiftedRepo = makeRepo(BASE);
+    const head = git(shiftedRepo, ['rev-parse', 'HEAD']);
+    const result = applyLiveQueuedWrites({ cwd: shiftedRepo, proposals: [
+      proposal({ id: 'insert-top', actor: 'a', hash: hashText(BASE), head, patch: '@@ -0,0 +1 @@\n+top\n' }),
+      proposal({ id: 'shifted-beta', actor: 'b', hash: hashText(BASE), head, patch: replaceLine(BASE, 'beta', 'BETA') })
+    ] });
+    assert.deepEqual(result.writes.map((write) => write.decision), ['accepted', 'accepted']);
+    assert.equal(result.writes[1]?.hunkOffsets?.[0]?.offset, 1);
+    const entries = readFileSync(path.join(shiftedRepo, '.atm/runtime/live-write-journal.jsonl'), 'utf8').trim().split('\n').map((line) => JSON.parse(line));
+    assert.deepEqual(entries[1].changedLines, [2, 3]);
+    assert.equal(entries[1].baseHash, hashText(`top\n${BASE}`));
+  }
+
   const stress = await runStress();
   console.log(JSON.stringify({ overlap: 'writer-1 accepted, writer-2 queued then accepted', stale: 'stale-base', stress }, null, 2));
   console.log('live queued write ok');

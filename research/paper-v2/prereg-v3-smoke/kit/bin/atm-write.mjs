@@ -10,6 +10,18 @@ import { createHash } from 'node:crypto';
 import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import net from 'node:net';
 import path from 'node:path';
+// Generated, type-stripped copy of the CLI core unified-patch module
+// (#359, #361): the same strict parser and hunk locator, so this wrapper cannot
+// disagree with the CLI about where a hunk lands. Guarded by preflight check
+// hunk-locator-parity. Do not add a second parser here.
+import {
+  UnifiedPatchApplicationError,
+  hunkOffsetsOf,
+  locateUnifiedPatchHunks,
+  locatedLineIndexes,
+  parseUnifiedPatch,
+  splitSourceText
+} from './unified-patch.generated.mjs';
 
 const STEWARD_ID = 'neutral-write-steward';
 const CLI_PACKAGE = '@ai-atomic-framework/cli@0.1.21';
@@ -142,11 +154,11 @@ function gitText(repo, args, safePath) {
   });
 }
 
-function anchorsFromPatch(patch) {
+function anchorsFromPatch(hunks) {
   const anchors = [];
-  for (const match of patch.matchAll(/^@@ -(\d+)(?:,(\d+))? \+\d+(?:,\d+)? @@/gm)) {
-    const start = Number(match[1]);
-    const count = match[2] === undefined ? 1 : Number(match[2]);
+  for (const hunk of hunks) {
+    const start = hunk.oldStart;
+    const count = hunk.oldCount;
     const end = count === 0 ? start : start + Math.max(count, 1) - 1;
     anchors.push({ kind: 'line-range', hint: `${start}-${end}` });
   }
@@ -166,7 +178,7 @@ function proposalDocument(input) {
     fileBeforeHash: input.fileBeforeHash,
     targetFile: input.relativeFile,
     atomRefs: [{ atomId: `atom-${input.proposalId}`, atomCid: `cid-${input.proposalId}` }],
-    anchors: anchorsFromPatch(input.patch),
+    anchors: anchorsFromPatch(input.hunks),
     intent: input.message,
     patch: input.patch,
     validators: ['prereg-v3-smoke'],
@@ -202,7 +214,6 @@ const taskId = argValue('--task') || process.env.ATM_TASK || `prereg-${actorId}`
 const message = argValue('--message') || `prereg-v3-smoke: ${taskId} ${relativeFile}`;
 const baseFile = argValue('--base-file');
 const patch = patchArg === '-' ? readFileSync(0, 'utf8') : readFileSync(path.resolve(patchArg), 'utf8');
-if (!patch.includes('@@')) fail('patch', 'patch 不是 unified diff', { file: relativeFile });
 
 const attempt = Math.max(1, Number(argValue('--attempt') || process.env.PREREG_WRITE_ATTEMPT || 1) || 1);
 const started = Date.now();
@@ -234,89 +245,29 @@ function gitBuffer(repo, args, safePath) {
   });
 }
 
-function parsePatchHunks(patch) {
-  const lines = patch.split(/\r?\n/);
-  if (lines.length > 0 && lines[lines.length - 1] === '') lines.pop();
-  const hunks = [];
-  let current = null;
-  for (const line of lines) {
-    const header = /^@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@/.exec(line);
-    if (header) {
-      if (current) hunks.push(current);
-      current = { oldStart: Number(header[1]), lines: [] };
-      continue;
-    }
-    if (!current) continue;
-    if (line === '\\ No newline at end of file') {
-      current.uncertain = true;
-      continue;
-    }
-    if (line.startsWith(' ') || line.startsWith('-') || line.startsWith('+')) {
-      current.lines.push({ marker: line[0], text: line.slice(1) });
-      continue;
-    }
-    if (line === '') {
-      current.lines.push({ marker: ' ', text: '' });
-      continue;
-    }
-    hunks.push(current);
-    current = null;
+/** Strict parse with the CLI parser. A malformed patch is the model's error, never a kit crash. */
+function parseSubmittedPatch(patch, relativeFile) {
+  try {
+    return { hunks: parseUnifiedPatch(patch, { targetFile: relativeFile }), error: null };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    return { hunks: null, error: error instanceof UnifiedPatchApplicationError ? message : `patch could not be parsed: ${message}` };
   }
-  if (current) hunks.push(current);
-  return hunks;
 }
 
-function sourceLines(before) {
-  const endsWithNewline = before.endsWith('\n');
-  if (before.length === 0) return [];
-  const lines = before.split(/\r?\n/);
-  if (endsWithNewline) lines.pop();
-  return lines;
-}
-
-function patchLineIndexes(patch) {
-  const covered = [];
-  const changed = [];
-  for (const hunk of parsePatchHunks(patch)) {
-    let cursor = hunk.oldStart <= 0 ? 0 : hunk.oldStart - 1;
-    for (const entry of hunk.lines) {
-      if (entry.marker === '+') {
-        changed.push(cursor);
-        continue;
-      }
-      covered.push(cursor);
-      if (entry.marker === '-') changed.push(cursor);
-      cursor += 1;
-    }
+/** Located hunks in `text` with the CLI locator, or null when the patch does not apply there. */
+function locateIn(text, hunks) {
+  try {
+    return locateUnifiedPatchHunks(splitSourceText(text), hunks, { mode: 'nearest' });
+  } catch {
+    return null;
   }
-  return { covered, changed };
 }
 
 function intersects(left, right) {
   if (!left?.length || !right?.length) return false;
   const set = new Set(left);
   return right.some((value) => set.has(value));
-}
-
-/** true when the hunk context matches, false when it does not, null when the patch uses newline markers this check does not judge. */
-function patchApplicability(before, patch) {
-  const hunks = parsePatchHunks(patch);
-  if (hunks.length === 0) return true;
-  if (hunks.some((hunk) => hunk.uncertain)) return null;
-  const lines = sourceLines(before);
-  let cursor = 0;
-  for (const hunk of hunks) {
-    const start = hunk.oldStart <= 0 ? 0 : hunk.oldStart - 1;
-    if (start < cursor || start > lines.length) return false;
-    let index = start;
-    for (const entry of hunk.lines) {
-      if (entry.marker === '+') continue;
-      if (lines[index] !== entry.text) return false;
-      index += 1;
-    }
-    cursor = index;
-  }
-  return true;
 }
 
 function readJournal(repo) {
@@ -356,38 +307,45 @@ function normalizeHash(value) {
 
 /**
  * 沒有 --base-file 時，模型是對著某一個已讀內容寫 diff。
- * 內容仍是目前檔案就宣告目前雜湊。
- * 內容對得上 journal 裡某個 base，而且行和那次提交重疊，就宣告那個 base，
- * 讓公開 CLI 回 overlapping-write-queued 與目前內容。
+ * 內容仍是目前檔案（用 CLI 同一個定位器找得到 hunk）就宣告目前雜湊。
+ * 內容對得上 journal 裡某個 base，而且在那個 base 裡定位到的行和那次提交重疊，
+ * 就宣告那個 base，讓公開 CLI 回 overlapping-write-queued 與目前內容。
+ * 重疊一律用定位後的行號比，不用 hunk 標頭的行號（#359）。
  * 對不上任何版本的 hunk 仍宣告目前雜湊，CLI 回 patch-context-mismatch。
+ * 回傳宣告的雜湊，以及該 base 裡的定位結果（算 hunkOffsets 用）。
  */
-function chooseDeclaredBaseHash(input, liveBytes) {
+function chooseDeclaredBase(input, liveBytes) {
   const liveHash = sha256Bytes(liveBytes);
-  const applicability = patchApplicability(liveBytes.toString('utf8'), input.patch);
-  if (applicability !== false) return liveHash;
-  const lines = patchLineIndexes(input.patch);
+  const liveLocated = locateIn(liveBytes.toString('utf8'), input.hunks);
+  if (liveLocated) return { hash: liveHash, located: liveLocated };
   const versions = historicalFileHashes(input.writableRoot, input.relativeFile, input.safePath);
   const journal = readJournal(input.writableRoot).filter((entry) => entry.file === input.relativeFile);
   for (const entry of journal.slice().reverse()) {
     const version = versions.find((item) => normalizeHash(item.hash) === normalizeHash(entry.baseHash));
     if (!version) continue;
-    if (patchApplicability(version.text, input.patch) !== true) continue;
+    const located = locateIn(version.text, input.hunks);
+    if (!located) continue;
+    const lines = locatedLineIndexes(located);
     const changed = Array.isArray(entry.changedLines) ? entry.changedLines : [];
-    if (intersects(changed, lines.covered) || intersects(changed, lines.changed)) return version.hash;
+    if (intersects(changed, lines.covered) || intersects(changed, lines.changed)) return { hash: version.hash, located };
   }
-  return liveHash;
+  return { hash: liveHash, located: null };
 }
 
 function submitLive(input) {
   const head = gitText(input.writableRoot, ['rev-parse', 'HEAD'], input.safePath);
   if (head.status !== 0) fail('base', `無法讀取 HEAD：${head.stderr}`);
   const baseCommit = head.stdout.trim();
+  const parsed = parseSubmittedPatch(input.patch, input.relativeFile);
+  if (!parsed.hunks) return malformedPatch(input, parsed.error);
+  input = { ...input, hunks: parsed.hunks };
   const liveBytes = input.baseFile
     ? readFileSync(path.resolve(input.baseFile))
     : readFileSync(path.join(input.writableRoot, input.relativeFile));
-  const fileBeforeHash = input.baseFile
-    ? sha256Bytes(liveBytes)
-    : chooseDeclaredBaseHash(input, liveBytes);
+  const declaredBase = input.baseFile
+    ? { hash: sha256Bytes(liveBytes), located: locateIn(liveBytes.toString('utf8'), input.hunks) }
+    : chooseDeclaredBase(input, liveBytes);
+  const fileBeforeHash = declaredBase.hash;
   const proposalId = `prop-${input.actorId}-a${input.attempt}-${createHash('sha256').update(`${input.relativeFile}\n${input.patch}`).digest('hex').slice(0, 12)}`;
   const proposal = proposalDocument({ ...input, proposalId, baseCommit, fileBeforeHash });
   const inbox = path.join(input.writableRoot, '.prereg-smoke', 'inbox');
@@ -431,6 +389,7 @@ function submitLive(input) {
     sessionSlot,
     file: input.relativeFile,
     declaredBaseHash: fileBeforeHash,
+    hunkOffsets: declaredBase.located ? hunkOffsetsOf(declaredBase.located) : null,
     currentFileText: typeof live?.currentFileText === 'string' ? live.currentFileText : currentFileText(input),
     currentFileHash: live?.currentFileHash || null,
     batchSize: 1,
@@ -448,6 +407,48 @@ function submitLive(input) {
   appendFileSync(logPath, `${JSON.stringify(record)}\n`);
   const exitCode = decision === 'accepted' ? 0 : (decision === 'rejected-by-design' ? 3 : 1);
   return { record, exitCode };
+}
+
+/**
+ * 解析不了的 patch（沒有 hunk、標頭行數和內容不合、少了前綴、多檔或檔名不對）
+ * 是模型送錯，不是 kit 故障：記成 rejected-by-design / patch-malformed，exit 3，不呼叫 CLI。
+ */
+function malformedPatch(input, message) {
+  const proposalId = `prop-${input.actorId}-a${input.attempt}-${createHash('sha256').update(`${input.relativeFile}\n${input.patch}`).digest('hex').slice(0, 12)}`;
+  const text = currentFileText(input);
+  const record = {
+    schema: 'prereg-v3-smoke.stewardWrite.v1',
+    ok: false,
+    decision: 'rejected-by-design',
+    reasonCode: 'patch-malformed',
+    messageCode: null,
+    verdict: 'blocked',
+    phase: 'parse',
+    terminal: 'blocked',
+    stopReason: message,
+    proposalId,
+    taskId: input.taskId,
+    actorId: input.actorId,
+    sessionSlot,
+    file: input.relativeFile,
+    declaredBaseHash: null,
+    hunkOffsets: null,
+    currentFileText: text,
+    currentFileHash: text === null ? null : sha256Bytes(Buffer.from(text, 'utf8')),
+    batchSize: 1,
+    attempt: input.attempt,
+    retryCount: Math.max(0, input.attempt - 1),
+    hashDriftCount: 0,
+    writeToCommitMs: null,
+    commit: { gitIndexLockWaitMs: 0, headMoves: 0 },
+    planRequired: false,
+    cli: CLI_PACKAGE,
+    entry: 'broker steward apply-live'
+  };
+  const logPath = path.join(input.writableRoot, '.prereg-smoke', 'steward-writes.jsonl');
+  mkdirSync(path.dirname(logPath), { recursive: true });
+  appendFileSync(logPath, `${JSON.stringify(record)}\n`);
+  return { record, exitCode: 3 };
 }
 
 function confirmLiveWrite(input, beforeBytes, beforeHead, proposalId) {

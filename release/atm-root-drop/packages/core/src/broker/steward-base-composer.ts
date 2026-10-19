@@ -12,9 +12,9 @@ import { rebaseProposalsByRegionIdentity } from './steward-region-rebase.ts';
 import {
   eofMarkerViolation,
   eofNewlineDecision,
-  hunkOldLineIndex,
+  locateUnifiedPatchHunks,
+  type LocatedHunk,
   joinSourceText,
-  oldSideNewlineAgrees,
   parseUnifiedPatchHunks,
   resolveEofNewline,
   splitSourceText,
@@ -122,15 +122,17 @@ function resolveProposalEdit(
   const span = new Set<number>();
   const deleted = new Set<number>();
   const inserts = new Map<number, string[]>();
-  const hunks = parseUnifiedPatchHunks(proposal.patch);
-  const markerError = eofMarkerViolation(hunks, baseLines.length);
+  let located: LocatedHunk[];
+  try {
+    const hunks = parseUnifiedPatchHunks(proposal.patch);
+    located = locateUnifiedPatchHunks({ lines: [...baseLines], endsWithNewline: fileEndsWithNewline, lineEnding: '\n' }, hunks, { mode: 'nearest' });
+  } catch (error) {
+    return { detail: `proposal '${proposal.proposalId}' ${error instanceof Error ? error.message : String(error)}` };
+  }
+  const markerError = eofMarkerViolation(located, baseLines.length);
   if (markerError) return { detail: `proposal '${proposal.proposalId}' ${markerError}` };
-  let cursor = 0;
-  for (const hunk of hunks) {
-    const start = hunkOldLineIndex(hunk.oldStart);
-    if (start < cursor) return { detail: `proposal '${proposal.proposalId}' hunk at old line ${hunk.oldStart} overlaps an earlier hunk` };
-    if (start > baseLines.length) return { detail: `proposal '${proposal.proposalId}' hunk at old line ${hunk.oldStart} starts past the end of a ${baseLines.length}-line base` };
-    cursor = start;
+  for (const { hunk, index } of located) {
+    let cursor = index;
     for (const entry of hunk.lines) {
       if (entry.marker === '+') {
         const gap = inserts.get(cursor) ?? [];
@@ -138,23 +140,12 @@ function resolveProposalEdit(
         inserts.set(cursor, gap);
         continue;
       }
-      if (baseLines[cursor] !== entry.text) {
-        return { detail: `proposal '${proposal.proposalId}' context mismatch at base line ${cursor + 1}: expected ${JSON.stringify(entry.text)}, found ${JSON.stringify(baseLines[cursor] ?? null)}` };
-      }
-      if (!oldSideNewlineAgrees({
-        noNewline: entry.noNewline,
-        lineIndex: cursor,
-        lineCount: baseLines.length,
-        fileEndsWithNewline
-      })) {
-        return { detail: `proposal '${proposal.proposalId}' newline mismatch at base line ${cursor + 1}: the ${entry.noNewline ? 'old side omits' : 'old side keeps'} the end-of-file newline` };
-      }
       span.add(cursor);
       if (entry.marker === '-') deleted.add(cursor);
       cursor += 1;
     }
   }
-  return { proposalId: proposal.proposalId, span, deleted, inserts, eofNewline: eofNewlineDecision(hunks, baseLines.length) };
+  return { proposalId: proposal.proposalId, span, deleted, inserts, eofNewline: eofNewlineDecision(located, baseLines.length) };
 }
 
 function mergedEofNewline(edits: readonly ProposalEdit[]): EofNewlineDecision | 'conflict' {

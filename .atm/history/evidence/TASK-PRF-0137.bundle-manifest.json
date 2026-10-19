@@ -1,0 +1,46 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0137",
+  "updatedAt": "2026-10-19T16:56:31.017Z",
+  "updatedBy": "grok-bot",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/worktree-callsite-census.test.ts",
+    "validate:hist-v2-smoke-runbook"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types scripts/validate-hist-v2-smoke-runbook.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a79fe9cfd91634c2e28546d5bf1d6ff16469bddc3089abe6326584704827316f",
+      "stderrSha256": "sha256:b5f9ad18be43d3a7734bfe53f463a7ac05cb5c86fb0b32328d005c0a255988f9",
+      "validators": [
+        "validate:hist-v2-smoke-runbook"
+      ],
+      "generatedAt": "2026-10-19T16:56:29.424Z",
+      "startedAt": "2026-10-19T16:56:00.435Z",
+      "finishedAt": "2026-10-19T16:56:29.424Z",
+      "durationMs": 28989,
+      "runnerKind": "dev-source",
+      "sourceCommit": "7a0280fece5dd1f94f2597a7a1e41e322bc52e00",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/worktree-callsite-census.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:155111bc46227e6ae0cb8701a1ca11ab317c8c620ea676050b86eef13deca8d9",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/worktree-callsite-census.test.ts"
+      ],
+      "generatedAt": "2026-10-19T16:56:31.016Z",
+      "startedAt": "2026-10-19T16:56:30.707Z",
+      "finishedAt": "2026-10-19T16:56:31.016Z",
+      "durationMs": 309,
+      "runnerKind": "dev-source",
+      "sourceCommit": "7a0280fece5dd1f94f2597a7a1e41e322bc52e00",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

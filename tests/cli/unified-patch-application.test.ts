@@ -82,18 +82,18 @@ assert.equal(UNIFIED_PATCH_APPLICATION_SCHEMA_ID, 'atm.unifiedPatchApplication.v
   assert.throws(
     () => applyUnifiedPatch(before, '@@ -2,1 +2,1 @@\n-TWO\n+2\n'),
     (error: unknown) => error instanceof UnifiedPatchApplicationError
-      && /context mismatch at line 2/.test((error as Error).message)
+      && /patch context not found for hunk @@ -2/.test((error as Error).message)
   );
   assert.throws(
     () => applyUnifiedPatch(before, '@@ -9,1 +9,1 @@\n-nine\n+9\n'),
-    /starts past the end of a 3-line file/
+    /patch context not found for hunk @@ -9/
   );
   assert.throws(
     () => applyUnifiedPatch(before, '@@ -2,1 +2,1 @@\n-two\n+2\n@@ -1,1 +1,1 @@\n-one\n+1\n'),
     /overlaps an earlier hunk/
   );
-  // A patch with no hunks is a no-op, never an append.
-  assert.equal(applyUnifiedPatch(before, '--- a/x\n+++ b/x\n'), before);
+  // A patch with no hunks fails closed.
+  assert.throws(() => applyUnifiedPatch(before, '--- a/x\n+++ b/x\n'), (error: unknown) => error instanceof UnifiedPatchApplicationError && error.reason === 'malformed');
 }
 
 // --- ACC-4: boundary bytes. The composer feeds this output straight into

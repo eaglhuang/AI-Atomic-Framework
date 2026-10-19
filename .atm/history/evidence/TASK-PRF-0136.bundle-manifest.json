@@ -1,0 +1,46 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0136",
+  "updatedAt": "2026-10-19T16:34:44.629Z",
+  "updatedBy": "grok-bot",
+  "freshValidationPasses": [
+    "node --strip-types packages/core/src/broker/__tests__/shared-compose-inbox.test.ts",
+    "validate:hist-v2-harness"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/core/src/broker/__tests__/shared-compose-inbox.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e4769c3651b96f3bb5870de0317ad08769e62e7d8b439a4e3e2ff87ed7d23d10",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/core/src/broker/__tests__/shared-compose-inbox.test.ts"
+      ],
+      "generatedAt": "2026-10-19T16:34:11.302Z",
+      "startedAt": "2026-10-19T16:34:10.345Z",
+      "finishedAt": "2026-10-19T16:34:11.302Z",
+      "durationMs": 957,
+      "runnerKind": "dev-source",
+      "sourceCommit": "c6d375a50c84b61299310ac8a118446f5e314579",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-hist-v2-harness.ts --mode test",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:58896ef50464c7e5df6c6024b166f003940cd9441c1f5a9d189cd3312acb4b04",
+      "stderrSha256": "sha256:bc7b87847816b16da728f118ff7ecb069b06c298ecd8ea2a8931726dbc61cf6b",
+      "validators": [
+        "validate:hist-v2-harness"
+      ],
+      "generatedAt": "2026-10-19T16:34:44.626Z",
+      "startedAt": "2026-10-19T16:34:12.466Z",
+      "finishedAt": "2026-10-19T16:34:44.626Z",
+      "durationMs": 32160,
+      "runnerKind": "dev-source",
+      "sourceCommit": "c6d375a50c84b61299310ac8a118446f5e314579",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

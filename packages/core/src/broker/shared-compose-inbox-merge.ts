@@ -59,7 +59,10 @@ export function gitMergeFileBytes(current: string, base: string, theirs: string)
 
 export function materializeMember(member: ComposeMemberInput): { readonly ok: true; readonly ready: ReadyMember } | { readonly ok: false; readonly detail: string } {
   try {
-    const mine = applyUnifiedPatch(member.baseBytes, member.patch);
+    // An empty patch is a content-preserving member (for example a rename).
+    // The strict parser refuses a patch with no hunks, so keep the inbox's
+    // identity contract here instead of loosening the parser.
+    const mine = member.patch.trim() === '' ? member.baseBytes : applyUnifiedPatch(member.baseBytes, member.patch);
     return {
       ok: true,
       ready: {
