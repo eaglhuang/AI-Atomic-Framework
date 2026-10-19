@@ -1,0 +1,114 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0135",
+  "updatedAt": "2026-10-19T15:16:14.493Z",
+  "updatedBy": "grok-bot",
+  "freshValidationPasses": [
+    "bash research/paper-v2/prereg-v3-smoke/kit/test/test-hunk-locator-parity.sh",
+    "node --strip-types tests/cli/unified-patch-application.test.ts",
+    "node --strip-types tests/cli/unified-patch-eof-newline.test.ts",
+    "node --strip-types tests/cli/unified-patch-locator.test.ts",
+    "node --strip-types tests/cli/unified-patch-v10c-replay.test.ts",
+    "node --strip-types tests/core/live-queued-write.test.ts"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/unified-patch-locator.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:82672813231ae3ddc376ed1fcd669bfaa9da3d390bbfca868c5b840a623be9bc",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/unified-patch-locator.test.ts"
+      ],
+      "generatedAt": "2026-10-19T15:15:41.375Z",
+      "startedAt": "2026-10-19T15:15:38.833Z",
+      "finishedAt": "2026-10-19T15:15:41.375Z",
+      "durationMs": 2542,
+      "runnerKind": "dev-source",
+      "sourceCommit": "2096a866497350e392f6c8a6974c0aa9542d8939",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/unified-patch-v10c-replay.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3e5fa3576a3602af12160e92661fb5b2e2f41433081e3b759b2a7226ed071475",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/unified-patch-v10c-replay.test.ts"
+      ],
+      "generatedAt": "2026-10-19T15:15:42.764Z",
+      "startedAt": "2026-10-19T15:15:42.674Z",
+      "finishedAt": "2026-10-19T15:15:42.764Z",
+      "durationMs": 90,
+      "runnerKind": "dev-source",
+      "sourceCommit": "2096a866497350e392f6c8a6974c0aa9542d8939",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/unified-patch-application.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:76dafa11596c1c9a14e056de416b20c4c89beba496a5e9642e9319ea0a394e92",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/unified-patch-application.test.ts"
+      ],
+      "generatedAt": "2026-10-19T15:16:01.039Z",
+      "startedAt": "2026-10-19T15:15:44.109Z",
+      "finishedAt": "2026-10-19T15:16:01.039Z",
+      "durationMs": 16930,
+      "runnerKind": "dev-source",
+      "sourceCommit": "2096a866497350e392f6c8a6974c0aa9542d8939",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/unified-patch-eof-newline.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:100ad82252e9f086f0eee681a3e0da831baf6d03cfb7238a90ccd1ff97c8ebf9",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/unified-patch-eof-newline.test.ts"
+      ],
+      "generatedAt": "2026-10-19T15:16:02.963Z",
+      "startedAt": "2026-10-19T15:16:02.411Z",
+      "finishedAt": "2026-10-19T15:16:02.963Z",
+      "durationMs": 552,
+      "runnerKind": "dev-source",
+      "sourceCommit": "2096a866497350e392f6c8a6974c0aa9542d8939",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/core/live-queued-write.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:22315acc04d2ab4b60bbba8a259f82c0928d88cf38ce98ba0e705d82893d0f1d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/core/live-queued-write.test.ts"
+      ],
+      "generatedAt": "2026-10-19T15:16:13.002Z",
+      "startedAt": "2026-10-19T15:16:04.214Z",
+      "finishedAt": "2026-10-19T15:16:13.002Z",
+      "durationMs": 8788,
+      "runnerKind": "dev-source",
+      "sourceCommit": "2096a866497350e392f6c8a6974c0aa9542d8939",
+      "cached": false
+    },
+    {
+      "command": "bash research/paper-v2/prereg-v3-smoke/kit/test/test-hunk-locator-parity.sh",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:318d42741d3bfdb1f7c87f73d487999d6d39669d5757d13f09be0af87e580eba",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "bash research/paper-v2/prereg-v3-smoke/kit/test/test-hunk-locator-parity.sh"
+      ],
+      "generatedAt": "2026-10-19T15:16:14.491Z",
+      "startedAt": "2026-10-19T15:16:14.308Z",
+      "finishedAt": "2026-10-19T15:16:14.491Z",
+      "durationMs": 183,
+      "runnerKind": "dev-source",
+      "sourceCommit": "2096a866497350e392f6c8a6974c0aa9542d8939",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
