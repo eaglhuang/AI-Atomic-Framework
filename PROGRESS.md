@@ -32,3 +32,7 @@ Both validators pass locally. ATM: TASK-PRF-0136 imported and claimed (lane lane
 - ATM Dogfood: success. All 5 other jobs: success. Product CI failed, but only on `worktree-callsite-census.test.ts`: the new `git worktree add` in validate-hist-v2-smoke-runbook.ts is an unclassified production worktree call site, and the production classes are a closed set.
 - Fix (follow-up task TASK-PRF-0137, lane lane-20261019165542-grok-bot-b6f2c9fc27): the validator uses a throwaway `git clone --shared --no-checkout` instead of a linked worktree. Runbook validator (26 tests) and census test pass locally.
 - 2026-10-20 00:58 Asia/Taipei: TASK-PRF-0137 closed (taskflow close --historical-delivery 7a0280fec --write → 9e2ed1e58). No runner-sync receipt was needed because only a script changed. Waiting for CI.
+
+## 2026-10-20 01:17 Asia/Taipei — CI on 758d1c146: ATM Dogfood failed
+- `validate-hist-v2-smoke-runbook` failed with "unable to read sha1 file" for blobs of the pinned merge. CI checks out with `filter: blob:none`, and the `--shared` clone cannot fetch missing blobs lazily. Reproduced locally in a blob:none clone. The harness validator and the census pass in CI.
+- Fix (follow-up task TASK-PRF-0138, lane lane-20261019171738-grok-bot-69c0e384a1): before cloning, the validator runs a binary content diff of the pinned paths in this repository, which batch-fetches both sides. Verified in a blob:none clone (26 tests OK) and in a full checkout.

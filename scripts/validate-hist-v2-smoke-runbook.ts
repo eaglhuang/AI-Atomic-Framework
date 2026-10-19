@@ -39,6 +39,10 @@ let status = 1;
 try {
   // --shared borrows this repository's object store, so detached CI heads and
   // the pinned merge resolve without fetching.
+  // CI checks out with --filter=blob:none, so the pinned blobs may not be local
+  // yet and the clone cannot fetch them lazily. A content diff in this
+  // repository batch-fetches both sides of the pinned paths first.
+  git(root, ['-c', 'core.pager=cat', 'diff', '--no-ext-diff', '--no-textconv', '--binary', '--output=/dev/null', pins.core_merge_sha, headSha, '--', ...pins.core_paths]);
   git(root, ['clone', '--quiet', '--shared', '--no-checkout', root, pinnedRoot]);
   git(pinnedRoot, ['checkout', '--quiet', '--detach', headSha]);
   git(pinnedRoot, ['checkout', pins.core_merge_sha, '--', ...pins.core_paths]);
