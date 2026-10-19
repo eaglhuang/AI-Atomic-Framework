@@ -1,6 +1,32 @@
 <!-- ATM TEMPLATE: root-drop-agent-instructions -->
 # ATM Bootstrap Instructions
 
+## Day 1
+
+Use only these five commands: `welcome`, `next`, `taskflow`, `evidence`, `doctor`.
+
+**Empty queue: skip `guide`, `orient`, and `start`.** **Trust `evidence.nextAction.playbook` over a conflicting `nextAction.command`** (after claim it is often `start`; do not paste it). **Replace every `<...>` placeholder before pasting; unquoted `<id>` is a shell redirect.** **Do not dump the JSON. Write it to a file and extract fields with `jq`.**
+
+First governed write, from the project root. Change the title, goal, scope file, and validator for the real task. `--lane-session` is inside the playbook lines; do not invent it. `create-atm` writes `{{ATM_COMMAND_PREFIX}}` as the entrypoint.
+
+```bash
+{{ATM_COMMAND_PREFIX}} taskflow open --write --actor newcomer-ai --title "Add hello.txt" --goal "Create hello.txt with one line of text." --scope-path hello.txt --validator "test -f hello.txt" --json > /tmp/atm-open.json
+TASK=$(jq -r '.evidence.generation.taskId' /tmp/atm-open.json)
+{{ATM_COMMAND_PREFIX}} next --claim --actor newcomer-ai --task "$TASK" --json > /tmp/atm-claim.json
+printf 'hello\n' > hello.txt
+EVIDENCE=$(jq -r '.evidence.nextAction.playbook.commandSequence[] | select(startswith("{{ATM_COMMAND_PREFIX}} evidence run"))' /tmp/atm-claim.json)
+CLOSE=$(jq -r '.evidence.nextAction.playbook.commandSequence[] | select(startswith("{{ATM_COMMAND_PREFIX}} taskflow close") and contains(" --write "))' /tmp/atm-claim.json)
+bash -c "$EVIDENCE" > /tmp/atm-evidence.json
+bash -c "$CLOSE" > /tmp/atm-close.json
+jq -r '.ok, .messages[0].code' /tmp/atm-close.json
+```
+
+`welcome --json` reports the product version at `evidence.versions.frameworkVersion`. Pin that npm version. Do not pin `evidence.versions.releaseTrain.frameworkVersion` or a git tag such as `v0.9.0-alpha.1`. Git `user.name` / `user.email` are required for the commit `taskflow close --write` creates. ATM `identity set` is a different actor profile and is not the recovery hint when that commit fails.
+
+## Day 2+
+
+Captain, dispatch, wave, batch, and team flows are not day-1 work.
+
 This repository uses the default ATM bootstrap pack.
 
 Captain/dispatch entry gate: if the user asks for Captain, Coordinator, dispatch, task cards, sidecars, subagents, delegation, condition review, or closeout work, first route the request through `ai-role-router` when available, then through `atm-dispatch` before drafting instructions, delegating work, or reviewing another agent. State `Skill used: atm-dispatch` and the chosen `Delegation mode`. Internal sidecar is the default for review, preflight, grep, checklist, planning-only checks, and post-report verification. External dispatch is opt-in, and external write is forbidden unless the user explicitly grants write authority and scope.
@@ -13,7 +39,7 @@ If the request says to finish all task cards, a whole plan, a task family, or mu
 
 Use `{{ATM_COMMAND_PREFIX}} next --json` only as read-only repository orientation when there is no current user prompt.
 
-For ordinary work with no matching task card, open one yourself with `{{ATM_COMMAND_PREFIX}} taskflow open --write --actor <id> --title "<title>" --goal "<goal>" --scope-path "<files>" --validator "<command>" --json` (cards live in `docs/tasks/`), claim it with `next --claim --task <TASK-ID>`, and pass the playbook's `--lane-session <id>` to every later ATM command.
+For ordinary work with no matching task card, use the Day-1 short path at the top of this file. Cards are written to `docs/tasks/`. Do not paste unquoted placeholders, and do not paste `nextAction.command` when it disagrees with the playbook.
 
 First-contact behavior:
 

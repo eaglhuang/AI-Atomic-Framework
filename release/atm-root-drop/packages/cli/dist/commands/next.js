@@ -1,5 +1,5 @@
 import { withActiveClaimResume } from './next/active-claim-resume.js';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { readActiveGuidanceSession, toGuidanceNextAction } from '../_vendor/core/dist/guidance/index.js';
 import { buildFirstUseUserNotice } from './first-use-notice.js';
@@ -263,7 +263,7 @@ async function runNextRoute(argv) {
     profile.mark('detect-governance-runtime');
     const doctorChecks = doctor.evidence.checks;
     const failed = doctorChecks.find((check) => check.ok !== true);
-    const nextAction = decideRuntimeNextAction(runtime, failed?.name ?? null, importedTaskQueue, governanceCommandPrefix(process.argv[1] ?? null), classifyRunnerMode(process.argv[1] ?? null), detectFrameworkRepoIdentity(options.cwd).isFrameworkRepo ? 'framework' : 'adopter', existsSync(path.join(options.cwd, 'package.json')));
+    const nextAction = decideRuntimeNextAction(runtime, failed?.name ?? null, importedTaskQueue, governanceCommandPrefix(process.argv[1] ?? null), classifyRunnerMode(process.argv[1] ?? null), detectFrameworkRepoIdentity(options.cwd).isFrameworkRepo ? 'framework' : 'adopter', existsSync(path.join(options.cwd, 'package.json')), packageHasTestScript(options.cwd));
     const userNotice = buildFirstUseUserNotice(nextAction);
     profile.flush('default-next');
     return withRunnerMode(makeResult({
@@ -289,6 +289,18 @@ async function runNextRoute(argv) {
             lastHandoffAt: runtime.lastHandoffAt
         }
     }), options.cwd);
+}
+function packageHasTestScript(cwd) {
+    const packagePath = path.join(cwd, 'package.json');
+    if (!existsSync(packagePath))
+        return false;
+    try {
+        const manifest = JSON.parse(readFileSync(packagePath, 'utf8'));
+        return typeof manifest.scripts?.test === 'string' && manifest.scripts.test.trim().length > 0;
+    }
+    catch {
+        return false;
+    }
 }
 import { createNextProfiler } from './next/profiler.js';
 import { claimNextImportedTask, extractClaimIntentFlag } from './next/claim-orchestration.js';

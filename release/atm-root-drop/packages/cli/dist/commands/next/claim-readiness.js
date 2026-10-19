@@ -4,7 +4,8 @@ import { findTaskClaimDependencyBlockers } from '../tasks/public-surface.js';
 import { taskPathFor } from '../tasks/task-file-io-helpers.js';
 import { normalizeTaskRouteStatus } from './intent-normalizers.js';
 import { canTaskBePreparedForClaim } from './route-predicates.js';
-import { quoteCliValue } from './view-projections.js';
+import { sealCommandTree } from '../shared/paste-command.js';
+import { quoteCliToken, quoteCliValue } from './view-projections.js';
 export function extractClaimIntentFlag(argv) {
     const remaining = [];
     let claimIntent = null;
@@ -52,6 +53,8 @@ function describeDependencyBlocker(taskId, blocker) {
     return `Task ${taskId} is blocked until prerequisite task(s) close.`;
 }
 export function diagnoseClaimReadinessForTasks(cwd, tasks, claimIntent, options = {}) {
+    const suppliedActor = options.actorId?.trim() ?? '';
+    const actor = suppliedActor && !/<[^>\r\n]+>/.test(suppliedActor) ? quoteCliToken(suppliedActor) : '<id>';
     const diagnostics = [];
     for (const task of tasks) {
         const status = normalizeTaskRouteStatus(task.status);
@@ -86,7 +89,7 @@ export function diagnoseClaimReadinessForTasks(cwd, tasks, claimIntent, options 
                 claimable: false,
                 blockerCode: 'ATM_NEXT_CLAIM_REVIEW_CLOSEOUT_ONLY_REQUIRED',
                 blockerSummary: `Task ${task.workItemId} is in review; reclaim it only through closeout-only when no more source mutation is needed.`,
-                requiredCommand: `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(task.workItemId)} --claim-intent closeout-only --json`,
+                requiredCommand: `node atm.mjs next --claim --actor ${actor} --prompt ${quoteCliValue(task.workItemId)} --claim-intent closeout-only --json`,
                 dependencyBlockers: []
             });
             continue;
@@ -145,14 +148,14 @@ export function diagnoseClaimReadinessForTasks(cwd, tasks, claimIntent, options 
             claimable: true,
             blockerCode: 'ATM_NEXT_CLAIM_READY',
             blockerSummary: `Task ${task.workItemId} can be prepared for claim.`,
-            requiredCommand: `node atm.mjs next --claim --actor <id> --task ${task.workItemId} --auto-intent --json`,
+            requiredCommand: `node atm.mjs next --claim --actor ${actor} --task ${task.workItemId} --auto-intent --json`,
             dependencyBlockers: []
         });
     }
     const primaryBlocker = diagnostics.find((entry) => !entry.claimable) ?? null;
-    return {
+    return sealCommandTree({
         schemaId: 'atm.claimReadinessReport.v1',
         diagnostics,
         primaryBlocker
-    };
+    });
 }

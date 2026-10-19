@@ -11,6 +11,19 @@ assert.ok(explicitTask);
 assert.equal(explicitTask.claimCommandShape, 'task-scoped');
 assert.match(explicitTask.normalClaimCommand, /--task TASK-RFT-0001/);
 assert.match(explicitTask.taskScopedClaimCommand, /--task TASK-RFT-0001/);
+assert.equal(explicitTask.pasteReady, false);
+assert.ok(explicitTask.missing.includes('--actor'));
+assert.match(explicitTask.normalClaimCommand, /--actor ATM_ACTOR_ID/);
+assert.doesNotMatch(explicitTask.normalClaimCommand, /[<>]/);
+const knownActor = buildTaskScopedClaimCommand({
+  selectedTaskId: 'TASK-RFT-0001',
+  explicitTaskSelector: 'TASK-RFT-0001',
+  userPrompt: 'finish RFT-0001',
+  actorId: 'ai-a'
+});
+assert.equal(knownActor?.pasteReady, true);
+assert.match(knownActor?.taskScopedClaimCommand ?? '', /--actor ai-a/);
+assert.doesNotMatch(knownActor?.taskScopedClaimCommand ?? '', /[<>]/);
 
 const promptResolved = buildTaskScopedClaimCommand({
   selectedTaskId: 'TASK-RFT-0002',

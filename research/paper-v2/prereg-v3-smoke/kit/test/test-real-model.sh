@@ -1,14 +1,32 @@
 #!/bin/bash
 # 選擇性的真實模型探測。預設跳過，不呼叫 Codex。
-# PREFLIGHT_REAL_MODEL=1 時，只對這一輪選到的邊界跑一次很小的、與題目無關的 codex exec。
-# PREREG_BOUNDARY 可以覆寫那個選擇。Arm A 一次，Arm B 用同一個模式一次。
+# PREFLIGHT_REAL_MODEL=1 probes only the selected boundary; a missing BEGIN marker permits one retry per arm.
+# PREREG_BOUNDARY can override that selection. Each arm has at most two total attempts.
 # Arm B 必須經 steward 把 atm-write 叫成功，capture 要從真實 stdout 抽出 patch。
 set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # shellcheck disable=SC1091
 source "$HERE/lib/common.sh"
 
+persist_probe_attempt() {
+  [ -n "${PROBE_EVIDENCE_SESSION:-}" ] || return 0
+  local name dest="$PREREG_PREFLIGHT_RUN_DIR/arm-$PROBE_EVIDENCE_ARM/attempt-$PROBE_EVIDENCE_ATTEMPT"
+  mkdir -p "$dest"
+  for name in prompt.txt stdout.jsonl stderr.txt intended.patch probe-result.json started-at ended-at exit-code launch-env.txt codex-argv.txt QUOTA_STOP WAIT_FAILED attempt.log; do
+    [ ! -f "$PROBE_EVIDENCE_SESSION/$name" ] || cp "$PROBE_EVIDENCE_SESSION/$name" "$dest/$name"
+  done
+}
+
+flush_probe_log() {
+  if [ -n "${PROBE_LOG_FILE:-}" ]; then
+    cat "$PROBE_LOG_FILE" >&"$PROBE_LOG_STDOUT"
+    exec {PROBE_LOG_STDOUT}>&-
+    unset PROBE_LOG_FILE PROBE_LOG_STDOUT
+  fi
+}
+
 cleanup_real() {
+  persist_probe_attempt
   local dir
   for dir in "${CLEAN_DIRS[@]:-}"; do
     [ -n "${dir:-}" ] && [ -d "$dir" ] || continue
@@ -20,6 +38,7 @@ cleanup_real() {
     stop_steward_pid "$PREREG_STEWARD_PID" || true
     unset PREREG_STEWARD_PID || true
   fi
+  flush_probe_log
 }
 
 track_dir() {
@@ -95,7 +114,8 @@ wait_for_launch() {
       kill "$child" 2>/dev/null || true
       pkill -P "$child" 2>/dev/null || true
       wait "$child" 2>/dev/null || true
-      die "real codex exec exceeded ${limit}s (${label})"
+      echo "real codex exec exceeded ${limit}s (${label})" >&2
+      return 124
     fi
     sleep 1
     waited=$((waited + 1))
@@ -103,21 +123,37 @@ wait_for_launch() {
   wait "$child" 2>/dev/null || true
 }
 
-assert_captured_patch() {
-  local session="$1" label="$2"
-  capture_intended_patch "$session"
-  if [ ! -s "$session/intended.patch" ]; then
-    echo "capture 沒有從真實 stdout 抽出 patch (${label})" >&2
-    exit 1
+# release_worktree already stops the worker and launcher. Verify that its
+# best-effort stop really completed before a retry can replace their ownership.
+finish_probe_steward() {
+  local repo="$1" launcher="${PREREG_STEWARD_PID:-}" worker="" pid tick alive
+  if [ -f "$repo/.prereg-smoke/daemon.pid" ]; then
+    worker="$(cat "$repo/.prereg-smoke/daemon.pid")"
   fi
-  if ! grep -q 'diff --git ' "$session/intended.patch"; then
-    echo "抽出的 patch 沒有 diff --git (${label})" >&2
-    exit 1
-  fi
+  release_worktree "$repo" || die 'steward-cleanup-failed: worktree release failed; no retry'
+  for pid in "$worker" "$launcher"; do
+    [ -n "$pid" ] || continue
+    alive=1
+    for tick in {1..20}; do
+      if [ "${PREREG_BOUNDARY:-}" = "unix-user" ]; then
+        as_root kill -0 "$pid" >/dev/null 2>&1 || alive=0
+      else
+        kill -0 "$pid" 2>/dev/null || alive=0
+      fi
+      [ "$alive" = 1 ] || break
+      sleep 0.1
+    done
+    if [ "$alive" = 1 ]; then
+      # Keep a live owner for EXIT cleanup; never discard it for the next probe.
+      export PREREG_STEWARD_PID="${launcher:-$pid}"
+      die "steward-cleanup-failed: PID ${pid} is still running; no retry"
+    fi
+  done
+  unset PREREG_STEWARD_PID PREREG_STEWARD_SOCK || true
 }
 
-run_real_exec() {
-  local arm="$1" mode="$2"
+run_real_attempt() {
+  local arm="$1" mode="$2" attempt="$3"
   local repo session
   if [ "$arm" = "B" ] && { [ "$mode" = "codex-landlock" ] || [ "$mode" = "bwrap-ro" ]; }; then
     repo="$(mktemp -d "${HOME}/prereg-real.XXXXXX")"
@@ -127,8 +163,13 @@ run_real_exec() {
   session="$(mktemp -d)"
   track_dir "$repo"
   track_dir "$session"
+  PROBE_EVIDENCE_SESSION="$session"
+  PROBE_EVIDENCE_ARM="$arm"
+  PROBE_EVIDENCE_ATTEMPT="$attempt"
+  export PREREG_SESSION_SLOT="probe-${arm}-${attempt}"
   prepare_probe_repo "$repo"
-  unset PREREG_SANDBOX_SCRATCH PREREG_SANDBOX_REPO PREREG_STEWARD_SOCK PREREG_STEWARD_PID || true
+  [ -z "${PREREG_STEWARD_PID:-}" ] || die 'steward-cleanup-failed: previous attempt still owns a PID; no retry'
+  unset PREREG_SANDBOX_SCRATCH PREREG_SANDBOX_REPO PREREG_STEWARD_SOCK || true
   export PREREG_ARM="$arm"
   install_arm_git_bin "$arm" "$session/bin"
   export PREREG_ARM_BIN="$session/bin"
@@ -146,58 +187,108 @@ run_real_exec() {
   write_probe_prompt "$arm" "$session/prompt.txt"
   # Codex 的 bash -lc 會吃掉 env -i 的 PATH。探測在呼叫模型之前先確認兩臂的 python、
   # atm-write 與 git 仍解析到 kit。對不上就失敗，不繼續。
-  PREREG_SMOKE_CODEX=1 assert_session_login_path "$session" "$repo"
+  echo "probe attempt=${attempt} arm=${arm} phase=path-check model_started=false"
+  if ! (PREREG_SMOKE_CODEX=1 assert_session_login_path "$session" "$repo"); then
+    echo "probe attempt=${attempt} arm=${arm} reason=path-resolution changed=false committed=false model_started=false"
+    printf '{"attempt":%s,"arm":"%s","reason":"path-resolution","model_started":false}\n' "$attempt" "$arm" > "$session/probe-result.json"
+    persist_probe_attempt
+    die 'probe PATH resolution failed; no retry'
+  fi
   unset PREREG_SMOKE_CODEX || true
   local base_sha=""
-  if [ "$arm" = "A" ]; then
-    base_sha="$(git -C "$repo" rev-parse HEAD)"
-  fi
+  base_sha="$(git -C "$repo" rev-parse HEAD)"
   echo "real-model arm=${arm} mode=${mode:-none}"
   (
     launch_codex "$session" "$session/prompt.txt" "$repo"
   ) &
   local child=$!
-  wait_for_launch "$child" "arm=${arm} mode=${mode:-none}"
-  assert_captured_patch "$session" "arm=${arm} mode=${mode:-none}"
+  local wait_status=0
+  wait_for_launch "$child" "arm=${arm} mode=${mode:-none}" || wait_status=$?
+  [ "$wait_status" = 0 ] || printf '%s\n' "$wait_status" > "$session/WAIT_FAILED"
+  inspect_probe_attempt "$arm" "$repo" "$session" "$base_sha" "$attempt"
+  local reason
+  reason="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["reason"])' "$session/probe-result.json")"
+  persist_probe_attempt
+  case "$reason" in
+    ok) PROBE_RETRY_NEEDED=0 ;;
+    missing-begin-marker) PROBE_RETRY_NEEDED=1 ;;
+    *) die "probe failed: ${reason}; no retry" ;;
+  esac
   if [ "$arm" = "B" ]; then
-    python3 - "$repo/note.txt" "$repo/.prereg-smoke/steward-writes.jsonl" <<'PY'
-import json, pathlib, sys
-text = pathlib.Path(sys.argv[1]).read_text(encoding="utf-8")
-log = pathlib.Path(sys.argv[2])
-if text != "new\n":
-    raise SystemExit(f"atm-write did not update note.txt: {text!r}")
-if not log.is_file():
-    raise SystemExit("missing steward-writes.jsonl")
-accepted = False
-for line in log.read_text(encoding="utf-8").splitlines():
-    if not line.strip():
-        continue
-    row = json.loads(line)
-    if row.get("decision") == "accepted" and row.get("terminal") == "committed":
-        accepted = True
-if not accepted:
-    raise SystemExit("steward log has no accepted write")
-PY
-    release_worktree "$repo" || true
+    finish_probe_steward "$repo"
     release_sandbox_scratch "${PREREG_SANDBOX_SCRATCH:-}" || true
     unset PREREG_SANDBOX_SCRATCH PREREG_SANDBOX_REPO || true
-  else
-    python3 - "$repo" "$base_sha" <<'PY'
-import pathlib, subprocess, sys
-repo = pathlib.Path(sys.argv[1])
-base = sys.argv[2]
-text = (repo / "note.txt").read_text(encoding="utf-8")
-if text != "new\n":
-    raise SystemExit(f"arm A did not edit note.txt: {text!r}")
-head = subprocess.check_output(["git", "-C", str(repo), "rev-parse", "HEAD"], text=True).strip()
-if not head or head == base:
-    raise SystemExit(f"arm A git commit did not move HEAD ({base} -> {head})")
-shown = subprocess.check_output(["git", "-C", str(repo), "show", "HEAD:note.txt"], text=True)
-if shown != "new\n":
-    raise SystemExit(f"arm A commit does not contain note.txt: {shown!r}")
-PY
   fi
-  echo "real-model ok arm=${arm} mode=${mode:-none}"
+}
+
+inspect_probe_attempt() {
+  python3 - "$@" <<'PYPROBE'
+import json, pathlib, subprocess, sys
+arm, repo, session, base, attempt = sys.argv[1:]
+repo, session = pathlib.Path(repo), pathlib.Path(session)
+def git(*args):
+    return subprocess.check_output(["git", "-C", str(repo), *args], text=True).strip()
+try: head = git("rev-parse", "HEAD")
+except subprocess.CalledProcessError: head = None
+changed = not (repo / "note.txt").is_file() or (repo / "note.txt").read_text() != "old\n"
+committed = head is not None and head != base
+rows = []
+log = repo / ".prereg-smoke/steward-writes.jsonl"
+evidence_error = False
+if log.is_file():
+    try: rows = [json.loads(line) for line in log.read_text().splitlines() if line.strip()]
+    except json.JSONDecodeError: evidence_error = True
+accepted = any(row.get("decision") == "accepted" and row.get("terminal") == "committed" for row in rows)
+chunks = []
+def walk(value):
+    if isinstance(value, dict):
+        if value.get("type") in {"agent_message", "stub.intended_patch"} and isinstance(value.get("text"), str):
+            chunks.append(value["text"])
+        for child in value.values(): walk(child)
+    elif isinstance(value, list):
+        for child in value: walk(child)
+stdout = session / "stdout.jsonl"
+for line in (stdout.read_text() if stdout.is_file() else "").splitlines():
+    try: walk(json.loads(line))
+    except json.JSONDecodeError: chunks.append(line)
+text = "\n".join(chunks)
+lines = text.splitlines()
+begins = [i for i, line in enumerate(lines) if line == "BEGIN_INTENDED_PATCH"]
+ends = [i for i, line in enumerate(lines) if line == "END_INTENDED_PATCH"]
+ordered_pair = len(begins) == len(ends) == 1 and begins[0] < ends[0]
+if (session / "WAIT_FAILED").exists(): reason = "launch-wait-failed"
+elif (session / "QUOTA_STOP").exists(): reason = "quota"
+elif not (session / "exit-code").is_file(): reason = "model-start-failed"
+elif (session / "exit-code").read_text().strip() != "0": reason = "model-exit"
+elif not (repo / "note.txt").is_file() or (repo / "note.txt").read_text() != "new\n": reason = "write-missing"
+elif arm == "A" and (not committed or git("show", "HEAD:note.txt") != "new"): reason = "a-no-commit"
+elif arm == "B" and (evidence_error or not accepted): reason = "b-no-accepted-write"
+elif "BEGIN_INTENDED_PATCH" not in text: reason = "missing-begin-marker"
+elif not ordered_pair or not (session / "intended.patch").is_file(): reason = "malformed-patch"
+elif subprocess.run(["git", "-C", str(repo), "apply", "--reverse", "--check", str(session / "intended.patch")], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode != 0: reason = "malformed-patch"
+else: reason = "ok"
+record = dict(attempt=int(attempt), arm=arm, reason=reason, changed=changed, committed=committed, steward_accepted=accepted, model_started=True)
+(session / "probe-result.json").write_text(json.dumps(record) + "\n")
+print("probe-result " + json.dumps(record, sort_keys=True), flush=True)
+PYPROBE
+}
+
+run_real_exec() {
+  local arm="$1" mode="$2" attempt
+  init_preflight_evidence
+  for attempt in 1 2; do
+    PROBE_RETRY_NEEDED=0
+    mkdir -p "$PREREG_PREFLIGHT_RUN_DIR/arm-$arm/attempt-$attempt"
+    PROBE_LOG_FILE="$PREREG_PREFLIGHT_RUN_DIR/arm-$arm/attempt-$attempt/attempt.log"
+    exec {PROBE_LOG_STDOUT}>&1
+    run_real_attempt "$arm" "$mode" "$attempt" > "$PROBE_LOG_FILE" 2>&1
+    flush_probe_log
+    if [ "$PROBE_RETRY_NEEDED" = "0" ]; then
+      echo "real-model ok arm=${arm} mode=${mode:-none} attempt=${attempt}"
+      return 0
+    fi
+  done
+  die "probe missing BEGIN_INTENDED_PATCH after 2 attempts; no third attempt"
 }
 
 if [ "${PREREG_PROBE_PREPARE_ONLY:-}" = "1" ]; then
@@ -209,6 +300,8 @@ if [ "${PREFLIGHT_REAL_MODEL:-}" != "1" ]; then
   exit 0
 fi
 
+init_preflight_evidence
+require_probe_python
 command -v codex >/dev/null 2>&1 || die "PREFLIGHT_REAL_MODEL=1 但 codex 不在 PATH。"
 if ! codex login status >/dev/null 2>&1; then
   die "PREFLIGHT_REAL_MODEL=1 但 codex 沒有登入。不印出 auth.json。"

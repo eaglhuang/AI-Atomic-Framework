@@ -17,6 +17,7 @@ import { resolveCommitLaneSessionId } from '../git-governance/implementation.js'
 import { resolveActorWorkSession } from '../actor-session.js';
 import { resolvePlanningPathFromStored } from '../planning-repo-root.js';
 import { CliError, quoteCliValue } from '../shared.js';
+import { assertTaskflowGitAuthor } from './git-author-guard.js';
 import { isPathAllowedByScope } from '../work-channels.js';
 import { resolveRunnerPublicationCloseHandoff } from '../framework-development/runner-publication-close-handoff.js';
 import { normalizeMarkdownPathDeclaration } from './markdown-paths.js';
@@ -560,6 +561,7 @@ export function commitRepoWithTemporaryIndex(input) {
             env.ATM_CLOSE_TRANSACTION_RECEIPT_SURFACE = 'taskflow-close-governance-followup';
             issueCloseTransactionHookReceipt({ root: input.repoRoot, taskId: input.taskId, actorId: input.actorId, invocationNonce, closeWindowLock, stageFiles: input.stageFiles, parentHead: tryGitScalar(input.repoRoot, ['rev-parse', '--verify', 'HEAD']) ?? '' });
         }
+        assertTaskflowGitAuthor(input.repoRoot, input.actorId);
         runGitWithEnv(input.repoRoot, input.args, env);
         if (input.stageFiles.length > 0) {
             for (const chunk of chunkGitPathspecs(input.stageFiles)) {

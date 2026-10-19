@@ -6,11 +6,12 @@ import { getCommandSpec } from '../command-specs.js';
 import { buildResidueDiagnosisEvidence, generateTaskCard, loadTaskDocumentOrThrow, runTasks, runTasksRosterUpdate } from '../tasks/public-surface.js';
 import { authorizeLaneCapability } from '../lane-session/capability-authority.js';
 import { describeMissingGitBase } from '../shared/git-base-remediation.js';
-import { buildTaskflowOpenCommand } from './open-command.js';
+import { buildTaskflowOpenCommand, collectDelegatedOpenWriteGaps } from './open-command.js';
 import { assertClosebackPlanningPathReady, buildCloseBackendArgv, buildClosebackPlan, buildCloseWriteRollbackSnapshot, buildTaskflowCloseDiagnostics, executeCloseWriteCommitPhase, inspectObservedTaskEvidence, resolveClosebackPlanningPath, resolveCloseWriteSupport, capturePlanningCardSnapshot, applyPlanningCardCloseback, resolvePlanningRosterPaths } from './closeback-orchestration.js';
 import { buildAutoEvidencePlan, executeAutoEvidencePlan } from '../evidence.js';
 import { mapAutoEvidenceCommand } from './auto-evidence-mapper.js';
 import { CliError, makeResult, message, parseArgsForCommand, quoteCliValue, relativePathFrom } from '../shared.js';
+import { assertTaskflowGitAuthor } from './git-author-guard.js';
 import { buildDelegationContract, buildTaskflowOpenDiagnostics, loadProfile, resolveOpenerMode, resolveWriteSupport, BUILTIN_TASKFLOW_OPENER } from './profile-loader.js';
 import { canResolveHostOpenerPolicy, resolveHostOpenerPolicyDecision } from './host-opener-policy.js';
 import { buildTaskflowClosePreflight, inspectPlanningAuthorityDelivery, preflightBlockersToWriteReadinessBlockers } from './close-preflight.js';
@@ -135,8 +136,11 @@ function uniqueTaskIds(values) { return [...new Set(values.map((value) => value.
 function buildWriteReadinessHint(input) {
     if (input.openerMode === 'delegated-governed' && !input.writeRequested) {
         const hint = buildTaskflowOpenCommand(input.openArgv);
-        return { schemaId: 'atm.taskflowOpenWriteReadinessHint.v1', status: hint.command ? 'ready' : 'incomplete',
-            summary: hint.command ? 'POSIX sh write hint preserves supplied open options; existing write prerequisites still apply.' : 'Cannot safely display the write command; inspect missingPrerequisites before continuing.', missingPrerequisites: hint.reason ? [`Cannot render POSIX sh command: ${hint.reason}. Supply safe literal arguments and rerun dry-run.`] : [], nextCommand: hint.command, nextCommandShell: hint.shell, operatorLane: 'taskflow open', fallbackSurface: null };
+        const gaps = collectDelegatedOpenWriteGaps(input.openArgv, input.delegationContract.openerPath);
+        const renderGap = hint.reason ? [`Cannot render POSIX sh command: ${hint.reason}. Supply safe literal arguments and rerun dry-run.`] : [];
+        const missingPrerequisites = [...gaps, ...renderGap];
+        return { schemaId: 'atm.taskflowOpenWriteReadinessHint.v1', status: hint.command && missingPrerequisites.length === 0 ? 'ready' : 'incomplete',
+            summary: missingPrerequisites.length > 0 ? `taskflow open --write is not ready. Missing required flags: ${missingPrerequisites.join(', ')}.` : 'POSIX sh write hint preserves supplied open options; existing write prerequisites still apply.', missingPrerequisites, nextCommand: hint.command, nextCommandShell: hint.shell, operatorLane: 'taskflow open', fallbackSurface: null };
     }
     if (input.openerMode === 'delegated-governed') {
         return { schemaId: 'atm.taskflowOpenWriteReadinessHint.v1', status: 'ready',
@@ -379,7 +383,7 @@ function resolveTaskflowOpenOutputRoot(input) {
 }
 function csvOption(value) { return String(value ?? '').split(',').map((entry) => entry.trim()).filter(Boolean); } /** ATM's built-in opener writes a repository-neutral adopter card owned by the opening actor; the AI must declare the card's scope and validators because the card is the delivery contract. */
 function builtinOpenerCardFields(input) { const options = input.parsed.options; if (input.delegationContract.openerPath !== BUILTIN_TASKFLOW_OPENER)
-    return { templateKey: input.template }; const scopePaths = csvOption(options.scopePath).map((entry) => entry.replace(/\\/g, '/').replace(/^\.\//, '')); const validators = csvOption(options.validator); const owner = String(options.actor ?? process.env.ATM_ACTOR_ID ?? '').trim(); /* Name only the flags actually missing: the old text always listed --scope-path and --validator, even when only --actor was absent. */ /* Name only the flags actually missing: the old text always listed --scope-path and --validator, even when only --actor was absent. */ const missingFlags = [...(!owner ? ['--actor <id>'] : []), ...(scopePaths.length === 0 ? ['--scope-path <csv>'] : []), ...(validators.length === 0 ? ['--validator <csv>'] : [])]; if (missingFlags.length > 0) {
+    return { templateKey: input.template }; const scopePaths = csvOption(options.scopePath).map((entry) => entry.replace(/\\/g, '/').replace(/^\.\//, '')); const validators = csvOption(options.validator); const owner = String(options.actor ?? process.env.ATM_ACTOR_ID ?? '').trim(); /* Name only the flags actually missing: the old text always listed --scope-path and --validator, even when only --actor was absent. */ /* Name only the flags actually missing: the old text always listed --scope-path and --validator, even when only --actor was absent. */ const missingFlags = [...(!owner ? ['--actor'] : []), ...(scopePaths.length === 0 ? ['--scope-path'] : []), ...(validators.length === 0 ? ['--validator'] : [])]; if (missingFlags.length > 0) {
     throw new CliError('ATM_CLI_USAGE', `taskflow open --write with the built-in opener is missing ${missingFlags.join(', ')}. The task card is the delivery contract: --actor names its owner, --scope-path the files it may change, and --validator the commands that prove it.`, { exitCode: 2, details: { missingFlags: missingFlags.map((flag) => flag.split(' ')[0]), requiredFlags: ['--actor', '--scope-path', '--validator'], optionalFlags: ['--goal'] } });
 } return { templateKey: options.template ? input.template : 'adopter-task', owner, repoName: path.basename(input.openOutputRoot), scopePaths, validators, goal: options.goal ? String(options.goal) : undefined }; }
 function resolveOutputAbsolute(root, outputPath) { return path.isAbsolute(outputPath) ? path.resolve(outputPath) : path.resolve(root, outputPath); }
@@ -473,6 +477,8 @@ async function runTaskflowClose(parsed, cwd, surface = 'close') {
     }
     const writeSupport = resolveCloseWriteSupport({ writeRequested, closeMode: closebackPlan.closeMode, actorSupplied: actorId.length > 0, taskIdSupplied: taskId.length > 0,
         historicalDeliveryGateRequired: closebackPlan.historicalDeliveryGate.required && !hasUncommittedDeliverables, historicalDeliverySupplied: historicalDeliveryRefs.length > 0 || historicalBatchRef !== null });
+    if (surface === 'close' && writeRequested && closebackPlan.closeMode !== 'ambiguous-manual-review')
+        assertTaskflowGitAuthor(cwd, actorId);
     if (writeRequested && !writeSupport.allowed) {
         throw new CliError(closebackPlan.closeMode === 'ambiguous-manual-review' ? 'ATM_TASKFLOW_CLOSE_AMBIGUOUS_RESIDUE' : 'ATM_TASKFLOW_CLOSE_WRITE_BLOCKED', writeSupport.reason, { exitCode: 1, details: { closeMode: closebackPlan.closeMode, writeSupport, diagnostics, closebackPlan, recommendedCommand: diagnosis.nextCommand } });
     }

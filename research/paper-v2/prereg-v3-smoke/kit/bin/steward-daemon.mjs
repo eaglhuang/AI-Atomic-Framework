@@ -71,6 +71,10 @@ const server = net.createServer({ allowHalfOpen: true }, (socket) => {
       reply(socket, { exitCode: 1, stdout: '', stderr: '拒絕這個寫入請求\n' });
       return;
     }
+    if (req.sessionSlot != null && (typeof req.sessionSlot !== 'string' || !/^[A-Za-z0-9_-]+$/.test(req.sessionSlot))) {
+      reply(socket, { exitCode: 1, stdout: '', stderr: 'Invalid session slot\n' });
+      return;
+    }
     const id = randomBytes(8).toString('hex');
     const patchPath = path.join(inbound, `${id}.patch`);
     writeFileSync(patchPath, req.patch);
@@ -84,6 +88,7 @@ const server = net.createServer({ allowHalfOpen: true }, (socket) => {
       '--message', safeToken(req.message, 'prereg-v3-smoke'),
       '--attempt', String(Number.isInteger(req.attempt) && req.attempt > 0 ? req.attempt : 1)
     ];
+    if (req.sessionSlot != null) args.push('--session-slot', req.sessionSlot);
     if (req.baseText != null) {
       const basePath = path.join(inbound, `${id}.base`);
       writeFileSync(basePath, String(req.baseText));
@@ -91,6 +96,7 @@ const server = net.createServer({ allowHalfOpen: true }, (socket) => {
     }
     const env = { ...process.env };
     delete env.PREREG_STEWARD_SOCK;
+    delete env.PREREG_SESSION_SLOT;
     const child = spawn(process.execPath, args, { cwd, env });
     let stdout = '';
     let stderr = '';

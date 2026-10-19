@@ -187,30 +187,53 @@ def apply_to_text(base_text, patch_text):
 
 
 def tokens_of(session):
-    total = {"input_tokens": 0, "output_tokens": 0, "total_tokens": 0, "events": 0}
+    keys = ("input_tokens", "output_tokens", "total_tokens", "cached_input_tokens", "reasoning_output_tokens")
+    usages = []
+    def collect(value):
+        if isinstance(value, dict):
+            if isinstance(value.get("usage"), dict):
+                usages.append(value["usage"])
+            for key, child in value.items():
+                if key != "usage":
+                    collect(child)
+        elif isinstance(value, list):
+            for child in value:
+                collect(child)
     path = session / "stdout.jsonl"
-    if not path.exists():
-        return total
-    for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
-        try:
-            event = json.loads(line)
-        except json.JSONDecodeError:
-            continue
-        usage = event.get("usage") if isinstance(event, dict) else None
-        if not isinstance(usage, dict):
-            # codex jsonl sometimes nests usage under a message payload
-            blob = json.dumps(event)
-            for key in ("input_tokens", "output_tokens", "total_tokens"):
-                found = re.search(rf'"{key}"\s*:\s*(\d+)', blob)
-                if found:
-                    total[key] += int(found.group(1))
-                    total["events"] += 1
-            continue
-        for key in ("input_tokens", "output_tokens", "total_tokens"):
-            if isinstance(usage.get(key), int):
-                total[key] += usage[key]
-        total["events"] += 1
-    return total
+    if path.is_file():
+        for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
+            try:
+                collect(json.loads(line))
+            except json.JSONDecodeError:
+                continue
+    # An incomplete sum would look like a measured total. Preserve unknowns.
+    return {**{key: sum(row[key] for row in usages)
+               if usages and all(type(row.get(key)) is int and row[key] >= 0 for row in usages)
+               else None for key in keys}, "events": len(usages)}
+
+
+def conflict_count(arm_dir, rows):
+    """Count observed contention, never general steward rejection."""
+    count = arm_index_lock_count(arm_dir)
+    observed = count is not None
+    incomplete = False
+    count = count or 0
+    for row in rows:
+        reason = row.get("reasonCode")
+        if reason in {"overlapping-write-queued", "overlapping-write-conflict"}:
+            observed = True
+            count += 1
+        elif reason == "patch-context-mismatch":
+            before, current = row.get("declaredBaseHash"), row.get("currentFileHash")
+            # Equal hashes positively rule out concurrent base drift. A mismatch
+            # alone cannot establish a conflict (a malformed patch also fails).
+            if before and current and before == current:
+                observed = True
+            else:
+                incomplete = True
+        elif row.get("decision") == "accepted" and row.get("terminal") == "committed":
+            observed = True
+    return count if observed and not incomplete else None
 
 
 def steward_rows(work):
@@ -959,7 +982,7 @@ def score_arm(arm_name, arm_dir, tasks, base):
         "corruption": corruption,
         "indexLockCount": index_lock,
         "gitErrors": git_errors,
-        "conflictCount": (index_lock or 0) + rejected_count,
+        "conflictCount": conflict_count(arm_dir, rows),
         "resolutionTimeMs": None,
         "steward": {
             "writes": len(rows),

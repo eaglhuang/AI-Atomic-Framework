@@ -33,6 +33,7 @@ export * from './generated-projection-steward.js';
 export * from './wave-manifest.js';
 export * from './wave-broker-scheduler.js';
 export * from './shared-delivery-commit.js';
+export * from './shared-compose-inbox.js';
 export * from './shared-write-provenance-policy.js';
 export * from './wave-generated-executor.js';
 export * from './parallel-admission-policy.js';

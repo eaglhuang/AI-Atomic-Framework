@@ -14,6 +14,7 @@ import {
 import { cleanupBrokerRuntimeSnapshots } from '../../../../core/src/broker/lifecycle.ts';
 import { calculateBrokerDecision } from '../../../../core/src/broker/decision.ts';
 import { composeBrokerProposals } from '../../../../core/src/broker/compose.ts';
+import { applyLiveQueuedWrites } from '../../../../core/src/live-write/live-queued-write.ts';
 import { applyStewardPlan, executeBrokerScopedWrite, planStewardApply } from '../../../../core/src/broker/steward.ts';
 import { buildTeamBrokerRuntimeActivationHandshake, buildTeamBrokerRunRecord, buildTeamBrokerRunRecordEnvelope, projectTeamBrokerRearbitrationSnapshot } from '../../../../core/src/broker/team-lane.ts';
 import { defaultBrokerProposalStoreRelativePath, findBrokerProposal, listBrokerProposalSummaries, loadBrokerProposalStore, readBrokerProposalFile, saveBrokerProposalStore, upsertBrokerProposalStore, validateBrokerProposal } from '../../../../core/src/broker/proposal.ts';
@@ -44,11 +45,53 @@ function persistComposedMergePlan(cwd: string, mergePlan: MergePlan): { readonly
   };
 }
 
+function applyLiveStewardWrites(options: ParsedBrokerOptions) {
+  const proposals = loadComposeProposals(options);
+  const result = applyLiveQueuedWrites({
+    cwd: options.cwd,
+    proposals,
+    scopeFiles: options.scopeFiles,
+    stewardId: options.stewardId ?? 'neutral-write-steward'
+  });
+  const rejected = result.writes.filter((write) => write.decision !== 'accepted');
+  const acceptedCount = result.writes.length - rejected.length;
+  return makeResult({
+    ok: result.ok,
+    command: 'broker',
+    cwd: options.cwd,
+    messages: [
+      message(
+        result.ok ? 'info' : rejected.some((write) => write.decision === 'kit-error') ? 'error' : 'warn',
+        result.ok ? 'ATM_BROKER_LIVE_WRITE_APPLIED' : 'ATM_BROKER_LIVE_WRITE_QUEUED',
+        result.ok
+          ? `Live steward committed ${acceptedCount} write(s) without a precomputed merge plan.`
+          : `Live steward committed ${acceptedCount} write(s) and queued ${rejected.length} without touching the file for those.`,
+        {
+          acceptedCount,
+          rejectedCount: rejected.length,
+          reasonCodes: rejected.map((write) => write.reasonCode),
+          planRequired: false
+        }
+      )
+    ],
+    evidence: {
+      action: 'steward-apply-live',
+      stewardId: options.stewardId ?? 'neutral-write-steward',
+      planRequired: false,
+      queuePath: result.queuePath,
+      liveWrites: result.writes
+    }
+  });
+}
+
 export function handleBrokerStewardRuntimeActions(options: ParsedBrokerOptions, context: BrokerCommandContext) {
   const registryPath = context.registryPath;
   if (options.action === 'steward') {
     if (!options.stewardAction) {
-      throw new CliError('ATM_CLI_USAGE', 'broker steward requires an action: plan | apply.', { exitCode: 2 });
+      throw new CliError('ATM_CLI_USAGE', 'broker steward requires an action: plan | apply | apply-live.', { exitCode: 2 });
+    }
+    if (options.stewardAction === 'apply-live') {
+      return applyLiveStewardWrites(options);
     }
     if (!options.mergePlanFile) {
       throw new CliError('ATM_CLI_USAGE', 'broker steward requires --merge-plan-file <path>.', { exitCode: 2 });
@@ -176,7 +219,7 @@ export function handleBrokerStewardRuntimeActions(options: ParsedBrokerOptions, 
       });
     }
 
-    throw new CliError('ATM_CLI_USAGE', 'broker steward supports: plan, apply.', { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', 'broker steward supports: plan, apply, apply-live.', { exitCode: 2 });
   }
 
   if (options.action === 'runtime') {

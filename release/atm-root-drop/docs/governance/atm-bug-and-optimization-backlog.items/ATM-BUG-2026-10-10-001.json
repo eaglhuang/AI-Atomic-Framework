@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "date": "2026-10-10",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Source regression verified; PR 244 remote validation pending",
+  "id": "ATM-BUG-2026-10-10-001",
+  "area": "Push transient lifecycle and cleanup classification",
+  "finding": "Cleanup classified every push-attempt path as disposable without reading operation status. An isolated regression proved cleanup apply deletes an in-progress push record. Successful push, preview and no-op also left records; the stable actor/target filename let a retry overwrite an earlier recovery record.",
+  "expectedBehavior": "Only complete successful records may be disposable. Active, failed, blocked, malformed and unknown records remain recoverable. Each push owns a unique transient path and cleans that path on success without overwriting another attempt's recovery bytes.",
+  "evidenceOrRepro": "tests/cli/push-residue-lifecycle.test.ts failed on running before the classifier repair and passed after it. tests/cli/git-first-push-admission.test.ts failed on successful preview residue before producer repair. Selected coverage includes successful preview, publication, no-op retry, failed admission and subsequent success preserving earlier recovery bytes. Tests use temporary Git repositories with finally cleanup.",
+  "followUp": "Remote CI, frozen runner and npm deployment remain separate. Preserve failed timeout recovery; do not automatically erase old failure records. Existing residue.spec.ts expected deletion of abandoned historical evidence, but the current canonical classifier explicitly preserves the abandon audit trail except disposable bundle manifests. The regression now asserts ledger/evidence/event preservation and uses a valid completed push record; residue.spec.ts and historical-residue-cleanup.test.ts pass without weakening production policy. The new tests/cli lifecycle regression is automatically selected by the non-quarantined CLI sweep. Broader build, lane, task close and cancellation lifecycle coverage remains incomplete. No new CLI gate, resource registry or log platform."
+}

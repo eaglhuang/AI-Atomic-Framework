@@ -49,10 +49,17 @@ function compactPlaybookMessageData(data) {
  */
 export function compactNextRouteResult(result) {
     const evidence = result.evidence;
+    const nextAction = evidence && isPlainRecord(evidence.nextAction) ? evidence.nextAction : null;
+    const orientationCommand = readNestedString(evidence, ['nextAction', 'command']) ?? readNestedString(result, ['nextAction', 'command']) ?? null;
     const firstLayerContract = buildFirstLayerCommandContract();
     const firstLayerCompactOrientation = {
         status: readNestedString(evidence, ['nextAction', 'status']) ?? readNestedString(result, ['nextAction', 'status']) ?? null,
-        command: readNestedString(evidence, ['nextAction', 'command']) ?? readNestedString(result, ['nextAction', 'command']) ?? null,
+        command: orientationCommand,
+        ...(nextAction?.pasteReady === false ? {
+            pasteReady: false,
+            missing: nextAction.missing,
+            commandTemplate: typeof nextAction.commandTemplate === 'string' ? nextAction.commandTemplate : orientationCommand
+        } : {}),
         recommendedChannel: readNestedString(evidence, ['nextAction', 'recommendedChannel']) ?? null,
         ticketStates: firstLayerContract.ticketStates.map((entry) => ({
             state: entry.state,

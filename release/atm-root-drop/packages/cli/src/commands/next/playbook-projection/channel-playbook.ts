@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { readFileSync } from 'node:fs';
-import { quoteCliValue } from '../view-projections.ts';
+import { sealCommandTree } from '../../shared/paste-command.ts';
+import { quoteCliToken, quoteCliValue } from '../view-projections.ts';
 
 /** Validator commands a claimed task card declares, read from its ledger record. */
 export function readTaskValidators(taskPath: string): readonly string[] {
@@ -22,7 +23,7 @@ function buildTaskflowCloseOperatorCommands(taskId: string, actor: string, lane 
 }
 
 export function buildTaskDeliveryPrinciple(input: { readonly channel: 'normal' | 'batch'; readonly taskId?: string }) {
-  return {
+  return sealCommandTree({
     schemaId: 'atm.taskDeliveryPrinciple.v1',
     taskId: input.taskId ?? null,
     channel: input.channel,
@@ -38,7 +39,7 @@ export function buildTaskDeliveryPrinciple(input: { readonly channel: 'normal' |
     nextStep: input.channel === 'batch'
       ? 'Work only on the current queue head, produce its real deliverables, then run node atm.mjs batch checkpoint --actor <id> --json.'
       : 'Run taskflow pre-close, then taskflow close dry-run (no --write), read evidence.writeReadinessHint.blockers[].requiredCommand, then taskflow close --write.'
-  };
+  });
 }
 
 type BatchPlaybookState = 'queue-preview' | 'queue-head-active' | 'repair-required';
@@ -63,7 +64,8 @@ export function buildChannelPlaybook(input: {
   /** Validators the claimed card declares; each gets its own evidence run. */
   readonly validators?: readonly string[] | null;
 }) {
-  const actor = input.actorPlaceholder ?? '<id>';
+  const suppliedActor = input.actorPlaceholder?.trim() ?? '';
+  const actor = suppliedActor && !/<[^>\r\n]+>/.test(suppliedActor) ? quoteCliToken(suppliedActor) : '<id>';
   const prompt = input.originalPrompt?.trim() || '<current user prompt>';
   const taskId = input.taskId ?? '<task-id>';
   const defaultClaimCommand = input.fastClaimCommand?.trim()
@@ -73,7 +75,7 @@ export function buildChannelPlaybook(input: {
   const closeOps = buildTaskflowCloseOperatorCommands(taskId, actor, lane);
   if (input.channel === 'fast') {
     const commitCommand = `node atm.mjs git commit --actor ${actor} --message "<message>" --auto-stage --json`;
-    return {
+    return sealCommandTree({
       schemaId: 'atm.channelPlaybook.v1',
       channel: 'fast',
       title: 'Fast quickfix playbook',
@@ -96,8 +98,8 @@ export function buildChannelPlaybook(input: {
       ],
       commandSequence: [
         ...(input.fastClaimActive ? [] : [defaultClaimCommand]),
-        '<edit allowed files>',
-        '<run focused validator>',
+        'implement-deliverables',
+        'run the focused validator for the touched files',
         commitCommand
       ],
       commitTiming: 'Commit after the focused validator passes. The ATM wrapper auto-stages only the quickfix-allowed files and governed provenance; bare `git commit` is for read-only inspection or non-governed maintenance only.',
@@ -105,7 +107,7 @@ export function buildChannelPlaybook(input: {
         preferredCommand: `node atm.mjs git commit --actor ${actor} --message "<message>" --json`,
         directGitPolicy: 'Direct git remains available for read-only commands and non-governed maintenance. When staging .atm/history/** task or evidence files, use the ATM wrapper so trailers and claim binding stay consistent.'
       }
-    };
+    });
   }
   if (input.channel === 'batch') {
     const head = input.queueHeadTaskId ?? input.taskId ?? '<queue-head-task-id>';
@@ -122,24 +124,24 @@ export function buildChannelPlaybook(input: {
     const commandSequence = isRepairState
       ? [
         batchRepairCommand,
-        batchClaimCommand,
-        '<implement queue-head deliverables>',
-        'node atm.mjs evidence add --task <queue-head-task-id> --actor <id> --kind test --freshness fresh --summary "<what passed>" --artifacts <real-files> --validators <validator-name> --command "<command>" --exit-code 0 --stdout-sha256 sha256:<hash> --stderr-sha256 sha256:<hash> --json',
-        'git add <deliverables> .atm/history/evidence/<queue-head-task-id>.bundle-manifest.json',
+        ...(input.claimActive ? [] : [batchClaimCommand]),
+        'implement-deliverables',
+        `node atm.mjs evidence add --task ${head} --actor ${actor} --kind test --freshness fresh --summary "<what passed>" --artifacts <real-files> --validators <validator-name> --command "<command>" --exit-code 0 --stdout-sha256 sha256:<hash> --stderr-sha256 sha256:<hash> --json`,
+        `git add <deliverables> .atm/history/evidence/${head}.bundle-manifest.json`,
         `node atm.mjs batch checkpoint --actor ${actor} --json`,
-        'git add .atm/history/tasks/<queue-head-task-id>.json .atm/history/task-events/<queue-head-task-id>/',
-        `node atm.mjs git commit --actor ${actor} --task <queue-head-task-id> --message "<scope>: complete <queue-head-task-id>" --json`
+        `git add <deliverables> .atm/history/tasks/${head}.json .atm/history/task-events/${head}/`,
+        `node atm.mjs git commit --actor ${actor} --task ${head} --message "<scope>: complete ${head}" --json`
       ]
       : [
-        batchClaimCommand,
-        '<implement queue-head deliverables>',
-        'node atm.mjs evidence add --task <queue-head-task-id> --actor <id> --kind test --freshness fresh --summary "<what passed>" --artifacts <real-files> --validators <validator-name> --command "<command>" --exit-code 0 --stdout-sha256 sha256:<hash> --stderr-sha256 sha256:<hash> --json',
-        'git add <deliverables> .atm/history/evidence/<queue-head-task-id>.bundle-manifest.json',
+        ...(input.claimActive ? [] : [batchClaimCommand]),
+        'implement-deliverables',
+        `node atm.mjs evidence add --task ${head} --actor ${actor} --kind test --freshness fresh --summary "<what passed>" --artifacts <real-files> --validators <validator-name> --command "<command>" --exit-code 0 --stdout-sha256 sha256:<hash> --stderr-sha256 sha256:<hash> --json`,
+        `git add <deliverables> .atm/history/evidence/${head}.bundle-manifest.json`,
         `node atm.mjs batch checkpoint --actor ${actor} --json`,
-        'git add .atm/history/tasks/<queue-head-task-id>.json .atm/history/task-events/<queue-head-task-id>/',
-        `node atm.mjs git commit --actor ${actor} --task <queue-head-task-id> --message "<scope>: complete <queue-head-task-id>" --json`
+        `git add <deliverables> .atm/history/tasks/${head}.json .atm/history/task-events/${head}/`,
+        `node atm.mjs git commit --actor ${actor} --task ${head} --message "<scope>: complete ${head}" --json`
       ];
-    return {
+    return sealCommandTree({
       schemaId: 'atm.channelPlaybook.v1',
       channel: 'batch',
       title: 'Batch queue-head playbook',
@@ -184,12 +186,12 @@ export function buildChannelPlaybook(input: {
       checkpointCommand: `node atm.mjs batch checkpoint --actor ${actor} --json`,
       repairCommand: batchRepairCommand,
       governedGitEntrypoint: {
-        preferredCommand: `node atm.mjs git commit --actor ${actor} --task <queue-head-task-id> --message "<scope>: complete <queue-head-task-id>" --json`,
+        preferredCommand: `node atm.mjs git commit --actor ${actor} --task ${head} --message "<scope>: complete ${head}" --json`,
         directGitPolicy: 'Batch delivery commits must use the ATM wrapper after checkpoint; bare git commit is not banned for read-only inspection.'
       }
-    };
+    });
   }
-  return {
+  return sealCommandTree({
     schemaId: 'atm.channelPlaybook.v1',
     channel: 'normal',
     title: 'Single-task playbook',
@@ -216,8 +218,8 @@ export function buildChannelPlaybook(input: {
     ],
     commandSequence: [
       ...(input.claimActive ? [] : [defaultClaimCommand]),
-      '<implement task deliverables>',
-      ...(input.validators?.length ? input.validators : ['<validator>']).map((validator) => `node atm.mjs evidence run --task ${taskId} --actor ${actor}${lane} --command ${quoteCliValue(validator)} --validators ${quoteCliValue(validator)} --json`),
+      'implement-deliverables',
+      ...(input.validators ?? []).filter((validator) => validator.trim() && !/<[^>\r\n]+>/.test(validator)).map((validator) => `node atm.mjs evidence run --task ${taskId} --actor ${actor}${lane} --command ${quoteCliValue(validator)} --validators ${quoteCliValue(validator)} --json`),
       closeOps.preClose,
       closeOps.dryRun,
       closeOps.write
@@ -235,5 +237,5 @@ export function buildChannelPlaybook(input: {
       directGitPolicy: 'Use taskflow close --write for normal closure. Bare git commit is not banned globally, but governed task/evidence bundles must use the ATM wrapper.',
       fallbackFields: ['copyableCommitCommand', 'hostGitCompatibilityGuidance']
     }
-  };
+  });
 }

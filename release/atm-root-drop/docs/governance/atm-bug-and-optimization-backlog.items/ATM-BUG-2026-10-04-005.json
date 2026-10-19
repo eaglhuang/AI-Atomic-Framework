@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "date": "2026-10-04",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Local source repair validated; publication pending",
+  "id": "ATM-BUG-2026-10-04-005",
+  "area": "Setup / project launcher conflict preflight",
+  "finding": "Setup checked root instructions and adapter conflicts before bootstrap but checked an existing incompatible atm.mjs only after bootstrap had created governance files. Dry-run omitted the launcher check entirely. This left a partially configured project after a predictable failure. A write-boundary review also found that a shared npm launcher arriving after an absence check could be adopted without comparing its bytes.",
+  "expectedBehavior": "Plan the project launcher without writing before both real and dry-run setup. Reuse canonical pinned-runner source selection and npm identity/integrity checks, preserve every existing byte on conflict, and carry the same observed absence into exclusive creation at the write boundary. Existing explicit force behavior for the lower-level bootstrap remains unchanged.",
+  "evidenceOrRepro": "tests/cli/setup-install.test.ts reproduced actual setup residue, false-positive dry-run, and concurrent pinned-file overwrite before repair. The corrected tests cover full path/digest preservation, directory/symlink/non-UTF-8 conflicts, valid pinned setup/rerun, new data and legacy layout npm integrity checks, npm planning with no bootstrap, and exclusive creation for pinned and npm launchers. Independent review identified the npm arrival seam; both npm layout cases then failed red and passed green with a retained preflight snapshot and no bootstrap marker.",
+  "followUp": "Rebuild and run frozen and installed acceptance before claiming distribution availability. The preflight is an optimistic admission check; runtime writes must retain their exclusive creation and fresh validation protections."
+}

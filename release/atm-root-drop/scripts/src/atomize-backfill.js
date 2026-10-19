@@ -19,6 +19,7 @@
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { resolve, join, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { computeAtomCid, createAtomBundle } from '../../packages/core/src/registry/atom-capsule.ts';
 
 const SCHEMA_ID = 'atm.atomBackfillProposal.v1';
 const SCHEMA_VERSION = '1.0.0';
@@ -123,6 +124,19 @@ function buildAtomProposal(filePath, family) {
   };
 }
 
+// 與 packages/core 的 atom CID 計算保持一致（同 scripts/lib/atom-id-to-cid.ts），
+// 讓 backfill 產出的 atomRefs 可直接用於 broker proposal 的 preflight。
+async function attachAtomRefs(repoRoot, proposals) {
+  for (const p of proposals) {
+    const sourcePath = join(repoRoot, p.path);
+    const atomCid = existsSync(sourcePath)
+      ? computeAtomCid(createAtomBundle(readFileSync(sourcePath, 'utf8')))
+      : null;
+    p.atomCid = atomCid;
+    p.atomRefs = atomCid ? [{ atomId: p.atomId, atomCid }] : [];
+  }
+}
+
 async function loadInventory(repoRoot) {
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = dirname(__filename);
@@ -156,6 +170,8 @@ export async function atomizeBackfill(options) {
       proposals.push(buildAtomProposal(filePath, family));
     }
   }
+
+  await attachAtomRefs(repoRoot, proposals);
 
   const generatedAt = new Date().toISOString();
   const familyBreakdown = {};

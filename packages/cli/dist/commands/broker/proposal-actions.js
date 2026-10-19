@@ -1,6 +1,7 @@
 import path from 'node:path';
 import { CliError, makeResult, message } from '../shared.js';
 import { defaultBrokerProposalStoreRelativePath, findBrokerProposal, listBrokerProposalSummaries, loadBrokerProposalStore, readBrokerProposalFile, saveBrokerProposalStore, upsertBrokerProposalStore, validateBrokerProposal } from '../../_vendor/core/dist/broker/proposal.js';
+import { fillProposalAtomCids } from '../../_vendor/core/dist/broker/proposal-atom-cid.js';
 import { relativeStorePath } from './parser.js';
 import { isProposalLanePrivatePath, isLiveSharedMutationPath } from '../next/proposal-lane.js';
 export function validateProposalLaneDurableRef(filePath) {
@@ -28,7 +29,7 @@ export function handleBrokerProposalActions(options) {
             if (options.proposalFiles.length !== 1) {
                 throw new CliError('ATM_CLI_USAGE', 'broker proposal create requires exactly one --proposal-file <path>.', { exitCode: 2 });
             }
-            const proposal = readBrokerProposalFile(path.resolve(options.cwd, options.proposalFiles[0]));
+            const proposal = fillProposalAtomCids(readBrokerProposalFile(path.resolve(options.cwd, options.proposalFiles[0])), options.cwd);
             const validation = validateBrokerProposal(proposal, { cwd: options.cwd });
             if (!validation.ok) {
                 throw new CliError('ATM_BROKER_PROPOSAL_INVALID', 'Broker proposal failed validation.', {

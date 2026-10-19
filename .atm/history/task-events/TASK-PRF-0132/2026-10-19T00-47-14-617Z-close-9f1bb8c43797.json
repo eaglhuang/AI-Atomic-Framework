@@ -1,0 +1,60 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-10-19T00-47-14-617Z-close-9f1bb8c43797",
+  "taskId": "TASK-PRF-0132",
+  "action": "close",
+  "actorId": "codex-issue345",
+  "sessionId": "session-20261018150817-codex-issue345-TASK-PRF-0132-dea75af3a4",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0132.json",
+  "taskSha256": "sha256:3d044703d3f9413d9771d1ab0b27d074b11874c7c93a608ce50bb494a3bad0bf",
+  "createdAt": "2026-10-19T00:47:14.617Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0132 --actor codex-issue345 --status done --historical-delivery ec9c30310a42ae8953020e85c75080b46dd8b568",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20261018150817-codex-issue345-TASK-PRF-0132-dea75af3a4",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0132.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/onefile-adopter-atomize-proposal.test.ts"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/onefile-adopter-atomize-proposal.test.ts"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-10-19T00:47:14.561Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0132.*",
+        ".atm/history/task-events/TASK-PRF-0132/**",
+        ".atm/history/tasks/TASK-PRF-0132.json",
+        "packages/cli/dist",
+        "packages/cli/dist/**",
+        "release/atm-onefile",
+        "release/atm-onefile/**",
+        "release/atm-root-drop",
+        "release/atm-root-drop/**",
+        "scripts/onefile-runtime-closure.ts",
+        "scripts/src/atomize-backfill.js",
+        "tests/cli/onefile-adopter-atomize-proposal.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/dist",
+        "packages/cli/dist/**",
+        "scripts/onefile-runtime-closure.ts",
+        "scripts/src/atomize-backfill.js",
+        "tests/cli/onefile-adopter-atomize-proposal.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types tests/cli/onefile-adopter-atomize-proposal.test.ts"
+      ]
+    }
+  }
+}

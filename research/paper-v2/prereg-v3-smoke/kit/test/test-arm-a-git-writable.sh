@@ -15,7 +15,7 @@ cleanup() { chmod -R u+w "$BASE" 2>/dev/null || true; rm -rf "$BASE"; }
 trap cleanup EXIT
 
 grep -q 'git add note.txt and git commit' "$HERE/test/test-real-model.sh"
-grep -q 'arm A git commit did not move HEAD' "$HERE/test/test-real-model.sh"
+grep -q 'reason = "a-no-commit"' "$HERE/test/test-real-model.sh"
 
 collect() {
   local arm="$1" boundary="${2-}" work="$3"

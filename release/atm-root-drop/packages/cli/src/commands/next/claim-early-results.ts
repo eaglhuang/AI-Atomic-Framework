@@ -9,7 +9,7 @@ import { buildChannelPlaybook, buildNextMessages } from './playbook-projection.t
 import { diagnoseClaimReadinessForTasks, type NextClaimIntent } from './claim-readiness.ts';
 import { normalizeTaskRouteStatus, type TaskIntent } from './intent-normalizers.ts';
 import type { ImportedTaskQueue } from './route-predicates.ts';
-import { quoteCliValue } from './view-projections.ts';
+import { quoteCliToken, quoteCliValue } from './view-projections.ts';
 import type { inspectIntegrationBootstrap } from '../integration.ts';
 import type { inspectRuntimeAdapterReadiness } from '../runtime-adapter-readiness.ts';
 import type { NextActionLike } from './next-action-assembly.ts';
@@ -87,17 +87,25 @@ export function tryBuildQuickfixClaimResult(input: {
   return null;
 }
 
+function claimActorFlag(actorId: string | null | undefined): string {
+  const actor = actorId?.trim() ?? '';
+  if (actor && !/<[^>\r\n]+>/.test(actor)) return ` --actor ${quoteCliToken(actor)}`;
+  return ' --actor <id>';
+}
+
 export function buildNoClaimableTaskResult(input: {
   readonly cwd: string;
+  readonly actorId?: string | null;
   readonly claimIntent: NextClaimIntent;
   readonly importedTaskQueue: ImportedTaskQueue;
   readonly taskIntent: TaskIntent | null;
 }) {
+    const actorFlag = claimActorFlag(input.actorId);
     const claimReadiness = diagnoseClaimReadinessForTasks(
       input.cwd,
       input.importedTaskQueue.promptScope?.selectedTasks ?? input.importedTaskQueue.tasks,
       input.claimIntent,
-      { dependencyMode: input.importedTaskQueue.claimableTask ? 'claim-files' : 'hard' }
+      { dependencyMode: input.importedTaskQueue.claimableTask ? 'claim-files' : 'hard', actorId: input.actorId }
     );
     const primaryBlocker = claimReadiness.primaryBlocker;
     const selectedReviewTask = input.importedTaskQueue.selectedTask
@@ -105,7 +113,7 @@ export function buildNoClaimableTaskResult(input: {
       ? input.importedTaskQueue.selectedTask
       : null;
     if (selectedReviewTask && input.claimIntent !== 'closeout-only') {
-      const requiredCommand = `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(selectedReviewTask.workItemId)} --claim-intent closeout-only --json`;
+      const requiredCommand = `node atm.mjs next --claim${actorFlag} --prompt ${quoteCliValue(selectedReviewTask.workItemId)} --claim-intent closeout-only --json`;
       return makeResult({
         ok: false,
         command: 'next',
@@ -140,8 +148,8 @@ export function buildNoClaimableTaskResult(input: {
           taskId: unknownTaskId,
           knownTaskIds,
           requiredCommand: knownTaskIds[0]
-            ? `node atm.mjs next --claim --actor <id> --task ${knownTaskIds[0]} --auto-intent --json`
-            : 'node atm.mjs taskflow open --write --actor <id> --title "<title>" --goal "<goal>" --json'
+            ? `node atm.mjs next --claim${actorFlag} --task ${knownTaskIds[0]} --auto-intent --json`
+            : `node atm.mjs taskflow open --write${actorFlag} --json`
         })],
         evidence: { taskIntent: input.taskIntent, importedTaskQueue: input.importedTaskQueue }
       });
@@ -167,11 +175,11 @@ export function buildNoClaimableTaskResult(input: {
       messages: [message('error', claimCode, claimText, {
         requiredCommand: primaryBlocker?.requiredCommand
           ?? (promptScopeMiss
-            ? `node atm.mjs next --claim --actor <id> --task ${singleVisibleTask.workItemId} --auto-intent --json`
+            ? `node atm.mjs next --claim${actorFlag} --task ${singleVisibleTask.workItemId} --auto-intent --json`
             : null)
           ?? (input.importedTaskQueue.promptScope?.selectedTasks[0]?.sourcePlanPath
             ? `node atm.mjs tasks import --from ${quoteCliValue(input.importedTaskQueue.promptScope.selectedTasks[0].sourcePlanPath ?? '')} --dry-run --cwd . --json`
-            : 'node atm.mjs tasks import --from <plan.md> --dry-run --cwd . --json'),
+            : 'node atm.mjs tasks import --dry-run --cwd . --json'),
         primaryBlocker,
         claimReadiness
       })],

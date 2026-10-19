@@ -19,6 +19,34 @@ const CREDENTIAL_PATTERNS = [
  * This function never evaluates arguments, reads environment values or runs a
  * command. Repeated caller flags stay in order, preserving parser semantics.
  */
+const OPEN_CARD_FLAGS = ['--actor', '--scope-path', '--validator'];
+const PLACEHOLDER_VALUE = /<[^>\r\n]+>/;
+export function readOpenFlagValue(argv, flag) {
+    const index = argv.indexOf(flag);
+    if (index < 0)
+        return null;
+    const value = argv[index + 1];
+    if (typeof value !== 'string' || value.length === 0 || value.startsWith('--'))
+        return null;
+    return value;
+}
+/** Flags a dry-run must not call ready while they are absent or still placeholders. */
+export function collectDelegatedOpenWriteGaps(argv, openerPath) {
+    const gaps = [];
+    if (openerPath === 'atm:builtin') {
+        for (const flag of OPEN_CARD_FLAGS) {
+            const value = readOpenFlagValue(argv, flag);
+            if (!value || PLACEHOLDER_VALUE.test(value))
+                gaps.push(flag);
+        }
+    }
+    for (const flag of ['--actor', '--scope-path', '--validator', '--task-id', '--task']) {
+        const value = readOpenFlagValue(argv, flag);
+        if (value && PLACEHOLDER_VALUE.test(value) && !gaps.includes(flag))
+            gaps.push(flag);
+    }
+    return gaps;
+}
 export function buildTaskflowOpenCommand(argv) {
     const parts = ['node atm.mjs taskflow open --write'];
     for (let index = 0; index < argv.length; index += 1) {

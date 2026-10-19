@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "date": "2026-10-04",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Local source repair validated; publication pending",
+  "id": "ATM-BUG-2026-10-04-004",
+  "area": "Normal task close / first-use guidance",
+  "finding": "Normal task playbooks appended separate staging and commit commands after taskflow close --write already owns delivery and governance commits. The reminder still recommended direct tasks close, while the first-five-minutes guide prescribed a pre-close commit. A fresh governed newsletter run exposed the redundant evidence-only commit and conflicting operator instructions.",
+  "expectedBehavior": "Normal claimed and unclaimed task routes end at the governed close write command after pre-close and dry-run. Keep actor, task, and lane identities on emitted commands. Describe explicit stage-only and interrupted-close recovery, while retaining WIP, fast, and batch channel behavior.",
+  "evidenceOrRepro": "tests/cli/normal-close-operator-convergence.test.ts failed against the upstream normal command sequence before repair, then passed with no separate git add or git commit, matching preferred close entrypoint, corrected reminder and first-use documentation, lane propagation, and retained fast/batch behavior. Guidance was compared against main at 36a9128dc216568bde12435a1e6ab116eb0f1ee4 before editing. The test is registered in the fast CLI regression suite.",
+  "followUp": "Keep source validation distinct from frozen-runner publication and a new npm release. Framework delivery prerequisites and exceptional returned recovery commands still take precedence; this change does not alter the close implementation or authorize closing incomplete work."
+}
