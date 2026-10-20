@@ -178,6 +178,7 @@ run_real_attempt() {
   PROBE_EVIDENCE_ATTEMPT="$attempt"
   export PREREG_SESSION_SLOT="probe-${arm}-${attempt}"
   prepare_probe_repo "$repo"
+  export PREREG_SESSION_BASE_COMMIT="$(/usr/bin/git -c safe.directory='*' -C "$repo" rev-parse HEAD)"
   [ -z "${PREREG_STEWARD_PID:-}" ] || die 'steward-cleanup-failed: previous attempt still owns a PID; no retry'
   unset PREREG_SANDBOX_SCRATCH PREREG_SANDBOX_REPO PREREG_STEWARD_SOCK || true
   export PREREG_ARM="$arm"

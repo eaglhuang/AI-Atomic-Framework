@@ -4,7 +4,7 @@ import type { TeamBrokerRuntimeActivationHandshakeEvidence } from './team-lane.j
 import type { DecompositionRequest, MergePlan, PatchProposal } from './types.js';
 export { applyUnifiedPatch } from './unified-patch.js';
 export type StewardArbitrationVerdict = 'apply' | 'merge-required' | 'blocked' | 'human-required';
-export type StewardValidationCode = 'scope-lock-mismatch' | 'stale-base-commit' | 'file-hash-drift' | 'invalid-merge-plan' | 'out-of-scope-target' | 'blocked-merge-plan' | 'missing-proposal' | 'invalid-steward-identity' | 'human-review-required' | 'compose-context-mismatch' | 'steward-final-patch-required' | 'compose-permutation-unstable';
+export type StewardValidationCode = 'scope-lock-mismatch' | 'stale-base-commit' | 'file-hash-drift' | 'invalid-merge-plan' | 'out-of-scope-target' | 'blocked-merge-plan' | 'missing-proposal' | 'invalid-steward-identity' | 'human-review-required' | 'compose-context-mismatch' | 'steward-final-patch-required' | 'compose-permutation-unstable' | 'stale-base' | 'stale-base-conflict';
 export interface StewardValidationIssue {
     readonly code: StewardValidationCode;
     readonly detail: string;

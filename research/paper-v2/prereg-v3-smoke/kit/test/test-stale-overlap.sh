@@ -1,6 +1,5 @@
 #!/bin/bash
-# 沒有 --base-file 時，對得上已提交 base 且行重疊的 patch 必須是 overlapping-write-queued。
-# 對不上任何版本的 hunk 仍是 patch-context-mismatch。
+# 沒有 --base-file 時，以啟動 commit 或上次回覆宣告 base，不從 patch 猜版本。
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
 # shellcheck disable=SC1091
@@ -17,6 +16,7 @@ printf 'alpha\nbeta\ngamma\n' > "$REPO/loader.py"
 git -C "$REPO" add loader.py
 git -C "$REPO" -c user.name=prereg -c user.email=prereg@localhost commit -q -m base
 
+export PREREG_SESSION_BASE_COMMIT="$(git -C "$REPO" rev-parse HEAD)"
 export PREREG_BOUNDARY=codex-sandbox
 write_session_write_config "$REPO"
 
@@ -64,11 +64,11 @@ row = json.loads(open(sys.argv[1], encoding="utf-8").read())
 status = int(sys.argv[2])
 text = pathlib.Path(sys.argv[3]).read_text(encoding="utf-8")
 assert status == 3, (status, row)
-assert row["reasonCode"] == "overlapping-write-queued", row
-assert row["messageCode"] == "ATM_BROKER_LIVE_WRITE_QUEUED", row
+assert row["reasonCode"] == "patch-context-mismatch", row
+assert row["messageCode"] is None, row
 assert "beta-one" in (row.get("currentFileText") or ""), row.get("currentFileText")
 assert "beta-one" in text, text
-assert row.get("declaredBaseHash") != row.get("currentFileHash"), row
+assert row.get("declaredBaseHash") == row.get("currentFileHash"), row
 PY
 
 write_patch "$BASE/malformed.diff" "not-in-any-version" zzz

@@ -1,0 +1,64 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-10-20T17-37-15-109Z-close-5e52e0bc3f4a",
+  "taskId": "TASK-PRF-0143",
+  "action": "close",
+  "actorId": "grok-bot",
+  "sessionId": "session-20261020173239-grok-bot-TASK-PRF-0143-cfe14eb136",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0143.json",
+  "taskSha256": "sha256:8e8870a077f89633db34fd333b915b42d1de504561aea8f83367072db87178d8",
+  "createdAt": "2026-10-20T17:37:15.109Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0143 --actor grok-bot --status done --historical-delivery 2c9e7c7b8 --historical-delivery 4d0e60a59eaac245adef69b452e212db988dd8d3",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20261020173239-grok-bot-TASK-PRF-0143-cfe14eb136",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0143.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/physical-line-budget-gate.test.ts",
+      "node --strip-types tests/core/stale-base-translation.test.ts",
+      "validate:broker-steward"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/physical-line-budget-gate.test.ts",
+      "node --strip-types tests/core/stale-base-translation.test.ts",
+      "validate:broker-steward"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-10-20T17:37:15.103Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0143.*",
+        ".atm/history/task-events/TASK-PRF-0143/**",
+        ".atm/history/tasks/TASK-PRF-0143.json",
+        ".atm/task-plans/TASK-PRF-0143.md",
+        "packages/cli/dist",
+        "packages/cli/dist/**",
+        "packages/core/src/broker/**",
+        "packages/core/src/broker/steward-transactional-apply.ts",
+        "PROGRESS.md",
+        "release/atm-onefile/**",
+        "release/atm-root-drop/**"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/dist",
+        "packages/cli/dist/**",
+        "packages/core/src/broker/**",
+        "packages/core/src/broker/steward-transactional-apply.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types tests/cli/physical-line-budget-gate.test.ts",
+        "node --strip-types tests/core/stale-base-translation.test.ts",
+        "validate:broker-steward"
+      ]
+    }
+  }
+}

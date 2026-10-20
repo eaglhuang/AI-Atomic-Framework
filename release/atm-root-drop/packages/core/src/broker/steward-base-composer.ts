@@ -23,7 +23,7 @@ import {
   type EofNewlineDecision
 } from './unified-patch.ts';
 
-export type StewardCompositionBlockCode = 'compose-context-mismatch' | 'steward-final-patch-required' | 'compose-permutation-unstable';
+export type StewardCompositionBlockCode = 'compose-context-mismatch' | 'steward-final-patch-required' | 'compose-permutation-unstable' | 'stale-base' | 'stale-base-conflict';
 
 export interface StewardCompositionBlock {
   readonly code: StewardCompositionBlockCode;
@@ -46,12 +46,17 @@ interface ProposalEdit {
   readonly eofNewline: EofNewlineDecision;
 }
 
+const EOF_MARKER_DETAIL = 'no-newline marker is not at end of file';
+
 /** Exhaustive permutation checks stay cheap up to this many proposals per file. */
 const MAX_EXHAUSTIVE_PERMUTATION_PROPOSALS = 4;
 
 export function composeTextPatchesAgainstBase(filePath: string, before: string, proposals: readonly PatchProposal[]): BaseCompositionResult {
   const declared = composeTextPatchesAtDeclaredLines(filePath, before, proposals);
   if (declared.ok || declared.block.code !== 'compose-context-mismatch') return declared;
+  // A misplaced no-newline marker is a malformed patch, not a drifted region:
+  // the region fallback must not accept what the applier rejects (#374 item 3).
+  if (declared.block.detail.includes(EOF_MARKER_DETAIL)) return declared;
   return rebaseProposalsByRegionIdentity(filePath, before, proposals) ?? declared;
 }
 

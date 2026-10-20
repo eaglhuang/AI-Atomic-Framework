@@ -45,6 +45,9 @@ try {
   git(root, ['-c', 'core.pager=cat', 'diff', '--no-ext-diff', '--no-textconv', '--binary', '--output=/dev/null', pins.core_merge_sha, headSha, '--', ...pins.core_paths]);
   git(root, ['clone', '--quiet', '--shared', '--no-checkout', root, pinnedRoot]);
   git(pinnedRoot, ['checkout', '--quiet', '--detach', headSha]);
+  // Drop the pinned paths first: checkout <pin> -- <paths> restores files but
+  // keeps ones added after the pin, which the runbook would still see as a diff.
+  git(pinnedRoot, ['rm', '-r', '-q', '--ignore-unmatch', '--', ...pins.core_paths]);
   git(pinnedRoot, ['checkout', pins.core_merge_sha, '--', ...pins.core_paths]);
   git(pinnedRoot, ['-c', 'user.name=hist-v2-smoke-validator', '-c', 'user.email=hist-v2-smoke-validator@atm.local', '-c', 'commit.gpgsign=false', 'commit', '--quiet', '--no-verify', '--allow-empty', '-m', 'validator: pinned core paths']);
   status = runTests(pinnedRoot);

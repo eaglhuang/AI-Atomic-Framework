@@ -1,0 +1,93 @@
+{
+  "schemaId": "atm.closeRecoveryReceipt.v1",
+  "taskId": "TASK-PRF-0140",
+  "entries": [
+    {
+      "recoveryId": "close-recovery-1792515289603-9267a3",
+      "action": "abort",
+      "actorId": "grok-bot",
+      "reason": "close --write of 2026-10-20 08:30 Taipei was killed after the ledger write (pid 610018 gone); tasks renew then reopened the working ledger, so roll-forward is inconsistent",
+      "at": "2026-10-20T16:54:49.921Z",
+      "before": {
+        "state": "interrupted-not-landed",
+        "phase": "ledger-written",
+        "outcome": "in-progress",
+        "lock": {
+          "present": true,
+          "status": "active",
+          "holderTaskId": "TASK-PRF-0140",
+          "acquiredAt": "2026-10-20T00:30:03.394Z",
+          "heldByTask": true
+        },
+        "holder": {
+          "alive": false,
+          "reason": "owner-pid-gone",
+          "ownerPid": 610018,
+          "leaseExpiresAt": "2026-10-20T00:38:24.766Z"
+        },
+        "ledger": {
+          "head": null,
+          "index": {
+            "status": "done",
+            "lastTransitionId": "2026-10-20T00-30-53-597Z-close-b1be40ae5cb4"
+          },
+          "working": {
+            "status": "running",
+            "lastTransitionId": "2026-10-20T14-21-12-977Z-renew-7b423fc1ddce"
+          },
+          "workingEqualsIndex": false
+        },
+        "landed": false,
+        "landedCommit": null
+      },
+      "unstaged": [
+        ".atm/history/evidence/TASK-PRF-0140.bundle-manifest.json",
+        ".atm/history/evidence/TASK-PRF-0140.closure-packet.json",
+        ".atm/history/task-events/TASK-PRF-0140/2026-10-20T00-30-53-597Z-close-b1be40ae5cb4.json",
+        ".atm/history/tasks/TASK-PRF-0140.json"
+      ],
+      "archived": [
+        {
+          "path": ".atm/history/task-events/TASK-PRF-0140/2026-10-20T00-30-53-597Z-close-b1be40ae5cb4.json",
+          "archivePath": ".atm/runtime/close-recovery/TASK-PRF-0140/close-recovery-1792515289603-9267a3/.atm/history/task-events/TASK-PRF-0140/2026-10-20T00-30-53-597Z-close-b1be40ae5cb4.json",
+          "sha256": "sha256:062f4fad375d78c59642d1ede7f161eecf2f63f8cb825bc8401afaab4731190f"
+        },
+        {
+          "path": ".atm/history/task-events/TASK-PRF-0140/2026-10-20T00-30-53-856Z-close-c5fe58b52d33.json",
+          "archivePath": ".atm/runtime/close-recovery/TASK-PRF-0140/close-recovery-1792515289603-9267a3/.atm/history/task-events/TASK-PRF-0140/2026-10-20T00-30-53-856Z-close-c5fe58b52d33.json",
+          "sha256": "sha256:2b876a79638781467c676f8708c271a1b80b08a5a3b1759d592c2da57926deef"
+        },
+        {
+          "path": ".atm/history/evidence/TASK-PRF-0140.closure-packet.json",
+          "archivePath": ".atm/runtime/close-recovery/TASK-PRF-0140/close-recovery-1792515289603-9267a3/.atm/history/evidence/TASK-PRF-0140.closure-packet.json",
+          "sha256": "sha256:136e3b6a7b95220b1851da646444c5bcedcb484a2bed2e4801bb03c3f08c6bb6"
+        },
+        {
+          "path": ".atm/history/evidence/TASK-PRF-0140.seal-and-commit.json",
+          "archivePath": ".atm/runtime/close-recovery/TASK-PRF-0140/close-recovery-1792515289603-9267a3/.atm/history/evidence/TASK-PRF-0140.seal-and-commit.json",
+          "sha256": "sha256:a8163ab6f3c47d5126eebbcf557c2964b4f259769880f08bc4ec205d1d70ef01"
+        }
+      ],
+      "restored": [
+        {
+          "path": ".atm/history/tasks/TASK-PRF-0140.json",
+          "source": "close-fields-removed",
+          "sha256": "sha256:980c26ad1597c34c611c59cae1ebba766fe8a36eb79f264291f49f1ce26029f2"
+        },
+        {
+          "path": ".atm/task-plans/TASK-PRF-0140.md",
+          "source": "head",
+          "sha256": "sha256:65a942b758c5e771975129ae8118ed6f30ea7423ad3e3a4833c88bb98a202b1e"
+        }
+      ],
+      "card": {
+        "path": ".atm/task-plans/TASK-PRF-0140.md",
+        "source": "head",
+        "matchesSeal": true
+      },
+      "lockReleased": "aborted",
+      "deadMutexRemoved": true,
+      "archiveRoot": ".atm/runtime/close-recovery/TASK-PRF-0140/close-recovery-1792515289603-9267a3"
+    }
+  ]
+}

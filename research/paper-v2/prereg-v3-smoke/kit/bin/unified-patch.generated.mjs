@@ -255,7 +255,7 @@ function newLinesOf(hunk                  )                                  {
  * `\ No newline at end of file` for the last line of the old or new file.
  */
 export function eofMarkerViolation(hunks                        , baseLineCount        )                {
-  for (const { hunk, index: start } of hunks) {
+  for (const [position, { hunk, index: start }] of hunks.entries()) {
     const oldLines = oldLinesOf(hunk);
     const newLines = newLinesOf(hunk);
     for (let index = 0; index < oldLines.length; index += 1) {
@@ -266,8 +266,10 @@ export function eofMarkerViolation(hunks                        , baseLineCount 
     }
     for (let index = 0; index < newLines.length; index += 1) {
       if (!newLines[index] .noNewline) continue;
+      // The marker must end the final output line: last line of the last hunk,
+      // and that hunk must reach the end of the base (#374 item 2).
       const reachesEof = baseLineCount === 0 || start + oldLines.length >= baseLineCount;
-      if (index !== newLines.length - 1 || !reachesEof) return 'no-newline marker is not at end of file';
+      if (index !== newLines.length - 1 || !reachesEof || position !== hunks.length - 1) return 'no-newline marker is not at end of file';
     }
   }
   return null;
@@ -280,9 +282,10 @@ export function eofNewlineDecision(hunks                        , baseLineCount 
   for (const { hunk, index: start } of hunks) {
     const oldLines = oldLinesOf(hunk);
     const newLines = newLinesOf(hunk);
+    // A pure insertion after the last line reaches EOF too (#374 item 1).
     const reachesEof = baseLineCount === 0
       ? newLines.length > 0 || oldLines.length > 0
-      : oldLines.length > 0 && start + oldLines.length >= baseLineCount;
+      : start + oldLines.length >= baseLineCount;
     if (newLines.some((line) => line.noNewline) && (baseLineCount === 0 || reachesEof)) {
       absent = true;
       continue;

@@ -43,7 +43,9 @@ export type StewardValidationCode =
   | 'human-review-required'
   | 'compose-context-mismatch'
   | 'steward-final-patch-required'
-  | 'compose-permutation-unstable';
+  | 'compose-permutation-unstable'
+  | 'stale-base'
+  | 'stale-base-conflict';
 export interface StewardValidationIssue {
   readonly code: StewardValidationCode;
   readonly detail: string;

@@ -5,7 +5,9 @@ import path from 'node:path';
 import { sortProposalsForCompose } from './merge-plan.js';
 import { commitCanonicalFiles, defaultStewardCommitLockRoot } from './steward-commit-guard.js';
 import { composeTextPatchesAgainstBase } from './steward-base-composer.js';
-import { applyUnifiedPatch, UnifiedPatchApplicationError } from './unified-patch.js';
+import { applyUnifiedPatch, parseUnifiedPatchHunks, UnifiedPatchApplicationError } from './unified-patch.js';
+import { proposalRegionIdentity } from './steward-region-rebase.js';
+import { findCommittedBaseText, renderTranslatedPatch, translateStalePatch } from './stale-base-translation.js';
 export function buildPatchProposalComposition(input) {
     const sorted = sortProposalsForCompose(input.proposals);
     const byFile = new Map();
@@ -23,7 +25,13 @@ export function buildPatchProposalComposition(input) {
     for (const [filePath, proposals] of [...byFile].sort((left, right) => left[0].localeCompare(right[0]))) {
         const targetPath = path.resolve(input.cwd, filePath);
         const before = readFileSync(targetPath, 'utf8');
-        const composed = composeProposalPatchesAgainstImmutableBase(filePath, before, proposals);
+        // #363 AC4: re-check declared bases in the apply queue; stale ones are translated, never re-composed.
+        const rebased = translateStaleProposals(input.cwd, filePath, before, proposals);
+        if ('block' in rebased) {
+            blocked = rebased.block;
+            break;
+        }
+        const composed = composeProposalPatchesAgainstImmutableBase(filePath, before, rebased.proposals);
         if (!composed.ok) {
             blocked = composed.block;
             break;
@@ -95,6 +103,55 @@ export function buildPatchProposalComposition(input) {
  * declared pointers describe disjoint semantic slices, so they are merged as
  * JSON values and fall back to the text route on any hidden mutation.
  */
+/**
+ * Proposals whose declared `fileBeforeHash` is not `before` are translated from
+ * their committed base to `before` (#363). Region-identity proposals keep the
+ * region rebase. A base that is not in history is `stale-base`; a translation
+ * conflict is `stale-base-conflict`. Nothing is guessed.
+ */
+function translateStaleProposals(cwd, filePath, before, proposals) {
+    const currentHash = hashContent(before).replace(/^sha256:/, '');
+    const out = [];
+    for (const proposal of proposals) {
+        const declared = String(proposal.fileBeforeHash ?? '').replace(/^sha256:/, '');
+        if (!declared || declared === currentHash || proposalRegionIdentity(proposal) !== null) {
+            out.push(proposal);
+            continue;
+        }
+        const block = (code, detail) => ({ block: { code, filePath, proposalIds: [proposal.proposalId], detail: `proposal '${proposal.proposalId}' ${detail}` } });
+        const base = findCommittedBaseText(cwd, filePath, declared);
+        if (base === null)
+            return block('stale-base', `declares base ${declared.slice(0, 12)} of ${filePath}, which is not in committed history; it cannot be translated to the current file`);
+        let hunks = null;
+        try {
+            hunks = parseUnifiedPatchHunks(proposal.patch, { targetFile: filePath });
+        }
+        catch (error) {
+            if (!(error instanceof UnifiedPatchApplicationError))
+                throw error;
+        }
+        if (hunks === null) {
+            out.push(proposal);
+            continue;
+        }
+        const translated = translateStalePatch({ baseText: base, currentText: before, hunks });
+        if (!translated.ok)
+            return block(translated.reason === 'stale-base-conflict' ? 'stale-base-conflict' : 'stale-base', translated.detail);
+        const patch = renderTranslatedPatch(filePath, before, translated.blocks);
+        let roundTrip = null;
+        try {
+            roundTrip = applyUnifiedPatch(before, patch);
+        }
+        catch (error) {
+            if (!(error instanceof UnifiedPatchApplicationError))
+                throw error;
+        }
+        if (roundTrip !== translated.text)
+            return block('stale-base-conflict', 'translation could not be rendered as a patch on the current file');
+        out.push({ ...proposal, patch, fileBeforeHash: hashContent(before) });
+    }
+    return { proposals: out };
+}
 function composeProposalPatchesAgainstImmutableBase(filePath, before, proposals) {
     const textRoute = () => composeTextPatchesAgainstBase(filePath, before, proposals);
     const pointers = proposals.map((proposal) => declaredSingleJsonPointer(proposal));

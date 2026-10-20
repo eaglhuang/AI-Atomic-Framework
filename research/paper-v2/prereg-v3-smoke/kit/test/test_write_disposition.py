@@ -91,6 +91,11 @@ def main():
     assert payload["status"] == "blocked", payload["status"]
     assert payload["arms"]["B"]["steward"]["decisions"] == ["rejected-by-design"]
     assert payload["status"] != "ok"
+    code, payload = build("rejected-by-design", "base-unknown", "alpha\nbeta\n", "beta-one")
+    assert code == 3 and payload["status"] == "blocked", (code, payload)
+    steward = payload["arms"]["B"]["steward"]
+    assert steward["decisions"] == ["rejected-by-design"], steward
+    assert steward["rejected"] == 1 and steward["reasonCodes"] == ["base-unknown"], steward
     print("write disposition ok")
 
 

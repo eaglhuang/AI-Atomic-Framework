@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -9,7 +10,7 @@ const cwd = mkdtempSync(path.join(os.tmpdir(), 'atm-steward-json-pointer-'));
 const before = '{\n  "files": ["dist", "src"],\n  "dependencies": {}\n}\n';
 const proposal = (id: string, actorId: string, anchor: string, patch: string): PatchProposal => ({
   schemaId: 'atm.patchProposal.v1', specVersion: '0.1.0', migration: brokerAdapterMigration(),
-  proposalId: id, taskId: id, actorId, baseCommit: 'base', fileBeforeHash: 'sha256:base',
+  proposalId: id, taskId: id, actorId, baseCommit: 'base', fileBeforeHash: `sha256:${createHash('sha256').update(before, 'utf8').digest('hex')}`,
   targetFile: 'package.json', atomRefs: [{ atomId: `atom.${id}`, atomCid: `cid:${id}` }],
   anchors: [{ kind: 'json-pointer', hint: anchor }], intent: id, patch, validators: [], rollback: 'discard'
 });

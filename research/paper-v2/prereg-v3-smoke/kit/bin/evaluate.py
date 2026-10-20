@@ -254,6 +254,8 @@ def classify_write(row):
     if row.get("ok") is True and row.get("terminal") == "committed":
         return "accepted"
     reason = str(row.get("reasonCode") or row.get("stopReason") or "").strip()
+    if reason == "base-unknown":
+        return "rejected-by-design"
     if row.get("terminal") in {"blocked", "queued"} and reason:
         return "rejected-by-design"
     return "kit-error"

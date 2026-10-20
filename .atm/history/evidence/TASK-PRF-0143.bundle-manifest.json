@@ -1,0 +1,63 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0143",
+  "updatedAt": "2026-10-20T17:35:36.942Z",
+  "updatedBy": "grok-bot",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/physical-line-budget-gate.test.ts",
+    "node --strip-types tests/core/stale-base-translation.test.ts",
+    "validate:broker-steward"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/physical-line-budget-gate.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d2fd4e132423ecdc47b6ecb9057cab6ca35a4b67e224ac5eeea387875b62e087",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/physical-line-budget-gate.test.ts"
+      ],
+      "generatedAt": "2026-10-20T17:35:14.346Z",
+      "startedAt": "2026-10-20T17:35:14.031Z",
+      "finishedAt": "2026-10-20T17:35:14.346Z",
+      "durationMs": 315,
+      "runnerKind": "dev-source",
+      "sourceCommit": "2c9e7c7b8a05ea6ea965706285fdf6c7bdc358e7",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/core/stale-base-translation.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7e08742246439c266d733753f3ab5904e8dd888c06067686f48ac476bca27328",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/core/stale-base-translation.test.ts"
+      ],
+      "generatedAt": "2026-10-20T17:35:18.368Z",
+      "startedAt": "2026-10-20T17:35:15.349Z",
+      "finishedAt": "2026-10-20T17:35:18.368Z",
+      "durationMs": 3019,
+      "runnerKind": "dev-source",
+      "sourceCommit": "2c9e7c7b8a05ea6ea965706285fdf6c7bdc358e7",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-broker-steward.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7c4e3734903aa3ad77f63c14a32370a6e8b7c487bac22921ed736cbaa74de81f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:broker-steward"
+      ],
+      "generatedAt": "2026-10-20T17:35:36.940Z",
+      "startedAt": "2026-10-20T17:35:19.365Z",
+      "finishedAt": "2026-10-20T17:35:36.940Z",
+      "durationMs": 17575,
+      "runnerKind": "dev-source",
+      "sourceCommit": "2c9e7c7b8a05ea6ea965706285fdf6c7bdc358e7",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
