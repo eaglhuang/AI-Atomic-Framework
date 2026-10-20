@@ -25,8 +25,8 @@ export declare function guidancePaths(repositoryRoot: string, sessionId?: string
     sessionsRoot: string;
     auditLogPath: string;
     proposalsRoot: string;
-    sessionPath: string;
-    proposalPath: string;
+    sessionPath: string | null;
+    proposalPath: string | null;
 };
 export declare function writeGuidanceSession(session: GuidanceSession): void;
 export declare function readActiveGuidanceSession(repositoryRoot: string): GuidanceSession | null;
