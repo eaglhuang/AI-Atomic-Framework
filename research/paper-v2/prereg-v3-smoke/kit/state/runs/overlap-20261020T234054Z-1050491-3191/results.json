@@ -1,0 +1,501 @@
+{
+  "schema": "prereg-v3-smoke.results.v1",
+  "label": "smoke/exploratory",
+  "winClaim": false,
+  "status": "ok",
+  "mode": "fixture",
+  "commonBase": "2baad662c48278582df9e701c00a097a98cbd817",
+  "boundary": "unix-user",
+  "boundaryMechanism": "unix-user prereg-steward owns the worktree; prereg-session is not the owner and has no sudo; codex exec uses --sandbox workspace-write and sandbox_workspace_write.network_access=true so the steward socket can connect; prereg-session owns .agents .codex .aws so Codex can create them; tracked files stay prereg-steward-owned",
+  "testIdNormalization": null,
+  "overlapCondition": "none",
+  "arms": {
+    "A": {
+      "arm": "A",
+      "boundary": null,
+      "boundaryMechanism": null,
+      "status": "ok",
+      "work": "/workspace/AI-Atomic-Framework-360/AI-Atomic-Framework/research/paper-v2/prereg-v3-smoke/kit/state/runs/overlap-20261020T234054Z-1050491-3191/arm-a/work",
+      "head": "667cbf9ae1d261331620e04b87f66fd80e166978",
+      "snapshot": "667cbf9ae1d261331620e04b87f66fd80e166978",
+      "snapshotCreated": true,
+      "startSkewMs": 12,
+      "model": "stub-no-model",
+      "reasoningEffort": null,
+      "sessions": [
+        {
+          "slot": 1,
+          "evidenceStatus": "ok",
+          "instanceId": "fixture-overlap-one",
+          "startedAt": "2026-10-21T07:40:54,613085954+08:00",
+          "endedAt": "2026-10-21T07:40:55,781065099+08:00",
+          "exitCode": 0,
+          "tokens": {
+            "input_tokens": 0,
+            "output_tokens": 0,
+            "total_tokens": 0,
+            "cached_input_tokens": null,
+            "reasoning_output_tokens": null,
+            "events": 1
+          },
+          "lostEdits": [
+            {
+              "file": "shared.py",
+              "missingAddedLines": [
+                "beta-one",
+                "beta"
+              ],
+              "missingCount": 2,
+              "match": "hunk"
+            }
+          ],
+          "unfinishedEdits": [
+            {
+              "file": "shared.py",
+              "missingAddedLines": [
+                "beta-one",
+                "beta"
+              ],
+              "missingCount": 2,
+              "match": "hunk"
+            }
+          ],
+          "keptOrRejected": [],
+          "stewardRejected": false,
+          "lostEditConfidence": "hunk",
+          "rejectionAttribution": "none",
+          "quotaStop": false
+        },
+        {
+          "slot": 2,
+          "evidenceStatus": "ok",
+          "instanceId": "fixture-overlap-two",
+          "startedAt": "2026-10-21T07:40:54,617636425+08:00",
+          "endedAt": "2026-10-21T07:40:56,180679680+08:00",
+          "exitCode": 0,
+          "tokens": {
+            "input_tokens": 0,
+            "output_tokens": 0,
+            "total_tokens": 0,
+            "cached_input_tokens": null,
+            "reasoning_output_tokens": null,
+            "events": 1
+          },
+          "lostEdits": [],
+          "unfinishedEdits": [],
+          "keptOrRejected": [
+            {
+              "file": "shared.py",
+              "missingCount": 0,
+              "match": "low"
+            }
+          ],
+          "stewardRejected": false,
+          "lostEditConfidence": "low",
+          "rejectionAttribution": "none",
+          "quotaStop": false
+        }
+      ],
+      "lostEditCount": 1,
+      "silentLostEditCount": 1,
+      "lostEditConfidence": "low",
+      "rejectionAttribution": "none",
+      "corruption": [],
+      "indexLockCount": 0,
+      "gitErrors": [],
+      "conflictCount": 0,
+      "resolutionTimeMs": null,
+      "steward": {
+        "writes": 0,
+        "rejected": 0,
+        "resubmissions": 0,
+        "recomposeOrRetry": 0,
+        "crossSessionOverlapRejections": 0,
+        "acknowledgedOverrides": 0,
+        "mergedBothResubmissions": 0,
+        "queueWaitMs": [],
+        "writeToCommitMs": [],
+        "batchSizes": [],
+        "terminals": [],
+        "decisions": [],
+        "reasonCodes": [],
+        "writesDetail": []
+      },
+      "tests": [
+        {
+          "instanceId": "fixture-overlap-one",
+          "exitCode": 1,
+          "passed": 1,
+          "failed": 1,
+          "notSeen": 0,
+          "tests": [
+            {
+              "label": "fixture.tests.MarkerTests.test_session_one",
+              "status": "fail"
+            },
+            {
+              "label": "fixture.tests.MarkerTests.test_untouched",
+              "status": "pass"
+            }
+          ],
+          "outputTail": "fixture.tests.MarkerTests.test_session_one ... FAIL\nfixture.tests.MarkerTests.test_untouched ... ok\n",
+          "kitError": null,
+          "failToPass": {
+            "denominator": 1,
+            "passed": 0,
+            "failed": 1,
+            "notSeen": 0
+          },
+          "passToPass": {
+            "denominator": 1,
+            "passed": 1,
+            "failed": 0,
+            "notSeen": 0
+          }
+        },
+        {
+          "instanceId": "fixture-overlap-two",
+          "exitCode": 1,
+          "passed": 2,
+          "failed": 1,
+          "notSeen": 0,
+          "tests": [
+            {
+              "label": "fixture.tests.MarkerTests.test_session_two",
+              "status": "pass"
+            },
+            {
+              "label": "fixture.tests.MarkerTests.test_untouched",
+              "status": "pass"
+            },
+            {
+              "label": "fixture.tests.MarkerTests.test_session_one",
+              "status": "fail"
+            }
+          ],
+          "outputTail": "fixture.tests.MarkerTests.test_session_two ... ok\nfixture.tests.MarkerTests.test_untouched ... ok\nfixture.tests.MarkerTests.test_session_one ... FAIL\n",
+          "kitError": null,
+          "failToPass": {
+            "denominator": 1,
+            "passed": 1,
+            "failed": 0,
+            "notSeen": 0
+          },
+          "passToPass": {
+            "denominator": 2,
+            "passed": 1,
+            "failed": 1,
+            "notSeen": 0
+          }
+        }
+      ]
+    },
+    "B": {
+      "arm": "B",
+      "boundary": "unix-user",
+      "boundaryMechanism": "unix-user prereg-steward owns the worktree; prereg-session is not the owner and has no sudo; codex exec uses --sandbox workspace-write and sandbox_workspace_write.network_access=true so the steward socket can connect; prereg-session owns .agents .codex .aws so Codex can create them; tracked files stay prereg-steward-owned",
+      "status": "ok",
+      "work": "/workspace/AI-Atomic-Framework-360/AI-Atomic-Framework/research/paper-v2/prereg-v3-smoke/kit/state/runs/overlap-20261020T234054Z-1050491-3191/arm-b/work",
+      "head": "eec02bf8acc79ada096b6e4cf0f321ed78b9aab5",
+      "snapshot": "eec02bf8acc79ada096b6e4cf0f321ed78b9aab5",
+      "snapshotCreated": true,
+      "startSkewMs": 15,
+      "model": "stub-no-model",
+      "reasoningEffort": null,
+      "sessions": [
+        {
+          "slot": 1,
+          "evidenceStatus": "ok",
+          "instanceId": "fixture-overlap-one",
+          "startedAt": "2026-10-21T07:41:00,485896746+08:00",
+          "endedAt": "2026-10-21T07:41:01,052914616+08:00",
+          "exitCode": 0,
+          "tokens": {
+            "input_tokens": 0,
+            "output_tokens": 0,
+            "total_tokens": 0,
+            "cached_input_tokens": null,
+            "reasoning_output_tokens": null,
+            "events": 1
+          },
+          "lostEdits": [],
+          "unfinishedEdits": [],
+          "keptOrRejected": [
+            {
+              "file": "shared.py",
+              "missingCount": 0,
+              "match": "low"
+            }
+          ],
+          "stewardRejected": true,
+          "lostEditConfidence": "low",
+          "rejectionAttribution": "low",
+          "quotaStop": false
+        },
+        {
+          "slot": 2,
+          "evidenceStatus": "ok",
+          "instanceId": "fixture-overlap-two",
+          "startedAt": "2026-10-21T07:41:00,489853199+08:00",
+          "endedAt": "2026-10-21T07:41:01,886610836+08:00",
+          "exitCode": 0,
+          "tokens": {
+            "input_tokens": 0,
+            "output_tokens": 0,
+            "total_tokens": 0,
+            "cached_input_tokens": null,
+            "reasoning_output_tokens": null,
+            "events": 1
+          },
+          "lostEdits": [],
+          "unfinishedEdits": [],
+          "keptOrRejected": [
+            {
+              "file": "shared.py",
+              "missingCount": 0,
+              "match": "low"
+            }
+          ],
+          "stewardRejected": true,
+          "lostEditConfidence": "low",
+          "rejectionAttribution": "low",
+          "quotaStop": false
+        }
+      ],
+      "lostEditCount": 0,
+      "silentLostEditCount": 0,
+      "lostEditConfidence": "low",
+      "rejectionAttribution": "low",
+      "corruption": [],
+      "indexLockCount": 0,
+      "gitErrors": [],
+      "conflictCount": 1,
+      "resolutionTimeMs": null,
+      "steward": {
+        "writes": 3,
+        "rejected": 1,
+        "resubmissions": 1,
+        "recomposeOrRetry": 1,
+        "crossSessionOverlapRejections": 0,
+        "acknowledgedOverrides": 0,
+        "mergedBothResubmissions": 0,
+        "queueWaitMs": [
+          0,
+          0,
+          0
+        ],
+        "writeToCommitMs": [
+          284,
+          307
+        ],
+        "batchSizes": [
+          1,
+          1,
+          1
+        ],
+        "terminals": [
+          "committed",
+          "blocked",
+          "committed"
+        ],
+        "decisions": [
+          "accepted",
+          "rejected-by-design",
+          "accepted"
+        ],
+        "reasonCodes": [
+          null,
+          "overlapping-write-queued",
+          null
+        ],
+        "writesDetail": [
+          {
+            "schema": "prereg-v3-smoke.stewardWrite.v1",
+            "ok": true,
+            "decision": "accepted",
+            "reasonCode": null,
+            "messageCode": "ATM_BROKER_LIVE_WRITE_APPLIED",
+            "verdict": "applied",
+            "phase": "commit",
+            "terminal": "committed",
+            "stopReason": null,
+            "proposalId": "prop-stub-fixture-overlap-one-slot-1-a1-5341c925595c",
+            "taskId": "fixture-overlap-one",
+            "actorId": "stub-fixture-overlap-one-slot-1",
+            "sessionSlot": "1",
+            "file": "shared.py",
+            "declaredBaseHash": "sha256:8ae027facacbe9c7f1128bf296b6bdcb6bef0f820593ded0435c7e15d98a9f3c",
+            "hunkOffsets": [
+              {
+                "declaredOldStart": 2,
+                "appliedOldStart": 2,
+                "offset": 0
+              }
+            ],
+            "crossSessionOverlap": null,
+            "acknowledgedOverlap": null,
+            "currentFileHash": "sha256:d1d0fec5591c9b589d6373672bb42e4f8a8568ffd6c11bbd7801f49c06a95584",
+            "batchSize": 1,
+            "attempt": 1,
+            "retryCount": 0,
+            "hashDriftCount": 0,
+            "writeToCommitMs": 284,
+            "commit": {
+              "gitIndexLockWaitMs": 0,
+              "headMoves": 0
+            },
+            "planRequired": false,
+            "cli": "@ai-atomic-framework/cli@0.1.21",
+            "entry": "broker steward apply-live"
+          },
+          {
+            "schema": "prereg-v3-smoke.stewardWrite.v1",
+            "ok": false,
+            "decision": "rejected-by-design",
+            "reasonCode": "overlapping-write-queued",
+            "messageCode": "ATM_BROKER_LIVE_WRITE_QUEUED",
+            "verdict": "blocked",
+            "phase": "live",
+            "terminal": "blocked",
+            "stopReason": "\u9019\u7b46\u5beb\u5165\u548c\u5df2\u7d93\u63d0\u4ea4\u7684\u884c\u91cd\u758a\uff0c\u6a94\u6848\u6c92\u6709\u88ab\u6539",
+            "proposalId": "prop-stub-fixture-overlap-two-slot-2-a1-7449af1b09ba",
+            "taskId": "fixture-overlap-two",
+            "actorId": "stub-fixture-overlap-two-slot-2",
+            "sessionSlot": "2",
+            "file": "shared.py",
+            "declaredBaseHash": "sha256:8ae027facacbe9c7f1128bf296b6bdcb6bef0f820593ded0435c7e15d98a9f3c",
+            "hunkOffsets": [
+              {
+                "declaredOldStart": 2,
+                "appliedOldStart": 2,
+                "offset": 0
+              }
+            ],
+            "crossSessionOverlap": null,
+            "acknowledgedOverlap": null,
+            "currentFileHash": "sha256:d1d0fec5591c9b589d6373672bb42e4f8a8568ffd6c11bbd7801f49c06a95584",
+            "batchSize": 1,
+            "attempt": 1,
+            "retryCount": 0,
+            "hashDriftCount": 0,
+            "writeToCommitMs": null,
+            "commit": {
+              "gitIndexLockWaitMs": 0,
+              "headMoves": 0
+            },
+            "planRequired": false,
+            "cli": "@ai-atomic-framework/cli@0.1.21",
+            "entry": "broker steward apply-live"
+          },
+          {
+            "schema": "prereg-v3-smoke.stewardWrite.v1",
+            "ok": true,
+            "decision": "accepted",
+            "reasonCode": null,
+            "messageCode": "ATM_BROKER_LIVE_WRITE_APPLIED",
+            "verdict": "applied",
+            "phase": "commit",
+            "terminal": "committed",
+            "stopReason": null,
+            "proposalId": "prop-stub-fixture-overlap-two-slot-2-a2-36d8b336bbfd",
+            "taskId": "fixture-overlap-two",
+            "actorId": "stub-fixture-overlap-two-slot-2",
+            "sessionSlot": "2",
+            "file": "shared.py",
+            "declaredBaseHash": "sha256:d1d0fec5591c9b589d6373672bb42e4f8a8568ffd6c11bbd7801f49c06a95584",
+            "hunkOffsets": [
+              {
+                "declaredOldStart": 4,
+                "appliedOldStart": 4,
+                "offset": 0
+              }
+            ],
+            "crossSessionOverlap": null,
+            "acknowledgedOverlap": null,
+            "currentFileHash": "sha256:d1579c254e2e5df7f428422f941868c7dd2d147288d7e967e708aae3583515cc",
+            "batchSize": 1,
+            "attempt": 2,
+            "retryCount": 1,
+            "hashDriftCount": 0,
+            "writeToCommitMs": 307,
+            "commit": {
+              "gitIndexLockWaitMs": 0,
+              "headMoves": 0
+            },
+            "planRequired": false,
+            "cli": "@ai-atomic-framework/cli@0.1.21",
+            "entry": "broker steward apply-live"
+          }
+        ]
+      },
+      "tests": [
+        {
+          "instanceId": "fixture-overlap-one",
+          "exitCode": 0,
+          "passed": 2,
+          "failed": 0,
+          "notSeen": 0,
+          "tests": [
+            {
+              "label": "fixture.tests.MarkerTests.test_session_one",
+              "status": "pass"
+            },
+            {
+              "label": "fixture.tests.MarkerTests.test_untouched",
+              "status": "pass"
+            }
+          ],
+          "outputTail": "fixture.tests.MarkerTests.test_session_one ... ok\nfixture.tests.MarkerTests.test_untouched ... ok\n",
+          "kitError": null,
+          "failToPass": {
+            "denominator": 1,
+            "passed": 1,
+            "failed": 0,
+            "notSeen": 0
+          },
+          "passToPass": {
+            "denominator": 1,
+            "passed": 1,
+            "failed": 0,
+            "notSeen": 0
+          }
+        },
+        {
+          "instanceId": "fixture-overlap-two",
+          "exitCode": 0,
+          "passed": 3,
+          "failed": 0,
+          "notSeen": 0,
+          "tests": [
+            {
+              "label": "fixture.tests.MarkerTests.test_session_two",
+              "status": "pass"
+            },
+            {
+              "label": "fixture.tests.MarkerTests.test_untouched",
+              "status": "pass"
+            },
+            {
+              "label": "fixture.tests.MarkerTests.test_session_one",
+              "status": "pass"
+            }
+          ],
+          "outputTail": "fixture.tests.MarkerTests.test_session_two ... ok\nfixture.tests.MarkerTests.test_untouched ... ok\nfixture.tests.MarkerTests.test_session_one ... ok\n",
+          "kitError": null,
+          "failToPass": {
+            "denominator": 1,
+            "passed": 1,
+            "failed": 0,
+            "notSeen": 0
+          },
+          "passToPass": {
+            "denominator": 2,
+            "passed": 2,
+            "failed": 0,
+            "notSeen": 0
+          }
+        }
+      ]
+    }
+  }
+}

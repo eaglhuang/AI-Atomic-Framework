@@ -1,0 +1,449 @@
+{
+  "schema": "prereg-v3-smoke.results.v1",
+  "label": "smoke/exploratory",
+  "winClaim": false,
+  "status": "ok",
+  "mode": "fixture",
+  "commonBase": "6ecf77b761b0daa5c646f6123387a3f936825ddd",
+  "boundary": "unix-user",
+  "boundaryMechanism": "unix-user prereg-steward owns the worktree; prereg-session is not the owner and has no sudo; codex exec uses --sandbox workspace-write and sandbox_workspace_write.network_access=true so the steward socket can connect; prereg-session owns .agents .codex .aws so Codex can create them; tracked files stay prereg-steward-owned",
+  "testIdNormalization": null,
+  "overlapCondition": "none",
+  "arms": {
+    "A": {
+      "arm": "A",
+      "boundary": null,
+      "boundaryMechanism": null,
+      "status": "ok",
+      "work": "/workspace/AI-Atomic-Framework-360/AI-Atomic-Framework/research/paper-v2/prereg-v3-smoke/kit/state/runs/selfcheck-20261020T234247Z-1071729-2967/arm-a/work",
+      "head": "2094d897e71f5c62b844cb479ac4b997e16246a7",
+      "snapshot": "2094d897e71f5c62b844cb479ac4b997e16246a7",
+      "snapshotCreated": true,
+      "startSkewMs": 12,
+      "model": "stub-no-model",
+      "reasoningEffort": null,
+      "sessions": [
+        {
+          "slot": 1,
+          "evidenceStatus": "ok",
+          "instanceId": "fixture-session-one",
+          "startedAt": "2026-10-21T07:42:47,197219937+08:00",
+          "endedAt": "2026-10-21T07:42:48,366339692+08:00",
+          "exitCode": 0,
+          "tokens": {
+            "input_tokens": 0,
+            "output_tokens": 0,
+            "total_tokens": 0,
+            "cached_input_tokens": null,
+            "reasoning_output_tokens": null,
+            "events": 1
+          },
+          "lostEdits": [
+            {
+              "file": "shared.py",
+              "missingAddedLines": [
+                "beta-one",
+                "beta"
+              ],
+              "missingCount": 2,
+              "match": "hunk"
+            }
+          ],
+          "unfinishedEdits": [
+            {
+              "file": "shared.py",
+              "missingAddedLines": [
+                "beta-one",
+                "beta"
+              ],
+              "missingCount": 2,
+              "match": "hunk"
+            }
+          ],
+          "keptOrRejected": [],
+          "stewardRejected": false,
+          "lostEditConfidence": "hunk",
+          "rejectionAttribution": "none",
+          "quotaStop": false
+        },
+        {
+          "slot": 2,
+          "evidenceStatus": "ok",
+          "instanceId": "fixture-session-two",
+          "startedAt": "2026-10-21T07:42:47,199669639+08:00",
+          "endedAt": "2026-10-21T07:42:48,765464192+08:00",
+          "exitCode": 0,
+          "tokens": {
+            "input_tokens": 0,
+            "output_tokens": 0,
+            "total_tokens": 0,
+            "cached_input_tokens": null,
+            "reasoning_output_tokens": null,
+            "events": 1
+          },
+          "lostEdits": [],
+          "unfinishedEdits": [],
+          "keptOrRejected": [
+            {
+              "file": "shared.py",
+              "missingCount": 0,
+              "match": "low"
+            }
+          ],
+          "stewardRejected": false,
+          "lostEditConfidence": "low",
+          "rejectionAttribution": "none",
+          "quotaStop": false
+        }
+      ],
+      "lostEditCount": 1,
+      "silentLostEditCount": 1,
+      "lostEditConfidence": "low",
+      "rejectionAttribution": "none",
+      "corruption": [],
+      "indexLockCount": 0,
+      "gitErrors": [],
+      "conflictCount": 0,
+      "resolutionTimeMs": null,
+      "steward": {
+        "writes": 0,
+        "rejected": 0,
+        "resubmissions": 0,
+        "recomposeOrRetry": 0,
+        "crossSessionOverlapRejections": 0,
+        "acknowledgedOverrides": 0,
+        "mergedBothResubmissions": 0,
+        "queueWaitMs": [],
+        "writeToCommitMs": [],
+        "batchSizes": [],
+        "terminals": [],
+        "decisions": [],
+        "reasonCodes": [],
+        "writesDetail": []
+      },
+      "tests": [
+        {
+          "instanceId": "fixture-session-one",
+          "exitCode": 1,
+          "passed": 1,
+          "failed": 1,
+          "notSeen": 0,
+          "tests": [
+            {
+              "label": "fixture.tests.MarkerTests.test_session_one",
+              "status": "fail"
+            },
+            {
+              "label": "fixture.tests.MarkerTests.test_untouched",
+              "status": "pass"
+            }
+          ],
+          "outputTail": "fixture.tests.MarkerTests.test_session_one ... FAIL\nfixture.tests.MarkerTests.test_untouched ... ok\n",
+          "kitError": null,
+          "failToPass": {
+            "denominator": 1,
+            "passed": 0,
+            "failed": 1,
+            "notSeen": 0
+          },
+          "passToPass": {
+            "denominator": 1,
+            "passed": 1,
+            "failed": 0,
+            "notSeen": 0
+          }
+        },
+        {
+          "instanceId": "fixture-session-two",
+          "exitCode": 0,
+          "passed": 2,
+          "failed": 0,
+          "notSeen": 0,
+          "tests": [
+            {
+              "label": "fixture.tests.MarkerTests.test_session_two",
+              "status": "pass"
+            },
+            {
+              "label": "fixture.tests.MarkerTests.test_untouched",
+              "status": "pass"
+            }
+          ],
+          "outputTail": "fixture.tests.MarkerTests.test_session_two ... ok\nfixture.tests.MarkerTests.test_untouched ... ok\n",
+          "kitError": null,
+          "failToPass": {
+            "denominator": 1,
+            "passed": 1,
+            "failed": 0,
+            "notSeen": 0
+          },
+          "passToPass": {
+            "denominator": 1,
+            "passed": 1,
+            "failed": 0,
+            "notSeen": 0
+          }
+        }
+      ]
+    },
+    "B": {
+      "arm": "B",
+      "boundary": "unix-user",
+      "boundaryMechanism": "unix-user prereg-steward owns the worktree; prereg-session is not the owner and has no sudo; codex exec uses --sandbox workspace-write and sandbox_workspace_write.network_access=true so the steward socket can connect; prereg-session owns .agents .codex .aws so Codex can create them; tracked files stay prereg-steward-owned",
+      "status": "ok",
+      "work": "/workspace/AI-Atomic-Framework-360/AI-Atomic-Framework/research/paper-v2/prereg-v3-smoke/kit/state/runs/selfcheck-20261020T234247Z-1071729-2967/arm-b/work",
+      "head": "941611a0cf6ca0ce065d00ec3e0d4ff50ff36d31",
+      "snapshot": "941611a0cf6ca0ce065d00ec3e0d4ff50ff36d31",
+      "snapshotCreated": true,
+      "startSkewMs": 16,
+      "model": "stub-no-model",
+      "reasoningEffort": null,
+      "sessions": [
+        {
+          "slot": 1,
+          "evidenceStatus": "ok",
+          "instanceId": "fixture-session-one",
+          "startedAt": "2026-10-21T07:42:51,957887964+08:00",
+          "endedAt": "2026-10-21T07:42:52,555939293+08:00",
+          "exitCode": 0,
+          "tokens": {
+            "input_tokens": 0,
+            "output_tokens": 0,
+            "total_tokens": 0,
+            "cached_input_tokens": null,
+            "reasoning_output_tokens": null,
+            "events": 1
+          },
+          "lostEdits": [],
+          "unfinishedEdits": [],
+          "keptOrRejected": [
+            {
+              "file": "shared.py",
+              "missingCount": 0,
+              "match": "low"
+            }
+          ],
+          "stewardRejected": false,
+          "lostEditConfidence": "low",
+          "rejectionAttribution": "none",
+          "quotaStop": false
+        },
+        {
+          "slot": 2,
+          "evidenceStatus": "ok",
+          "instanceId": "fixture-session-two",
+          "startedAt": "2026-10-21T07:42:51,960445692+08:00",
+          "endedAt": "2026-10-21T07:42:52,542040734+08:00",
+          "exitCode": 0,
+          "tokens": {
+            "input_tokens": 0,
+            "output_tokens": 0,
+            "total_tokens": 0,
+            "cached_input_tokens": null,
+            "reasoning_output_tokens": null,
+            "events": 1
+          },
+          "lostEdits": [],
+          "unfinishedEdits": [],
+          "keptOrRejected": [
+            {
+              "file": "shared.py",
+              "missingCount": 0,
+              "match": "low"
+            }
+          ],
+          "stewardRejected": false,
+          "lostEditConfidence": "low",
+          "rejectionAttribution": "none",
+          "quotaStop": false
+        }
+      ],
+      "lostEditCount": 0,
+      "silentLostEditCount": 0,
+      "lostEditConfidence": "low",
+      "rejectionAttribution": "none",
+      "corruption": [],
+      "indexLockCount": 0,
+      "gitErrors": [],
+      "conflictCount": 0,
+      "resolutionTimeMs": null,
+      "steward": {
+        "writes": 2,
+        "rejected": 0,
+        "resubmissions": 0,
+        "recomposeOrRetry": 0,
+        "crossSessionOverlapRejections": 0,
+        "acknowledgedOverrides": 0,
+        "mergedBothResubmissions": 0,
+        "queueWaitMs": [
+          0,
+          0
+        ],
+        "writeToCommitMs": [
+          286,
+          295
+        ],
+        "batchSizes": [
+          1,
+          1
+        ],
+        "terminals": [
+          "committed",
+          "committed"
+        ],
+        "decisions": [
+          "accepted",
+          "accepted"
+        ],
+        "reasonCodes": [
+          null,
+          null
+        ],
+        "writesDetail": [
+          {
+            "schema": "prereg-v3-smoke.stewardWrite.v1",
+            "ok": true,
+            "decision": "accepted",
+            "reasonCode": null,
+            "messageCode": "ATM_BROKER_LIVE_WRITE_APPLIED",
+            "verdict": "applied",
+            "phase": "commit",
+            "terminal": "committed",
+            "stopReason": null,
+            "proposalId": "prop-stub-fixture-session-two-slot-2-a1-36d8b336bbfd",
+            "taskId": "fixture-session-two",
+            "actorId": "stub-fixture-session-two-slot-2",
+            "sessionSlot": "2",
+            "file": "shared.py",
+            "declaredBaseHash": "sha256:8ae027facacbe9c7f1128bf296b6bdcb6bef0f820593ded0435c7e15d98a9f3c",
+            "hunkOffsets": [
+              {
+                "declaredOldStart": 4,
+                "appliedOldStart": 4,
+                "offset": 0
+              }
+            ],
+            "crossSessionOverlap": null,
+            "acknowledgedOverlap": null,
+            "currentFileHash": "sha256:11496c3c5cc2cdb74d1ebb238c038088fbea2dd4416860545be27366e75f9934",
+            "batchSize": 1,
+            "attempt": 1,
+            "retryCount": 0,
+            "hashDriftCount": 0,
+            "writeToCommitMs": 286,
+            "commit": {
+              "gitIndexLockWaitMs": 0,
+              "headMoves": 0
+            },
+            "planRequired": false,
+            "cli": "@ai-atomic-framework/cli@0.1.21",
+            "entry": "broker steward apply-live"
+          },
+          {
+            "schema": "prereg-v3-smoke.stewardWrite.v1",
+            "ok": true,
+            "decision": "accepted",
+            "reasonCode": null,
+            "messageCode": "ATM_BROKER_LIVE_WRITE_APPLIED",
+            "verdict": "applied",
+            "phase": "commit",
+            "terminal": "committed",
+            "stopReason": null,
+            "proposalId": "prop-stub-fixture-session-one-slot-1-a1-5341c925595c",
+            "taskId": "fixture-session-one",
+            "actorId": "stub-fixture-session-one-slot-1",
+            "sessionSlot": "1",
+            "file": "shared.py",
+            "declaredBaseHash": "sha256:8ae027facacbe9c7f1128bf296b6bdcb6bef0f820593ded0435c7e15d98a9f3c",
+            "hunkOffsets": [
+              {
+                "declaredOldStart": 2,
+                "appliedOldStart": 2,
+                "offset": 0
+              }
+            ],
+            "crossSessionOverlap": null,
+            "acknowledgedOverlap": null,
+            "currentFileHash": "sha256:d1579c254e2e5df7f428422f941868c7dd2d147288d7e967e708aae3583515cc",
+            "batchSize": 1,
+            "attempt": 1,
+            "retryCount": 0,
+            "hashDriftCount": 0,
+            "writeToCommitMs": 295,
+            "commit": {
+              "gitIndexLockWaitMs": 0,
+              "headMoves": 0
+            },
+            "planRequired": false,
+            "cli": "@ai-atomic-framework/cli@0.1.21",
+            "entry": "broker steward apply-live"
+          }
+        ]
+      },
+      "tests": [
+        {
+          "instanceId": "fixture-session-one",
+          "exitCode": 0,
+          "passed": 2,
+          "failed": 0,
+          "notSeen": 0,
+          "tests": [
+            {
+              "label": "fixture.tests.MarkerTests.test_session_one",
+              "status": "pass"
+            },
+            {
+              "label": "fixture.tests.MarkerTests.test_untouched",
+              "status": "pass"
+            }
+          ],
+          "outputTail": "fixture.tests.MarkerTests.test_session_one ... ok\nfixture.tests.MarkerTests.test_untouched ... ok\n",
+          "kitError": null,
+          "failToPass": {
+            "denominator": 1,
+            "passed": 1,
+            "failed": 0,
+            "notSeen": 0
+          },
+          "passToPass": {
+            "denominator": 1,
+            "passed": 1,
+            "failed": 0,
+            "notSeen": 0
+          }
+        },
+        {
+          "instanceId": "fixture-session-two",
+          "exitCode": 0,
+          "passed": 2,
+          "failed": 0,
+          "notSeen": 0,
+          "tests": [
+            {
+              "label": "fixture.tests.MarkerTests.test_session_two",
+              "status": "pass"
+            },
+            {
+              "label": "fixture.tests.MarkerTests.test_untouched",
+              "status": "pass"
+            }
+          ],
+          "outputTail": "fixture.tests.MarkerTests.test_session_two ... ok\nfixture.tests.MarkerTests.test_untouched ... ok\n",
+          "kitError": null,
+          "failToPass": {
+            "denominator": 1,
+            "passed": 1,
+            "failed": 0,
+            "notSeen": 0
+          },
+          "passToPass": {
+            "denominator": 1,
+            "passed": 1,
+            "failed": 0,
+            "notSeen": 0
+          }
+        }
+      ]
+    }
+  }
+}
