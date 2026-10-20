@@ -41,3 +41,28 @@ Both validators pass locally. ATM: TASK-PRF-0136 imported and claimed (lane lane
 - The `taskflow close --write` run was interrupted after phase `ledger-written`: the ledger said done, the bundle was partly staged, no commit was made, and the owner pid was gone. A rerun was blocked by `ATM_PLANNING_SOURCE_IDENTITY_DRIFT`, because close had already appended its metadata to the md. With the sealed md restored, the planner instead offered a planning-mirror re-import, which would have conflicted with the done ledger. I took neither path, so there was no double close.
 - Finished the commit step through ATM's own surfaces. `atm git commit --task TASK-PRF-0138` created 6eeb4ce70 with the 9 ledger, event, bundle and closure files, carrying the sealed receipt's ATM-Seal-Digest/Manifest/Target-Head-Before trailers and an ATM-Close-Recovery trailer. `atm git record-commit` created 9a6f1699e for the seal-and-commit receipt.
 - .atm/task-plans/TASK-PRF-0138.md (the closed mirror) is left untracked: the governed commit surfaces refuse it after close, and I did not commit it with raw git.
+
+# #362: per-line EOL preservation (branch fix/362-eol-preserving-patch)
+
+## 2026-10-20 06:50 Asia/Taipei — start
+- Base: main 119158900 (PR #370 merged). Codex is logged in on the box and GH_ATM_PUSH_TOKEN is set.
+- ATM: TASK-PRF-0139 imported and claimed (grok-bot, lane lane-20261019224956-grok-bot-70b5fb0cd6). Its scope includes the leftover closed card .atm/task-plans/TASK-PRF-0138.md.
+
+## 2026-10-20 (Asia/Taipei) — #362 source + tests milestone
+- unified-patch.ts: split on LF only, each line keeps its CR; CR-sensitive context (git-exact); headers/markers tolerate a trailing CR; patches carrying CR applied verbatim; CR-free pure insertions follow the neighbouring line's EOL (documented divergence from git apply).
+- steward-base-composer.ts uses the same new-side rule (newSideLineTexts).
+- Updated old CRLF-normalisation assertions (application L105, locator L51, validate-broker-cowrite CRLF fixture) to CR-carrying patches plus LF-patch refusal checks.
+- New tests/cli/unified-patch-eol.test.ts incl. seeded git-apply differential (own base + EOL-flipped base): 711 equal, 579 both-refuse, 0 divergences.
+- Kit generated copy regenerated; 8 CR parity cases added (447 cases ok).
+- Codex read-only review (567,530 in / 511,104 cached / 6,140 out): fixed 2 regressions it found — a CR anywhere in a body line now marks the patch CR-aware (was endsWith only), and a bare CR on an unterminated final line is no longer copied as an EOL by pure insertions. 4 pre-existing issues (EOF-insertion marker, per-hunk marker validation, region-fallback marker bypass, relocated-offset not carried to later pure insertions) left out of scope for follow-up issues.
+- 0138 card committed under TASK-PRF-0139 via governed `atm git commit` (0ca7b168d) after `tasks renew` (ticket had expired).
+- Clean sweep at 0ca7b168d: PASS (plus unified-patch-eol in the sweep worktree).
+- BLOCKED: `taskflow close` for TASK-PRF-0139 is refused with ATM_CLOSE_WINDOW_STAGED_INDEX_LOCKED: the staged-index lock is still held by the interrupted TASK-PRF-0138 close (acquired 2026-10-20 01:18 Asia/Taipei, close transaction stuck at phase ledger-written). No governed release surface exists; manual .atm edits are forbidden. Awaiting user decision; PR not opened yet.
+
+## 2026-10-20 07:27 (Asia/Taipei) — one-time manual close-window lock recovery
+- Approved by the user (文一) in chat; approval relayed 2026-10-20 07:27 Asia/Taipei.
+- Original holder: TASK-PRF-0138 (actor grok-bot), lock acquired 2026-10-20 01:18:45 Asia/Taipei (2026-10-19T17:18:45.018Z); its close transaction was interrupted and stuck at phase `ledger-written` (outcome in-progress).
+- The 0138 close had already been completed with governed commits 6eeb4ce70 (`atm git commit --task TASK-PRF-0138`, ATM-Close-Recovery) and 9a6f1699e (`atm git record-commit`, seal receipt).
+- Backup of the original: /workspace/close-window-staged-index.lock.TASK-PRF-0138.20261020T072724+0800.json (box).
+- Exact edit, in `.atm/runtime/locks/close-window-staged-index.lock.json` only (gitignored runtime file; no other `.atm` file touched):
+  `"status": "active"` → `"released"`, `"releasedAt": null` → `"2026-10-19T23:27:24.000Z"`, `"releaseOutcome": null` → `"aborted"`.

@@ -1,0 +1,86 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-10-19T23-29-45-009Z-close-73bde9273584",
+  "taskId": "TASK-PRF-0139",
+  "action": "close",
+  "actorId": "grok-bot",
+  "sessionId": "session-20261019224956-grok-bot-TASK-PRF-0139-b7dd53f78e",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0139.json",
+  "taskSha256": "sha256:2b51987c6d972786bf62b4a9b99591eea93825e6bd1b6b1502814f6db028add4",
+  "createdAt": "2026-10-19T23:29:45.009Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0139 --actor grok-bot --status done --historical-delivery 78e71236a6678352c7af254ad8e0d08e894539cf --historical-delivery ccf6bd54b411d6e35d18c8885c44311f0014389d",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20261019224956-grok-bot-TASK-PRF-0139-b7dd53f78e",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0139.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "bash research/paper-v2/prereg-v3-smoke/kit/test/test-hunk-locator-parity.sh",
+      "node --strip-types tests/cli/unified-patch-application.test.ts",
+      "node --strip-types tests/cli/unified-patch-eof-newline.test.ts",
+      "node --strip-types tests/cli/unified-patch-eol.test.ts",
+      "node --strip-types tests/cli/unified-patch-locator.test.ts",
+      "node --strip-types tests/core/live-queued-write.test.ts"
+    ],
+    "requiredGates": [
+      "bash research/paper-v2/prereg-v3-smoke/kit/test/test-hunk-locator-parity.sh",
+      "node --strip-types tests/cli/unified-patch-application.test.ts",
+      "node --strip-types tests/cli/unified-patch-eof-newline.test.ts",
+      "node --strip-types tests/cli/unified-patch-eol.test.ts",
+      "node --strip-types tests/cli/unified-patch-locator.test.ts",
+      "node --strip-types tests/core/live-queued-write.test.ts"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-10-19T23:29:45.000Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0139.*",
+        ".atm/history/task-events/TASK-PRF-0139/**",
+        ".atm/history/tasks/TASK-PRF-0139.json",
+        ".atm/task-plans/TASK-PRF-0138.md",
+        ".atm/task-plans/TASK-PRF-0139.md",
+        "packages/cli/dist",
+        "packages/cli/dist/**",
+        "packages/core/src/broker/**",
+        "packages/core/src/broker/unified-patch.ts",
+        "packages/core/src/live-write/**",
+        "PROGRESS.md",
+        "release/atm-onefile/**",
+        "release/atm-root-drop/**",
+        "research/paper-v2/prereg-v3-smoke/kit/**",
+        "research/paper-v2/prereg-v3-smoke/kit/bin/unified-patch.generated.mjs",
+        "scripts/**",
+        "tests/cli/**",
+        "tests/cli/unified-patch-eol.test.ts",
+        "tests/core/**"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/dist",
+        "packages/cli/dist/**",
+        "packages/core/src/broker/**",
+        "packages/core/src/broker/unified-patch.ts",
+        "packages/core/src/live-write/**",
+        "scripts/**",
+        "tests/cli/**",
+        "tests/cli/unified-patch-eol.test.ts",
+        "tests/core/**"
+      ],
+      "requiredGates": [
+        "bash research/paper-v2/prereg-v3-smoke/kit/test/test-hunk-locator-parity.sh",
+        "node --strip-types tests/cli/unified-patch-application.test.ts",
+        "node --strip-types tests/cli/unified-patch-eof-newline.test.ts",
+        "node --strip-types tests/cli/unified-patch-eol.test.ts",
+        "node --strip-types tests/cli/unified-patch-locator.test.ts",
+        "node --strip-types tests/core/live-queued-write.test.ts"
+      ]
+    }
+  }
+}

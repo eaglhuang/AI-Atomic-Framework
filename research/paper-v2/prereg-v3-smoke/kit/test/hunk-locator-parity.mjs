@@ -48,6 +48,15 @@ add('eof no newline', 'pad\na\nb', '@@ -1 +1 @@\n-b\n\\ No newline at end of fil
 add('eof marker not at eof (old side)', 'b\na\nb', '@@ -1 +1 @@\n-b\n\\ No newline at end of file\n+B\n');
 add('eof marker not at eof (new side)', 'a\nb\nc\n', '@@ -1 +1 @@\n-a\n+A\n\\ No newline at end of file\n');
 add('crlf', 'pad\r\na\r\nb\r\n', '@@ -1 +1 @@\n-b\n+B\n');
+// #362: per-line EOL preservation, CR-sensitive context, CRLF-saved patches.
+add('crlf-patch-on-crlf', 'pad\r\na\r\nb\r\n', '@@ -3 +3 @@\n-b\r\n+B\r\n');
+add('mixed-edit-lf-part', 'a\r\nb\nc\n', '@@ -3 +3 @@\n-c\n+C\n');
+add('mixed-edit-crlf-part', 'a\nb\r\nc\n', '@@ -2 +2 @@\n-b\r\n+B\r\n');
+add('lf-file-crlf-added-line', 'a\nb\n', '@@ -1 +1,2 @@\n a\n+X\r\n');
+add('crlf-file-lf-context', 'a\r\nb\r\nc\r\n', '@@ -1,3 +1,3 @@\n a\n-b\n+B\n c\n');
+add('crlf-file-lf-pure-insertion', 'a\r\nb\r\n', '@@ -1,0 +2 @@\n+X\n');
+add('crlf-saved-patch', 'a\r\nb\r\n', '--- a/f\r\n+++ b/f\r\n@@ -1,2 +1,2 @@\r\n a\r\n-b\r\n+B\r\n');
+add('crlf-no-final-newline', 'a\r\nb', '@@ -2 +2 @@\n-b\n\\ No newline at end of file\n+b\r\n');
 add('-U0 insert', 'a\nb\nc\nd\n', '@@ -3,0 +4 @@\n+insert\n');
 add('-U0 top', 'a\n', '@@ -0,0 +1 @@\n+top\n');
 add('-U0 past end', 'a\n', '@@ -5,0 +6 @@\n+x\n');

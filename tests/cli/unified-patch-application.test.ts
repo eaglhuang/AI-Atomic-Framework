@@ -102,7 +102,9 @@ assert.equal(UNIFIED_PATCH_APPLICATION_SCHEMA_ID, 'atm.unifiedPatchApplication.v
 
 {
   assert.equal(applyUnifiedPatch('one\ntwo', '@@ -1,1 +1,1 @@\n-one\n+ONE\n'), 'ONE\ntwo', 'a file without a trailing newline must not gain one');
-  assert.equal(applyUnifiedPatch('one\r\ntwo\r\n', '@@ -1,1 +1,1 @@\n-one\n+ONE\n'), 'ONE\r\ntwo\r\n', 'CRLF files must keep CRLF');
+  assert.equal(applyUnifiedPatch('one\r\ntwo\r\n', '@@ -1,1 +1,1 @@\n-one\r\n+ONE\r\n'), 'ONE\r\ntwo\r\n', 'CRLF files must keep CRLF');
+  // #362: a CR-only difference is a context mismatch, as with git apply.
+  assert.throws(() => applyUnifiedPatch('one\r\ntwo\r\n', '@@ -1,1 +1,1 @@\n-one\n+ONE\n'), (error: unknown) => error instanceof UnifiedPatchApplicationError && error.reason === 'context-not-found', 'an LF patch must not match CRLF lines');
   assert.equal(applyUnifiedPatch('one\n\nthree\n', '@@ -3,1 +3,1 @@\n-three\n+THREE\n'), 'one\n\nTHREE\n', 'blank source lines must not shift the cursor');
 }
 

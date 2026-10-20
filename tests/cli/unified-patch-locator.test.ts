@@ -48,7 +48,8 @@ assert.equal(applyUnifiedPatch('a\nb\nb\nc\n', replace(2, 'b', 'B')), 'a\nB\nb\n
 }
 const marker = '\\ No newline at end of file';
 assert.equal(applyUnifiedPatch('pad\na\nb', `@@ -1 +1 @@\n-b\n${marker}\n+B\n${marker}\n`), 'pad\na\nB');
-assert.equal(applyUnifiedPatch('pad\r\na\r\nb\r\n', replace(1, 'b', 'B')), 'pad\r\na\r\nB\r\n');
+assert.equal(applyUnifiedPatch('pad\r\na\r\nb\r\n', replace(1, 'b\r', 'B\r')), 'pad\r\na\r\nB\r\n');
+fails(() => applyUnifiedPatch('pad\r\na\r\nb\r\n', replace(1, 'b', 'B')), 'context-not-found');
 // Paper-draft row 2: an earlier writer inserted one line above the second edit.
 const draft = applyUnifiedPatch('title\nrow 2\nend\n', '@@ -0,0 +1 @@\n+intro\n');
 const row2 = applyUnifiedPatchDetailed(draft, replace(2, 'row 2', 'row 2 revised'));

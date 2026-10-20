@@ -1,5 +1,5 @@
 import { rebaseProposalsByRegionIdentity } from './steward-region-rebase.js';
-import { eofMarkerViolation, eofNewlineDecision, locateUnifiedPatchHunks, joinSourceText, parseUnifiedPatchHunks, resolveEofNewline, splitSourceText } from './unified-patch.js';
+import { eofMarkerViolation, eofNewlineDecision, locateUnifiedPatchHunks, newSideLineTexts, patchCarriesCr, joinSourceText, parseUnifiedPatchHunks, resolveEofNewline, splitSourceText } from './unified-patch.js';
 /** Exhaustive permutation checks stay cheap up to this many proposals per file. */
 const MAX_EXHAUSTIVE_PERMUTATION_PROPOSALS = 4;
 export function composeTextPatchesAgainstBase(filePath, before, proposals) {
@@ -79,12 +79,17 @@ function resolveProposalEdit(proposal, baseLines, fileEndsWithNewline) {
     const markerError = eofMarkerViolation(located, baseLines.length);
     if (markerError)
         return { detail: `proposal '${proposal.proposalId}' ${markerError}` };
+    const carriesCr = patchCarriesCr(located.map(({ hunk }) => hunk));
     for (const { hunk, index } of located) {
         let cursor = index;
+        const newSide = newSideLineTexts(hunk, baseLines, index, carriesCr, fileEndsWithNewline);
+        let newIndex = 0;
         for (const entry of hunk.lines) {
+            if (entry.marker !== '-')
+                newIndex += 1;
             if (entry.marker === '+') {
                 const gap = inserts.get(cursor) ?? [];
-                gap.push(entry.text);
+                gap.push(newSide[newIndex - 1]);
                 inserts.set(cursor, gap);
                 continue;
             }
