@@ -523,6 +523,8 @@ async function runTaskflowClose(parsed, cwd, surface = 'close') {
                 throw new CliError(closeWindowLock.blockedCode ?? 'ATM_CLOSE_WINDOW_STAGED_INDEX_BLOCKED', closeWindowLock.blockedSummary ?? 'Close window staged-index lock could not be acquired.', { exitCode: 1, details: { taskId, actorId, closeWindowLock, deferForeignStagedCommand: `node atm.mjs taskflow close --task ${taskId} --actor ${quoteCliValue(actorId)} --defer-foreign-staged --write --json` } });
             }
             const preCloseStagedFiles = readStagedFiles(cwd);
+            const closeRecoveryLane = await import('./close-recovery.js');
+            closeRecoveryLane.persistCloseRecoverySnapshot({ cwd, taskId, actorId, snapshot: { taskPath: taskLedgerPath, previousTaskContent, transitionPath: null, closurePacketPath: null, closeCommitWindowPath: null, closeWindowStagedIndexLockActive: closeWindowLock?.ok === true, planningCard: planningCardSnapshot, stagedArtifacts: [], preCloseStagedFiles } });
             const preCloseDeliveryCommit = await commitTaskflowDeliveryFiles({ bundle: previewCommitBundle, actorId, taskId, deferForeignStaged });
             const effectiveHistoricalDeliveryRefs = preCloseDeliveryCommit?.commitSha ? uniqueSorted([...historicalDeliveryRefs, preCloseDeliveryCommit.commitSha]) : historicalDeliveryRefs;
             const backendArgv = buildCloseBackendArgv({ cwd, taskId,
@@ -539,6 +541,7 @@ async function runTaskflowClose(parsed, cwd, surface = 'close') {
                 closeWindowStagedIndexLockActive: closeWindowLock?.ok === true, preCloseStagedFiles });
             const planningCardCloseback = closebackPlan.backendSurface === 'tasks-close' && backendResult.ok ? applyPlanningCardCloseback({ cwd, planningMirrorPath: closebackPlan.writerBoundary.planningMirrorPath, actorId, historicalDeliveryRefs: effectiveHistoricalDeliveryRefs }) : null;
             const rollbackSnapshotWithPlanning = planningCardCloseback?.transitionPath && rollbackSnapshot.planningCard ? { ...rollbackSnapshot, planningCard: { ...rollbackSnapshot.planningCard, transitionPath: planningCardCloseback.transitionPath }, stagedArtifacts: [...rollbackSnapshot.stagedArtifacts, planningCardCloseback.transitionPath] } : rollbackSnapshot;
+            closeRecoveryLane.persistCloseRecoverySnapshot({ cwd, taskId, actorId, snapshot: rollbackSnapshotWithPlanning });
             let rosterCloseback = null;
             const closeMessages = [];
             const planningRosterPaths = closebackPlan.writerBoundary.rosterClosebackCommand && closebackPlan.writerBoundary.rosterIndexPath && closebackPlan.writerBoundary.planningMirrorPath ? resolvePlanningRosterPaths({ cwd, planningMirrorPath: closebackPlan.writerBoundary.planningMirrorPath, rosterIndexPath: closebackPlan.writerBoundary.rosterIndexPath }) : null;
@@ -571,6 +574,7 @@ async function runTaskflowClose(parsed, cwd, surface = 'close') {
             const { bundle: governedCommitBundle, transaction: closeWriteTransaction } = backendResult.ok ? await executeCloseWriteCommitPhase({ cwd, taskId, actorId, snapshot: rollbackSnapshotWithPlanning, commit: () => finalizeTaskflowCommitBundle({ bundle: commitBundleInput, actorId,
                     taskId }) }) : { bundle: commitBundleInput, transaction: { schemaId: 'atm.closeWriteTransaction.v1', taskId, phase: 'pending', ok: false, failureStep: 'backend-close', failureCode: 'ATM_TASKFLOW_CLOSE_WRITE_FAILED', failureReason: 'backend close did not complete', rolledBackArtifacts: [], recoveryCommand: diagnosis.nextCommand, backendCloseApplied: false, commitBundleApplied: false } };
             const writeOk = backendResult.ok && closeWriteTransaction.ok && !governedCommitBundle.failClosed;
+            closeRecoveryLane.recordCloseWriteOutcome({ cwd, taskId, outcome: writeOk ? 'completed' : closeWriteTransaction.phase === 'rolled_back' ? 'rolled-back' : 'failed', failure: writeOk ? null : closeWriteTransaction.failureReason ?? null });
             const brokerRuntimeCleanup = writeOk ? clearBrokerRuntimeStateForTask({ cwd, taskId }).runtimeCleanup ?? null : null;
             const residueAdvisory = writeOk ? buildTaskflowCloseResidueAdvisory(enrichedDiagnosis) : null;
             if (residueAdvisory) {
@@ -625,7 +629,10 @@ export async function runTaskflow(argv = []) {
         if (!taskId)
             throw new CliError('ATM_CLI_USAGE', 'taskflow status requires --task <id>.', { exitCode: 2 });
         const status = readCloseTransactionStatus(cwd, taskId);
-        return { ...makeResult({ ok: true, command: 'taskflow status', cwd, mode: 'read-only', messages: [message(status ? 'info' : 'warn', status ? 'ATM_TASKFLOW_CLOSE_STATUS_READ' : 'ATM_TASKFLOW_CLOSE_STATUS_MISSING', status ? `Close transaction status found for ${taskId}.` : `No close transaction status receipt found for ${taskId}.`, { taskId, status })], evidence: { taskId, closeTransactionStatus: status } }), schemaId: 'atm.taskflowCloseStatusResult.v1', writeEnabled: false };
+        return { ...makeResult({ ok: true, command: 'taskflow status', cwd, mode: 'read-only', messages: [message(status ? 'info' : 'warn', status ? 'ATM_TASKFLOW_CLOSE_STATUS_READ' : 'ATM_TASKFLOW_CLOSE_STATUS_MISSING', status ? `Close transaction status found for ${taskId}.` : `No close transaction status receipt found for ${taskId}.`, { taskId, status })], evidence: { taskId, closeTransactionStatus: status, closeRecovery: (await import('./close-recovery.js')).inspectCloseRecovery({ cwd, taskId }) } }), schemaId: 'atm.taskflowCloseStatusResult.v1', writeEnabled: false };
+    }
+    if (action === 'close' && (parsed.options.recover || parsed.options.abort)) {
+        return (await import('./close-recovery.js')).runTaskflowCloseRecovery(parsed, cwd);
     }
     if (action === 'close') {
         return runTaskflowClose(parsed, cwd, 'close');

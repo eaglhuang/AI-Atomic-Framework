@@ -32,7 +32,10 @@ export default defineCommandSpec({
         { flag: '--defer-foreign-state', summary: 'Alias for --defer-foreign-staged plus --defer-governance-dirty.' },
         { flag: '--auto-evidence', summary: 'For taskflow close --write: auto-run missing task-card declared validators through evidence run before backend close. Dry-run and pre-close always expose autoEvidencePlan when --actor is supplied; --validators on evidence run remains an override for extra evidence.' },
         { flag: '--emergency-approval', value: 'leaseId', summary: 'For taskflow close: forward a human-approved protected backend lease when the orchestrator must perform stale-runner recovery.' },
-        { flag: '--reason', value: 'text', summary: 'Required explanation for --waiver-out-of-scope-delivery.' },
+        { flag: '--reason', value: 'text', summary: 'Required explanation for --waiver-out-of-scope-delivery; recorded in the recovery receipt for --recover/--abort.' },
+        { flag: '--recover', summary: 'For taskflow close: recover an interrupted close whose holder is gone. Marks a landed close completed, or rolls a consistent staged close forward through the governed commit, then releases the close-window lock. Dry-run unless --write.' },
+        { flag: '--abort', summary: 'For taskflow close: abort an interrupted close whose holder is gone. Unstages and archives the close artifacts, restores the ledger and planning card, and releases the close-window lock with a recovery receipt. Refused once the close landed. Dry-run unless --write.' },
+        { flag: '--stale-after-ms', value: 'ms', summary: 'For taskflow close --recover/--abort: how old a close-window lock without a live holder lease must be before it is treated as stale (default 120000).' },
         commonJsonOption,
         commonPrettyOption,
         commonHelpOption
@@ -50,6 +53,8 @@ export default defineCommandSpec({
         'node atm.mjs taskflow close --task TASK-ADOPTER-0001 --actor codex-main --historical-batch hist-batch-2026-06-16T10-00-00-000Z --write --json',
         'node atm.mjs taskflow close --task TASK-ADOPTER-0001 --actor codex-main --defer-foreign-staged --write --json',
         'node atm.mjs taskflow close --task TASK-ADOPTER-0001 --actor codex-main --defer-foreign-state --write --json',
+        'node atm.mjs taskflow close --task TASK-ADOPTER-0001 --actor codex-main --recover --json',
+        'node atm.mjs taskflow close --task TASK-ADOPTER-0001 --actor codex-main --abort --reason "close process died mid-transaction" --write --json',
         'node atm.mjs taskflow status --task TASK-ADOPTER-0001 --json'
     ],
     help: {

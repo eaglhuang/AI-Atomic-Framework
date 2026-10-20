@@ -10,14 +10,14 @@ export interface AtomicMapHashInput {
 export declare function createAtomicMapHashPayload(input: AtomicMapHashInput): {
     replacement?: {
         legacyUris: string[];
-    } | undefined;
+    };
     members: {
-        role?: string | undefined;
+        role?: string;
         atomId: string;
         version: string;
     }[];
     edges: {
-        edgeKind?: string | undefined;
+        edgeKind?: string;
         from: string;
         to: string;
         binding: string;

@@ -19,6 +19,7 @@ import { resolvePlanningPathFromStored } from '../planning-repo-root.ts';
 import { quoteCliValue } from '../shared.ts';
 import { evaluateTaskWorkAdmissionGate } from '../git-governance/work-admission-check.ts';
 import { inspectCloseWindowStagedIndexAdmission } from '../tasks/close-window-lock.ts';
+import { closeRecoveryCommand, inspectCloseHolderLiveness } from '../tasks/close-holder-liveness.ts';
 import { evaluateAcceptanceEvidenceClosureGate } from '../tasks/close-orchestrator/acceptance-evidence-gate.ts';
 import { evaluateTaskflowTelemetryObligationGate } from './telemetry-obligation-close-gate.ts';
 
@@ -279,7 +280,11 @@ export function buildTaskflowCloseWriteReadinessHint(input: {
       ? closeWindowAdmission.residueDrainCommand ?? null
       : closeWindowAdmission.blockedCode === 'ATM_CLOSE_WINDOW_FOREIGN_STAGED_TASKS'
         ? `node atm.mjs taskflow close --task ${input.taskId} --actor ${quoteCliValue(input.actorId || '<actor>')} --defer-foreign-staged --write --json`
-        : closeWindowAdmission.lock?.taskId ? `node atm.mjs tasks status --task ${closeWindowAdmission.lock.taskId} --json` : null,
+        : closeWindowAdmission.lock?.taskId
+          ? (inspectCloseHolderLiveness({ cwd: input.cwd, taskId: closeWindowAdmission.lock.taskId, lockAcquiredAt: closeWindowAdmission.lock.acquiredAt }).alive
+            ? `node atm.mjs tasks status --task ${closeWindowAdmission.lock.taskId} --json`
+            : closeRecoveryCommand(closeWindowAdmission.lock.taskId, 'recover'))
+          : null,
     files: closeWindowAdmission.unexpectedStagedTasks.flatMap((entry) => entry.stagedFiles)
   });
 

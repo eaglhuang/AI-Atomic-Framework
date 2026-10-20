@@ -8,6 +8,7 @@ import { buildDependencyCloseoutRecoveryCommand, formatDependencyCloseoutBlocked
 import { findTaskClaimDependencyBlockers } from './dependency-gates.js';
 import { evaluateTaskClaimAdmission } from './lifecycle-state.js';
 import { CliError, makeResult, message, relativePathFrom, resolveValue } from '../shared.js';
+import { assertRenewAllowedForCloseState } from './renew-close-guard.js';
 import { normalizeWorkItemStatus } from './task-transition-helpers.js';
 import { writeTaskDocumentWithTransition } from './close-helpers/task-transition-writer.js';
 import { taskPathFor } from './task-file-io-helpers.js';
@@ -235,6 +236,8 @@ export async function runTasksClaimLifecycle(action, argv) {
             }
         });
     }
+    if (action === 'renew')
+        assertRenewAllowedForCloseState({ cwd: options.cwd, taskId: options.taskId, actorId, status: String(taskDocument.status ?? ''), relativeTaskPath: relativePathFrom(options.cwd, taskPath) }); // #373
     if (!currentClaim) {
         throw new CliError('ATM_TASK_CLAIM_MISSING', `Task ${options.taskId} has no active claim record.`, {
             exitCode: 1,
