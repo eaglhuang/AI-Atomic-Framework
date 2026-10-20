@@ -110,6 +110,7 @@ EOF
     "HOME=/var/lib/${SESSION_USER}" \
     "TMPDIR=/tmp" \
     "PREREG_STEWARD_SOCK=${PREREG_STEWARD_SOCK}" \
+    "PREREG_SESSION_BASE_COMMIT=$(git -c safe.directory='*' -C "$root" rev-parse HEAD)" \
     LANG=C.UTF-8 \
     "$HERE/bin/atm-write" shared.py "$patch" --actor session-b --task fixture-b --cwd "$root"
 
@@ -244,6 +245,7 @@ PY
     "HOME=${scratch}" \
     "TMPDIR=${scratch}" \
     "PREREG_STEWARD_SOCK=${PREREG_STEWARD_SOCK}" \
+    "PREREG_SESSION_BASE_COMMIT=$(git -c safe.directory='*' -C "$SANDBOX_REPO" rev-parse HEAD)" \
     LANG=C.UTF-8 \
     "$HERE/bin/atm-write" shared.py "$patch" --actor session-b --task fixture-b --cwd "$SANDBOX_REPO" \
     >"$scratch/atm-write.out" 2>"$scratch/atm-write.err"

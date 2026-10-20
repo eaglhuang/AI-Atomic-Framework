@@ -113,12 +113,16 @@ EOF
 
 START_MS="$(date +%s%3N)"
 pids=()
+# 兩個工作階段都從同一個啟動 commit 開始；atm-write 沒有回覆紀錄時用它宣告 base（#363）。
+SESSION_BASE_COMMIT="$(/usr/bin/git -c safe.directory='*' -C "$WORK" rev-parse HEAD)"
+[ -n "$SESSION_BASE_COMMIT" ] || { echo "無法讀取工作樹 HEAD：$WORK" >&2; exit 1; }
 for slot in 1 2; do
   instance="${IDS[$((slot - 1))]}"
   session="$ARM_DIR/session-$slot"
   write_prompt "$slot" "$session/prompt.txt" "$instance"
   PREREG_INSTANCE_ID="$instance" \
   PREREG_SESSION_SLOT="$slot" \
+  PREREG_SESSION_BASE_COMMIT="$SESSION_BASE_COMMIT" \
   PREREG_WORK="$WORK" \
     launch_codex "$session" "$session/prompt.txt" "$WORK" &
   pids+=("$!")

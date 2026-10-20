@@ -89,7 +89,7 @@ EOF
 prepare_repo "$BASE/noop"
 before="$(git -C "$BASE/noop" rev-parse HEAD)"
 set +e
-FAKE_CLI_MODE=noop node "$HERE/bin/atm-write.mjs" note.txt "$BASE/noop.diff" --cwd "$BASE/noop" >"$BASE/noop.json"
+PREREG_SESSION_BASE_COMMIT="$before" FAKE_CLI_MODE=noop node "$HERE/bin/atm-write.mjs" note.txt "$BASE/noop.diff" --cwd "$BASE/noop" >"$BASE/noop.json"
 noop_status=$?
 set -e
 python3 - "$BASE/noop.json" "$noop_status" "$BASE/noop/note.txt" "$before" "$BASE/noop" <<'PY'
@@ -112,7 +112,7 @@ PY
 
 prepare_repo "$BASE/apply"
 set +e
-FAKE_CLI_MODE=apply node "$HERE/bin/atm-write.mjs" note.txt "$BASE/noop.diff" --cwd "$BASE/apply" >"$BASE/apply.json"
+PREREG_SESSION_BASE_COMMIT="$(git -C "$BASE/apply" rev-parse HEAD)" FAKE_CLI_MODE=apply node "$HERE/bin/atm-write.mjs" note.txt "$BASE/noop.diff" --cwd "$BASE/apply" >"$BASE/apply.json"
 apply_status=$?
 set -e
 python3 - "$BASE/apply.json" "$apply_status" "$BASE/apply" <<'PY'

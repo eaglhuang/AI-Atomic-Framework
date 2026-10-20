@@ -18,7 +18,6 @@ import {
   UnifiedPatchApplicationError,
   hunkOffsetsOf,
   locateUnifiedPatchHunks,
-  locatedLineIndexes,
   parseUnifiedPatch,
   splitSourceText
 } from './unified-patch.generated.mjs';
@@ -73,6 +72,7 @@ async function runStewardClient() {
     file: fileArg,
     patch,
     sessionSlot,
+    sessionBaseCommit: argValue('--session-base-commit') || process.env.PREREG_SESSION_BASE_COMMIT || null,
     actor: argValue('--actor') || process.env.ATM_ACTOR || 'prereg-session',
     task: argValue('--task') || process.env.ATM_TASK || 'prereg',
     message: argValue('--message') || 'prereg-v3-smoke',
@@ -199,9 +199,6 @@ const config = loadConfig(invokedCwd);
 const writableRoot = path.resolve(config.writableRoot || invokedCwd);
 const cli = config.cli;
 const safePath = config.safePath || '/usr/bin:/bin';
-if (!cli || !existsSync(cli) || cliVersion(cli, safePath) !== '0.1.21') {
-  fail('cli-unavailable', `公開 CLI ${CLI_PACKAGE} 不可用。中止寫入。沒有 claim 退路。`, { cli: cli || null });
-}
 
 const relativeFile = fileArg.replace(/\\/g, '/').replace(/^\.\//, '');
 const targetPath = path.resolve(writableRoot, relativeFile);
@@ -226,6 +223,7 @@ const result = submitLive({
   taskId,
   message,
   baseFile,
+  sessionBaseCommit: argValue('--session-base-commit') || process.env.PREREG_SESSION_BASE_COMMIT || null,
   patch,
   attempt,
   targetPath,
@@ -264,87 +262,79 @@ function locateIn(text, hunks) {
   }
 }
 
-function intersects(left, right) {
-  if (!left?.length || !right?.length) return false;
-  const set = new Set(left);
-  return right.some((value) => set.has(value));
-}
-
-function readJournal(repo) {
-  const file = path.join(repo, '.atm', 'runtime', 'live-write-journal.jsonl');
-  if (!existsSync(file)) return [];
-  const entries = [];
-  for (const line of readFileSync(file, 'utf8').split('\n')) {
-    if (!line.trim()) continue;
-    try {
-      entries.push(JSON.parse(line));
-    } catch {
-      // 壞掉的一列不能拿來判斷 base。
+/** 宣告只來自 session 看過的內容，與 patch 能否定位無關。 */
+function sessionBase(input) {
+  if (input.baseFile) {
+    const bytes = readFileSync(path.resolve(input.baseFile));
+    return { hash: sha256Bytes(bytes), text: bytes.toString('utf8') };
+  }
+  const seenPath = path.join(input.writableRoot, '.prereg-smoke', 'session-seen.jsonl');
+  if (existsSync(seenPath)) {
+    for (const line of readFileSync(seenPath, 'utf8').split('\n').reverse()) {
+      if (!line.trim()) continue;
+      let entry;
+      try {
+        entry = JSON.parse(line);
+      } catch {
+        continue;
+      }
+      if (entry.actorId !== input.actorId || entry.sessionSlot !== sessionSlot || entry.file !== input.relativeFile) continue;
+      if (entry.seenHash) return { hash: entry.seenHash, text: textAtHash(input, entry.seenHash) };
+      break;
     }
   }
-  return entries;
-}
-
-function historicalFileHashes(repo, relativeFile, safePath) {
-  const listed = gitText(repo, ['rev-list', 'HEAD', '--', relativeFile], safePath);
-  if (listed.status !== 0) return [];
-  const found = [];
-  const seen = new Set();
-  for (const sha of listed.stdout.split('\n').map((item) => item.trim()).filter(Boolean)) {
-    const blob = gitBuffer(repo, ['cat-file', '-p', `${sha}:${relativeFile}`], safePath);
-    if (blob.status !== 0 || !blob.stdout) continue;
-    const hash = sha256Bytes(blob.stdout);
-    if (seen.has(hash)) continue;
-    seen.add(hash);
-    found.push({ hash, text: blob.stdout.toString('utf8') });
+  if (input.sessionBaseCommit) {
+    const blob = gitBuffer(input.writableRoot, ['cat-file', '-p', `${input.sessionBaseCommit}:${input.relativeFile}`], input.safePath);
+    if (blob.status === 0) return { hash: sha256Bytes(blob.stdout), text: blob.stdout.toString('utf8') };
   }
-  return found;
+  return null;
 }
 
-function normalizeHash(value) {
-  return String(value || '').replace(/^sha256:/, '');
-}
-
-/**
- * 沒有 --base-file 時，模型是對著某一個已讀內容寫 diff。
- * 內容仍是目前檔案（用 CLI 同一個定位器找得到 hunk）就宣告目前雜湊。
- * 內容對得上 journal 裡某個 base，而且在那個 base 裡定位到的行和那次提交重疊，
- * 就宣告那個 base，讓公開 CLI 回 overlapping-write-queued 與目前內容。
- * 重疊一律用定位後的行號比，不用 hunk 標頭的行號（#359）。
- * 對不上任何版本的 hunk 仍宣告目前雜湊，CLI 回 patch-context-mismatch。
- * 回傳宣告的雜湊，以及該 base 裡的定位結果（算 hunkOffsets 用）。
- */
-function chooseDeclaredBase(input, liveBytes) {
-  const liveHash = sha256Bytes(liveBytes);
-  const liveLocated = locateIn(liveBytes.toString('utf8'), input.hunks);
-  if (liveLocated) return { hash: liveHash, located: liveLocated };
-  const versions = historicalFileHashes(input.writableRoot, input.relativeFile, input.safePath);
-  const journal = readJournal(input.writableRoot).filter((entry) => entry.file === input.relativeFile);
-  for (const entry of journal.slice().reverse()) {
-    const version = versions.find((item) => normalizeHash(item.hash) === normalizeHash(entry.baseHash));
-    if (!version) continue;
-    const located = locateIn(version.text, input.hunks);
-    if (!located) continue;
-    const lines = locatedLineIndexes(located);
-    const changed = Array.isArray(entry.changedLines) ? entry.changedLines : [];
-    if (intersects(changed, lines.covered) || intersects(changed, lines.changed)) return { hash: version.hash, located };
+// 雜湊已由 session 紀錄決定；只找回相同版本的文字來計算 hunkOffsets。
+function textAtHash(input, hash) {
+  if (existsSync(input.targetPath)) {
+    const bytes = readFileSync(input.targetPath);
+    if (sha256Bytes(bytes) === hash) return bytes.toString('utf8');
   }
-  return { hash: liveHash, located: null };
+  const listed = gitText(input.writableRoot, ['rev-list', 'HEAD', '--', input.relativeFile], input.safePath);
+  if (listed.status !== 0) return null;
+  for (const commit of listed.stdout.trim().split('\n').filter(Boolean)) {
+    const blob = gitBuffer(input.writableRoot, ['cat-file', '-p', `${commit}:${input.relativeFile}`], input.safePath);
+    if (blob.status === 0 && sha256Bytes(blob.stdout) === hash) return blob.stdout.toString('utf8');
+  }
+  return null;
+}
+
+function appendWriteRecord(input, record) {
+  const dir = path.join(input.writableRoot, '.prereg-smoke');
+  mkdirSync(dir, { recursive: true });
+  appendFileSync(path.join(dir, 'steward-writes.jsonl'), `${JSON.stringify(record)}\n`);
+  if (record.decision === 'accepted' || record.decision === 'rejected-by-design') {
+    const seen = {
+      actorId: input.actorId,
+      sessionSlot,
+      file: input.relativeFile,
+      seenHash: record.currentFileHash,
+      source: 'atm-write-reply',
+      at: new Date().toISOString()
+    };
+    appendFileSync(path.join(dir, 'session-seen.jsonl'), `${JSON.stringify(seen)}\n`);
+  }
 }
 
 function submitLive(input) {
-  const head = gitText(input.writableRoot, ['rev-parse', 'HEAD'], input.safePath);
-  if (head.status !== 0) fail('base', `無法讀取 HEAD：${head.stderr}`);
-  const baseCommit = head.stdout.trim();
   const parsed = parseSubmittedPatch(input.patch, input.relativeFile);
   if (!parsed.hunks) return malformedPatch(input, parsed.error);
   input = { ...input, hunks: parsed.hunks };
-  const liveBytes = input.baseFile
-    ? readFileSync(path.resolve(input.baseFile))
-    : readFileSync(path.join(input.writableRoot, input.relativeFile));
-  const declaredBase = input.baseFile
-    ? { hash: sha256Bytes(liveBytes), located: locateIn(liveBytes.toString('utf8'), input.hunks) }
-    : chooseDeclaredBase(input, liveBytes);
+  const declaredBase = sessionBase(input);
+  if (!declaredBase) return malformedPatch(input, '無法確定 session 看過的 base', 'base-unknown');
+  declaredBase.located = declaredBase.text === null ? null : locateIn(declaredBase.text, input.hunks);
+  const head = gitText(input.writableRoot, ['rev-parse', 'HEAD'], input.safePath);
+  if (head.status !== 0) fail('base', `無法讀取 HEAD：${head.stderr}`);
+  const baseCommit = head.stdout.trim();
+  if (!input.cli || !existsSync(input.cli) || cliVersion(input.cli, input.safePath) !== '0.1.21') {
+    fail('cli-unavailable', `公開 CLI ${CLI_PACKAGE} 不可用。中止寫入。沒有 claim 退路。`, { cli: input.cli || null });
+  }
   const fileBeforeHash = declaredBase.hash;
   const proposalId = `prop-${input.actorId}-a${input.attempt}-${createHash('sha256').update(`${input.relativeFile}\n${input.patch}`).digest('hex').slice(0, 12)}`;
   const proposal = proposalDocument({ ...input, proposalId, baseCommit, fileBeforeHash });
@@ -373,6 +363,7 @@ function submitLive(input) {
   const reasonCode = decision === 'accepted' ? null : (falseAccept ? 'write-not-applied' : (live?.reasonCode || null));
   const ok = decision === 'accepted';
   const elapsedMs = Date.now() - input.started;
+  const text = typeof live?.currentFileText === 'string' ? live.currentFileText : currentFileText(input);
   const record = {
     schema: 'prereg-v3-smoke.stewardWrite.v1',
     ok,
@@ -390,8 +381,8 @@ function submitLive(input) {
     file: input.relativeFile,
     declaredBaseHash: fileBeforeHash,
     hunkOffsets: declaredBase.located ? hunkOffsetsOf(declaredBase.located) : null,
-    currentFileText: typeof live?.currentFileText === 'string' ? live.currentFileText : currentFileText(input),
-    currentFileHash: live?.currentFileHash || null,
+    currentFileText: text,
+    currentFileHash: live?.currentFileHash || (text === null ? null : sha256Bytes(Buffer.from(text, 'utf8'))),
     batchSize: 1,
     attempt: input.attempt,
     retryCount: Math.max(0, input.attempt - 1),
@@ -402,9 +393,7 @@ function submitLive(input) {
     cli: CLI_PACKAGE,
     entry: 'broker steward apply-live'
   };
-  const logPath = path.join(input.writableRoot, '.prereg-smoke', 'steward-writes.jsonl');
-  mkdirSync(path.dirname(logPath), { recursive: true });
-  appendFileSync(logPath, `${JSON.stringify(record)}\n`);
+  appendWriteRecord(input, record);
   const exitCode = decision === 'accepted' ? 0 : (decision === 'rejected-by-design' ? 3 : 1);
   return { record, exitCode };
 }
@@ -413,17 +402,17 @@ function submitLive(input) {
  * 解析不了的 patch（沒有 hunk、標頭行數和內容不合、少了前綴、多檔或檔名不對）
  * 是模型送錯，不是 kit 故障：記成 rejected-by-design / patch-malformed，exit 3，不呼叫 CLI。
  */
-function malformedPatch(input, message) {
+function malformedPatch(input, message, reasonCode = 'patch-malformed') {
   const proposalId = `prop-${input.actorId}-a${input.attempt}-${createHash('sha256').update(`${input.relativeFile}\n${input.patch}`).digest('hex').slice(0, 12)}`;
   const text = currentFileText(input);
   const record = {
     schema: 'prereg-v3-smoke.stewardWrite.v1',
     ok: false,
     decision: 'rejected-by-design',
-    reasonCode: 'patch-malformed',
+    reasonCode,
     messageCode: null,
     verdict: 'blocked',
-    phase: 'parse',
+    phase: reasonCode === 'patch-malformed' ? 'parse' : 'live',
     terminal: 'blocked',
     stopReason: message,
     proposalId,
@@ -445,9 +434,7 @@ function malformedPatch(input, message) {
     cli: CLI_PACKAGE,
     entry: 'broker steward apply-live'
   };
-  const logPath = path.join(input.writableRoot, '.prereg-smoke', 'steward-writes.jsonl');
-  mkdirSync(path.dirname(logPath), { recursive: true });
-  appendFileSync(logPath, `${JSON.stringify(record)}\n`);
+  appendWriteRecord(input, record);
   return { record, exitCode: 3 };
 }
 

@@ -75,6 +75,10 @@ const server = net.createServer({ allowHalfOpen: true }, (socket) => {
       reply(socket, { exitCode: 1, stdout: '', stderr: 'Invalid session slot\n' });
       return;
     }
+    if (req.sessionBaseCommit != null && (typeof req.sessionBaseCommit !== 'string' || !/^[0-9a-f]{40,64}$/.test(req.sessionBaseCommit))) {
+      reply(socket, { exitCode: 1, stdout: '', stderr: 'Invalid session base commit\n' });
+      return;
+    }
     const id = randomBytes(8).toString('hex');
     const patchPath = path.join(inbound, `${id}.patch`);
     writeFileSync(patchPath, req.patch);
@@ -89,6 +93,7 @@ const server = net.createServer({ allowHalfOpen: true }, (socket) => {
       '--attempt', String(Number.isInteger(req.attempt) && req.attempt > 0 ? req.attempt : 1)
     ];
     if (req.sessionSlot != null) args.push('--session-slot', req.sessionSlot);
+    if (req.sessionBaseCommit != null) args.push('--session-base-commit', req.sessionBaseCommit);
     if (req.baseText != null) {
       const basePath = path.join(inbound, `${id}.base`);
       writeFileSync(basePath, String(req.baseText));
@@ -97,6 +102,7 @@ const server = net.createServer({ allowHalfOpen: true }, (socket) => {
     const env = { ...process.env };
     delete env.PREREG_STEWARD_SOCK;
     delete env.PREREG_SESSION_SLOT;
+    delete env.PREREG_SESSION_BASE_COMMIT;
     const child = spawn(process.execPath, args, { cwd, env });
     let stdout = '';
     let stderr = '';

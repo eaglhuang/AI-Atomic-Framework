@@ -87,11 +87,9 @@ if (arm === 'A') {
   }
   while (attempt <= maxRetries + 1) {
     const patchPath = path.join(sessionDir, `file-${file.replaceAll('/', '_')}.a${attempt}.patch`);
-    const basePath = path.join(sessionDir, `base-${file.replaceAll('/', '_')}.a${attempt}`);
     writeFileSync(patchPath, activePatch);
-    writeFileSync(basePath, live);
     const result = spawnSync('atm-write', [
-      file, patchPath, '--base-file', basePath,
+      file, patchPath,
       '--actor', `stub-${instanceId}`,
       '--task', instanceId,
       '--message', `stub ${instanceId} ${file} attempt ${attempt}`,
