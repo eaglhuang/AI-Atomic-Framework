@@ -88,9 +88,7 @@ export function buildPatchProposalComposition(input: {
   for (const [filePath, proposals] of [...byFile].sort((left, right) => left[0].localeCompare(right[0]))) {
     const targetPath = path.resolve(input.cwd, filePath);
     const before = readFileSync(targetPath, 'utf8');
-    // #363 AC4: every attempt re-checks each proposal's declared base against
-    // the bytes read inside the apply queue; a stale one is translated, never
-    // re-composed at its old line numbers.
+    // #363 AC4: re-check declared bases in the apply queue; stale ones are translated, never re-composed.
     const rebased = translateStaleProposals(input.cwd, filePath, before, proposals);
     if ('block' in rebased) {
       blocked = rebased.block;
@@ -187,14 +185,9 @@ function translateStaleProposals(cwd: string, filePath: string, before: string, 
     const block = (code: 'stale-base' | 'stale-base-conflict', detail: string) => ({ block: { code, filePath, proposalIds: [proposal.proposalId], detail: `proposal '${proposal.proposalId}' ${detail}` } });
     const base = findCommittedBaseText(cwd, filePath, declared);
     if (base === null) return block('stale-base', `declares base ${declared.slice(0, 12)} of ${filePath}, which is not in committed history; it cannot be translated to the current file`);
-    let hunks: ReturnType<typeof parseUnifiedPatchHunks>;
-    try {
-      hunks = parseUnifiedPatchHunks(proposal.patch, { targetFile: filePath });
-    } catch (error) {
-      if (!(error instanceof UnifiedPatchApplicationError)) throw error;
-      out.push(proposal);
-      continue;
-    }
+    let hunks: ReturnType<typeof parseUnifiedPatchHunks> | null = null;
+    try { hunks = parseUnifiedPatchHunks(proposal.patch, { targetFile: filePath }); } catch (error) { if (!(error instanceof UnifiedPatchApplicationError)) throw error; }
+    if (hunks === null) { out.push(proposal); continue; }
     const translated = translateStalePatch({ baseText: base, currentText: before, hunks });
     if (!translated.ok) return block(translated.reason === 'stale-base-conflict' ? 'stale-base-conflict' : 'stale-base', translated.detail);
     const patch = renderTranslatedPatch(filePath, before, translated.blocks);
