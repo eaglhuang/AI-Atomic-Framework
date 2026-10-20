@@ -157,10 +157,12 @@ async function main() {
       proposal({ id: 'top', actor: 'a', hash: hashText(repeated), head, patch: '@@ -0,0 +1 @@\n+top\n' }),
       proposal({ id: 'stale-repeated', actor: 'b', hash: hashText(repeated), head, patch: '@@ -2 +2 @@\n-b\n+B\n' })
     ] });
+    // #363: the stale write is translated from its base, so it edits the b it
+    // was written against (base line 2, now line 3), not a re-read match.
     assert.equal(result.writes[0]?.decision, 'accepted');
-    assert.equal(result.writes[1]?.reasonCode, 'stale-base');
-    assert.equal(result.writes[1]?.hunkOffsets, null);
-    assert.equal(readFileSync(path.join(repeatedRepo, 'shared.py'), 'utf8'), `top\n${repeated}`);
+    assert.equal(result.writes[1]?.decision, 'accepted');
+    assert.deepEqual(result.writes[1]?.hunkOffsets, [{ declaredOldStart: 2, appliedOldStart: 3, offset: 1 }]);
+    assert.equal(readFileSync(path.join(repeatedRepo, 'shared.py'), 'utf8'), 'top\na\nB\nb\nc\n');
   }
 
   {

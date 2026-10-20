@@ -1,5 +1,5 @@
 import type { PatchProposal } from './types.js';
-export type StewardCompositionBlockCode = 'compose-context-mismatch' | 'steward-final-patch-required' | 'compose-permutation-unstable';
+export type StewardCompositionBlockCode = 'compose-context-mismatch' | 'steward-final-patch-required' | 'compose-permutation-unstable' | 'stale-base' | 'stale-base-conflict';
 export interface StewardCompositionBlock {
     readonly code: StewardCompositionBlockCode;
     readonly filePath: string;

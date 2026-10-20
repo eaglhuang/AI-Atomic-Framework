@@ -6,6 +6,8 @@
  * 之後的寫入若改到已經提交的行，在碰檔案之前拒絕，帶回現在的內容，並留下佇列紀錄。
  * 不相交、而且上下文仍對得上現況的寫入，直接套上。
  * 宣告的 base 對不上、又沒有這條路徑自己提交過的不相交紀錄時，當成 stale-base，不寫。
+ * 宣告的 base 對不上時，patch 先在它自己的 base 定位，再翻譯到目前檔案（#363），
+ * 絕不在目前檔案的舊行號重讀。它刪改的行在 base 之後被改過就拒絕，不套到別處。
  *
  * 既有的 `broker steward apply --merge-plan-file` 不受影響。
  */
@@ -34,6 +36,7 @@ import {
   hunkOldLineIndex,
   parseUnifiedPatchHunks
 } from '../broker/unified-patch.ts';
+import { findCommittedBaseText, translateStalePatch } from '../broker/stale-base-translation.ts';
 
 export type LiveWriteDecision = 'accepted' | 'rejected-by-design' | 'kit-error';
 
@@ -163,7 +166,7 @@ function applyOneLocked(cwd: string, file: string, targetPath: string, proposal:
     const index = hunkOldLineIndex(hunk.oldStart, hunk.oldCount);
     return { hunk, index, declaredIndex: index, offset: 0 };
   }));
-  const base = findBaseText(cwd, file, declared);
+  const base = findCommittedBaseText(cwd, file, declared);
   if (base !== null) {
     try {
       lines = locatedLineIndexes(locateUnifiedPatchHunks(splitSourceText(base), hunks, { mode: 'nearest' }));
@@ -176,31 +179,21 @@ function applyOneLocked(cwd: string, file: string, targetPath: string, proposal:
   if (overlaps) {
     return queueRejection(cwd, proposal, file, 'overlapping-write-queued', current, '這筆寫入和已經提交的行重疊，檔案沒有被改');
   }
-  try {
-    const applied = applyParsedUnifiedPatchDetailed(current.text, hunks, { mode: 'unique' });
-    if (applied.text === current.text) return rejected(proposal, file, 'no-op-patch', false, current.text, current.hash, 'patch 沒有改變檔案');
-    if (prior.length > 0) {
-      return commitPrepared(cwd, file, targetPath, proposal, current.text, applied.text, locatedLineIndexes(applied.located).changed, applied.hunkOffsets);
-    }
-  } catch (error) {
-    if (!(error instanceof UnifiedPatchApplicationError)) throw error;
+  if (base === null) {
+    return queueRejection(cwd, proposal, file, 'stale-base', current, '宣告的 base 不在已提交的歷史裡，無法翻譯到目前檔案');
   }
-  const detail = prior.length > 0
-    ? 'base 已經前進，這份 patch 對不上現在的內容'
-    : '宣告的 base 不是目前檔案，而且沒有可套用的不相交提交';
-  return queueRejection(cwd, proposal, file, 'stale-base', current, detail);
-}
-
-function findBaseText(cwd: string, file: string, declared: string): string | null {
-  const history = spawnSync('git', ['-C', cwd, 'rev-list', '--max-count=200', 'HEAD', '--', file], { encoding: 'utf8' });
-  if (history.status !== 0) return null;
-  for (const sha of history.stdout.trim().split('\n').filter(Boolean)) {
-    const result = spawnSync('git', ['-C', cwd, 'cat-file', '-p', `${sha}:${file}`]);
-    if (result.status !== 0) continue;
-    const text = result.stdout.toString('utf8');
-    if (normalizeHash(hashContent(text)) === declared) return text;
+  if (prior.length === 0) {
+    return queueRejection(cwd, proposal, file, 'stale-base', current, '宣告的 base 不是目前檔案，而且沒有可套用的不相交提交');
   }
-  return null;
+  // #363: translate from the declared base; never re-read the declared lines in the current file.
+  const translated = translateStalePatch({ baseText: base, currentText: current.text, hunks });
+  if (!translated.ok) {
+    return translated.reason === 'stale-base-conflict'
+      ? queueRejection(cwd, proposal, file, 'overlapping-write-queued', current, `這筆寫入改到 base 之後被改過的行，檔案沒有被改：${translated.detail}`)
+      : queueRejection(cwd, proposal, file, 'stale-base', current, `base 已經前進，這份 patch 對不上它宣告的 base：${translated.detail}`);
+  }
+  if (translated.text === current.text) return rejected(proposal, file, 'no-op-patch', false, current.text, current.hash, 'patch 沒有改變檔案');
+  return commitPrepared(cwd, file, targetPath, proposal, current.text, translated.text, locatedLineIndexes(translated.located).changed, translated.hunkOffsets);
 }
 
 function commitPrepared(

@@ -1420,20 +1420,19 @@
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/serial-queue/contracts.js",
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/serial-queue/policy.js",
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/serial-queue/queue.js",
-    "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/shared-compose-inbox-commit.d.ts",
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/shared-compose-inbox-commit.js",
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/shared-compose-inbox-contract.js",
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/shared-compose-inbox-fs.js",
-    "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/shared-compose-inbox-merge.d.ts",
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/shared-compose-inbox-merge.js",
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/shared-compose-inbox-receipt.js",
-    "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/shared-compose-inbox.d.ts",
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/shared-compose-inbox.js",
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/shared-delivery-commit.js",
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/shared-delivery-saga.js",
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/shared-surface-queue.js",
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/shared-write-provenance-policy.js",
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/sqlite-runtime.js",
+    "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/stale-base-translation.d.ts",
+    "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/stale-base-translation.js",
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/steward-apply-queue.js",
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/steward-base-composer.d.ts",
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/steward-base-composer.js",
@@ -3718,20 +3717,19 @@
     "release/atm-root-drop/packages/core/dist/broker/serial-queue/contracts.js",
     "release/atm-root-drop/packages/core/dist/broker/serial-queue/policy.js",
     "release/atm-root-drop/packages/core/dist/broker/serial-queue/queue.js",
-    "release/atm-root-drop/packages/core/dist/broker/shared-compose-inbox-commit.d.ts",
     "release/atm-root-drop/packages/core/dist/broker/shared-compose-inbox-commit.js",
     "release/atm-root-drop/packages/core/dist/broker/shared-compose-inbox-contract.js",
     "release/atm-root-drop/packages/core/dist/broker/shared-compose-inbox-fs.js",
-    "release/atm-root-drop/packages/core/dist/broker/shared-compose-inbox-merge.d.ts",
     "release/atm-root-drop/packages/core/dist/broker/shared-compose-inbox-merge.js",
     "release/atm-root-drop/packages/core/dist/broker/shared-compose-inbox-receipt.js",
-    "release/atm-root-drop/packages/core/dist/broker/shared-compose-inbox.d.ts",
     "release/atm-root-drop/packages/core/dist/broker/shared-compose-inbox.js",
     "release/atm-root-drop/packages/core/dist/broker/shared-delivery-commit.js",
     "release/atm-root-drop/packages/core/dist/broker/shared-delivery-saga.js",
     "release/atm-root-drop/packages/core/dist/broker/shared-surface-queue.js",
     "release/atm-root-drop/packages/core/dist/broker/shared-write-provenance-policy.js",
     "release/atm-root-drop/packages/core/dist/broker/sqlite-runtime.js",
+    "release/atm-root-drop/packages/core/dist/broker/stale-base-translation.d.ts",
+    "release/atm-root-drop/packages/core/dist/broker/stale-base-translation.js",
     "release/atm-root-drop/packages/core/dist/broker/steward-apply-queue.js",
     "release/atm-root-drop/packages/core/dist/broker/steward-base-composer.d.ts",
     "release/atm-root-drop/packages/core/dist/broker/steward-base-composer.js",
@@ -4220,6 +4218,7 @@
     "release/atm-root-drop/packages/core/src/broker/shared-surface-queue.ts",
     "release/atm-root-drop/packages/core/src/broker/shared-write-provenance-policy.ts",
     "release/atm-root-drop/packages/core/src/broker/sqlite-runtime.ts",
+    "release/atm-root-drop/packages/core/src/broker/stale-base-translation.ts",
     "release/atm-root-drop/packages/core/src/broker/steward-apply-queue.ts",
     "release/atm-root-drop/packages/core/src/broker/steward-base-composer.ts",
     "release/atm-root-drop/packages/core/src/broker/steward-commit-guard.ts",
@@ -6593,6 +6592,7 @@
     "release/atm-root-drop/tests/core/same-atom-bounded-proposal-routing.test.ts",
     "release/atm-root-drop/tests/core/shared-write-provenance-policy.test.ts",
     "release/atm-root-drop/tests/core/sqlite-runtime-quiet.test.ts",
+    "release/atm-root-drop/tests/core/stale-base-translation.test.ts",
     "release/atm-root-drop/tests/core/steward-apply-queue-busy.test.ts",
     "release/atm-root-drop/tests/core/steward-concurrent-commit.test.ts",
     "release/atm-root-drop/tests/core/steward-json-pointer-compose.test.ts",
@@ -19403,15 +19403,6 @@
         "replaceable": true
       },
       {
-        "path": "packages/cli/dist/_vendor/core/dist/broker/shared-compose-inbox-commit.d.ts",
-        "digest": "6c62bfcdd1d48f5513e02e8d5fd484811e095ca25cb15cf7205a1845af540cff",
-        "origin": "source",
-        "inputPaths": [
-          "packages/cli/dist/_vendor/core/dist/broker/shared-compose-inbox-commit.d.ts"
-        ],
-        "replaceable": true
-      },
-      {
         "path": "packages/cli/dist/_vendor/core/dist/broker/shared-compose-inbox-commit.js",
         "digest": "7d5522accf0ff7c6a6e4da2f90b85fa33cd818d824d12d3aec70ff9d1123ff9b",
         "origin": "source",
@@ -19439,15 +19430,6 @@
         "replaceable": true
       },
       {
-        "path": "packages/cli/dist/_vendor/core/dist/broker/shared-compose-inbox-merge.d.ts",
-        "digest": "5a04323300c5efc76149cc81e375593a9124ed4d556b884c93bd4af7a295348a",
-        "origin": "source",
-        "inputPaths": [
-          "packages/cli/dist/_vendor/core/dist/broker/shared-compose-inbox-merge.d.ts"
-        ],
-        "replaceable": true
-      },
-      {
         "path": "packages/cli/dist/_vendor/core/dist/broker/shared-compose-inbox-merge.js",
         "digest": "beb633bdde0e1691f3eb4685d4e38c29ee549ca77f938029ba013b5e45fe6e40",
         "origin": "source",
@@ -19462,15 +19444,6 @@
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/core/dist/broker/shared-compose-inbox-receipt.js"
-        ],
-        "replaceable": true
-      },
-      {
-        "path": "packages/cli/dist/_vendor/core/dist/broker/shared-compose-inbox.d.ts",
-        "digest": "9eca12cd3d1c5239429c38a09d7f37b0b8618f57d4f5617d8083fe354421413b",
-        "origin": "source",
-        "inputPaths": [
-          "packages/cli/dist/_vendor/core/dist/broker/shared-compose-inbox.d.ts"
         ],
         "replaceable": true
       },
@@ -19529,6 +19502,24 @@
         "replaceable": true
       },
       {
+        "path": "packages/cli/dist/_vendor/core/dist/broker/stale-base-translation.d.ts",
+        "digest": "cb52a12761e95f8e4f0811c6592ec2caf6ce3387bc28ddef3f1ce5e2d53905e0",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/_vendor/core/dist/broker/stale-base-translation.d.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/_vendor/core/dist/broker/stale-base-translation.js",
+        "digest": "ef1799b869b7e8d20c88e67c0086cc6041d858c923732f0e15922c63c4e3bf24",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/_vendor/core/dist/broker/stale-base-translation.js"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/cli/dist/_vendor/core/dist/broker/steward-apply-queue.js",
         "digest": "f8b30ed2dfcaa005de7ca5f95ea51aeb13b379fb2a4603d9d98244237e908ba7",
         "origin": "source",
@@ -19539,7 +19530,7 @@
       },
       {
         "path": "packages/cli/dist/_vendor/core/dist/broker/steward-base-composer.d.ts",
-        "digest": "11bdf17a6df4c32d5d3c1a7f47d59ddc7344fb2694c843ac4d0482ebb1e63faa",
+        "digest": "02bc543414c4a68bdc46911c06249d77fda3022d2f470463631e26bd71a36606",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/core/dist/broker/steward-base-composer.d.ts"
@@ -19548,7 +19539,7 @@
       },
       {
         "path": "packages/cli/dist/_vendor/core/dist/broker/steward-base-composer.js",
-        "digest": "02ce48f2b212003d4aaf97cc1a957670d1e61c61b725a8d1acd57813ec4d5744",
+        "digest": "3d89722e7af6b5eaba6baa2cebaee7317c226dfb5b02887354f80431716bf36c",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/core/dist/broker/steward-base-composer.js"
@@ -19620,7 +19611,7 @@
       },
       {
         "path": "packages/cli/dist/_vendor/core/dist/broker/steward-transactional-apply.js",
-        "digest": "aa182283ed8dcceac5ef12be874d1766aac0eb4080583c3acb3ad2ba2c5996f8",
+        "digest": "1f5bd9b7befd2d0c63e28338f938de5d45c1e3952994bf72d62b3fc1c5b3a8c0",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/core/dist/broker/steward-transactional-apply.js"
@@ -19629,7 +19620,7 @@
       },
       {
         "path": "packages/cli/dist/_vendor/core/dist/broker/steward.d.ts",
-        "digest": "1b05ecc771606f26351914b2bffe075f697c2bf2a03c8041eba20388bee043a6",
+        "digest": "82f7f5b7e4bebbe19ab2c1c6fe50301a21cdf0d68df20918b63d80d0e7eda7f2",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/core/dist/broker/steward.d.ts"
@@ -19836,7 +19827,7 @@
       },
       {
         "path": "packages/cli/dist/_vendor/core/dist/broker/unified-patch.js",
-        "digest": "d5a9ff34e39ef66ddcb2f3b9d3136ae6f2aebba1835c67e1fe3ddf19fdae9701",
+        "digest": "9a15d491653fd787dd1306a6a5ae18e83d428fbf86c18107d12ed8bad5d50f71",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/core/dist/broker/unified-patch.js"
@@ -20754,7 +20745,7 @@
       },
       {
         "path": "packages/cli/dist/_vendor/core/dist/live-write/live-queued-write.js",
-        "digest": "5a1f504ef8dae272ff7e79ea796e6fccb154b68ef0096a95487e7525aa2bbf7d",
+        "digest": "26641011c1b5dc21e793e5eebb3da40ce506671c0f811737faf165a3a80df7d4",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/core/dist/live-write/live-queued-write.js"
@@ -24291,7 +24282,7 @@
       },
       {
         "path": "packages/cli/dist/build-identity.json",
-        "digest": "2f08b00b339ce608702cf7c2857f1a60ebea71f6c5d5180ad75b5a93947f1e75",
+        "digest": "079ec522af353c99514deefa99963d7f38f9c6386a3b07774abb6a08bc26a4ae",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/build-identity.json"
@@ -30393,7 +30384,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/build-identity.json",
-        "digest": "ed3ced5bf1995c407250adbe0ee38c7702f85cd6ed294f6e740c85ce34764ad9",
+        "digest": "be9203d1405081c3983b74da18a1c9bb012193b270f1fb4342c2271e3ac07530",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/build-identity.json"
@@ -31122,7 +31113,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/manifest.json",
-        "digest": "b0794664602c7714491e1420d9c8e38cc13ae1ded7763d2e43cc5ce4448349a7",
+        "digest": "e7f8cef478e9ecc470d32e28bfae72a25bef345a673c64956ee586820e8a3d23",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/manifest.json"
@@ -31131,7 +31122,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/runtime.mjs",
-        "digest": "7dbb0faa0e41b77d164591421f4017ad8a3c6c671135d23ecbc428d80922d1ce",
+        "digest": "9c266ceb42c9a56f0d70206577a2decdd12ac74e6b8fbe1cfd584a9471dbd6c5",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/runtime.mjs"
@@ -40085,15 +40076,6 @@
         "replaceable": true
       },
       {
-        "path": "packages/core/dist/broker/shared-compose-inbox-commit.d.ts",
-        "digest": "6c62bfcdd1d48f5513e02e8d5fd484811e095ca25cb15cf7205a1845af540cff",
-        "origin": "source",
-        "inputPaths": [
-          "packages/core/dist/broker/shared-compose-inbox-commit.d.ts"
-        ],
-        "replaceable": true
-      },
-      {
         "path": "packages/core/dist/broker/shared-compose-inbox-commit.js",
         "digest": "7d5522accf0ff7c6a6e4da2f90b85fa33cd818d824d12d3aec70ff9d1123ff9b",
         "origin": "source",
@@ -40121,15 +40103,6 @@
         "replaceable": true
       },
       {
-        "path": "packages/core/dist/broker/shared-compose-inbox-merge.d.ts",
-        "digest": "5a04323300c5efc76149cc81e375593a9124ed4d556b884c93bd4af7a295348a",
-        "origin": "source",
-        "inputPaths": [
-          "packages/core/dist/broker/shared-compose-inbox-merge.d.ts"
-        ],
-        "replaceable": true
-      },
-      {
         "path": "packages/core/dist/broker/shared-compose-inbox-merge.js",
         "digest": "beb633bdde0e1691f3eb4685d4e38c29ee549ca77f938029ba013b5e45fe6e40",
         "origin": "source",
@@ -40144,15 +40117,6 @@
         "origin": "source",
         "inputPaths": [
           "packages/core/dist/broker/shared-compose-inbox-receipt.js"
-        ],
-        "replaceable": true
-      },
-      {
-        "path": "packages/core/dist/broker/shared-compose-inbox.d.ts",
-        "digest": "9eca12cd3d1c5239429c38a09d7f37b0b8618f57d4f5617d8083fe354421413b",
-        "origin": "source",
-        "inputPaths": [
-          "packages/core/dist/broker/shared-compose-inbox.d.ts"
         ],
         "replaceable": true
       },
@@ -40211,6 +40175,24 @@
         "replaceable": true
       },
       {
+        "path": "packages/core/dist/broker/stale-base-translation.d.ts",
+        "digest": "cb52a12761e95f8e4f0811c6592ec2caf6ce3387bc28ddef3f1ce5e2d53905e0",
+        "origin": "source",
+        "inputPaths": [
+          "packages/core/dist/broker/stale-base-translation.d.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/core/dist/broker/stale-base-translation.js",
+        "digest": "ef1799b869b7e8d20c88e67c0086cc6041d858c923732f0e15922c63c4e3bf24",
+        "origin": "source",
+        "inputPaths": [
+          "packages/core/dist/broker/stale-base-translation.js"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/core/dist/broker/steward-apply-queue.js",
         "digest": "f8b30ed2dfcaa005de7ca5f95ea51aeb13b379fb2a4603d9d98244237e908ba7",
         "origin": "source",
@@ -40221,7 +40203,7 @@
       },
       {
         "path": "packages/core/dist/broker/steward-base-composer.d.ts",
-        "digest": "11bdf17a6df4c32d5d3c1a7f47d59ddc7344fb2694c843ac4d0482ebb1e63faa",
+        "digest": "02bc543414c4a68bdc46911c06249d77fda3022d2f470463631e26bd71a36606",
         "origin": "source",
         "inputPaths": [
           "packages/core/dist/broker/steward-base-composer.d.ts"
@@ -40230,7 +40212,7 @@
       },
       {
         "path": "packages/core/dist/broker/steward-base-composer.js",
-        "digest": "02ce48f2b212003d4aaf97cc1a957670d1e61c61b725a8d1acd57813ec4d5744",
+        "digest": "3d89722e7af6b5eaba6baa2cebaee7317c226dfb5b02887354f80431716bf36c",
         "origin": "source",
         "inputPaths": [
           "packages/core/dist/broker/steward-base-composer.js"
@@ -40302,7 +40284,7 @@
       },
       {
         "path": "packages/core/dist/broker/steward-transactional-apply.js",
-        "digest": "aa182283ed8dcceac5ef12be874d1766aac0eb4080583c3acb3ad2ba2c5996f8",
+        "digest": "1f5bd9b7befd2d0c63e28338f938de5d45c1e3952994bf72d62b3fc1c5b3a8c0",
         "origin": "source",
         "inputPaths": [
           "packages/core/dist/broker/steward-transactional-apply.js"
@@ -40311,7 +40293,7 @@
       },
       {
         "path": "packages/core/dist/broker/steward.d.ts",
-        "digest": "1b05ecc771606f26351914b2bffe075f697c2bf2a03c8041eba20388bee043a6",
+        "digest": "82f7f5b7e4bebbe19ab2c1c6fe50301a21cdf0d68df20918b63d80d0e7eda7f2",
         "origin": "source",
         "inputPaths": [
           "packages/core/dist/broker/steward.d.ts"
@@ -40518,7 +40500,7 @@
       },
       {
         "path": "packages/core/dist/broker/unified-patch.js",
-        "digest": "d5a9ff34e39ef66ddcb2f3b9d3136ae6f2aebba1835c67e1fe3ddf19fdae9701",
+        "digest": "9a15d491653fd787dd1306a6a5ae18e83d428fbf86c18107d12ed8bad5d50f71",
         "origin": "source",
         "inputPaths": [
           "packages/core/dist/broker/unified-patch.js"
@@ -41436,7 +41418,7 @@
       },
       {
         "path": "packages/core/dist/live-write/live-queued-write.js",
-        "digest": "5a1f504ef8dae272ff7e79ea796e6fccb154b68ef0096a95487e7525aa2bbf7d",
+        "digest": "26641011c1b5dc21e793e5eebb3da40ce506671c0f811737faf165a3a80df7d4",
         "origin": "source",
         "inputPaths": [
           "packages/core/dist/live-write/live-queued-write.js"
@@ -44603,6 +44585,15 @@
         "replaceable": true
       },
       {
+        "path": "packages/core/src/broker/stale-base-translation.ts",
+        "digest": "65df798b8dc8f946635ca375d46e27ba7bfa91875001cbf22403ac66076d14ed",
+        "origin": "source",
+        "inputPaths": [
+          "packages/core/src/broker/stale-base-translation.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/core/src/broker/steward-apply-queue.ts",
         "digest": "76728b0fdd64226270f96d94df83d3f4ff657ac134d14afdd453bbbf585042c5",
         "origin": "source",
@@ -44613,7 +44604,7 @@
       },
       {
         "path": "packages/core/src/broker/steward-base-composer.ts",
-        "digest": "b205a7e43551c0f60e478c41d0e600f3f40d91a9a8567080aba7079c007807c8",
+        "digest": "6a3d417c8eb2ec25ad4c99d16ee48e9a400d9f021ff67778ee02951e85a3152f",
         "origin": "source",
         "inputPaths": [
           "packages/core/src/broker/steward-base-composer.ts"
@@ -44658,7 +44649,7 @@
       },
       {
         "path": "packages/core/src/broker/steward-transactional-apply.ts",
-        "digest": "1b602cd2169281659a43e18aa2c26926fe10027b1cda213ebc74f4c4be83cdfb",
+        "digest": "478c3f98f4f2b12b008a636a804aeb62657722149cf3b9c733e78d863ec54f05",
         "origin": "source",
         "inputPaths": [
           "packages/core/src/broker/steward-transactional-apply.ts"
@@ -44667,7 +44658,7 @@
       },
       {
         "path": "packages/core/src/broker/steward.ts",
-        "digest": "c8a2dd181ac8699144f2e167e680da20e0d60a43419f6a1628f7bd408681c1c2",
+        "digest": "68002ad6c8d27f71e6247f2851f7f5f18ba3480738eedf08312381ed8a79535e",
         "origin": "source",
         "inputPaths": [
           "packages/core/src/broker/steward.ts"
@@ -44838,7 +44829,7 @@
       },
       {
         "path": "packages/core/src/broker/unified-patch.ts",
-        "digest": "bd6e8e926e4753d289a04ae056c2ef3fb2d1403386e32148acb64ceed4e2e964",
+        "digest": "9e968ec5b942b4b7437be5b64f7775e5dd4abcfe1c04d195f41deff303d2d272",
         "origin": "source",
         "inputPaths": [
           "packages/core/src/broker/unified-patch.ts"
@@ -45684,7 +45675,7 @@
       },
       {
         "path": "packages/core/src/live-write/live-queued-write.ts",
-        "digest": "5e2a13b8889d022cb90be3b0f331ebe646b2d2fd72413e76c568214cd0929ef2",
+        "digest": "63f5ded946b0e7ca57903343438ffab5cddb219a1f094280ed39839b77410482",
         "origin": "source",
         "inputPaths": [
           "packages/core/src/live-write/live-queued-write.ts"
@@ -47259,7 +47250,7 @@
       },
       {
         "path": "packages/create-atm/dist/build-identity.json",
-        "digest": "6f7319373c2e2e8aeea2c21d88dfd55313b4cb90cbc652e63b8a0ad5e431f164",
+        "digest": "1af0310184dd8ba66bac58aa9c3c47c1994d1c3476ac243696304a1fdf9427d2",
         "origin": "source",
         "inputPaths": [
           "packages/create-atm/dist/build-identity.json"
@@ -54882,7 +54873,7 @@
       },
       {
         "path": "scripts/validate-broker-steward.ts",
-        "digest": "b8edaf1eb49ab9a49cddfb823281d2da470034171394d3123b23548d09f73427",
+        "digest": "9df0e259854eec96826ba88cedfd3dd83ec40394acba2757450c4772bc84eb16",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-broker-steward.ts"
@@ -55467,7 +55458,7 @@
       },
       {
         "path": "scripts/validate-hist-v2-smoke-runbook.ts",
-        "digest": "2539b59da45240dd255e96a0c1e7578e33d5f41d30974f1ce1773075c3d9b9fe",
+        "digest": "2fd2b78d8768aa12cbf07b9b2bb04849ef0d12347cef6e69ba8293571a03ac9f",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-hist-v2-smoke-runbook.ts"
@@ -65808,7 +65799,7 @@
       },
       {
         "path": "tests/core/live-queued-write.test.ts",
-        "digest": "9fff3381025adbf5413ffa60ade51e931743e648ff71d2a5fec3ba1dfdab9963",
+        "digest": "d514336c5d5f5e0256af93885c045398fec48af6b8e5b04ea1c9d5637b04f202",
         "origin": "source",
         "inputPaths": [
           "tests/core/live-queued-write.test.ts"
@@ -65951,6 +65942,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/core/stale-base-translation.test.ts",
+        "digest": "8e754e8efcadea6f4f8688823f922a609a93ceec27eda9a912f2d9e4d78c97c1",
+        "origin": "source",
+        "inputPaths": [
+          "tests/core/stale-base-translation.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/core/steward-apply-queue-busy.test.ts",
         "digest": "3d98dd295f80e376697dd40682c2e1c87f9c0e32f31f4a3b5aa010f9d7294fdf",
         "origin": "source",
@@ -65970,7 +65970,7 @@
       },
       {
         "path": "tests/core/steward-json-pointer-compose.test.ts",
-        "digest": "c15537f2290816634d98a7109f7c2d611f20d476889369116b3923cd0441781b",
+        "digest": "dada018e89beb346a4458b711b9f992d80dea0cb3f1be0521b165f870cfe058d",
         "origin": "source",
         "inputPaths": [
           "tests/core/steward-json-pointer-compose.test.ts"
@@ -68642,7 +68642,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:0ba5fc65eea19dc5e4e04031f4521a895217111aef1439f35cfa3ad47812c63e"
+    "treeDigest": "sha256:f74dcafb5b644cf2d40299db7e5c0a205645eaa46a3e0857c010a6f9ab2c8391"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -69690,6 +69690,7 @@
       "packages/core/src/broker/shared-surface-queue.ts",
       "packages/core/src/broker/shared-write-provenance-policy.ts",
       "packages/core/src/broker/sqlite-runtime.ts",
+      "packages/core/src/broker/stale-base-translation.ts",
       "packages/core/src/broker/steward-apply-queue.ts",
       "packages/core/src/broker/steward-base-composer.ts",
       "packages/core/src/broker/steward-commit-guard.ts",
@@ -70269,7 +70270,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:dc682f04516c59f07e4b2343f80909c3cf617121f89363cffdf1d58f2c73bf72"
+    "digest": "sha256:224d81a2485dba75ee2fd79207bac0422b0d27820a245eb7c17d478eab824515"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -71663,20 +71664,19 @@
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/serial-queue/contracts.js",
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/serial-queue/policy.js",
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/serial-queue/queue.js",
-      "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/shared-compose-inbox-commit.d.ts",
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/shared-compose-inbox-commit.js",
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/shared-compose-inbox-contract.js",
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/shared-compose-inbox-fs.js",
-      "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/shared-compose-inbox-merge.d.ts",
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/shared-compose-inbox-merge.js",
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/shared-compose-inbox-receipt.js",
-      "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/shared-compose-inbox.d.ts",
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/shared-compose-inbox.js",
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/shared-delivery-commit.js",
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/shared-delivery-saga.js",
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/shared-surface-queue.js",
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/shared-write-provenance-policy.js",
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/sqlite-runtime.js",
+      "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/stale-base-translation.d.ts",
+      "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/stale-base-translation.js",
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/steward-apply-queue.js",
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/steward-base-composer.d.ts",
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/steward-base-composer.js",
@@ -73961,20 +73961,19 @@
       "release/atm-root-drop/packages/core/dist/broker/serial-queue/contracts.js",
       "release/atm-root-drop/packages/core/dist/broker/serial-queue/policy.js",
       "release/atm-root-drop/packages/core/dist/broker/serial-queue/queue.js",
-      "release/atm-root-drop/packages/core/dist/broker/shared-compose-inbox-commit.d.ts",
       "release/atm-root-drop/packages/core/dist/broker/shared-compose-inbox-commit.js",
       "release/atm-root-drop/packages/core/dist/broker/shared-compose-inbox-contract.js",
       "release/atm-root-drop/packages/core/dist/broker/shared-compose-inbox-fs.js",
-      "release/atm-root-drop/packages/core/dist/broker/shared-compose-inbox-merge.d.ts",
       "release/atm-root-drop/packages/core/dist/broker/shared-compose-inbox-merge.js",
       "release/atm-root-drop/packages/core/dist/broker/shared-compose-inbox-receipt.js",
-      "release/atm-root-drop/packages/core/dist/broker/shared-compose-inbox.d.ts",
       "release/atm-root-drop/packages/core/dist/broker/shared-compose-inbox.js",
       "release/atm-root-drop/packages/core/dist/broker/shared-delivery-commit.js",
       "release/atm-root-drop/packages/core/dist/broker/shared-delivery-saga.js",
       "release/atm-root-drop/packages/core/dist/broker/shared-surface-queue.js",
       "release/atm-root-drop/packages/core/dist/broker/shared-write-provenance-policy.js",
       "release/atm-root-drop/packages/core/dist/broker/sqlite-runtime.js",
+      "release/atm-root-drop/packages/core/dist/broker/stale-base-translation.d.ts",
+      "release/atm-root-drop/packages/core/dist/broker/stale-base-translation.js",
       "release/atm-root-drop/packages/core/dist/broker/steward-apply-queue.js",
       "release/atm-root-drop/packages/core/dist/broker/steward-base-composer.d.ts",
       "release/atm-root-drop/packages/core/dist/broker/steward-base-composer.js",
@@ -74463,6 +74462,7 @@
       "release/atm-root-drop/packages/core/src/broker/shared-surface-queue.ts",
       "release/atm-root-drop/packages/core/src/broker/shared-write-provenance-policy.ts",
       "release/atm-root-drop/packages/core/src/broker/sqlite-runtime.ts",
+      "release/atm-root-drop/packages/core/src/broker/stale-base-translation.ts",
       "release/atm-root-drop/packages/core/src/broker/steward-apply-queue.ts",
       "release/atm-root-drop/packages/core/src/broker/steward-base-composer.ts",
       "release/atm-root-drop/packages/core/src/broker/steward-commit-guard.ts",
@@ -76836,6 +76836,7 @@
       "release/atm-root-drop/tests/core/same-atom-bounded-proposal-routing.test.ts",
       "release/atm-root-drop/tests/core/shared-write-provenance-policy.test.ts",
       "release/atm-root-drop/tests/core/sqlite-runtime-quiet.test.ts",
+      "release/atm-root-drop/tests/core/stale-base-translation.test.ts",
       "release/atm-root-drop/tests/core/steward-apply-queue-busy.test.ts",
       "release/atm-root-drop/tests/core/steward-concurrent-commit.test.ts",
       "release/atm-root-drop/tests/core/steward-json-pointer-compose.test.ts",
@@ -77141,22 +77142,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:96205e96c8cd31e033092939c8a34448f5656ede6c5d2785b418522db332d5ca",
-  "sealedSourceCommit": "700f75a254baf2766dc4f265f866dea1b8990aee",
-  "buildDecision": "incrementalBuild",
-  "buildDecisionReason": "diff planner selected 2 affected package(s)",
-  "incrementalPlanDigest": "sha256:c19151a57755321f6654f8a4f3af3c36e51235fd7ed6cfeee6f78a00bb119071",
-  "tsBuildCacheDigest": "sha256:7666ba86f4c17cee434e2ec1f3c8b59b309444913de8056075e06916d61fda62",
+  "buildInputsTreeHash": "sha256:c2508aa62ce8036e221c3ee7fc482eab21610da0f90c655ad195f6bfa62b352d",
+  "sealedSourceCommit": "d0ff38465cc5a6c5f6dc24845a25c7d61bd7b676",
+  "buildDecision": "fullRebuild",
+  "buildDecisionReason": "build-script-change",
+  "incrementalPlanDigest": "sha256:9bc928514aea336428d4efd99ba35da53da0f3a4a8f420565ccf497b4376782e",
+  "tsBuildCacheDigest": "sha256:f6251993d6173725f78401fd58a512376c9f670677974b6bcdd9a15a4b29e354",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 15,
-    "skipDecision": 21,
-    "worktreeSetup": 19062,
-    "typescriptBuild": 13205,
-    "rootDropReleaseAssembly": 15725,
-    "onefileReleaseAssembly": 14582,
-    "artifactSync": 533,
+    "inputHashCalculation": 24,
+    "skipDecision": 30,
+    "worktreeSetup": 18844,
+    "typescriptBuild": 18564,
+    "rootDropReleaseAssembly": 15362,
+    "onefileReleaseAssembly": 14553,
+    "artifactSync": 522,
     "cleanup": 0,
-    "totalElapsed": 68637
+    "totalElapsed": 73490
   }
 }
