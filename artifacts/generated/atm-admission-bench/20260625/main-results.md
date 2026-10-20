@@ -54,7 +54,7 @@
 | agr-benchmark | layer2-threshold-not-met | layer1 | blocked-cid-conflict | pass | ✓ |
 | agr-benchmark | layer2-threshold-not-met | layer2Adr | blocked-cid-conflict | pass | ✓ |
 | agr-conflict-benchmark | parallel-safe-disjoint | conflict | allow-parallel | pass | ✓ |
-| agr-conflict-benchmark | read-write-dependency-freeze | conflict | allow-with-watch | fail | ✓ |
+| agr-conflict-benchmark | read-write-dependency-freeze | conflict | freeze | pass | ✓ |
 | agr-conflict-benchmark | capsule-cid-drift-freeze | conflict | freeze | pass | ✓ |
 | agr-conflict-benchmark | shared-surface-blocked | conflict | freeze | pass | ✓ |
 | agr-conflict-benchmark | cid-conflict-blocked | conflict | freeze | pass | ✓ |
