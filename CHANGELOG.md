@@ -1,12 +1,72 @@
 # Changelog
 
-## [Unreleased] - 2026-06-28
+## [Unreleased] - 2026-10-20
 
 Post-paper mainline changes landed after `v0.9.0-alpha.1`.
 
 This section records adopter-visible behavior, release-surface fixes,
 new benchmark/evidence tracks, and the first shipped ATM skill growth
 bridge after the paper-aligned public release.
+
+### Date and version conventions
+
+- History reviewed through [2cd1a48ca](https://github.com/eaglhuang/AI-Atomic-Framework/commit/2cd1a48ca76b8a301df919635c2ae6720d2b51f1), using the complete reachable Git history. New daily entries use the cited commit's **committer date converted to UTC**; author/event dates and later merge dates can differ. They are not release dates. Previously recorded dates remain historical labels, and later fixes supersede earlier implementation details.
+- The older `[0.1.0]`–`[0.9.0]` sections below are **May–June development milestones**, retained from this changelog. They are not the later npm `0.1.x` release sequence. In particular, the June 23 `[0.9.0]` milestone is not a stable npm `0.9.0` release.
+- The paper snapshot is [v0.9.0-alpha.1](https://github.com/eaglhuang/AI-Atomic-Framework/releases/tag/v0.9.0-alpha.1): source commit [a897f144c](https://github.com/eaglhuang/AI-Atomic-Framework/commit/a897f144c) was recorded on June 24, and its GitHub Release was published **2026-06-24 17:13:59Z**. The historical June 23 milestone and that publication are distinct events.
+- Runtime publication dates below come from the CLI's [npm publication metadata](https://registry.npmjs.org/@ai-atomic-framework%2fcli); GitHub Release dates come from the [release records](https://github.com/eaglhuang/AI-Atomic-Framework/releases). A source tag or package.json version does not establish an npm publication date. Package publications can differ: beta.5 has a September 11 GitHub Release but a September 12 CLI npm publication.
+- HIST-v2, method preregistration v2.0, classifier/harness generations, and HIST-v3/prereg-v3 name **research artifacts**, not framework release versions. Historical evidence is described as recorded; this changelog update does not rerun those product tests or experiments. Superseded, partial, invalid, and exploratory results retain those limitations.
+
+### Published runtime versions and source tags
+
+`Unreleased` names the current source-line summary, not a new release number. This historical publication index does not reclassify already published versions as unreleased.
+
+The stable npm runtime milestone is **CLI `0.1.0` (2026-09-13)**. The complete observed CLI publication sequence follows in reverse publication order; all dates are UTC. The GitHub Releases list is only a subset of npm publications and source tags. `create-atm` has its own [publication metadata](https://registry.npmjs.org/create-atm), not an assumed identical publication history.
+
+| CLI version | npm publication date (UTC) | Source tag | GitHub Release publication date (UTC) |
+| --- | --- | --- | --- |
+| `0.1.21` | 2026-10-16 | [v0.1.21](https://github.com/eaglhuang/AI-Atomic-Framework/tree/v0.1.21) | No GitHub Release listed |
+| `0.1.20` | 2026-10-09 | [v0.1.20](https://github.com/eaglhuang/AI-Atomic-Framework/tree/v0.1.20) | No GitHub Release listed |
+| `0.1.19` | 2026-10-09 | [v0.1.19](https://github.com/eaglhuang/AI-Atomic-Framework/tree/v0.1.19) | No GitHub Release listed |
+| `0.1.18` | 2026-10-08 | [v0.1.18](https://github.com/eaglhuang/AI-Atomic-Framework/tree/v0.1.18) | No GitHub Release listed |
+| `0.1.18-beta.0` | 2026-10-08 | [v0.1.18-beta.0](https://github.com/eaglhuang/AI-Atomic-Framework/tree/v0.1.18-beta.0) | [2026-10-08](https://github.com/eaglhuang/AI-Atomic-Framework/releases/tag/v0.1.18-beta.0) |
+| `0.1.17` | 2026-10-07 | [v0.1.17](https://github.com/eaglhuang/AI-Atomic-Framework/tree/v0.1.17) | No GitHub Release listed |
+| `0.1.16` | 2026-10-05 | [v0.1.16](https://github.com/eaglhuang/AI-Atomic-Framework/tree/v0.1.16) | No GitHub Release listed |
+| `0.1.15` | 2026-10-05 | [v0.1.15](https://github.com/eaglhuang/AI-Atomic-Framework/tree/v0.1.15) | No GitHub Release listed |
+| `0.1.14` | 2026-10-04 | [v0.1.14](https://github.com/eaglhuang/AI-Atomic-Framework/tree/v0.1.14) | No GitHub Release listed |
+| `0.1.13` | 2026-10-04 | [v0.1.13](https://github.com/eaglhuang/AI-Atomic-Framework/tree/v0.1.13) | [2026-10-04](https://github.com/eaglhuang/AI-Atomic-Framework/releases/tag/v0.1.13) |
+| `0.1.12` | 2026-10-04 | [v0.1.12](https://github.com/eaglhuang/AI-Atomic-Framework/tree/v0.1.12) | [2026-10-04](https://github.com/eaglhuang/AI-Atomic-Framework/releases/tag/v0.1.12) |
+| `0.1.11` | 2026-10-04 | [v0.1.11](https://github.com/eaglhuang/AI-Atomic-Framework/tree/v0.1.11) | [2026-10-04](https://github.com/eaglhuang/AI-Atomic-Framework/releases/tag/v0.1.11) |
+| `0.1.10` | 2026-10-03 | [v0.1.10](https://github.com/eaglhuang/AI-Atomic-Framework/tree/v0.1.10) | [2026-10-03](https://github.com/eaglhuang/AI-Atomic-Framework/releases/tag/v0.1.10) |
+| `0.1.9` | 2026-10-03 | [v0.1.9](https://github.com/eaglhuang/AI-Atomic-Framework/tree/v0.1.9) | No GitHub Release listed |
+| `0.1.8` | 2026-10-03 | [v0.1.8](https://github.com/eaglhuang/AI-Atomic-Framework/tree/v0.1.8) | No GitHub Release listed |
+| `0.1.7` | 2026-10-03 | [v0.1.7](https://github.com/eaglhuang/AI-Atomic-Framework/tree/v0.1.7) | No GitHub Release listed |
+| `0.1.6` | 2026-10-02 | [v0.1.6](https://github.com/eaglhuang/AI-Atomic-Framework/tree/v0.1.6) | No GitHub Release listed |
+| `0.1.5` | 2026-10-01 | [v0.1.5](https://github.com/eaglhuang/AI-Atomic-Framework/tree/v0.1.5) | No GitHub Release listed |
+| `0.1.4` | 2026-09-30 | [v0.1.4](https://github.com/eaglhuang/AI-Atomic-Framework/tree/v0.1.4) | [2026-09-30](https://github.com/eaglhuang/AI-Atomic-Framework/releases/tag/v0.1.4) |
+| `0.1.2` | 2026-09-20 | [v0.1.2](https://github.com/eaglhuang/AI-Atomic-Framework/tree/v0.1.2) | [2026-09-20](https://github.com/eaglhuang/AI-Atomic-Framework/releases/tag/v0.1.2) |
+| `0.1.1` | 2026-09-19 | [v0.1.1](https://github.com/eaglhuang/AI-Atomic-Framework/tree/v0.1.1) | No GitHub Release listed |
+| `0.1.0` | 2026-09-13 | [v0.1.0](https://github.com/eaglhuang/AI-Atomic-Framework/tree/v0.1.0) | [2026-09-13](https://github.com/eaglhuang/AI-Atomic-Framework/releases/tag/v0.1.0) |
+| `0.1.0-beta.5` | 2026-09-12 | [v0.1.0-beta.5](https://github.com/eaglhuang/AI-Atomic-Framework/tree/v0.1.0-beta.5) | [2026-09-11](https://github.com/eaglhuang/AI-Atomic-Framework/releases/tag/v0.1.0-beta.5) |
+| `0.1.0-beta.4` | 2026-08-30 | [v0.1.0-beta.4](https://github.com/eaglhuang/AI-Atomic-Framework/tree/v0.1.0-beta.4) | [2026-08-30](https://github.com/eaglhuang/AI-Atomic-Framework/releases/tag/v0.1.0-beta.4) |
+| `0.1.0-beta.3` | 2026-08-30 | [v0.1.0-beta.3](https://github.com/eaglhuang/AI-Atomic-Framework/tree/v0.1.0-beta.3) | No GitHub Release listed |
+| `0.1.0-beta.2` | 2026-08-29 | [v0.1.0-beta.2](https://github.com/eaglhuang/AI-Atomic-Framework/tree/v0.1.0-beta.2) | No GitHub Release listed |
+| `0.1.0-beta.1` | 2026-08-29 | [v0.1.0-beta.1](https://github.com/eaglhuang/AI-Atomic-Framework/tree/v0.1.0-beta.1) | No GitHub Release listed |
+| `0.1.0-beta.0` | 2026-08-29 | [v0.1.0-beta.0](https://github.com/eaglhuang/AI-Atomic-Framework/tree/v0.1.0-beta.0) | No GitHub Release listed |
+
+The source tag [v0.1.3](https://github.com/eaglhuang/AI-Atomic-Framework/tree/v0.1.3) points to [e07abaaa4](https://github.com/eaglhuang/AI-Atomic-Framework/commit/e07abaaa4) (committer date September 30); the observed CLI npm time metadata contains no `0.1.3` publication, so none is invented here. The beta.4 GitHub record has `prerelease: false` despite its beta name; the identifier is retained. The `0.1.18-beta.0` release notes explicitly target npm `next` without changing `latest`; that historical channel statement is not a claim about today's tags. CLI `0.1.21` was published at **2026-10-16 06:30:42.712Z**, independently of its source-tag creation time.
+
+### Added - major post-paper milestones
+
+- **Provider-neutral Team runtime and handoff contracts (July).** Role skill-pack manifests, runtime capability wiring, and governed handoff ledgers made team execution boundaries explicit ([d45abbfb0](https://github.com/eaglhuang/AI-Atomic-Framework/commit/d45abbfb0), [beeb0da75](https://github.com/eaglhuang/AI-Atomic-Framework/commit/beeb0da75), [16215e90c](https://github.com/eaglhuang/AI-Atomic-Framework/commit/16215e90c)).
+- **Receipt-bound composition and causal validation (July).** Shared writes gained steward-bound admission, transactional patch materialization, semantic gates, structured execution receipts, zero-test rejection, and causal validator selection ([c979427a2](https://github.com/eaglhuang/AI-Atomic-Framework/commit/c979427a2), [35a08fc6b](https://github.com/eaglhuang/AI-Atomic-Framework/commit/35a08fc6b), [6ea33fd4a](https://github.com/eaglhuang/AI-Atomic-Framework/commit/6ea33fd4a), [c778a76b8](https://github.com/eaglhuang/AI-Atomic-Framework/commit/c778a76b8)).
+- **Installable public runtime (August–September).** Immutable evidence storage and a self-contained npm runtime led to the stable CLI `0.1.0` publication on September 13. This is a separate version line from the earlier development milestones below ([dbcb4ad69](https://github.com/eaglhuang/AI-Atomic-Framework/commit/dbcb4ad69), [ec58da0df](https://github.com/eaglhuang/AI-Atomic-Framework/commit/ec58da0df), [81eae9b39](https://github.com/eaglhuang/AI-Atomic-Framework/commit/81eae9b39)).
+- **One-step adopter setup and local task cards (October).** CLI `0.1.8` introduced vendor-neutral `setup`; single-repository adopters can open their own scoped cards, while later first-run fixes keep the current playbook, actor, lane, and validators visible ([14ea2997b](https://github.com/eaglhuang/AI-Atomic-Framework/commit/14ea2997b), [bb486c40b](https://github.com/eaglhuang/AI-Atomic-Framework/commit/bb486c40b), [e42022164](https://github.com/eaglhuang/AI-Atomic-Framework/commit/e42022164)).
+- **Shared-compose coordinator and research method milestones (October).** The cross-writer compose coordinator landed alongside HIST-v2 method/classifier work. HIST-v2, harness generations, and prereg-v3 smoke archives are research tracks, not an ATM `2.0` or `3.0` product release. The partial pilot-r2 stopped at 747/1,740 cells and recorded an inconsistent counterexample; the evidence index marks superseded/invalid smoke runs and HIST-v3 as DRAFT / NOT FROZEN. No completed main-run or independent reproduction is asserted ([cb2524243](https://github.com/eaglhuang/AI-Atomic-Framework/commit/cb2524243), [527426f48](https://github.com/eaglhuang/AI-Atomic-Framework/commit/527426f48), [52882594c](https://github.com/eaglhuang/AI-Atomic-Framework/commit/52882594c), [evidence index](research/paper-v2/EVIDENCE_INDEX.md)).
+
+### Fixed - subsequent patch and onboarding corrections
+
+- **Unified patches reject malformed input and preserve per-line EOL.** Strict parsing and offset location were followed by CRLF/LF preservation for each affected line, extending the earlier end-of-file newline fix ([f31d938a9](https://github.com/eaglhuang/AI-Atomic-Framework/commit/f31d938a9), [ccf6bd54b](https://github.com/eaglhuang/AI-Atomic-Framework/commit/ccf6bd54b)).
+- **Outcome-first onboarding with verified closure.** README now offers three entry paths and a bounded Bash example that checks exact bytes, successful claim/evidence/close, lane continuity, and the committed result without evaluating arbitrary returned commands ([adf13b16e](https://github.com/eaglhuang/AI-Atomic-Framework/commit/adf13b16e)).
 
 ### Fixed - unified diff end-of-file newline
 
@@ -134,8 +194,56 @@ bridge after the paper-aligned public release.
 
 ### Daily log
 
+#### 2026-10-20
+
+- Changed README to outcome-first, progressive adoption with one bounded request, three entry paths, explicit runtime/version boundaries, and a fail-closed first-write example ([adf13b16e](https://github.com/eaglhuang/AI-Atomic-Framework/commit/adf13b16e)).
+
+#### 2026-10-19
+
+- Fixed strict unified-patch parsing, offset location, and per-line CRLF/LF preservation; retained malformed-patch and no-newline boundaries ([f31d938a9](https://github.com/eaglhuang/AI-Atomic-Framework/commit/f31d938a9), [ccf6bd54b](https://github.com/eaglhuang/AI-Atomic-Framework/commit/ccf6bd54b)).
+- Archived prereg-v3 smoke v10c as exploratory, with Arm B blocked, rather than a product or benchmark success claim ([2626e38c3](https://github.com/eaglhuang/AI-Atomic-Framework/commit/2626e38c3), [evidence index](research/paper-v2/EVIDENCE_INDEX.md)).
+
+#### 2026-10-18
+
+- Fixed the onefile's canonical atom-capsule runtime closure and repaired smoke preflight Python/PATH/probe handling ([e50f192a9](https://github.com/eaglhuang/AI-Atomic-Framework/commit/e50f192a9), [0abd29699](https://github.com/eaglhuang/AI-Atomic-Framework/commit/0abd29699)).
+
+#### 2026-10-17
+
+- Hardened research evaluation provenance: missing evaluator snapshots are invalid, session PATH survives login shells, and false accepts are rejected. The v7/v8 smoke archives remain INVALID ([41d3ab5af](https://github.com/eaglhuang/AI-Atomic-Framework/commit/41d3ab5af), [a2bc011a0](https://github.com/eaglhuang/AI-Atomic-Framework/commit/a2bc011a0), [61bee7533](https://github.com/eaglhuang/AI-Atomic-Framework/commit/61bee7533)).
+
+#### 2026-10-16
+
+- Published CLI `0.1.21` to npm at 06:30:42Z; its source tag points to [3faf627b2](https://github.com/eaglhuang/AI-Atomic-Framework/commit/3faf627b2). Publication verification follows the same immutable candidate rather than treating a tag as registry success.
+- Hardened live research writes and sandbox boundaries; corrected gold-test application, offline Django setup, and scoring of runs where tests did not execute ([41122f241](https://github.com/eaglhuang/AI-Atomic-Framework/commit/41122f241), [ba0755172](https://github.com/eaglhuang/AI-Atomic-Framework/commit/ba0755172), [85de2a92f](https://github.com/eaglhuang/AI-Atomic-Framework/commit/85de2a92f)).
+
+#### 2026-10-15
+
+- Added HIST-v2 harness v3 diagnosis and archived the partial pilot-r2; development replay and smoke-kit repair are separate from a frozen, completed experiment ([c8d6f4c67](https://github.com/eaglhuang/AI-Atomic-Framework/commit/c8d6f4c67), [52882594c](https://github.com/eaglhuang/AI-Atomic-Framework/commit/52882594c)).
+- Made suggested commands paste-safe and carried known actors into quickfix claims ([74fe2405f](https://github.com/eaglhuang/AI-Atomic-Framework/commit/74fe2405f)).
+
+#### 2026-10-14
+
+- Added the cross-writer shared-compose batch coordinator; recorded the HIST-v2 method preregistration v2.0 and classifier v8 as research artifacts, not framework release versions ([7e244bc60](https://github.com/eaglhuang/AI-Atomic-Framework/commit/7e244bc60), [527426f48](https://github.com/eaglhuang/AI-Atomic-Framework/commit/527426f48), [3ec951fca](https://github.com/eaglhuang/AI-Atomic-Framework/commit/3ec951fca)).
+
+#### 2026-10-11
+
+- Kept claimed next actions at `implement-deliverables`, reported missing Git authors as structured close blockers, and compacted Day-1 JSON ([210454481](https://github.com/eaglhuang/AI-Atomic-Framework/commit/210454481), [58421f600](https://github.com/eaglhuang/AI-Atomic-Framework/commit/58421f600), [879fd632d](https://github.com/eaglhuang/AI-Atomic-Framework/commit/879fd632d)).
+
+#### 2026-10-10
+
+- Embedded ajv and atomization helpers into the onefile and filled registry-backed atom CIDs in proposals/backfill ([859721f86](https://github.com/eaglhuang/AI-Atomic-Framework/commit/859721f86), [de52d5af8](https://github.com/eaglhuang/AI-Atomic-Framework/commit/de52d5af8), [f8395bf27](https://github.com/eaglhuang/AI-Atomic-Framework/commit/f8395bf27)).
+- Added HIST-v2 pair-classifier/pre-label tooling and benchmark-redesign drafts; these snapshots are research preparation, not a framework release or an independently validated result ([87bc5fd44](https://github.com/eaglhuang/AI-Atomic-Framework/commit/87bc5fd44), [ec4e30dde](https://github.com/eaglhuang/AI-Atomic-Framework/commit/ec4e30dde)).
+
+#### 2026-10-09
+
+- Made first-run setup usable from the project directory; preserved invocation lanes, staged path bytes, deletions, rename pairs, and verified first pushes to absent remote refs ([1e84a05e9](https://github.com/eaglhuang/AI-Atomic-Framework/commit/1e84a05e9), [4d68f448c](https://github.com/eaglhuang/AI-Atomic-Framework/commit/4d68f448c), [184d735c8](https://github.com/eaglhuang/AI-Atomic-Framework/commit/184d735c8), [3878cde9c](https://github.com/eaglhuang/AI-Atomic-Framework/commit/3878cde9c)).
+- Fixed unified-diff EOF newline markers and busy steward queues; isolated validator cleanup from active work ([52f0df8e8](https://github.com/eaglhuang/AI-Atomic-Framework/commit/52f0df8e8), [b35a6141b](https://github.com/eaglhuang/AI-Atomic-Framework/commit/b35a6141b), [f66c84dad](https://github.com/eaglhuang/AI-Atomic-Framework/commit/f66c84dad)).
+- Archived HIST trials, an EOF-counterexample-stopped run, and a follow-up rerun. These precede the later HIST-v2 redesign and do not establish a completed HIST-v2 main run or independent reproduction ([8e7cc3967](https://github.com/eaglhuang/AI-Atomic-Framework/commit/8e7cc3967), [8311089e5](https://github.com/eaglhuang/AI-Atomic-Framework/commit/8311089e5), [evidence index](research/paper-v2/EVIDENCE_INDEX.md)).
+
 #### 2026-10-08
 
+- Preserved literal validator comma arguments and narrowed taskflow missing-flag hints; CLI `0.1.18-beta.0` and `0.1.18` have distinct npm publication records ([162274029](https://github.com/eaglhuang/AI-Atomic-Framework/commit/162274029), [210b3f4d7](https://github.com/eaglhuang/AI-Atomic-Framework/commit/210b3f4d7)).
+- Archived paper-v2 evidence generations r1–r4, retaining review findings and counterexamples; their draft observations do not imply independent reproduction or a product version increment ([cb2489f2f](https://github.com/eaglhuang/AI-Atomic-Framework/commit/cb2489f2f), [83a91f505](https://github.com/eaglhuang/AI-Atomic-Framework/commit/83a91f505)).
 - Closed the multi-process steward lost-update and torn-write window with a
   per-file compare-and-swap and an atomic rename. Public steward evidence
   remains `applied` or `blocked`; transactional receipts may now report
@@ -144,6 +252,349 @@ bridge after the paper-aligned public release.
   hash drift. Disjoint regions can both commit; the same region stays blocked.
   Commit locks moved under the repo `.atm/runtime` directory, with bounded
   re-compose retries and stale-holder reclaim.
+
+#### 2026-10-07
+
+- Added file-heat observation and recoverable hot-conflict parking; composed steward patches against one base and failed closed on unsafe combinations ([23a98b334](https://github.com/eaglhuang/AI-Atomic-Framework/commit/23a98b334), [9ee4e65b0](https://github.com/eaglhuang/AI-Atomic-Framework/commit/9ee4e65b0), [a5a567967](https://github.com/eaglhuang/AI-Atomic-Framework/commit/a5a567967), [65e8aab36](https://github.com/eaglhuang/AI-Atomic-Framework/commit/65e8aab36)).
+- Named each claimed card's real validators and provided a route out of the larger-task guide loop ([e42022164](https://github.com/eaglhuang/AI-Atomic-Framework/commit/e42022164), [b880f0cc5](https://github.com/eaglhuang/AI-Atomic-Framework/commit/b880f0cc5)).
+
+#### 2026-10-06
+
+- Changed npm release parity to validate an immutable candidate before promotion, rather than independently rebuilt publication artifacts ([355968c4b](https://github.com/eaglhuang/AI-Atomic-Framework/commit/355968c4b)).
+- Added two-phase derived-atom occupancy and surfaced failing validator output tails ([8dd6a1c6d](https://github.com/eaglhuang/AI-Atomic-Framework/commit/8dd6a1c6d), [f8401387c](https://github.com/eaglhuang/AI-Atomic-Framework/commit/f8401387c)).
+
+#### 2026-10-05
+
+- Pinned starter installation to its declared CLI dependency, added runtime-aware first-run routing, and tolerated half-edited package manifests ([95e2711ef](https://github.com/eaglhuang/AI-Atomic-Framework/commit/95e2711ef), [a94948f2c](https://github.com/eaglhuang/AI-Atomic-Framework/commit/a94948f2c), [151642c97](https://github.com/eaglhuang/AI-Atomic-Framework/commit/151642c97)).
+
+#### 2026-10-04
+
+- Let a single-repository adopter open scoped local task cards; added `taskflow abandon` and preserved literal command commas ([bb486c40b](https://github.com/eaglhuang/AI-Atomic-Framework/commit/bb486c40b), [9fdac4e16](https://github.com/eaglhuang/AI-Atomic-Framework/commit/9fdac4e16), [ea260f4c2](https://github.com/eaglhuang/AI-Atomic-Framework/commit/ea260f4c2)).
+
+#### 2026-10-03
+
+- Added vendor-neutral one-step `setup` in CLI `0.1.8`; adopter ignore rules keep `.atm/history` tracked while excluding generated runtime state ([14ea2997b](https://github.com/eaglhuang/AI-Atomic-Framework/commit/14ea2997b), [865de9a8c](https://github.com/eaglhuang/AI-Atomic-Framework/commit/865de9a8c), [4fe97a521](https://github.com/eaglhuang/AI-Atomic-Framework/commit/4fe97a521)).
+
+#### 2026-10-02
+
+- Reused planning-root observations during route scoring, reduced duplicate reproducibility builds, and excluded declared fixture commands from runtime telemetry ([823c13aeb](https://github.com/eaglhuang/AI-Atomic-Framework/commit/823c13aeb), [5b9d354fb](https://github.com/eaglhuang/AI-Atomic-Framework/commit/5b9d354fb), [a89a208a5](https://github.com/eaglhuang/AI-Atomic-Framework/commit/a89a208a5)).
+
+#### 2026-10-01
+
+- Added an always-on Cursor rule, a claimable first-request fast route, and an ATMChart immediately after bootstrap ([256ba48f6](https://github.com/eaglhuang/AI-Atomic-Framework/commit/256ba48f6), [ff2ac0308](https://github.com/eaglhuang/AI-Atomic-Framework/commit/ff2ac0308), [345b4f2a9](https://github.com/eaglhuang/AI-Atomic-Framework/commit/345b4f2a9)).
+- Rejected signal-terminated validator outcomes, stopped synthesizing historical validation passes, and made repair/delivery previews side-effect free ([b8001b6ae](https://github.com/eaglhuang/AI-Atomic-Framework/commit/b8001b6ae), [ed317820d](https://github.com/eaglhuang/AI-Atomic-Framework/commit/ed317820d), [1fe6791b2](https://github.com/eaglhuang/AI-Atomic-Framework/commit/1fe6791b2)).
+
+#### 2026-09-30
+
+- Synchronized release-train metadata and validated release dry-runs; repaired observed telemetry coverage ([7b799a433](https://github.com/eaglhuang/AI-Atomic-Framework/commit/7b799a433), [e07abaaa4](https://github.com/eaglhuang/AI-Atomic-Framework/commit/e07abaaa4)).
+
+#### 2026-09-29
+
+- Made npm adopter recovery and bootstrap instructions consistently name a runnable command prefix ([f7c79d9bc](https://github.com/eaglhuang/AI-Atomic-Framework/commit/f7c79d9bc), [3d92eaca5](https://github.com/eaglhuang/AI-Atomic-Framework/commit/3d92eaca5)).
+
+#### 2026-09-28
+
+- Fixed printed npm guidance so its commands can actually be executed ([f3d20e7ba](https://github.com/eaglhuang/AI-Atomic-Framework/commit/f3d20e7ba)).
+
+#### 2026-09-23
+
+- Proved the clean-install first-use path and avoided routing adopters into a nonexistent npm test script ([53f2c6fc0](https://github.com/eaglhuang/AI-Atomic-Framework/commit/53f2c6fc0), [31cb9613c](https://github.com/eaglhuang/AI-Atomic-Framework/commit/31cb9613c), [e974ca80f](https://github.com/eaglhuang/AI-Atomic-Framework/commit/e974ca80f)).
+
+#### 2026-09-22
+
+- Preserved executable npm runtime bins and retained failed Product CI burn-in evidence ([c52c00767](https://github.com/eaglhuang/AI-Atomic-Framework/commit/c52c00767), [239242f94](https://github.com/eaglhuang/AI-Atomic-Framework/commit/239242f94)).
+
+#### 2026-09-21
+
+- Bounded Git output and pathspec batches for temporary-index cleanup; removed three false active-work route blocks ([bc8638e5e](https://github.com/eaglhuang/AI-Atomic-Framework/commit/bc8638e5e), [c84532bdd](https://github.com/eaglhuang/AI-Atomic-Framework/commit/c84532bdd), [8e91890fa](https://github.com/eaglhuang/AI-Atomic-Framework/commit/8e91890fa)).
+
+#### 2026-09-20
+
+- Published CLI `0.1.2` with missing runtime schemas restored; built candidates before packing and stopped duplicating embedded schemas ([cd37f2fc9](https://github.com/eaglhuang/AI-Atomic-Framework/commit/cd37f2fc9), [7638f2c98](https://github.com/eaglhuang/AI-Atomic-Framework/commit/7638f2c98)).
+
+#### 2026-09-19
+
+- Made `atm create` usable from the published package and waited for registry propagation before applying the post-publish gate ([180c79204](https://github.com/eaglhuang/AI-Atomic-Framework/commit/180c79204), [fcedee2da](https://github.com/eaglhuang/AI-Atomic-Framework/commit/fcedee2da)).
+
+#### 2026-09-18
+
+- Added a fail-closed public-registry post-publish check and repaired packaged telemetry's module boundary ([fbdf07f8c](https://github.com/eaglhuang/AI-Atomic-Framework/commit/fbdf07f8c), [54872bf11](https://github.com/eaglhuang/AI-Atomic-Framework/commit/54872bf11)).
+
+#### 2026-09-17
+
+- Reduced `next` latency by deferring expensive scans while retaining pre-claim broker advice; bounded ignored-deliverable scans ([ea675732f](https://github.com/eaglhuang/AI-Atomic-Framework/commit/ea675732f), [5e4e51d62](https://github.com/eaglhuang/AI-Atomic-Framework/commit/5e4e51d62), [9474cc211](https://github.com/eaglhuang/AI-Atomic-Framework/commit/9474cc211)).
+
+#### 2026-09-15
+
+- Prefiltered active queues, measured claim phases in milliseconds, and provided explicit recovery of released staged task records ([32219a899](https://github.com/eaglhuang/AI-Atomic-Framework/commit/32219a899), [ea324151e](https://github.com/eaglhuang/AI-Atomic-Framework/commit/ea324151e), [b732f72a6](https://github.com/eaglhuang/AI-Atomic-Framework/commit/b732f72a6)).
+
+#### 2026-09-14
+
+- Closed the compact npm runtime's chart/schema boundary and deferred full framework status from ordinary `next` calls ([bac08a4b8](https://github.com/eaglhuang/AI-Atomic-Framework/commit/bac08a4b8), [e62546837](https://github.com/eaglhuang/AI-Atomic-Framework/commit/e62546837), [9c59bee27](https://github.com/eaglhuang/AI-Atomic-Framework/commit/9c59bee27)).
+
+#### 2026-09-13
+
+- Reached the stable public npm CLI `0.1.0` milestone with a measured adopter runtime boundary and lazy-loaded command runners ([81eae9b39](https://github.com/eaglhuang/AI-Atomic-Framework/commit/81eae9b39), [d085f0830](https://github.com/eaglhuang/AI-Atomic-Framework/commit/d085f0830)).
+
+#### 2026-09-12
+
+- Added fail-closed Product CI burn-in evaluation, separate historical-failure baselines, and paired-benchmark metric/decision validators ([7f45b1705](https://github.com/eaglhuang/AI-Atomic-Framework/commit/7f45b1705), [e74624857](https://github.com/eaglhuang/AI-Atomic-Framework/commit/e74624857), [aa7263c50](https://github.com/eaglhuang/AI-Atomic-Framework/commit/aa7263c50)).
+
+#### 2026-09-11
+
+- Retried transient Windows onefile-cache rename failures and bounded release validator/job runtime ([a3de11e68](https://github.com/eaglhuang/AI-Atomic-Framework/commit/a3de11e68), [c86f0e297](https://github.com/eaglhuang/AI-Atomic-Framework/commit/c86f0e297)).
+
+#### 2026-09-10
+
+- Moved mutable evidence outside tracked history, hydrated closure packets from the runtime ledger, and separated npm/onefile payload contracts ([6ac164fe8](https://github.com/eaglhuang/AI-Atomic-Framework/commit/6ac164fe8), [010609832](https://github.com/eaglhuang/AI-Atomic-Framework/commit/010609832), [0374416b2](https://github.com/eaglhuang/AI-Atomic-Framework/commit/0374416b2)).
+
+#### 2026-09-09
+
+- Restored scaffold assets in the compact runtime and sped up required CI without dropping its declared coverage ([1853d042f](https://github.com/eaglhuang/AI-Atomic-Framework/commit/1853d042f), [28abd508f](https://github.com/eaglhuang/AI-Atomic-Framework/commit/28abd508f)).
+
+#### 2026-09-08
+
+- Built a compact installable npm runtime and repaired packaged integration-adapter readiness ([9ce4e845a](https://github.com/eaglhuang/AI-Atomic-Framework/commit/9ce4e845a), [d125b81dc](https://github.com/eaglhuang/AI-Atomic-Framework/commit/d125b81dc)).
+
+#### 2026-09-07
+
+- Prevented close from deferring reconciliation residue instead of accounting for it ([8d3b4a3e4](https://github.com/eaglhuang/AI-Atomic-Framework/commit/8d3b4a3e4)).
+
+#### 2026-09-06
+
+- Added bounded adoption of unowned work in progress and separated runtime Git-head journals from tracked receipts ([a50574095](https://github.com/eaglhuang/AI-Atomic-Framework/commit/a50574095), [c7eff27dc](https://github.com/eaglhuang/AI-Atomic-Framework/commit/c7eff27dc)).
+
+#### 2026-09-05
+
+- Reused adopted lane sessions, inspected historical commit/scope spans, and fixed installed-package helper resolution ([138181ded](https://github.com/eaglhuang/AI-Atomic-Framework/commit/138181ded), [9c498d94e](https://github.com/eaglhuang/AI-Atomic-Framework/commit/9c498d94e), [2ac8e8346](https://github.com/eaglhuang/AI-Atomic-Framework/commit/2ac8e8346)).
+
+#### 2026-09-04
+
+- Restored the canonical onefile build boundary and admitted declared ignored deliverables through the governed Git path ([d61f8aaed](https://github.com/eaglhuang/AI-Atomic-Framework/commit/d61f8aaed), [e920670ce](https://github.com/eaglhuang/AI-Atomic-Framework/commit/e920670ce)).
+
+#### 2026-09-03
+
+- Scoped release validators to release work and suppressed optional Git index locks in ATM subprocesses ([6f5343435](https://github.com/eaglhuang/AI-Atomic-Framework/commit/6f5343435), [d04defb7c](https://github.com/eaglhuang/AI-Atomic-Framework/commit/d04defb7c)).
+
+#### 2026-09-02
+
+- Preserved sealed staged blobs and bounded branch-queue waiting by the actual commit timeout ([5228e65ee](https://github.com/eaglhuang/AI-Atomic-Framework/commit/5228e65ee), [f46a27f22](https://github.com/eaglhuang/AI-Atomic-Framework/commit/f46a27f22)).
+
+#### 2026-09-01
+
+- Required explicit broker conflict-release order and preserved terminal-history ownership during cleanup/reconciliation ([f367946a6](https://github.com/eaglhuang/AI-Atomic-Framework/commit/f367946a6), [653d8c7ce](https://github.com/eaglhuang/AI-Atomic-Framework/commit/653d8c7ce)).
+
+#### 2026-08-30
+
+- Bound admission tickets to explicit claim scope and separated benchmark pre-run readiness from final custodian acceptance ([ce731c8f4](https://github.com/eaglhuang/AI-Atomic-Framework/commit/ce731c8f4), [253cfc907](https://github.com/eaglhuang/AI-Atomic-Framework/commit/253cfc907), [c74a6f5f6](https://github.com/eaglhuang/AI-Atomic-Framework/commit/c74a6f5f6)).
+
+#### 2026-08-29
+
+- Closed the standalone CLI's package boundary, bundled skill companions, and verified the tag-versioned tarball. npm CLI beta.0–beta.2 publications began on this UTC date ([ec58da0df](https://github.com/eaglhuang/AI-Atomic-Framework/commit/ec58da0df), [ece36f30d](https://github.com/eaglhuang/AI-Atomic-Framework/commit/ece36f30d), [12c368c94](https://github.com/eaglhuang/AI-Atomic-Framework/commit/12c368c94)).
+
+#### 2026-08-28
+
+- Hardened release-audit discovery and admission for owned ignored candidate artifacts, rather than omitting them from delivery evidence ([ad3eb7275](https://github.com/eaglhuang/AI-Atomic-Framework/commit/ad3eb7275), [39d6cd052](https://github.com/eaglhuang/AI-Atomic-Framework/commit/39d6cd052)).
+
+#### 2026-08-27
+
+- Migrated runtime evidence into an immutable ledger, enforced adopter artifact budgets, and added clean runtime-package installation checks ([dbcb4ad69](https://github.com/eaglhuang/AI-Atomic-Framework/commit/dbcb4ad69), [0e0591329](https://github.com/eaglhuang/AI-Atomic-Framework/commit/0e0591329), [656b6d4f5](https://github.com/eaglhuang/AI-Atomic-Framework/commit/656b6d4f5)).
+
+#### 2026-08-26
+
+- Added repeatable Product CI burn-in dispatch and release-candidate labels ([e3b27c6f5](https://github.com/eaglhuang/AI-Atomic-Framework/commit/e3b27c6f5), [6647e264f](https://github.com/eaglhuang/AI-Atomic-Framework/commit/6647e264f)).
+
+#### 2026-08-25
+
+- Composed disjoint JSON-pointer proposals, persisted explicit merge plans, and preserved typed dependency declarations ([8a9984509](https://github.com/eaglhuang/AI-Atomic-Framework/commit/8a9984509), [5cf291dd2](https://github.com/eaglhuang/AI-Atomic-Framework/commit/5cf291dd2), [bc953fbbe](https://github.com/eaglhuang/AI-Atomic-Framework/commit/bc953fbbe)).
+
+#### 2026-08-24
+
+- Recovered task import from discovered source cards instead of requiring an already materialized ledger ([4c9519b70](https://github.com/eaglhuang/AI-Atomic-Framework/commit/4c9519b70)).
+
+#### 2026-08-23
+
+- Automatically handed off concurrent close windows and bound runner takeover to its exact physical dirty-file scope ([9c99b2ad0](https://github.com/eaglhuang/AI-Atomic-Framework/commit/9c99b2ad0), [5354cebca](https://github.com/eaglhuang/AI-Atomic-Framework/commit/5354cebca)).
+
+#### 2026-08-22
+
+- Enforced proven hard-causal task dependencies at import and claim, rather than treating all declared relationships as execution blockers ([da019ca48](https://github.com/eaglhuang/AI-Atomic-Framework/commit/da019ca48), [0cdbc9e95](https://github.com/eaglhuang/AI-Atomic-Framework/commit/0cdbc9e95)).
+
+#### 2026-08-21
+
+- Sealed the skill source universe and projection parity; isolated validator commands from the caller's lane session ([603ad3514](https://github.com/eaglhuang/AI-Atomic-Framework/commit/603ad3514), [7c352a457](https://github.com/eaglhuang/AI-Atomic-Framework/commit/7c352a457)).
+
+#### 2026-08-20
+
+- Stabilized immutable wave-observer receipt inputs and stopped obsolete observer successors from invalidating current evidence ([59eb2efd0](https://github.com/eaglhuang/AI-Atomic-Framework/commit/59eb2efd0), [8bebdb200](https://github.com/eaglhuang/AI-Atomic-Framework/commit/8bebdb200)).
+
+#### 2026-08-19
+
+- Kept the live Git index at HEAD after governed commits and recovered ancestor-owned residue without rewriting later paths ([a8bbf3ad0](https://github.com/eaglhuang/AI-Atomic-Framework/commit/a8bbf3ad0), [2f8322cad](https://github.com/eaglhuang/AI-Atomic-Framework/commit/2f8322cad)).
+
+#### 2026-08-18
+
+- Repaired stale-evidence recovery, environment-prefixed validator formatting, and the bridge from verified published-runner receipts ([aa5d12ba5](https://github.com/eaglhuang/AI-Atomic-Framework/commit/aa5d12ba5), [8a2d9f126](https://github.com/eaglhuang/AI-Atomic-Framework/commit/8a2d9f126)).
+
+#### 2026-08-16
+
+- Sealed skill projection parity and stopped independent evidence certificates from invalidating themselves on remote fast-forward ([81712257a](https://github.com/eaglhuang/AI-Atomic-Framework/commit/81712257a), [a83803554](https://github.com/eaglhuang/AI-Atomic-Framework/commit/a83803554)).
+
+#### 2026-08-15
+
+- Resolved terminal-history ownership through canonical authority snapshots and retained durable lane ownership on framework claims ([1bea12f10](https://github.com/eaglhuang/AI-Atomic-Framework/commit/1bea12f10), [8c6916a2f](https://github.com/eaglhuang/AI-Atomic-Framework/commit/8c6916a2f)).
+
+#### 2026-08-14
+
+- Resealed work-admission tickets atomically on scope amendments; preserved declared validator commands and failed closed on undeliverable skill source templates ([60e4daba4](https://github.com/eaglhuang/AI-Atomic-Framework/commit/60e4daba4), [82f17c1ad](https://github.com/eaglhuang/AI-Atomic-Framework/commit/82f17c1ad), [1b58c4a2d](https://github.com/eaglhuang/AI-Atomic-Framework/commit/1b58c4a2d)).
+
+#### 2026-08-13
+
+- Applied real unified patches in the neutral steward and grounded four-plan certificate judgments in observed evidence and live remote state ([8cef64b8f](https://github.com/eaglhuang/AI-Atomic-Framework/commit/8cef64b8f), [f8f7789a3](https://github.com/eaglhuang/AI-Atomic-Framework/commit/f8f7789a3)).
+
+#### 2026-08-12
+
+- Added independent four-plan certificate and shadow-comparison surfaces, including explicit hostile-dogfood and closeout observations; these are evidence mechanisms, not a new public version ([a1d0306a0](https://github.com/eaglhuang/AI-Atomic-Framework/commit/a1d0306a0), [169f13033](https://github.com/eaglhuang/AI-Atomic-Framework/commit/169f13033)).
+
+#### 2026-08-11
+
+- Preserved released-index residue through close and coordinated close with sealed-runner publication ([703b451d9](https://github.com/eaglhuang/AI-Atomic-Framework/commit/703b451d9), [3985b713d](https://github.com/eaglhuang/AI-Atomic-Framework/commit/3985b713d)).
+
+#### 2026-08-10
+
+- Made publication handoff atomic and distinguished terminal ownership from live residue ownership ([264ad16e6](https://github.com/eaglhuang/AI-Atomic-Framework/commit/264ad16e6), [97037d7af](https://github.com/eaglhuang/AI-Atomic-Framework/commit/97037d7af)).
+
+#### 2026-08-09
+
+- Preserved publication transaction evidence and made release recovery fail closed ([7b7c625ff](https://github.com/eaglhuang/AI-Atomic-Framework/commit/7b7c625ff), [0d3839c9b](https://github.com/eaglhuang/AI-Atomic-Framework/commit/0d3839c9b)).
+
+#### 2026-08-08
+
+- Added sandboxed test-patch proposals and evidence freshness certificates ([bdc02704a](https://github.com/eaglhuang/AI-Atomic-Framework/commit/bdc02704a), [ab501515c](https://github.com/eaglhuang/AI-Atomic-Framework/commit/ab501515c)).
+
+#### 2026-07-31
+
+- Added coverage-universe compilation, a QualityGauntlet facade, and closure-assurance reduction, with mutation-adapter lineage and equivalence governance ([d1a1f2bee](https://github.com/eaglhuang/AI-Atomic-Framework/commit/d1a1f2bee), [27d63f7d7](https://github.com/eaglhuang/AI-Atomic-Framework/commit/27d63f7d7), [b31579017](https://github.com/eaglhuang/AI-Atomic-Framework/commit/b31579017)).
+
+#### 2026-07-30
+
+- Added incremental evidence-freshness rerun plans, data-driven skill distribution profiles, and editor-global overlays ([d939ece33](https://github.com/eaglhuang/AI-Atomic-Framework/commit/d939ece33), [68374405e](https://github.com/eaglhuang/AI-Atomic-Framework/commit/68374405e), [8a289b8db](https://github.com/eaglhuang/AI-Atomic-Framework/commit/8a289b8db)).
+
+#### 2026-07-29
+
+- Added independent acceptance-evidence close gates and final verdict aggregation rather than treating task status alone as delivery proof ([56a506b3e](https://github.com/eaglhuang/AI-Atomic-Framework/commit/56a506b3e), [ccb5413e4](https://github.com/eaglhuang/AI-Atomic-Framework/commit/ccb5413e4)).
+
+#### 2026-07-28
+
+- Bound historical admission attestation to immutable provenance and reconciled stale publication receipts ([91fcf80a5](https://github.com/eaglhuang/AI-Atomic-Framework/commit/91fcf80a5), [052bebb10](https://github.com/eaglhuang/AI-Atomic-Framework/commit/052bebb10), [1f566b660](https://github.com/eaglhuang/AI-Atomic-Framework/commit/1f566b660)).
+
+#### 2026-07-27
+
+- Added historical-runner red/green discrimination and autonomous review lifecycle recovery ([9faccadbd](https://github.com/eaglhuang/AI-Atomic-Framework/commit/9faccadbd), [a58b814fa](https://github.com/eaglhuang/AI-Atomic-Framework/commit/a58b814fa)).
+
+#### 2026-07-26
+
+- Added causal validator selection and phase-suite promotion gating so task evidence and broader phase coverage use one contract ([c778a76b8](https://github.com/eaglhuang/AI-Atomic-Framework/commit/c778a76b8)).
+
+#### 2026-07-25
+
+- Added structured execution receipts and a zero-test hard gate, plus migration of causal validator execution contracts ([6ea33fd4a](https://github.com/eaglhuang/AI-Atomic-Framework/commit/6ea33fd4a), [6dea40d8b](https://github.com/eaglhuang/AI-Atomic-Framework/commit/6dea40d8b)).
+
+#### 2026-07-24
+
+- Added causal task-authoring, progressive-disclosure skill definitions, and provider support for deep module refactoring ([d3312405e](https://github.com/eaglhuang/AI-Atomic-Framework/commit/d3312405e), [e8d9226a3](https://github.com/eaglhuang/AI-Atomic-Framework/commit/e8d9226a3), [d8fee0a3e](https://github.com/eaglhuang/AI-Atomic-Framework/commit/d8fee0a3e)).
+
+#### 2026-07-23
+
+- Added receipt-bound shared-write admission, steward-only delivery, transactional patch materialization, and post-compose semantic gates ([c979427a2](https://github.com/eaglhuang/AI-Atomic-Framework/commit/c979427a2), [35a08fc6b](https://github.com/eaglhuang/AI-Atomic-Framework/commit/35a08fc6b)).
+
+#### 2026-07-22
+
+- Added acceptance-evidence realness contracts, content-sealed runner parity, and staged-candidate line-budget checks ([eb397c3d4](https://github.com/eaglhuang/AI-Atomic-Framework/commit/eb397c3d4), [b3ab50a2c](https://github.com/eaglhuang/AI-Atomic-Framework/commit/b3ab50a2c), [957a333fb](https://github.com/eaglhuang/AI-Atomic-Framework/commit/957a333fb)).
+
+#### 2026-07-21
+
+- Exposed broker replay evidence and required real dogfood lifecycle observations; isolated parallel validator failure diagnostics ([c29341677](https://github.com/eaglhuang/AI-Atomic-Framework/commit/c29341677), [59a448617](https://github.com/eaglhuang/AI-Atomic-Framework/commit/59a448617), [df793f300](https://github.com/eaglhuang/AI-Atomic-Framework/commit/df793f300)).
+
+#### 2026-07-20
+
+- Sealed canonical telemetry summaries and provided a bounded temporary framework-claim skill route ([aa0a88e92](https://github.com/eaglhuang/AI-Atomic-Framework/commit/aa0a88e92), [cbbe4d868](https://github.com/eaglhuang/AI-Atomic-Framework/commit/cbbe4d868)).
+
+#### 2026-07-19
+
+- Added atomic wave-checkpoint receipts, gate-coverage preflight, and canonical task-ID import boundaries ([408315750](https://github.com/eaglhuang/AI-Atomic-Framework/commit/408315750), [0f24213f6](https://github.com/eaglhuang/AI-Atomic-Framework/commit/0f24213f6), [f9d96a28c](https://github.com/eaglhuang/AI-Atomic-Framework/commit/f9d96a28c)).
+
+#### 2026-07-18
+
+- Added executor-neutral wave runtime and lane-aware same-task claim/adoption handling ([ed3de81e0](https://github.com/eaglhuang/AI-Atomic-Framework/commit/ed3de81e0), [8ec46699b](https://github.com/eaglhuang/AI-Atomic-Framework/commit/8ec46699b)).
+
+#### 2026-07-17
+
+- Removed concrete planning-repository names from adapters and repaired the memory-consolidation skill source ([f0de9a493](https://github.com/eaglhuang/AI-Atomic-Framework/commit/f0de9a493), [4ece6cc10](https://github.com/eaglhuang/AI-Atomic-Framework/commit/4ece6cc10)).
+
+#### 2026-07-16
+
+- Added explicit lane adoption and released orphan runner-sync queue heads, keeping unrelated preparation outside shared build ownership ([eef10bf71](https://github.com/eaglhuang/AI-Atomic-Framework/commit/eef10bf71), [9c3d80cec](https://github.com/eaglhuang/AI-Atomic-Framework/commit/9c3d80cec)).
+
+#### 2026-07-15
+
+- Added generated-projection and runner-sync steward queues to coordinate shared output publication ([08484f35e](https://github.com/eaglhuang/AI-Atomic-Framework/commit/08484f35e), [216315cf1](https://github.com/eaglhuang/AI-Atomic-Framework/commit/216315cf1)).
+
+#### 2026-07-14
+
+- Allowed historical delivery references to name the actual delivery repository during cross-repository reconciliation ([cbf8a0aaf](https://github.com/eaglhuang/AI-Atomic-Framework/commit/cbf8a0aaf)).
+
+#### 2026-07-13
+
+- Added runtime-residue reconciliation and historical batch-checkpoint closeback, distinguishing temporary artifacts from user work ([649be4a8f](https://github.com/eaglhuang/AI-Atomic-Framework/commit/649be4a8f), [6e7514313](https://github.com/eaglhuang/AI-Atomic-Framework/commit/6e7514313), [9e752e1ff](https://github.com/eaglhuang/AI-Atomic-Framework/commit/9e752e1ff)).
+
+#### 2026-07-12
+
+- Drove closure readiness from the write-side validator set and reconciled failed-commit evidence ([4fbf35c32](https://github.com/eaglhuang/AI-Atomic-Framework/commit/4fbf35c32), [573ac3cf7](https://github.com/eaglhuang/AI-Atomic-Framework/commit/573ac3cf7)).
+
+#### 2026-07-11
+
+- Added governed Team handoff ledgers and repaired stale direction-lock release while honoring claim globs for generated mirrors ([16215e90c](https://github.com/eaglhuang/AI-Atomic-Framework/commit/16215e90c), [d67fa47d8](https://github.com/eaglhuang/AI-Atomic-Framework/commit/d67fa47d8), [322b02cd2](https://github.com/eaglhuang/AI-Atomic-Framework/commit/322b02cd2)).
+
+#### 2026-07-10
+
+- Added provider-neutral role skill-pack manifests, integration runtime capabilities, and OpenAI-family runtime bridges ([beeb0da75](https://github.com/eaglhuang/AI-Atomic-Framework/commit/beeb0da75), [d45abbfb0](https://github.com/eaglhuang/AI-Atomic-Framework/commit/d45abbfb0), [e540beb98](https://github.com/eaglhuang/AI-Atomic-Framework/commit/e540beb98)).
+
+#### 2026-07-09
+
+- Fenced protected staged ATM history and finalized diagnostic historical-batch evidence ([39c5223a6](https://github.com/eaglhuang/AI-Atomic-Framework/commit/39c5223a6), [e6f73063b](https://github.com/eaglhuang/AI-Atomic-Framework/commit/e6f73063b)).
+
+#### 2026-07-08
+
+- Compacted `next` output, quieted successful validators, and repaired batch routing and interrupted-close residue handling ([3195d5a5a](https://github.com/eaglhuang/AI-Atomic-Framework/commit/3195d5a5a), [31f36d7b0](https://github.com/eaglhuang/AI-Atomic-Framework/commit/31f36d7b0)).
+
+#### 2026-07-07
+
+- Retired the legacy `do` command, exposed broker register-mismatch details, and removed a blocking advisory from pre-commit ([1d494571a](https://github.com/eaglhuang/AI-Atomic-Framework/commit/1d494571a), [d18a527f8](https://github.com/eaglhuang/AI-Atomic-Framework/commit/d18a527f8), [ec324d3c0](https://github.com/eaglhuang/AI-Atomic-Framework/commit/ec324d3c0)).
+
+#### 2026-07-06
+
+- Made onefile-budget fixtures mirror the real payload boundary so retained release output cannot trigger recursive self-spawn ([3ef6a21ab](https://github.com/eaglhuang/AI-Atomic-Framework/commit/3ef6a21ab)).
+
+#### 2026-07-03
+
+- Excluded `release/**` from the onefile payload to stop nested-launcher recursion ([286e0cdb0](https://github.com/eaglhuang/AI-Atomic-Framework/commit/286e0cdb0)).
+
+#### 2026-07-02
+
+- Surfaced stale claims and framework locks as audit findings and updated official arXiv links ([8491ed6ea](https://github.com/eaglhuang/AI-Atomic-Framework/commit/8491ed6ea), [16c42db33](https://github.com/eaglhuang/AI-Atomic-Framework/commit/16c42db33)).
+
+#### 2026-07-01
+
+- Repaired auto-evidence mapping, reset-open classification, and broker/CID parity; hardened clean-checkout validator runners ([8f8ce1f68](https://github.com/eaglhuang/AI-Atomic-Framework/commit/8f8ce1f68), [867c8a4ae](https://github.com/eaglhuang/AI-Atomic-Framework/commit/867c8a4ae)).
+
+#### 2026-06-30
+
+- Made skill-companion enumeration deterministic and stabilized validator reruns against host-path drift ([1f8628dfb](https://github.com/eaglhuang/AI-Atomic-Framework/commit/1f8628dfb), [3800c6554](https://github.com/eaglhuang/AI-Atomic-Framework/commit/3800c6554)).
+
+#### 2026-06-29
+
+- Added the unified test-catalog bridge, prepared task-scoped commit evidence before push, and hardened fresh-clone validator portability ([ecbff0fad](https://github.com/eaglhuang/AI-Atomic-Framework/commit/ecbff0fad), [0e9641b40](https://github.com/eaglhuang/AI-Atomic-Framework/commit/0e9641b40), [8dc8b5d46](https://github.com/eaglhuang/AI-Atomic-Framework/commit/8dc8b5d46)).
 
 #### 2026-06-28
 
@@ -192,12 +643,14 @@ bridge after the paper-aligned public release.
 - Linked the frozen-runner build lesson back into SKL runtime evidence
   so the skill-growth layer captures the dogfood path.
 
-## [0.9.0] — 2026-06-23 (paper-aligned first public release)
+## [0.9.0] — 2026-06-23 (historical paper-aligned development milestone)
 
-First public release accompanying the arXiv preprint
+Historical development summary for the arXiv preprint
 *"ATM: Adapter-Guided Atomization with CID Broker for Single-Domain
-Multi-Vendor LLM Code Co-Synthesis"* (preprint pending; this release is
-the paper-aligned snapshot of all ✅ claims).
+Multi-Vendor LLM Code Co-Synthesis"*. The original June 23 milestone
+was later published as the paper snapshot `v0.9.0-alpha.1` on June 24;
+see the date and version conventions above. The following claims and
+limitations are retained as the historical snapshot description.
 
 Scope of this release: single-workspace / single-filesystem-domain
 pre-write admission control for multi-agent LLM code synthesis.
@@ -620,6 +1073,14 @@ version output.
 
 ---
 
+### 2026-05-19
+
+- Added the Python language adapter and task-plan import flow, with explicit python-only readiness boundaries; introduced actor identity, lease/reservation, evidence-gated close, and Git trailer contracts ([f38767070](https://github.com/eaglhuang/AI-Atomic-Framework/commit/f38767070), [ff3b5360c](https://github.com/eaglhuang/AI-Atomic-Framework/commit/ff3b5360c), [7b58305af](https://github.com/eaglhuang/AI-Atomic-Framework/commit/7b58305af), [9b83c7ee8](https://github.com/eaglhuang/AI-Atomic-Framework/commit/9b83c7ee8)).
+
+### 2026-05-18
+
+- Added pinned-runner bootstrap, Codex/root-entry integration, security/version-skew/known-bad-version safeguards, release trust-chain policy, and deprecation canaries ([7653816f3](https://github.com/eaglhuang/AI-Atomic-Framework/commit/7653816f3), [f844fe4eb](https://github.com/eaglhuang/AI-Atomic-Framework/commit/f844fe4eb), [c4983ec9f](https://github.com/eaglhuang/AI-Atomic-Framework/commit/c4983ec9f), [f3f904a1d](https://github.com/eaglhuang/AI-Atomic-Framework/commit/f3f904a1d)). These are implementation dates, not npm publication dates.
+
 ## [0.3.0] — 2026-05-17 (M4–M10 integration + ScopeLock 0.2.0 + replacement gating)
 
 Single-day major release that closed M4–M10 rollout and adapter
@@ -638,6 +1099,14 @@ propagation / review / human-approval / rollback proof evidence.
 - Delivered M4-M10 integration rollout and adapter hardening: framework-neutral onboarding proof, agent entry skill templates, integration lifecycle CLI, map equivalence coverage, and the M5/M4 adapter contract suite for Claude Code, Copilot, Cursor, and Gemini.
 
 ---
+
+### 2026-05-14
+
+- Corrected error-code escaping and documented Node strip-types usage ([135be041a](https://github.com/eaglhuang/AI-Atomic-Framework/commit/135be041a)).
+
+### 2026-05-13
+
+- Migrated source, validators, and tests from JavaScript modules to TypeScript; added orphan-commit diagnosis and hardened cross-platform/Node 24 validation ([beebeb211](https://github.com/eaglhuang/AI-Atomic-Framework/commit/beebeb211), [dbbf75b43](https://github.com/eaglhuang/AI-Atomic-Framework/commit/dbbf75b43), [e0d33080c](https://github.com/eaglhuang/AI-Atomic-Framework/commit/e0d33080c)).
 
 ## [0.2.0] — 2026-05-12 (Portable runner + npm-first + polymorph contracts)
 
@@ -706,3 +1175,7 @@ scaffolding, and the lifecycle police plugin (ATM-2-0031).
 - Phase B1 complete: committed self-description and self-verification landed for the seed.
 - Phase B1 complete: the registry status is now governed.
 - Legacy planning ID ATM-CORE-0001 remains as metadata, while ATM-CORE-0002 governs the retained hand-written seed source.
+
+## 2026-05-05
+
+- Created the repository baseline ([ee215122f](https://github.com/eaglhuang/AI-Atomic-Framework/commit/ee215122f)).
