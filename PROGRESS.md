@@ -66,3 +66,9 @@ Both validators pass locally. ATM: TASK-PRF-0136 imported and claimed (lane lane
 - Backup of the original: /workspace/close-window-staged-index.lock.TASK-PRF-0138.20261020T072724+0800.json (box).
 - Exact edit, in `.atm/runtime/locks/close-window-staged-index.lock.json` only (gitignored runtime file; no other `.atm` file touched):
   `"status": "active"` → `"released"`, `"releasedAt": null` → `"2026-10-19T23:27:24.000Z"`, `"releaseOutcome": null` → `"aborted"`.
+
+# #363 — stale-base writes placed by translation (TASK-PRF-0140)
+## 2026-10-20 08:05 (Asia/Taipei) — start
+- Branch fix/363-stale-base-translation from main bc6a569ca. Codex logged in, push token present.
+- TASK-PRF-0140 imported and claimed (lane lane-20261020000506-grok-bot-76689ff000).
+- Plan: shared `stale-base-translation.ts` (locate in declared base, derive change blocks from the patch, diff base→current, git merge-file conflict rule, map forward); use it in live write (C1) and steward composition inside the apply queue (C3); kit wrapper stops inferring the base (C2); fold #374 items 1-3.
