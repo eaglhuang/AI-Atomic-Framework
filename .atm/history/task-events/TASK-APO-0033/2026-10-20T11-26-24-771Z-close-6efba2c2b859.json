@@ -1,0 +1,46 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-10-20T11-26-24-771Z-close-6efba2c2b859",
+  "taskId": "TASK-APO-0033",
+  "action": "close",
+  "actorId": "codex-changelog-20261020",
+  "sessionId": "session-20261020111554-codex-changelog-20261020-TASK-APO-0033-dc8f9f37d0",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-APO-0033.json",
+  "taskSha256": "sha256:4e59c90994d2d6ae876e03e3f72d54a08d95acffa3f978b0bb8e0e2846bb6922",
+  "createdAt": "2026-10-20T11:26:24.771Z",
+  "command": "node atm.mjs tasks close --task TASK-APO-0033 --actor codex-changelog-20261020 --status done --historical-delivery 93c525c5276591c9477daa357899d06919e75658",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20261020111554-codex-changelog-20261020-TASK-APO-0033-dc8f9f37d0",
+    "closurePacketPath": ".atm/history/evidence/TASK-APO-0033.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "python3 /workspace/atm-readme-planning/validate_changelog.py"
+    ],
+    "requiredGates": [
+      "python3 /workspace/atm-readme-planning/validate_changelog.py"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-10-20T11:26:24.768Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "suspected",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-APO-0033.*",
+        ".atm/history/task-events/TASK-APO-0033/**",
+        ".atm/history/tasks/TASK-APO-0033.json",
+        "CHANGELOG.md"
+      ],
+      "criticalChangedFiles": [],
+      "requiredGates": [
+        "python3 /workspace/atm-readme-planning/validate_changelog.py"
+      ]
+    }
+  }
+}
