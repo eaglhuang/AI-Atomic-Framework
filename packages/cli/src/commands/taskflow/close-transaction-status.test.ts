@@ -11,6 +11,7 @@ try {
   assert.equal(readCloseTransactionStatus(cwd, started.taskId)?.phase, 'started');
   const committed = writeCloseTransactionStatus({ cwd, taskId: started.taskId, phase: 'ledger-written', ledgerCommit: 'a'.repeat(40) });
   assert.equal(committed.ledgerCommit, 'a'.repeat(40));
+  assert.match(committed.recoveryCommand, /taskflow close --task TASK-CLOSE-STATUS-0001 --actor <actor-id> --recover --json/, 'an in-progress close points at the governed recovery lane (#373)');
   assert.equal(readCloseTransactionStatus(cwd, started.taskId)?.startedAt, started.startedAt);
   const complete = writeCloseTransactionStatus({ cwd, taskId: started.taskId, phase: 'post-cleanup-complete', cleanupComplete: true, targetCommit: 'b'.repeat(40), planningCommit: 'c'.repeat(40) });
   assert.equal(complete.outcome, 'completed');

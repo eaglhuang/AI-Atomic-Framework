@@ -66,3 +66,10 @@ Both validators pass locally. ATM: TASK-PRF-0136 imported and claimed (lane lane
 - Backup of the original: /workspace/close-window-staged-index.lock.TASK-PRF-0138.20261020T072724+0800.json (box).
 - Exact edit, in `.atm/runtime/locks/close-window-staged-index.lock.json` only (gitignored runtime file; no other `.atm` file touched):
   `"status": "active"` → `"released"`, `"releasedAt": null` → `"2026-10-19T23:27:24.000Z"`, `"releaseOutcome": null` → `"aborted"`.
+
+## #373 governed recovery/abort for interrupted taskflow close (TASK-PRF-0141, grok-bot)
+- 23:07 Asia/Taipei 2026-10-20: branch fix/373-close-recover from main bc6a569ca. TASK-PRF-0141 imported and claimed.
+- Added `taskflow close --recover|--abort` (dry-run by default, `--write` applies). It checks holder liveness: the mutex ownerPid is gone, or the lock has no unexpired lease and is older than --stale-after-ms. Recover rolls forward: a landed close is marked completed, or a consistent staged close is committed through the governed commit, then the lock is released as committed. Abort unstages the task-owned staged paths, archives the close artifacts with sha256, restores the ledger and card (preferring the sealed digest), records rolled-back and releases the lock as aborted. Abort is refused once the close landed. Each run appends a receipt; a repeat run is a no-op.
+- Close --write now persists a pre-close snapshot and records terminal transaction phases. Status and blocker hints point at the recover dry-run when the holder is dead.
+- Bug fixes: tasks renew refuses closed or closing tasks. Payload digest and dirty files skip directory paths (EISDIR on kit/state/runs).
+- tests/cli/taskflow-close-recovery.test.ts covers the 0138 landed case, the 0140 interrupted+renewed case, a live holder, a consistent roll-forward dry run, a clean repo and directory payloads. It passes, and typecheck is clean.

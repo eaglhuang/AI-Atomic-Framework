@@ -6,6 +6,7 @@ import { normalizeRelativePath } from './task-file-io-helpers.ts';
 import { CliError, quoteCliValue, relativePathFrom } from '../shared.ts';
 import { inspectGitIndexOwnership } from '../git-index-ownership.ts';
 import { evaluateCloseWindowStagedIndexAdmission } from './close-window-staged-index-admission.ts';
+import { closeRecoveryCommand, inspectCloseHolderLiveness } from './close-holder-liveness.ts';
 import {
   classifyCloseWindowUnexpectedStaged,
   residueDisclosure,
@@ -495,13 +496,18 @@ export function assertCloseWindowStagingAllowed(input: {
   const lock = readCloseWindowStagedIndexLock(input.cwd);
   if (!lock || lock.status !== 'active') return;
   if (lock.taskId === normalizeTaskId(input.taskId)) return;
-  throw new CliError('ATM_CLOSE_WINDOW_STAGED_INDEX_LOCKED', `Close window staged-index lock held by ${lock.taskId} blocks ${input.operation}.`, {
+  // A holder whose close process is gone can never release the lock itself;
+  // point at the governed recovery lane instead of a read-only status (#373).
+  const holder = inspectCloseHolderLiveness({ cwd: input.cwd, taskId: lock.taskId, lockAcquiredAt: lock.acquiredAt });
+  throw new CliError('ATM_CLOSE_WINDOW_STAGED_INDEX_LOCKED', `Close window staged-index lock held by ${lock.taskId} blocks ${input.operation}.${holder.alive ? '' : ` The holder's close process is gone (${holder.reason}); recover or abort it through the governed recovery lane.`}`, {
     exitCode: 1,
     details: {
       lockTaskId: lock.taskId,
       operation: input.operation,
       lockPath: relativePathFrom(input.cwd, closeWindowStagedIndexLockPath(input.cwd)),
-      requiredCommand: `node atm.mjs tasks status --task ${lock.taskId} --json`
+      holderAlive: holder.alive,
+      holderLivenessReason: holder.reason,
+      requiredCommand: holder.alive ? `node atm.mjs tasks status --task ${lock.taskId} --json` : closeRecoveryCommand(lock.taskId, 'recover')
     }
   });
 }
