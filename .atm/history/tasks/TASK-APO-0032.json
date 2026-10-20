@@ -1,0 +1,248 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-APO-0032",
+  "title": "Outcome-first README onboarding",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "Every command in `validators` passes and is recorded with `node atm.mjs evidence run`.",
+    "Follow the claimed playbook for evidence, close and commit, preserving lane-session.",
+    "Product diff is README.md only; required CLI-generated governance artifacts are separate.",
+    "Present three entry paths after one bounded AI request; retain next/playbook authority and safety gates.",
+    "Distinguish adopter/contributor runtimes, release/main, historical 0.1.20 and mutable latest.",
+    "The Bash/jq example checks every phase and exact hello newline, never evaluates returned shell text.",
+    "Remote non-main review ref contains the delivery commit; report CI and unrun checks accurately."
+  ],
+  "deliverables": [
+    "README.md"
+  ],
+  "scopePaths": [
+    "README.md"
+  ],
+  "validators": [
+    "python3 /workspace/atm-readme-planning/validate_readme.py"
+  ],
+  "planningRepo": "/workspace/atm-readme-planning",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [
+    "AGENTS.md",
+    "packages",
+    "release",
+    "templates"
+  ],
+  "nonGoals": [
+    "framework implementation",
+    "merge",
+    "release",
+    "main push"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the delivery commit if the change fails validation.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "documentation",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 1 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../atm-readme-planning/agent-pack-onboarding/tasks/TASK-APO-0032-readme-onboarding.task.md",
+    "sectionTitle": "TASK-APO-0032",
+    "headingLine": 35,
+    "hash": "67ced26ded3ba90f",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "/workspace/atm-readme-planning",
+      "repoRoot": "/workspace/atm-readme-planning",
+      "taskCardPath": "../atm-readme-planning/agent-pack-onboarding/tasks/TASK-APO-0032-readme-onboarding.task.md",
+      "planningCommitSha": "7b55cee28972a808d55312379e2e7cb62f5ad793",
+      "contentDigest": "sha256:67ced26ded3ba90fa80cd2261ff00eea1f957630c358821b59d0cf48b474dc33",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-10-20T09:57:05.943Z"
+    }
+  },
+  "importedAt": "2026-10-20T09:50:19.329Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_python3.workspace.atm.readme.planning.validate.readme.py",
+      "command": "python3 /workspace/atm-readme-planning/validate_readme.py",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "dependencies",
+      "atomizationImpact"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-10-20T09-58-29-490Z-close-6a108101a36e",
+  "lastTransitionAt": "2026-10-20T09:58:29.490Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-readme-20261020",
+  "reservedAt": "2026-10-20T09:50:24.011Z",
+  "promotedAt": "2026-10-20T09:50:24.012Z",
+  "claim": {
+    "actorId": "codex-readme-20261020",
+    "leaseId": "lease-b504d47a5468",
+    "claimedAt": "2026-10-20T09:50:24.014Z",
+    "heartbeatAt": "2026-10-20T09:58:29.489Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-APO-0032.json",
+      "README.md"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20261020095024-codex-readme-20261020-f260ee1601",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261020095024-codex-readme-20261020-f260ee1601\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-10-20T09:50:24.014Z",
+  "startedByActor": "codex-readme-20261020",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-2736eb27031af0e0",
+    "ticketDigest": "sha256:2736eb27031af0e033fd579614dcdd6b7ef5f61c5efb2e35e9e963c0d7e458eb",
+    "taskId": "TASK-APO-0032",
+    "origin": "claim",
+    "actorId": "codex-readme-20261020",
+    "laneSessionId": "lane-20261020095024-codex-readme-20261020-f260ee1601",
+    "claimGeneration": "lease-b504d47a5468",
+    "issuedAt": "2026-10-20T09:50:24.014Z",
+    "expiresAt": "2026-10-20T10:20:24.014Z",
+    "scopeDigest": "sha256:0f02129938924e03ff55ac77b9ea8170be9fe5c069b0a8fb1ba6033357d37a90",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-10-20T09:50:24.014Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-APO-0032.*",
+          ".atm/history/task-events/TASK-APO-0032/**",
+          ".atm/history/tasks/TASK-APO-0032.json",
+          "README.md"
+        ],
+        "digest": "sha256:0cdd1f02455e6ae8d4b294e23c8dc4c92f7ee79651ad4fb7d426139d10d01a58"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20261020095024-codex-readme-20261020-TASK-APO-0032-1e32721e4c",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-APO-0032",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-APO-0032.*",
+      ".atm/history/task-events/TASK-APO-0032/**",
+      ".atm/history/tasks/TASK-APO-0032.json",
+      "README.md"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "8109dd5584b66511fafad484b30274162b3ccd1187abcfeb4516c89ad4969b07",
+    "actorId": "codex-readme-20261020",
+    "sessionId": "session-20261020095024-codex-readme-20261020-TASK-APO-0032-1e32721e4c",
+    "laneSession": {
+      "laneSessionId": "lane-20261020095024-codex-readme-20261020-f260ee1601",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261020095024-codex-readme-20261020-f260ee1601\""
+    },
+    "createdAt": "2026-10-20T09:50:24.868Z",
+    "status": "active"
+  },
+  "closedAt": "2026-10-20T09:58:29.489Z",
+  "closedByActor": "codex-readme-20261020",
+  "closedBySessionId": "session-20261020095024-codex-readme-20261020-TASK-APO-0032-1e32721e4c",
+  "closurePacket": ".atm/history/evidence/TASK-APO-0032.closure-packet.json"
+}
