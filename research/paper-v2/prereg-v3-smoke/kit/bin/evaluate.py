@@ -236,6 +236,26 @@ def conflict_count(arm_dir, rows):
     return count if observed and not incomplete else None
 
 
+def cross_session_counts(rows):
+    """#360: cross-session-overlap outcomes, counted apart from patch-context-mismatch,
+    stale-base and overlapping-write-queued. An acknowledged override of another
+    session's committed line is reported as such, never as a plain accepted write."""
+    counts = {"crossSessionOverlapRejections": 0, "acknowledgedOverrides": 0, "mergedBothResubmissions": 0}
+    pending = set()
+    for row in rows:
+        key = (row.get("actorId"), row.get("file"))
+        if row.get("reasonCode") == "cross-session-overlap":
+            counts["crossSessionOverlapRejections"] += 1
+            pending.add(key)
+        elif row.get("decision") == "accepted":
+            if row.get("acknowledgedOverlap"):
+                counts["acknowledgedOverrides"] += 1
+            elif key in pending:
+                counts["mergedBothResubmissions"] += 1
+            pending.discard(key)
+    return counts
+
+
 def steward_rows(work):
     path = work / ".prereg-smoke" / "steward-writes.jsonl"
     if not path.exists():
@@ -991,6 +1011,7 @@ def score_arm(arm_name, arm_dir, tasks, base):
             "rejected": rejected_count,
             "resubmissions": resubmissions,
             "recomposeOrRetry": resubmissions,
+            **cross_session_counts(rows),
             "queueWaitMs": [int((row.get("commit") or {}).get("gitIndexLockWaitMs") or 0) for row in rows],
             "writeToCommitMs": latencies,
             "batchSizes": [row.get("batchSize") for row in rows],
