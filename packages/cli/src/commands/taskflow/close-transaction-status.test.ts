@@ -18,6 +18,9 @@ try {
   assert.equal(complete.cleanupComplete, true);
   assert.match(complete.recoveryCommand, /taskflow status/);
   assert.equal(closeTransactionStatusPath(cwd, started.taskId).endsWith(`${started.taskId}.json`), true);
+  const restarted = writeCloseTransactionStatus({ cwd, taskId: started.taskId, phase: 'started', startedAt: '2099-01-01T00:00:00.000Z' });
+  assert.equal(restarted.startedAt, '2099-01-01T00:00:00.000Z', 'a new close attempt starts a fresh transaction');
+  assert.equal(restarted.targetCommit, null, 'a new attempt does not inherit the previous commits');
   console.log('close transaction status: ok');
 } finally {
   rmSync(cwd, { recursive: true, force: true });
