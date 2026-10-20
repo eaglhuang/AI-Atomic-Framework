@@ -2,7 +2,7 @@
 doc_id: doc_TASK-PRF-0140
 task_id: TASK-PRF-0140
 title: 'Stale-base writes placed by base-to-current translation, never at stale line numbers (#363)'
-status: planned
+status: done
 owner: grok-bot
 priority: P1
 depends_on:
@@ -47,6 +47,15 @@ nonGoals:
 - Do not re-pin the hist-v2 smoke runbook or modify any sealed archive.
 - Original-intent anchoring and cross-session-overlap rejection stay in #360.
 - Do not tag or publish npm.
+completed_at: "2026-10-20T16:59:39.191Z"
+completed_by_agent: "grok-bot"
+closedAt: "2026-10-20T16:59:39.191Z"
+closedByActor: "grok-bot"
+closedByCommand: atm tasks close
+lastTransitionId: "2026-10-20T16-59-39-191Z-close-70d33d7a974e"
+lastTransitionAt: "2026-10-20T16:59:39.191Z"
+ledgerContractVersion: task-ledger/v1
+delivery_commit: "4408ea4c7"
 ---
 
 # TASK-PRF-0140 — stale-base translation (#363)
