@@ -17,242 +17,179 @@
 [![Evidence First](https://img.shields.io/badge/Evidence-First-ef4444.svg)](#safety-model)
 [![Agent Ready](https://img.shields.io/badge/Agent-Ready-8b5cf6.svg)](#for-ai-agents)
 
-ATM is the governance layer for AI-assisted engineering. It keeps AI work from drifting into hallucinated scope by turning a human goal into one bounded production chain: task intent, scope, admission, implementation, validation, evidence, and handoff.
+ATM turns an AI coding request into a bounded, validated change with reviewable evidence.
 
-The best part is that humans do not need to drive the machinery. In an ATM-enabled repository, an AI agent can learn the repo-local ATM skill, route the request through the governed workflow, coordinate with other agents, and leave behind proof that explains what changed and why.
+Tell your agent the outcome; ATM supplies the scope, admission, validation, evidence, and closure contract. Start with one small task and add coordination when your project needs it.
 
-ATM is not another chat agent or workflow app. It is the operating contract for the multi-agent era: a way for people and agents to produce stable, reviewable software together instead of relying on prompt memory, ad hoc conventions, or merge-time cleanup.
-ATM is not just an atom runner. It is the route, scope, evidence, close, and handoff contract around AI-assisted work.
+## Start with an outcome
 
-## Day 1 install
+In an ATM-enabled repository, ask your agent:
 
-New project, Node 20+. This is the single newcomer command (checked on npm `latest` = 0.1.20):
+```text
+Use ATM governance to add hello.txt containing exactly "hello" plus one newline.
+Change only hello.txt. Check the exact bytes, record the validation evidence,
+and formally close the task. Report the commit and evidence paths; stop if
+admission, validation, evidence, or closure fails.
+```
+
+For your own project, replace the file, outcome, and validator with one bounded change. Success means the actual content, passing checks, formal closure, and evidence you can open. Installing ATM is preparation, not completion of that request.
+
+| Your starting point | Next step |
+| --- | --- |
+| New project | [Create an ATM project](#new-project). |
+| Existing repository | [Set up ATM in that repository](#existing-repository). |
+| ATM already installed | [Give your agent the bounded request](#already-installed), or try the [first governed write](#first-governed-write). |
+
+## Install or connect ATM
+
+The published npm runtime supports **Node.js 20+** and npm; Git is required for the starter and governed commits. Framework source contributors use **Node.js 24** and the [contributor workflow](#contributor-workflow). These are different paths.
+
+### New project
+
+<a id="day-1-install"></a>
+
+With Git's author name and email already configured, run:
 
 ```bash
 npx --yes create-atm@latest my-app --agent cursor --json
-```
-
-`create-atm` runs `git init` and the first commit (`chore: initialize ATM project`). Git needs `user.name` and `user.email` before that commit. Set them once for the machine:
-
-```bash
-git config --global user.name "Your Name"
-git config --global user.email "you@example.com"
-```
-
-If create-atm already failed at `initial commit` (`ok: false`, `ATM_CREATE_FAILED`), the generated files are kept. Finish the commit inside that directory, then continue:
-
-```bash
 cd my-app
-git config user.name "Your Name"
-git config user.email "you@example.com"
-git add -A
-git commit -m "chore: initialize ATM project"
 ```
 
-Other `--agent` ids: `claude-code`, `codex`, `copilot`, `gemini`, `antigravity`. Omit `--agent` for a CLI-only project.
+`cursor` is the literal integration ID in this example. Substitute `claude-code`, `codex`, `copilot`, `gemini`, or `antigravity` for another editor; omit `--agent` for CLI-only setup. In other examples, replace the entire `<editor-id>` placeholder with one of these IDs before running it.
 
-Existing repository: install the CLI at a stable path and run `setup`. The generated `atm.mjs` stores that path; do not move or delete the install.
+The starter runs `git init` and an initial commit. Check `ok: true` and `ATM_CREATE_READY` before continuing. If it fails at the initial commit, files are retained: inspect the generated directory, configure a Git author there, and follow the reported recovery. Do not blindly stage unrelated files in an existing repository. Git author configuration is distinct from ATM actor identity; see [Git's configuration guide](https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup).
+
+### Existing repository
+
+<a id="60-second-start"></a>
+<a id="add-atm-to-an-existing-repository"></a>
+
+Install a published CLI at a stable location outside your repositories. These paths use Bash on macOS/Linux; replace the target with your actual project directory:
 
 ```bash
-npm install --prefix ~/atm-runner @ai-atomic-framework/cli@latest
-node ~/atm-runner/node_modules/@ai-atomic-framework/cli/dist/npm-runtime/atm.mjs setup --cwd /absolute/path/to/existing-repo --agents cursor --json
+npm install --prefix "$HOME/atm-runner" @ai-atomic-framework/cli@latest
+node "$HOME/atm-runner/node_modules/@ai-atomic-framework/cli/dist/npm-runtime/atm.mjs" setup --cwd /absolute/path/to/existing-repo --agents cursor --dry-run --json
 ```
 
-> **Version pin.** Pin the npm version that `node atm.mjs welcome --json` reports at `evidence.versions.frameworkVersion`. On 2026-10-11 that field was `0.1.20` for both `create-atm` and `@ai-atomic-framework/cli`. `evidence.versions.releaseTrain.frameworkVersion` was `0.0.0` on that release; do not pin to it. A git tag such as `v0.9.0-alpha.1` is a paper snapshot, not the npm package.
+Inspect the preview, then run the same setup command without `--dry-run`. Check `ok: true`, the selected target, integration verification, and notices before continuing. Enter that target directory before using its `node atm.mjs` launcher.
 
-Day-1 commands are only `welcome`, `next`, `taskflow`, `evidence`, and `doctor`. Details for agents: [`docs/ATM_AI_FIRST_5_MIN.md`](docs/ATM_AI_FIRST_5_MIN.md).
+`setup` requires CLI 0.1.8+. It detects supported integrations; noninteractive use requires `--agents <ids>` or `--agents none` when none are detected. A comma-separated selection such as `--agents cursor,gemini` overrides detection. Detection does not prove an agent is installed, authenticated, or running.
 
-## First governed write
+Setup preserves user-owned integration content or reports conflicts; it does not overwrite conflicts with `--force` or change global agent configuration. Review each conflict and its recovery before retrying. File checks are optimistic preconditions, not an operating-system transaction against arbitrary concurrent writers.
 
-Run this from the new project (`cd my-app`). It is the short path checked on 0.1.20: open, claim, write, evidence, close. Adapt the title, goal, scope file, and validator to the real task.
+Keep the shared CLI at its original path: a generated launcher can reference it. Each project retains its own tasks, configuration, locks, and evidence; shared invocation is not necessarily zero-copy installation. If the runner moves, restore its location or retain a backup of the generated launcher before reviewing setup from the new location. Setup preserves a differing launcher rather than automatically rebinding it.
 
-**Empty queue: skip `guide`, `orient`, and `start`.** `next --prompt` on an empty project returns a prefilled `taskflow open`. Until `--actor`, `--scope-path`, and `--validator` are known, that command is a dry-run and names the missing flags. Do not follow `guide`.
+### Already installed
 
-**Trust the playbook.** After claim, `nextAction.command` is `implement-deliverables`, the same sentinel as `playbook.commandSequence[0]`. It means edit the declared files. It is not a shell command, and it is not `start`. Run the playbook's `evidence run` line and its `taskflow close --write` line. The playbook also lists `pre-close` and a dry-run `close`; this hello.txt path closes without them.
-
-**Replace every `<...>` placeholder before pasting.** An unquoted `<id>` is a shell redirect. This block has none.
-
-**Do not dump the JSON.** Claim, evidence, and close envelopes are tens of kilobytes. Write them to a file and read fields with `jq`.
+Open the project root in your editor, read `AGENTS.md` and the repo-local ATM skill, and give the agent the [bounded request](#start-with-an-outcome). For user-requested work, the official route is:
 
 ```bash
-node atm.mjs taskflow open --write --actor newcomer-ai --title "Add hello.txt" --goal "Create hello.txt with one line of text." --scope-path hello.txt --validator "test -f hello.txt" --json > /tmp/atm-open.json
-TASK=$(jq -r '.evidence.generation.taskId' /tmp/atm-open.json)
-node atm.mjs next --claim --actor newcomer-ai --task "$TASK" --json > /tmp/atm-claim.json
-printf 'hello\n' > hello.txt
-EVIDENCE=$(jq -r '.evidence.nextAction.playbook.commandSequence[] | select(startswith("node atm.mjs evidence run"))' /tmp/atm-claim.json)
-CLOSE=$(jq -r '.evidence.nextAction.playbook.commandSequence[] | select(startswith("node atm.mjs taskflow close") and contains(" --write "))' /tmp/atm-claim.json)
-bash -c "$EVIDENCE" > /tmp/atm-evidence.json
-bash -c "$CLOSE" > /tmp/atm-close.json
-jq -r '.ok, .messages[0].code' /tmp/atm-close.json
+node atm.mjs next --prompt "Add hello.txt containing exactly hello plus one newline; change only hello.txt and leave validation and closure evidence." --json
 ```
 
-`close --write` needs the playbook's `--lane-session`. Without it, 0.1.20 returns `ATM_LANE_BORROWED_ACTOR_BLOCKED`. A missing Git author fails the same close with `ATM_CLI_UNHANDLED` and a raw `git commit` error. That JSON does not contain an `identity set` hint. Git `user.name` / `user.email` and ATM `identity set` are different; set the Git author (commands above) and retry the same close line. `doctor --json` is the health check. On an empty project its `evidence.recommendedAction` is `next --json`, which is not this write. A successful close can still leave `.atm/runtime/welcome.lineage.json` untracked if you ran `welcome`.
+Read `evidence.nextAction.playbook` before editing, closing, or committing. Show any `ATM_USER_NOTICE` or `evidence.userNotice` to the user before proceeding. Without a user request, `next --json` is read-only orientation. Installation and welcome do not replace admission for the actual task.
 
-## Day 2+
+### Versions and distributions
 
-Captain, dispatch, wave, batch, and team flows are not the first write.
+`@latest` is a moving npm tag, not a promise of version 0.1.20. Earlier onboarding checks used **0.1.20**; npm reported **0.1.21** for both packages on 2026-10-20. Pin the product version observed at `evidence.versions.frameworkVersion` in `node atm.mjs welcome --json`. On 0.1.20, `evidence.versions.releaseTrain.frameworkVersion` was `0.0.0`; that is not the product version to pin.
 
-Captain/dispatch entry gate: if the user asks for Captain, Coordinator, dispatch, task cards, sidecars, subagents, delegation, condition review, or closeout work, route the request through `ai-role-router` when available, then through `atm-dispatch` before drafting instructions, delegating work, or reviewing another agent. State `Skill used: atm-dispatch` and the chosen `Delegation mode`. Internal sidecar is the default; External dispatch is opt-in; external write is forbidden unless the user explicitly grants write authority and scope.
-
-## Why ATM Exists
-
-AI-assisted engineering breaks down when agents work from loose conversation instead of a shared production path:
-
-- an agent starts editing before it understands the real task boundary;
-- the request expands until no one can tell which outcome is being delivered;
-- validation happens, but the evidence is scattered across terminal output;
-- a review sees the final diff without the decision trail that produced it;
-- the next agent inherits chat history instead of durable project context.
-
-ATM makes the task the center of gravity. It narrows the work before mutation, keeps the agent inside an explicit scope, requires validation before closure, and records the evidence needed to debug, audit, or resume the work later.
-
-That matters more as teams move from one AI helper to many cooperating agents. ATM gives those agents a shared route for deciding what can happen in parallel, what needs serialization, and what must fail closed before it damages the shared repo.
-
-## What You Get
-
-| Capability | What it provides |
-| --- | --- |
-| Agent-native entry | Repo-local skills and integrations teach an AI agent how to use ATM without making the human learn the CLI first. |
-| Drift control | User intent is converted into scoped work before mutation, reducing hallucinated scope and accidental contribution creep. |
-| Task-to-evidence chain | Each governed request can carry intent, scope, validation, artifacts, closure, and handoff in one reviewable path. |
-| Multi-agent coordination | Admission and locking rules help agents decide what can run in parallel, what must serialize, and what should fail closed. |
-| Durable recovery | Evidence and handoff artifacts make it possible to resume, audit, or debug a task without reconstructing chat history. |
-| Portable governance | Core contracts stay neutral across languages, repositories, editors, and agent environments. |
-| Replaceable bundle | Tasks, rules, artifacts, evidence, and adapters can evolve without forking core ATM semantics. |
-
-## 60-Second Start
-
-A new project uses the [Day-1 install](#day-1-install) above. This section is `setup` for a repository that already exists. One shared ATM runner can serve multiple existing repositories through `--cwd`; each target keeps its own governance state and evidence.
-
-The `setup` command combines project selection, bootstrap, integration discovery, installation, verification, and welcome. It ships in `@ai-atomic-framework/cli` 0.1.8 and later. Install the CLI once at a stable location outside your projects; each project's generated `atm.mjs` points back to that runner, so moving or deleting it breaks the projects it set up:
-
-```bash
-npm install --prefix ~/atm-runner @ai-atomic-framework/cli@latest
-```
-
-The runner entry is then `~/atm-runner/node_modules/@ai-atomic-framework/cli/dist/npm-runtime/atm.mjs`.
-
-In an interactive terminal, or from inside the project directory, run:
-
-```bash
-node /absolute/path/to/atm.mjs setup
-```
-
-ATM asks which project should receive the setup. For an explicit target:
-
-```bash
-node /absolute/path/to/atm.mjs setup --cwd /path/to/project --json
-```
-
-Setup selects all supported integrations it detects. If none are detected, interactive mode asks you to choose; noninteractive mode requires `--agents <ids>` or `--agents none`. See [Add ATM to an existing repository](#add-atm-to-an-existing-repository) for selection and preview options.
-
-The fastest way to start is to let the AI use ATM for you.
-
-### Case: give an agent one bounded task
-
-Open an ATM-enabled repository in an agent-capable editor such as Codex, Claude Code, Cursor, Copilot, Gemini, or Antigravity. Then say:
-
-```text
-Use ATM governance for this request: add a small login form validation fix and leave reviewable evidence.
-```
-
-Within the first minute, the ATM-aware agent should:
-
-1. Read the repository entry guidance and load the repo-local ATM skill or integration.
-2. Convert your request into a governed route with a playbook, scope, and validation expectation.
-3. Edit only inside the admitted boundary.
-4. Run the focused validator.
-5. Report the changed files and the evidence path so the work can be reviewed or resumed.
-
-The human experience should feel like ordinary delegation: describe the outcome, let the agent route through ATM, and review the evidence it leaves behind.
-
-### Case: start a new ATM-enabled repo
-
-Ask an agent:
-
-```text
-Create a new ATM-enabled repository named test-app for my editor, then show me the first governed request I can try.
-```
-
-The agent can use the starter behind the scenes, install the selected agent integration, and make the local ATM skill visible. If you want the underlying command, it is:
-
-```bash
-npx --yes create-atm@latest test-app --agent cursor --json
-```
-
-Replace `<editor-id>` with a supported integration ID. This new-project starter is separate from the `setup` flow for existing projects.
-
-After that, the first useful test is still human-sized:
-
-```text
-Use ATM governance to inspect this repo and suggest the next safe improvement.
-```
-
-ATM remains CLI-backed for evidence and automation, but the intended first touch is AI-led: the agent learns the governance route, then uses the CLI as the durable execution layer.
-
-### Quick verify for the paper evidence
-
-```bash
-git clone https://github.com/eaglhuang/AI-Atomic-Framework
-cd AI-Atomic-Framework
-git checkout v0.9.0-alpha.1
-npm install
-npm test -- broker/decision
-npm run bench:admission:paper -- --seed 20260625
-```
-
-### Add ATM to an existing repository
-
-`setup` requires `@ai-atomic-framework/cli` 0.1.8 or later. Keep the runner at a stable external location (see [60-Second Start](#60-second-start)) and select the target explicitly:
-
-```bash
-node /absolute/path/to/atm.mjs setup --cwd /path/to/project --json
-```
-
-Setup detects supported configuration paths and explicit editor environment hints, selects all detected integrations, checks for conflicts, bootstraps the target, installs and verifies the selected integrations, and runs welcome. Detection does not establish that an agent is installed, authenticated, or currently running.
-
-Supported integration IDs are `claude-code`, `codex`, `copilot`, `cursor`, `gemini`, and `antigravity`. Override detection with a comma-separated selection, or choose `none` for CLI-only setup:
-
-```bash
-node /absolute/path/to/atm.mjs setup --cwd /path/to/project --agents cursor,gemini --json
-node /absolute/path/to/atm.mjs setup --cwd /path/to/project --agents none --json
-node /absolute/path/to/atm.mjs setup --cwd /path/to/project --agents cursor,gemini --dry-run --json
-```
-
-The last command previews the target and integration conflicts without writing. Existing user-owned integration content is preserved or reported as a conflict; setup does not overwrite it with `--force`. Setup writes only to the selected project, not global agent configuration. Review a reported conflict, then rerun the returned recovery command. File checks are optimistic preconditions, not an operating-system transaction against arbitrary concurrent writers.
-
-Use the same runner with a different `--cwd` for another project. Each target retains its own tasks, locks, configuration, and evidence. Bootstrap may install a pinned onefile in the target. An installed npm CLI without a standalone onefile creates a small project launcher referencing that shared CLI installation; keep it at a stable location. If it moves, restore the original location, or inspect and rename the generated project `atm.mjs` to a retained backup before rerunning setup from the new installation. Setup preserves a differing existing launcher and does not automatically rebind it. Shared invocation does not imply a zero-copy installation in every distribution. After successful setup, follow the returned next command and route the user's actual request through `next --prompt`.
-
-For distributions without `setup`, bootstrap and integration installation remain separate steps:
-
-```bash
-node /absolute/path/to/atm.mjs bootstrap --cwd /path/to/project --json
-node /absolute/path/to/atm.mjs integration add <editor-id> --cwd /path/to/project --json
-node /absolute/path/to/atm.mjs integration verify <editor-id> --cwd /path/to/project --json
-node /absolute/path/to/atm.mjs welcome --cwd /path/to/project --json
-```
-
-Use one official distribution:
+Published packages and release bundles are consumer distributions. The `main` branch is framework development and may differ from the published runtime. Git tag `v0.9.0-alpha.1` is a [paper snapshot](#paper-reproduction), not the npm version.
 
 | Distribution | Use when |
 | --- | --- |
-| npm `create-atm` | You want the lowest-friction starter route. |
-| `release/atm-onefile/atm.mjs` | You want a single-file embedded runtime (copy it, then `node atm.mjs bootstrap --json`). |
-| `release/atm-root-drop/` | You want the portable multi-file bundle. |
+| npm `create-atm` | Create a new project. |
+| npm `@ai-atomic-framework/cli` | Set up an existing project using a stable external runner. |
+| `release/atm-onefile/atm.mjs` | Embed an official single-file runtime, then bootstrap it. |
+| `release/atm-root-drop/` | Use the portable multi-file bundle. |
 
-Which version to pin: pin `evidence.versions.frameworkVersion` from `welcome --json` (npm `create-atm` and `@ai-atomic-framework/cli`). On 0.1.20, `evidence.versions.releaseTrain.frameworkVersion` is `0.0.0`; do not pin to that field. Git tags such as `v0.9.0-alpha.1` mark paper snapshots, not the installable product.
+For distributions without `setup`, see [self-hosting](docs/SELF_HOSTING_ALPHA.md) and [integration installation](docs/AGENT_PACK_ONBOARDING.md). Use one official distribution and the local `next` route, rather than a second bootstrap workflow.
 
-The bootstrap pattern is consistent: place an official ATM distribution in the target repository, make the ATM entry route visible to agents, and let the local skill or integration call `node atm.mjs next --prompt "<current user prompt>" --json` for user-requested governed work.
+## First governed write
 
-The release-bundle root-drop bootstrap workflow keeps that entry route portable for repositories that prefer a checked-in distribution over an npm starter.
+Use a **new, empty adopter project**, not this framework repository or a repository with unrelated active work. This example requires **Bash, jq, standard POSIX tools (cmp, od, tr, grep), Git with an author configured, Node.js, and an installed ATM launcher**. It is not a PowerShell script. Run it as one Bash session; `set -e` stops on a failed phase. Retain the evidence directory printed at the end.
 
-### Give the agent one fallback instruction
+The empty-queue path is open → claim → write → evidence → pre-close → close preview → close. Skip `guide`, `orient`, and `start` for this example. `implement-deliverables` means edit the admitted files; it is not a shell command. A conflicting `nextAction.command` does not override the playbook.
 
-```text
-Read README.md if present, then run "node atm.mjs next --prompt \"<current user prompt>\" --json" from the repository root before task work. If the result includes `ATM_USER_NOTICE` or `evidence.userNotice`, show it to the user before executing the returned command.
+The script checks the playbook against this exact bounded workflow. It never evaluates commands returned by ATM. If the current version returns a different playbook, it stops before editing: read that playbook and its notices, then adapt deliberately. Do not remove guards to force it through.
+
+```bash
+cd my-app
+set -euo pipefail
+command -v jq >/dev/null
+command -v cmp >/dev/null
+command -v od >/dev/null
+command -v tr >/dev/null
+command -v grep >/dev/null
+test -f atm.mjs
+test ! -e hello.txt
+git var GIT_AUTHOR_IDENT >/dev/null
+RUN=$(mktemp -d "${TMPDIR:-/tmp}/atm-hello.XXXXXX")
+VALIDATOR="od -An -tx1 hello.txt | tr -d '[:space:]' | grep -qx 68656c6c6f0a"
+
+node atm.mjs taskflow open --write --actor newcomer-ai \
+  --title "Add hello.txt" --goal "Create exactly hello plus one newline." \
+  --scope-path hello.txt --validator "$VALIDATOR" --json > "$RUN/open.json"
+jq -e '.ok == true and (.evidence.generation.taskId | type == "string" and length > 0)' "$RUN/open.json" >/dev/null
+TASK=$(jq -r '.evidence.generation.taskId' "$RUN/open.json")
+[[ "$TASK" =~ ^[A-Za-z0-9._-]+$ ]]
+
+node atm.mjs next --claim --actor newcomer-ai --task "$TASK" --json > "$RUN/claim.json"
+jq -e '.ok == true and (.evidence.nextAction.playbook.commandSequence | type == "array" and length > 0)' "$RUN/claim.json" >/dev/null
+jq -e --arg task "$TASK" '.evidence.claimResult.taskId == $task and .evidence.claimResult.actorId == "newcomer-ai" and (.evidence.claimResult.claim.files | index("hello.txt") != null)' "$RUN/claim.json" >/dev/null
+jq -e '.evidence.nextAction.targetWork.allowedFiles == ["hello.txt"]' "$RUN/claim.json" >/dev/null
+if jq -e '(.evidence.userNotice // .userNotice) != null or any(.messages[]?; .code == "ATM_USER_NOTICE")' "$RUN/claim.json" >/dev/null; then
+  jq '{userNotice, messages, playbook: .evidence.nextAction.playbook}' "$RUN/claim.json"
+  exit 1
+fi
+jq '.evidence.nextAction.playbook' "$RUN/claim.json"
+LANE=$(jq -er '[.evidence.nextAction.playbook.commandSequence[] | capture("--lane-session (?<lane>[A-Za-z0-9._-]+)") | .lane] | unique | select(length == 1) | .[0]' "$RUN/claim.json")
+[[ "$LANE" =~ ^[A-Za-z0-9._-]+$ ]]
+BASE="--task $TASK --actor newcomer-ai --lane-session $LANE"
+EXPECTED=$(jq -n --arg base "$BASE" --arg v "$VALIDATOR" '[
+  "implement-deliverables",
+  ("node atm.mjs evidence run " + $base + " --command \"" + $v + "\" --validators \"" + $v + "\" --json"),
+  ("node atm.mjs taskflow pre-close " + $base + " --json"),
+  ("node atm.mjs taskflow close " + $base + " --json"),
+  ("node atm.mjs taskflow close " + $base + " --write --json")
+]')
+jq -e --argjson expected "$EXPECTED" '.evidence.nextAction.playbook.commandSequence == $expected' "$RUN/claim.json" >/dev/null
+
+# A successful claim and matching playbook are required before this write.
+printf 'hello\n' > hello.txt
+printf 'hello\n' | cmp -s hello.txt -
+node atm.mjs evidence run --task "$TASK" --actor newcomer-ai --lane-session "$LANE" \
+  --command "$VALIDATOR" --validators "$VALIDATOR" --json > "$RUN/evidence.json"
+jq -e '.ok == true and (.evidence.observedCommandOutcomes | length > 0 and all(.[]; .status == "observed" and .value.exitCode == 0))' "$RUN/evidence.json" >/dev/null
+node atm.mjs taskflow pre-close --task "$TASK" --actor newcomer-ai --lane-session "$LANE" --json > "$RUN/pre-close.json"
+jq -e '.ok == true' "$RUN/pre-close.json" >/dev/null
+node atm.mjs taskflow close --task "$TASK" --actor newcomer-ai --lane-session "$LANE" --json > "$RUN/preview.json"
+jq -e '.ok == true and .evidence.writeReadinessHint.status == "ready"' "$RUN/preview.json" >/dev/null
+node atm.mjs taskflow close --task "$TASK" --actor newcomer-ai --lane-session "$LANE" --write --json > "$RUN/close.json"
+jq -e '.ok == true' "$RUN/close.json" >/dev/null
+jq -e '.status == "done"' ".atm/history/tasks/$TASK.json" >/dev/null
+COMMIT=$(jq -er '(.commitBundle // .evidence.governedCommitBundle).targetRepo | select(.status == "committed") | .commitSha | select(test("^[0-9a-f]{40}$"))' "$RUN/close.json")
+printf 'hello\n' | cmp -s hello.txt -
+git show "$COMMIT:hello.txt" | cmp -s hello.txt -
+printf 'Task: %s\nCommit: %s\nEvidence: %s\n' "$TASK" "$COMMIT" "$RUN"
 ```
 
-The skill-first path is preferred when an integration exists. This fallback instruction keeps the same governance route visible for agents, shells, and editors that do not yet expose the friendly skill wrapper.
+A successful `close --write` normally commits the deliverables and governance bundle. Inspect its terminal status, commit, and evidence/closure paths; if it reports stage-only, interrupted closure, or missing commit evidence, follow its recovery and report the task as unfinished. Retain these JSON files and the task's `.atm/history` evidence. File existence, install success, or a validator alone is not task completion.
+
+Keep the returned `--lane-session` on every later governed command. Historical 0.1.20 returns `ATM_LANE_BORROWED_ACTOR_BLOCKED` without it. On that version a missing Git author can fail close with `ATM_CLI_UNHANDLED`; Git author configuration and ATM `identity set` differ. Inspect failure output and retry only a safe, confirmed-unexecuted close after resolving its cause. `doctor --json` checks health; it does not deliver or close this task.
+
+## Why ATM Exists
+
+Loose requests can drift before review: agents edit outside the intended boundary, validation results disappear into logs, and the next agent inherits conversation instead of durable context. ATM makes the task the delivery contract, with scope before mutation and evidence before closure.
+
+| What you get | Reviewable outcome |
+| --- | --- |
+| Agent-native entry | Repo-local guidance routes the request through the official workflow. |
+| Scope and admission | The agent knows which change it may make before writing. |
+| Validation and evidence | Focused checks and retained artifacts explain whether the outcome passed. |
+| Durable handoff | Another person or agent can review, resume, or audit the work. |
+| Optional coordination | Broker and lane rules coordinate shared writes as projects grow. |
+| Portable contracts | Host-specific enforcement stays in adapters, hooks, or plugins. |
+
 
 ## For AI Agents
 
@@ -401,6 +338,23 @@ ATM is organized around contracts first. Implementations may vary, but the seman
 | Plugins and Host Adapters | Optional governance capabilities and host-specific storage, Git, CI, issue tracker, language, or runtime integrations. | Push host-specific rules back into core contracts. |
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full layer model.
+
+## Day 2+: coordination
+
+Captain, dispatch, wave, batch, and team flows are advanced workflows, not prerequisites for the first write. Follow the role-routing gate in [For AI Agents](#for-ai-agents) before delegating or reviewing another agent. State `Skill used: atm-dispatch` and the chosen `Delegation mode`. Internal sidecar is the default; external dispatch is opt-in, and external write requires explicit user authority and scope.
+
+## Paper reproduction
+
+The paper snapshot is independent of the published onboarding runtime. Reproduce it in a separate checkout using the contributor runtime requirements for that snapshot:
+
+```bash
+git clone https://github.com/eaglhuang/AI-Atomic-Framework
+cd AI-Atomic-Framework
+git checkout v0.9.0-alpha.1
+npm install
+npm test -- broker/decision
+npm run bench:admission:paper -- --seed 20260625
+```
 
 ## Historical Batch Lane
 
