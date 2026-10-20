@@ -139,6 +139,49 @@ ATM snapshots deferred files under `.atm/runtime/snapshots/close-window-foreign-
 before unstaging them from the index. Do not silently unstage another agent's
 close bundle outside this governed path.
 
+### Recovering an interrupted close
+
+A close whose process dies mid-transaction (for example after the ledger write
+but before the governed commit) leaves the lock active with no live holder.
+The lock is never hand-edited; the governed recovery lane reconciles it:
+
+```bash
+# Inspect (dry-run is the default): holder liveness, HEAD/index/working ledger,
+# whether the close landed, and which recovery is safe.
+node atm.mjs taskflow close --task <task-id> --actor <actor-id> --recover --json
+
+# Roll forward: mark a landed close completed, or commit a consistent staged
+# close bundle through the governed commit, then release the lock as committed.
+node atm.mjs taskflow close --task <task-id> --actor <actor-id> --recover --reason "<why>" --write --json
+
+# Abort: unstage the close's artifacts, archive the files it created under
+# .atm/runtime/close-recovery/<task-id>/<recovery-id>/, restore the ledger and
+# planning card to their pre-close content, release the lock as aborted.
+node atm.mjs taskflow close --task <task-id> --actor <actor-id> --abort --reason "<why>" --write --json
+```
+
+- A holder is dead when its close mutex `ownerPid` is gone, or when the lock
+  has no unexpired lease and is older than `--stale-after-ms`
+  (`ATM_CLOSE_RECOVERY_STALE_AFTER_MS`, default 120000). A live holder is
+  refused with `ATM_CLOSE_RECOVERY_HOLDER_ALIVE`.
+- Roll-forward requires the staged ledger to be closed, the working ledger to
+  equal it, and its close transition to exist; otherwise
+  `ATM_CLOSE_RECOVERY_ROLL_FORWARD_INCONSISTENT` names `--abort`.
+- Abort is refused once the close landed on HEAD
+  (`ATM_CLOSE_RECOVERY_ALREADY_LANDED`), so a close is never applied twice.
+- Every applied recovery appends to
+  `.atm/history/evidence/<task-id>.close-recovery.json`; a repeat run with
+  nothing left to do is a no-op (`ATM_CLOSE_RECOVERY_NOTHING_TO_RECOVER`).
+- `taskflow close --write` persists its pre-close snapshot at
+  `.atm/runtime/close-transactions/<task-id>.rollback-snapshot.json` so abort
+  restores exact pre-close bytes, and records a terminal transaction phase
+  (`post-cleanup-complete`, `rolled-back`, or `failed`).
+- `tasks renew` refuses a task whose close is in flight but has not landed on
+  HEAD (`ATM_TASKS_RENEW_CLOSE_IN_PROGRESS`; recover or abort first) and a
+  closed task with no close in flight (`ATM_TASKS_RENEW_TASK_CLOSED`). A close
+  that landed but did not finish its closeback stays renewable, which is the
+  post-crash reconcile path.
+
 ### Foreign staged restore protocol
 
 Use this when pre-close or the close-window lock reports `unexpectedStagedTasks`

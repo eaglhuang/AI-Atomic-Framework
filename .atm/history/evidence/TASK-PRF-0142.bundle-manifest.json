@@ -1,0 +1,63 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0142",
+  "updatedAt": "2026-10-20T16:22:16.148Z",
+  "updatedBy": "grok-bot",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/physical-line-budget-gate.test.ts",
+    "node --strip-types tests/cli/rft-atomization-rollout.test.ts",
+    "node --strip-types tests/cli/taskflow-close-recovery.test.ts"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/rft-atomization-rollout.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b9a9a0b4cdb913976bcc504732b66e6ed8a35fa5bb66ec01ef9c870c7bcb0352",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/rft-atomization-rollout.test.ts"
+      ],
+      "generatedAt": "2026-10-20T16:22:01.750Z",
+      "startedAt": "2026-10-20T16:22:01.550Z",
+      "finishedAt": "2026-10-20T16:22:01.750Z",
+      "durationMs": 200,
+      "runnerKind": "dev-source",
+      "sourceCommit": "fce2b9c75ad9bd9395d16ae30465bb1dcb552c2c",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/physical-line-budget-gate.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e23a43e6eb1b8cc36a2e8b98fce7dada39be4f04429478d99ed44119a841db3f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/physical-line-budget-gate.test.ts"
+      ],
+      "generatedAt": "2026-10-20T16:22:03.100Z",
+      "startedAt": "2026-10-20T16:22:02.804Z",
+      "finishedAt": "2026-10-20T16:22:03.100Z",
+      "durationMs": 296,
+      "runnerKind": "dev-source",
+      "sourceCommit": "fce2b9c75ad9bd9395d16ae30465bb1dcb552c2c",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/taskflow-close-recovery.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e773cc023a9a9b1f3ffab82dadbe0cdd8e881aaefd4b874a7fcf754adee0ced3",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/taskflow-close-recovery.test.ts"
+      ],
+      "generatedAt": "2026-10-20T16:22:16.145Z",
+      "startedAt": "2026-10-20T16:22:04.285Z",
+      "finishedAt": "2026-10-20T16:22:16.145Z",
+      "durationMs": 11860,
+      "runnerKind": "dev-source",
+      "sourceCommit": "fce2b9c75ad9bd9395d16ae30465bb1dcb552c2c",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

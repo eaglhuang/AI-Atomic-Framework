@@ -8,7 +8,7 @@ import { listActorWorkSessions, updateActorWorkSessionState } from '../actor-ses
 import { buildDependencyCloseoutRecoveryCommand, formatDependencyCloseoutBlockedMessage, assessCloseoutProvenanceGap } from './closeout-provenance.ts';
 import { findTaskClaimDependencyBlockers, type TaskClaimDependencyBlocker } from './dependency-gates.ts';
 import { evaluateTaskClaimAdmission } from './lifecycle-state.ts';
-import { CliError, makeResult, message, relativePathFrom, resolveValue } from '../shared.ts';
+import { CliError, makeResult, message, relativePathFrom, resolveValue } from '../shared.ts'; import { assertRenewAllowedForCloseState } from './renew-close-guard.ts';
 import { findActiveTaskQueue, writeTaskDirectionLock } from '../task-direction.ts';
 import { normalizeWorkItemStatus } from './task-transition-helpers.ts';
 import { writeTaskDocumentWithTransition } from './close-helpers/task-transition-writer.ts';
@@ -236,6 +236,7 @@ export async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'releas
     });
   }
 
+  if (action === 'renew') assertRenewAllowedForCloseState({ cwd: options.cwd, taskId: options.taskId, actorId, status: String(taskDocument.status ?? ''), relativeTaskPath: relativePathFrom(options.cwd, taskPath) }); // #373
   if (!currentClaim) {
     throw new CliError('ATM_TASK_CLAIM_MISSING', `Task ${options.taskId} has no active claim record.`, {
       exitCode: 1,
