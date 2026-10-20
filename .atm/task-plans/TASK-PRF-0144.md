@@ -2,7 +2,7 @@
 doc_id: doc_TASK-PRF-0144
 task_id: TASK-PRF-0144
 title: 'Original-intent anchoring and cross-session-overlap rejection for live steward writes (#360)'
-status: open
+status: done
 owner: grok-bot
 priority: P1
 depends_on:
@@ -48,6 +48,15 @@ nonGoals:
 - Do not re-pin the hist-v2 smoke runbook or modify any sealed archive; v10c's sealed result stands.
 - Do not tag or publish npm.
 - The merge-plan steward path (`broker steward apply`) keeps #363 stale-base translation; anchoring is live-write only (documented).
+completed_at: "2026-10-20T23:58:35.818Z"
+completed_by_agent: "grok-bot"
+closedAt: "2026-10-20T23:58:35.818Z"
+closedByActor: "grok-bot"
+closedByCommand: atm tasks close
+lastTransitionId: "2026-10-20T23-58-35-818Z-close-ccae6e510725"
+lastTransitionAt: "2026-10-20T23:58:35.818Z"
+ledgerContractVersion: task-ledger/v1
+delivery_commit: "5a2d99cc8577f6015fbaf4432547bc819192009b"
 ---
 
 # TASK-PRF-0144 — original-intent anchoring, cross-session-overlap (#360)
