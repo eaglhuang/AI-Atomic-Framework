@@ -39,6 +39,7 @@ async function main() {
   acknowledgement();
   staleContextCausedByOtherSession();
   v10cReplay();
+  reviewRegressions();
   await cliSurface();
   const concurrency = await stubbedMultiSessionConcurrency(6);
   console.log(JSON.stringify({ concurrency }));
@@ -177,6 +178,49 @@ function v10cReplay() {
   const acked = write(repo, { id: 'rec5-ack', actor: slot2, hash: hashText(base1), file, patch: rec5Patch }, ['rec3']);
   assert.equal(acked.decision, 'accepted', acked.detail);
   assert.deepEqual(readJsonl(repo, 'live-write-journal.jsonl').at(-1).acknowledgedOverlap, ['rec3']);
+}
+
+function reviewRegressions() {
+  // Duplicate lines keep their provenance: A's owned line and A's later identical copy are both protected.
+  {
+    const text0 = 'left\nold\nright\nend\n';
+    const repo = makeRepo(FILE, text0);
+    write(repo, { id: 'b-0', actor: 'session-b', hash: hashText(text0), patch: replace(text0, 4, 'end', 'end-b') });
+    let text = read(repo);
+    assert.equal(write(repo, { id: 'a-1', actor: 'session-a', hash: hashText(text), patch: replace(text, 2, 'old', 'owned') }).decision, 'accepted');
+    text = read(repo);
+    assert.equal(write(repo, { id: 'a-2', actor: 'session-a', hash: hashText(text), patch: `${header()}@@ -1,1 +1,2 @@\n left\n+owned\n` }).decision, 'accepted');
+    text = read(repo);
+    assert.equal(text, 'left\nowned\nowned\nright\nend-b\n');
+    const second = write(repo, { id: 'b-1', actor: 'session-b', hash: hashText(text), patch: remove(text, 3, ['owned']) });
+    assertOverlap(second, 'session-a', 'a-1');
+    const first = write(repo, { id: 'b-2', actor: 'session-b', hash: hashText(text), patch: remove(text, 2, ['owned']) });
+    assertOverlap(first, 'session-a', 'a-2');
+  }
+  // An anchor older than the journal chain (an ordinary commit came between) still sees A's later steward write.
+  {
+    const repo = makeRepo(FILE, BASE);
+    const h1 = BASE.replace('eight', 'eight-ordinary');
+    writeFileSync(path.join(repo, FILE), h1);
+    git(repo, ['-c', 'user.name=atm', '-c', 'user.email=atm@example.com', 'commit', '-q', '-am', 'ordinary']);
+    assert.equal(write(repo, { id: 'a-1', actor: 'session-a', hash: hashText(h1), patch: replace(h1, 2, 'two', 'two-a') }).decision, 'accepted');
+    const text = read(repo);
+    const first = write(repo, { id: 'b-1', actor: 'session-b', hash: hashText(BASE), patch: replace(BASE, 6, 'six', 'six-b') });
+    assert.equal(first.decision, 'rejected-by-design', 'stale first proposal without prior same-base commits stays stale-base');
+    assertOverlap(write(repo, { id: 'b-2', actor: 'session-b', hash: hashText(text), patch: replace(text, 2, 'two-a', 'two-b') }), 'session-a', 'a-1');
+  }
+  // Keeping another session's deletion is not an overlap: B rewrites only the untouched neighbours.
+  {
+    const text0 = 'left\ndeleted\nright\nend\n';
+    const repo = makeRepo(FILE, text0);
+    write(repo, { id: 'b-0', actor: 'session-b', hash: hashText(text0), patch: replace(text0, 4, 'end', 'end-b') });
+    let text = read(repo);
+    assert.equal(write(repo, { id: 'a-1', actor: 'session-a', hash: hashText(text), patch: remove(text, 2, ['deleted']) }).decision, 'accepted');
+    text = read(repo);
+    const kept = write(repo, { id: 'b-1', actor: 'session-b', hash: hashText(text), patch: `${header()}@@ -1,2 +1,2 @@\n-left\n-right\n+LEFT\n+RIGHT\n` });
+    assert.equal(kept.decision, 'accepted', kept.detail);
+    assert.equal(read(repo), 'LEFT\nRIGHT\nend-b\n');
+  }
 }
 
 async function cliSurface() {

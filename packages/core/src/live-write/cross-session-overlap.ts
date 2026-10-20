@@ -19,6 +19,7 @@
 import { spawnSync } from 'node:child_process';
 import { appendFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
+import { hashContent } from '../broker/adapters/cas.ts';
 import { diffLineBlocks, lineTokens, mapBaseLineForward } from '../broker/stale-base-translation.ts';
 
 /** One committed change: before tokens [beforeStart, beforeEnd) became after tokens [afterStart, afterEnd). */
@@ -131,59 +132,68 @@ export function anchorsRelativePath(): string {
   return path.join('.atm', 'runtime', 'live-write-anchors.jsonl');
 }
 
-/** Journal entries for the file committed since the anchor base (journal order). */
-export function entriesSinceAnchor<T extends OverlapJournalFields>(entries: readonly T[], anchor: AnchorRecord, currentHash: string): T[] {
+/**
+ * Journal entries for the file committed since the anchor base (journal order).
+ * The anchor is located on the journal's hash chain; when its hash is not on the
+ * chain, Git ancestry decides (entries whose commit descends from the newest
+ * commit holding the anchor text); when that is unknown too, every entry counts (fail closed).
+ */
+export function entriesSinceAnchor<T extends OverlapJournalFields>(cwd: string, entries: readonly T[], anchor: AnchorRecord, currentHash: string): T[] {
   const forFile = entries.map((entry, index) => ({ entry, index })).filter(({ entry }) => entry.file === anchor.file);
-  const hash = (value: string) => value.replace(/^sha256:/, '');
-  const anchorHash = hash(anchor.baseHash);
+  const anchorHash = bare(anchor.baseHash);
   let start = -1;
-  for (const { entry, index } of forFile) if (hash(entry.afterHash) === anchorHash && index < anchor.journalIndex) start = index + 1;
-  if (start < 0) start = forFile.find(({ entry }) => hash(entry.baseHash) === anchorHash)?.index ?? -1;
-  if (start < 0) {
-    if (anchorHash === hash(currentHash)) return [];
-    start = anchor.journalIndex;
-  }
-  return forFile.filter(({ index }) => index >= start).map(({ entry }) => entry);
+  for (const { entry, index } of forFile) if (bare(entry.afterHash) === anchorHash && index < anchor.journalIndex) start = index + 1;
+  if (start < 0) start = forFile.find(({ entry }) => bare(entry.baseHash) === anchorHash)?.index ?? -1;
+  if (start >= 0) return forFile.filter(({ index }) => index >= start).map(({ entry }) => entry);
+  if (anchorHash === bare(currentHash) && forFile.every(({ index }) => index < anchor.journalIndex)) return [];
+  const anchorCommit = commitHoldingText(cwd, anchor.file, anchorHash);
+  if (anchorCommit === null) return forFile.map(({ entry }) => entry);
+  return forFile.filter(({ entry }) => !entry.commitSha || (entry.commitSha !== anchorCommit && isAncestor(cwd, anchorCommit, entry.commitSha))).map(({ entry }) => entry);
 }
 
 /**
  * Other sessions' committed lines (since the anchor) that the targeted current
- * ranges delete or modify. `readAfterText` returns the file text right after an
- * entry's commit (null when unavailable; such an entry cannot be mapped and is skipped).
+ * ranges delete or modify. Each entry's lines are carried forward through the
+ * later journal entries' own change blocks (exact provenance, so duplicate lines
+ * stay attributed); where the chain breaks (an out-of-band commit or a pre-#360
+ * entry) the rest is mapped with a line diff to the current text. `readAfterText`
+ * returns the file text right after an entry's commit (null when unavailable).
+ * A pure deletion owns no remaining line; `includeDeletionGaps` (classification of
+ * an already-rejected write only) also counts a write spanning the deletion gap.
  */
 export function findCrossSessionOverlaps(input: {
   readonly actorId: string;
   readonly currentText: string;
+  readonly currentHash: string;
   readonly entries: readonly OverlapJournalFields[];
   readonly targets: readonly LineRange[];
   readonly readAfterText: (entry: OverlapJournalFields) => string | null;
+  readonly includeDeletionGaps?: boolean;
 }): CrossSessionOverlap[] {
   const targets = input.targets.filter((range) => range.end > range.start);
   if (targets.length === 0) return [];
   const currentTokens = lineTokens(input.currentText);
   const found: CrossSessionOverlap[] = [];
-  for (const entry of input.entries) {
-    if (!entry.actorId || entry.actorId === input.actorId || !entry.blocks || entry.blocks.length === 0) continue;
-    const afterText = input.readAfterText(entry);
-    if (afterText === null) continue;
-    const later = diffLineBlocks(lineTokens(afterText), currentTokens);
+  input.entries.forEach((entry, position) => {
+    if (!entry.actorId || entry.actorId === input.actorId || !entry.blocks || entry.blocks.length === 0) return;
+    const mapper = forwardMapper(entry, input.entries.slice(position + 1), input.currentHash, currentTokens, input.readAfterText);
+    if (mapper === null) return;
     const hitLines: number[] = [];
     const hitBlocks: CommittedBlock[] = [];
     for (const block of entry.blocks) {
       let hit = false;
       if (block.afterEnd > block.afterStart) {
         for (let line = block.afterStart; line < block.afterEnd; line += 1) {
-          const mapped = mapBaseLineForward(line, later);
+          const mapped = mapper(line);
           if (mapped !== null && targets.some((range) => range.start <= mapped && mapped < range.end)) { hitLines.push(mapped); hit = true; }
         }
-      } else {
-        // A pure deletion leaves a gap; a write deleting lines on both sides of it targets the change.
-        const gap = mapBaseLineForward(block.afterStart, later);
+      } else if (input.includeDeletionGaps) {
+        const gap = mapper(block.afterStart);
         if (gap !== null && targets.some((range) => range.start < gap && gap < range.end)) { hitLines.push(gap); hit = true; }
       }
       if (hit) hitBlocks.push(block);
     }
-    if (hitBlocks.length === 0) continue;
+    if (hitBlocks.length === 0) return;
     found.push({
       actorId: entry.actorId,
       proposalId: entry.proposalId,
@@ -192,8 +202,71 @@ export function findCrossSessionOverlaps(input: {
       currentLines: toRanges(hitLines),
       diff: renderBlocks(entry.file, hitBlocks)
     });
-  }
+  });
   return found;
+}
+
+/** Maps a line index right after `entry` to the current text, or null when a later change covers it. */
+function forwardMapper(
+  entry: OverlapJournalFields,
+  later: readonly OverlapJournalFields[],
+  currentHash: string,
+  currentTokens: readonly string[],
+  readAfterText: (entry: OverlapJournalFields) => string | null
+): ((line: number) => number | null) | null {
+  const steps: (readonly CommittedBlock[])[] = [];
+  let last: OverlapJournalFields = entry;
+  for (const next of later) {
+    if (bare(next.baseHash) !== bare(last.afterHash) || !next.blocks) break;
+    steps.push(next.blocks);
+    last = next;
+  }
+  let tail: ReturnType<typeof diffLineBlocks> | null = null;
+  if (bare(last.afterHash) !== bare(currentHash)) {
+    const text = readAfterText(last);
+    if (text === null) return null;
+    tail = diffLineBlocks(lineTokens(text), currentTokens);
+  }
+  return (line: number) => {
+    let value: number | null = line;
+    for (const blocks of steps) {
+      value = mapThroughBlocks(value, blocks);
+      if (value === null) return null;
+    }
+    return tail === null ? value : mapBaseLineForward(value, tail);
+  };
+}
+
+/** A line's index after one committed change, or null when the change rewrote it. */
+export function mapThroughBlocks(line: number, blocks: readonly CommittedBlock[]): number | null {
+  let delta = 0;
+  for (const block of [...blocks].sort((l, r) => l.beforeStart - r.beforeStart)) {
+    if (block.beforeEnd <= line) {
+      delta += block.added.length - (block.beforeEnd - block.beforeStart);
+      continue;
+    }
+    if (block.beforeStart <= line) return null;
+    break;
+  }
+  return line + delta;
+}
+
+function bare(value: string): string {
+  return value.replace(/^sha256:/, '');
+}
+
+function commitHoldingText(cwd: string, file: string, hash: string, maxCommits = 200): string | null {
+  const history = spawnSync('git', ['-C', cwd, 'rev-list', `--max-count=${maxCommits}`, 'HEAD', '--', file], { encoding: 'utf8' });
+  if (history.status !== 0) return null;
+  for (const sha of history.stdout.trim().split('\n').filter(Boolean)) {
+    const result = spawnSync('git', ['-C', cwd, 'cat-file', '-p', `${sha}:${file}`]);
+    if (result.status === 0 && bare(hashContent(result.stdout.toString('utf8'))) === hash) return sha;
+  }
+  return null;
+}
+
+function isAncestor(cwd: string, ancestor: string, descendant: string): boolean {
+  return spawnSync('git', ['-C', cwd, 'merge-base', '--is-ancestor', ancestor, descendant]).status === 0;
 }
 
 /** The text of `file` at `commitSha`, or null. */

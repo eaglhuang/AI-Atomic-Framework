@@ -188,9 +188,9 @@ function applyOneLocked(cwd: string, file: string, targetPath: string, proposal:
     if (!(error instanceof UnifiedPatchApplicationError)) throw error;
     return rejected(proposal, file, 'patch-malformed', false, current.text, current.hash, error.message);
   }
-  const since = entriesSinceAnchor(journal, anchor, observed);
-  const overlapsFor = (targets: readonly LineRange[]) => findCrossSessionOverlaps({
-    actorId: proposal.actorId, currentText: current.text, entries: since, targets, readAfterText: (entry) => gitFileAt(cwd, entry.commitSha, file) ?? findCommittedBaseText(cwd, file, entry.afterHash)
+  const since = entriesSinceAnchor(cwd, journal, anchor, observed);
+  const overlapsFor = (targets: readonly LineRange[], includeDeletionGaps = false) => findCrossSessionOverlaps({
+    actorId: proposal.actorId, currentText: current.text, currentHash: current.hash, entries: since, targets, includeDeletionGaps, readAfterText: (entry) => gitFileAt(cwd, entry.commitSha, file) ?? findCommittedBaseText(cwd, file, entry.afterHash)
   });
   const guard = (targets: readonly LineRange[]): { rejection: LiveQueuedWrite | null; acknowledged: string[] } => {
     const overlaps = overlapsFor(targets);
@@ -206,7 +206,7 @@ function applyOneLocked(cwd: string, file: string, targetPath: string, proposal:
       // A context mismatch caused by another session's change since the anchor is that session's overlap (#360 AC4).
       const anchorText = normalizeHash(anchor.baseHash) === observed ? null : findCommittedBaseText(cwd, file, anchor.baseHash);
       const fromAnchor = anchorText === null ? null : translateStalePatch({ baseText: anchorText, currentText: current.text, hunks });
-      const overlaps = fromAnchor && !fromAnchor.ok ? overlapsFor(conflictRanges(fromAnchor.conflicts)) : [];
+      const overlaps = fromAnchor && !fromAnchor.ok ? overlapsFor(conflictRanges(fromAnchor.conflicts), true) : [];
       if (overlaps.length > 0) return overlapRejection(cwd, proposal, file, current, overlaps, ack);
       return rejected(proposal, file, 'patch-context-mismatch', false, current.text, current.hash, error.message);
     }
@@ -232,7 +232,7 @@ function applyOneLocked(cwd: string, file: string, targetPath: string, proposal:
   let acknowledged: string[] = [];
   if (existed && translated) {
     // A resubmission (the session already anchored this file) is checked against other sessions first.
-    const conflicting = translated.ok ? [] : overlapsFor(conflictRanges(translated.conflicts));
+    const conflicting = translated.ok ? [] : overlapsFor(conflictRanges(translated.conflicts), true);
     const check = translated.ok
       ? guard(translated.blocks.map((block) => ({ start: block.currentStart, end: block.currentEnd })))
       : { rejection: conflicting.length > 0 ? overlapRejection(cwd, proposal, file, current, conflicting, ack) : null, acknowledged: [] };
