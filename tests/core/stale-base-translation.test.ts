@@ -60,6 +60,10 @@ const B3 = '@@ -3 +3 @@\n-b\n+B3\n';
   // An insertion between blank lines keeps its gap.
   const blanks = translate('x\n\n\ny\n', 'top\nx\n\n\ny\n', '@@ -2,0 +3 @@\n+mid\n');
   assert.ok(blanks.ok && blanks.text === 'top\nx\n\nmid\n\ny\n', JSON.stringify(blanks));
+  // Ambiguous translation: someone duplicated the edited line, so either copy could be "the" b.
+  // The insertion touches the edited line wherever the diff places it, so this is rejected.
+  assert.equal(translate('a\nb\nc\n', 'a\nb\nb\nc\n', '@@ -2 +2 @@\n-b\n+B\n').ok, false);
+  assert.equal(translate('a\nb\nc\n', 'a\nb\nb\nc\n', '@@ -1,3 +1,3 @@\n a\n-b\n+B\n c\n').ok, false);
   // An insertion into the same gap as a change since the base is a conflict.
   assert.equal(translate('x\ny\n', 'x\nother\ny\n', '@@ -1,0 +2 @@\n+mine\n').ok, false);
 }

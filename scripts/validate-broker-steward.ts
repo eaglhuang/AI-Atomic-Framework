@@ -365,6 +365,12 @@ try {
   });
   check(liveQueued.status === 0, `live queued write regression must pass:\n${liveQueued.stdout}\n${liveQueued.stderr}`);
 
+  const staleBase = spawnSync(process.execPath, ['--strip-types', path.join(root, 'tests/core/stale-base-translation.test.ts')], {
+    cwd: root,
+    encoding: 'utf8'
+  });
+  check(staleBase.status === 0, `stale-base translation regression must pass:\n${staleBase.stdout}\n${staleBase.stderr}`);
+
   const concurrent = spawnSync(process.execPath, ['--strip-types', path.join(root, 'tests/core/steward-concurrent-commit.test.ts')], {
     cwd: root,
     encoding: 'utf8'
