@@ -103,12 +103,18 @@ function sha256Text(value) { return createHash('sha256').update(value).digest('h
 function sha256Json(value) {
     return `sha256:${sha256Text(`${JSON.stringify(value, null, 2)}\n`)}`;
 }
-function taskflowSealManifestPath(taskId) { return `.atm/history/evidence/${taskId}.seal-and-commit.json`; }
+function taskflowSealManifestPath(taskId) { return `.atm/history/evidence/${taskId}.seal-and-commit.json`; } /** Nested repositories and gitignored run directories surface as directory paths; only regular files carry a payload digest (#373: EISDIR on kit/state/runs). */
+export function isRegularPayloadFile(absolutePath) { try {
+    return statSync(absolutePath).isFile();
+}
+catch {
+    return false;
+} }
 function readPayloadEntries(repoRoot, stageFiles, excludeFiles = []) {
     if (!repoRoot)
         return [];
     const excluded = new Set(excludeFiles.map((entry) => entry.replace(/\\/g, '/')));
-    return uniqueSorted(stageFiles).filter((file) => !excluded.has(file)).filter((file) => existsSync(path.resolve(repoRoot, file))).map((file) => { const absolutePath = path.resolve(repoRoot, file); return { path: file, sha256: `sha256:${sha256Text(readFileSync(absolutePath, 'utf8'))}` }; });
+    return uniqueSorted(stageFiles).filter((file) => !excluded.has(file)).filter((file) => isRegularPayloadFile(path.resolve(repoRoot, file))).map((file) => { const absolutePath = path.resolve(repoRoot, file); return { path: file, sha256: `sha256:${sha256Text(readFileSync(absolutePath, 'utf8'))}` }; });
 }
 function payloadDigest(repoRoot, stageFiles, excludeFiles = []) { return sha256Json(readPayloadEntries(repoRoot, stageFiles, excludeFiles)); }
 function evidenceDigest(repoRoot, stageFiles, excludeFiles = []) {
@@ -183,7 +189,10 @@ function getDirtyFiles(cwd) {
             if (parts[1])
                 filePart = parts[1].trim();
         }
-        files.push(filePart.replace(/\\/g, '/'));
+        const normalizedDirtyPath = filePart.replace(/\\/g, '/');
+        if (normalizedDirtyPath.endsWith('/'))
+            continue;
+        files.push(normalizedDirtyPath);
     }
     return [...new Set(files.filter(Boolean))].sort((a, b) => a.localeCompare(b));
 }

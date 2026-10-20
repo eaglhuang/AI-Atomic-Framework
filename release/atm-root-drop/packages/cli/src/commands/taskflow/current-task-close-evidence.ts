@@ -30,6 +30,7 @@ export function buildCurrentTaskCloseEvidence(taskId: string): CurrentTaskCloseE
       `${evidenceRoot}.json`,
       `${evidenceRoot}.bundle-manifest.json`,
       `${evidenceRoot}.closure-packet.json`,
+      `${evidenceRoot}.close-recovery.json`,
       `${evidenceRoot}.live-index-reconciliation.json`,
       `${evidenceRoot}.runner-publication-takeover.json`,
       `${evidenceRoot}.runner-sync-receipt.json`,

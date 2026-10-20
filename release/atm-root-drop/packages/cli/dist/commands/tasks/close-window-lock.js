@@ -6,6 +6,7 @@ import { normalizeRelativePath } from './task-file-io-helpers.js';
 import { CliError, quoteCliValue, relativePathFrom } from '../shared.js';
 import { inspectGitIndexOwnership } from '../git-index-ownership.js';
 import { evaluateCloseWindowStagedIndexAdmission } from './close-window-staged-index-admission.js';
+import { closeRecoveryCommand, inspectCloseHolderLiveness } from './close-holder-liveness.js';
 import { classifyCloseWindowUnexpectedStaged, residueDisclosure, EMPTY_CLOSE_WINDOW_RESIDUE_DISCLOSURE } from './close-window-residue-classification.js';
 export const CLOSE_WINDOW_STAGED_INDEX_LOCK_SCHEMA_ID = 'atm.closeWindowStagedIndexLock.v1';
 /**
@@ -392,13 +393,18 @@ export function assertCloseWindowStagingAllowed(input) {
         return;
     if (lock.taskId === normalizeTaskId(input.taskId))
         return;
-    throw new CliError('ATM_CLOSE_WINDOW_STAGED_INDEX_LOCKED', `Close window staged-index lock held by ${lock.taskId} blocks ${input.operation}.`, {
+    // A holder whose close process is gone can never release the lock itself;
+    // point at the governed recovery lane instead of a read-only status (#373).
+    const holder = inspectCloseHolderLiveness({ cwd: input.cwd, taskId: lock.taskId, lockAcquiredAt: lock.acquiredAt });
+    throw new CliError('ATM_CLOSE_WINDOW_STAGED_INDEX_LOCKED', `Close window staged-index lock held by ${lock.taskId} blocks ${input.operation}.${holder.alive ? '' : ` The holder's close process is gone (${holder.reason}); recover or abort it through the governed recovery lane.`}`, {
         exitCode: 1,
         details: {
             lockTaskId: lock.taskId,
             operation: input.operation,
             lockPath: relativePathFrom(input.cwd, closeWindowStagedIndexLockPath(input.cwd)),
-            requiredCommand: `node atm.mjs tasks status --task ${lock.taskId} --json`
+            holderAlive: holder.alive,
+            holderLivenessReason: holder.reason,
+            requiredCommand: holder.alive ? `node atm.mjs tasks status --task ${lock.taskId} --json` : closeRecoveryCommand(lock.taskId, 'recover')
         }
     });
 }

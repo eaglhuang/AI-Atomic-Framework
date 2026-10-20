@@ -8,6 +8,7 @@ import { resolvePlanningPathFromStored } from '../planning-repo-root.js';
 import { quoteCliValue } from '../shared.js';
 import { evaluateTaskWorkAdmissionGate } from '../git-governance/work-admission-check.js';
 import { inspectCloseWindowStagedIndexAdmission } from '../tasks/close-window-lock.js';
+import { closeRecoveryCommand, inspectCloseHolderLiveness } from '../tasks/close-holder-liveness.js';
 import { evaluateAcceptanceEvidenceClosureGate } from '../tasks/close-orchestrator/acceptance-evidence-gate.js';
 import { evaluateTaskflowTelemetryObligationGate } from './telemetry-obligation-close-gate.js';
 // TASK-SKL-0029 — write-readiness lifecycle adapter.
@@ -187,7 +188,11 @@ export function buildTaskflowCloseWriteReadinessHint(input) {
                 ? closeWindowAdmission.residueDrainCommand ?? null
                 : closeWindowAdmission.blockedCode === 'ATM_CLOSE_WINDOW_FOREIGN_STAGED_TASKS'
                     ? `node atm.mjs taskflow close --task ${input.taskId} --actor ${quoteCliValue(input.actorId || '<actor>')} --defer-foreign-staged --write --json`
-                    : closeWindowAdmission.lock?.taskId ? `node atm.mjs tasks status --task ${closeWindowAdmission.lock.taskId} --json` : null,
+                    : closeWindowAdmission.lock?.taskId
+                        ? (inspectCloseHolderLiveness({ cwd: input.cwd, taskId: closeWindowAdmission.lock.taskId, lockAcquiredAt: closeWindowAdmission.lock.acquiredAt }).alive
+                            ? `node atm.mjs tasks status --task ${closeWindowAdmission.lock.taskId} --json`
+                            : closeRecoveryCommand(closeWindowAdmission.lock.taskId, 'recover'))
+                        : null,
             files: closeWindowAdmission.unexpectedStagedTasks.flatMap((entry) => entry.stagedFiles)
         });
     if (!workAdmission.decision.ok) {
