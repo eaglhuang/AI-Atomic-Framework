@@ -1,0 +1,162 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-PRF-0143",
+  "targetRepoIdentity": {
+    "kind": "framework",
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "/workspace/AI-Atomic-Framework-359/AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "4d0e60a59eaac245adef69b452e212db988dd8d3",
+  "governedTreeSha": "b87127d7b404d3a641ccb8e6d90aa2bdcfbbe311",
+  "targetCommitDelta": {
+    "currentCommitSha": "4d0e60a59eaac245adef69b452e212db988dd8d3",
+    "parentCommitShas": [
+      "4d0e60a59eaac245adef69b452e212db988dd8d3"
+    ],
+    "governedTreeSha": "b87127d7b404d3a641ccb8e6d90aa2bdcfbbe311",
+    "changedFiles": [
+      ".atm/history/task-events/TASK-PRF-0143/2026-10-20T17-32-35-360Z-import-65a5cbe00812.json",
+      ".atm/history/task-events/TASK-PRF-0143/2026-10-20T17-32-39-595Z-reserve-afb703635e24.json",
+      ".atm/history/task-events/TASK-PRF-0143/2026-10-20T17-32-39-596Z-promote-666de9cabef3.json",
+      ".atm/history/task-events/TASK-PRF-0143/2026-10-20T17-32-41-504Z-claim-7156b2ae4c94.json",
+      ".atm/history/tasks/TASK-PRF-0143.json",
+      ".atm/task-plans/TASK-PRF-0140.md",
+      ".atm/task-plans/TASK-PRF-0143.md",
+      "packages/cli/dist/_vendor/atm-markdown-task-source/dist/templates.d.ts",
+      "packages/cli/dist/_vendor/core/dist/broker/steward-transactional-apply.js",
+      "packages/cli/dist/build-identity.json",
+      "packages/cli/dist/npm-runtime/build-identity.json",
+      "packages/cli/dist/npm-runtime/manifest.json",
+      "packages/cli/dist/npm-runtime/runtime.mjs",
+      "packages/core/src/broker/steward-transactional-apply.ts",
+      "PROGRESS.md",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/atm-markdown-task-source/dist/templates.d.ts",
+      "release/atm-root-drop/packages/cli/dist/_vendor/atm-markdown-task-source/dist/templates.d.ts",
+      "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/steward-transactional-apply.js",
+      "release/atm-root-drop/packages/cli/dist/build-identity.json",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/build-identity.json",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/manifest.json",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/runtime.mjs",
+      "release/atm-root-drop/packages/core/dist/broker/steward-transactional-apply.js",
+      "release/atm-root-drop/packages/core/src/broker/steward-transactional-apply.ts",
+      "release/atm-root-drop/packages/create-atm/dist/build-identity.json",
+      "release/atm-root-drop/release-manifest.json"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/physical-line-budget-gate.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d2fd4e132423ecdc47b6ecb9057cab6ca35a4b67e224ac5eeea387875b62e087",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --strip-types tests/core/stale-base-translation.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7e08742246439c266d733753f3ab5904e8dd888c06067686f48ac476bca27328",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --strip-types scripts/validate-broker-steward.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7c4e3734903aa3ad77f63c14a32370a6e8b7c487bac22921ed736cbaa74de81f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/physical-line-budget-gate.test.ts",
+    "node --strip-types tests/core/stale-base-translation.test.ts",
+    "validate:broker-steward"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "node --strip-types tests/cli/physical-line-budget-gate.test.ts",
+    "node --strip-types tests/core/stale-base-translation.test.ts",
+    "validate:broker-steward"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-10-20T17:37:15.103Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-PRF-0143.*",
+      ".atm/history/task-events/TASK-PRF-0143/**",
+      ".atm/history/tasks/TASK-PRF-0143.json",
+      ".atm/task-plans/TASK-PRF-0143.md",
+      "packages/cli/dist",
+      "packages/cli/dist/**",
+      "packages/core/src/broker/**",
+      "packages/core/src/broker/steward-transactional-apply.ts",
+      "PROGRESS.md",
+      "release/atm-onefile/**",
+      "release/atm-root-drop/**"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/dist",
+      "packages/cli/dist/**",
+      "packages/core/src/broker/**",
+      "packages/core/src/broker/steward-transactional-apply.ts"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/physical-line-budget-gate.test.ts",
+      "node --strip-types tests/core/stale-base-translation.test.ts",
+      "validate:broker-steward"
+    ]
+  },
+  "evidencePath": ".atm/runtime/evidence-ledger/bundles/TASK-PRF-0143.json",
+  "closedAt": "2026-10-20T17:37:15.103Z",
+  "closedByActor": "grok-bot",
+  "sessionId": "session-20261020173239-grok-bot-TASK-PRF-0143-cfe14eb136",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "2c9e7c7b8a05ea6ea965706285fdf6c7bdc358e7",
+    "taskMatchedFiles": [
+      "packages/cli/dist/_vendor/core/dist/broker/steward-transactional-apply.js",
+      "packages/cli/dist/build-identity.json",
+      "packages/cli/dist/npm-runtime/build-identity.json",
+      "packages/cli/dist/npm-runtime/manifest.json",
+      "packages/cli/dist/npm-runtime/runtime.mjs"
+    ],
+    "governanceFiles": [],
+    "allowedRunnerOutputFiles": [
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/steward-transactional-apply.js",
+      "release/atm-root-drop/packages/cli/dist/build-identity.json",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/build-identity.json",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/manifest.json",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/runtime.mjs",
+      "release/atm-root-drop/packages/core/dist/broker/steward-transactional-apply.js",
+      "release/atm-root-drop/packages/core/src/broker/steward-transactional-apply.ts",
+      "release/atm-root-drop/packages/create-atm/dist/build-identity.json",
+      "release/atm-root-drop/release-manifest.json"
+    ],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
