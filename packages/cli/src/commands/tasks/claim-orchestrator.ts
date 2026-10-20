@@ -240,7 +240,7 @@ export async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'releas
   }
 
   if (action === 'renew') {
-    assertRenewAllowedForCloseState({ cwd: options.cwd, taskId: options.taskId, actorId, status: String(taskDocument.status ?? '') });
+    assertRenewAllowedForCloseState({ cwd: options.cwd, taskId: options.taskId, actorId, status: String(taskDocument.status ?? ''), relativeTaskPath: relativePathFrom(options.cwd, taskPath) });
   }
 
   if (!currentClaim) {
@@ -606,28 +606,37 @@ export async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'releas
 }
 
 /**
- * `tasks renew` only extends a live claim; it must never reopen a task whose
- * close already finished or is still in flight (#373). Renewing a closed task
- * used to flip the ledger back to running while the close bundle stayed staged
- * as done, which left an interrupted close unrecoverable.
+ * `tasks renew` must never desynchronise a close (#373).
+ *
+ * - A close in flight (close-window lock held by the task, or an open close
+ *   transaction whose staged ledger carries the close) that has NOT landed on
+ *   HEAD is refused: renewing would flip the working ledger back to running
+ *   while the staged bundle still says done, which is how TASK-PRF-0140 became
+ *   unrecoverable. The recovery lane is the way out.
+ * - A close in flight that already landed on HEAD stays renewable: that is the
+ *   governed post-crash reconcile path (renew, then taskflow close converges the
+ *   remaining closeback).
+ * - A closed task with no close in flight is refused: renew does not reopen it.
  */
-function assertRenewAllowedForCloseState(input: { cwd: string; taskId: string; actorId: string; status: string }): void {
-  if (input.status === 'done' || input.status === 'abandoned') {
-    throw new CliError('ATM_TASKS_RENEW_TASK_CLOSED', `Task ${input.taskId} is ${input.status}; tasks renew does not reopen a closed task.`, {
-      exitCode: 1,
-      details: { taskId: input.taskId, status: input.status, requiredCommand: `node atm.mjs taskflow status --task ${input.taskId} --json` }
-    });
-  }
+function assertRenewAllowedForCloseState(input: { cwd: string; taskId: string; actorId: string; status: string; relativeTaskPath: string }): void {
+  const closedStatuses = new Set(['done', 'abandoned', 'review', 'blocked']);
+  const statusAt = (spec: string): string | null => {
+    try {
+      const parsed = JSON.parse(execFileSync('git', ['show', `${spec}${input.relativeTaskPath}`], { cwd: input.cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }));
+      return typeof parsed?.status === 'string' ? parsed.status : null;
+    } catch {
+      return null;
+    }
+  };
   const lock = readCloseWindowStagedIndexLockReport(input.cwd);
   const transaction = readCloseTransactionStatus(input.cwd, input.taskId);
   const lockHeld = lock?.status === 'active' && lock.taskId === input.taskId;
-  // A legacy close that succeeded can leave its receipt at in-progress, so an
-  // open receipt only counts while the staged ledger still carries the close.
-  let stagedStatus: string | null = null;
-  try { stagedStatus = JSON.parse(execFileSync('git', ['show', `:.atm/history/tasks/${input.taskId}.json`], { cwd: input.cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] })).status ?? null; } catch { stagedStatus = null; }
-  const transactionOpen = transaction !== null && transaction.outcome === 'in-progress' && (stagedStatus === 'done' || stagedStatus === 'abandoned' || stagedStatus === 'review' || stagedStatus === 'blocked');
-  if (lockHeld || transactionOpen) {
-    throw new CliError('ATM_TASKS_RENEW_CLOSE_IN_PROGRESS', `Task ${input.taskId} has a close in progress (${lockHeld ? 'close-window lock held' : `close transaction at ${transaction?.phase}`}); renewing would desynchronise the ledger from the staged close. Recover or abort the close first.`, {
+  const transactionOpen = transaction !== null && (transaction.outcome === 'in-progress' || transaction.outcome === 'failed')
+    && closedStatuses.has(statusAt(':') ?? '');
+  const closeInFlight = lockHeld || transactionOpen;
+  const landed = closedStatuses.has(statusAt('HEAD:') ?? '');
+  if (closeInFlight && !landed) {
+    throw new CliError('ATM_TASKS_RENEW_CLOSE_IN_PROGRESS', `Task ${input.taskId} has a close in progress that has not landed (${lockHeld ? 'close-window lock held' : `close transaction at ${transaction?.phase}`}); renewing would desynchronise the ledger from the staged close. Recover or abort the close first.`, {
       exitCode: 1,
       details: {
         taskId: input.taskId,
@@ -635,6 +644,12 @@ function assertRenewAllowedForCloseState(input: { cwd: string; taskId: string; a
         closeTransactionPhase: transaction?.phase ?? null,
         requiredCommand: `node atm.mjs taskflow close --task ${input.taskId} --actor ${input.actorId} --recover --json`
       }
+    });
+  }
+  if (!closeInFlight && (input.status === 'done' || input.status === 'abandoned')) {
+    throw new CliError('ATM_TASKS_RENEW_TASK_CLOSED', `Task ${input.taskId} is ${input.status}; tasks renew does not reopen a closed task.`, {
+      exitCode: 1,
+      details: { taskId: input.taskId, status: input.status, requiredCommand: `node atm.mjs taskflow status --task ${input.taskId} --json` }
     });
   }
 }

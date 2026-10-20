@@ -176,8 +176,11 @@ node atm.mjs taskflow close --task <task-id> --actor <actor-id> --abort --reason
   `.atm/runtime/close-transactions/<task-id>.rollback-snapshot.json` so abort
   restores exact pre-close bytes, and records a terminal transaction phase
   (`post-cleanup-complete`, `rolled-back`, or `failed`).
-- `tasks renew` refuses a closed task (`ATM_TASKS_RENEW_TASK_CLOSED`) and a task
-  whose close is in progress (`ATM_TASKS_RENEW_CLOSE_IN_PROGRESS`).
+- `tasks renew` refuses a task whose close is in flight but has not landed on
+  HEAD (`ATM_TASKS_RENEW_CLOSE_IN_PROGRESS`; recover or abort first) and a
+  closed task with no close in flight (`ATM_TASKS_RENEW_TASK_CLOSED`). A close
+  that landed but did not finish its closeback stays renewable, which is the
+  post-crash reconcile path.
 
 ### Foreign staged restore protocol
 
