@@ -7,6 +7,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'nod
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { parseAtmResultLine } from '../../scripts/lib/atm-result-line.ts';
 import { isClean, runSweep, validateConfig, type SweepBatchTrace, type SweepConfig } from '../../scripts/run-cli-test-sweep.ts';
 
 const frameworkRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -17,7 +18,7 @@ git('config', 'user.email', 'fixture@example.invalid');
 git('config', 'user.name', 'fixture');
 mkdirSync(path.join(fixture, 'tests'));
 const tests: Record<string, string> = {
-  'pass.test.ts': 'console.log("ok");',
+  'pass.test.ts': 'console.log("ok"); console.error("diagnostic");',
   'fail.test.ts': 'process.exit(3);',
   'hang.test.ts': 'setTimeout(() => {}, 60000);',
   'writer.test.ts': 'import { writeFileSync } from "node:fs"; writeFileSync("tracked.txt", "changed\\n");',
@@ -42,6 +43,16 @@ assert.equal(byName['pass.test.ts'].dirtied.length, 0, 'tests that share a batch
 assert.equal(readFileSync(path.join(fixture, 'tracked.txt'), 'utf8').replace(/\r\n/g, '\n'), 'original\n', 'writes made by tests are discarded');
 assert.ok(traces.some((trace) => trace.attempt === 'initial' && trace.dirtyRetry), 'a dirty parallel batch is recorded before retry');
 assert.ok(traces.some((trace) => trace.attempt === 'retry' && trace.execution === 'serial' && trace.tests.includes('writer.test.ts')), 'the dirty writer retry is recorded as serial');
+
+const streamLog = `${fixture}.log`;
+try {
+  const loggedResults = await runSweep(fixture, config, ['pass.test.ts'], { logFile: streamLog });
+  assert.equal(isClean(loggedResults[0]), true);
+  assert.match(readFileSync(streamLog, 'utf8'), /ok/);
+  assert.match(readFileSync(streamLog, 'utf8'), /diagnostic/);
+} finally {
+  rmSync(streamLog, { force: true });
+}
 
 const available = Object.keys(tests);
 assert.deepEqual(validateConfig({ ...config, quarantine: [{ test: 'fail.test.ts', reason: 'failing-on-main', detail: 'exit 3', disposition: 'triage' }] }, available), []);
@@ -96,6 +107,10 @@ try {
   writeFileSync(path.join(reportFixture, 'tracked.txt'), 'original\n');
   reportGit('add', '.');
   reportGit('commit', '--quiet', '-m', 'fixture');
+  mkdirSync(path.join(reportFixture, 'scripts/lib'));
+  writeFileSync(path.join(reportFixture, 'scripts/lib/atm-result-line.ts'), readFileSync(path.join(frameworkRoot, 'scripts/lib/atm-result-line.ts')));
+  reportGit('add', 'scripts/lib/atm-result-line.ts');
+  reportGit('commit', '--quiet', '-m', 'logging helper fixture');
   const reportRun = spawnSync(process.execPath, ['--strip-types', 'scripts/run-cli-test-sweep.ts'], { cwd: reportFixture, encoding: 'utf8' });
   assert.equal(reportRun.status, 1, reportRun.stderr);
   const report = JSON.parse(reportRun.stdout);
@@ -105,6 +120,30 @@ try {
   assert.equal(report.failures[0].test, 'a-writer.test.ts');
   assert.deepEqual(report.failures[0].dirtied, [' M tracked.txt']);
   assert.equal(readFileSync(path.join(reportFixture, 'tracked.txt'), 'utf8'), 'changed\n');
+  writeFileSync(path.join(reportFixture, 'tracked.txt'), 'original\n');
+  const logFile = `${reportFixture}.log`;
+  try {
+    const logged = spawnSync(process.execPath, ['--strip-types', 'scripts/run-cli-test-sweep.ts', '--log-file', logFile], { cwd: reportFixture, encoding: 'utf8' });
+    assert.equal(logged.status, 1, logged.stderr);
+    assert.equal(logged.stderr, '');
+    assert.equal(logged.stdout.trim().split('\n').length, 1);
+    const result = parseAtmResultLine(logged.stdout.trim());
+    assert.equal(result?.code, 'SWEEP_FAILED');
+    assert.match(result?.hint ?? '', /a-writer.test.ts/);
+    assert.match(readFileSync(logFile, 'utf8'), /"failures"/);
+    const priorLog = readFileSync(logFile, 'utf8');
+    writeFileSync(path.join(reportFixture, 'tracked.txt'), 'original\n');
+    const success = spawnSync(process.execPath, ['--strip-types', 'scripts/run-cli-test-sweep.ts', '--check-quarantine'], {
+      cwd: reportFixture, encoding: 'utf8', env: { ...process.env, ATM_SWEEP_LOG_FILE: logFile }
+    });
+    assert.equal(success.status, 0, success.stderr);
+    assert.equal(success.stderr, '');
+    assert.equal(success.stdout.trim().split('\n').length, 1);
+    assert.equal(parseAtmResultLine(success.stdout.trim())?.code, 'SWEEP_OK');
+    assert.ok(readFileSync(logFile, 'utf8').startsWith(priorLog), 'sweep log must append');
+  } finally {
+    rmSync(logFile, { force: true });
+  }
 } finally {
   rmSync(reportFixture, { recursive: true, force: true });
 }
