@@ -81568,21 +81568,33 @@
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
   "buildInputsTreeHash": "sha256:23d72e4ee2ac878d7b5ff9492f02d646a74a3c6a9ff3d7595b753fca3dc97da0",
-  "sealedSourceCommit": "c5641ae6052f933c747d6895560dff2e1575fe32",
-  "buildDecision": "incrementalBuild",
-  "buildDecisionReason": "diff planner selected 2 affected package(s)",
-  "incrementalPlanDigest": "sha256:b93e04c62346fd9300720e7737b0bf27019c1d1f15f47aa427f860b668bf4e53",
-  "tsBuildCacheDigest": "sha256:8288e2146fed83a8c663d2673a582267d49f9b083cefb3f0767a4a4eeadc1b10",
+  "sealedSourceCommit": "477d56a7a5d71985bec54d0aa520ae26a8a0786f",
+  "buildDecision": "cacheHitSkip",
+  "buildDecisionReason": "build input tree hash matches release manifests",
+  "incrementalPlanDigest": null,
+  "tsBuildCacheDigest": null,
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 11,
-    "skipDecision": 20,
-    "worktreeSetup": 18450,
-    "typescriptBuild": 10832,
-    "rootDropReleaseAssembly": 22700,
-    "onefileReleaseAssembly": 21260,
-    "artifactSync": 462,
+    "inputHashCalculation": 16,
+    "skipDecision": 69,
+    "worktreeSetup": 0,
+    "typescriptBuild": 0,
+    "rootDropReleaseAssembly": 0,
+    "onefileReleaseAssembly": 0,
+    "artifactSync": 0,
     "cleanup": 0,
-    "totalElapsed": 79129
+    "totalElapsed": 5362
+  },
+  "dominantPhaseSummary": {
+    "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
+    "dominantPhase": "skipDecision",
+    "dominantPhaseMs": 69,
+    "totalElapsedMs": 5362,
+    "dominanceRatio": 0.0129,
+    "phaseMedianMs": 0,
+    "phaseP95Ms": 69,
+    "measuredPhaseCount": 8,
+    "optimizationVerdict": "inconclusive",
+    "basis": "single-run"
   }
 }
