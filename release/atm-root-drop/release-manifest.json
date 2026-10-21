@@ -1281,6 +1281,7 @@
     "release/atm-root-drop/packages/atm-markdown-task-source/dist/index.js",
     "release/atm-root-drop/packages/atm-markdown-task-source/dist/task-card-parser.d.ts",
     "release/atm-root-drop/packages/atm-markdown-task-source/dist/task-card-parser.js",
+    "release/atm-root-drop/packages/atm-markdown-task-source/dist/templates.d.ts",
     "release/atm-root-drop/packages/atm-markdown-task-source/dist/templates.js",
     "release/atm-root-drop/packages/atm-markdown-task-source/package.json",
     "release/atm-root-drop/packages/atm-markdown-task-source/src/index.ts",
@@ -1315,6 +1316,7 @@
     "release/atm-root-drop/packages/cli/dist/_vendor/atm-markdown-task-source/dist/index.js",
     "release/atm-root-drop/packages/cli/dist/_vendor/atm-markdown-task-source/dist/task-card-parser.d.ts",
     "release/atm-root-drop/packages/cli/dist/_vendor/atm-markdown-task-source/dist/task-card-parser.js",
+    "release/atm-root-drop/packages/cli/dist/_vendor/atm-markdown-task-source/dist/templates.d.ts",
     "release/atm-root-drop/packages/cli/dist/_vendor/atm-markdown-task-source/dist/templates.js",
     "release/atm-root-drop/packages/cli/dist/_vendor/atm-markdown-task-source/templates/aao-l2-split-template.md",
     "release/atm-root-drop/packages/cli/dist/_vendor/atm-markdown-task-source/templates/adopter-task-template.md",
@@ -1732,6 +1734,9 @@
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/lane/wip-ownership-transition.js",
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/live-write/cross-session-overlap.js",
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/live-write/live-queued-write.js",
+    "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/live-write/live-write-commit.js",
+    "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/live-write/live-write-journal-store.js",
+    "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/live-write/live-write-journal.js",
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/manager/atom-birth-transaction.js",
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/manager/atom-generator.js",
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/manager/atom-space.js",
@@ -4233,6 +4238,9 @@
     "release/atm-root-drop/packages/core/dist/lane/wip-ownership-transition.js",
     "release/atm-root-drop/packages/core/dist/live-write/cross-session-overlap.js",
     "release/atm-root-drop/packages/core/dist/live-write/live-queued-write.js",
+    "release/atm-root-drop/packages/core/dist/live-write/live-write-commit.js",
+    "release/atm-root-drop/packages/core/dist/live-write/live-write-journal-store.js",
+    "release/atm-root-drop/packages/core/dist/live-write/live-write-journal.js",
     "release/atm-root-drop/packages/core/dist/manager/atom-birth-transaction.js",
     "release/atm-root-drop/packages/core/dist/manager/atom-generator.js",
     "release/atm-root-drop/packages/core/dist/manager/atom-space.js",
@@ -4732,6 +4740,9 @@
     "release/atm-root-drop/packages/core/src/lane/wip-ownership-transition.ts",
     "release/atm-root-drop/packages/core/src/live-write/cross-session-overlap.ts",
     "release/atm-root-drop/packages/core/src/live-write/live-queued-write.ts",
+    "release/atm-root-drop/packages/core/src/live-write/live-write-commit.ts",
+    "release/atm-root-drop/packages/core/src/live-write/live-write-journal-store.ts",
+    "release/atm-root-drop/packages/core/src/live-write/live-write-journal.ts",
     "release/atm-root-drop/packages/core/src/manager/atom-birth-transaction.ts",
     "release/atm-root-drop/packages/core/src/manager/atom-generator.ts",
     "release/atm-root-drop/packages/core/src/manager/atom-space.ts",
@@ -6990,6 +7001,7 @@
     "release/atm-root-drop/tests/core/cross-session-overlap.test.ts",
     "release/atm-root-drop/tests/core/id-allocator.test.ts",
     "release/atm-root-drop/tests/core/live-queued-write.test.ts",
+    "release/atm-root-drop/tests/core/live-write-commit-path.test.ts",
     "release/atm-root-drop/tests/core/map-generator.test.ts",
     "release/atm-root-drop/tests/core/map-id-allocator.test.ts",
     "release/atm-root-drop/tests/core/map-integration.test.ts",
@@ -7309,7 +7321,7 @@
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
     "copied": 0,
-    "unchanged": 7273,
+    "unchanged": 7285,
     "removed": 0
   },
   "buildMode": "full",
@@ -18565,6 +18577,15 @@
         "replaceable": true
       },
       {
+        "path": "packages/atm-markdown-task-source/dist/templates.d.ts",
+        "digest": "45a7e29750c0c783a089905b7590e39890bad1a3f10d474a1fa6ab3c190086bb",
+        "origin": "source",
+        "inputPaths": [
+          "packages/atm-markdown-task-source/dist/templates.d.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/atm-markdown-task-source/dist/templates.js",
         "digest": "cfbe6b596d4fe5433aa393a981ecea4598325e586c30177fb678b8963675047a",
         "origin": "source",
@@ -18867,6 +18888,15 @@
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/atm-markdown-task-source/dist/task-card-parser.js"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/_vendor/atm-markdown-task-source/dist/templates.d.ts",
+        "digest": "45a7e29750c0c783a089905b7590e39890bad1a3f10d474a1fa6ab3c190086bb",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/_vendor/atm-markdown-task-source/dist/templates.d.ts"
         ],
         "replaceable": true
       },
@@ -22607,7 +22637,7 @@
       },
       {
         "path": "packages/cli/dist/_vendor/core/dist/live-write/cross-session-overlap.js",
-        "digest": "7f535aefc5cd4f6a1ba981bcc1c5d04dd7bfb5bb466703fcc0ba11db64f97c8e",
+        "digest": "4f06b467a045d144cdf120d0530b075337976debd09910004105d3140d80e110",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/core/dist/live-write/cross-session-overlap.js"
@@ -22616,10 +22646,37 @@
       },
       {
         "path": "packages/cli/dist/_vendor/core/dist/live-write/live-queued-write.js",
-        "digest": "ef94269993e968351f16246f465e57d6ed778711cd9e4fc4be9678c2247a4596",
+        "digest": "a4d8a717c4001899928fa4e6bc638bd87fc53ca9f19a559ef2c5b523e473b246",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/core/dist/live-write/live-queued-write.js"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/_vendor/core/dist/live-write/live-write-commit.js",
+        "digest": "65bf5e9a094c905bb893c50f1c110fadfbd5f6d29dc50b23df20ba3699558708",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/_vendor/core/dist/live-write/live-write-commit.js"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/_vendor/core/dist/live-write/live-write-journal-store.js",
+        "digest": "1053624e74018ce7b1dd01086b91b94ca57c91978271434a80a502307d0bff49",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/_vendor/core/dist/live-write/live-write-journal-store.js"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/_vendor/core/dist/live-write/live-write-journal.js",
+        "digest": "4423db7ede5836c3520128ec7ca43ae374e75c9f245f3ff0b5143d0f737e4ec9",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/_vendor/core/dist/live-write/live-write-journal.js"
         ],
         "replaceable": true
       },
@@ -26468,7 +26525,7 @@
       },
       {
         "path": "packages/cli/dist/build-identity.json",
-        "digest": "119a7f2bb9f2b35601fb3c25f9c21866115f2fd4a2fc0375b5a6cd6e20dbc3d7",
+        "digest": "2ccc227bb53f5bcd5700b0386074d5c439107ee0853faba5c4985c9104807512",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/build-identity.json"
@@ -27017,7 +27074,7 @@
       },
       {
         "path": "packages/cli/dist/commands/broker/steward-runtime-actions.js",
-        "digest": "51462a3c130ee112a3aa422f1ee0d0c04c95ab0baf52f1b4f85a34eb303f6472",
+        "digest": "11e4bf0e6ab5f3a8e54674d3a1417b6d4e2688319b2f054168951f6bfd038be8",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/broker/steward-runtime-actions.js"
@@ -32597,7 +32654,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/build-identity.json",
-        "digest": "eb02dc2ca06395bf1ab2b407057911fa0a806c086cacd45cc2a0b8f0cb04aa01",
+        "digest": "3cadb1968479a7486fd6edda12695ed648d6fa1664fac7e8312af74ac6af6fc0",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/build-identity.json"
@@ -33326,7 +33383,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/manifest.json",
-        "digest": "777d6bcb842a3f78c8c2a3888a43b4931157dbf5ff715b7979ac13e69cb1a525",
+        "digest": "4df5035d7328ee1a37ec6df12a30a768483899e91511f255063b3dcc5e4f9352",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/manifest.json"
@@ -33335,7 +33392,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/runtime.mjs",
-        "digest": "75ea39edb36602e185f7fd679cec3eb31343b9d97b3649e2561b4e81f65597ff",
+        "digest": "8df785fcf5bf810c3cf7ac5d85fdc8a23e6775c0a3dab4229ac1594015334584",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/runtime.mjs"
@@ -34397,7 +34454,7 @@
       },
       {
         "path": "packages/cli/src/commands/broker/steward-runtime-actions.ts",
-        "digest": "dd407648b04f353c7626b276b2cc2ae084f2869d00595106fbd1aec54bc9f76c",
+        "digest": "ad7fa5aed8af717b4018d35fc79668e455294143f1b31828ffbf0963d694be1d",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/broker/steward-runtime-actions.ts"
@@ -45116,7 +45173,7 @@
       },
       {
         "path": "packages/core/dist/live-write/cross-session-overlap.js",
-        "digest": "7f535aefc5cd4f6a1ba981bcc1c5d04dd7bfb5bb466703fcc0ba11db64f97c8e",
+        "digest": "4f06b467a045d144cdf120d0530b075337976debd09910004105d3140d80e110",
         "origin": "source",
         "inputPaths": [
           "packages/core/dist/live-write/cross-session-overlap.js"
@@ -45125,10 +45182,37 @@
       },
       {
         "path": "packages/core/dist/live-write/live-queued-write.js",
-        "digest": "ef94269993e968351f16246f465e57d6ed778711cd9e4fc4be9678c2247a4596",
+        "digest": "a4d8a717c4001899928fa4e6bc638bd87fc53ca9f19a559ef2c5b523e473b246",
         "origin": "source",
         "inputPaths": [
           "packages/core/dist/live-write/live-queued-write.js"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/core/dist/live-write/live-write-commit.js",
+        "digest": "65bf5e9a094c905bb893c50f1c110fadfbd5f6d29dc50b23df20ba3699558708",
+        "origin": "source",
+        "inputPaths": [
+          "packages/core/dist/live-write/live-write-commit.js"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/core/dist/live-write/live-write-journal-store.js",
+        "digest": "1053624e74018ce7b1dd01086b91b94ca57c91978271434a80a502307d0bff49",
+        "origin": "source",
+        "inputPaths": [
+          "packages/core/dist/live-write/live-write-journal-store.js"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/core/dist/live-write/live-write-journal.js",
+        "digest": "4423db7ede5836c3520128ec7ca43ae374e75c9f245f3ff0b5143d0f737e4ec9",
+        "origin": "source",
+        "inputPaths": [
+          "packages/core/dist/live-write/live-write-journal.js"
         ],
         "replaceable": true
       },
@@ -49607,7 +49691,7 @@
       },
       {
         "path": "packages/core/src/live-write/cross-session-overlap.ts",
-        "digest": "71cf0d0966842ae0ee2f607f09e16b1ba2f33c2c5ad7c563adddd16825e77703",
+        "digest": "cbf3b6776f468c208ab299bb2ed45f310b162a49399764a60419e5cce876fe02",
         "origin": "source",
         "inputPaths": [
           "packages/core/src/live-write/cross-session-overlap.ts"
@@ -49616,10 +49700,37 @@
       },
       {
         "path": "packages/core/src/live-write/live-queued-write.ts",
-        "digest": "c92343ca12bf76fb023464f8c56b76031f09df7aa1d6837d691dd384bf4b3773",
+        "digest": "0b6e6a0a52851a8783ad19b470d6c8e72157dd1b886e9d083a84753987070940",
         "origin": "source",
         "inputPaths": [
           "packages/core/src/live-write/live-queued-write.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/core/src/live-write/live-write-commit.ts",
+        "digest": "0c34a045451021f52a4dfa58d50b6fc61fb816171acdf89573a4b12895a8b714",
+        "origin": "source",
+        "inputPaths": [
+          "packages/core/src/live-write/live-write-commit.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/core/src/live-write/live-write-journal-store.ts",
+        "digest": "62509909230ebf9374159ecf78f9e76753f595690e48c38cb84f4cebb0ebc9cf",
+        "origin": "source",
+        "inputPaths": [
+          "packages/core/src/live-write/live-write-journal-store.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/core/src/live-write/live-write-journal.ts",
+        "digest": "e2a790d9a35d3f63da43406297149c5e948b02132c8ebfe370b377d4d71d0877",
+        "origin": "source",
+        "inputPaths": [
+          "packages/core/src/live-write/live-write-journal.ts"
         ],
         "replaceable": true
       },
@@ -51191,7 +51302,7 @@
       },
       {
         "path": "packages/create-atm/dist/build-identity.json",
-        "digest": "9fc4ef0bd2757959b2371d66ccf66bf7b373cb04cf4235b17e9265d7226f962b",
+        "digest": "c293e7151b20884c780063933c8493c83f7af6ff599d9b7d22f6cef51a6a1e2f",
         "origin": "source",
         "inputPaths": [
           "packages/create-atm/dist/build-identity.json"
@@ -58940,7 +59051,7 @@
       },
       {
         "path": "scripts/validate-broker-steward.ts",
-        "digest": "ace84f52f7bfbb6b57a7d47a94822cddfd16c5317096b9f25727c5922ac5c14d",
+        "digest": "17e5d8b3d0665b94cfc70e6e10a34f13e33df1c711b4303f9d1be486db51e017",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-broker-steward.ts"
@@ -69929,10 +70040,19 @@
       },
       {
         "path": "tests/core/live-queued-write.test.ts",
-        "digest": "d514336c5d5f5e0256af93885c045398fec48af6b8e5b04ea1c9d5637b04f202",
+        "digest": "5709644f77d31c715cd48cab5bdfa1a32b59fb8609d9d3289d921dba8eba0333",
         "origin": "source",
         "inputPaths": [
           "tests/core/live-queued-write.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "tests/core/live-write-commit-path.test.ts",
+        "digest": "cfe92c841da49869c2187f312e4c5730554ba2e283ea79773e8aa264ed5abdca",
+        "origin": "source",
+        "inputPaths": [
+          "tests/core/live-write-commit-path.test.ts"
         ],
         "replaceable": true
       },
@@ -70073,7 +70193,7 @@
       },
       {
         "path": "tests/core/stale-base-translation.test.ts",
-        "digest": "8e754e8efcadea6f4f8688823f922a609a93ceec27eda9a912f2d9e4d78c97c1",
+        "digest": "78dee71d4e220d301a6a23eff7024ff942329cf292501f61234323fc1f07d990",
         "origin": "source",
         "inputPaths": [
           "tests/core/stale-base-translation.test.ts"
@@ -72772,7 +72892,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:fb8c4eb892025b7d0c3f580352b2cd2f0c11aab7333fe0466372ad7be3df76cf"
+    "treeDigest": "sha256:60f5deaa73b55589bab9ccd4bc73082e60ab96aae63ac8fa42bc1a34af735bf9"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -73946,6 +74066,9 @@
       "packages/core/src/lane/wip-ownership-transition.ts",
       "packages/core/src/live-write/cross-session-overlap.ts",
       "packages/core/src/live-write/live-queued-write.ts",
+      "packages/core/src/live-write/live-write-commit.ts",
+      "packages/core/src/live-write/live-write-journal-store.ts",
+      "packages/core/src/live-write/live-write-journal.ts",
       "packages/core/src/manager/atom-birth-transaction.ts",
       "packages/core/src/manager/atom-generator.ts",
       "packages/core/src/manager/atom-space.ts",
@@ -74404,7 +74527,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:f9bc6adcf68310b3de339af50a661a341c6e9573e0501dc5eef9c4b31ff0e1a7"
+    "digest": "sha256:f585c4640afc52edd86fe1a24d2201747abf573db320a46085b095911375da78"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -75659,6 +75782,7 @@
       "release/atm-root-drop/packages/atm-markdown-task-source/dist/index.js",
       "release/atm-root-drop/packages/atm-markdown-task-source/dist/task-card-parser.d.ts",
       "release/atm-root-drop/packages/atm-markdown-task-source/dist/task-card-parser.js",
+      "release/atm-root-drop/packages/atm-markdown-task-source/dist/templates.d.ts",
       "release/atm-root-drop/packages/atm-markdown-task-source/dist/templates.js",
       "release/atm-root-drop/packages/atm-markdown-task-source/package.json",
       "release/atm-root-drop/packages/atm-markdown-task-source/src/index.ts",
@@ -75693,6 +75817,7 @@
       "release/atm-root-drop/packages/cli/dist/_vendor/atm-markdown-task-source/dist/index.js",
       "release/atm-root-drop/packages/cli/dist/_vendor/atm-markdown-task-source/dist/task-card-parser.d.ts",
       "release/atm-root-drop/packages/cli/dist/_vendor/atm-markdown-task-source/dist/task-card-parser.js",
+      "release/atm-root-drop/packages/cli/dist/_vendor/atm-markdown-task-source/dist/templates.d.ts",
       "release/atm-root-drop/packages/cli/dist/_vendor/atm-markdown-task-source/dist/templates.js",
       "release/atm-root-drop/packages/cli/dist/_vendor/atm-markdown-task-source/templates/aao-l2-split-template.md",
       "release/atm-root-drop/packages/cli/dist/_vendor/atm-markdown-task-source/templates/adopter-task-template.md",
@@ -76110,6 +76235,9 @@
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/lane/wip-ownership-transition.js",
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/live-write/cross-session-overlap.js",
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/live-write/live-queued-write.js",
+      "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/live-write/live-write-commit.js",
+      "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/live-write/live-write-journal-store.js",
+      "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/live-write/live-write-journal.js",
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/manager/atom-birth-transaction.js",
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/manager/atom-generator.js",
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/manager/atom-space.js",
@@ -78611,6 +78739,9 @@
       "release/atm-root-drop/packages/core/dist/lane/wip-ownership-transition.js",
       "release/atm-root-drop/packages/core/dist/live-write/cross-session-overlap.js",
       "release/atm-root-drop/packages/core/dist/live-write/live-queued-write.js",
+      "release/atm-root-drop/packages/core/dist/live-write/live-write-commit.js",
+      "release/atm-root-drop/packages/core/dist/live-write/live-write-journal-store.js",
+      "release/atm-root-drop/packages/core/dist/live-write/live-write-journal.js",
       "release/atm-root-drop/packages/core/dist/manager/atom-birth-transaction.js",
       "release/atm-root-drop/packages/core/dist/manager/atom-generator.js",
       "release/atm-root-drop/packages/core/dist/manager/atom-space.js",
@@ -79110,6 +79241,9 @@
       "release/atm-root-drop/packages/core/src/lane/wip-ownership-transition.ts",
       "release/atm-root-drop/packages/core/src/live-write/cross-session-overlap.ts",
       "release/atm-root-drop/packages/core/src/live-write/live-queued-write.ts",
+      "release/atm-root-drop/packages/core/src/live-write/live-write-commit.ts",
+      "release/atm-root-drop/packages/core/src/live-write/live-write-journal-store.ts",
+      "release/atm-root-drop/packages/core/src/live-write/live-write-journal.ts",
       "release/atm-root-drop/packages/core/src/manager/atom-birth-transaction.ts",
       "release/atm-root-drop/packages/core/src/manager/atom-generator.ts",
       "release/atm-root-drop/packages/core/src/manager/atom-space.ts",
@@ -81368,6 +81502,7 @@
       "release/atm-root-drop/tests/core/cross-session-overlap.test.ts",
       "release/atm-root-drop/tests/core/id-allocator.test.ts",
       "release/atm-root-drop/tests/core/live-queued-write.test.ts",
+      "release/atm-root-drop/tests/core/live-write-commit-path.test.ts",
       "release/atm-root-drop/tests/core/map-generator.test.ts",
       "release/atm-root-drop/tests/core/map-id-allocator.test.ts",
       "release/atm-root-drop/tests/core/map-integration.test.ts",
@@ -81690,33 +81825,21 @@
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
   "buildInputsTreeHash": "sha256:a31054cc03e830d83ee1010d7b2b4ebba5c2ef78b00ce7c7e590222ced749035",
-  "sealedSourceCommit": "d47fb82c0cc7fb39132d98f314f050538a568006",
-  "buildDecision": "cacheHitSkip",
-  "buildDecisionReason": "build input tree hash matches release manifests",
-  "incrementalPlanDigest": null,
-  "tsBuildCacheDigest": null,
+  "sealedSourceCommit": "ffb39282ae43286d18e714a1e71859f6fbea58cd",
+  "buildDecision": "fullRebuild",
+  "buildDecisionReason": "release artifacts are dirty or missing",
+  "incrementalPlanDigest": "sha256:69be1c9818c18728e8f1b511104186b9aa12fa873196b06051dfd114e5a9dd02",
+  "tsBuildCacheDigest": "sha256:2e2a01bb379a7d56a5b61497e050f0df68461e19276a739b4b6cac0db2109ccd",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 12,
-    "skipDecision": 60,
-    "worktreeSetup": 0,
-    "typescriptBuild": 0,
-    "rootDropReleaseAssembly": 0,
-    "onefileReleaseAssembly": 0,
-    "artifactSync": 0,
+    "inputHashCalculation": 13,
+    "skipDecision": 127,
+    "worktreeSetup": 18418,
+    "typescriptBuild": 22357,
+    "rootDropReleaseAssembly": 21460,
+    "onefileReleaseAssembly": 22030,
+    "artifactSync": 482,
     "cleanup": 0,
-    "totalElapsed": 4776
-  },
-  "dominantPhaseSummary": {
-    "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
-    "dominantPhase": "skipDecision",
-    "dominantPhaseMs": 60,
-    "totalElapsedMs": 4776,
-    "dominanceRatio": 0.0126,
-    "phaseMedianMs": 0,
-    "phaseP95Ms": 60,
-    "measuredPhaseCount": 8,
-    "optimizationVerdict": "inconclusive",
-    "basis": "single-run"
+    "totalElapsed": 89984
   }
 }

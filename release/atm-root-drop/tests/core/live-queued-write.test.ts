@@ -146,7 +146,7 @@ async function main() {
     })] });
     assert.equal(result.writes[0]?.decision, 'accepted');
     assert.deepEqual(result.writes[0]?.hunkOffsets, [{ declaredOldStart: 1, appliedOldStart: 2, offset: 1 }]);
-    const entry = JSON.parse(readFileSync(path.join(offsetRepo, '.atm/runtime/live-write-journal.jsonl'), 'utf8').trim());
+    const entry = readFileSync(path.join(offsetRepo, '.atm/runtime/live-write-journal.jsonl'), 'utf8').trim().split('\n').map((line) => JSON.parse(line)).find((entry) => entry.kind === 'committed');
     assert.deepEqual(entry.changedLines, [1, 2]);
   }
   {
@@ -202,7 +202,7 @@ async function main() {
     ] });
     assert.deepEqual(result.writes.map((write) => write.decision), ['accepted', 'accepted']);
     assert.equal(result.writes[1]?.hunkOffsets?.[0]?.offset, 1);
-    const entries = readFileSync(path.join(shiftedRepo, '.atm/runtime/live-write-journal.jsonl'), 'utf8').trim().split('\n').map((line) => JSON.parse(line));
+    const entries = readFileSync(path.join(shiftedRepo, '.atm/runtime/live-write-journal.jsonl'), 'utf8').trim().split('\n').map((line) => JSON.parse(line)).filter((entry) => !entry.kind || entry.kind === 'committed');
     assert.deepEqual(entries[1].changedLines, [2, 3]);
     assert.equal(entries[1].baseHash, hashText(`top\n${BASE}`));
   }

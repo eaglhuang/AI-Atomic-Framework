@@ -189,7 +189,7 @@ try {
     assert.deepEqual(result.writes.map((write) => write.decision), ['accepted', 'accepted'], JSON.stringify(result.writes));
     assert.equal(readFileSync(path.join(repo, 'f.txt'), 'utf8'), 'Z\na\nb\nB3\nc\n');
     assert.deepEqual(result.writes[1]?.hunkOffsets, [{ declaredOldStart: 3, appliedOldStart: 4, offset: 1 }]);
-    const journal = readFileSync(path.join(repo, '.atm/runtime/live-write-journal.jsonl'), 'utf8').trim().split('\n').map((line) => JSON.parse(line));
+    const journal = readFileSync(path.join(repo, '.atm/runtime/live-write-journal.jsonl'), 'utf8').trim().split('\n').map((line) => JSON.parse(line)).filter((entry) => !entry.kind || entry.kind === 'committed');
     assert.deepEqual(journal[1].changedLines, [3, 4], 'journal records current coordinates');
   }
   {
