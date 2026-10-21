@@ -194,3 +194,9 @@ Status legend: *fixed* (already merged), *quick-fixed* (this round, PR linked), 
 3. Recovery after interrupted closes (F1–F3).
 4. Re-running and re-reading the same validators (F10).
 5. CI polling (F12).
+
+### F27 Cross-branch task-ID collision (fixed by this PR)
+- Parallel branches allocated TASK-PRF-0156 from local/main state. TASK-PRF-0157 refreshes all origin heads and scans remote card names and contents before automatic allocation; two-session regression coverage includes newly published unmerged cards and unavailable origin.
+
+### F28 Publication claim expires during sealed compilation (fixed by this PR)
+- A thirty-minute build outlived its publication claim and required a retry. TASK-PRF-0157 checks for two hours of remaining authority before private compilation and prints a concrete four-hour renew command when insufficient; publication still revalidates ownership. Regression coverage includes expiry and a competing session.

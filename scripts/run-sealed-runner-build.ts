@@ -1,3 +1,4 @@
+import { assertSealedRunnerClaimLifetime } from './sealed-runner-claim-preflight.ts';
 import { spawnSync } from 'node:child_process';
 import { withSealedBuildLog } from './sealed-build-log-sink.ts';
 import { createHash } from 'node:crypto';
@@ -159,6 +160,7 @@ function runSealedBuild(buildTarget: BuildTarget): void {
       ? 'AGENT_IDENTITY'
       : 'fallback';
   const publicationTaskId = process.env.ATM_RUNNER_PUBLICATION_TASK?.trim() || null;
+  assertSealedRunnerClaimLifetime({ cwd: repoRoot, actorId, taskId: publicationTaskId });
   const sealedSourceSha = readGitScalar(repoRoot, ['rev-parse', '--verify', 'HEAD']);
   if (!sealedSourceSha) fail('Unable to resolve sealed source SHA from HEAD.', 1);
   // A takeover receipt authorizes the pre-existing live surface. Capture it

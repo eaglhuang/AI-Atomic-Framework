@@ -136,3 +136,5 @@ Both validators pass locally. ATM: TASK-PRF-0136 imported and claimed (lane lane
 - Tests: the new tests/core/live-write-commit-path.test.ts passed 3 of 3 runs. live-queued-write, cross-session-overlap, stale-base-translation, v10c replay, broker-steward, broker-cowrite, hot-concurrency, rft rollout and kit parity + offline preflight all pass. typecheck, eslint, the 600-line budget gate, the smoke-runbook validator and validate-cli --mode test all pass, checked independently outside the Codex sandbox.
 
 TASK-PRF-0157 milestone 1: imported and claimed both governance fixes; origin census found 0156 as highest existing ID.
+
+TASK-PRF-0157 milestone 2: both fixes and regression tests implemented; typecheck, eslint, publication lifecycle and preclose passed.
