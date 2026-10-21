@@ -15,9 +15,7 @@
  *
  * 既有的 `broker steward apply --merge-plan-file` 不受影響。
  */
-import { spawnSync } from 'node:child_process';
-import { createHash } from 'node:crypto';
-import { appendFileSync, existsSync, mkdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdirSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { hashContent } from '../broker/adapters/cas.ts';
 import {
@@ -29,6 +27,8 @@ import {
   releaseKernelAdvisoryLock,
   StewardLockTimeoutError
 } from '../broker/steward-kernel-lock.ts';
+import { readJournal, isCommitted, RecoveryRequiredError } from './live-write-journal-store.ts';
+import { commitLiveWrite, reconcileLiveWrites, GitIndexContentionError } from './live-write-commit.ts';
 import type { PatchProposal } from '../broker/types.ts';
 import {
   UnifiedPatchApplicationError,
@@ -59,6 +59,9 @@ export type LiveWriteDecision = 'accepted' | 'rejected-by-design' | 'kit-error';
 
 export type LiveWriteReasonCode =
   | 'overlapping-write-queued'
+  | 'git-index-contention'
+  | 'recovery-required'
+  | 'target-missing'
   | 'stale-base'
   | 'patch-malformed'
   | 'no-op-patch'
@@ -92,18 +95,6 @@ export interface LiveQueuedWriteResult {
   readonly writes: readonly LiveQueuedWrite[];
   readonly queuePath: string;
   readonly planRequired: false;
-}
-
-interface JournalEntry {
-  readonly file: string;
-  readonly baseHash: string;
-  readonly afterHash: string;
-  readonly changedLines: readonly number[];
-  readonly proposalId: string;
-  readonly actorId?: string | null;
-  readonly commitSha?: string | null;
-  readonly blocks?: readonly CommittedBlock[];
-  readonly acknowledgedOverlap?: readonly string[];
 }
 
 type Change = { start: number; end: number; added: readonly string[] };
@@ -150,7 +141,7 @@ export function applyLiveQueuedWrites(input: {
 function applyFileGroup(cwd: string, file: string, proposals: readonly PatchProposal[], ack: readonly string[]): LiveQueuedWrite[] {
   const targetPath = path.resolve(cwd, file);
   if (!existsSync(targetPath) || !statSync(targetPath).isFile()) {
-    return proposals.map((proposal) => rejected(proposal, file, 'stale-base', true, null, null, '目標檔不存在'));
+    return proposals.map((proposal) => rejected(proposal, file, 'target-missing', false, null, null, '目標檔不存在'));
   }
   const lockDir = canonicalCommitLockPath(defaultStewardCommitLockRoot(cwd), targetPath);
   try {
@@ -163,6 +154,15 @@ function applyFileGroup(cwd: string, file: string, proposals: readonly PatchProp
     throw error;
   }
   try {
+    try {
+      reconcileLiveWrites(cwd, file);
+    } catch (error) {
+      const current = readCurrent(targetPath);
+      if (error instanceof RecoveryRequiredError || error instanceof GitIndexContentionError) {
+        return proposals.map((proposal) => rejected(proposal, file, error instanceof GitIndexContentionError ? 'git-index-contention' : 'recovery-required', false, current.text, current.hash, error.message));
+      }
+      return proposals.map((proposal) => kitError(proposal, file, 'live-write-commit-failed', current.text, current.hash, String(error)));
+    }
     const results: LiveQueuedWrite[] = [];
     for (const proposal of proposals) {
       results.push(applyOneLocked(cwd, file, targetPath, proposal, ack));
@@ -179,7 +179,7 @@ function applyOneLocked(cwd: string, file: string, targetPath: string, proposal:
   const observed = normalizeHash(current.hash);
   // #360: anchor the session's original target (even a malformed first proposal declares what it saw),
   // then check every write against other sessions' lines committed since it.
-  const journal = readJournal(cwd);
+  const journal = readJournal(cwd).filter(isCommitted);
   const { anchor, existed } = ensureAnchor(cwd, { actorId: proposal.actorId, taskId: proposal.taskId ?? null, file, declaredHash: declared, proposalId: proposal.proposalId, journalLength: journal.length });
   let hunks: ReturnType<typeof parseUnifiedPatchHunks>;
   try {
@@ -239,7 +239,7 @@ function applyOneLocked(cwd: string, file: string, targetPath: string, proposal:
     if (check.rejection) return check.rejection;
     acknowledged = check.acknowledged;
   }
-  const prior = readJournal(cwd).filter((entry) => entry.file === file && normalizeHash(entry.baseHash) === declared);
+  const prior = journal.filter((entry) => entry.file === file && normalizeHash(entry.baseHash) === declared);
   const overlaps = prior.some((entry) => intersects(entry.changedLines, lines.covered) || intersects(entry.changedLines, lines.changed));
   if (overlaps) {
     return queueRejection(cwd, proposal, file, 'overlapping-write-queued', current, '這筆寫入和已經提交的行重疊，檔案沒有被改');
@@ -333,17 +333,9 @@ function commitPrepared(
 ): LiveQueuedWrite {
   if (next === before) return rejected(proposal, file, 'no-op-patch', false, before, hashContent(before), 'patch 沒有改變檔案');
   try {
-    replaceFileAtomically(targetPath, next);
-    const sha = gitCommit(cwd, file, proposal.proposalId);
-    appendJournal(cwd, {
-      file,
-      baseHash: hashContent(before),
-      afterHash: hashContent(next),
-      changedLines,
-      proposalId: proposal.proposalId,
-      actorId: proposal.actorId,
-      commitSha: sha,
-      blocks,
+    const sha = commitLiveWrite(cwd, targetPath, before, next, {
+      file, baseHash: hashContent(before), afterHash: hashContent(next), changedLines,
+      proposalId: proposal.proposalId, actorId: proposal.actorId, blocks,
       ...(acknowledged.length > 0 ? { acknowledgedOverlap: acknowledged } : {})
     });
     return {
@@ -361,8 +353,8 @@ function commitPrepared(
       ...(acknowledged.length > 0 ? { acknowledgedOverlap: acknowledged } : {})
     };
   } catch (error) {
-    restoreFile(targetPath, before);
     const message = error instanceof Error ? error.message : String(error);
+    if (error instanceof GitIndexContentionError || error instanceof RecoveryRequiredError) return rejected(proposal, file, error instanceof GitIndexContentionError ? 'git-index-contention' : 'recovery-required', false, before, hashContent(before), message);
     return kitError(proposal, file, 'live-write-commit-failed', before, hashContent(before), message);
   }
 }
@@ -396,94 +388,14 @@ function readCurrent(targetPath: string): { text: string; hash: string } {
   return { text, hash: hashContent(text) };
 }
 
-function readJournal(cwd: string): JournalEntry[] {
-  const file = path.join(cwd, journalRelativePath());
-  if (!existsSync(file)) return [];
-  const entries: JournalEntry[] = [];
-  for (const line of readFileSync(file, 'utf8').split('\n')) {
-    if (!line.trim()) continue;
-    entries.push(JSON.parse(line) as JournalEntry);
-  }
-  return entries;
-}
-
-function appendJournal(cwd: string, entry: JournalEntry): void {
-  const file = path.join(cwd, journalRelativePath());
-  mkdirSync(path.dirname(file), { recursive: true });
-  appendFileSync(file, `${JSON.stringify(entry)}\n`);
-}
-
 function appendQueue(cwd: string, entry: unknown): void {
   const file = path.join(cwd, queueRelativePath());
   mkdirSync(path.dirname(file), { recursive: true });
   appendFileSync(file, `${JSON.stringify(entry)}\n`);
 }
 
-function journalRelativePath(): string {
-  return path.join('.atm', 'runtime', 'live-write-journal.jsonl');
-}
-
 function queueRelativePath(): string {
   return path.join('.atm', 'runtime', 'live-write-queue.jsonl').split(path.sep).join('/');
-}
-
-function replaceFileAtomically(targetPath: string, content: string): void {
-  const temporary = path.join(path.dirname(targetPath), `.${path.basename(targetPath)}.${createHash('sha256').update(content).digest('hex').slice(0, 8)}.atm-tmp`);
-  const mode = statSync(targetPath).mode;
-  try {
-    writeFileSync(temporary, content, { encoding: 'utf8', mode: mode & 0o777 });
-    renameSync(temporary, targetPath);
-  } catch (error) {
-    rmSync(temporary, { force: true });
-    throw error;
-  }
-}
-
-function restoreFile(targetPath: string, content: string): void {
-  try {
-    writeFileSync(targetPath, content, 'utf8');
-  } catch {
-    // 還原失敗留給呼叫端的 kit-error 訊息。
-  }
-}
-
-function gitCommit(cwd: string, file: string, proposalId: string): string {
-  for (let attempt = 0; attempt < 5; attempt += 1) {
-    const add = spawnSync('git', ['-C', cwd, 'add', '--', file], { encoding: 'utf8' });
-    if (add.status !== 0) {
-      if (attempt < 4 && /index\.lock/.test(`${add.stderr}${add.stdout}`)) {
-        sleepMs(20 * (attempt + 1));
-        continue;
-      }
-      throw new Error(add.stderr || add.stdout || 'git add 失敗');
-    }
-    const commit = spawnSync('git', [
-      '-C', cwd,
-      '-c', 'user.name=atm-steward',
-      '-c', 'user.email=atm-steward@localhost',
-      '-c', 'commit.gpgsign=false',
-      'commit', '-m', `steward live write ${proposalId}`,
-      '--', file
-    ], { encoding: 'utf8' });
-    if (commit.status === 0) return headSha(cwd) ?? '';
-    if (attempt < 4 && /index\.lock/.test(`${commit.stderr}${commit.stdout}`)) {
-      sleepMs(20 * (attempt + 1));
-      continue;
-    }
-    throw new Error(commit.stderr || commit.stdout || 'git commit 失敗');
-  }
-  throw new Error('git commit 失敗');
-}
-
-function sleepMs(ms: number): void {
-  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
-}
-
-function headSha(cwd: string): string | null {
-  const result = spawnSync('git', ['-C', cwd, 'rev-parse', 'HEAD'], { encoding: 'utf8' });
-  if (result.status !== 0) return null;
-  const sha = result.stdout.trim();
-  return sha || null;
 }
 
 function rejected(

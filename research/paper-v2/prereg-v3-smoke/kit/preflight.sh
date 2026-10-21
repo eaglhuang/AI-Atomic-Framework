@@ -223,6 +223,12 @@ check seal-index bash "$HERE/test/test-seal-index.sh"
 check overlap bash "$HERE/test/test-overlap-decision.sh"
 check stale-overlap bash "$HERE/test/test-stale-overlap.sh"
 check stale-base-declared bash "$HERE/test/test-stale-base-declared.sh"
+# Node 22 uses the experimental spelling; newer runtimes also accept --strip-types.
+NODE_STRIP_TYPES_FLAG=--strip-types
+if ! node --strip-types --no-warnings -e '' >/dev/null 2>&1; then
+  NODE_STRIP_TYPES_FLAG=--experimental-strip-types
+fi
+check live-write-journal-parity node "$NODE_STRIP_TYPES_FLAG" --no-warnings "$HERE/test/test-live-write-journal-parity.mjs"
 check hunk-locator-parity bash "$HERE/test/test-hunk-locator-parity.sh"
 check atm-write-malformed bash "$HERE/test/test-atm-write-malformed.sh"
 check overlap-condition bash "$HERE/test/test-overlap-condition.sh"

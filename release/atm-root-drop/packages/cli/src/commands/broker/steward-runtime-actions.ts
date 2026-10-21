@@ -64,12 +64,15 @@ function applyLiveStewardWrites(options: ParsedBrokerOptions) {
     messages: [
       message(
         result.ok ? 'info' : rejected.some((write) => write.decision === 'kit-error') ? 'error' : 'warn',
-        result.ok ? 'ATM_BROKER_LIVE_WRITE_APPLIED' : crossSession.length > 0 ? 'ATM_BROKER_LIVE_WRITE_CROSS_SESSION_OVERLAP' : 'ATM_BROKER_LIVE_WRITE_QUEUED',
+        result.ok ? 'ATM_BROKER_LIVE_WRITE_APPLIED'
+          : rejected.some((write) => write.decision === 'kit-error') ? 'ATM_BROKER_LIVE_WRITE_KIT_ERROR'
+          : crossSession.length > 0 ? 'ATM_BROKER_LIVE_WRITE_CROSS_SESSION_OVERLAP'
+          : rejected.every((write) => write.queued) ? 'ATM_BROKER_LIVE_WRITE_QUEUED' : 'ATM_BROKER_LIVE_WRITE_REJECTED',
         result.ok
           ? `Live steward committed ${acceptedCount} write(s) without a precomputed merge plan.`
           : crossSession.length > 0
             ? `Live steward rejected ${crossSession.length} write(s) that target another session's committed lines: ${crossSession.map((write) => write.detail).join(' | ')}`
-            : `Live steward committed ${acceptedCount} write(s) and queued ${rejected.length} without touching the file for those.`,
+            : `Live steward committed ${acceptedCount} write(s) and rejected ${rejected.length} without touching the file for those.`,
         {
           acceptedCount,
           rejectedCount: rejected.length,

@@ -9,6 +9,7 @@ import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import net from 'node:net';
+import { parseLiveWriteJournal } from './live-write-journal.generated.mjs';
 import path from 'node:path';
 // Generated, type-stripped copy of the CLI core unified-patch module
 // (#359, #361): the same strict parser and hunk locator, so this wrapper cannot
@@ -272,14 +273,7 @@ function sessionBase(input) {
   }
   const seenPath = path.join(input.writableRoot, '.prereg-smoke', 'session-seen.jsonl');
   if (existsSync(seenPath)) {
-    for (const line of readFileSync(seenPath, 'utf8').split('\n').reverse()) {
-      if (!line.trim()) continue;
-      let entry;
-      try {
-        entry = JSON.parse(line);
-      } catch {
-        continue;
-      }
+    for (const entry of parseLiveWriteJournal(readFileSync(seenPath, 'utf8')).reverse()) {
       if (entry.actorId !== input.actorId || entry.sessionSlot !== sessionSlot || entry.file !== input.relativeFile) continue;
       if (entry.seenHash) return { hash: entry.seenHash, text: textAtHash(input, entry.seenHash) };
       break;
@@ -311,7 +305,7 @@ function appendWriteRecord(input, record) {
   const dir = path.join(input.writableRoot, '.prereg-smoke');
   mkdirSync(dir, { recursive: true });
   appendFileSync(path.join(dir, 'steward-writes.jsonl'), `${JSON.stringify(record)}\n`);
-  if (record.decision === 'accepted' || record.decision === 'rejected-by-design') {
+  if (record.reasonCode !== 'recovery-required' && (record.decision === 'accepted' || record.decision === 'rejected-by-design')) {
     const seen = {
       actorId: input.actorId,
       sessionSlot,
@@ -328,7 +322,12 @@ function submitLive(input) {
   const parsed = parseSubmittedPatch(input.patch, input.relativeFile);
   if (!parsed.hunks) return malformedPatch(input, parsed.error);
   input = { ...input, hunks: parsed.hunks };
-  const declaredBase = sessionBase(input);
+  let declaredBase;
+  try {
+    declaredBase = sessionBase(input);
+  } catch (error) {
+    return malformedPatch(input, String(error), 'recovery-required');
+  }
   if (!declaredBase) return malformedPatch(input, '無法確定 session 看過的 base', 'base-unknown');
   declaredBase.located = declaredBase.text === null ? null : locateIn(declaredBase.text, input.hunks);
   const head = gitText(input.writableRoot, ['rev-parse', 'HEAD'], input.safePath);
@@ -417,6 +416,7 @@ function malformedPatch(input, message, reasonCode = 'patch-malformed') {
     reasonCode,
     messageCode: null,
     verdict: 'blocked',
+    queued: false,
     phase: reasonCode === 'patch-malformed' ? 'parse' : 'live',
     terminal: 'blocked',
     stopReason: message,
@@ -465,7 +465,7 @@ function confirmLiveWrite(input, beforeBytes, beforeHead, proposalId) {
 }
 
 function recordMessageCode(code, reasonCode) {
-  // 公開 CLI 0.1.21 把每一筆非接受都標成 QUEUED。只有 overlapping-write-queued 才是排隊。
+  // Preserve honest current CLI codes; older 0.1.21 mislabeled rejections as QUEUED.
   if (code === 'ATM_BROKER_LIVE_WRITE_QUEUED' && reasonCode !== 'overlapping-write-queued') return null;
   return code || null;
 }
