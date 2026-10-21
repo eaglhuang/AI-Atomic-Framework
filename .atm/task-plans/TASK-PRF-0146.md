@@ -2,7 +2,7 @@
 doc_id: doc_TASK-PRF-0146
 task_id: TASK-PRF-0146
 title: 'Live-write commit path: repo-wide commit lock, own commitSha, atomic journal, honest message codes, crash reconciliation (#364)'
-status: open
+status: done
 owner: grok-bot
 priority: P1
 depends_on:
@@ -46,6 +46,15 @@ rollback:
   notes: Revert the delivery commit.
 nonGoals:
 - Do not re-pin the hist-v2 smoke runbook or modify sealed archives. Do not tag or publish npm.
+completed_at: "2026-10-21T03:14:18.723Z"
+completed_by_agent: "grok-bot"
+closedAt: "2026-10-21T03:14:18.723Z"
+closedByActor: "grok-bot"
+closedByCommand: atm tasks close
+lastTransitionId: "2026-10-21T03-14-18-723Z-close-d3d315c4a2fc"
+lastTransitionAt: "2026-10-21T03:14:18.723Z"
+ledgerContractVersion: task-ledger/v1
+delivery_commit: "678ad2728"
 ---
 
 # TASK-PRF-0146 — live-write commit path (#364)
