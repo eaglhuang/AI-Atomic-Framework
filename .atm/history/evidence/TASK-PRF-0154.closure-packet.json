@@ -1,0 +1,95 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-PRF-0154",
+  "targetRepoIdentity": {
+    "kind": "framework",
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "/workspace/AI-Atomic-Framework-360/AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "d2035717ceb82275d8ebd91c156b8a798333d619",
+  "governedTreeSha": "a2a7d6984763ff9f084d22b69f4080c56dfa2325",
+  "targetCommitDelta": {
+    "currentCommitSha": "d2035717ceb82275d8ebd91c156b8a798333d619",
+    "parentCommitShas": [
+      "d2035717ceb82275d8ebd91c156b8a798333d619"
+    ],
+    "governedTreeSha": "a2a7d6984763ff9f084d22b69f4080c56dfa2325",
+    "changedFiles": [
+      ".atm/history/task-events/TASK-PRF-0154/2026-10-21T03-35-58-484Z-import-3b2d88e456d3.json",
+      ".atm/history/task-events/TASK-PRF-0154/2026-10-21T03-36-22-952Z-import-5a3658460a62.json",
+      ".atm/history/task-events/TASK-PRF-0154/2026-10-21T03-36-24-960Z-claim-b96d47f1f46a.json",
+      ".atm/history/task-events/TASK-PRF-0154/2026-10-21T04-12-53-284Z-renew-1f9c12d1f962.json",
+      ".atm/history/task-events/TASK-PRF-0154/2026-10-21T04-13-47-186Z-renew-dc73575f4b4d.json",
+      ".atm/history/task-events/TASK-PRF-0154/2026-10-21T04-15-06-112Z-scope-amendment-a9cb9173c6c6.json",
+      ".atm/history/tasks/TASK-PRF-0154.json",
+      ".atm/task-plans/TASK-PRF-0154.md",
+      "research/paper-v2/prereg-v3-smoke/kit/preflight.sh"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "bash research/paper-v2/prereg-v3-smoke/kit/preflight.sh",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c08dcddebe3d936c86b7ad918a52334cbac245736e4aa8cafaf87537df5d23be",
+      "stderrSha256": "sha256:3af345401a1df02a009ce8059867da5420e3bd4d44417e05125cf61b67393114",
+      "runnerVersion": "0.1.2"
+    }
+  ],
+  "validationPasses": [
+    "bash research/paper-v2/prereg-v3-smoke/kit/preflight.sh"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "bash research/paper-v2/prereg-v3-smoke/kit/preflight.sh"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-10-21T04:21:17.459Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "suspected",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-PRF-0154.*",
+      ".atm/history/task-events/TASK-PRF-0154/**",
+      ".atm/history/tasks/TASK-PRF-0154.json",
+      ".atm/task-plans/TASK-PRF-0154.md",
+      "research/paper-v2/prereg-v3-smoke/kit/preflight.sh",
+      "research/paper-v2/prereg-v3-smoke/kit/test/**"
+    ],
+    "criticalChangedFiles": [],
+    "requiredGates": [
+      "bash research/paper-v2/prereg-v3-smoke/kit/preflight.sh"
+    ]
+  },
+  "evidencePath": ".atm/runtime/evidence-ledger/bundles/TASK-PRF-0154.json",
+  "closedAt": "2026-10-21T04:21:17.460Z",
+  "closedByActor": "grok-bot",
+  "sessionId": "session-20261021033623-grok-bot-TASK-PRF-0154-0645cd0f4c",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "d2035717ceb82275d8ebd91c156b8a798333d619",
+    "taskMatchedFiles": [
+      "research/paper-v2/prereg-v3-smoke/kit/preflight.sh"
+    ],
+    "governanceFiles": [],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
