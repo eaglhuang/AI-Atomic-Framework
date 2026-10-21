@@ -66,17 +66,40 @@ function countPhysicalLines(filePath) {
 }
 function countCandidatePhysicalLines(cwd, file, maxLines) {
     const finalLines = countPhysicalLines(path.join(cwd, file));
-    const baselineLines = countHeadPhysicalLines(cwd, file);
     if (finalLines <= maxLines)
         return finalLines;
-    if (baselineLines !== null && baselineLines > maxLines && finalLines <= baselineLines) {
-        return countStagedDiffPhysicalLines(cwd, file) ?? finalLines;
+    for (const ref of physicalLineBaselineRefs(cwd)) {
+        const baselineLines = countHeadPhysicalLines(cwd, file, ref);
+        if (baselineLines !== null && baselineLines > maxLines && finalLines <= baselineLines) {
+            const changedLines = countStagedDiffPhysicalLines(cwd, file, ref);
+            if (changedLines !== null && changedLines <= maxLines)
+                return changedLines;
+        }
     }
     return finalLines;
 }
-function countHeadPhysicalLines(cwd, file) {
+/** Only immutable immediate merge parents qualify; never trust a remote name
+ * or walk arbitrary ancestry to excuse newly introduced oversized source. */
+function physicalLineBaselineRefs(cwd) {
+    const refs = ['HEAD'];
+    const git = (args) => execFileSync('git', args, {
+        cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore']
+    }).trim();
     try {
-        const content = execFileSync('git', ['show', `HEAD:${normalizeRelativePath(file)}`], {
+        const parents = git(['rev-list', '--parents', '-n', '1', 'HEAD']).split(/\s+/).slice(1);
+        if (parents.length > 1)
+            refs.push(...parents);
+    }
+    catch { /* A repository without HEAD has no inherited baseline. */ }
+    try {
+        refs.push(git(['rev-parse', '--verify', 'MERGE_HEAD']));
+    }
+    catch { /* Ordinary commits have no pending merge. */ }
+    return [...new Set(refs)].filter(ref => ref === 'HEAD' || /^[a-f0-9]{40,64}$/.test(ref));
+}
+function countHeadPhysicalLines(cwd, file, ref = 'HEAD') {
+    try {
+        const content = execFileSync('git', ['show', `${ref}:${normalizeRelativePath(file)}`], {
             cwd,
             encoding: 'utf8',
             stdio: ['ignore', 'pipe', 'ignore']
@@ -89,13 +112,13 @@ function countHeadPhysicalLines(cwd, file) {
         return null;
     }
 }
-function countStagedDiffPhysicalLines(cwd, file) {
+function countStagedDiffPhysicalLines(cwd, file, ref = 'HEAD') {
     try {
         // Commit admission runs before the task-scoped index transaction stages an
         // auto-stage candidate. Compare HEAD with the complete candidate tree so
         // the oversized-baseline exception has identical semantics for staged and
         // unstaged task-scoped files.
-        const output = execFileSync('git', ['diff', '--numstat', 'HEAD', '--', file], {
+        const output = execFileSync('git', ['diff', '--numstat', ref, '--', file], {
             cwd,
             encoding: 'utf8',
             stdio: ['ignore', 'pipe', 'ignore']

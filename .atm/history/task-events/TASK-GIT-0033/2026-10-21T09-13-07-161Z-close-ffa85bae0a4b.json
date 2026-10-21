@@ -1,0 +1,55 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-10-21T09-13-07-161Z-close-ffa85bae0a4b",
+  "taskId": "TASK-GIT-0033",
+  "action": "close",
+  "actorId": "codex-gpt-6",
+  "sessionId": "session-20261021072850-codex-gpt-6-TASK-GIT-0033-7cfa3a90cd",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-GIT-0033.json",
+  "taskSha256": "sha256:04845ea652f90293a3eab025def2d2fdcddb1c1ce602dd2819c2b48fdf0192d2",
+  "createdAt": "2026-10-21T09:13:07.161Z",
+  "command": "node atm.mjs tasks close --task TASK-GIT-0033 --actor codex-gpt-6 --status done --historical-delivery 8fbe559a6c924dbcfec3c1823176235635144726",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20261021072850-codex-gpt-6-TASK-GIT-0033-7cfa3a90cd",
+    "closurePacketPath": ".atm/history/evidence/TASK-GIT-0033.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --experimental-strip-types tests/cli/merge-parent-line-budget.test.ts",
+      "node --strip-types tests/cli/commit-attribution-sealed-transaction.test.ts",
+      "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts"
+    ],
+    "requiredGates": [
+      "git diff --check",
+      "node --experimental-strip-types tests/cli/merge-parent-line-budget.test.ts"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-10-21T09:13:07.061Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-GIT-0033.*",
+        ".atm/history/task-events/TASK-GIT-0033/**",
+        ".atm/history/tasks/TASK-GIT-0033.json",
+        "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+        "tests/cli/merge-parent-line-budget.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+        "tests/cli/merge-parent-line-budget.test.ts"
+      ],
+      "requiredGates": [
+        "git diff --check",
+        "node --experimental-strip-types tests/cli/merge-parent-line-budget.test.ts"
+      ]
+    }
+  }
+}

@@ -1,0 +1,249 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-GIT-0033",
+  "title": "Recognize inherited merge-parent source in physical line admission",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "Every command in `validators` passes and is recorded with `node atm.mjs evidence run`.",
+    "The change is committed with `node atm.mjs git commit --task TASK-GIT-0033` and closed with `node atm.mjs taskflow close --task TASK-GIT-0033`."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+    "tests/cli/merge-parent-line-budget.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+    "tests/cli/merge-parent-line-budget.test.ts"
+  ],
+  "validators": [
+    "node --experimental-strip-types tests/cli/merge-parent-line-budget.test.ts",
+    "git diff --check"
+  ],
+  "planningRepo": "AI-Atomic-Framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the delivery commit if the change fails validation.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 2 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "tasks/TASK-GIT-0033.task.md",
+    "sectionTitle": "TASK-GIT-0033",
+    "headingLine": 31,
+    "hash": "f08892fabbb5f3a4",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/AI-Atomic-Framework.git",
+      "repoRoot": "C:/Users/User/AI-Atomic-Framework",
+      "taskCardPath": "tasks/TASK-GIT-0033.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:f08892fabbb5f3a4610ab6097e92ff68dda872cc370421c3359e4eb7ae674f0c",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-10-21T07:28:42.232Z"
+    }
+  },
+  "importedAt": "2026-10-21T07:28:42.232Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.experimental.strip.types.tests.cli.merge.parent.line.budget.test.ts",
+      "command": "node --experimental-strip-types tests/cli/merge-parent-line-budget.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_git.diff.check",
+      "command": "git diff --check",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "dependencies"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-10-21T09-13-07-161Z-close-ffa85bae0a4b",
+  "lastTransitionAt": "2026-10-21T09:13:07.161Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-6",
+  "reservedAt": "2026-10-21T07:28:50.453Z",
+  "promotedAt": "2026-10-21T07:28:50.457Z",
+  "claim": {
+    "actorId": "codex-gpt-6",
+    "leaseId": "lease-c9da8bab0dc8",
+    "claimedAt": "2026-10-21T07:28:50.462Z",
+    "heartbeatAt": "2026-10-21T09:13:07.074Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-GIT-0033.json",
+      "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+      "tests/cli/merge-parent-line-budget.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20261021090122-codex-gpt-6-383e1dfd5f",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261021090122-codex-gpt-6-383e1dfd5f\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-10-21T07:28:50.462Z",
+  "startedByActor": "codex-gpt-6",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-2d2f96aee9e3af6a",
+    "ticketDigest": "sha256:2d2f96aee9e3af6ace46124de1b96992ec928a7aaa98f6000d52f8a6fc5afcb2",
+    "taskId": "TASK-GIT-0033",
+    "origin": "claim",
+    "actorId": "codex-gpt-6",
+    "laneSessionId": "lane-20261021090122-codex-gpt-6-383e1dfd5f",
+    "claimGeneration": "lease-c9da8bab0dc8",
+    "issuedAt": "2026-10-21T09:01:22.993Z",
+    "expiresAt": "2026-10-21T09:31:22.993Z",
+    "scopeDigest": "sha256:b7177042a461818f57928ff5f76ad5cf0e34aebb8fce66d88956683ea3fc6956",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-10-21T09:01:22.993Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-GIT-0033.*",
+          ".atm/history/evidence/git-head.json",
+          ".atm/history/task-events/TASK-GIT-0033/**",
+          ".atm/history/tasks/TASK-GIT-0033.json",
+          "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+          "tests/cli/merge-parent-line-budget.test.ts"
+        ],
+        "digest": "sha256:b9aa5093758fcbb5feec50988f3a40a5d473054adf6a763c0adcaf041c041e23"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20261021072850-codex-gpt-6-TASK-GIT-0033-7cfa3a90cd",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-GIT-0033",
+    "batchId": "batch-b4225de6ed1a",
+    "scopeKey": "TASK-PRF",
+    "queueId": "queue-227469bd783a478c",
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-GIT-0033.*",
+      ".atm/history/task-events/TASK-GIT-0033/**",
+      ".atm/history/tasks/TASK-GIT-0033.json",
+      "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+      "tests/cli/merge-parent-line-budget.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "065a00e3fb8383a6601664582bf722e9488387849a7b215a1b8622a803675b57",
+    "actorId": "codex-gpt-6",
+    "sessionId": "session-20261021072850-codex-gpt-6-TASK-GIT-0033-7cfa3a90cd",
+    "laneSession": {
+      "laneSessionId": "lane-20261021072850-codex-gpt-6-6b748e15b7",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261021072850-codex-gpt-6-6b748e15b7\""
+    },
+    "createdAt": "2026-10-21T07:28:58.458Z",
+    "status": "active"
+  },
+  "closedAt": "2026-10-21T09:13:07.074Z",
+  "closedByActor": "codex-gpt-6",
+  "closedBySessionId": "session-20261021072850-codex-gpt-6-TASK-GIT-0033-7cfa3a90cd",
+  "closurePacket": ".atm/history/evidence/TASK-GIT-0033.closure-packet.json"
+}
