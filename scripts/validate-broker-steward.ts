@@ -371,6 +371,12 @@ try {
   });
   check(staleBase.status === 0, `stale-base translation regression must pass:\n${staleBase.stdout}\n${staleBase.stderr}`);
 
+  const crossSession = spawnSync(process.execPath, ['--strip-types', path.join(root, 'tests/core/cross-session-overlap.test.ts')], {
+    cwd: root,
+    encoding: 'utf8'
+  });
+  check(crossSession.status === 0, `cross-session-overlap regression must pass:\n${crossSession.stdout}\n${crossSession.stderr}`);
+
   const concurrent = spawnSync(process.execPath, ['--strip-types', path.join(root, 'tests/core/steward-concurrent-commit.test.ts')], {
     cwd: root,
     encoding: 'utf8'

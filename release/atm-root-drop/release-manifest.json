@@ -1779,6 +1779,8 @@
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/lane/lifecycle.js",
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/lane/wip-ownership-transition.d.ts",
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/lane/wip-ownership-transition.js",
+    "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/live-write/cross-session-overlap.d.ts",
+    "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/live-write/cross-session-overlap.js",
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/live-write/live-queued-write.d.ts",
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/live-write/live-queued-write.js",
     "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/manager/atom-birth-transaction.d.ts",
@@ -4435,6 +4437,8 @@
     "release/atm-root-drop/packages/core/dist/lane/lifecycle.js",
     "release/atm-root-drop/packages/core/dist/lane/wip-ownership-transition.d.ts",
     "release/atm-root-drop/packages/core/dist/lane/wip-ownership-transition.js",
+    "release/atm-root-drop/packages/core/dist/live-write/cross-session-overlap.d.ts",
+    "release/atm-root-drop/packages/core/dist/live-write/cross-session-overlap.js",
     "release/atm-root-drop/packages/core/dist/live-write/live-queued-write.d.ts",
     "release/atm-root-drop/packages/core/dist/live-write/live-queued-write.js",
     "release/atm-root-drop/packages/core/dist/manager/atom-birth-transaction.d.ts",
@@ -5043,6 +5047,7 @@
     "release/atm-root-drop/packages/core/src/lane/lane-capability-provider.ts",
     "release/atm-root-drop/packages/core/src/lane/lifecycle.ts",
     "release/atm-root-drop/packages/core/src/lane/wip-ownership-transition.ts",
+    "release/atm-root-drop/packages/core/src/live-write/cross-session-overlap.ts",
     "release/atm-root-drop/packages/core/src/live-write/live-queued-write.ts",
     "release/atm-root-drop/packages/core/src/manager/atom-birth-transaction.ts",
     "release/atm-root-drop/packages/core/src/manager/atom-generator.ts",
@@ -5947,7 +5952,6 @@
     "release/atm-root-drop/scripts/lib/admission-bench/types.ts",
     "release/atm-root-drop/scripts/lib/agr-benchmark-runner.ts",
     "release/atm-root-drop/scripts/lib/agr-conflict-benchmark-runner.ts",
-    "release/atm-root-drop/scripts/lib/atm-result-line.ts",
     "release/atm-root-drop/scripts/lib/atom-id-to-cid.ts",
     "release/atm-root-drop/scripts/lib/cli-json-spawn.ts",
     "release/atm-root-drop/scripts/lib/external-benchmark/adjudication.ts",
@@ -5998,7 +6002,6 @@
     "release/atm-root-drop/scripts/paired-ab-v4-cell-workload.ts",
     "release/atm-root-drop/scripts/plan-performance-report-v3.ts",
     "release/atm-root-drop/scripts/plan-performance-report-v4.ts",
-    "release/atm-root-drop/scripts/preclose-check.ts",
     "release/atm-root-drop/scripts/pricing/parse-provider-price-page.ts",
     "release/atm-root-drop/scripts/pricing/refresh-model-prices.ts",
     "release/atm-root-drop/scripts/product-ci-burn-in-workflow-scope.json",
@@ -6030,7 +6033,6 @@
     "release/atm-root-drop/scripts/runner-version-selection-replay.ts",
     "release/atm-root-drop/scripts/scan-broker-runs.ts",
     "release/atm-root-drop/scripts/seal-release-prepublish-evidence.ts",
-    "release/atm-root-drop/scripts/sealed-build-log-sink.ts",
     "release/atm-root-drop/scripts/sealed-build-output-ownership.ts",
     "release/atm-root-drop/scripts/sealed-runner-artifact-lifecycle.ts",
     "release/atm-root-drop/scripts/sealed-runner-publication.ts",
@@ -6047,7 +6049,6 @@
     "release/atm-root-drop/scripts/temp-root.ts",
     "release/atm-root-drop/scripts/templates/atm-stable-launcher.mjs",
     "release/atm-root-drop/scripts/test-catalog.config.json",
-    "release/atm-root-drop/scripts/update-help-snapshots.ts",
     "release/atm-root-drop/scripts/validate-admission-failure-reason.ts",
     "release/atm-root-drop/scripts/validate-adopter-artifact-manifest.ts",
     "release/atm-root-drop/scripts/validate-agent-execute.ts",
@@ -6091,7 +6092,6 @@
     "release/atm-root-drop/scripts/validate-cli/context.ts",
     "release/atm-root-drop/scripts/validate-cli/focused-regressions.ts",
     "release/atm-root-drop/scripts/validate-cli/full-suite.ts",
-    "release/atm-root-drop/scripts/validate-cli/help-snapshots.ts",
     "release/atm-root-drop/scripts/validate-cli/orchestrator.ts",
     "release/atm-root-drop/scripts/validate-cli/surface-suite.ts",
     "release/atm-root-drop/scripts/validate-content-anchor.ts",
@@ -6588,7 +6588,6 @@
     "release/atm-root-drop/tests/cli/atm-chart-final-600.test.ts",
     "release/atm-root-drop/tests/cli/atm-chart-public-runtime.test.ts",
     "release/atm-root-drop/tests/cli/atm-dispatch-windows-text-io.test.ts",
-    "release/atm-root-drop/tests/cli/atm-result-line.test.ts",
     "release/atm-root-drop/tests/cli/atomic-wave-checkpoint-closeback-saga.test.ts",
     "release/atm-root-drop/tests/cli/atomization-max-lines.test.ts",
     "release/atm-root-drop/tests/cli/atomize-backfill-atom-refs.test.ts",
@@ -6803,7 +6802,6 @@
     "release/atm-root-drop/tests/cli/governed-state-ownership-routing-boundaries.test.ts",
     "release/atm-root-drop/tests/cli/handoff-resume-route.test.ts",
     "release/atm-root-drop/tests/cli/hard-causal-dependency-import.test.ts",
-    "release/atm-root-drop/tests/cli/help-snapshots.test.ts",
     "release/atm-root-drop/tests/cli/historical-residue-cleanup.test.ts",
     "release/atm-root-drop/tests/cli/historical-work-admission-attestation.test.ts",
     "release/atm-root-drop/tests/cli/hook-audit-scope-classification.test.ts",
@@ -7013,7 +7011,6 @@
     "release/atm-root-drop/tests/cli/pre-push-provisional-closure-packet.test.ts",
     "release/atm-root-drop/tests/cli/pre-team-dual-captain-e2e.test.ts",
     "release/atm-root-drop/tests/cli/pre-team-foundation-gate.test.ts",
-    "release/atm-root-drop/tests/cli/preclose-check.test.ts",
     "release/atm-root-drop/tests/cli/printed-commands-carry-lane.test.ts",
     "release/atm-root-drop/tests/cli/product-ci-burn-in-schedule.test.ts",
     "release/atm-root-drop/tests/cli/product-ci-burn-in.test.ts",
@@ -7110,7 +7107,6 @@
     "release/atm-root-drop/tests/cli/runtime-telemetry-boundary.test.ts",
     "release/atm-root-drop/tests/cli/scope-amendment-rearbitration.test.ts",
     "release/atm-root-drop/tests/cli/scope-amendment-work-admission-ticket.test.ts",
-    "release/atm-root-drop/tests/cli/sealed-build-log-sink.test.ts",
     "release/atm-root-drop/tests/cli/sealed-runner-build-input-cache.test.ts",
     "release/atm-root-drop/tests/cli/sealed-runner-build-junction-cleanup.test.ts",
     "release/atm-root-drop/tests/cli/sealed-runner-publication-lifecycle.test.ts",
@@ -7299,6 +7295,7 @@
     "release/atm-root-drop/tests/core/causal-repair-receipt.test.ts",
     "release/atm-root-drop/tests/core/composer-serializability.test.ts",
     "release/atm-root-drop/tests/core/content-anchor-resolver.test.ts",
+    "release/atm-root-drop/tests/core/cross-session-overlap.test.ts",
     "release/atm-root-drop/tests/core/id-allocator.test.ts",
     "release/atm-root-drop/tests/core/live-queued-write.test.ts",
     "release/atm-root-drop/tests/core/map-generator.test.ts",
@@ -7620,7 +7617,7 @@
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
     "copied": 0,
-    "unchanged": 7584,
+    "unchanged": 7581,
     "removed": 0
   },
   "buildMode": "full",
@@ -18382,7 +18379,7 @@
       },
       {
         "path": "package.json",
-        "digest": "52211d1f66aa414542fbb3ebe34c9be1a191155eda53aa7b42c3ecf5ef351f54",
+        "digest": "ea21acace5b48d76e5ab7b6783459197e06ed0e26327d417462d1c7d2b0cb255",
         "origin": "source",
         "inputPaths": [
           "package.json"
@@ -23358,8 +23355,26 @@
         "replaceable": true
       },
       {
+        "path": "packages/cli/dist/_vendor/core/dist/live-write/cross-session-overlap.d.ts",
+        "digest": "a44559df737bffc268f1f3d9546393179238c31227f80b73d906c27d5af6b6e1",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/_vendor/core/dist/live-write/cross-session-overlap.d.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/_vendor/core/dist/live-write/cross-session-overlap.js",
+        "digest": "7f535aefc5cd4f6a1ba981bcc1c5d04dd7bfb5bb466703fcc0ba11db64f97c8e",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/_vendor/core/dist/live-write/cross-session-overlap.js"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/cli/dist/_vendor/core/dist/live-write/live-queued-write.d.ts",
-        "digest": "ce1b2f42aa737c473259fe03c075660718cc2e220cd250b7a87d430c0e12b5c8",
+        "digest": "4b33a9b48d25d011a79e63ffe0cedb47e73c37837493dfca8ff75d744045cbae",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/core/dist/live-write/live-queued-write.d.ts"
@@ -23368,7 +23383,7 @@
       },
       {
         "path": "packages/cli/dist/_vendor/core/dist/live-write/live-queued-write.js",
-        "digest": "26641011c1b5dc21e793e5eebb3da40ce506671c0f811737faf165a3a80df7d4",
+        "digest": "ef94269993e968351f16246f465e57d6ed778711cd9e4fc4be9678c2247a4596",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/core/dist/live-write/live-queued-write.js"
@@ -28201,7 +28216,7 @@
       },
       {
         "path": "packages/cli/dist/build-identity.json",
-        "digest": "f82e56d18a0c9b121052edea0b88fb049e2c40b471a9657bb34f7d9d11dc6614",
+        "digest": "f2d333b6518d0584c706f16922d27f385be2b03b2cdb9c397a6b242012df146e",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/build-identity.json"
@@ -28534,7 +28549,7 @@
       },
       {
         "path": "packages/cli/dist/commands/broker/parser.js",
-        "digest": "e79e09c79b0e5fc68f73ec2094c6275fb3068e71d734c8048d839b63e0e220ef",
+        "digest": "0bd599b05e9a5dbbb0474ef5c1a10e14cc74914af62a545b6e8605d9d22904a8",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/broker/parser.js"
@@ -28750,7 +28765,7 @@
       },
       {
         "path": "packages/cli/dist/commands/broker/steward-runtime-actions.js",
-        "digest": "4a69e7956047c97f373e2d86276eb9615e548bbb46a68eed4c5d764d12e19878",
+        "digest": "51462a3c130ee112a3aa422f1ee0d0c04c95ab0baf52f1b4f85a34eb303f6472",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/broker/steward-runtime-actions.js"
@@ -28930,7 +28945,7 @@
       },
       {
         "path": "packages/cli/dist/commands/command-specs/broker.spec.js",
-        "digest": "195f89b9c834f502eeff3c2cdce9e2a32cf0a13f1b9925260f809cec44e069cc",
+        "digest": "7af8b3d0f43062d6339ce3535969b82353c8284947d6a435f72e5cc9907699eb",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/command-specs/broker.spec.js"
@@ -34330,7 +34345,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/build-identity.json",
-        "digest": "385859ce14b3e04e0a91d247ad7eb7bed4c1e685bca4db77b4c6797f1ff83915",
+        "digest": "9e46fbe97bad4d8811501910107584c5ae064c8bd7a98684f99e5cc72a95e2cb",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/build-identity.json"
@@ -35059,7 +35074,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/manifest.json",
-        "digest": "fa7266dd463b74d95ccd3571a68feca1170483bed406585c9e2bc06d753f9d7e",
+        "digest": "1958ecd139a9def9730c42403d28bc48f80333d9f0763b4f31a68e52bc9e4963",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/manifest.json"
@@ -35068,7 +35083,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/runtime.mjs",
-        "digest": "237e7d3c3441bec44ac75c31cb1f58efbcb8636151a63f811dd2d24301da050f",
+        "digest": "75ea39edb36602e185f7fd679cec3eb31343b9d97b3649e2561b4e81f65597ff",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/runtime.mjs"
@@ -35914,7 +35929,7 @@
       },
       {
         "path": "packages/cli/src/commands/broker/parser.ts",
-        "digest": "6336d220764978e1d59d458046e899c6ab1e5f313f78c4154fc0965a833a6f2c",
+        "digest": "6263e358c986c737a99bf99e3b6a40dfdbcee0949494397cb5bfee019848a8ce",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/broker/parser.ts"
@@ -36130,7 +36145,7 @@
       },
       {
         "path": "packages/cli/src/commands/broker/steward-runtime-actions.ts",
-        "digest": "e0edeab7e700a013f681f02b30bddacc39e8522d2522b894b0077d67e65e3f83",
+        "digest": "dd407648b04f353c7626b276b2cc2ae084f2869d00595106fbd1aec54bc9f76c",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/broker/steward-runtime-actions.ts"
@@ -36319,7 +36334,7 @@
       },
       {
         "path": "packages/cli/src/commands/command-specs/broker.spec.ts",
-        "digest": "0c0df87a2657c774b43ab6ab25f3c4fa94db8966b4723662f4a8a189738074d0",
+        "digest": "8992e4c0ccd688eb882bfbfff55708339ef9f15de79c71a0f1d2c302d95b998c",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/command-specs/broker.spec.ts"
@@ -37840,7 +37855,7 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
-        "digest": "78baa7ce20f63243b4efd667cfcb94b85963327f784d75ebe886b66dc7d5b2f2",
+        "digest": "af6bdeec96488a56e40051ca27f3f7e1079a7347ba1ea2f6a8f6cb46cfa74464",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts"
@@ -47262,8 +47277,26 @@
         "replaceable": true
       },
       {
+        "path": "packages/core/dist/live-write/cross-session-overlap.d.ts",
+        "digest": "a44559df737bffc268f1f3d9546393179238c31227f80b73d906c27d5af6b6e1",
+        "origin": "source",
+        "inputPaths": [
+          "packages/core/dist/live-write/cross-session-overlap.d.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/core/dist/live-write/cross-session-overlap.js",
+        "digest": "7f535aefc5cd4f6a1ba981bcc1c5d04dd7bfb5bb466703fcc0ba11db64f97c8e",
+        "origin": "source",
+        "inputPaths": [
+          "packages/core/dist/live-write/cross-session-overlap.js"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/core/dist/live-write/live-queued-write.d.ts",
-        "digest": "ce1b2f42aa737c473259fe03c075660718cc2e220cd250b7a87d430c0e12b5c8",
+        "digest": "4b33a9b48d25d011a79e63ffe0cedb47e73c37837493dfca8ff75d744045cbae",
         "origin": "source",
         "inputPaths": [
           "packages/core/dist/live-write/live-queued-write.d.ts"
@@ -47272,7 +47305,7 @@
       },
       {
         "path": "packages/core/dist/live-write/live-queued-write.js",
-        "digest": "26641011c1b5dc21e793e5eebb3da40ce506671c0f811737faf165a3a80df7d4",
+        "digest": "ef94269993e968351f16246f465e57d6ed778711cd9e4fc4be9678c2247a4596",
         "origin": "source",
         "inputPaths": [
           "packages/core/dist/live-write/live-queued-write.js"
@@ -52734,8 +52767,17 @@
         "replaceable": true
       },
       {
+        "path": "packages/core/src/live-write/cross-session-overlap.ts",
+        "digest": "71cf0d0966842ae0ee2f607f09e16b1ba2f33c2c5ad7c563adddd16825e77703",
+        "origin": "source",
+        "inputPaths": [
+          "packages/core/src/live-write/cross-session-overlap.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/core/src/live-write/live-queued-write.ts",
-        "digest": "63f5ded946b0e7ca57903343438ffab5cddb219a1f094280ed39839b77410482",
+        "digest": "c92343ca12bf76fb023464f8c56b76031f09df7aa1d6837d691dd384bf4b3773",
         "origin": "source",
         "inputPaths": [
           "packages/core/src/live-write/live-queued-write.ts"
@@ -54310,7 +54352,7 @@
       },
       {
         "path": "packages/create-atm/dist/build-identity.json",
-        "digest": "099298a8c7e22b6eedcb11881f5c6c693b850828c562649d249ab650a0bca190",
+        "digest": "2e70e917e0be3b85a84981045ce2569370d203ddb24b442e2ec83b9ab39ab6c8",
         "origin": "source",
         "inputPaths": [
           "packages/create-atm/dist/build-identity.json"
@@ -60861,15 +60903,6 @@
         "replaceable": true
       },
       {
-        "path": "scripts/lib/atm-result-line.ts",
-        "digest": "c7d85fa976bef4ff745dce358b6cd9ee99a0c9ea93f7ca035efb693eefc5bc89",
-        "origin": "source",
-        "inputPaths": [
-          "scripts/lib/atm-result-line.ts"
-        ],
-        "replaceable": true
-      },
-      {
         "path": "scripts/lib/atom-id-to-cid.ts",
         "digest": "88ab46b7018f96b6b0474fa5056e342f41071941b37efd8257eb1857ef86a608",
         "origin": "source",
@@ -61320,15 +61353,6 @@
         "replaceable": true
       },
       {
-        "path": "scripts/preclose-check.ts",
-        "digest": "eef83add5c79f63188cbde54c27cb524c8fe3117962a70bb84b050f99eb16406",
-        "origin": "source",
-        "inputPaths": [
-          "scripts/preclose-check.ts"
-        ],
-        "replaceable": true
-      },
-      {
         "path": "scripts/pricing/parse-provider-price-page.ts",
         "digest": "9da6909c3d587765bbb8141273bc73ebfb267ad0f4986c56ebbf62f86db88611",
         "origin": "source",
@@ -61456,7 +61480,7 @@
       },
       {
         "path": "scripts/run-cli-test-sweep.ts",
-        "digest": "641e28527ba8a8b03494c41f824fbbbd8b1015641905c00e5b4698330e9d4721",
+        "digest": "95c2a0d329771a987f4aa6805281980361384b2de8b619a0413a9cd98a29b6d9",
         "origin": "source",
         "inputPaths": [
           "scripts/run-cli-test-sweep.ts"
@@ -61501,7 +61525,7 @@
       },
       {
         "path": "scripts/run-sealed-runner-build.ts",
-        "digest": "c1956340c1443f82f5ebffccdacdf2435ab69a70f6d31b36914d6ecf64636af5",
+        "digest": "48424a3c5e3ff73ee6b037da87f3aba7e4d0b4187e590ba96d1a429d27a0e0ad",
         "origin": "source",
         "inputPaths": [
           "scripts/run-sealed-runner-build.ts"
@@ -61604,15 +61628,6 @@
         "origin": "source",
         "inputPaths": [
           "scripts/seal-release-prepublish-evidence.ts"
-        ],
-        "replaceable": true
-      },
-      {
-        "path": "scripts/sealed-build-log-sink.ts",
-        "digest": "38f638e4f900d29a71fd68bb4ef918a248dfdf8a59a01f77d32daf0c52573dcc",
-        "origin": "source",
-        "inputPaths": [
-          "scripts/sealed-build-log-sink.ts"
         ],
         "replaceable": true
       },
@@ -61757,15 +61772,6 @@
         "origin": "source",
         "inputPaths": [
           "scripts/test-catalog.config.json"
-        ],
-        "replaceable": true
-      },
-      {
-        "path": "scripts/update-help-snapshots.ts",
-        "digest": "b5090b66f557d147d5dfe75a6cfd267f97f18a8d586833f64715996d76576620",
-        "origin": "source",
-        "inputPaths": [
-          "scripts/update-help-snapshots.ts"
         ],
         "replaceable": true
       },
@@ -62059,7 +62065,7 @@
       },
       {
         "path": "scripts/validate-broker-steward.ts",
-        "digest": "9df0e259854eec96826ba88cedfd3dd83ec40394acba2757450c4772bc84eb16",
+        "digest": "ace84f52f7bfbb6b57a7d47a94822cddfd16c5317096b9f25727c5922ac5c14d",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-broker-steward.ts"
@@ -62131,7 +62137,7 @@
       },
       {
         "path": "scripts/validate-cli/context.ts",
-        "digest": "a465e346605019e5b4ae241ff2c1c37900bcb6020aa929d3176c19f5f367a74d",
+        "digest": "59bb62f25ecf35dd905fb4fbbdcff815323604c2ccc02b381fef66a85d56b7d7",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-cli/context.ts"
@@ -62157,15 +62163,6 @@
         "replaceable": true
       },
       {
-        "path": "scripts/validate-cli/help-snapshots.ts",
-        "digest": "8f8b301b10b99e4ec2e8a2a582aabf893b4a99e5b9fff890b8f3d8acaa1352c7",
-        "origin": "source",
-        "inputPaths": [
-          "scripts/validate-cli/help-snapshots.ts"
-        ],
-        "replaceable": true
-      },
-      {
         "path": "scripts/validate-cli/orchestrator.ts",
         "digest": "30a4fd15114626d2704b42ebe7da9ec430f3c02d1624e1b066ecb8aae832bec2",
         "origin": "source",
@@ -62176,7 +62173,7 @@
       },
       {
         "path": "scripts/validate-cli/surface-suite.ts",
-        "digest": "7e23b71257cf5e5c491e3d0d1d7c00c20a218ed11d7dcc28d9e99591f696a57b",
+        "digest": "3689f50969a8b9d82507d6cda968e201c1de7bbbee3ac45cb996bd154eddb93b",
         "origin": "source",
         "inputPaths": [
           "scripts/validate-cli/surface-suite.ts"
@@ -66630,15 +66627,6 @@
         "replaceable": true
       },
       {
-        "path": "tests/cli/atm-result-line.test.ts",
-        "digest": "c7e2fce669c9ddb689760e93091f3053df34c0f148cbe3c27a4ae3e2afb4f2e4",
-        "origin": "source",
-        "inputPaths": [
-          "tests/cli/atm-result-line.test.ts"
-        ],
-        "replaceable": true
-      },
-      {
         "path": "tests/cli/atomic-wave-checkpoint-closeback-saga.test.ts",
         "digest": "0c3d827f07d560ef7cfad951cfca7865fb012ffb3bccc873ff9756aaeb2c3779",
         "origin": "source",
@@ -67252,7 +67240,7 @@
       },
       {
         "path": "tests/cli/cli-test-sweep.test.ts",
-        "digest": "eca1f3e88e220728785b170b4334b9e8a672be7891d99aa1b73347211b64af09",
+        "digest": "e64088f0ae707fdfe2db47df8bc554fb5745d92d7274fc4e0052596b6bb04182",
         "origin": "source",
         "inputPaths": [
           "tests/cli/cli-test-sweep.test.ts"
@@ -68561,15 +68549,6 @@
         "origin": "source",
         "inputPaths": [
           "tests/cli/hard-causal-dependency-import.test.ts"
-        ],
-        "replaceable": true
-      },
-      {
-        "path": "tests/cli/help-snapshots.test.ts",
-        "digest": "1ea635ea9f45ddeb9da7ff127eec04abae070e16053a9d1bc39348f5ca894959",
-        "origin": "source",
-        "inputPaths": [
-          "tests/cli/help-snapshots.test.ts"
         ],
         "replaceable": true
       },
@@ -70455,15 +70434,6 @@
         "replaceable": true
       },
       {
-        "path": "tests/cli/preclose-check.test.ts",
-        "digest": "aed8d2371fd5ffdd43e6f5b2f12edfc1654d8611a7879b57854c84428864ef3d",
-        "origin": "source",
-        "inputPaths": [
-          "tests/cli/preclose-check.test.ts"
-        ],
-        "replaceable": true
-      },
-      {
         "path": "tests/cli/printed-commands-carry-lane.test.ts",
         "digest": "0c894209e49a4f10c3bd3ca3374f696b2042c4207a4663c3c0dd76889a62fe33",
         "origin": "source",
@@ -71324,15 +71294,6 @@
         "origin": "source",
         "inputPaths": [
           "tests/cli/scope-amendment-work-admission-ticket.test.ts"
-        ],
-        "replaceable": true
-      },
-      {
-        "path": "tests/cli/sealed-build-log-sink.test.ts",
-        "digest": "cdc6fc08d81d6eab1fedeb07bef22db38b6df57e5a0ac4d6684eb13f43c171be",
-        "origin": "source",
-        "inputPaths": [
-          "tests/cli/sealed-build-log-sink.test.ts"
         ],
         "replaceable": true
       },
@@ -73029,6 +72990,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/core/cross-session-overlap.test.ts",
+        "digest": "63b0823add1dcb895bdd8ce510517b9128789cce3b29d9d23e3727bd07d4a1a5",
+        "origin": "source",
+        "inputPaths": [
+          "tests/core/cross-session-overlap.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/core/id-allocator.test.ts",
         "digest": "05d73a36ee3fba07844f252f30864513688c6ebbde977b84ac8d6a573482a6fa",
         "origin": "source",
@@ -73264,7 +73234,7 @@
       },
       {
         "path": "tests/core/transactional-steward-single-write.test.ts",
-        "digest": "e00f8f6fea015ce705942c7a599b45fa956c1df2ba48425f0a460be9bfe05e5a",
+        "digest": "83c3cf020d7ab35e06d162f980a0c2cf63471dba5b4919ab3312746cd6c7b1a8",
         "origin": "source",
         "inputPaths": [
           "tests/core/transactional-steward-single-write.test.ts"
@@ -75882,7 +75852,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:80c345be1d738315321c25662f04b30ae739c652e6006aec16e53e10f49cbeb2"
+    "treeDigest": "sha256:09bfdfa6531ff1697007e50fbf8b820de6e7a023b6731feea60113bc7794b376"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -77054,6 +77024,7 @@
       "packages/core/src/lane/lane-capability-provider.ts",
       "packages/core/src/lane/lifecycle.ts",
       "packages/core/src/lane/wip-ownership-transition.ts",
+      "packages/core/src/live-write/cross-session-overlap.ts",
       "packages/core/src/live-write/live-queued-write.ts",
       "packages/core/src/manager/atom-birth-transaction.ts",
       "packages/core/src/manager/atom-generator.ts",
@@ -77513,7 +77484,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:17ead6c5e5996b4f24ba816ab52f16f7318ec22b8a0722aa30a47394f17fa523"
+    "digest": "sha256:a90fe8527a7392e13e957d68031591b71be3e3c539fe2035cc9e2392dc51d7a4"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -79266,6 +79237,8 @@
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/lane/lifecycle.js",
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/lane/wip-ownership-transition.d.ts",
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/lane/wip-ownership-transition.js",
+      "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/live-write/cross-session-overlap.d.ts",
+      "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/live-write/cross-session-overlap.js",
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/live-write/live-queued-write.d.ts",
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/live-write/live-queued-write.js",
       "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/manager/atom-birth-transaction.d.ts",
@@ -81922,6 +81895,8 @@
       "release/atm-root-drop/packages/core/dist/lane/lifecycle.js",
       "release/atm-root-drop/packages/core/dist/lane/wip-ownership-transition.d.ts",
       "release/atm-root-drop/packages/core/dist/lane/wip-ownership-transition.js",
+      "release/atm-root-drop/packages/core/dist/live-write/cross-session-overlap.d.ts",
+      "release/atm-root-drop/packages/core/dist/live-write/cross-session-overlap.js",
       "release/atm-root-drop/packages/core/dist/live-write/live-queued-write.d.ts",
       "release/atm-root-drop/packages/core/dist/live-write/live-queued-write.js",
       "release/atm-root-drop/packages/core/dist/manager/atom-birth-transaction.d.ts",
@@ -82530,6 +82505,7 @@
       "release/atm-root-drop/packages/core/src/lane/lane-capability-provider.ts",
       "release/atm-root-drop/packages/core/src/lane/lifecycle.ts",
       "release/atm-root-drop/packages/core/src/lane/wip-ownership-transition.ts",
+      "release/atm-root-drop/packages/core/src/live-write/cross-session-overlap.ts",
       "release/atm-root-drop/packages/core/src/live-write/live-queued-write.ts",
       "release/atm-root-drop/packages/core/src/manager/atom-birth-transaction.ts",
       "release/atm-root-drop/packages/core/src/manager/atom-generator.ts",
@@ -83434,7 +83410,6 @@
       "release/atm-root-drop/scripts/lib/admission-bench/types.ts",
       "release/atm-root-drop/scripts/lib/agr-benchmark-runner.ts",
       "release/atm-root-drop/scripts/lib/agr-conflict-benchmark-runner.ts",
-      "release/atm-root-drop/scripts/lib/atm-result-line.ts",
       "release/atm-root-drop/scripts/lib/atom-id-to-cid.ts",
       "release/atm-root-drop/scripts/lib/cli-json-spawn.ts",
       "release/atm-root-drop/scripts/lib/external-benchmark/adjudication.ts",
@@ -83485,7 +83460,6 @@
       "release/atm-root-drop/scripts/paired-ab-v4-cell-workload.ts",
       "release/atm-root-drop/scripts/plan-performance-report-v3.ts",
       "release/atm-root-drop/scripts/plan-performance-report-v4.ts",
-      "release/atm-root-drop/scripts/preclose-check.ts",
       "release/atm-root-drop/scripts/pricing/parse-provider-price-page.ts",
       "release/atm-root-drop/scripts/pricing/refresh-model-prices.ts",
       "release/atm-root-drop/scripts/product-ci-burn-in-workflow-scope.json",
@@ -83517,7 +83491,6 @@
       "release/atm-root-drop/scripts/runner-version-selection-replay.ts",
       "release/atm-root-drop/scripts/scan-broker-runs.ts",
       "release/atm-root-drop/scripts/seal-release-prepublish-evidence.ts",
-      "release/atm-root-drop/scripts/sealed-build-log-sink.ts",
       "release/atm-root-drop/scripts/sealed-build-output-ownership.ts",
       "release/atm-root-drop/scripts/sealed-runner-artifact-lifecycle.ts",
       "release/atm-root-drop/scripts/sealed-runner-publication.ts",
@@ -83534,7 +83507,6 @@
       "release/atm-root-drop/scripts/temp-root.ts",
       "release/atm-root-drop/scripts/templates/atm-stable-launcher.mjs",
       "release/atm-root-drop/scripts/test-catalog.config.json",
-      "release/atm-root-drop/scripts/update-help-snapshots.ts",
       "release/atm-root-drop/scripts/validate-admission-failure-reason.ts",
       "release/atm-root-drop/scripts/validate-adopter-artifact-manifest.ts",
       "release/atm-root-drop/scripts/validate-agent-execute.ts",
@@ -83578,7 +83550,6 @@
       "release/atm-root-drop/scripts/validate-cli/context.ts",
       "release/atm-root-drop/scripts/validate-cli/focused-regressions.ts",
       "release/atm-root-drop/scripts/validate-cli/full-suite.ts",
-      "release/atm-root-drop/scripts/validate-cli/help-snapshots.ts",
       "release/atm-root-drop/scripts/validate-cli/orchestrator.ts",
       "release/atm-root-drop/scripts/validate-cli/surface-suite.ts",
       "release/atm-root-drop/scripts/validate-content-anchor.ts",
@@ -84075,7 +84046,6 @@
       "release/atm-root-drop/tests/cli/atm-chart-final-600.test.ts",
       "release/atm-root-drop/tests/cli/atm-chart-public-runtime.test.ts",
       "release/atm-root-drop/tests/cli/atm-dispatch-windows-text-io.test.ts",
-      "release/atm-root-drop/tests/cli/atm-result-line.test.ts",
       "release/atm-root-drop/tests/cli/atomic-wave-checkpoint-closeback-saga.test.ts",
       "release/atm-root-drop/tests/cli/atomization-max-lines.test.ts",
       "release/atm-root-drop/tests/cli/atomize-backfill-atom-refs.test.ts",
@@ -84290,7 +84260,6 @@
       "release/atm-root-drop/tests/cli/governed-state-ownership-routing-boundaries.test.ts",
       "release/atm-root-drop/tests/cli/handoff-resume-route.test.ts",
       "release/atm-root-drop/tests/cli/hard-causal-dependency-import.test.ts",
-      "release/atm-root-drop/tests/cli/help-snapshots.test.ts",
       "release/atm-root-drop/tests/cli/historical-residue-cleanup.test.ts",
       "release/atm-root-drop/tests/cli/historical-work-admission-attestation.test.ts",
       "release/atm-root-drop/tests/cli/hook-audit-scope-classification.test.ts",
@@ -84500,7 +84469,6 @@
       "release/atm-root-drop/tests/cli/pre-push-provisional-closure-packet.test.ts",
       "release/atm-root-drop/tests/cli/pre-team-dual-captain-e2e.test.ts",
       "release/atm-root-drop/tests/cli/pre-team-foundation-gate.test.ts",
-      "release/atm-root-drop/tests/cli/preclose-check.test.ts",
       "release/atm-root-drop/tests/cli/printed-commands-carry-lane.test.ts",
       "release/atm-root-drop/tests/cli/product-ci-burn-in-schedule.test.ts",
       "release/atm-root-drop/tests/cli/product-ci-burn-in.test.ts",
@@ -84597,7 +84565,6 @@
       "release/atm-root-drop/tests/cli/runtime-telemetry-boundary.test.ts",
       "release/atm-root-drop/tests/cli/scope-amendment-rearbitration.test.ts",
       "release/atm-root-drop/tests/cli/scope-amendment-work-admission-ticket.test.ts",
-      "release/atm-root-drop/tests/cli/sealed-build-log-sink.test.ts",
       "release/atm-root-drop/tests/cli/sealed-runner-build-input-cache.test.ts",
       "release/atm-root-drop/tests/cli/sealed-runner-build-junction-cleanup.test.ts",
       "release/atm-root-drop/tests/cli/sealed-runner-publication-lifecycle.test.ts",
@@ -84786,6 +84753,7 @@
       "release/atm-root-drop/tests/core/causal-repair-receipt.test.ts",
       "release/atm-root-drop/tests/core/composer-serializability.test.ts",
       "release/atm-root-drop/tests/core/content-anchor-resolver.test.ts",
+      "release/atm-root-drop/tests/core/cross-session-overlap.test.ts",
       "release/atm-root-drop/tests/core/id-allocator.test.ts",
       "release/atm-root-drop/tests/core/live-queued-write.test.ts",
       "release/atm-root-drop/tests/core/map-generator.test.ts",
@@ -85109,22 +85077,34 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:cde38aaa6693b454621cd331f42243b397a24e88424e3e4c41af2b88b35a12f4",
-  "sealedSourceCommit": "a580e6ec5860f35160d6c15a6adc9201ea415d77",
-  "buildDecision": "fullRebuild",
-  "buildDecisionReason": "build-script-change",
-  "incrementalPlanDigest": "sha256:3604eb9d4c42c9b564735d7c79a09ed097451d357fcf597ed32d202e5c9c1382",
-  "tsBuildCacheDigest": "sha256:86344c8ad91a14a51649d25c76d6304db4433dd76bd58fa79c5a18c403e58d4a",
+  "buildInputsTreeHash": "sha256:14ce721c06a7b3edc27dae7347c61bd68ecac3bc7cd0cb48c700322d7a28dee9",
+  "sealedSourceCommit": "cd759dc2a53d5f95212fbf726db745c9ad0f1b88",
+  "buildDecision": "cacheHitSkip",
+  "buildDecisionReason": "build input tree hash matches release manifests",
+  "incrementalPlanDigest": null,
+  "tsBuildCacheDigest": null,
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
     "inputHashCalculation": 16,
-    "skipDecision": 28,
-    "worktreeSetup": 18842,
-    "typescriptBuild": 17502,
-    "rootDropReleaseAssembly": 12173,
-    "onefileReleaseAssembly": 10439,
-    "artifactSync": 637,
+    "skipDecision": 73,
+    "worktreeSetup": 0,
+    "typescriptBuild": 0,
+    "rootDropReleaseAssembly": 0,
+    "onefileReleaseAssembly": 0,
+    "artifactSync": 0,
     "cleanup": 0,
-    "totalElapsed": 65123
+    "totalElapsed": 5909
+  },
+  "dominantPhaseSummary": {
+    "schemaId": "atm.runnerSyncDominantPhaseSummary.v1",
+    "dominantPhase": "skipDecision",
+    "dominantPhaseMs": 73,
+    "totalElapsedMs": 5909,
+    "dominanceRatio": 0.0124,
+    "phaseMedianMs": 0,
+    "phaseP95Ms": 73,
+    "measuredPhaseCount": 8,
+    "optimizationVerdict": "inconclusive",
+    "basis": "single-run"
   }
 }
