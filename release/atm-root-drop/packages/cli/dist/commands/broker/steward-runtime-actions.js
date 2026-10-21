@@ -26,21 +26,27 @@ function applyLiveStewardWrites(options) {
         cwd: options.cwd,
         proposals,
         scopeFiles: options.scopeFiles,
-        stewardId: options.stewardId ?? 'neutral-write-steward'
+        stewardId: options.stewardId ?? 'neutral-write-steward',
+        ackOverlap: options.ackOverlap ?? []
     });
     const rejected = result.writes.filter((write) => write.decision !== 'accepted');
     const acceptedCount = result.writes.length - rejected.length;
+    const crossSession = rejected.filter((write) => write.reasonCode === 'cross-session-overlap');
     return makeResult({
         ok: result.ok,
         command: 'broker',
         cwd: options.cwd,
         messages: [
-            message(result.ok ? 'info' : rejected.some((write) => write.decision === 'kit-error') ? 'error' : 'warn', result.ok ? 'ATM_BROKER_LIVE_WRITE_APPLIED' : 'ATM_BROKER_LIVE_WRITE_QUEUED', result.ok
+            message(result.ok ? 'info' : rejected.some((write) => write.decision === 'kit-error') ? 'error' : 'warn', result.ok ? 'ATM_BROKER_LIVE_WRITE_APPLIED' : crossSession.length > 0 ? 'ATM_BROKER_LIVE_WRITE_CROSS_SESSION_OVERLAP' : 'ATM_BROKER_LIVE_WRITE_QUEUED', result.ok
                 ? `Live steward committed ${acceptedCount} write(s) without a precomputed merge plan.`
-                : `Live steward committed ${acceptedCount} write(s) and queued ${rejected.length} without touching the file for those.`, {
+                : crossSession.length > 0
+                    ? `Live steward rejected ${crossSession.length} write(s) that target another session's committed lines: ${crossSession.map((write) => write.detail).join(' | ')}`
+                    : `Live steward committed ${acceptedCount} write(s) and queued ${rejected.length} without touching the file for those.`, {
                 acceptedCount,
                 rejectedCount: rejected.length,
                 reasonCodes: rejected.map((write) => write.reasonCode),
+                crossSessionOverlap: crossSession.flatMap((write) => write.crossSessionOverlap ?? []).map(({ actorId, proposalId, commitSha }) => ({ actorId, proposalId, commitSha })),
+                acknowledgedOverlap: result.writes.flatMap((write) => write.acknowledgedOverlap ?? []),
                 planRequired: false
             })
         ],

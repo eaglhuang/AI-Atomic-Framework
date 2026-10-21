@@ -1,0 +1,277 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0145",
+  "title": "Refresh the broker --help snapshot for --ack-overlap (#360 follow-up)",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [
+    "TASK-PRF-0144"
+  ],
+  "acceptance": [
+    "`validate-cli --mode test` passes."
+  ],
+  "deliverables": [
+    "tests/cli-fixtures/help-snapshots/broker.json"
+  ],
+  "scopePaths": [
+    ".atm/history/evidence/TASK-PRF-0145.*",
+    ".atm/history/task-events/TASK-PRF-0145/**",
+    ".atm/history/tasks/TASK-PRF-0145.json",
+    ".atm/task-plans/TASK-PRF-0145.md",
+    "PROGRESS.md",
+    "tests/cli-fixtures/help-snapshots/broker.json",
+    "packages/cli/dist",
+    "packages/cli/dist/**",
+    "release/atm-onefile/**",
+    "release/atm-root-drop/**"
+  ],
+  "validators": [
+    "node --strip-types scripts/validate-cli.ts --mode test"
+  ],
+  "planningRepo": "AI-Atomic-Framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [
+    "No behaviour change. Do not re-pin the hist-v2 smoke runbook. Do not tag or publish npm."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the delivery commit.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 1 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": ".atm/task-plans/TASK-PRF-0145.md",
+    "sectionTitle": "TASK-PRF-0145",
+    "headingLine": 37,
+    "hash": "29ae32a8b5a479bb",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/AI-Atomic-Framework.git",
+      "repoRoot": "/workspace/AI-Atomic-Framework-360/AI-Atomic-Framework",
+      "taskCardPath": ".atm/task-plans/TASK-PRF-0145.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:29ae32a8b5a479bbc24850633be143e65fab84b656a0680f753e5a4e86ffb43e",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-10-21T00:12:05.357Z"
+    }
+  },
+  "importedAt": "2026-10-21T00:12:05.357Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.scripts.validate.cli.ts.mode.test",
+      "command": "node --strip-types scripts/validate-cli.ts --mode test",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": [
+      {
+        "taskId": "TASK-PRF-0144",
+        "relation": "legacy-untyped",
+        "admissionMode": "legacy-status-gate",
+        "provenFacts": [],
+        "missingFacts": [],
+        "contradictions": [],
+        "producerOutput": null,
+        "producerOutputSatisfied": false,
+        "negativeControlCommand": null,
+        "blockingCandidate": false
+      }
+    ]
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "dependencies"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-10-21T00-17-51-679Z-close-b4bea4b490d7",
+  "lastTransitionAt": "2026-10-21T00:17:51.679Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "grok-bot",
+  "reservedAt": "2026-10-21T00:12:08.421Z",
+  "promotedAt": "2026-10-21T00:12:08.424Z",
+  "claim": {
+    "actorId": "grok-bot",
+    "leaseId": "lease-0a1298e89199",
+    "claimedAt": "2026-10-21T00:12:08.427Z",
+    "heartbeatAt": "2026-10-21T00:17:51.677Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-PRF-0145.json",
+      ".atm/history/evidence/TASK-PRF-0145.*",
+      ".atm/history/task-events/TASK-PRF-0145/**",
+      ".atm/task-plans/TASK-PRF-0145.md",
+      "packages/cli/dist",
+      "packages/cli/dist/**",
+      "PROGRESS.md",
+      "release/atm-onefile/**",
+      "release/atm-root-drop/**",
+      "tests/cli-fixtures/help-snapshots/broker.json"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20261021001208-grok-bot-0a54d2db17",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261021001208-grok-bot-0a54d2db17\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-10-21T00:12:08.427Z",
+  "startedByActor": "grok-bot",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-6e755ad6e09d286c",
+    "ticketDigest": "sha256:6e755ad6e09d286ce0f57d400a07fea948795ce4300662de585228b12e2226d6",
+    "taskId": "TASK-PRF-0145",
+    "origin": "claim",
+    "actorId": "grok-bot",
+    "laneSessionId": "lane-20261021001208-grok-bot-0a54d2db17",
+    "claimGeneration": "lease-0a1298e89199",
+    "issuedAt": "2026-10-21T00:12:08.427Z",
+    "expiresAt": "2026-10-21T00:42:08.427Z",
+    "scopeDigest": "sha256:5f5c4b134c1aa52506add02e6309a6aad687b4429a41f21d82fb5b6a25a7e894",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-10-21T00:12:08.427Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0145.*",
+          ".atm/history/task-events/TASK-PRF-0145/**",
+          ".atm/history/tasks/TASK-PRF-0145.json",
+          ".atm/task-plans/TASK-PRF-0145.md",
+          "PROGRESS.md",
+          "packages/cli/dist",
+          "packages/cli/dist/**",
+          "release/atm-onefile/**",
+          "release/atm-root-drop/**",
+          "tests/cli-fixtures/help-snapshots/broker.json"
+        ],
+        "digest": "sha256:4f9fc3d8bb6f76a7725a3b014e82cd72043d5487065894653c3ea9b70cd3d7b4"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20261021001208-grok-bot-TASK-PRF-0145-e10e2d5155",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0145",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0145.*",
+      ".atm/history/task-events/TASK-PRF-0145/**",
+      ".atm/history/tasks/TASK-PRF-0145.json",
+      ".atm/task-plans/TASK-PRF-0145.md",
+      "packages/cli/dist",
+      "packages/cli/dist/**",
+      "PROGRESS.md",
+      "release/atm-onefile/**",
+      "release/atm-root-drop/**",
+      "tests/cli-fixtures/help-snapshots/broker.json"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "dc4ecacd33e2231a2d70c5794cbbfd33470754a5665befdf970b6f0b091add34",
+    "actorId": "grok-bot",
+    "sessionId": "session-20261021001208-grok-bot-TASK-PRF-0145-e10e2d5155",
+    "laneSession": {
+      "laneSessionId": "lane-20261021001208-grok-bot-0a54d2db17",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261021001208-grok-bot-0a54d2db17\""
+    },
+    "createdAt": "2026-10-21T00:12:10.637Z",
+    "status": "active"
+  },
+  "closedAt": "2026-10-21T00:17:51.678Z",
+  "closedByActor": "grok-bot",
+  "closedBySessionId": "session-20261021001208-grok-bot-TASK-PRF-0145-e10e2d5155",
+  "closurePacket": ".atm/history/evidence/TASK-PRF-0145.closure-packet.json"
+}

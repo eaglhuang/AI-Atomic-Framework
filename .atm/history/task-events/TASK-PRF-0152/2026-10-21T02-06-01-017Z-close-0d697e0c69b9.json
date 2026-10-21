@@ -1,0 +1,57 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-10-21T02-06-01-017Z-close-0d697e0c69b9",
+  "taskId": "TASK-PRF-0152",
+  "action": "close",
+  "actorId": "grok-bot",
+  "sessionId": "session-20261021020310-grok-bot-TASK-PRF-0152-67f5f899c0",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0152.json",
+  "taskSha256": "sha256:d93785db382b2c964ee5a217b4603670ea17cdcde49b19fd7ac619f2bb3b2063",
+  "createdAt": "2026-10-21T02:06:01.017Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0152 --actor grok-bot --status done --historical-delivery cc00da44f38abf98249fd89eb1bce4a47a25eb13",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20261021020310-grok-bot-TASK-PRF-0152-67f5f899c0",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0152.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types scripts/preclose-check.ts",
+      "node --strip-types tests/cli/physical-line-budget-gate.test.ts"
+    ],
+    "requiredGates": [
+      "node --strip-types scripts/preclose-check.ts",
+      "node --strip-types tests/cli/physical-line-budget-gate.test.ts"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-10-21T02:06:01.009Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0152.*",
+        ".atm/history/task-events/TASK-PRF-0152/**",
+        ".atm/history/tasks/TASK-PRF-0152.json",
+        ".atm/task-plans/TASK-PRF-0152.md",
+        "packages/cli/dist",
+        "packages/cli/dist/**",
+        "release/atm-onefile/**",
+        "release/atm-onefile/release-manifest.json",
+        "release/atm-root-drop/**"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/dist",
+        "packages/cli/dist/**"
+      ],
+      "requiredGates": [
+        "node --strip-types scripts/preclose-check.ts",
+        "node --strip-types tests/cli/physical-line-budget-gate.test.ts"
+      ]
+    }
+  }
+}

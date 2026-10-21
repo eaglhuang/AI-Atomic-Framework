@@ -210,6 +210,8 @@ const actorId = sessionActor(argValue('--actor') || process.env.ATM_ACTOR || 'pr
 const taskId = argValue('--task') || process.env.ATM_TASK || `prereg-${actorId}`;
 const message = argValue('--message') || `prereg-v3-smoke: ${taskId} ${relativeFile}`;
 const baseFile = argValue('--base-file');
+// #360: an explicit override of another session's committed lines, naming their proposal id(s).
+const ackOverlap = argValue('--ack-overlap');
 const patch = patchArg === '-' ? readFileSync(0, 'utf8') : readFileSync(path.resolve(patchArg), 'utf8');
 
 const attempt = Math.max(1, Number(argValue('--attempt') || process.env.PREREG_WRITE_ATTEMPT || 1) || 1);
@@ -349,7 +351,8 @@ function submitLive(input) {
     '--cwd', input.writableRoot,
     '--proposal-file', relativeProposal,
     '--scope-file', input.relativeFile,
-    '--steward-id', STEWARD_ID
+    '--steward-id', STEWARD_ID,
+    ...(ackOverlap ? ['--ack-overlap', ackOverlap] : [])
   ], input.writableRoot, input.safePath);
   const payload = parseCli(applied);
   const live = payload?.evidence?.liveWrites?.[0] || null;
@@ -381,6 +384,8 @@ function submitLive(input) {
     file: input.relativeFile,
     declaredBaseHash: fileBeforeHash,
     hunkOffsets: declaredBase.located ? hunkOffsetsOf(declaredBase.located) : null,
+    crossSessionOverlap: Array.isArray(live?.crossSessionOverlap) ? live.crossSessionOverlap : null,
+    acknowledgedOverlap: Array.isArray(live?.acknowledgedOverlap) ? live.acknowledgedOverlap : null,
     currentFileText: text,
     currentFileHash: live?.currentFileHash || (text === null ? null : sha256Bytes(Buffer.from(text, 'utf8'))),
     batchSize: 1,

@@ -1,5 +1,6 @@
 import { assert, assertMessageCode, assertReadable, createCliTempWorkspace, existsSync, initializeGitRepository, path, readFileSync, readJson, resolveTaskScopedCommitBundle, root, runAtm, runAtmSpawned, safeRmSync, spawnSync, type ValidateCliContext, writeJson } from './context.ts';
 
+import { helpUsageMatches, listedHelpCommands } from './help-snapshots.ts';
 import { runFocusedRegressions } from './focused-regressions.ts';
 
 export async function runSurfaceSuite(ctx: ValidateCliContext) {
@@ -88,10 +89,7 @@ async function assertHelpSurfaces(ctx: ValidateCliContext) {
   const globalHelp = await runAtm(['--help'], root);
   assert(globalHelp.exitCode === 0, '--help must exit 0');
   assertReadable(globalHelp, '--help');
-  const listedCommands = (Array.isArray(globalHelp.parsed.evidence?.commands) ? globalHelp.parsed.evidence.commands : [])
-    .map((entry: any) => typeof entry === 'string' ? entry : entry.command)
-    .filter(Boolean)
-    .sort((left: any, right: any) => left.localeCompare(right));
+  const listedCommands = listedHelpCommands(globalHelp.parsed.evidence);
   assert(JSON.stringify(ctx.runnerCommandNames) === JSON.stringify(ctx.allSpecCommandNames), 'runner registry and command spec registry must stay in sync');
   assert(JSON.stringify(listedCommands) === JSON.stringify(ctx.publicCommandNames), '--help command list must match public command specs');
   assert(JSON.stringify(listedCommands) === JSON.stringify([...ctx.helpCommandSnapshot.commands].sort((left, right) => left.localeCompare(right))), '--help command list must match snapshot fixture');
@@ -108,7 +106,7 @@ async function assertHelpSurfaces(ctx: ValidateCliContext) {
     assertReadable(commandHelp, `${commandName} --help`);
     const snapshotUsage = (ctx.perCommandHelpSnapshots as Record<string, any>)[commandName];
     if (snapshotUsage) {
-      assert(JSON.stringify(commandHelp.parsed.evidence?.usage ?? null) === JSON.stringify(snapshotUsage), `${commandName} --help usage snapshot must match fixture`);
+      assert(helpUsageMatches(commandHelp.parsed.evidence?.usage, snapshotUsage), `${commandName} --help usage snapshot must match fixture`);
     }
   }
 }

@@ -45,6 +45,7 @@ export default defineCommandSpec({
         { flag: '--persist-merge-plan', summary: 'Persist a broker-computed compose plan to its canonical runtime path; compose is read-only unless this flag is present.' },
         { flag: '--merge-plan-file', value: 'path', summary: 'Path to MergePlan JSON payload for steward plan / apply.' },
         { flag: '--scope-file', value: 'path', summary: 'Scoped file-write target allowed for steward apply or runtime activate. Repeatable.' },
+        { flag: '--ack-overlap', value: 'proposalId', summary: 'steward apply-live: explicitly override another session\'s committed lines named by a cross-session-overlap rejection. Repeatable or comma-separated.' },
         { flag: '--steward-id', value: 'id', summary: 'Neutral write steward identifier.' },
         { flag: '--evidence-out', value: 'path', summary: 'Output path for steward apply or runtime activation evidence JSON.' },
         { flag: '--run-evidence-dir', value: 'path', summary: 'Directory to write broker batch run records (default: .atm/runtime/broker-collision-evidence/runs, resolved against --cwd).' },

@@ -4,9 +4,10 @@
 // and a disposition; the sweep also fails when a quarantined test starts passing
 // cleanly, so the quarantine cannot silently outlive its reason.
 import { spawn, spawnSync } from 'node:child_process';
-import { readdirSync, readFileSync } from 'node:fs';
+import { appendFileSync, mkdirSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { formatAtmResultLine } from './lib/atm-result-line.ts';
 
 export interface QuarantineEntry {
   readonly test: string;
@@ -44,6 +45,7 @@ export interface SweepBatchTrace {
 }
 
 export interface SweepRunOptions {
+  readonly logFile?: string;
   readonly onBatch?: (trace: SweepBatchTrace) => void;
 }
 
@@ -93,12 +95,17 @@ function preserveBatchChanges(root: string): void {
   // writer's changes, or an older user stash when creation failed.
 }
 
-function runOne(root: string, testDir: string, test: string, timeoutMs: number): Promise<Omit<TestResult, 'dirtied'>> {
+function runOne(root: string, testDir: string, test: string, timeoutMs: number, logFile?: string): Promise<Omit<TestResult, 'dirtied'>> {
   return new Promise((resolve) => {
     const started = Date.now();
-    const child = spawn(process.execPath, ['--strip-types', path.join(testDir, test)], { cwd: root, stdio: ['ignore', 'ignore', 'pipe'] });
+    const child = spawn(process.execPath, ['--strip-types', path.join(testDir, test)], { cwd: root, stdio: ['ignore', logFile ? 'pipe' : 'ignore', 'pipe'] });
+    if (logFile) {
+      appendFileSync(logFile, `\n[test] ${test}\n`);
+      child.stdout?.on('data', (chunk) => appendFileSync(logFile, chunk));
+      child.stderr?.on('data', (chunk) => appendFileSync(logFile, chunk));
+    }
     let stderr = '';
-    child.stderr.on('data', (chunk) => { stderr = (stderr + chunk).slice(-4000); });
+    child.stderr!.on('data', (chunk) => { stderr = (stderr + chunk).slice(-4000); });
     let timedOut = false;
     const timer = setTimeout(() => { timedOut = true; child.kill('SIGKILL'); }, timeoutMs);
     child.on('close', (code) => {
@@ -121,7 +128,7 @@ export async function runSweep(root: string, config: SweepConfig, only?: readonl
       throw new Error('CLI sweep requires a clean dedicated worktree; existing WIP is preserved. Use an isolated test checkout.');
     }
     const batchStarted = Date.now();
-    const outcomes = await Promise.all(batch.map((test) => runOne(root, testDir, test, config.timeoutMs)));
+    const outcomes = await Promise.all(batch.map((test) => runOne(root, testDir, test, config.timeoutMs, options.logFile)));
     const added = [...worktreeState(root)].filter((line) => !before.has(line));
     const dirtyRetry = added.length > 0 && batch.length > 1;
     options.onBatch?.({
@@ -150,7 +157,7 @@ export async function runSweep(root: string, config: SweepConfig, only?: readonl
   return results;
 }
 
-async function main(): Promise<void> {
+async function main(logFile?: string): Promise<void> {
   const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
   const configPath = path.join(root, 'scripts/cli-test-sweep.config.json');
   const config = JSON.parse(readFileSync(configPath, 'utf8')) as SweepConfig;
@@ -178,13 +185,14 @@ async function main(): Promise<void> {
   const startedAt = Date.now();
   const selected = available.filter((test) => includeQuarantine ? quarantined.has(test) : !quarantined.has(test)).sort();
   const serial = new Set((config.serial ?? []).map((entry) => entry.test));
-  const results = await runSweep(root, config, selected.filter((test) => !serial.has(test)), { onBatch: (trace) => batches.push(trace) });
+  const results = await runSweep(root, config, selected.filter((test) => !serial.has(test)), { logFile, onBatch: (trace) => batches.push(trace) });
   if (worktreeState(root).size === 0) {
-    results.push(...await runSweep(root, { ...config, concurrency: 1 }, selected.filter((test) => serial.has(test)), { onBatch: (trace) => batches.push(trace) }));
+    results.push(...await runSweep(root, { ...config, concurrency: 1 }, selected.filter((test) => serial.has(test)), { logFile, onBatch: (trace) => batches.push(trace) }));
   }
   const completedTests = new Set(results.map((result) => result.test));
   const skippedTests = selected.filter((test) => !completedTests.has(test));
   const failures = results.filter((result) => includeQuarantine ? isClean(result) : !isClean(result));
+  sweepFailures = [...failures.map((result) => result.test), ...skippedTests].slice(0, 3);
   const slowTests = [...results]
     .sort((left, right) => right.durationMs - left.durationMs || left.test.localeCompare(right.test))
     .slice(0, 20)
@@ -217,4 +225,31 @@ async function main(): Promise<void> {
   process.exitCode = summary.ok ? 0 : 1;
 }
 
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) await main();
+let sweepFailures: string[] = [];
+
+async function runMain(): Promise<void> {
+  const index = process.argv.indexOf('--log-file');
+  const logFile = index >= 0 ? process.argv[index + 1] : process.env.ATM_SWEEP_LOG_FILE;
+  if (!logFile) return main();
+  const originalLog = console.log;
+  const originalError = console.error;
+  let hint = '';
+  try {
+    mkdirSync(path.dirname(logFile), { recursive: true });
+    const writeLog = (...values: unknown[]) => appendFileSync(logFile, `${values.join(' ')}\n`);
+    console.log = writeLog;
+    console.error = (...values: unknown[]) => { hint = values.join(' '); writeLog(...values); };
+    await main(logFile);
+  } catch (error) {
+    process.exitCode = 1;
+    hint = (error as Error).message;
+    try { appendFileSync(logFile, `${hint}\n`); } catch {}
+  } finally {
+    console.log = originalLog;
+    console.error = originalError;
+  }
+  const ok = !process.exitCode;
+  console.log(formatAtmResultLine({ step: 'sweep', status: ok ? 'ok' : 'fail', code: ok ? 'SWEEP_OK' : 'SWEEP_FAILED', log: logFile, hint: ok ? '' : `${sweepFailures.join(', ') || hint}; see log` }));
+}
+
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) await runMain();

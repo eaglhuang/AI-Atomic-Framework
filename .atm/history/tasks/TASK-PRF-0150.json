@@ -1,0 +1,413 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0150",
+  "title": "Governance friction quick fixes: one-line results, pre-close check, help snapshot regen, stale tests",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "New tests pass; both previously failing tests pass; physical-line-budget gate and typecheck pass.",
+    "`help-snapshots:update` on clean main produces no diff."
+  ],
+  "deliverables": [
+    "scripts/lib/atm-result-line.ts",
+    "scripts/sealed-build-log-sink.ts",
+    "scripts/preclose-check.ts",
+    "scripts/update-help-snapshots.ts",
+    "AGENTS.md"
+  ],
+  "scopePaths": [
+    ".atm/history/evidence/TASK-PRF-0150.*",
+    ".atm/history/task-events/TASK-PRF-0150/**",
+    ".atm/history/tasks/TASK-PRF-0150.json",
+    ".atm/task-plans/TASK-PRF-0150.md",
+    "AGENTS.md",
+    "package.json",
+    "scripts/lib/atm-result-line.ts",
+    "scripts/sealed-build-log-sink.ts",
+    "scripts/preclose-check.ts",
+    "scripts/update-help-snapshots.ts",
+    "scripts/run-sealed-runner-build.ts",
+    "scripts/run-cli-test-sweep.ts",
+    "scripts/validate-cli/**",
+    "tests/cli/atm-result-line.test.ts",
+    "tests/cli/sealed-build-log-sink.test.ts",
+    "tests/cli/help-snapshots.test.ts",
+    "tests/cli/preclose-check.test.ts",
+    "tests/cli/cli-test-sweep.test.ts",
+    "tests/core/transactional-steward-single-write.test.ts",
+    "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+    "packages/cli/dist",
+    "packages/cli/dist/**",
+    "release/atm-onefile/**",
+    "release/atm-root-drop/**"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/atm-result-line.test.ts",
+    "node --strip-types tests/cli/sealed-build-log-sink.test.ts",
+    "node --strip-types tests/cli/help-snapshots.test.ts",
+    "node --strip-types tests/cli/preclose-check.test.ts",
+    "node --strip-types tests/cli/cli-test-sweep.test.ts",
+    "node --strip-types tests/core/transactional-steward-single-write.test.ts",
+    "node --strip-types packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+    "node --strip-types tests/cli/physical-line-budget-gate.test.ts",
+    "node --strip-types scripts/preclose-check.ts"
+  ],
+  "planningRepo": "AI-Atomic-Framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [
+    "No change to taskflow close semantics or product runtime code.",
+    "Hard proposals (detached close, bundle filtering, amend path, CLI-wide result line, validator reuse, ship wrapper) are design-only in a separate PR.",
+    "Do not tag or publish npm."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the delivery commit.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 9 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": ".atm/task-plans/TASK-PRF-0150.md",
+    "sectionTitle": "TASK-PRF-0150",
+    "headingLine": 64,
+    "hash": "0ebfcf3e19df7161",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/AI-Atomic-Framework.git",
+      "repoRoot": "/workspace/AI-Atomic-Framework-gov/AI-Atomic-Framework",
+      "taskCardPath": ".atm/task-plans/TASK-PRF-0150.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:0ebfcf3e19df7161e21424fa672a02aa8169cccf2459f145df179f331ac1bf0f",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-10-21T01:04:38.843Z"
+    }
+  },
+  "importedAt": "2026-10-21T01:04:38.843Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.atm.result.line.test.ts",
+      "command": "node --strip-types tests/cli/atm-result-line.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.sealed.build.log.sink.test.ts",
+      "command": "node --strip-types tests/cli/sealed-build-log-sink.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.help.snapshots.test.ts",
+      "command": "node --strip-types tests/cli/help-snapshots.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.preclose.check.test.ts",
+      "command": "node --strip-types tests/cli/preclose-check.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.cli.test.sweep.test.ts",
+      "command": "node --strip-types tests/cli/cli-test-sweep.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.core.transactional.steward.single.write.test.ts",
+      "command": "node --strip-types tests/core/transactional-steward-single-write.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.packages.cli.src.commands.git.governance.implementation.commit.bundle.resolution.test.ts",
+      "command": "node --strip-types packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.physical.line.budget.gate.test.ts",
+      "command": "node --strip-types tests/cli/physical-line-budget-gate.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.scripts.preclose.check.ts",
+      "command": "node --strip-types scripts/preclose-check.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "dependencies"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-10-21T01-09-34-034Z-close-088a22dce950",
+  "lastTransitionAt": "2026-10-21T01:09:34.034Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "grok-bot",
+  "reservedAt": "2026-10-21T01:05:06.657Z",
+  "promotedAt": "2026-10-21T01:05:06.659Z",
+  "claim": {
+    "actorId": "grok-bot",
+    "leaseId": "lease-48d18dd1428d",
+    "claimedAt": "2026-10-21T01:05:06.661Z",
+    "heartbeatAt": "2026-10-21T01:09:34.032Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-PRF-0150.json",
+      ".atm/history/evidence/TASK-PRF-0150.*",
+      ".atm/history/task-events/TASK-PRF-0150/**",
+      ".atm/task-plans/TASK-PRF-0150.md",
+      "AGENTS.md",
+      "package.json",
+      "packages/cli/dist",
+      "packages/cli/dist/**",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+      "release/atm-onefile/**",
+      "release/atm-root-drop/**",
+      "scripts/lib/atm-result-line.ts",
+      "scripts/preclose-check.ts",
+      "scripts/run-cli-test-sweep.ts",
+      "scripts/run-sealed-runner-build.ts",
+      "scripts/sealed-build-log-sink.ts",
+      "scripts/update-help-snapshots.ts",
+      "scripts/validate-cli/**",
+      "tests/cli/atm-result-line.test.ts",
+      "tests/cli/cli-test-sweep.test.ts",
+      "tests/cli/help-snapshots.test.ts",
+      "tests/cli/preclose-check.test.ts",
+      "tests/cli/sealed-build-log-sink.test.ts",
+      "tests/core/transactional-steward-single-write.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20261021010506-grok-bot-9c8396f6c6",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261021010506-grok-bot-9c8396f6c6\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-10-21T01:05:06.661Z",
+  "startedByActor": "grok-bot",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-57647bfbcf4fd785",
+    "ticketDigest": "sha256:57647bfbcf4fd7852337176d4fb4651349357edbd7967d0d3f82415bf17012e4",
+    "taskId": "TASK-PRF-0150",
+    "origin": "claim",
+    "actorId": "grok-bot",
+    "laneSessionId": "lane-20261021010506-grok-bot-9c8396f6c6",
+    "claimGeneration": "lease-48d18dd1428d",
+    "issuedAt": "2026-10-21T01:05:06.661Z",
+    "expiresAt": "2026-10-21T01:35:06.661Z",
+    "scopeDigest": "sha256:9bea8314cfbb3a22ca96c7bd23a2ceab3b4c17dfbaf51856660bc7f1942d67d2",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-10-21T01:05:06.661Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0150.*",
+          ".atm/history/task-events/TASK-PRF-0150/**",
+          ".atm/history/tasks/TASK-PRF-0150.json",
+          ".atm/task-plans/TASK-PRF-0150.md",
+          "AGENTS.md",
+          "package.json",
+          "packages/cli/dist",
+          "packages/cli/dist/**",
+          "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+          "release/atm-onefile/**",
+          "release/atm-root-drop/**",
+          "scripts/lib/atm-result-line.ts",
+          "scripts/preclose-check.ts",
+          "scripts/run-cli-test-sweep.ts",
+          "scripts/run-sealed-runner-build.ts",
+          "scripts/sealed-build-log-sink.ts",
+          "scripts/update-help-snapshots.ts",
+          "scripts/validate-cli/**",
+          "tests/cli/atm-result-line.test.ts",
+          "tests/cli/cli-test-sweep.test.ts",
+          "tests/cli/help-snapshots.test.ts",
+          "tests/cli/preclose-check.test.ts",
+          "tests/cli/sealed-build-log-sink.test.ts",
+          "tests/core/transactional-steward-single-write.test.ts"
+        ],
+        "digest": "sha256:81c100fb7500f1406ffa49018b33d54db49138dbd9341e13369eaca326975413"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
+    }
+  },
+  "startedBySessionId": "session-20261021010506-grok-bot-TASK-PRF-0150-d7f4b9846e",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0150",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0150.*",
+      ".atm/history/task-events/TASK-PRF-0150/**",
+      ".atm/history/tasks/TASK-PRF-0150.json",
+      ".atm/task-plans/TASK-PRF-0150.md",
+      "AGENTS.md",
+      "package.json",
+      "packages/cli/dist",
+      "packages/cli/dist/**",
+      "packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+      "release/atm-onefile/**",
+      "release/atm-root-drop/**",
+      "scripts/lib/atm-result-line.ts",
+      "scripts/preclose-check.ts",
+      "scripts/run-cli-test-sweep.ts",
+      "scripts/run-sealed-runner-build.ts",
+      "scripts/sealed-build-log-sink.ts",
+      "scripts/update-help-snapshots.ts",
+      "scripts/validate-cli/**",
+      "tests/cli/atm-result-line.test.ts",
+      "tests/cli/cli-test-sweep.test.ts",
+      "tests/cli/help-snapshots.test.ts",
+      "tests/cli/preclose-check.test.ts",
+      "tests/cli/sealed-build-log-sink.test.ts",
+      "tests/core/transactional-steward-single-write.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "b25533211818ee456cd7411a0891bc83d084a2139ace352701c9c72b4f238236",
+    "actorId": "grok-bot",
+    "sessionId": "session-20261021010506-grok-bot-TASK-PRF-0150-d7f4b9846e",
+    "laneSession": {
+      "laneSessionId": "lane-20261021010506-grok-bot-9c8396f6c6",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261021010506-grok-bot-9c8396f6c6\""
+    },
+    "createdAt": "2026-10-21T01:05:08.607Z",
+    "status": "active"
+  },
+  "closedAt": "2026-10-21T01:09:34.032Z",
+  "closedByActor": "grok-bot",
+  "closedBySessionId": "session-20261021010506-grok-bot-TASK-PRF-0150-d7f4b9846e",
+  "closurePacket": ".atm/history/evidence/TASK-PRF-0150.closure-packet.json"
+}
