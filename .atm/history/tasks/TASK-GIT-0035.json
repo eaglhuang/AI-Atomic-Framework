@@ -1,0 +1,260 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-GIT-0035",
+  "title": "Distinguish local planning projection from cross-authority close writes",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "Every command in `validators` passes and is recorded with `node atm.mjs evidence run`.",
+    "The change is committed with `node atm.mjs git commit --task TASK-GIT-0035` and closed with `node atm.mjs taskflow close --task TASK-GIT-0035`."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/taskflow/close-orchestration.ts",
+    "packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts",
+    "tests/cli/target-owned-planning-route.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/taskflow/close-orchestration.ts",
+    "packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts",
+    "tests/cli/target-owned-planning-route.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/target-owned-planning-route.test.ts",
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts",
+    "git diff --check"
+  ],
+  "planningRepo": "AI-Atomic-Framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the delivery commit if the change fails validation.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 3 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "tasks/TASK-GIT-0035.task.md",
+    "sectionTitle": "TASK-GIT-0035",
+    "headingLine": 34,
+    "hash": "89dc00546708e053",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/AI-Atomic-Framework.git",
+      "repoRoot": "C:/Users/User/AI-Atomic-Framework",
+      "taskCardPath": "tasks/TASK-GIT-0035.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:89dc00546708e0535b18fff7a85855dd9a59a42b9361bde281379c828ca43606",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-10-21T09:46:59.555Z"
+    }
+  },
+  "importedAt": "2026-10-21T09:46:59.555Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.target.owned.planning.route.test.ts",
+      "command": "node --strip-types tests/cli/target-owned-planning-route.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.packages.cli.src.commands.taskflow.tests.taskflow.close.crash.matrix.test.ts",
+      "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_git.diff.check",
+      "command": "git diff --check",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "dependencies"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-10-21T09-47-15-098Z-claim-0556b448d47b",
+  "lastTransitionAt": "2026-10-21T09:47:15.098Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-6",
+  "reservedAt": "2026-10-21T09:47:07.319Z",
+  "promotedAt": "2026-10-21T09:47:07.324Z",
+  "claim": {
+    "actorId": "codex-gpt-6",
+    "leaseId": "lease-cb2ae60dca50",
+    "claimedAt": "2026-10-21T09:47:07.329Z",
+    "heartbeatAt": "2026-10-21T09:47:07.329Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-GIT-0035.json",
+      "packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "tests/cli/target-owned-planning-route.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20261021094707-codex-gpt-6-7b5874f4f4",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261021094707-codex-gpt-6-7b5874f4f4\""
+    }
+  },
+  "startedAt": "2026-10-21T09:47:07.329Z",
+  "startedByActor": "codex-gpt-6",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-99fbf89d9445d1f2",
+    "ticketDigest": "sha256:99fbf89d9445d1f2ebb9042e4d8c08e24d61309519e0b3afd77593b1609cb9b8",
+    "taskId": "TASK-GIT-0035",
+    "origin": "claim",
+    "actorId": "codex-gpt-6",
+    "laneSessionId": "lane-20261021094707-codex-gpt-6-7b5874f4f4",
+    "claimGeneration": "lease-cb2ae60dca50",
+    "issuedAt": "2026-10-21T09:47:07.329Z",
+    "expiresAt": "2026-10-21T10:17:07.329Z",
+    "scopeDigest": "sha256:d6896fa64ad4ab5ac691202255e598e7e09dc259c1d6b2dd5d03bc162031b6f2",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-10-21T09:47:07.329Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-GIT-0035.*",
+          ".atm/history/task-events/TASK-GIT-0035/**",
+          ".atm/history/tasks/TASK-GIT-0035.json",
+          "packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts",
+          "packages/cli/src/commands/taskflow/close-orchestration.ts",
+          "tests/cli/target-owned-planning-route.test.ts"
+        ],
+        "digest": "sha256:a14a8e18de62a4baaaceaec412183360d51274cd8e0f17686eed7f3383af8cd0"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20261021094707-codex-gpt-6-TASK-GIT-0035-d107781e38",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-GIT-0035",
+    "batchId": "batch-b4225de6ed1a",
+    "scopeKey": "TASK-PRF",
+    "queueId": "queue-227469bd783a478c",
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-GIT-0035.*",
+      ".atm/history/task-events/TASK-GIT-0035/**",
+      ".atm/history/tasks/TASK-GIT-0035.json",
+      "packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "tests/cli/target-owned-planning-route.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "9c11fe1dd73683f063516b160d76dc5ad8f29dba02a26b4ce577c5bc83c77940",
+    "actorId": "codex-gpt-6",
+    "sessionId": "session-20261021094707-codex-gpt-6-TASK-GIT-0035-d107781e38",
+    "laneSession": {
+      "laneSessionId": "lane-20261021094707-codex-gpt-6-7b5874f4f4",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261021094707-codex-gpt-6-7b5874f4f4\""
+    },
+    "createdAt": "2026-10-21T09:47:15.097Z",
+    "status": "active"
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-GIT-0035",
+  "updatedAt": "2026-10-21T09:50:47.912Z",
+  "updatedBy": "codex-gpt-6",
+  "freshValidationPasses": [
+    "git diff --check",
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts",
+    "node --strip-types tests/cli/target-owned-planning-route.test.ts"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/target-owned-planning-route.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:08bc73d450778e9c71007341ac018358572a8799a6b2e8dba2635f9180c31c09",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/target-owned-planning-route.test.ts"
+      ],
+      "generatedAt": "2026-10-21T09:50:26.430Z",
+      "startedAt": "2026-10-21T09:50:24.882Z",
+      "finishedAt": "2026-10-21T09:50:26.430Z",
+      "durationMs": 1548,
+      "runnerKind": "dev-source",
+      "sourceCommit": "dede701cb58c278eb0be8aa191fb8b2902a80f14",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7fa55b436882110790a0bf72b3510a0df69e93ccf3f80e17fb62a3b403a828d9",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts"
+      ],
+      "generatedAt": "2026-10-21T09:50:43.815Z",
+      "startedAt": "2026-10-21T09:50:30.522Z",
+      "finishedAt": "2026-10-21T09:50:43.815Z",
+      "durationMs": 13293,
+      "runnerKind": "dev-source",
+      "sourceCommit": "dede701cb58c278eb0be8aa191fb8b2902a80f14",
+      "cached": false
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:4795ce6c7f3c2d038182cf1c0d6f9690b35fe9027022d0e4a2a9b0dd8ea8472e",
+      "validators": [
+        "git diff --check"
+      ],
+      "generatedAt": "2026-10-21T09:50:47.911Z",
+      "startedAt": "2026-10-21T09:50:47.553Z",
+      "finishedAt": "2026-10-21T09:50:47.911Z",
+      "durationMs": 358,
+      "runnerKind": "dev-source",
+      "sourceCommit": "dede701cb58c278eb0be8aa191fb8b2902a80f14",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

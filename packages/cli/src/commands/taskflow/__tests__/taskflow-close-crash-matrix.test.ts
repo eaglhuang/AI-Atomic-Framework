@@ -139,7 +139,8 @@ async function makeKillAfterTargetCommitFixture() {
     targetAllowedFiles: ['src/deliver.txt'],
     planningRepo: 'planning',
     targetRepo: 'target',
-    closureAuthority: 'target_repo',
+    // This fixture intentionally commits the external planning repository.
+    // Target-owned external cards are covered separately as read-only.
     source: { planPath }
   });
   writeText(path.join(targetRepo, 'src/deliver.txt'), 'baseline\n');
