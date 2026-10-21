@@ -1,0 +1,105 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-PRF-0151",
+  "targetRepoIdentity": {
+    "kind": "framework",
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "/workspace/AI-Atomic-Framework-gov/AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "45e28e4ef6c1c165177f9bb8805d1c8b89a54465",
+  "governedTreeSha": "4fcccedca8460026892850b67c10d8a8d6097a7a",
+  "targetCommitDelta": {
+    "currentCommitSha": "45e28e4ef6c1c165177f9bb8805d1c8b89a54465",
+    "parentCommitShas": [
+      "45e28e4ef6c1c165177f9bb8805d1c8b89a54465"
+    ],
+    "governedTreeSha": "4fcccedca8460026892850b67c10d8a8d6097a7a",
+    "changedFiles": [
+      ".atm/history/task-events/TASK-PRF-0151/2026-10-21T01-11-49-058Z-import-814c7ef0e722.json",
+      ".atm/history/task-events/TASK-PRF-0151/2026-10-21T01-11-53-485Z-reserve-2b6c3822bc69.json",
+      ".atm/history/task-events/TASK-PRF-0151/2026-10-21T01-11-53-486Z-promote-32d2680b3fe3.json",
+      ".atm/history/task-events/TASK-PRF-0151/2026-10-21T01-11-55-699Z-claim-3f8f6077d902.json",
+      ".atm/history/tasks/TASK-PRF-0151.json",
+      ".atm/task-plans/TASK-PRF-0151.md",
+      "docs/governance/governance-friction-2026-10.md",
+      "docs/governance/proposals/governance-token-cost-proposals-2026-10.md",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/release-manifest.json"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/physical-line-budget-gate.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d2fd4e132423ecdc47b6ecb9057cab6ca35a4b67e224ac5eeea387875b62e087",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/physical-line-budget-gate.test.ts"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "node --strip-types tests/cli/physical-line-budget-gate.test.ts"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-10-21T01:13:18.086Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-PRF-0151.*",
+      ".atm/history/task-events/TASK-PRF-0151/**",
+      ".atm/history/tasks/TASK-PRF-0151.json",
+      ".atm/task-plans/TASK-PRF-0151.md",
+      "docs/governance/governance-friction-2026-10.md",
+      "docs/governance/proposals/**",
+      "docs/governance/proposals/governance-token-cost-proposals-2026-10.md",
+      "packages/cli/dist",
+      "packages/cli/dist/**",
+      "release/atm-onefile/**",
+      "release/atm-root-drop/**"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/dist",
+      "packages/cli/dist/**"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/physical-line-budget-gate.test.ts"
+    ]
+  },
+  "evidencePath": ".atm/runtime/evidence-ledger/bundles/TASK-PRF-0151.json",
+  "closedAt": "2026-10-21T01:13:18.086Z",
+  "closedByActor": "grok-bot",
+  "sessionId": "session-20261021011153-grok-bot-TASK-PRF-0151-ee889082ff",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "45e28e4ef6c1c165177f9bb8805d1c8b89a54465",
+    "taskMatchedFiles": [],
+    "governanceFiles": [],
+    "allowedRunnerOutputFiles": [
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/release-manifest.json"
+    ],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
