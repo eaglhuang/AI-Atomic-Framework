@@ -1,0 +1,56 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-10-21T10-23-46-906Z-close-24c789913577",
+  "taskId": "TASK-GIT-0034",
+  "action": "close",
+  "actorId": "codex-gpt-6",
+  "sessionId": "session-20261021093651-codex-gpt-6-TASK-GIT-0034-e0fe9809ce",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-GIT-0034.json",
+  "taskSha256": "sha256:4fddba40c60adab8e49e2a6c85314bdaf78d52e5e0ffe659600751c984791df4",
+  "createdAt": "2026-10-21T10:23:46.906Z",
+  "command": "node atm.mjs tasks close --task TASK-GIT-0034 --actor codex-gpt-6 --status done --historical-delivery 035aff404c425b159f4ddefd564a50ced44df817",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20261021093651-codex-gpt-6-TASK-GIT-0034-e0fe9809ce",
+    "closurePacketPath": ".atm/history/evidence/TASK-GIT-0034.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts",
+      "node --strip-types tests/cli/git-change-read-integrity.test.ts",
+      "node --strip-types tests/cli/pre-team-foundation-gate.test.ts --mode validate"
+    ],
+    "requiredGates": [
+      "git diff --check",
+      "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts",
+      "node --strip-types tests/cli/pre-team-foundation-gate.test.ts --mode validate"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-10-21T10:23:46.791Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-GIT-0034.*",
+        ".atm/history/task-events/TASK-GIT-0034/**",
+        ".atm/history/tasks/TASK-GIT-0034.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-10-21-001.json",
+        "packages/cli/src/commands/tasks/close-orchestrator/close-write.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/tasks/close-orchestrator/close-write.ts"
+      ],
+      "requiredGates": [
+        "git diff --check",
+        "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts",
+        "node --strip-types tests/cli/pre-team-foundation-gate.test.ts --mode validate"
+      ]
+    }
+  }
+}

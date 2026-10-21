@@ -194,7 +194,7 @@ export async function executeCloseWrites(input: {
   });
   const teamCleanup = createTerminalTeamRunCleanupTransaction({ cwd: options.cwd, taskId: options.taskId, terminalTaskStatus: options.status });
   let cleanedTeamRuns: ReturnType<typeof teamCleanup.cleanup> = [];
-  const indexBefore = execFileSync('git', ['write-tree'], { cwd: options.cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
+  let indexBefore: string | null = null;
   let stagedPaths: string[] = [];
   let stagedEntries: string | null = null;
   const readScopedIndex = () => execFileSync('git', ['ls-files', '--stage', '-z', '--', ...stagedPaths], { cwd: options.cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
@@ -208,6 +208,9 @@ export async function executeCloseWrites(input: {
     previousTaskContent: input.previousTaskContent,
     createdClosurePacketAbsolute: input.createdClosurePacketAbsolute,
     runWrites: () => {
+      // Snapshot admission can fail on an existing index lock. Keep that
+      // failure inside the same transaction boundary as the subsequent writes.
+      indexBefore = execFileSync('git', ['write-tree'], { cwd: options.cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
       if (input.pendingClosurePacket) {
         closurePacketPath = writeClosurePacket(options.cwd, options.taskId, input.pendingClosurePacket);
         closurePacket = input.pendingClosurePacket;
@@ -273,6 +276,7 @@ export async function executeCloseWrites(input: {
     try { teamCleanup.rollback(); } catch (rollbackError) { rollbackErrors.push(rollbackError); }
     try {
       if (stagedPaths.length) {
+        if (!indexBefore) throw new Error('Close index snapshot is unavailable; refusing index rollback');
         if (stagedEntries !== readScopedIndex()) throw new Error('Close index changed after staging; refusing to overwrite concurrent work');
         execFileSync('git', ['restore', '--source', indexBefore, '--staged', '--', ...stagedPaths], { cwd: options.cwd, stdio: ['ignore', 'ignore', 'pipe'] });
       }

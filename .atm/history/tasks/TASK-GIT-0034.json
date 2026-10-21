@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-GIT-0034",
   "title": "Keep close index snapshot failures inside the transaction boundary",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -131,8 +131,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-10-21T09-58-40-559Z-renew-ba044e807497",
-  "lastTransitionAt": "2026-10-21T09:58:40.559Z",
+  "lastTransitionId": "2026-10-21T10-23-46-906Z-close-24c789913577",
+  "lastTransitionAt": "2026-10-21T10:23:46.906Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-6",
   "reservedAt": "2026-10-21T09:36:51.688Z",
@@ -141,52 +141,54 @@
     "actorId": "codex-gpt-6",
     "leaseId": "lease-5455749c67b0",
     "claimedAt": "2026-10-21T09:36:51.699Z",
-    "heartbeatAt": "2026-10-21T09:58:39.318Z",
+    "heartbeatAt": "2026-10-21T10:23:46.804Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-GIT-0034.json",
       "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-10-21-001.json",
       "packages/cli/src/commands/tasks/close-orchestrator/close-write.ts"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
-      "laneSessionId": "lane-20261021093651-codex-gpt-6-dc2bac2485",
+      "laneSessionId": "lane-20261021100736-codex-gpt-6-e7508a8725",
       "status": "active",
-      "source": "option",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261021093651-codex-gpt-6-dc2bac2485\""
-    }
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261021100736-codex-gpt-6-e7508a8725\""
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-10-21T09:36:51.699Z",
   "startedByActor": "codex-gpt-6",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-3b97ed911481e9b2",
-    "ticketDigest": "sha256:3b97ed911481e9b2d77d1416a5ee5a192f0a3cbf8c6cb997d0a15828c5d025b8",
+    "ticketId": "wat-605166d1cb9868d2",
+    "ticketDigest": "sha256:605166d1cb9868d2662c28b691b66edea294c8f98226ea27fa94fd2abc794ed8",
     "taskId": "TASK-GIT-0034",
     "origin": "claim",
     "actorId": "codex-gpt-6",
-    "laneSessionId": "lane-20261021093651-codex-gpt-6-dc2bac2485",
+    "laneSessionId": "lane-20261021100736-codex-gpt-6-e7508a8725",
     "claimGeneration": "lease-5455749c67b0",
-    "issuedAt": "2026-10-21T09:58:39.318Z",
-    "expiresAt": "2026-10-21T10:28:39.318Z",
-    "scopeDigest": "sha256:c9c76f697b53c19a624e7a5d00b13110bd7a4631c3a960f564ac48ea62995708",
+    "issuedAt": "2026-10-21T10:07:36.099Z",
+    "expiresAt": "2026-10-21T10:37:36.099Z",
+    "scopeDigest": "sha256:72386f8c3edb2b8b5396d682d8e0a793f5cc5b19ad4db17b56ff0812ee126875",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-10-21T09:58:39.318Z"
+      "selectedAt": "2026-10-21T10:07:36.099Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/TASK-GIT-0034.*",
+          ".atm/history/evidence/git-head.json",
           ".atm/history/task-events/TASK-GIT-0034/**",
           ".atm/history/tasks/TASK-GIT-0034.json",
           "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-10-21-001.json",
           "packages/cli/src/commands/tasks/close-orchestrator/close-write.ts"
         ],
-        "digest": "sha256:3949816438b2c58f32c3fcecec4186039d25e77d753845ca1ed42b11cde8b08e"
+        "digest": "sha256:83f78c792ba232effddb8ec76ca5a859ac9cf6dcbdb7bd51e4646153236b80a3"
       },
       {
         "kind": "lifecycle-operation",
@@ -250,5 +252,9 @@
     },
     "createdAt": "2026-10-21T09:36:59.710Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-10-21T10:23:46.804Z",
+  "closedByActor": "codex-gpt-6",
+  "closedBySessionId": "session-20261021093651-codex-gpt-6-TASK-GIT-0034-e0fe9809ce",
+  "closurePacket": ".atm/history/evidence/TASK-GIT-0034.closure-packet.json"
 }

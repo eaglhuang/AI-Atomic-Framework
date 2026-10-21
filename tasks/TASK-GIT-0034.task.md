@@ -2,7 +2,7 @@
 doc_id: doc_TASK-GIT-0034
 task_id: TASK-GIT-0034
 title: "Keep close index snapshot failures inside the transaction boundary"
-status: in-progress
+status: done
 started_at: 2026-10-21T09:37:00Z
 started_by_agent: codex-gpt-6
 amendment_epoch: 1
@@ -30,6 +30,15 @@ rollback:
   notes: "Revert the delivery commit if the change fails validation."
 outOfScope: []
 nonGoals: []
+completed_at: "2026-10-21T10:23:47.186Z"
+completed_by_agent: "codex-gpt-6"
+closedAt: "2026-10-21T10:23:47.186Z"
+closedByActor: "codex-gpt-6"
+closedByCommand: atm tasks close
+lastTransitionId: "2026-10-21T10-23-47-186Z-close-e2e16e290381"
+lastTransitionAt: "2026-10-21T10:23:47.186Z"
+ledgerContractVersion: task-ledger/v1
+delivery_commit: "035aff404c425b159f4ddefd564a50ced44df817"
 ---
 
 # TASK-GIT-0034 - Keep close index snapshot failures inside the transaction boundary

@@ -82,7 +82,9 @@ export function buildClosebackPlan(input) {
     const backendSurface = input.planningAuthorityDeliveryGate?.ok === true ? 'tasks-close'
         : resolveTaskflowCloseBackend(input.diagnosis.bucket, closeMode);
     const targetOwned = String(input.taskDocument?.closureAuthority ?? input.taskDocument?.closure_authority ?? '').replace(/-/g, '_') === 'target_repo';
-    const planningMirrorPath = targetOwned ? null : input.diagnosis.triangulation.planningFrontmatter.source;
+    const planningSource = input.diagnosis.triangulation.planningFrontmatter.source;
+    const externalPlanning = planningSource ? resolveStoredPlanningPath(input.cwd ?? process.cwd(), planningSource).isExternalPlanning : false;
+    const planningMirrorPath = targetOwned && externalPlanning ? null : planningSource;
     const rosterIndexPath = input.delegationContract.policy.rosterSync.indexPath;
     const rosterClosebackCommand = rosterIndexPath && planningMirrorPath ? buildRosterClosebackCommand({ indexPath: rosterIndexPath, fromPath: planningMirrorPath }) : null;
     let backendCommand = buildTasksStatusCommand(input.taskId);

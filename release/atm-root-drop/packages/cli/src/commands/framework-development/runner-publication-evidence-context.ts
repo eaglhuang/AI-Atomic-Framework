@@ -1,3 +1,5 @@
+import { isRunnerPublicationArtifactPath } from '../../../../core/src/broker/runner-build-output-inventory.ts';
+
 export function runnerPublicationEvidencePath(taskId: string, schemaId: unknown): string | null {
   if (schemaId === 'atm.runnerSyncReceipt.v1') {
     return `.atm/history/evidence/${taskId}.runner-sync-receipt.json`;
@@ -25,7 +27,7 @@ export function isLockBackedRunnerPublicationEvidence(file: string, evidence: Re
     && evidence.entries.length > 0
     && evidence.entries.every((entry) => typeof entry?.path === 'string'
       && typeof entry?.observedDigest === 'string'
-      && /^(packages\/cli\/dist|release\/atm-root-drop|release\/atm-onefile)\//.test(normalizeRelativePath(entry.path)));
+      && isRunnerPublicationArtifactPath(normalizeRelativePath(entry.path)));
 }
 
 export function isFreshFrameworkTempLock(lock: Record<string, unknown> | null | undefined, now = Date.now()): boolean {
