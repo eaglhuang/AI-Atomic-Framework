@@ -1,3 +1,4 @@
+import { assertFinalCandidateIndex } from './candidate-file-policy.ts';
 /**
  * Git adapter for the sealed commit attribution contract.
  *
@@ -184,7 +185,7 @@ export function runWithSealedTaskScopedCommitIndex<T>(input: {
     const bundle = evidencePaths.length > 0
       ? mergeSealedCommitBundles(
         sealed,
-        sealCommitBundleFromCandidateIndex({ cwd: input.cwd, env, paths: evidencePaths }),
+        sealCommitBundleFromCandidateIndex({ cwd: input.cwd, env, paths: evidencePaths, policy: { declaredPaths: evidencePaths } }),
         { supersedingPaths: evidencePaths, surface: input.surface }
       )
       : sealed;
@@ -201,6 +202,7 @@ export function runWithSealedTaskScopedCommitIndex<T>(input: {
     // before the attempt, and the same boundary settles both exits: it decides
     // on HEAD movement rather than on control flow, and it never converts an
     // index problem into a commit failure or a commit failure into silence.
+    assertFinalCandidateIndex(input.cwd, env, { declaredPaths: bundle.entries.filter((entry) => entry.declared).map((entry) => entry.path) });
     const liveIndexSnapshot = captureLiveIndexSnapshot(input.cwd, bundle.entries.map((entry) => entry.path));
     const headBeforeCommit = readHeadCommit(input.cwd);
     let result: T;

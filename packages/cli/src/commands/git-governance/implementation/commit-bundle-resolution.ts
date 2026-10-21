@@ -1,3 +1,4 @@
+import { resolveCandidateFiles, type CandidateFilePolicy } from './candidate-file-policy.ts';
 import { isGeneratedReportPath, isPreservedForeignBootstrapReport } from '../../shared/bootstrap-report-provenance.ts';
 import {
   isCommitAttributionSideEffectPath,
@@ -406,7 +407,12 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
     : unstagedDirtyFiles.filter(
       (filePath: LegacyValue) => attributionAllowed(filePath),
     );
-  const stageCandidates = uniqueSorted([
+  const candidatePolicy: CandidateFilePolicy = {
+    declaredPaths: [...(input.taskDocument.deliverables ?? []).filter((entry: unknown): entry is string => typeof entry === "string"), ...taskOwnedProtectedOverrideAudits],
+    scopePaths: [...declaredScope, ...taskOwnedProtectedOverrideAudits],
+    readOnlyPaths: input.taskDocument.planningReadOnlyPaths ?? [],
+  };
+  const stageCandidates = resolveCandidateFiles(input.cwd, uniqueSorted([
     ...commitAttributionStageCandidates,
     ...(input.autoStage
       ? [
@@ -418,7 +424,7 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
           ...taskOwnedProtectedOverrideAudits,
         ].filter((filePath: LegacyValue) => !isCommitAttributionSideEffectPath(filePath))
       : []),
-  ]);
+  ]), candidatePolicy);
   const commitFiles = buildTaskScopedCommitFileSet({
     inScopeStagedFiles,
     inScopeStagedDeletions,
@@ -493,13 +499,15 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
   const liveSealedBundle = sealCommitBundleFromLiveIndex({
     cwd: input.cwd,
     paths: commitFiles,
+    policy: candidatePolicy,
     provenance: "task-scope",
   });
   const sealedBundle = input.autoStage && stageCandidates.length > 0
     ? withWorktreeCandidateIndex({
       cwd: input.cwd,
       paths: stageCandidates,
-      run: (env) => {
+      policy: candidatePolicy,
+      run: (env, files) => {
         protectedGovernanceStateReport = inspectProtectedGovernanceStateDestructiveChanges({
           cwd: input.cwd,
           taskId: input.taskId,
@@ -509,7 +517,7 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
         });
         return mergeSealedCommitBundles(
           liveSealedBundle,
-          sealCommitBundleFromCandidateIndex({ cwd: input.cwd, env, paths: stageCandidates }),
+          sealCommitBundleFromCandidateIndex({ cwd: input.cwd, env, paths: files, policy: candidatePolicy }),
           { supersedingPaths: stageCandidates, surface: "auto-stage-worktree-overlay" },
         );
       },
