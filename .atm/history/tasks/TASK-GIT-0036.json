@@ -1,0 +1,249 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-GIT-0036",
+  "title": "Align sealed package publication membership and takeover evidence",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "Every command in `validators` passes and is recorded with `node atm.mjs evidence run`.",
+    "The change is committed with `node atm.mjs git commit --task TASK-GIT-0036` and closed with `node atm.mjs taskflow close --task TASK-GIT-0036`."
+  ],
+  "deliverables": [
+    "packages/core/src/broker/runner-build-output-inventory.ts",
+    "packages/cli/src/commands/framework-development/runner-publication-evidence-context.ts",
+    "tests/cli/package-publication-membership.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/runner-build-output-inventory.ts",
+    "packages/cli/src/commands/framework-development/runner-publication-evidence-context.ts",
+    "tests/cli/package-publication-membership.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/package-publication-membership.test.ts",
+    "git diff --check"
+  ],
+  "planningRepo": "AI-Atomic-Framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the delivery commit if the change fails validation.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 2 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "tasks/TASK-GIT-0036.task.md",
+    "sectionTitle": "TASK-GIT-0036",
+    "headingLine": 33,
+    "hash": "1ae66ed69b9612fb",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/AI-Atomic-Framework.git",
+      "repoRoot": "C:/Users/User/AI-Atomic-Framework",
+      "taskCardPath": "tasks/TASK-GIT-0036.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:1ae66ed69b9612fbc5d70ea01ec6924639d83bd4a56350b8bff1127073f036a3",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-10-21T10:09:11.563Z"
+    }
+  },
+  "importedAt": "2026-10-21T10:09:11.563Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.package.publication.membership.test.ts",
+      "command": "node --strip-types tests/cli/package-publication-membership.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_git.diff.check",
+      "command": "git diff --check",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "dependencies"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-10-21T10-09-27-932Z-claim-5e6947aba759",
+  "lastTransitionAt": "2026-10-21T10:09:27.932Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-6",
+  "reservedAt": "2026-10-21T10:09:19.807Z",
+  "promotedAt": "2026-10-21T10:09:19.812Z",
+  "claim": {
+    "actorId": "codex-gpt-6",
+    "leaseId": "lease-4eaf4d1ad408",
+    "claimedAt": "2026-10-21T10:09:19.817Z",
+    "heartbeatAt": "2026-10-21T10:09:19.817Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-GIT-0036.json",
+      "packages/cli/src/commands/framework-development/runner-publication-evidence-context.ts",
+      "packages/core/src/broker/runner-build-output-inventory.ts",
+      "tests/cli/package-publication-membership.test.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20261021100919-codex-gpt-6-856bb35ef3",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261021100919-codex-gpt-6-856bb35ef3\""
+    }
+  },
+  "startedAt": "2026-10-21T10:09:19.817Z",
+  "startedByActor": "codex-gpt-6",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-cf70386ae97f1bcd",
+    "ticketDigest": "sha256:cf70386ae97f1bcd777d184ae9b10d390344452e84d0d4bd6b6a5811e4fd894b",
+    "taskId": "TASK-GIT-0036",
+    "origin": "claim",
+    "actorId": "codex-gpt-6",
+    "laneSessionId": "lane-20261021100919-codex-gpt-6-856bb35ef3",
+    "claimGeneration": "lease-4eaf4d1ad408",
+    "issuedAt": "2026-10-21T10:09:19.817Z",
+    "expiresAt": "2026-10-21T10:39:19.817Z",
+    "scopeDigest": "sha256:35cc61ed8cd45a020a5eeb40801b1bede4c4f0326fc6fe05c1682e1cd67db3b3",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-10-21T10:09:19.817Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-GIT-0036.*",
+          ".atm/history/task-events/TASK-GIT-0036/**",
+          ".atm/history/tasks/TASK-GIT-0036.json",
+          "packages/cli/src/commands/framework-development/runner-publication-evidence-context.ts",
+          "packages/core/src/broker/runner-build-output-inventory.ts",
+          "tests/cli/package-publication-membership.test.ts"
+        ],
+        "digest": "sha256:f51577ecb14451b4ddc3310f9763cbbaa03b12792fd01007613f49d50c9a1b14"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:16b3a3251bcc76c96959e27b970bb15b257f6bc9ff0b1ff3a1714c4c6d3f928c"
+    }
+  },
+  "startedBySessionId": "session-20261021100919-codex-gpt-6-TASK-GIT-0036-ddc1f9dbfb",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-GIT-0036",
+    "batchId": "batch-b4225de6ed1a",
+    "scopeKey": "TASK-PRF",
+    "queueId": "queue-227469bd783a478c",
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-GIT-0036.*",
+      ".atm/history/task-events/TASK-GIT-0036/**",
+      ".atm/history/tasks/TASK-GIT-0036.json",
+      "packages/cli/src/commands/framework-development/runner-publication-evidence-context.ts",
+      "packages/core/src/broker/runner-build-output-inventory.ts",
+      "tests/cli/package-publication-membership.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "07a20b468806cc71f62ee600729891f0588c253a7b35c9bdcb5ed619849a8a76",
+    "actorId": "codex-gpt-6",
+    "sessionId": "session-20261021100919-codex-gpt-6-TASK-GIT-0036-ddc1f9dbfb",
+    "laneSession": {
+      "laneSessionId": "lane-20261021100919-codex-gpt-6-856bb35ef3",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261021100919-codex-gpt-6-856bb35ef3\""
+    },
+    "createdAt": "2026-10-21T10:09:27.931Z",
+    "status": "active"
+  }
+}
