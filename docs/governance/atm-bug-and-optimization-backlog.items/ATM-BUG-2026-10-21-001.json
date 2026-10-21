@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-10-21-001",
+  "date": "2026-10-21",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Index-lock assertions and full crash matrix pass with TASK-GIT-0034 and bounded planning-authority follow-up TASK-GIT-0035; formal delivery pending",
+  "area": "Close transaction index snapshot admission",
+  "finding": "git write-tree ran before executeTaskCloseTransaction. An intentional index.lock failure escaped as a raw process error instead of ATM_TASK_CLOSE_TRANSACTION_FAILED, failing the pre-team crash matrix on both PR382 and its parent.",
+  "reproduce": "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts; assertion at line 252 expected the transaction code but received undefined.",
+  "impact": "Close admission failure was outside the advertised transaction/error boundary and blocked Dogfood CI.",
+  "expectedBehavior": "Snapshot acquisition occurs inside the transaction before ledger mutation; preserve the existing index lock, staged contents and active claim on failure.",
+  "followUp": "Do not remove fault injection, relax assertions or include unrelated cleanup WIP. Separately track scoped merge index parking and inherited-source budget behavior; TASK-GIT-0033 repairs the latter."
+}
