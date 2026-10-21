@@ -26,17 +26,17 @@ Status legend: *fixed* (already merged), *quick-fixed* (this round, PR linked), 
 | F3 | `tasks renew` reopened a closed task | high | no | fixed by #373 |
 | F4 | Bundle assembly EISDIR on ignored nested run dir (`kit/state/runs/...`) | medium | no | fixed by #373 |
 | F5 | Deliver bundle force-adds gitignored/generated files (vendored `.d.ts`, run state, gitlinks, `.pyc`) | high | yes | proposed (P2) |
-| F6 | 600-line budget only fails in CI after the close | medium | yes | quick-fixed in #379 (`npm run preclose:check`), gate-in-close proposed (P3) |
-| F7 | `--help` usage snapshot drift only fails in CI after the close; no regenerate command | medium | yes | quick-fixed in #379 (`npm run help-snapshots:update`, preclose check), proposed (P3) |
+| F6 | 600-line budget only fails in CI after the close | medium | yes | quick-fixed in #379 (merged 8d95caa1) (`npm run preclose:check`), gate-in-close proposed (P3) |
+| F7 | `--help` usage snapshot drift only fails in CI after the close; no regenerate command | medium | yes | quick-fixed in #379 (merged 8d95caa1) (`npm run help-snapshots:update`, preclose check), proposed (P3) |
 | F8 | Every tiny CI fix needs a full new task round | medium | yes | proposed (P4) |
-| F9 | Verbose governance output is the main agent token cost | high | yes | quick-fixed in #379 for build/sweep + AGENTS guidance; CLI-wide result line proposed (P5) |
+| F9 | Verbose governance output is the main agent token cost | high | yes | quick-fixed in #379 (merged 8d95caa1) for build/sweep + AGENTS guidance; CLI-wide result line proposed (P5) |
 | F10 | Same validators rerun in evidence, close, sweep and CI | medium | yes | proposed (P6) |
 | F11 | No single build → close → sweep command; agents hand-chain and detach it | medium | yes | proposed (P7) |
-| F12 | Agents poll CI repeatedly | medium | yes | quick-fixed in #379 (AGENTS guidance) |
+| F12 | Agents poll CI repeatedly | medium | yes | quick-fixed in #379 (merged 8d95caa1) (AGENTS guidance) |
 | F13 | Claim tickets expire during long waits, forcing `tasks renew` | low | yes | proposed (part of P1/P7) |
 | F14 | Direction locks not restored on renew | low | no | limited: renew restores *released* locks only; needs a repro (backlog) |
-| F15 | Pre-existing failing test `transactional-steward-single-write` (write path) | high | no | quick-fixed in #379 (test updated to #363 contract) |
-| F16 | Pre-existing failing test `commit-bundle-resolution` | medium | no | quick-fixed in #379 (test outdated) |
+| F15 | Pre-existing failing test `transactional-steward-single-write` (write path) | high | no | quick-fixed in #379 (merged 8d95caa1) (test updated to #363 contract) |
+| F16 | Pre-existing failing test `commit-bundle-resolution` | medium | no | quick-fixed in #379 (merged 8d95caa1) (test outdated) |
 | F17 | Scope glob `dir/**` does not cover the bare path `dir` (scope amendment needed for `packages/cli/dist`) | low | no | proposed (P2 appendix) |
 | F18 | Validators assume linked worktrees are absent and blobs are present (census test, `blob:none` CI checkout) | low | no | fixed in TASK-PRF-0137/0138 |
 | F19 | Smoke-runbook broker pin mismatches on every broker change | low | no | by design; re-pin after the write-path fixes |
@@ -44,6 +44,8 @@ Status legend: *fixed* (already merged), *quick-fixed* (this round, PR linked), 
 | F21 | Working folder must be named `AI-Atomic-Framework` | low | no | note |
 | F22 | Per-command `--help` JSON is large (~23 KB for `tasks import --help`) | low | yes | proposed (P5) |
 | F24 | Claim discovery: `tasks claim` says "not ready", `taskflow open --write` refuses in template-only mode; the working path is `next --claim --task <id> --auto-intent`, and it refuses while any uncommitted WIP intersects the scope | low | yes | proposed (P5 hint text) |
+| F25 | A closed task cannot take a governed commit or publish the runner, so merging main after close (dist conflicts) or a one-line notes update needs a new task | medium | yes | proposed (P4); evidence TASK-PRF-0152, 0153 |
+| F26 | Sealed-build failure result line has a generic hint ("see log") instead of the error | low | no | follow-up to #379 |
 | F23 | Box environment: default Node 22 lacks `--strip-types`; Codex sandbox cannot spawn `git` (EPERM) | low | no | note |
 
 ## Details
@@ -71,8 +73,11 @@ Status legend: *fixed* (already merged), *quick-fixed* (this round, PR linked), 
   receipt inventory becomes staging paths
   (`.../framework-development/runner-publication-close-handoff.ts`).
 - Evidence: TASK-PRF-0135 re-added ~470 vendored `.d.ts`; TASK-PRF-0139 added 59;
-  TASK-PRF-0141 added 1053 under `release/`; TASK-PRF-0144 added `kit/state` run state,
-  embedded work repos as gitlinks and a `.pyc` (dropped by hand in 5fa733495).
+  TASK-PRF-0141 added 1053 under `release/`; TASK-PRF-0144 (#360, PR #378, merged as
+  324a5877) committed ~690 ignored files from the `research/paper-v2/prereg-v3-smoke/kit/**`
+  scope: offline-preflight run state in `kit/state/`, nested work repos as gitlinks and a
+  `.pyc`. They were removed in 5fa733495 but stay in main history.
+  TASK-PRF-0150 (#379) again added 469 vendored `.d.ts`.
   Tracked `.d.ts` on main went 425 → 1013. `git ls-files -ci --exclude-standard` reports
   39,697 tracked-but-ignored files (research 30,650; release 7,263; packages 1,676;
   artifacts 97; .atm 11); most of `research/` is intentional evidence, the rest needs triage.
@@ -154,12 +159,27 @@ Status legend: *fixed* (already merged), *quick-fixed* (this round, PR linked), 
 
 ### F20 Flaky concurrency test (medium)
 - Product CI on b23f1145d (PR #378) failed only `tests/cli/broker-native-hot-concurrency.test.ts`
-  (7-process register queue admission); it passed before and 5/5 locally.
+  (7-process broker register queue admission). The change did not touch that path; the suite
+  passed in the previous Product CI run on 5fa733495 and 5/5 times locally. A re-run passed.
+  Each flake costs a full CI round (~20 min) and an agent wake-up.
 
 ### F24 Claim discovery (low, daily)
 - Evidence: TASK-PRF-0150 (2026-10-21 09:05). The first two documented-looking commands
   failed; the third worked after stashing the already-written changes
   (`ATM_CLAIM_FOREIGN_UNSTAGED_WIP`). Hints should name the working command.
+
+### F25 Closed task is frozen even before merge (medium, daily)
+- Evidence: after #379 closed (TASK-PRF-0150), merging main (#378) conflicted only in
+  generated dist/release files. The rebuild failed: "Runner publication requires exactly
+  one active release-surface claim for grok-bot; found 0", so TASK-PRF-0152 was opened
+  just to rebuild. Adding two evidence lines to this note after TASK-PRF-0151 closed was
+  refused by `atm git commit --task TASK-PRF-0151` (`ATM_GIT_COMMIT_BUNDLE_BLOCKED`:
+  empty task-scoped candidate), so TASK-PRF-0153 carries them. Proposal P4.
+
+### F26 Generic build failure hint (low)
+- Evidence: the TASK-PRF-0150 merge rebuild printed
+  `ATM-RESULT ... code=BUILD_STEP_FAILED hint="sealed build step failed; see log"`; the
+  actual cause was one `Error:` line in the log. The hint should carry the first error line.
 
 ### F21–F23 Notes
 - F21: ATM requires the working folder name `AI-Atomic-Framework`, so parallel clones need
