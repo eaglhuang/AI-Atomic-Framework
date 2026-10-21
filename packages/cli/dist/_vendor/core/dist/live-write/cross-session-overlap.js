@@ -87,7 +87,7 @@ export function anchorsRelativePath() {
  * commit holding the anchor text); when that is unknown too, every entry counts (fail closed).
  */
 export function entriesSinceAnchor(cwd, entries, anchor, currentHash) {
-    const forFile = entries.map((entry, index) => ({ entry, index })).filter(({ entry }) => entry.file === anchor.file);
+    const forFile = entries.map((entry, index) => ({ entry, index })).filter(({ entry }) => entry.file === anchor.file && (entry.kind === undefined || entry.kind === 'committed'));
     const anchorHash = bare(anchor.baseHash);
     let start = -1;
     for (const { entry, index } of forFile)
@@ -120,10 +120,11 @@ export function findCrossSessionOverlaps(input) {
         return [];
     const currentTokens = lineTokens(input.currentText);
     const found = [];
-    input.entries.forEach((entry, position) => {
+    const entries = input.entries.filter((entry) => entry.kind === undefined || entry.kind === 'committed');
+    entries.forEach((entry, position) => {
         if (!entry.actorId || entry.actorId === input.actorId || !entry.blocks || entry.blocks.length === 0)
             return;
-        const mapper = forwardMapper(entry, input.entries.slice(position + 1), input.currentHash, currentTokens, input.readAfterText);
+        const mapper = forwardMapper(entry, entries.slice(position + 1), input.currentHash, currentTokens, input.readAfterText);
         if (mapper === null)
             return;
         const hitLines = [];
