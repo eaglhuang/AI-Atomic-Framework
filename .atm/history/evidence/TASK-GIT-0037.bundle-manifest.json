@@ -1,0 +1,46 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-GIT-0037",
+  "updatedAt": "2026-10-21T14:05:50.283Z",
+  "updatedBy": "codex-gpt-6",
+  "freshValidationPasses": [
+    "git diff --check",
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/commit-bundle-markdown-paths.spec.ts"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/commit-bundle-markdown-paths.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:28d516bd888d13339548d386198e8e42a63c4b3d268c5dae4b7e1aaf262ca13c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/taskflow/__tests__/commit-bundle-markdown-paths.spec.ts"
+      ],
+      "generatedAt": "2026-10-21T14:05:46.303Z",
+      "startedAt": "2026-10-21T14:05:44.339Z",
+      "finishedAt": "2026-10-21T14:05:46.303Z",
+      "durationMs": 1964,
+      "runnerKind": "dev-source",
+      "sourceCommit": "e6516e8e693dbf432e427a6155cb1824afe5ffe6",
+      "cached": false
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:4795ce6c7f3c2d038182cf1c0d6f9690b35fe9027022d0e4a2a9b0dd8ea8472e",
+      "validators": [
+        "git diff --check"
+      ],
+      "generatedAt": "2026-10-21T14:05:50.282Z",
+      "startedAt": "2026-10-21T14:05:49.964Z",
+      "finishedAt": "2026-10-21T14:05:50.282Z",
+      "durationMs": 318,
+      "runnerKind": "dev-source",
+      "sourceCommit": "e6516e8e693dbf432e427a6155cb1824afe5ffe6",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

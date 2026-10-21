@@ -55,4 +55,29 @@ const bundle = buildTaskflowCommitBundle({
 assert.equal(bundle.failClosed, false, 'markdown code-span deliverables must normalize to repo paths');
 assert.ok(bundle.targetDeliveryFiles.includes('src/code-span.ts'));
 
+const localCard = 'docs/tasks/TASK-BUNDLE-MARKDOWN-0001.task.md';
+writeText(path.join(targetRepo, localCard), '# Local card\n');
+writeJson(path.join(targetRepo, `.atm/history/tasks/${taskId}.json`), {
+  workItemId: taskId, closureAuthority: 'target_repo',
+  deliverables: ['src/code-span.ts'],
+  taskDirectionLock: { allowedFiles: ['src/code-span.ts'] },
+  source: { planPath: path.join(targetRepo, localCard) }
+});
+const localBundle = buildTaskflowCommitBundle({
+  cwd: targetRepo, taskId, actorId: 'validator', commitMode: 'dry-run',
+  planningMirrorPath: path.join(targetRepo, localCard), rosterIndexPath: null,
+  planningAuthorityDeliveryOk: false
+});
+assert.equal(localBundle.failClosed, false);
+assert.equal(localBundle.planningRepo.repoRoot, targetRepo);
+assert.ok(localBundle.planningRepo.stageFiles.includes(localCard),
+  'target-owned local Markdown must be in the shared close commit');
+const externalBundle = buildTaskflowCommitBundle({
+  cwd: targetRepo, taskId, actorId: 'validator', commitMode: 'dry-run',
+  planningMirrorPath: planPath, rosterIndexPath: null,
+  planningAuthorityDeliveryOk: false
+});
+assert.equal(externalBundle.planningRepo.repoRoot, targetRepo,
+  'target-owned closure must not acquire an external planning writer');
+assert.ok(!externalBundle.planningRepo.stageFiles.includes(localCard));
 console.log('ok: commit bundle markdown paths spec passed');
