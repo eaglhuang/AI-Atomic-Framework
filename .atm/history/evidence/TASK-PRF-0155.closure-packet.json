@@ -1,0 +1,120 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-PRF-0155",
+  "targetRepoIdentity": {
+    "kind": "framework",
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "/workspace/AI-Atomic-Framework-360/AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "afa0695841b6dc1804e83b9abc14ac7c40d9dbaa",
+  "governedTreeSha": "eb6920c37e59db94c1d17e0fc864799c5f03e0f2",
+  "targetCommitDelta": {
+    "currentCommitSha": "afa0695841b6dc1804e83b9abc14ac7c40d9dbaa",
+    "parentCommitShas": [
+      "afa0695841b6dc1804e83b9abc14ac7c40d9dbaa"
+    ],
+    "governedTreeSha": "eb6920c37e59db94c1d17e0fc864799c5f03e0f2",
+    "changedFiles": [
+      ".atm/history/task-events/TASK-PRF-0155/2026-10-21T04-58-49-891Z-import-1b705d8bdab5.json",
+      ".atm/history/task-events/TASK-PRF-0155/2026-10-21T04-58-57-733Z-claim-c0d36f5143fa.json",
+      ".atm/history/tasks/TASK-PRF-0155.json",
+      ".atm/task-plans/TASK-PRF-0155.md",
+      "packages/cli/dist/_vendor/atm-markdown-task-source/dist/templates.d.ts",
+      "packages/cli/dist/build-identity.json",
+      "packages/cli/dist/npm-runtime/build-identity.json",
+      "packages/cli/dist/npm-runtime/manifest.json",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/governance/governance-friction-2026-10.md",
+      "release/atm-root-drop/docs/governance/proposals/governance-token-cost-proposals-2026-10.md",
+      "release/atm-root-drop/packages/atm-markdown-task-source/dist/templates.d.ts",
+      "release/atm-root-drop/packages/cli/dist/_vendor/atm-markdown-task-source/dist/templates.d.ts",
+      "release/atm-root-drop/packages/cli/dist/build-identity.json",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/build-identity.json",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/manifest.json",
+      "release/atm-root-drop/packages/create-atm/dist/build-identity.json",
+      "release/atm-root-drop/release-manifest.json"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node atm.mjs --help",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:93dbfe458284cca7f14c30955f34979f23b2777da4e3a8c6d84ac59d79b4137e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    }
+  ],
+  "validationPasses": [
+    "node atm.mjs --help"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "node atm.mjs --help"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-10-21T05:02:27.459Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-PRF-0155.*",
+      ".atm/history/task-events/TASK-PRF-0155/**",
+      ".atm/history/tasks/TASK-PRF-0155.json",
+      ".atm/task-plans/TASK-PRF-0155.md",
+      "packages/cli/dist/**",
+      "release/atm-onefile/**",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/**",
+      "release/atm-root-drop/release-manifest.json"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/dist/**"
+    ],
+    "requiredGates": [
+      "node atm.mjs --help"
+    ]
+  },
+  "evidencePath": ".atm/runtime/evidence-ledger/bundles/TASK-PRF-0155.json",
+  "closedAt": "2026-10-21T05:02:27.459Z",
+  "closedByActor": "grok-bot",
+  "sessionId": "session-20261021045856-grok-bot-TASK-PRF-0155-58f9c29894",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "9e3bce4e8b7f7210d0a008364c1921066f073dd6",
+    "taskMatchedFiles": [
+      "packages/cli/dist/build-identity.json",
+      "packages/cli/dist/npm-runtime/build-identity.json",
+      "packages/cli/dist/npm-runtime/manifest.json"
+    ],
+    "governanceFiles": [],
+    "allowedRunnerOutputFiles": [
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/build-identity.json",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/build-identity.json",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/manifest.json",
+      "release/atm-root-drop/packages/create-atm/dist/build-identity.json",
+      "release/atm-root-drop/release-manifest.json"
+    ],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
