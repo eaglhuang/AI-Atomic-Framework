@@ -59,7 +59,7 @@ export declare function executeAgentTask(normalizedModel: ExecuteAgentTaskModel,
         specVersion: string;
         migration: Readonly<{
             strategy: "additive";
-            fromVersion: null;
+            fromVersion: any;
             notes: "Initial ExecuteAgentTask effect node evidence contract.";
         }>;
         atomId: string;

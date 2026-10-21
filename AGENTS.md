@@ -163,3 +163,22 @@ Source-first framework validation only:
 ```shell
 node atm.dev.mjs next --prompt "<current user prompt>" --json
 ```
+
+## Token-efficient governance runs
+
+- Redirect build, close, and sweep output to a log file. Read only the exit code
+  plus the `ATM-RESULT` line, or `tail -5` of the log.
+- Use `ATM_BUILD_LOG_FILE=/tmp/atm-build.log npm run build` and
+  `ATM_SWEEP_LOG_FILE=/tmp/atm-sweep.log node --strip-types scripts/run-cli-test-sweep.ts`
+  for summary output.
+- Use `taskflow close ... --summary --output-json /tmp/atm-close.json` instead
+  of plain `--json`. These global flags project a compact result and write that
+  projected JSON to the file; they do not save the full evidence envelope.
+- After merging main, run `npm run preclose:check` before `taskflow close --write`.
+- Run long closes detached: `setsid nohup node atm.mjs taskflow close ... --write --summary --output-json /tmp/atm-close.json > /tmp/atm-close.log 2>&1 < /dev/null &`
+  (replace `...` with the task, actor, and required playbook arguments).
+- Recover interrupted closes with `taskflow close ... --recover` or `--abort`.
+  Run the dry-run first (omit `--write`), inspect the recovery result, then repeat
+  with `--write`; recovery requires the prior holder to be gone. Abort is refused
+  after a close has landed.
+- Wait for CI once with `gh pr checks <pr> --watch --interval 120` instead of polling.
