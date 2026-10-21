@@ -11,9 +11,9 @@ export declare function probeRepository(cwd: string, recommendedPrompt: string):
     sourceControl: string;
     detectedFiles: string[];
     commands: {
-        test: string;
-        typecheck: string;
-        lint: string;
+        test: string | null;
+        typecheck: string | null;
+        lint: string | null;
     };
     recommendedPrompt: string;
 };

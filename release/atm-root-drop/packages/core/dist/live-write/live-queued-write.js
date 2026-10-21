@@ -9,6 +9,10 @@
  * 宣告的 base 對不上時，patch 先在它自己的 base 定位，再翻譯到目前檔案（#363），
  * 絕不在目前檔案的舊行號重讀。它刪改的行在 base 之後被改過就拒絕，不套到別處。
  *
+ * 原始意圖錨定（#360）：session 第一次對某檔送出的 base 是它的錨點。之後的寫入，
+ * 不論 base 新舊，只要刪改到其他 session 在錨點之後提交的行，就以 `cross-session-overlap`
+ * 拒絕，指名對方 session、proposal、commit 與 diff，檔案不動。見 cross-session-overlap.ts。
+ *
  * 既有的 `broker steward apply --merge-plan-file` 不受影響。
  */
 import { spawnSync } from 'node:child_process';
@@ -19,7 +23,8 @@ import { hashContent } from '../broker/adapters/cas.js';
 import { canonicalCommitLockPath, defaultStewardCommitLockRoot } from '../broker/steward-commit-guard.js';
 import { acquireKernelAdvisoryLock, releaseKernelAdvisoryLock, StewardLockTimeoutError } from '../broker/steward-kernel-lock.js';
 import { UnifiedPatchApplicationError, applyParsedUnifiedPatchDetailed, locateUnifiedPatchHunks, locatedLineIndexes, splitSourceText, hunkOldLineIndex, parseUnifiedPatchHunks } from '../broker/unified-patch.js';
-import { findCommittedBaseText, translateStalePatch } from '../broker/stale-base-translation.js';
+import { findCommittedBaseText, lineTokens, patchChangeBlocks, translateStalePatch } from '../broker/stale-base-translation.js';
+import { CROSS_SESSION_OVERLAP_INSTRUCTION, committedBlocks, describeOverlaps, diffCommittedBlocks, ensureAnchor, entriesSinceAnchor, findCrossSessionOverlaps, gitFileAt } from './cross-session-overlap.js';
 const LOCK_WAIT_MS = 30_000;
 const LOCK_POLL_MS = 5;
 export function applyLiveQueuedWrites(input) {
@@ -41,7 +46,7 @@ export function applyLiveQueuedWrites(input) {
             }
             continue;
         }
-        writes.push(...applyFileGroup(cwd, file, proposals));
+        writes.push(...applyFileGroup(cwd, file, proposals, input.ackOverlap ?? []));
     }
     return {
         ok: writes.every((write) => write.decision === 'accepted'),
@@ -50,7 +55,7 @@ export function applyLiveQueuedWrites(input) {
         planRequired: false
     };
 }
-function applyFileGroup(cwd, file, proposals) {
+function applyFileGroup(cwd, file, proposals, ack) {
     const targetPath = path.resolve(cwd, file);
     if (!existsSync(targetPath) || !statSync(targetPath).isFile()) {
         return proposals.map((proposal) => rejected(proposal, file, 'stale-base', true, null, null, '目標檔不存在'));
@@ -69,7 +74,7 @@ function applyFileGroup(cwd, file, proposals) {
     try {
         const results = [];
         for (const proposal of proposals) {
-            results.push(applyOneLocked(cwd, file, targetPath, proposal));
+            results.push(applyOneLocked(cwd, file, targetPath, proposal, ack));
         }
         return results;
     }
@@ -77,10 +82,14 @@ function applyFileGroup(cwd, file, proposals) {
         releaseKernelAdvisoryLock(lockDir);
     }
 }
-function applyOneLocked(cwd, file, targetPath, proposal) {
+function applyOneLocked(cwd, file, targetPath, proposal, ack) {
     const current = readCurrent(targetPath);
     const declared = normalizeHash(proposal.fileBeforeHash);
     const observed = normalizeHash(current.hash);
+    // #360: anchor the session's original target (even a malformed first proposal declares what it saw),
+    // then check every write against other sessions' lines committed since it.
+    const journal = readJournal(cwd);
+    const { anchor, existed } = ensureAnchor(cwd, { actorId: proposal.actorId, taskId: proposal.taskId ?? null, file, declaredHash: declared, proposalId: proposal.proposalId, journalLength: journal.length });
     let hunks;
     try {
         hunks = parseUnifiedPatchHunks(proposal.patch, { targetFile: file });
@@ -90,16 +99,37 @@ function applyOneLocked(cwd, file, targetPath, proposal) {
             throw error;
         return rejected(proposal, file, 'patch-malformed', false, current.text, current.hash, error.message);
     }
+    const since = entriesSinceAnchor(cwd, journal, anchor, observed);
+    const overlapsFor = (targets, includeDeletionGaps = false) => findCrossSessionOverlaps({
+        actorId: proposal.actorId, currentText: current.text, currentHash: current.hash, entries: since, targets, includeDeletionGaps, readAfterText: (entry) => gitFileAt(cwd, entry.commitSha, file) ?? findCommittedBaseText(cwd, file, entry.afterHash)
+    });
+    const guard = (targets) => {
+        const overlaps = overlapsFor(targets);
+        if (overlaps.every((overlap) => ack.includes(overlap.proposalId)))
+            return { rejection: null, acknowledged: overlaps.map((overlap) => overlap.proposalId) };
+        return { rejection: overlapRejection(cwd, proposal, file, current, overlaps, ack), acknowledged: [] };
+    };
     if (declared === observed) {
+        let applied;
         try {
-            const applied = applyParsedUnifiedPatchDetailed(current.text, hunks, { mode: 'nearest' });
-            return commitPrepared(cwd, file, targetPath, proposal, current.text, applied.text, locatedLineIndexes(applied.located).changed, applied.hunkOffsets);
+            applied = applyParsedUnifiedPatchDetailed(current.text, hunks, { mode: 'nearest' });
         }
         catch (error) {
             if (!(error instanceof UnifiedPatchApplicationError))
                 throw error;
+            // A context mismatch caused by another session's change since the anchor is that session's overlap (#360 AC4).
+            const anchorText = normalizeHash(anchor.baseHash) === observed ? null : findCommittedBaseText(cwd, file, anchor.baseHash);
+            const fromAnchor = anchorText === null ? null : translateStalePatch({ baseText: anchorText, currentText: current.text, hunks });
+            const overlaps = fromAnchor && !fromAnchor.ok ? overlapsFor(conflictRanges(fromAnchor.conflicts), true) : [];
+            if (overlaps.length > 0)
+                return overlapRejection(cwd, proposal, file, current, overlaps, ack);
             return rejected(proposal, file, 'patch-context-mismatch', false, current.text, current.hash, error.message);
         }
+        const changes = changesOf(current.text, applied.text, applied.located);
+        const check = guard(targetsOf(changes));
+        if (check.rejection)
+            return check.rejection;
+        return commitPrepared(cwd, file, targetPath, proposal, current.text, applied.text, locatedLineIndexes(applied.located).changed, applied.hunkOffsets, committedBlocks(current.text, changes), check.acknowledged);
     }
     let lines = locatedLineIndexes(hunks.map((hunk) => {
         const index = hunkOldLineIndex(hunk.oldStart, hunk.oldCount);
@@ -115,19 +145,30 @@ function applyOneLocked(cwd, file, targetPath, proposal) {
                 throw error;
         }
     }
+    // #363: translate from the declared base; never re-read the declared lines in the current file.
+    const translated = base === null ? null : translateStalePatch({ baseText: base, currentText: current.text, hunks });
+    let acknowledged = [];
+    if (existed && translated) {
+        // A resubmission (the session already anchored this file) is checked against other sessions first.
+        const conflicting = translated.ok ? [] : overlapsFor(conflictRanges(translated.conflicts), true);
+        const check = translated.ok
+            ? guard(translated.blocks.map((block) => ({ start: block.currentStart, end: block.currentEnd })))
+            : { rejection: conflicting.length > 0 ? overlapRejection(cwd, proposal, file, current, conflicting, ack) : null, acknowledged: [] };
+        if (check.rejection)
+            return check.rejection;
+        acknowledged = check.acknowledged;
+    }
     const prior = readJournal(cwd).filter((entry) => entry.file === file && normalizeHash(entry.baseHash) === declared);
     const overlaps = prior.some((entry) => intersects(entry.changedLines, lines.covered) || intersects(entry.changedLines, lines.changed));
     if (overlaps) {
         return queueRejection(cwd, proposal, file, 'overlapping-write-queued', current, '這筆寫入和已經提交的行重疊，檔案沒有被改');
     }
-    if (base === null) {
+    if (base === null || translated === null) {
         return queueRejection(cwd, proposal, file, 'stale-base', current, '宣告的 base 不在已提交的歷史裡，無法翻譯到目前檔案');
     }
     if (prior.length === 0) {
         return queueRejection(cwd, proposal, file, 'stale-base', current, '宣告的 base 不是目前檔案，而且沒有可套用的不相交提交');
     }
-    // #363: translate from the declared base; never re-read the declared lines in the current file.
-    const translated = translateStalePatch({ baseText: base, currentText: current.text, hunks });
     if (!translated.ok) {
         return translated.reason === 'stale-base-conflict'
             ? queueRejection(cwd, proposal, file, 'overlapping-write-queued', current, `這筆寫入改到 base 之後被改過的行，檔案沒有被改：${translated.detail}`)
@@ -135,9 +176,64 @@ function applyOneLocked(cwd, file, targetPath, proposal) {
     }
     if (translated.text === current.text)
         return rejected(proposal, file, 'no-op-patch', false, current.text, current.hash, 'patch 沒有改變檔案');
-    return commitPrepared(cwd, file, targetPath, proposal, current.text, translated.text, locatedLineIndexes(translated.located).changed, translated.hunkOffsets);
+    const blocks = committedBlocks(current.text, translated.blocks.map((block) => ({ start: block.currentStart, end: block.currentEnd, added: block.added })));
+    return commitPrepared(cwd, file, targetPath, proposal, current.text, translated.text, locatedLineIndexes(translated.located).changed, translated.hunkOffsets, blocks, acknowledged);
 }
-function commitPrepared(cwd, file, targetPath, proposal, before, next, changedLines, hunkOffsets, baseHash = hashContent(before)) {
+/** The write's change blocks in `before` coordinates: from the patch structure, else a line diff. */
+function changesOf(before, after, located) {
+    try {
+        return patchChangeBlocks(lineTokens(before), lineTokens(after), located).map((block) => ({ start: block.baseStart, end: block.baseEnd, added: block.added }));
+    }
+    catch (error) {
+        if (!(error instanceof UnifiedPatchApplicationError))
+            throw error;
+        return diffCommittedBlocks(before, after).map((block) => ({ start: block.beforeStart, end: block.beforeEnd, added: block.added }));
+    }
+}
+/** Lines a write deletes or modifies (pure insertions target nothing). */
+function targetsOf(changes) {
+    return changes.filter((change) => change.end > change.start).map((change) => ({ start: change.start, end: change.end }));
+}
+/**
+ * Current lines, changed since the patch's base, that the patch's own deleted or modified base lines became.
+ * Touching-only conflicts target nothing. An equal-length replacement maps line by line; otherwise the whole
+ * changed range counts, and a pure deletion becomes a two-line window around its gap.
+ */
+function conflictRanges(conflicts) {
+    const ranges = [];
+    for (const { ours, theirs } of conflicts) {
+        const from = Math.max(ours.baseStart, theirs.baseStart);
+        const to = Math.min(ours.baseEnd, theirs.baseEnd);
+        if (to <= from)
+            continue;
+        if (theirs.currentEnd === theirs.currentStart)
+            ranges.push({ start: Math.max(0, theirs.currentStart - 1), end: theirs.currentStart + 1 });
+        else if (theirs.currentEnd - theirs.currentStart === theirs.baseEnd - theirs.baseStart)
+            ranges.push({ start: theirs.currentStart + (from - theirs.baseStart), end: theirs.currentStart + (to - theirs.baseStart) });
+        else
+            ranges.push({ start: theirs.currentStart, end: theirs.currentEnd });
+    }
+    return ranges;
+}
+function overlapRejection(cwd, proposal, file, current, overlaps, ack) {
+    const unacknowledged = overlaps.filter((overlap) => !ack.includes(overlap.proposalId)).map((overlap) => overlap.proposalId);
+    const ackNote = ack.length > 0 ? ` --ack-overlap ${ack.join(',')} does not name ${unacknowledged.join(',')}.` : '';
+    appendQueue(cwd, {
+        proposalId: proposal.proposalId,
+        file,
+        reasonCode: 'cross-session-overlap',
+        actorId: proposal.actorId,
+        overlaps: overlaps.map(({ actorId, proposalId, commitSha }) => ({ actorId, proposalId, commitSha })),
+        currentFileHash: current.hash,
+        queuedAt: new Date().toISOString()
+    });
+    return {
+        ...rejected(proposal, file, 'cross-session-overlap', true, current.text, current.hash, `cross-session-overlap: ${describeOverlaps(overlaps)}. The file was not changed.${ackNote}`),
+        crossSessionOverlap: overlaps,
+        instruction: CROSS_SESSION_OVERLAP_INSTRUCTION
+    };
+}
+function commitPrepared(cwd, file, targetPath, proposal, before, next, changedLines, hunkOffsets, blocks, acknowledged) {
     if (next === before)
         return rejected(proposal, file, 'no-op-patch', false, before, hashContent(before), 'patch 沒有改變檔案');
     try {
@@ -145,10 +241,14 @@ function commitPrepared(cwd, file, targetPath, proposal, before, next, changedLi
         const sha = gitCommit(cwd, file, proposal.proposalId);
         appendJournal(cwd, {
             file,
-            baseHash,
+            baseHash: hashContent(before),
             afterHash: hashContent(next),
             changedLines,
-            proposalId: proposal.proposalId
+            proposalId: proposal.proposalId,
+            actorId: proposal.actorId,
+            commitSha: sha,
+            blocks,
+            ...(acknowledged.length > 0 ? { acknowledgedOverlap: acknowledged } : {})
         });
         return {
             proposalId: proposal.proposalId,
@@ -161,7 +261,8 @@ function commitPrepared(cwd, file, targetPath, proposal, before, next, changedLi
             currentFileHash: hashContent(next),
             commitSha: sha,
             hunkOffsets,
-            detail: '已寫入並提交'
+            detail: acknowledged.length > 0 ? `已寫入並提交（--ack-overlap 覆寫 ${acknowledged.join(', ')}）` : '已寫入並提交',
+            ...(acknowledged.length > 0 ? { acknowledgedOverlap: acknowledged } : {})
         };
     }
     catch (error) {

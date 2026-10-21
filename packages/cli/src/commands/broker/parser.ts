@@ -89,6 +89,7 @@ export interface ParsedBrokerOptions {
   readonly runCommand: string | null;
   readonly outputFiles: readonly string[];
   readonly stewardId: string | null;
+  readonly ackOverlap: readonly string[];
   readonly evidenceOutPath: string | null;
   readonly requestFiles: readonly string[];
   readonly requestsDir: string | null;
@@ -150,6 +151,7 @@ export function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
     runCommand: null as string | null,
     outputFiles: [] as string[],
     stewardId: null as string | null,
+    ackOverlap: [] as string[],
     evidenceOutPath: null as string | null,
     requestFiles: [] as string[],
     requestsDir: null as string | null,
@@ -372,6 +374,7 @@ export function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
       index += 1;
       continue;
     }
+    if (arg === '--ack-overlap') { state.ackOverlap.push(...requireValue(argv, index, '--ack-overlap').split(',').map((id) => id.trim()).filter(Boolean)); index += 1; continue; }
     if (arg === '--steward-id') {
       state.stewardId = requireValue(argv, index, '--steward-id');
       index += 1;
@@ -496,6 +499,7 @@ export function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
     runCommand: state.runCommand,
     outputFiles: state.outputFiles,
     stewardId: state.stewardId,
+    ackOverlap: state.ackOverlap,
     evidenceOutPath: state.evidenceOutPath,
     requestFiles: state.requestFiles,
     requestsDir: state.requestsDir,

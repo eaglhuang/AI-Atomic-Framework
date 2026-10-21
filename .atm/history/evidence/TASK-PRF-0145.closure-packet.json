@@ -1,0 +1,106 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-PRF-0145",
+  "targetRepoIdentity": {
+    "kind": "framework",
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "/workspace/AI-Atomic-Framework-360/AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "d97d35dd3ac6c6dd6eb68a9da8f5703796e5e68e",
+  "governedTreeSha": "bcd0e0bc9db3061414d0bb4ad0097e1b46682e0a",
+  "targetCommitDelta": {
+    "currentCommitSha": "d97d35dd3ac6c6dd6eb68a9da8f5703796e5e68e",
+    "parentCommitShas": [
+      "d97d35dd3ac6c6dd6eb68a9da8f5703796e5e68e"
+    ],
+    "governedTreeSha": "bcd0e0bc9db3061414d0bb4ad0097e1b46682e0a",
+    "changedFiles": [
+      ".atm/history/task-events/TASK-PRF-0145/2026-10-21T00-12-05-467Z-import-be610f91f90c.json",
+      ".atm/history/task-events/TASK-PRF-0145/2026-10-21T00-12-08-421Z-reserve-28d597174acd.json",
+      ".atm/history/task-events/TASK-PRF-0145/2026-10-21T00-12-08-424Z-promote-01ba71d8d139.json",
+      ".atm/history/task-events/TASK-PRF-0145/2026-10-21T00-12-10-637Z-claim-bb1849b54357.json",
+      ".atm/history/tasks/TASK-PRF-0145.json",
+      ".atm/task-plans/TASK-PRF-0144.md",
+      ".atm/task-plans/TASK-PRF-0145.md",
+      "PROGRESS.md",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/release-manifest.json",
+      "tests/cli-fixtures/help-snapshots/broker.json"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types scripts/validate-cli.ts --mode test",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ba8b8174ac97d2fb515d6c834e09d7a22f9f8382e1b9461323fc6f6ca89dff75",
+      "stderrSha256": "sha256:8ea65731fd01c506316db61a665dfed3896bcc90d15b1e799b534f382e16ebf8",
+      "runnerVersion": "0.1.2"
+    }
+  ],
+  "validationPasses": [
+    "validate:cli"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "validate:cli"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-10-21T00:17:51.672Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-PRF-0145.*",
+      ".atm/history/task-events/TASK-PRF-0145/**",
+      ".atm/history/tasks/TASK-PRF-0145.json",
+      ".atm/task-plans/TASK-PRF-0145.md",
+      "packages/cli/dist",
+      "packages/cli/dist/**",
+      "PROGRESS.md",
+      "release/atm-onefile/**",
+      "release/atm-root-drop/**",
+      "tests/cli-fixtures/help-snapshots/broker.json"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/dist",
+      "packages/cli/dist/**",
+      "tests/cli-fixtures/help-snapshots/broker.json"
+    ],
+    "requiredGates": [
+      "validate:cli"
+    ]
+  },
+  "evidencePath": ".atm/runtime/evidence-ledger/bundles/TASK-PRF-0145.json",
+  "closedAt": "2026-10-21T00:17:51.672Z",
+  "closedByActor": "grok-bot",
+  "sessionId": "session-20261021001208-grok-bot-TASK-PRF-0145-e10e2d5155",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "d97d35dd3ac6c6dd6eb68a9da8f5703796e5e68e",
+    "taskMatchedFiles": [],
+    "governanceFiles": [],
+    "allowedRunnerOutputFiles": [
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/release-manifest.json"
+    ],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

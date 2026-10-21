@@ -9,7 +9,7 @@ export declare function toReviewAdvisoryMachineFinding(finding: PoliceFinding): 
     severity: "low" | "medium" | "high" | "info";
     message: string;
     routeHint: string;
-    evidenceRefs: string[];
+    evidenceRefs: string[] | undefined;
     metadata: {
         policeFinding: PoliceFinding;
     };

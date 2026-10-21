@@ -58,6 +58,7 @@ export function parseBrokerArgs(argv) {
         runCommand: null,
         outputFiles: [],
         stewardId: null,
+        ackOverlap: [],
         evidenceOutPath: null,
         requestFiles: [],
         requestsDir: null,
@@ -279,6 +280,11 @@ export function parseBrokerArgs(argv) {
             index += 1;
             continue;
         }
+        if (arg === '--ack-overlap') {
+            state.ackOverlap.push(...requireValue(argv, index, '--ack-overlap').split(',').map((id) => id.trim()).filter(Boolean));
+            index += 1;
+            continue;
+        }
         if (arg === '--steward-id') {
             state.stewardId = requireValue(argv, index, '--steward-id');
             index += 1;
@@ -413,6 +419,7 @@ export function parseBrokerArgs(argv) {
         runCommand: state.runCommand,
         outputFiles: state.outputFiles,
         stewardId: state.stewardId,
+        ackOverlap: state.ackOverlap,
         evidenceOutPath: state.evidenceOutPath,
         requestFiles: state.requestFiles,
         requestsDir: state.requestsDir,
