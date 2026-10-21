@@ -2,7 +2,7 @@
 doc_id: doc_TASK-PRF-0156
 task_id: TASK-PRF-0156
 title: 'P2: never force-add ignored/generated files in close bundles'
-status: ready
+status: done
 owner: grok-bot
 priority: P1
 depends_on:
@@ -34,6 +34,15 @@ rollback:
   notes: Revert the delivery commit.
 nonGoals:
 - No history cleanup of already-tracked ignored files. No tag or npm publish.
+completed_at: "2026-10-21T14:36:30.579Z"
+completed_by_agent: "grok-bot"
+closedAt: "2026-10-21T14:36:30.579Z"
+closedByActor: "grok-bot"
+closedByCommand: atm tasks close
+lastTransitionId: "2026-10-21T14-36-30-579Z-close-924610417167"
+lastTransitionAt: "2026-10-21T14:36:30.579Z"
+ledgerContractVersion: task-ledger/v1
+delivery_commit: "41eefe252"
 ---
 
 # TASK-PRF-0156 — P2 exact per-file staging

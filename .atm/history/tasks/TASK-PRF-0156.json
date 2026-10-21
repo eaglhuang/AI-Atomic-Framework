@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-PRF-0156",
   "title": "P2: never force-add ignored/generated files in close bundles",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "TASK-PRF-0153"
@@ -140,14 +140,14 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-10-21T11-38-24-734Z-renew-968140a0cda2",
-  "lastTransitionAt": "2026-10-21T11:38:24.734Z",
+  "lastTransitionId": "2026-10-21T14-36-30-278Z-close-d91ad42ef74a",
+  "lastTransitionAt": "2026-10-21T14:36:30.278Z",
   "ledgerContractVersion": "task-ledger/v1",
   "claim": {
     "actorId": "grok-bot",
     "leaseId": "lease-079ac2a7bdd4",
     "claimedAt": "2026-10-21T05:10:35.083Z",
-    "heartbeatAt": "2026-10-21T11:38:24.423Z",
+    "heartbeatAt": "2026-10-21T14:36:30.276Z",
     "ttlSeconds": 86400,
     "files": [
       ".atm/history/evidence/TASK-PRF-0156.*",
@@ -170,13 +170,14 @@
       "release/atm-root-drop/**",
       "tests/**"
     ],
-    "state": "active",
+    "state": "released",
     "laneSession": {
       "laneSessionId": "lane-20261021111651-grok-bot-5123a9e38d",
       "status": "active",
       "source": "option",
       "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261021111651-grok-bot-5123a9e38d\""
-    }
+    },
+    "reason": "closed"
   },
   "owner": "grok-bot",
   "startedAt": "2026-10-21T05:10:35.083Z",
@@ -305,5 +306,9 @@
     },
     "createdAt": "2026-10-21T06:00:25.306Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-10-21T14:36:30.276Z",
+  "closedByActor": "grok-bot",
+  "closedBySessionId": "session-20261021051035-grok-bot-TASK-PRF-0156-d1fdce58aa",
+  "closurePacket": ".atm/history/evidence/TASK-PRF-0156.closure-packet.json"
 }
