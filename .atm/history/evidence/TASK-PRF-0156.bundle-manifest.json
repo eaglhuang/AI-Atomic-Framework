@@ -1,0 +1,57 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0156",
+  "updatedAt": "2026-10-21T06:31:13.777Z",
+  "updatedBy": "grok-bot",
+  "freshValidationPasses": [
+    "typecheck"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bdd7d877cb37bbd2436832dbd121e88117a469d33fb730cfbae413344415ff36",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-10-21T06:31:04.995Z",
+      "startedAt": "2026-10-21T06:30:35.851Z",
+      "finishedAt": "2026-10-21T06:31:04.995Z",
+      "durationMs": 29144,
+      "runnerKind": "dev-source",
+      "sourceCommit": "5da85166da96703bcae07216783fc5f276949f86",
+      "cached": false
+    },
+    {
+      "command": "node --test --experimental-strip-types packages/cli/src/commands/git-governance/implementation/candidate-file-policy.spec.ts packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts packages/cli/src/commands/taskflow/__tests__/ignored-artifact-close-bundle.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e594dae1e11f0496d7d0aa108d25884a3e2097f32d6c6dbb94056dd3ba312001",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-10-21T06:31:10.643Z",
+      "startedAt": "2026-10-21T06:31:07.094Z",
+      "finishedAt": "2026-10-21T06:31:10.643Z",
+      "durationMs": 3549,
+      "runnerKind": "dev-source",
+      "sourceCommit": "5da85166da96703bcae07216783fc5f276949f86",
+      "cached": false
+    },
+    {
+      "command": "npm run preclose:check",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3eddca0b1db9246f4ebb7d1dda3e8f38891b60ecdd9c5f0faddfdb2faa81e9ce",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-10-21T06:31:13.776Z",
+      "startedAt": "2026-10-21T06:31:12.231Z",
+      "finishedAt": "2026-10-21T06:31:13.776Z",
+      "durationMs": 1545,
+      "runnerKind": "dev-source",
+      "sourceCommit": "5da85166da96703bcae07216783fc5f276949f86",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

@@ -132,15 +132,15 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-10-21T05-10-37-519Z-claim-78cff576d04d",
-  "lastTransitionAt": "2026-10-21T05:10:37.519Z",
+  "lastTransitionId": "2026-10-21T06-36-46-433Z-renew-44a23e37b525",
+  "lastTransitionAt": "2026-10-21T06:36:46.433Z",
   "ledgerContractVersion": "task-ledger/v1",
   "claim": {
     "actorId": "grok-bot",
     "leaseId": "lease-079ac2a7bdd4",
     "claimedAt": "2026-10-21T05:10:35.083Z",
-    "heartbeatAt": "2026-10-21T05:10:35.083Z",
-    "ttlSeconds": 1800,
+    "heartbeatAt": "2026-10-21T06:36:45.609Z",
+    "ttlSeconds": 7200,
     "files": [
       ".atm/history/tasks/TASK-PRF-0156.json",
       ".atm/history/evidence/TASK-PRF-0156.*",
@@ -155,12 +155,11 @@
       "tests/**"
     ],
     "state": "active",
-    "intent": "write",
     "laneSession": {
-      "laneSessionId": "lane-20261021051035-grok-bot-f6f5c64471",
+      "laneSessionId": "lane-20261021063620-grok-bot-fe336604a4",
       "status": "active",
-      "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261021051035-grok-bot-f6f5c64471\""
+      "source": "option",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261021063620-grok-bot-fe336604a4\""
     }
   },
   "owner": "grok-bot",
@@ -169,26 +168,27 @@
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-a0281dc54548f69e",
-    "ticketDigest": "sha256:a0281dc54548f69e0042e58a8b1fa8190de5173e756f89d6d9296991de6ee6ed",
+    "ticketId": "wat-7bdb3a3973afc52f",
+    "ticketDigest": "sha256:7bdb3a3973afc52f364e331b0756246b070f78ee3acd673b501af9f73969b9ca",
     "taskId": "TASK-PRF-0156",
     "origin": "claim",
     "actorId": "grok-bot",
-    "laneSessionId": "lane-20261021051035-grok-bot-f6f5c64471",
+    "laneSessionId": "lane-20261021063620-grok-bot-fe336604a4",
     "claimGeneration": "lease-079ac2a7bdd4",
-    "issuedAt": "2026-10-21T05:10:35.083Z",
-    "expiresAt": "2026-10-21T05:40:35.083Z",
-    "scopeDigest": "sha256:ebdb4041483c435229e01c165f3638a7d8dc1ae006baa53fae87d456d82639b4",
+    "issuedAt": "2026-10-21T06:36:45.609Z",
+    "expiresAt": "2026-10-21T08:36:45.609Z",
+    "scopeDigest": "sha256:35e1ba44bd5aab0817ebecf9e8d3b0758a451845690c85de11a3886ba1714e37",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-10-21T05:10:35.083Z"
+      "selectedAt": "2026-10-21T06:36:45.609Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/TASK-PRF-0156.*",
+          ".atm/history/evidence/git-head.json",
           ".atm/history/task-events/TASK-PRF-0156/**",
           ".atm/history/tasks/TASK-PRF-0156.json",
           ".atm/task-plans/TASK-PRF-0156.md",
@@ -200,7 +200,7 @@
           "release/atm-root-drop/**",
           "tests/**"
         ],
-        "digest": "sha256:1e01c56704b040f4d846f8ce5a8166f264b1a88f68a93d33d81126c4edf5dacd"
+        "digest": "sha256:9c38570c2c53960d32366c485922387df004165893e499f3d2d9585e94503324"
       },
       {
         "kind": "lifecycle-operation",
