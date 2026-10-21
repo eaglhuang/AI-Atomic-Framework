@@ -408,7 +408,7 @@ export function resolveTaskScopedCommitBundle(input: LegacyValue) {
       (filePath: LegacyValue) => attributionAllowed(filePath),
     );
   const candidatePolicy: CandidateFilePolicy = {
-    declaredPaths: [...(input.taskDocument.deliverables ?? []).filter((entry: unknown): entry is string => typeof entry === "string"), ...taskOwnedProtectedOverrideAudits],
+    declaredPaths: [...(input.taskDocument.deliverables ?? []).filter((entry: unknown): entry is string => typeof entry === "string"), ...(deliverySliceStageFiles ?? []), ...taskOwnedProtectedOverrideAudits],
     scopePaths: [...declaredScope, ...taskOwnedProtectedOverrideAudits],
     readOnlyPaths: input.taskDocument.planningReadOnlyPaths ?? [],
   };
