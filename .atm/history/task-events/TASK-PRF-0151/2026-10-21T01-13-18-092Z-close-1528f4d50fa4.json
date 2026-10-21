@@ -1,0 +1,56 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-10-21T01-13-18-092Z-close-1528f4d50fa4",
+  "taskId": "TASK-PRF-0151",
+  "action": "close",
+  "actorId": "grok-bot",
+  "sessionId": "session-20261021011153-grok-bot-TASK-PRF-0151-ee889082ff",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0151.json",
+  "taskSha256": "sha256:1cd449d8a1d9132c8c1aa7b7153c9792df0b49b7f480e9b51d673637dc727f12",
+  "createdAt": "2026-10-21T01:13:18.092Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0151 --actor grok-bot --status done --historical-delivery 45e28e4ef6c1c165177f9bb8805d1c8b89a54465",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20261021011153-grok-bot-TASK-PRF-0151-ee889082ff",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0151.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/physical-line-budget-gate.test.ts"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/physical-line-budget-gate.test.ts"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-10-21T01:13:18.086Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0151.*",
+        ".atm/history/task-events/TASK-PRF-0151/**",
+        ".atm/history/tasks/TASK-PRF-0151.json",
+        ".atm/task-plans/TASK-PRF-0151.md",
+        "docs/governance/governance-friction-2026-10.md",
+        "docs/governance/proposals/**",
+        "docs/governance/proposals/governance-token-cost-proposals-2026-10.md",
+        "packages/cli/dist",
+        "packages/cli/dist/**",
+        "release/atm-onefile/**",
+        "release/atm-root-drop/**"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/dist",
+        "packages/cli/dist/**"
+      ],
+      "requiredGates": [
+        "node --strip-types tests/cli/physical-line-budget-gate.test.ts"
+      ]
+    }
+  }
+}
