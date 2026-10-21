@@ -377,6 +377,11 @@ try {
   });
   check(crossSession.status === 0, `cross-session-overlap regression must pass:\n${crossSession.stdout}\n${crossSession.stderr}`);
 
+  const commitPath = spawnSync(process.execPath, ['--strip-types', path.join(root, 'tests/core/live-write-commit-path.test.ts')], {
+    cwd: root, encoding: 'utf8'
+  });
+  check(commitPath.status === 0, `live-write commit path regression must pass:\n${commitPath.stdout}\n${commitPath.stderr}`);
+
   const concurrent = spawnSync(process.execPath, ['--strip-types', path.join(root, 'tests/core/steward-concurrent-commit.test.ts')], {
     cwd: root,
     encoding: 'utf8'
