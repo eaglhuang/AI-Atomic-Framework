@@ -2,7 +2,7 @@
 doc_id: doc_TASK-GIT-0035
 task_id: TASK-GIT-0035
 title: "Distinguish local planning projection from cross-authority close writes"
-status: in-progress
+status: done
 started_at: 2026-10-21T09:47:20Z
 started_by_agent: codex-gpt-6
 amendment_epoch: 1
@@ -32,6 +32,15 @@ rollback:
   notes: "Revert the delivery commit if the change fails validation."
 outOfScope: []
 nonGoals: []
+completed_at: "2026-10-21T14:14:52.327Z"
+completed_by_agent: "codex-gpt-6"
+closedAt: "2026-10-21T14:14:52.327Z"
+closedByActor: "codex-gpt-6"
+closedByCommand: atm tasks close
+lastTransitionId: "2026-10-21T14-14-52-327Z-close-093a1d8eb400"
+lastTransitionAt: "2026-10-21T14:14:52.327Z"
+ledgerContractVersion: task-ledger/v1
+delivery_commit: "299da0c48a1f9293fc782989250aec84b12695c7"
 ---
 
 # TASK-GIT-0035 - Distinguish local planning projection from cross-authority close writes

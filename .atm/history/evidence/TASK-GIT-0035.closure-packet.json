@@ -1,0 +1,164 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-GIT-0035",
+  "targetRepoIdentity": {
+    "kind": "framework",
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "f1bc581aba7de383385b84e8ec25503aedfec911",
+  "governedTreeSha": "67d13215181e7d5ec9a38853d31087f6ffbbd550",
+  "targetCommitDelta": {
+    "currentCommitSha": "f1bc581aba7de383385b84e8ec25503aedfec911",
+    "parentCommitShas": [
+      "f1bc581aba7de383385b84e8ec25503aedfec911"
+    ],
+    "governedTreeSha": "67d13215181e7d5ec9a38853d31087f6ffbbd550",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-6.runner-sync-receipt.json",
+      ".atm/history/task-events/TASK-GIT-0035/2026-10-21T10-24-33-849Z-renew-ae6cb88cc123.json",
+      ".atm/history/task-events/TASK-GIT-0035/2026-10-21T14-11-57-163Z-renew-1172686a01a8.json",
+      ".atm/history/tasks/TASK-GIT-0035.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/dist/build-identity.json",
+      "packages/cli/dist/commands/taskflow/commit-bundle-assembly.js",
+      "packages/cli/dist/npm-runtime/build-identity.json",
+      "packages/cli/dist/npm-runtime/manifest.json",
+      "packages/cli/dist/npm-runtime/runtime.mjs",
+      "packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/create-atm/dist/build-identity.json",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/build-identity.json",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/commit-bundle-assembly.js",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/build-identity.json",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/manifest.json",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/runtime.mjs",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/commit-bundle-markdown-paths.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "release/atm-root-drop/packages/create-atm/dist/build-identity.json",
+      "release/atm-root-drop/release-manifest.json",
+      "tests/cli/target-owned-planning-route.test.ts",
+      "tests/cli/task-close-cleanup-rollback.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/git-commit-failure-index-restoration.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ef93f83233cb22a0ba674df37f814fd67a278d06095c1e072b47520940298f17",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --strip-types tests/cli/git-commit-failure-residue-rollback.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:fad2b5ab35b0a574da7b21401cbbefc2ed271cc513323a8b864c3b646ba3e839",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --strip-types tests/cli/target-owned-planning-route.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:08bc73d450778e9c71007341ac018358572a8799a6b2e8dba2635f9180c31c09",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7fa55b436882110790a0bf72b3510a0df69e93ccf3f80e17fb62a3b403a828d9",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:4795ce6c7f3c2d038182cf1c0d6f9690b35fe9027022d0e4a2a9b0dd8ea8472e",
+      "runnerVersion": "0.1.2"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts",
+    "node --strip-types tests/cli/git-commit-failure-index-restoration.test.ts",
+    "node --strip-types tests/cli/git-commit-failure-residue-rollback.test.ts",
+    "node --strip-types tests/cli/target-owned-planning-route.test.ts"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "git diff --check",
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts",
+    "node --strip-types tests/cli/target-owned-planning-route.test.ts"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-10-21T14:14:51.919Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-GIT-0035.*",
+      ".atm/history/task-events/TASK-GIT-0035/**",
+      ".atm/history/tasks/TASK-GIT-0035.json",
+      "packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "tests/cli/target-owned-planning-route.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "tests/cli/target-owned-planning-route.test.ts"
+    ],
+    "requiredGates": [
+      "git diff --check",
+      "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts",
+      "node --strip-types tests/cli/target-owned-planning-route.test.ts"
+    ]
+  },
+  "evidencePath": ".atm/runtime/evidence-ledger/bundles/TASK-GIT-0035.json",
+  "closedAt": "2026-10-21T14:14:51.919Z",
+  "closedByActor": "codex-gpt-6",
+  "sessionId": "session-20261021094707-codex-gpt-6-TASK-GIT-0035-d107781e38",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "299da0c48a1f9293fc782989250aec84b12695c7",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "tests/cli/target-owned-planning-route.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/task-events/TASK-GIT-0035/2026-10-21T09-46-59-718Z-import-93a423bfba0e.json",
+      ".atm/history/task-events/TASK-GIT-0035/2026-10-21T09-47-07-319Z-reserve-5dcf317bab06.json",
+      ".atm/history/task-events/TASK-GIT-0035/2026-10-21T09-47-07-324Z-promote-e22d1a7b5450.json",
+      ".atm/history/task-events/TASK-GIT-0035/2026-10-21T09-47-15-098Z-claim-0556b448d47b.json",
+      ".atm/history/tasks/TASK-GIT-0035.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

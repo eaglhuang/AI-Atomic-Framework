@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-GIT-0035",
   "title": "Distinguish local planning projection from cross-authority close writes",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -133,8 +133,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-10-21T09-47-15-098Z-claim-0556b448d47b",
-  "lastTransitionAt": "2026-10-21T09:47:15.098Z",
+  "lastTransitionId": "2026-10-21T14-14-52-049Z-close-5a843eea02a6",
+  "lastTransitionAt": "2026-10-21T14:14:52.049Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-6",
   "reservedAt": "2026-10-21T09:47:07.319Z",
@@ -143,7 +143,7 @@
     "actorId": "codex-gpt-6",
     "leaseId": "lease-cb2ae60dca50",
     "claimedAt": "2026-10-21T09:47:07.329Z",
-    "heartbeatAt": "2026-10-21T09:47:07.329Z",
+    "heartbeatAt": "2026-10-21T14:14:51.932Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-GIT-0035.json",
@@ -151,34 +151,34 @@
       "packages/cli/src/commands/taskflow/close-orchestration.ts",
       "tests/cli/target-owned-planning-route.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
-      "laneSessionId": "lane-20261021094707-codex-gpt-6-7b5874f4f4",
+      "laneSessionId": "lane-20261021141155-codex-gpt-6-67072adcd4",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261021094707-codex-gpt-6-7b5874f4f4\""
-    }
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261021141155-codex-gpt-6-67072adcd4\""
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-10-21T09:47:07.329Z",
   "startedByActor": "codex-gpt-6",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-99fbf89d9445d1f2",
-    "ticketDigest": "sha256:99fbf89d9445d1f2ebb9042e4d8c08e24d61309519e0b3afd77593b1609cb9b8",
+    "ticketId": "wat-b0205fe2d10b77ba",
+    "ticketDigest": "sha256:b0205fe2d10b77ba0e1c7af7a3101bc3cf850e769dcaec1e93b2d6aec5eb5e02",
     "taskId": "TASK-GIT-0035",
     "origin": "claim",
     "actorId": "codex-gpt-6",
-    "laneSessionId": "lane-20261021094707-codex-gpt-6-7b5874f4f4",
+    "laneSessionId": "lane-20261021141155-codex-gpt-6-67072adcd4",
     "claimGeneration": "lease-cb2ae60dca50",
-    "issuedAt": "2026-10-21T09:47:07.329Z",
-    "expiresAt": "2026-10-21T10:17:07.329Z",
+    "issuedAt": "2026-10-21T14:11:55.530Z",
+    "expiresAt": "2026-10-21T14:41:55.530Z",
     "scopeDigest": "sha256:d6896fa64ad4ab5ac691202255e598e7e09dc259c1d6b2dd5d03bc162031b6f2",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-10-21T09:47:07.329Z"
+      "selectedAt": "2026-10-21T14:11:55.530Z"
     },
     "grants": [
       {
@@ -256,5 +256,9 @@
     },
     "createdAt": "2026-10-21T09:47:15.097Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-10-21T14:14:51.932Z",
+  "closedByActor": "codex-gpt-6",
+  "closedBySessionId": "session-20261021094707-codex-gpt-6-TASK-GIT-0035-d107781e38",
+  "closurePacket": ".atm/history/evidence/TASK-GIT-0035.closure-packet.json"
 }
