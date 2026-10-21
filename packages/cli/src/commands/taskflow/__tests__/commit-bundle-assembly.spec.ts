@@ -1,4 +1,31 @@
 import { issueWorkAdmissionTicket } from '../../../../../core/src/broker/work-admission-ticket.ts';
+import { test } from 'node:test';
+import { commitRepoWithTemporaryIndex } from '../commit-bundle-assembly.ts';
+import { candidateGit, nulPaths, stageExactCandidateFiles } from '../../git-governance/implementation/candidate-file-policy.ts';
+
+test('post-commit reset preserves foreign staged blobs matching literal special filenames', () => {
+  const repoRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-p2-reset-'));
+  try {
+    const git = (...args: string[]) => candidateGit(repoRoot, args);
+    git('init');
+    git('config', 'user.email', 'p2@example.invalid');
+    git('config', 'user.name', 'P2 regression');
+    const selected = ['star*.txt', 'question?.txt', 'bracket[ab].txt'];
+    const foreign = ['star-peer.txt', 'questionX.txt', 'bracketa.txt'];
+    for (const file of [...selected, ...foreign]) writeFileSync(path.join(repoRoot, file), 'base');
+    stageExactCandidateFiles(repoRoot, [...selected, ...foreign]);
+    git('-c', 'core.hooksPath=/dev/null', 'commit', '-m', 'fixture');
+    for (const file of foreign) writeFileSync(path.join(repoRoot, file), `staged ${file}`);
+    stageExactCandidateFiles(repoRoot, foreign);
+    const before = git('ls-files', '-s', '-z', '--', ...foreign);
+    for (const file of foreign) writeFileSync(path.join(repoRoot, file), 'unstaged bytes');
+    for (const file of selected) writeFileSync(path.join(repoRoot, file), 'delivery');
+    commitRepoWithTemporaryIndex({ repoRoot, stageFiles: selected, args: ['-c', 'core.hooksPath=/dev/null', 'commit', '-m', 'delivery'] });
+    assert.deepEqual(nulPaths(git('diff-tree', '--no-commit-id', '--name-only', '-r', '-z', 'HEAD')).sort(), [...selected].sort());
+    assert.equal(git('ls-files', '-s', '-z', '--', ...foreign), before, 'foreign staged object IDs must survive reset');
+    assert.deepEqual(nulPaths(git('diff', '--cached', '--name-only', '-z')).sort(), [...foreign].sort());
+  } finally { rmSync(repoRoot, { recursive: true, force: true }); }
+});
 import assert from 'node:assert/strict'; import { execFileSync } from 'node:child_process'; import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'; import os from 'node:os'; import path from 'node:path'; import { buildTaskflowCommitBundle, commitTaskflowDeliveryFiles, deferGovernanceDirtyFiles, finalizeTaskflowCommitBundle, isDeferrableGovernanceDirtyFile, restoreDeferredGovernanceDirtyFiles
 } from '../commit-bundle-assembly.ts'; import { closeTransactionMutexPath } from '../close-transaction-mutex.ts'; function writeJson(filePath: string, value: unknown) { mkdirSync(path.dirname(filePath), { recursive: true }); writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8'); } function writeText(filePath: string, text: string) { mkdirSync(path.dirname(filePath), { recursive: true });
 writeFileSync(filePath, text, 'utf8'); } function initGitRepo(repo: string) { mkdirSync(repo, { recursive: true }); execFileSync('git', ['init'], { cwd: repo, stdio: 'ignore' }); execFileSync('git', ['config', 'user.email', 'validator@example.invalid'], { cwd: repo, stdio: 'ignore' }); execFileSync('git', ['config', 'user.name', 'ATM Validator'], { cwd: repo, stdio: 'ignore' });

@@ -62,9 +62,9 @@ export function assembleSealedCommitIndex(input: { readonly cwd: string; readonl
   const gitlinks = candidateGitlinks(input.cwd, input.env, input.baseRef);
   for (const entry of input.bundle.entries) {
     if (entry.mode === '160000' || (entry.mode === '120000' && !isTombstone(entry) && !entry.declared) || !safeCandidatePath(input.cwd, entry.path, gitlinks)) throw new CliError('ATM_COMMIT_UNSAFE_CANDIDATE_PATH', `Unsafe sealed path: ${entry.path}`, { exitCode: 1 });
-    if (isTombstone(entry)) candidateGit(input.cwd, ['update-index', '--force-remove', '--', entry.path], input.env);
-    else candidateGit(input.cwd, ['update-index', '--add', '--cacheinfo', `${entry.mode},${entry.blobId},${entry.path}`], input.env);
   }
+  for (const entry of input.bundle.entries.filter(isTombstone)) candidateGit(input.cwd, ['update-index', '--force-remove', '--', entry.path], input.env);
+  for (const entry of input.bundle.entries.filter((entry) => !isTombstone(entry))) candidateGit(input.cwd, ['update-index', '--add', '--cacheinfo', `${entry.mode},${entry.blobId},${entry.path}`], input.env);
   // Content comes only from the seal; re-reading worktree paths here used to
   // recursively stage ignored children and could replace admitted bytes.
   assertFinalCandidateIndex(input.cwd, input.env, policy, input.baseRef);

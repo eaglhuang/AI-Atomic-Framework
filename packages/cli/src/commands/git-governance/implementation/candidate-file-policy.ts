@@ -49,7 +49,11 @@ export function matchesCandidateScope(file: string, scope: string): boolean {
 
 export function isDeclaredCandidate(file: string, policy: CandidateFilePolicy, cwd?: string): boolean {
   return Boolean(policy.declaredPaths?.includes(file))
-    && (policy.scopePaths === undefined || policy.scopePaths.some((scope) => matchesCandidateScope(file, scope)))
+    && withinCandidateBoundary(file, policy, cwd);
+}
+
+function withinCandidateBoundary(file: string, policy: CandidateFilePolicy, cwd?: string): boolean {
+  return (policy.scopePaths === undefined || policy.scopePaths.some((scope) => matchesCandidateScope(file, scope)))
     && !policy.readOnlyPaths?.some((scope) => matchesCandidateScope(file, cwd && path.isAbsolute(scope) ? path.relative(cwd, scope).split(path.sep).join('/') : scope));
 }
 
@@ -84,7 +88,8 @@ export function resolveCandidateFiles(cwd: string, candidates: readonly string[]
     else if (info?.isFile() || (info?.isSymbolicLink() && isDeclaredCandidate(file, policy, cwd)) || (!info && tracked.includes(file))) files.add(file);
   };
   for (const candidate of candidates) {
-    if (stat(path.join(cwd, candidate))) visit(candidate);
+    const literal = Boolean(stat(path.join(cwd, candidate))) || tracked.includes(candidate) || Boolean(policy.declaredPaths?.includes(candidate));
+    if (literal) visit(candidate);
     else if (/[*?[]/.test(candidate)) {
       const prefix = candidate.slice(0, candidate.search(/[*?[]/));
       const root = prefix.slice(0, prefix.lastIndexOf('/'));
@@ -98,7 +103,7 @@ export function resolveCandidateFiles(cwd: string, candidates: readonly string[]
       };
       if (stat(path.join(cwd, root || '.'))?.isDirectory()) discover(root);
     } else visit(candidate);
-    for (const file of tracked) if (matchesCandidateScope(file, candidate)) visit(file);
+    for (const file of tracked) if (literal ? file === candidate || file.startsWith(`${candidate}/`) : matchesCandidateScope(file, candidate)) visit(file);
   }
   const ignored = ignoredCandidatePaths(cwd, [...files]);
   return [...files].filter((file) => !ignored.has(file) || isDeclaredCandidate(file, policy, cwd) || !stat(path.join(cwd, file))).sort();
@@ -110,6 +115,9 @@ export function stageExactCandidateFiles(cwd: string, files: readonly string[], 
 }
 
 export function assertFinalCandidateIndex(cwd: string, env: NodeJS.ProcessEnv, policy: CandidateFilePolicy = {}, baseRef = 'HEAD'): void {
+  const changed = nulPaths(candidateGit(cwd, ['diff', '--cached', '--name-only', '--no-renames', '-z', baseRef], env));
+  const outsideBoundary = changed.filter((file) => !withinCandidateBoundary(file, policy, cwd));
+  if (outsideBoundary.length) throw new CliError('ATM_COMMIT_CANDIDATE_SCOPE_VIOLATION', 'Final candidate index violates scope or read-only paths.', { exitCode: 1, details: { paths: outsideBoundary } });
   const present = nulPaths(candidateGit(cwd, ['diff', '--cached', '--name-only', '--no-renames', '--diff-filter=ACMRT', '-z', baseRef], env));
   const ignored = ignoredCandidatePaths(cwd, present);
   const gitlinks = candidateGitlinks(cwd, env, baseRef);

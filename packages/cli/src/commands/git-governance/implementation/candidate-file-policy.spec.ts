@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { test } from 'node:test';
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -92,3 +93,69 @@ try {
   rmSync(root, { recursive: true, force: true });
   rmSync(outside, { recursive: true, force: true });
 }
+
+function fixture(run: (cwd: string) => void) {
+  const cwd = mkdtempSync(path.join(os.tmpdir(), 'atm-p2-regression-'));
+  try {
+    candidateGit(cwd, ['init']);
+    candidateGit(cwd, ['config', 'user.email', 'p2@example.invalid']);
+    candidateGit(cwd, ['config', 'user.name', 'P2 regression']);
+    candidateGit(cwd, ['-c', 'core.hooksPath=/dev/null', 'commit', '--allow-empty', '-m', 'fixture']);
+    run(cwd);
+  } finally { rmSync(cwd, { recursive: true, force: true }); }
+}
+
+test('literal wildcard filenames select only the requested tracked path, including deletions', () => fixture((cwd) => {
+  const literals = ['star*.txt', 'question?.txt'];
+  const peers = ['star-peer.txt', 'questionX.txt'];
+  for (const file of [...literals, ...peers]) writeFileSync(path.join(cwd, file), 'base');
+  stageExactCandidateFiles(cwd, [...literals, ...peers]);
+  candidateGit(cwd, ['-c', 'core.hooksPath=/dev/null', 'commit', '-m', 'tracked names']);
+  for (const file of literals) {
+    assert.deepEqual(resolveCandidateFiles(cwd, [file]), [file]);
+    rmSync(path.join(cwd, file));
+    assert.deepEqual(resolveCandidateFiles(cwd, [file]), [file]);
+  }
+  assert.deepEqual(resolveCandidateFiles(cwd, ['star*.txt'], { declaredPaths: ['star*.txt'] }), ['star*.txt']);
+}));
+
+test('final index rejects ordinary files outside scope or under read-only paths, including deletions', () => fixture((cwd) => {
+  writeFileSync(path.join(cwd, 'ordinary.txt'), 'base');
+  stageExactCandidateFiles(cwd, ['ordinary.txt']);
+  candidateGit(cwd, ['-c', 'core.hooksPath=/dev/null', 'commit', '-m', 'ordinary file']);
+  for (const deleted of [false, true]) {
+    if (deleted) rmSync(path.join(cwd, 'ordinary.txt'));
+    else writeFileSync(path.join(cwd, 'ordinary.txt'), 'changed');
+    for (const policy of [
+      { scopePaths: ['allowed/**'] },
+      { scopePaths: ['ordinary.txt'], readOnlyPaths: ['ordinary.txt'] },
+      { readOnlyPaths: [path.join(cwd, 'ordinary.txt')] }
+    ]) {
+      assert.throws(() => withWorktreeCandidateIndex({ cwd, paths: [], policy, run: (env) => {
+        stageExactCandidateFiles(cwd, ['ordinary.txt'], env);
+      } }), /scope|read.only/i);
+    }
+  }
+}));
+
+test('sealed index applies tombstones before directory-to-file and file-to-directory replacements', () => fixture((cwd) => {
+  mkdirSync(path.join(cwd, 'directory'));
+  writeFileSync(path.join(cwd, 'directory/child.txt'), 'child');
+  writeFileSync(path.join(cwd, 'file'), 'file');
+  stageExactCandidateFiles(cwd, ['directory/child.txt', 'file']);
+  candidateGit(cwd, ['-c', 'core.hooksPath=/dev/null', 'commit', '-m', 'replacement base']);
+  const blobId = candidateGit(cwd, ['hash-object', '-w', '--stdin'], undefined, 'replacement').trim();
+  const bundle = sealCommitBundle({ entries: [
+    { path: 'directory', mode: '100644', blobId, provenance: 'task-scope' },
+    { path: 'directory/child.txt', mode: '100644', blobId: '', disposition: 'deleted', provenance: 'task-scope' },
+    { path: 'file', mode: '100644', blobId: '', disposition: 'deleted', provenance: 'task-scope' },
+    { path: 'file/child.txt', mode: '100644', blobId, provenance: 'task-scope' }
+  ] });
+  const indexDir = mkdtempSync(path.join(os.tmpdir(), 'atm-p2-replacement-index-'));
+  try {
+    const env = { GIT_INDEX_FILE: path.join(indexDir, 'index') };
+    assembleSealedCommitIndex({ cwd, bundle, env });
+    assert.deepEqual(nulPaths(candidateGit(cwd, ['ls-files', '-z'], env)), ['directory', 'file/child.txt']);
+    candidateGit(cwd, ['write-tree'], env);
+  } finally { rmSync(indexDir, { recursive: true, force: true }); }
+}));
