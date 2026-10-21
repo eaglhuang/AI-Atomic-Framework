@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-GIT-0033",
   "title": "Recognize inherited merge-parent source in physical line admission",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -120,8 +120,8 @@
     ],
     "findings": []
   },
-  "lastTransitionId": "2026-10-21T07-28-58-459Z-claim-5d7dc4b99f37",
-  "lastTransitionAt": "2026-10-21T07:28:58.459Z",
+  "lastTransitionId": "2026-10-21T09-13-07-161Z-close-ffa85bae0a4b",
+  "lastTransitionAt": "2026-10-21T09:13:07.161Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-6",
   "reservedAt": "2026-10-21T07:28:50.453Z",
@@ -130,53 +130,54 @@
     "actorId": "codex-gpt-6",
     "leaseId": "lease-c9da8bab0dc8",
     "claimedAt": "2026-10-21T07:28:50.462Z",
-    "heartbeatAt": "2026-10-21T07:28:50.462Z",
+    "heartbeatAt": "2026-10-21T09:13:07.074Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-GIT-0033.json",
       "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
       "tests/cli/merge-parent-line-budget.test.ts"
     ],
-    "state": "active",
-    "intent": "write",
+    "state": "released",
     "laneSession": {
-      "laneSessionId": "lane-20261021072850-codex-gpt-6-6b748e15b7",
+      "laneSessionId": "lane-20261021090122-codex-gpt-6-383e1dfd5f",
       "status": "active",
       "source": "minted",
-      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261021072850-codex-gpt-6-6b748e15b7\""
-    }
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261021090122-codex-gpt-6-383e1dfd5f\""
+    },
+    "reason": "closed"
   },
   "startedAt": "2026-10-21T07:28:50.462Z",
   "startedByActor": "codex-gpt-6",
   "workAdmissionTicket": {
     "schemaId": "atm.workAdmissionTicket.v1",
     "specVersion": "0.1.0",
-    "ticketId": "wat-62a21fcc74264de4",
-    "ticketDigest": "sha256:62a21fcc74264de41e029df2d8af37ac38ad92e0472a1093c2e49feb594e890d",
+    "ticketId": "wat-2d2f96aee9e3af6a",
+    "ticketDigest": "sha256:2d2f96aee9e3af6ace46124de1b96992ec928a7aaa98f6000d52f8a6fc5afcb2",
     "taskId": "TASK-GIT-0033",
     "origin": "claim",
     "actorId": "codex-gpt-6",
-    "laneSessionId": "lane-20261021072850-codex-gpt-6-6b748e15b7",
+    "laneSessionId": "lane-20261021090122-codex-gpt-6-383e1dfd5f",
     "claimGeneration": "lease-c9da8bab0dc8",
-    "issuedAt": "2026-10-21T07:28:50.462Z",
-    "expiresAt": "2026-10-21T07:58:50.462Z",
-    "scopeDigest": "sha256:d938cb1a223e97cc620306cd38dca252863acb7d03cbebdb1879003503cf0565",
+    "issuedAt": "2026-10-21T09:01:22.993Z",
+    "expiresAt": "2026-10-21T09:31:22.993Z",
+    "scopeDigest": "sha256:b7177042a461818f57928ff5f76ad5cf0e34aebb8fce66d88956683ea3fc6956",
     "runnerSelection": {
       "runnerKind": "frozen",
       "runnerRef": "release/atm-onefile/atm.mjs",
-      "selectedAt": "2026-10-21T07:28:50.462Z"
+      "selectedAt": "2026-10-21T09:01:22.993Z"
     },
     "grants": [
       {
         "kind": "file-write",
         "values": [
           ".atm/history/evidence/TASK-GIT-0033.*",
+          ".atm/history/evidence/git-head.json",
           ".atm/history/task-events/TASK-GIT-0033/**",
           ".atm/history/tasks/TASK-GIT-0033.json",
           "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
           "tests/cli/merge-parent-line-budget.test.ts"
         ],
-        "digest": "sha256:e38852449541f0a2dbaf78cde43a936f2d088f66fb23a31e9b46db7a55624038"
+        "digest": "sha256:b9aa5093758fcbb5feec50988f3a40a5d473054adf6a763c0adcaf041c041e23"
       },
       {
         "kind": "lifecycle-operation",
@@ -240,5 +241,9 @@
     },
     "createdAt": "2026-10-21T07:28:58.458Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-10-21T09:13:07.074Z",
+  "closedByActor": "codex-gpt-6",
+  "closedBySessionId": "session-20261021072850-codex-gpt-6-TASK-GIT-0033-7cfa3a90cd",
+  "closurePacket": ".atm/history/evidence/TASK-GIT-0033.closure-packet.json"
 }

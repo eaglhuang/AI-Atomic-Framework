@@ -1,0 +1,156 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-GIT-0033",
+  "targetRepoIdentity": {
+    "kind": "framework",
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "8fbe559a6c924dbcfec3c1823176235635144726",
+  "governedTreeSha": "08609259ec630fb8feccfe491a01f661d1c161b9",
+  "targetCommitDelta": {
+    "currentCommitSha": "8fbe559a6c924dbcfec3c1823176235635144726",
+    "parentCommitShas": [
+      "8fbe559a6c924dbcfec3c1823176235635144726"
+    ],
+    "governedTreeSha": "08609259ec630fb8feccfe491a01f661d1c161b9",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-6.runner-sync-receipt.json",
+      ".atm/history/task-events/TASK-GIT-0033/2026-10-21T09-01-24-622Z-renew-c856247ad3ef.json",
+      ".atm/history/tasks/TASK-GIT-0033.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/dist/build-identity.json",
+      "packages/cli/dist/commands/git-governance/commit-scope-policy.js",
+      "packages/cli/dist/npm-runtime/build-identity.json",
+      "packages/cli/dist/npm-runtime/manifest.json",
+      "packages/cli/dist/npm-runtime/runtime.mjs",
+      "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+      "packages/create-atm/dist/build-identity.json",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/build-identity.json",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/commit-scope-policy.js",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/build-identity.json",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/manifest.json",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/runtime.mjs",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+      "release/atm-root-drop/packages/create-atm/dist/build-identity.json",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/tests/cli/ci-product-lane-contract.test.ts",
+      "tests/cli/merge-parent-line-budget.test.ts",
+      "tests/cli/task-close-cleanup-rollback.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/commit-attribution-sealed-transaction.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e17d8661df79407d04fb0c646616445ca5b7469cc4339ad551f0b18c9a60a088",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:caf5f01f03e8067a2abd5d397378fcfcdda00aa49f43e4ec065f0fa6c04c38d6",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:caf5f01f03e8067a2abd5d397378fcfcdda00aa49f43e4ec065f0fa6c04c38d6",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --experimental-strip-types tests/cli/merge-parent-line-budget.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2a10dd01ba5e3b2eb6da5df03ac433dde4a151a37c65dce42e0057e994a4b59b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "node --experimental-strip-types tests/cli/merge-parent-line-budget.test.ts",
+    "node --strip-types tests/cli/commit-attribution-sealed-transaction.test.ts",
+    "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "git diff --check",
+    "node --experimental-strip-types tests/cli/merge-parent-line-budget.test.ts"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-10-21T09:13:07.061Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-GIT-0033.*",
+      ".atm/history/task-events/TASK-GIT-0033/**",
+      ".atm/history/tasks/TASK-GIT-0033.json",
+      "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+      "tests/cli/merge-parent-line-budget.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+      "tests/cli/merge-parent-line-budget.test.ts"
+    ],
+    "requiredGates": [
+      "git diff --check",
+      "node --experimental-strip-types tests/cli/merge-parent-line-budget.test.ts"
+    ]
+  },
+  "evidencePath": ".atm/runtime/evidence-ledger/bundles/TASK-GIT-0033.json",
+  "closedAt": "2026-10-21T09:13:07.061Z",
+  "closedByActor": "codex-gpt-6",
+  "sessionId": "session-20261021072850-codex-gpt-6-TASK-GIT-0033-7cfa3a90cd",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "8fbe559a6c924dbcfec3c1823176235635144726",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+      "tests/cli/merge-parent-line-budget.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/task-events/TASK-GIT-0033/2026-10-21T07-28-42-398Z-import-151273d6e65f.json",
+      ".atm/history/task-events/TASK-GIT-0033/2026-10-21T07-28-50-453Z-reserve-957e3288ecf0.json",
+      ".atm/history/task-events/TASK-GIT-0033/2026-10-21T07-28-50-457Z-promote-ae44e786790d.json",
+      ".atm/history/task-events/TASK-GIT-0033/2026-10-21T07-28-58-459Z-claim-5d7dc4b99f37.json",
+      ".atm/history/tasks/TASK-GIT-0033.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

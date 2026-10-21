@@ -6451,6 +6451,7 @@
     "release/atm-root-drop/tests/cli/managed-plan-executor.test.ts",
     "release/atm-root-drop/tests/cli/mandatory-gate-telemetry.test.ts",
     "release/atm-root-drop/tests/cli/map-equivalence-isolation.test.ts",
+    "release/atm-root-drop/tests/cli/merge-parent-line-budget.test.ts",
     "release/atm-root-drop/tests/cli/model-price-refresh.test.ts",
     "release/atm-root-drop/tests/cli/module-boundary-topology.test.ts",
     "release/atm-root-drop/tests/cli/newcomer-fast-route-commit.test.ts",
@@ -7215,7 +7216,7 @@
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
     "copied": 0,
-    "unchanged": 7179,
+    "unchanged": 7180,
     "removed": 0
   },
   "buildMode": "full",
@@ -26239,7 +26240,7 @@
       },
       {
         "path": "packages/cli/dist/build-identity.json",
-        "digest": "f82a07df947d8292cb668e49a43d29c72d6d09937deab97b5aaab388b157f072",
+        "digest": "22abb3d4a32542cf2ef6eaf0077fc8ead1e990c1b1340a50ff829ef76eab861f",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/build-identity.json"
@@ -28165,7 +28166,7 @@
       },
       {
         "path": "packages/cli/dist/commands/git-governance/commit-scope-policy.js",
-        "digest": "fd74a9ee4c484d0fe7edb696bdecab7fc177276de7ad089e856a9caf33ba5569",
+        "digest": "cb838b78e9cbdfb47418b01ab17c2eca490265ce5ae10b58524b9c6345e1390d",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/git-governance/commit-scope-policy.js"
@@ -32314,7 +32315,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/build-identity.json",
-        "digest": "7f81e6a4b91d16578a8232352c5d41c9c9a478d9de04bde0c1c9cfd48ae76d0a",
+        "digest": "c6d7ee11bdb5a12e3017916ad5e0037ce198dc63a816e00ba1546b5e7457623f",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/build-identity.json"
@@ -33043,7 +33044,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/manifest.json",
-        "digest": "a8a464aee409ed5083566f67f7f83458f9f154c8a9c0791f1f7ac5cef20b6b24",
+        "digest": "04b05a69a2d616e6570cc7f2544377e9d9b71544ac0b77e18808e61483a503a8",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/manifest.json"
@@ -33052,7 +33053,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/runtime.mjs",
-        "digest": "0cbe1c6258a3406151b28a43be2faa0a9bed17996e787451b6349522a06e8b02",
+        "digest": "59deca502478785140033074ab8d9e6558e8789fad40f67306210fcc017f98ef",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/runtime.mjs"
@@ -35716,7 +35717,7 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
-        "digest": "d7aaaf6c8845c37900bb466a857f97884c76e1390a1b301d2a0a5412a9eac4cb",
+        "digest": "0f9d72c63ff537c438da7d3c7a32f1b7fe5a0969e5006bc7295bda8b91f6910c",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/commit-scope-policy.ts"
@@ -50575,7 +50576,7 @@
       },
       {
         "path": "packages/create-atm/dist/build-identity.json",
-        "digest": "d801a5ea9db30628a4e275b244cdd0aa4777e1647ee73a706590bf2ae3c91bb4",
+        "digest": "4ff1a80ce02aae285cba2367573c76a1c7373f5d23f0a0b79b30621023573afd",
         "origin": "source",
         "inputPaths": [
           "packages/create-atm/dist/build-identity.json"
@@ -63283,7 +63284,7 @@
       },
       {
         "path": "tests/cli/ci-product-lane-contract.test.ts",
-        "digest": "25e6cd2c104e34dd9012875c0df9cc5e90a98ea0c35fc16bf4f3f2058e4fa734",
+        "digest": "9b43822c4a145c45fb03fe974bb0a12e7b0bbcad497bda666048f3f65ee5fc44",
         "origin": "source",
         "inputPaths": [
           "tests/cli/ci-product-lane-contract.test.ts"
@@ -64988,6 +64989,15 @@
         "origin": "source",
         "inputPaths": [
           "tests/cli/map-equivalence-isolation.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "tests/cli/merge-parent-line-budget.test.ts",
+        "digest": "08de795fdc61e3472890537bb245ce5c4b9cfe2d011b3ff70b729ec105b99090",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/merge-parent-line-budget.test.ts"
         ],
         "replaceable": true
       },
@@ -71832,7 +71842,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:2d18b4c065ec83dbf9a0e122c9ecc063da90b88904ec013e341e224bf6b997bb"
+    "treeDigest": "sha256:3cdf94b132b82fc540b09731b62206d1b399582564013430f16d801c55918bd6"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -73444,7 +73454,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:9ed976f97e14707a231bdb61f8a876b67469ddff93d3305dad1264b1d20d0c18"
+    "digest": "sha256:0d773dcb03d16bcd1204a7e9dc7ee30816a477bb151b660bfaa00a3a2505f547"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -79869,6 +79879,7 @@
       "release/atm-root-drop/tests/cli/managed-plan-executor.test.ts",
       "release/atm-root-drop/tests/cli/mandatory-gate-telemetry.test.ts",
       "release/atm-root-drop/tests/cli/map-equivalence-isolation.test.ts",
+      "release/atm-root-drop/tests/cli/merge-parent-line-budget.test.ts",
       "release/atm-root-drop/tests/cli/model-price-refresh.test.ts",
       "release/atm-root-drop/tests/cli/module-boundary-topology.test.ts",
       "release/atm-root-drop/tests/cli/newcomer-fast-route-commit.test.ts",
@@ -80635,22 +80646,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:29f02710c7a38ca70e1071a3e23ac33df77df5981d71e6c02496df8759e1bae0",
-  "sealedSourceCommit": "4414aa1710a337ec1834486158607ce50024350d",
+  "buildInputsTreeHash": "sha256:c95c64f7dc74434cc6930e14314edf31d7ebc70361a63a7c38ba23c676aca9cc",
+  "sealedSourceCommit": "8fbe559a6c924dbcfec3c1823176235635144726",
   "buildDecision": "incrementalBuild",
-  "buildDecisionReason": "diff planner selected 2 affected package(s)",
-  "incrementalPlanDigest": "sha256:7c52082fb3b72f21190f638fccfb0f60e64b6c82a9d74240cfc10d72e05d59aa",
-  "tsBuildCacheDigest": "sha256:1faeca451ea66daed99a48aff5dec4d03b05f624fcb90afd67c466b85df0ef2a",
+  "buildDecisionReason": "diff planner selected 1 affected package(s)",
+  "incrementalPlanDigest": "sha256:52557368bdf3001f1abf947059b48012305c390984ee6d364f41f7514ae054f9",
+  "tsBuildCacheDigest": "sha256:d3ecc463f7e07b72d45da12d67429251570e0d2d3e44a16c6c2d20559f3e7db0",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 47,
-    "skipDecision": 70,
-    "worktreeSetup": 33015,
-    "typescriptBuild": 44669,
-    "rootDropReleaseAssembly": 97100,
-    "onefileReleaseAssembly": 80626,
-    "artifactSync": 11603,
+    "inputHashCalculation": 59,
+    "skipDecision": 63,
+    "worktreeSetup": 16891,
+    "typescriptBuild": 48581,
+    "rootDropReleaseAssembly": 77059,
+    "onefileReleaseAssembly": 52478,
+    "artifactSync": 7876,
     "cleanup": 0,
-    "totalElapsed": 339411
+    "totalElapsed": 222277
   }
 }
