@@ -55,7 +55,7 @@ interface RegistryDocument {
     registryId?: string;
 }
 export declare function createRegistryIndex(registryDocument: RegistryDocument | null | undefined, options?: CreateRegistryIndexOptions): Readonly<{
-    registryId: string;
+    registryId: string | null;
     size: number;
     diagnostics: DiagnosticRecord[];
     atomIdIndex: Map<string, NodeRef>;
@@ -64,17 +64,17 @@ export declare function createRegistryIndex(registryDocument: RegistryDocument |
     fingerprintIndex: Map<string, NodeRef[]>;
     versionIndex: Map<string, VersionRecord>;
     nodeRefs: NodeRef[];
-    getByCanonicalId(canonicalId: string): NodeRef;
-    getByUrn(urn: string): NodeRef;
+    getByCanonicalId(canonicalId: string): NodeRef | null;
+    getByUrn(urn: string): NodeRef | null;
     findByLogicalName(logicalName: string): NodeRef[];
     findBySemanticFingerprint(fingerprint: string): NodeRef[];
     findByFingerprintPrefix(prefix: string): NodeRef[];
     getVersions(canonicalId: string): {
-        current: string;
+        current: string | null;
         versions: string[];
     };
     toJSON(): {
-        registryId: string;
+        registryId: string | null;
         size: number;
         atomIds: string[];
         mapIds: string[];

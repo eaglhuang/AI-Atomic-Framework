@@ -18,6 +18,8 @@
     }
   },
   "scripts": {
+    "preclose:check": "node --strip-types scripts/preclose-check.ts",
+    "help-snapshots:update": "node --strip-types scripts/update-help-snapshots.ts",
     "packages:list": "node --strip-types scripts/list-packages.ts",
     "sync:registry-artifacts": "node --strip-types scripts/sync-registry-artifacts.ts",
     "build": "node --strip-types scripts/run-sealed-runner-build.ts full",
