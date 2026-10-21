@@ -1,0 +1,141 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-GIT-0036",
+  "targetRepoIdentity": {
+    "kind": "framework",
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "49bf5a010ae9510f6b00390674b02e88129b9446",
+  "governedTreeSha": "d98300b17e23d14be5b0f0b59857cc4c346307da",
+  "targetCommitDelta": {
+    "currentCommitSha": "49bf5a010ae9510f6b00390674b02e88129b9446",
+    "parentCommitShas": [
+      "49bf5a010ae9510f6b00390674b02e88129b9446"
+    ],
+    "governedTreeSha": "d98300b17e23d14be5b0f0b59857cc4c346307da",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-FRAMEWORK-TEMP-codex-gpt-6.runner-sync-receipt.json",
+      ".atm/history/task-events/TASK-GIT-0036/2026-10-21T14-15-37-189Z-renew-6f4931867b81.json",
+      ".atm/history/tasks/TASK-GIT-0036.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/dist/commands/taskflow/commit-bundle-assembly.js",
+      "packages/cli/src/commands/framework-development/runner-publication-evidence-context.ts",
+      "packages/core/src/broker/runner-build-output-inventory.ts",
+      "packages/create-atm/dist/build-identity.json",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/commit-bundle-assembly.js",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/commit-bundle-markdown-paths.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "tasks/TASK-GIT-0035.task.md",
+      "tests/cli/package-publication-membership.test.ts",
+      "tests/cli/task-close-cleanup-rollback.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/commit-attribution-sealed-transaction.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e17d8661df79407d04fb0c646616445ca5b7469cc4339ad551f0b18c9a60a088",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --strip-types tests/cli/governed-commit-surface-audit.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d590566ad6531c51d057ef1205855ca7a78b09f2d2a71ec28ca2b3a4292b3a4f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --strip-types tests/cli/package-publication-membership.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:75dccb5d18e3d2af916079464ea43a9f5a314ec5294e4a410d52378765133e54",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:4795ce6c7f3c2d038182cf1c0d6f9690b35fe9027022d0e4a2a9b0dd8ea8472e",
+      "runnerVersion": "0.1.2"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "node --strip-types tests/cli/commit-attribution-sealed-transaction.test.ts",
+    "node --strip-types tests/cli/governed-commit-surface-audit.test.ts",
+    "node --strip-types tests/cli/package-publication-membership.test.ts"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "git diff --check",
+    "node --strip-types tests/cli/package-publication-membership.test.ts"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-10-21T14:18:22.029Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-GIT-0036.*",
+      ".atm/history/task-events/TASK-GIT-0036/**",
+      ".atm/history/tasks/TASK-GIT-0036.json",
+      "packages/cli/src/commands/framework-development/runner-publication-evidence-context.ts",
+      "packages/core/src/broker/runner-build-output-inventory.ts",
+      "tests/cli/package-publication-membership.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/framework-development/runner-publication-evidence-context.ts",
+      "packages/core/src/broker/runner-build-output-inventory.ts",
+      "tests/cli/package-publication-membership.test.ts"
+    ],
+    "requiredGates": [
+      "git diff --check",
+      "node --strip-types tests/cli/package-publication-membership.test.ts"
+    ]
+  },
+  "evidencePath": ".atm/runtime/evidence-ledger/bundles/TASK-GIT-0036.json",
+  "closedAt": "2026-10-21T14:18:22.030Z",
+  "closedByActor": "codex-gpt-6",
+  "sessionId": "session-20261021100919-codex-gpt-6-TASK-GIT-0036-ddc1f9dbfb",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "d4f5652b3ca9526e159f2e03f9d1caf4f4a95905",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/framework-development/runner-publication-evidence-context.ts",
+      "packages/core/src/broker/runner-build-output-inventory.ts",
+      "tests/cli/package-publication-membership.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/task-events/TASK-GIT-0036/2026-10-21T10-09-11-725Z-import-5d0440e8d418.json",
+      ".atm/history/task-events/TASK-GIT-0036/2026-10-21T10-09-19-807Z-reserve-36903af0b064.json",
+      ".atm/history/task-events/TASK-GIT-0036/2026-10-21T10-09-19-812Z-promote-2df7ea38aa77.json",
+      ".atm/history/task-events/TASK-GIT-0036/2026-10-21T10-09-27-932Z-claim-5e6947aba759.json",
+      ".atm/history/tasks/TASK-GIT-0036.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

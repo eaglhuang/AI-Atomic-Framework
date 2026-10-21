@@ -1,0 +1,63 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-GIT-0034",
+  "updatedAt": "2026-10-21T09:52:18.750Z",
+  "updatedBy": "codex-gpt-6",
+  "freshValidationPasses": [
+    "git diff --check",
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts",
+    "node --strip-types tests/cli/pre-team-foundation-gate.test.ts --mode validate"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7fa55b436882110790a0bf72b3510a0df69e93ccf3f80e17fb62a3b403a828d9",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts"
+      ],
+      "generatedAt": "2026-10-21T09:51:16.264Z",
+      "startedAt": "2026-10-21T09:51:03.182Z",
+      "finishedAt": "2026-10-21T09:51:16.264Z",
+      "durationMs": 13082,
+      "runnerKind": "dev-source",
+      "sourceCommit": "dede701cb58c278eb0be8aa191fb8b2902a80f14",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/pre-team-foundation-gate.test.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:39459826e550ab51ec93c9998775983ec7769a6a47c48edecfca9528422ceed0",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/pre-team-foundation-gate.test.ts --mode validate"
+      ],
+      "generatedAt": "2026-10-21T09:52:14.052Z",
+      "startedAt": "2026-10-21T09:51:19.999Z",
+      "finishedAt": "2026-10-21T09:52:14.052Z",
+      "durationMs": 54053,
+      "runnerKind": "dev-source",
+      "sourceCommit": "dede701cb58c278eb0be8aa191fb8b2902a80f14",
+      "cached": false
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:4795ce6c7f3c2d038182cf1c0d6f9690b35fe9027022d0e4a2a9b0dd8ea8472e",
+      "validators": [
+        "git diff --check"
+      ],
+      "generatedAt": "2026-10-21T09:52:18.749Z",
+      "startedAt": "2026-10-21T09:52:18.392Z",
+      "finishedAt": "2026-10-21T09:52:18.749Z",
+      "durationMs": 357,
+      "runnerKind": "dev-source",
+      "sourceCommit": "299da0c48a1f9293fc782989250aec84b12695c7",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

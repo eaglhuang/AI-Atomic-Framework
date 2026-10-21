@@ -83,16 +83,16 @@ export type RunnerBuildOutputTarget = 'full' | 'packages' | 'root-drop' | 'onefi
 /** The stable output family of a sealed ATM runner build. */
 export function isRunnerBuildOutputPath(filePath: string): boolean {
   const normalized = normalizePath(filePath);
-  return normalized.startsWith('packages/cli/dist/')
-    || normalized.startsWith('release/atm-root-drop/')
-    || normalized.startsWith('release/atm-onefile/')
+  return isRunnerPublicationArtifactPath(normalized)
     || /^\.atm\/history\/evidence\/[^/]+\.runner-sync-receipt\.json$/i.test(normalized);
 }
 
 /** Build artifacts whose unexpected dirty state must match a sealed inventory. */
 export function isRunnerPublicationArtifactPath(filePath: string): boolean {
   const normalized = normalizePath(filePath);
-  return normalized.startsWith('packages/cli/dist/')
+  if (normalized.split('/').some((segment) => segment === '..' || segment === '.' || segment === '')) return false;
+  // Full and packages builds publish each immediate workspace package's dist.
+  return /^packages\/[^/]+\/dist\/.+/.test(normalized)
     || normalized.startsWith('release/atm-root-drop/')
     || normalized.startsWith('release/atm-onefile/');
 }
