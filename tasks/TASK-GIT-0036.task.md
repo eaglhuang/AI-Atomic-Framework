@@ -2,7 +2,7 @@
 doc_id: doc_TASK-GIT-0036
 task_id: TASK-GIT-0036
 title: "Align sealed package publication membership and takeover evidence"
-status: in-progress
+status: done
 started_at: 2026-10-21T10:09:30Z
 started_by_agent: codex-gpt-6
 amendment_epoch: 1
@@ -31,6 +31,15 @@ rollback:
   notes: "Revert the delivery commit if the change fails validation."
 outOfScope: []
 nonGoals: []
+completed_at: "2026-10-21T14:18:22.419Z"
+completed_by_agent: "codex-gpt-6"
+closedAt: "2026-10-21T14:18:22.419Z"
+closedByActor: "codex-gpt-6"
+closedByCommand: atm tasks close
+lastTransitionId: "2026-10-21T14-18-22-419Z-close-0a720e8e35c0"
+lastTransitionAt: "2026-10-21T14:18:22.419Z"
+ledgerContractVersion: task-ledger/v1
+delivery_commit: "d4f5652b3ca9526e159f2e03f9d1caf4f4a95905"
 ---
 
 # TASK-GIT-0036 - Align sealed package publication membership and takeover evidence

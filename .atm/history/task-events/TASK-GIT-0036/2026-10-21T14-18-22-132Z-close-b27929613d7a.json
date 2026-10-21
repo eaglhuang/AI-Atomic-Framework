@@ -1,0 +1,57 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-10-21T14-18-22-132Z-close-b27929613d7a",
+  "taskId": "TASK-GIT-0036",
+  "action": "close",
+  "actorId": "codex-gpt-6",
+  "sessionId": "session-20261021100919-codex-gpt-6-TASK-GIT-0036-ddc1f9dbfb",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-GIT-0036.json",
+  "taskSha256": "sha256:4e061676f7a142fada4e39bb355e05977919c60b1c23dbb194ca336f41ffcf80",
+  "createdAt": "2026-10-21T14:18:22.132Z",
+  "command": "node atm.mjs tasks close --task TASK-GIT-0036 --actor codex-gpt-6 --status done --historical-delivery d4f5652b3ca9526e159f2e03f9d1caf4f4a95905",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20261021100919-codex-gpt-6-TASK-GIT-0036-ddc1f9dbfb",
+    "closurePacketPath": ".atm/history/evidence/TASK-GIT-0036.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types tests/cli/commit-attribution-sealed-transaction.test.ts",
+      "node --strip-types tests/cli/governed-commit-surface-audit.test.ts",
+      "node --strip-types tests/cli/package-publication-membership.test.ts"
+    ],
+    "requiredGates": [
+      "git diff --check",
+      "node --strip-types tests/cli/package-publication-membership.test.ts"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-10-21T14:18:22.029Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-GIT-0036.*",
+        ".atm/history/task-events/TASK-GIT-0036/**",
+        ".atm/history/tasks/TASK-GIT-0036.json",
+        "packages/cli/src/commands/framework-development/runner-publication-evidence-context.ts",
+        "packages/core/src/broker/runner-build-output-inventory.ts",
+        "tests/cli/package-publication-membership.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/framework-development/runner-publication-evidence-context.ts",
+        "packages/core/src/broker/runner-build-output-inventory.ts",
+        "tests/cli/package-publication-membership.test.ts"
+      ],
+      "requiredGates": [
+        "git diff --check",
+        "node --strip-types tests/cli/package-publication-membership.test.ts"
+      ]
+    }
+  }
+}
