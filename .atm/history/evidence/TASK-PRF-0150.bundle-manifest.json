@@ -1,0 +1,165 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0150",
+  "updatedAt": "2026-10-21T01:07:33.381Z",
+  "updatedBy": "grok-bot",
+  "freshValidationPasses": [
+    "node --strip-types packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+    "node --strip-types scripts/preclose-check.ts",
+    "node --strip-types tests/cli/atm-result-line.test.ts",
+    "node --strip-types tests/cli/cli-test-sweep.test.ts",
+    "node --strip-types tests/cli/help-snapshots.test.ts",
+    "node --strip-types tests/cli/physical-line-budget-gate.test.ts",
+    "node --strip-types tests/cli/preclose-check.test.ts",
+    "node --strip-types tests/cli/sealed-build-log-sink.test.ts",
+    "node --strip-types tests/core/transactional-steward-single-write.test.ts"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/atm-result-line.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:921b0caeaf34394a4e8674aaa0f445ee39389ad3a6282feca501acb2c1c3bfec",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/atm-result-line.test.ts"
+      ],
+      "generatedAt": "2026-10-21T01:07:02.889Z",
+      "startedAt": "2026-10-21T01:07:02.816Z",
+      "finishedAt": "2026-10-21T01:07:02.889Z",
+      "durationMs": 73,
+      "runnerKind": "dev-source",
+      "sourceCommit": "185e070673e36cae8493038c9e8c1dcc12c13250",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/sealed-build-log-sink.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:168135409bafb03425ca7d1676256fb2f7ee8ff2f72c9375e0e05279322c0f7d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/sealed-build-log-sink.test.ts"
+      ],
+      "generatedAt": "2026-10-21T01:07:04.776Z",
+      "startedAt": "2026-10-21T01:07:04.188Z",
+      "finishedAt": "2026-10-21T01:07:04.776Z",
+      "durationMs": 588,
+      "runnerKind": "dev-source",
+      "sourceCommit": "185e070673e36cae8493038c9e8c1dcc12c13250",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/help-snapshots.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ba0efcb6bb47c8a1009eed0c873f5432c648bd33eafb3796a073b8c74fd803b3",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/help-snapshots.test.ts"
+      ],
+      "generatedAt": "2026-10-21T01:07:06.188Z",
+      "startedAt": "2026-10-21T01:07:06.086Z",
+      "finishedAt": "2026-10-21T01:07:06.188Z",
+      "durationMs": 102,
+      "runnerKind": "dev-source",
+      "sourceCommit": "185e070673e36cae8493038c9e8c1dcc12c13250",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/preclose-check.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:532e8037a085d508a1817458f8c0ed11456e577a56f3a83dc6e36dffe105abb9",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/preclose-check.test.ts"
+      ],
+      "generatedAt": "2026-10-21T01:07:13.571Z",
+      "startedAt": "2026-10-21T01:07:07.436Z",
+      "finishedAt": "2026-10-21T01:07:13.571Z",
+      "durationMs": 6135,
+      "runnerKind": "dev-source",
+      "sourceCommit": "185e070673e36cae8493038c9e8c1dcc12c13250",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/cli-test-sweep.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:869b7da56aecca82b15848c5b6013d65c81b818f30af59d206dd21b3b7cb0b24",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/cli-test-sweep.test.ts"
+      ],
+      "generatedAt": "2026-10-21T01:07:25.824Z",
+      "startedAt": "2026-10-21T01:07:14.781Z",
+      "finishedAt": "2026-10-21T01:07:25.824Z",
+      "durationMs": 11043,
+      "runnerKind": "dev-source",
+      "sourceCommit": "185e070673e36cae8493038c9e8c1dcc12c13250",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/core/transactional-steward-single-write.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a10f0b6b418b464ddb0b46a22283d5e3f5819e4e1f08c86653a55a09d9708add",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/core/transactional-steward-single-write.test.ts"
+      ],
+      "generatedAt": "2026-10-21T01:07:27.179Z",
+      "startedAt": "2026-10-21T01:07:27.050Z",
+      "finishedAt": "2026-10-21T01:07:27.179Z",
+      "durationMs": 129,
+      "runnerKind": "dev-source",
+      "sourceCommit": "185e070673e36cae8493038c9e8c1dcc12c13250",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:974173d6ff4cd6d2a3c8aa603d8f0c0a0c3af85f80cca6acd212e939353d4041",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.test.ts"
+      ],
+      "generatedAt": "2026-10-21T01:07:29.579Z",
+      "startedAt": "2026-10-21T01:07:28.434Z",
+      "finishedAt": "2026-10-21T01:07:29.579Z",
+      "durationMs": 1145,
+      "runnerKind": "dev-source",
+      "sourceCommit": "185e070673e36cae8493038c9e8c1dcc12c13250",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/physical-line-budget-gate.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4fb3161dbbb6577bc1c92c35b4949876a96e4f2972c90b7fcad5c761f170c33f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/physical-line-budget-gate.test.ts"
+      ],
+      "generatedAt": "2026-10-21T01:07:31.060Z",
+      "startedAt": "2026-10-21T01:07:30.750Z",
+      "finishedAt": "2026-10-21T01:07:31.060Z",
+      "durationMs": 310,
+      "runnerKind": "dev-source",
+      "sourceCommit": "185e070673e36cae8493038c9e8c1dcc12c13250",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/preclose-check.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b70a5cf8ac782be2d640b77cf3446ee5259489f04539faf9e46b9a88f7e29113",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types scripts/preclose-check.ts"
+      ],
+      "generatedAt": "2026-10-21T01:07:33.380Z",
+      "startedAt": "2026-10-21T01:07:32.258Z",
+      "finishedAt": "2026-10-21T01:07:33.380Z",
+      "durationMs": 1122,
+      "runnerKind": "dev-source",
+      "sourceCommit": "185e070673e36cae8493038c9e8c1dcc12c13250",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

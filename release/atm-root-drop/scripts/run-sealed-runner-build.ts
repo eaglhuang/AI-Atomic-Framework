@@ -1,4 +1,5 @@
 import { spawnSync } from 'node:child_process';
+import { withSealedBuildLog } from './sealed-build-log-sink.ts';
 import { createHash } from 'node:crypto';
 import { existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, rmSync, rmdirSync, symlinkSync, unlinkSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
@@ -86,6 +87,7 @@ export function isReparsePointOrSymlink(targetPath: string): boolean {
 }
 
 if (invokedAsCli) {
+  withSealedBuildLog();
   const target = parseTarget(process.argv.slice(2));
   if (process.argv.includes('--inner')) {
     runInnerBuild(target);

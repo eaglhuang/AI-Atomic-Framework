@@ -126,7 +126,9 @@ const foreignDeletionBundle = resolveTaskScopedCommitBundle({
   brokerConflictResolutionPath: null,
 });
 assert.equal(foreignDeletionBundle.ok, true, `foreign retained deletion must not block a bounded commit: ${foreignDeletionBundle.blockedCode} ${foreignDeletionBundle.blockedSummary}`);
-assert.ok(foreignDeletionBundle.skippedExternalDirtyFiles.includes('.atm/history/evidence/TASK-FOREIGN.bundle-manifest.json'));
+assert.ok(foreignDeletionBundle.outOfScopeStagedFiles.includes('.atm/history/evidence/TASK-FOREIGN.bundle-manifest.json'));
+assert.ok(!foreignDeletionBundle.commitFiles.includes('.atm/history/evidence/TASK-FOREIGN.bundle-manifest.json'));
+assert.equal(existsSync(foreignManifest), true);
 execFileSync('git', ['reset', '--', '.atm/history/evidence/TASK-FOREIGN.bundle-manifest.json'], { cwd });
 writeFileSync(foreignManifest, '{"schemaId":"fixture"}\n');
 

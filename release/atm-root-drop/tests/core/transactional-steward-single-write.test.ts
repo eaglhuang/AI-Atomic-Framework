@@ -63,6 +63,7 @@ try {
   assert.match(readFileSync(targetPath, 'utf8'), /"a"/);
   assert.match(readFileSync(targetPath, 'utf8'), /"b"/);
 
+  const appliedContent = readFileSync(targetPath, 'utf8');
   const stale = applyTransactionalStewardPlan({
     cwd,
     stewardId: 'neutral-write-steward',
@@ -74,9 +75,10 @@ try {
   });
 
   assert.equal(stale.ok, false);
-  assert.equal(stale.receipt.verdict, 'blocked');
+  assert.equal(stale.receipt.verdict, 're-compose');
   assert.match(stale.receipt.blockedReasons.join('\n'), /base hash is stale/);
   assert.equal(stale.receipt.files.length, 0);
+  assert.equal(readFileSync(targetPath, 'utf8'), appliedContent, 'stale retry must not apply a second write');
 } finally {
   rmSync(cwd, { recursive: true, force: true });
 }

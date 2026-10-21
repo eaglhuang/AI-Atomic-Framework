@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawn, spawnSync } from 'node:child_process';
+import { readHelpSnapshots } from './help-snapshots.ts';
 import { spawnCliCapture } from '../lib/cli-json-spawn.ts';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
@@ -58,16 +59,7 @@ export function createValidateCliContext(options: ValidateCliOptions) {
 
   const fixture = readJson('tests/cli-fixtures/cli-mvp.fixture.json');
   const helpCommandSnapshot = readJson('tests/cli-fixtures/help-snapshots/command-list.json');
-  const perCommandHelpSnapshots = {
-    explain: readJson('tests/cli-fixtures/help-snapshots/explain.json'),
-    broker: readJson('tests/cli-fixtures/help-snapshots/broker.json'),
-    next: readJson('tests/cli-fixtures/help-snapshots/next.json'),
-    orient: readJson('tests/cli-fixtures/help-snapshots/orient.json'),
-    start: readJson('tests/cli-fixtures/help-snapshots/start.json'),
-    guide: readJson('tests/cli-fixtures/help-snapshots/guide.json'),
-    registry: readJson('tests/cli-fixtures/help-snapshots/registry.json'),
-    upgrade: readJson('tests/cli-fixtures/help-snapshots/upgrade.json')
-  };
+  const { 'command-list': _commandList, ...perCommandHelpSnapshots } = readHelpSnapshots(root);
   const publicCommandNames = listCommandSpecs().map((spec: any) => spec.name).sort((left: any, right: any) => left.localeCompare(right));
   const internalCommandNames = Object.values(commandSpecs)
     .filter((spec: any) => spec.visibility === 'internal')
