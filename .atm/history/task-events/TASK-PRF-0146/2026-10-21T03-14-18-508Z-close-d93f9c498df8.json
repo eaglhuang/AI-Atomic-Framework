@@ -1,0 +1,87 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-10-21T03-14-18-508Z-close-d93f9c498df8",
+  "taskId": "TASK-PRF-0146",
+  "action": "close",
+  "actorId": "grok-bot",
+  "sessionId": "session-20261021011350-grok-bot-TASK-PRF-0146-a3150a6e18",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0146.json",
+  "taskSha256": "sha256:b9f0cd17a3a1b006de3bfd97382c00fb9a5fbbbf7f30a05543a3a5ded1a57a8f",
+  "createdAt": "2026-10-21T03:14:18.508Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0146 --actor grok-bot --status done --historical-delivery 678ad2728 --historical-delivery bb18430417b2319b08f2438b9b7623b99f9e6b0d",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20261021011350-grok-bot-TASK-PRF-0146-a3150a6e18",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0146.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/physical-line-budget-gate.test.ts",
+      "node --strip-types tests/core/cross-session-overlap.test.ts",
+      "node --strip-types tests/core/live-queued-write.test.ts",
+      "node --strip-types tests/core/live-write-commit-path.test.ts",
+      "validate:broker-steward"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/physical-line-budget-gate.test.ts",
+      "node --strip-types tests/core/cross-session-overlap.test.ts",
+      "node --strip-types tests/core/live-queued-write.test.ts",
+      "node --strip-types tests/core/live-write-commit-path.test.ts",
+      "validate:broker-steward"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-10-21T03:14:18.500Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0146.*",
+        ".atm/history/task-events/TASK-PRF-0146/**",
+        ".atm/history/tasks/TASK-PRF-0146.json",
+        ".atm/task-plans/TASK-PRF-0146.md",
+        "packages/cli/dist",
+        "packages/cli/dist/**",
+        "packages/cli/src/commands/broker/**",
+        "packages/core/src/broker/**",
+        "packages/core/src/live-write/**",
+        "packages/core/src/live-write/live-queued-write.ts",
+        "PROGRESS.md",
+        "release/atm-onefile/**",
+        "release/atm-root-drop/**",
+        "research/paper-v2/prereg-v3-smoke/kit/bin/**",
+        "research/paper-v2/prereg-v3-smoke/kit/preflight.sh",
+        "research/paper-v2/prereg-v3-smoke/kit/test/**",
+        "scripts/validate-broker-steward.ts",
+        "tests/cli-fixtures/**",
+        "tests/cli/**",
+        "tests/core/**",
+        "tests/core/live-write-commit-path.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/dist",
+        "packages/cli/dist/**",
+        "packages/cli/src/commands/broker/**",
+        "packages/core/src/broker/**",
+        "packages/core/src/live-write/**",
+        "packages/core/src/live-write/live-queued-write.ts",
+        "scripts/validate-broker-steward.ts",
+        "tests/cli-fixtures/**",
+        "tests/cli/**",
+        "tests/core/**",
+        "tests/core/live-write-commit-path.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types tests/cli/physical-line-budget-gate.test.ts",
+        "node --strip-types tests/core/cross-session-overlap.test.ts",
+        "node --strip-types tests/core/live-queued-write.test.ts",
+        "node --strip-types tests/core/live-write-commit-path.test.ts",
+        "validate:broker-steward"
+      ]
+    }
+  }
+}

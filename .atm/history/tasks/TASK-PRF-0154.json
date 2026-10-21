@@ -1,0 +1,259 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0154",
+  "title": "Smoke kit preflight: run live-write-journal parity on Node 22 (#364 follow-up)",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [
+    "TASK-PRF-0146"
+  ],
+  "acceptance": [
+    "preflight.sh passes on Node 22 and Node 24."
+  ],
+  "deliverables": [
+    "research/paper-v2/prereg-v3-smoke/kit/preflight.sh"
+  ],
+  "scopePaths": [
+    ".atm/history/evidence/TASK-PRF-0154.*",
+    ".atm/history/task-events/TASK-PRF-0154/**",
+    ".atm/history/tasks/TASK-PRF-0154.json",
+    ".atm/task-plans/TASK-PRF-0154.md",
+    "research/paper-v2/prereg-v3-smoke/kit/preflight.sh",
+    "research/paper-v2/prereg-v3-smoke/kit/test/**"
+  ],
+  "validators": [
+    "bash research/paper-v2/prereg-v3-smoke/kit/preflight.sh"
+  ],
+  "planningRepo": "AI-Atomic-Framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [
+    "Do not re-pin the smoke runbook. Do not tag or publish npm."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the delivery commit.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 1 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": ".atm/task-plans/TASK-PRF-0154.md",
+    "sectionTitle": "TASK-PRF-0154",
+    "headingLine": 33,
+    "hash": "6121f87b104b46f5",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/AI-Atomic-Framework.git",
+      "repoRoot": "/workspace/AI-Atomic-Framework-360/AI-Atomic-Framework",
+      "taskCardPath": ".atm/task-plans/TASK-PRF-0154.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:6121f87b104b46f5e831a0de31a4144d0791fbe2815dd8f99d059c691cee87e8",
+      "amendmentEpoch": 1,
+      "sealedAt": "2026-10-21T03:36:22.857Z"
+    }
+  },
+  "importedAt": "2026-10-21T03:36:22.857Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "disabled",
+    "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_bash.research.paper.v2.prereg.v3.smoke.kit.preflight.sh",
+      "command": "bash research/paper-v2/prereg-v3-smoke/kit/preflight.sh",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": [
+      {
+        "taskId": "TASK-PRF-0146",
+        "relation": "legacy-untyped",
+        "admissionMode": "legacy-status-gate",
+        "provenFacts": [],
+        "missingFacts": [],
+        "contradictions": [],
+        "producerOutput": null,
+        "producerOutputSatisfied": false,
+        "negativeControlCommand": null,
+        "blockingCandidate": false
+      }
+    ]
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "dependencies"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-10-21T04-21-17-465Z-close-4b4d95d83d4c",
+  "lastTransitionAt": "2026-10-21T04:21:17.465Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "claim": {
+    "actorId": "grok-bot",
+    "leaseId": "lease-1b203254afbf",
+    "claimedAt": "2026-10-21T03:36:23.476Z",
+    "heartbeatAt": "2026-10-21T04:21:17.464Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-PRF-0154.*",
+      ".atm/history/task-events/TASK-PRF-0154/**",
+      ".atm/history/tasks/TASK-PRF-0154.json",
+      ".atm/task-plans/TASK-PRF-0154.md",
+      "research/paper-v2/prereg-v3-smoke/kit/preflight.sh",
+      "research/paper-v2/prereg-v3-smoke/kit/test/**"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20261021041253-grok-bot-c340ac9c32",
+      "status": "active",
+      "source": "option",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261021041253-grok-bot-c340ac9c32\""
+    },
+    "reason": "closed"
+  },
+  "owner": "grok-bot",
+  "startedAt": "2026-10-21T03:36:23.476Z",
+  "startedByActor": "grok-bot",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-7fd462aec3a3db57",
+    "ticketDigest": "sha256:7fd462aec3a3db5768893a2f8c904e00ffd7fb8d1f6bd17ba516b856dba4e760",
+    "taskId": "TASK-PRF-0154",
+    "origin": "claim",
+    "actorId": "grok-bot",
+    "laneSessionId": "lane-20261021041253-grok-bot-c340ac9c32",
+    "claimGeneration": "lease-1b203254afbf",
+    "issuedAt": "2026-10-21T04:15:05.987Z",
+    "expiresAt": "2026-10-21T04:45:05.987Z",
+    "scopeDigest": "sha256:5275f919de9c608f5abb2cfddfad3b10093f1973d748579cbbdf0d9ad647d1e7",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-10-21T04:15:05.987Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0154.*",
+          ".atm/history/task-events/TASK-PRF-0154/**",
+          ".atm/history/tasks/TASK-PRF-0154.json",
+          ".atm/task-plans/TASK-PRF-0154.md",
+          "research/paper-v2/prereg-v3-smoke/kit/preflight.sh",
+          "research/paper-v2/prereg-v3-smoke/kit/test/**"
+        ],
+        "digest": "sha256:54f128872c091e56724d103c12da7a6272f04a1a87090548923855ee13865ba3"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "disabled",
+      "reasons": [
+        "low-risk-task"
+      ],
+      "maxSavePoints": 0,
+      "perTaskByteBudget": 0,
+      "repositoryByteBudget": 0,
+      "handoffTtlSeconds": 0,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:0dfda5eb6854c584791820720e4004b612d5ed31b9bfabd1654a9a85257c47bb"
+    }
+  },
+  "startedBySessionId": "session-20261021033623-grok-bot-TASK-PRF-0154-0645cd0f4c",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0154",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0154.*",
+      ".atm/history/task-events/TASK-PRF-0154/**",
+      ".atm/history/tasks/TASK-PRF-0154.json",
+      ".atm/task-plans/TASK-PRF-0154.md",
+      "research/paper-v2/prereg-v3-smoke/kit/preflight.sh",
+      "research/paper-v2/prereg-v3-smoke/kit/test/**"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "06e163497932409e615e68cd7219bff1a055f1157fd6e4b3061ba6ab85bf2f88",
+    "actorId": "grok-bot",
+    "sessionId": "session-20261021033623-grok-bot-TASK-PRF-0154-0645cd0f4c",
+    "laneSession": {
+      "laneSessionId": "lane-20261021033623-grok-bot-23b1630525",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261021033623-grok-bot-23b1630525\""
+    },
+    "createdAt": "2026-10-21T03:36:24.960Z",
+    "status": "active"
+  },
+  "closedAt": "2026-10-21T04:21:17.464Z",
+  "closedByActor": "grok-bot",
+  "closedBySessionId": "session-20261021033623-grok-bot-TASK-PRF-0154-0645cd0f4c",
+  "closurePacket": ".atm/history/evidence/TASK-PRF-0154.closure-packet.json"
+}

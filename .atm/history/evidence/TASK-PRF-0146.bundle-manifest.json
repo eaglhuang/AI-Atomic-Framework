@@ -1,0 +1,97 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0146",
+  "updatedAt": "2026-10-21T02:57:03.324Z",
+  "updatedBy": "grok-bot",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/physical-line-budget-gate.test.ts",
+    "node --strip-types tests/core/cross-session-overlap.test.ts",
+    "node --strip-types tests/core/live-queued-write.test.ts",
+    "node --strip-types tests/core/live-write-commit-path.test.ts",
+    "validate:broker-steward"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/core/live-write-commit-path.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6ce6b80b64d8fe0e2c886bb17771e138b299aaaad37dea54fb06132578c41e89",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/core/live-write-commit-path.test.ts"
+      ],
+      "generatedAt": "2026-10-21T02:56:25.452Z",
+      "startedAt": "2026-10-21T02:56:22.200Z",
+      "finishedAt": "2026-10-21T02:56:25.452Z",
+      "durationMs": 3252,
+      "runnerKind": "dev-source",
+      "sourceCommit": "b75cd4f7e0a742d3b381a2d389eefa9c9be4dd1e",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/core/live-queued-write.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9fba019b4d497ddf7c66dd202ca686425139db50a1a21eb65a9c2aaa241d5fff",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/core/live-queued-write.test.ts"
+      ],
+      "generatedAt": "2026-10-21T02:56:34.472Z",
+      "startedAt": "2026-10-21T02:56:26.479Z",
+      "finishedAt": "2026-10-21T02:56:34.472Z",
+      "durationMs": 7993,
+      "runnerKind": "dev-source",
+      "sourceCommit": "b75cd4f7e0a742d3b381a2d389eefa9c9be4dd1e",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/core/cross-session-overlap.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:90830eb3c90a8915d9a76ec663ebf9e44cf177da7fdc1801b0050d9460dc1e2f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/core/cross-session-overlap.test.ts"
+      ],
+      "generatedAt": "2026-10-21T02:56:37.639Z",
+      "startedAt": "2026-10-21T02:56:35.673Z",
+      "finishedAt": "2026-10-21T02:56:37.639Z",
+      "durationMs": 1966,
+      "runnerKind": "dev-source",
+      "sourceCommit": "b75cd4f7e0a742d3b381a2d389eefa9c9be4dd1e",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/physical-line-budget-gate.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e38cd5065d7693ece001aa839174eb470cb09970689dc9204c0eb4d4e4b962dc",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/physical-line-budget-gate.test.ts"
+      ],
+      "generatedAt": "2026-10-21T02:56:38.961Z",
+      "startedAt": "2026-10-21T02:56:38.682Z",
+      "finishedAt": "2026-10-21T02:56:38.961Z",
+      "durationMs": 279,
+      "runnerKind": "dev-source",
+      "sourceCommit": "b75cd4f7e0a742d3b381a2d389eefa9c9be4dd1e",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-broker-steward.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7c4e3734903aa3ad77f63c14a32370a6e8b7c487bac22921ed736cbaa74de81f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:broker-steward"
+      ],
+      "generatedAt": "2026-10-21T02:57:03.323Z",
+      "startedAt": "2026-10-21T02:56:39.976Z",
+      "finishedAt": "2026-10-21T02:57:03.323Z",
+      "durationMs": 23347,
+      "runnerKind": "dev-source",
+      "sourceCommit": "b75cd4f7e0a742d3b381a2d389eefa9c9be4dd1e",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
