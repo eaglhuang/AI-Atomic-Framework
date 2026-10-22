@@ -17,7 +17,6 @@ import { isPathAllowedByScope } from '../work-channels.ts';
 import { resolveTaskflowDeclaredFiles, resolveTaskflowEffectiveDeliverables } from './task-scope.ts';
 import { isCurrentTaskCloseEvidenceFile } from './current-task-close-evidence.ts';
 import { applyExplicitGovernanceDirtyDeferral } from './governance-dirty-deferral.ts';
-import { resolveVerifiedGeneratedOutputPaths } from './generated-output-advisory.ts';
 import { buildGovernanceDirtyBlocker, buildScopeDirtyBlocker, buildUnexpectedStagedBlocker } from './dirty-blockers.ts';
 import { inspectTaskflowGitAuthorGap, TASKFLOW_GIT_AUTHOR_MISSING } from './git-author-guard.ts';
 
@@ -468,7 +467,7 @@ export function buildHistoricalClosePreflight(input: {
         ? [`.atm/history/evidence/${input.taskId}.bundle-manifest.json`]
         : [])
     ]),
-    allowedAdvisoryDirtyFiles: [...foreignActiveDirtyFiles, ...resolveVerifiedGeneratedOutputPaths(input.cwd, input.taskId)],
+    allowedAdvisoryDirtyFiles: foreignActiveDirtyFiles,
     correctPlanningMirrorPreEditFiles: planningMirrorDirty.correctPlanningMirrorPreEditFiles,
     incorrectPlanningMirrorPreEditFiles: planningMirrorDirty.incorrectPlanningMirrorPreEditFiles
   });

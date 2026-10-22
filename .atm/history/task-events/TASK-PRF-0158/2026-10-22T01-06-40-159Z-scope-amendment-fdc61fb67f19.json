@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-10-22T01-06-40-159Z-scope-amendment-fdc61fb67f19",
+  "taskId": "TASK-PRF-0158",
+  "action": "scope-amendment",
+  "actorId": "grok-bot",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0158.json",
+  "taskSha256": "sha256:08880573506c4e6041364a96d448e9be9af266f49f036ec3061bd65a352862ac",
+  "createdAt": "2026-10-22T01:06:40.159Z",
+  "command": "node atm.mjs tasks scope add --task TASK-PRF-0158 --actor grok-bot --add \"packages/cli/src/commands/tasks/scope-lock-diagnostics.ts,packages/cli/src/commands/taskflow/historical-close-preflight.ts,packages/cli/src/commands/taskflow/__tests__/runner-publication-bundle-authority.spec.ts\" --reason \"Complete governed CI follow-up close: backend dirty guard must consume the same canonical generated-output receipt exception as pre-close; add backend parity regression.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Complete governed CI follow-up close: backend dirty guard must consume the same canonical generated-output receipt exception as pre-close; add backend parity regression."
+  }
+}
