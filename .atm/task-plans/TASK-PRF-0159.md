@@ -2,7 +2,7 @@
 doc_id: doc_TASK-PRF-0159
 task_id: TASK-PRF-0159
 title: Merge current main and reseal governance quick fixes for PR385
-status: open
+status: done
 owner: grok-bot
 priority: P1
 depends_on: []
@@ -93,6 +93,15 @@ evidence:
 rollback:
   strategy: revert-commit
   notes: Revert merge follow-up.
+completed_at: "2026-10-22T09:33:01.302Z"
+completed_by_agent: "grok-bot"
+closedAt: "2026-10-22T09:33:01.302Z"
+closedByActor: "grok-bot"
+closedByCommand: atm tasks close
+lastTransitionId: "2026-10-22T09-33-01-302Z-close-143265d9224b"
+lastTransitionAt: "2026-10-22T09:33:01.302Z"
+ledgerContractVersion: task-ledger/v1
+delivery_commit: "96fb1ade734f32666b9d24dd646853ea22d47b3d"
 ---
 
 # TASK-PRF-0159
