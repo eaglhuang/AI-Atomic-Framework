@@ -7,9 +7,11 @@ npm ci --ignore-scripts
 bash research/paper-v2/prereg-v3-smoke/kit/test/run-concurrency-suite.sh
 ```
 
-The dedicated `stub-concurrency.yml` workflow runs on PRs touching all four
-#367 path families, the suite, its reused tests, or dependency manifests.
-Its job budget is five minutes; the suite command has a four-minute timeout.
+The existing Product CI workflow runs its CLI sweep on every PR, including all
+four #367 path families. `tests/cli/stub-concurrency-suite.test.ts` is discovered
+by that sweep and registered as serial so process stress gets an isolated budget.
+The wrapper caps the suite at 170 seconds within the sweep's 180-second deadline.
+Local validation took 70 seconds; all files remain below the 600-line budget.
 There are no model calls, downloaded CLI pins, paid keys, or sealed-run writes.
 
 | #367 sub-item | Tests run by the entrypoint |
