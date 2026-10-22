@@ -19,6 +19,7 @@ function initGitRepo(repo: string) {
   execFileSync('git', ['init'], { cwd: repo, stdio: 'ignore' });
   execFileSync('git', ['config', 'user.email', 'validator@example.invalid'], { cwd: repo, stdio: 'ignore' });
   execFileSync('git', ['config', 'user.name', 'ATM Validator'], { cwd: repo, stdio: 'ignore' });
+  execFileSync('git', ['-c', 'core.hooksPath=/dev/null', 'commit', '--allow-empty', '-m', 'fixture base'], { cwd: repo, stdio: 'ignore' });
 }
 
 function writeProfile(planningRepo: string, input: {
