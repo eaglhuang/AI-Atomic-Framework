@@ -422,6 +422,7 @@ export function isPathAllowedByScope(filePath: string, allowedFiles: readonly st
   return allowedFiles.some((entry) => {
     const candidate = normalizeRelativePath(entry).toLowerCase();
     if (!candidate) return false;
+    if (candidate.endsWith('/**') && normalizedFile === candidate.slice(0, -3)) return true;
     if (candidate.includes('*')) {
       // `dir/**/*.ts` must match `dir/foo.ts` (zero intermediate directories).
       // Treat `**/` as an optional path prefix before single-segment wildcards.
