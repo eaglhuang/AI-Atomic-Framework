@@ -29,12 +29,12 @@ with tempfile.TemporaryDirectory() as tmp:
     rejected = {'decision': 'rejected-by-design', 'terminal': 'blocked',
                 'reasonCode': 'patch-context-mismatch', 'declaredBaseHash': 'sha256:a',
                 'currentFileHash': 'sha256:a'}
-    assert evaluate.conflict_count(root, [rejected]) == 0
+    assert evaluate.conflict_count(root, [rejected]) is None
     assert evaluate.classify_write(rejected) == 'rejected-by-design'
     unknown = {**rejected, 'currentFileHash': 'sha256:b'}
     assert evaluate.conflict_count(root, [unknown]) is None
     assert evaluate.conflict_count(root, [unknown, {'decision':'accepted', 'terminal':'committed'}]) is None
-    assert evaluate.conflict_count(root, [unknown, {'reasonCode':'overlapping-write-queued'}]) is None
+    assert evaluate.conflict_count(root, [unknown, {'reasonCode':'overlapping-write-queued'}]) == 1
     assert evaluate.conflict_count(root, [{'reasonCode': 'quota'}]) is None
     conflict = {'reasonCode': 'overlapping-write-queued'}
     assert evaluate.conflict_count(root, [rejected, conflict]) == 1

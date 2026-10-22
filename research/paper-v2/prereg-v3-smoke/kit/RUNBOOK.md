@@ -118,10 +118,29 @@ reasoning output counts are retained when reported. Aggregates with a missing
 contribution remain `null`; the kit does not estimate totals.
 
 Steward rejection is reported separately in `steward.rejected` and
-`steward.reasonCodes`. A `patch-context-mismatch` against the same base hash is
-not a conflict. `conflictCount` counts evidenced overlapping-write contention
-and failed Git index-lock commands; absent observations remain `null`. A changed
-hash alone does not establish a concurrent conflict.
+`steward.reasonCodes`. `conflictCount` counts journal-observed cross-session overlap rejections,
+acknowledged overrides, accepted overwrites, and failed Git index-lock commands.
+Declared/live hash equality does not exclude contention. Absent observations stay
+`null`. Accepted lines missing at the final snapshot are losses even after a prior
+rejection; journal provenance names the accepting and removing proposals. A loss
+is silent only when the losing session received no rejection/conflict report.
+Attempts are derived per session/file from overlapping rejected submissions;
+`steward.retryCount` equals `steward.resubmissions` (one per retried submission).
+Unmeasured hash drift, index-lock wait and head moves stay `null`. Malformed and
+no-op patches are model rejections. A valid patch falsely accepted without a
+commit, missing CLI, crash or infrastructure failure remains a kit error and
+makes the run INVALID.
+
+Generation `metrics-v11-366` is recorded under `generations/` with content hashes.
+It is a new immutable generation; existing sealed v10c evidence/results stand.
+To materialize it later, check out the commit introducing its manifest and verify
+its file hashes before running. Never overwrite an existing generation or sealed
+results. A historical re-score must have a fresh destination and provenance that
+identifies both the sealed input and scorer generation. This change does not
+re-score v10c and makes no win claim.
+
+The overlap suite runs `PREREG_STUB_WRITE_MODE=explicit` and `real`. Real mode
+uses process substitution, without `--base-file` or `--attempt`.
 
 Each session supplies `PREREG_SESSION_SLOT`. The writer includes the slot in its
 actor/proposal identity and `sessionSlot` record, including socket requests.

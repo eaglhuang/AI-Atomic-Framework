@@ -1,5 +1,5 @@
 #!/bin/bash
-# 公開 CLI 對沒有改到檔案的 patch 仍回 accepted。atm-write 必須改記 kit-error。
+# No-op model patches are rejected; a valid changing patch falsely accepted is a kit error.
 # 真的改到檔案並留下 proposal commit 的寫入仍是 accepted。
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
@@ -99,9 +99,9 @@ status = int(sys.argv[2])
 text = pathlib.Path(sys.argv[3]).read_text()
 before = sys.argv[4]
 repo = sys.argv[5]
-assert status == 1, (status, row)
-assert row["decision"] == "kit-error", row
-assert row["reasonCode"] == "write-not-applied", row
+assert status == 3, (status, row)
+assert row["decision"] == "rejected-by-design", row
+assert row["reasonCode"] == "patch-noop", row
 assert row["messageCode"] is None, row
 assert row["ok"] is False, row
 assert text == "alpha\nbeta\n", text
@@ -110,9 +110,28 @@ assert head == before, (before, head)
 print("noop downgraded")
 PY
 
+cat > "$BASE/change.diff" <<'EOF'
+--- a/note.txt
++++ b/note.txt
+@@ -1,2 +1 @@
+-alpha
+-beta
++changed
+EOF
+prepare_repo "$BASE/broken"
+set +e
+PREREG_SESSION_BASE_COMMIT="$(git -C "$BASE/broken" rev-parse HEAD)" FAKE_CLI_MODE=noop node "$HERE/bin/atm-write.mjs" note.txt "$BASE/change.diff" --cwd "$BASE/broken" >"$BASE/broken.json"
+broken_status=$?
+set -e
+python3 - "$BASE/broken.json" "$broken_status" <<'PYTEST'
+import json, sys
+row = json.load(open(sys.argv[1]))
+assert int(sys.argv[2]) == 1 and row['decision'] == 'kit-error', row
+assert row['reasonCode'] == 'write-not-applied', row
+PYTEST
 prepare_repo "$BASE/apply"
 set +e
-PREREG_SESSION_BASE_COMMIT="$(git -C "$BASE/apply" rev-parse HEAD)" FAKE_CLI_MODE=apply node "$HERE/bin/atm-write.mjs" note.txt "$BASE/noop.diff" --cwd "$BASE/apply" >"$BASE/apply.json"
+PREREG_SESSION_BASE_COMMIT="$(git -C "$BASE/apply" rev-parse HEAD)" FAKE_CLI_MODE=apply node "$HERE/bin/atm-write.mjs" note.txt "$BASE/change.diff" --cwd "$BASE/apply" >"$BASE/apply.json"
 apply_status=$?
 set -e
 python3 - "$BASE/apply.json" "$apply_status" "$BASE/apply" <<'PY'

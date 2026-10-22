@@ -17,6 +17,7 @@ import path from 'node:path';
 // hunk-locator-parity. Do not add a second parser here.
 import {
   UnifiedPatchApplicationError,
+  applyParsedUnifiedPatchDetailed,
   hunkOffsetsOf,
   locateUnifiedPatchHunks,
   parseUnifiedPatch,
@@ -215,7 +216,7 @@ const baseFile = argValue('--base-file');
 const ackOverlap = argValue('--ack-overlap');
 const patch = patchArg === '-' ? readFileSync(0, 'utf8') : readFileSync(path.resolve(patchArg), 'utf8');
 
-const attempt = Math.max(1, Number(argValue('--attempt') || process.env.PREREG_WRITE_ATTEMPT || 1) || 1);
+// Attempt evidence comes from the steward history, never a model-supplied flag.
 const started = Date.now();
 const result = submitLive({
   writableRoot,
@@ -228,7 +229,6 @@ const result = submitLive({
   baseFile,
   sessionBaseCommit: argValue('--session-base-commit') || process.env.PREREG_SESSION_BASE_COMMIT || null,
   patch,
-  attempt,
   targetPath,
   started
 });
@@ -318,23 +318,46 @@ function appendWriteRecord(input, record) {
   }
 }
 
+function submissionAttempt(input, hunks) {
+  const history = path.join(input.writableRoot, '.prereg-smoke', 'steward-writes.jsonl');
+  const spans = hunks?.map(h => [h.oldStart, h.oldStart + Math.max(1, h.oldCount) - 1]) || null;
+  const rows = existsSync(history) ? parseLiveWriteJournal(readFileSync(history, 'utf8')) : [];
+  const same = rows.filter(row => row.actorId === input.actorId && row.file === input.relativeFile && row.taskId === input.taskId);
+  const overlaps = row => spans && row.intentSpans
+    ? spans.some(a => row.intentSpans.some(b => a[0] <= b[1] && b[0] <= a[1]))
+    : row.patchHash === sha256Bytes(Buffer.from(input.patch));
+  const first = same.findIndex(row => row.decision === 'rejected-by-design' && overlaps(row));
+  return { ...input, intentSpans: spans, patchHash: sha256Bytes(Buffer.from(input.patch)),
+    attempt: first < 0 ? 1 : 2 + same.slice(first + 1).filter(overlaps).length };
+}
+
 function submitLive(input) {
   const parsed = parseSubmittedPatch(input.patch, input.relativeFile);
+  input = submissionAttempt(input, parsed.hunks);
   if (!parsed.hunks) return malformedPatch(input, parsed.error);
   input = { ...input, hunks: parsed.hunks };
   let declaredBase;
   try {
     declaredBase = sessionBase(input);
   } catch (error) {
-    return malformedPatch(input, String(error), 'recovery-required');
+    return malformedPatch(input, String(error), 'recovery-required', 'kit-error');
   }
   if (!declaredBase) return malformedPatch(input, '無法確定 session 看過的 base', 'base-unknown');
+  if (declaredBase.text !== null) {
+    try {
+      if (applyParsedUnifiedPatchDetailed(declaredBase.text, input.hunks).text === declaredBase.text) {
+        return malformedPatch(input, 'patch leaves the declared base unchanged', 'patch-noop');
+      }
+    } catch {
+      // A well-formed patch with stale context is classified by the steward.
+    }
+  }
   declaredBase.located = declaredBase.text === null ? null : locateIn(declaredBase.text, input.hunks);
   const head = gitText(input.writableRoot, ['rev-parse', 'HEAD'], input.safePath);
-  if (head.status !== 0) fail('base', `無法讀取 HEAD：${head.stderr}`);
+  if (head.status !== 0) return malformedPatch(input, `無法讀取 HEAD：${head.stderr}`, 'git-head-unavailable', 'kit-error');
   const baseCommit = head.stdout.trim();
   if (!input.cli || !existsSync(input.cli) || cliVersion(input.cli, input.safePath) !== '0.1.21') {
-    fail('cli-unavailable', `公開 CLI ${CLI_PACKAGE} 不可用。中止寫入。沒有 claim 退路。`, { cli: input.cli || null });
+    return malformedPatch(input, `公開 CLI ${CLI_PACKAGE} 不可用`, 'cli-unavailable', 'kit-error');
   }
   const fileBeforeHash = declaredBase.hash;
   const proposalId = `prop-${input.actorId}-a${input.attempt}-${createHash('sha256').update(`${input.relativeFile}\n${input.patch}`).digest('hex').slice(0, 12)}`;
@@ -390,9 +413,11 @@ function submitLive(input) {
     batchSize: 1,
     attempt: input.attempt,
     retryCount: Math.max(0, input.attempt - 1),
-    hashDriftCount: 0,
+    intentSpans: input.intentSpans,
+    patchHash: input.patchHash,
+    hashDriftCount: live?.hashDriftCount ?? null,
     writeToCommitMs: ok ? elapsedMs : null,
-    commit: { gitIndexLockWaitMs: 0, headMoves: 0 },
+    commit: { gitIndexLockWaitMs: live?.commit?.gitIndexLockWaitMs ?? null, headMoves: live?.commit?.headMoves ?? null },
     planRequired: false,
     cli: CLI_PACKAGE,
     entry: 'broker steward apply-live'
@@ -406,19 +431,19 @@ function submitLive(input) {
  * 解析不了的 patch（沒有 hunk、標頭行數和內容不合、少了前綴、多檔或檔名不對）
  * 是模型送錯，不是 kit 故障：記成 rejected-by-design / patch-malformed，exit 3，不呼叫 CLI。
  */
-function malformedPatch(input, message, reasonCode = 'patch-malformed') {
+function malformedPatch(input, message, reasonCode = 'patch-malformed', decision = 'rejected-by-design') {
   const proposalId = `prop-${input.actorId}-a${input.attempt}-${createHash('sha256').update(`${input.relativeFile}\n${input.patch}`).digest('hex').slice(0, 12)}`;
   const text = currentFileText(input);
   const record = {
     schema: 'prereg-v3-smoke.stewardWrite.v1',
     ok: false,
-    decision: 'rejected-by-design',
+    decision,
     reasonCode,
     messageCode: null,
     verdict: 'blocked',
     queued: false,
     phase: reasonCode === 'patch-malformed' ? 'parse' : 'live',
-    terminal: 'blocked',
+    terminal: decision === 'kit-error' ? 'kit-error' : 'blocked',
     stopReason: message,
     proposalId,
     taskId: input.taskId,
@@ -432,15 +457,17 @@ function malformedPatch(input, message, reasonCode = 'patch-malformed') {
     batchSize: 1,
     attempt: input.attempt,
     retryCount: Math.max(0, input.attempt - 1),
-    hashDriftCount: 0,
+    intentSpans: input.intentSpans,
+    patchHash: input.patchHash,
+    hashDriftCount: null,
     writeToCommitMs: null,
-    commit: { gitIndexLockWaitMs: 0, headMoves: 0 },
+    commit: { gitIndexLockWaitMs: null, headMoves: null },
     planRequired: false,
     cli: CLI_PACKAGE,
     entry: 'broker steward apply-live'
   };
   appendWriteRecord(input, record);
-  return { record, exitCode: 3 };
+  return { record, exitCode: decision === 'kit-error' ? 1 : 3 };
 }
 
 function confirmLiveWrite(input, beforeBytes, beforeHead, proposalId) {

@@ -6,6 +6,8 @@ import re
 import subprocess
 import tempfile
 from pathlib import Path
+from kit_generation import generation_metadata
+from metrics_provenance import journal_evidence, rows_for_session, loss_items, measured_wait, journal_resubmissions
 
 def resolve_state():
     if os.environ.get("PREREG_SMOKE_STATE"):
@@ -212,28 +214,20 @@ def tokens_of(session):
                else None for key in keys}, "events": len(usages)}
 
 
-def conflict_count(arm_dir, rows):
-    """Count observed contention, never general steward rejection."""
+def conflict_count(arm_dir, rows, overwrite_conflicts=None):
+    """Observed journal contention, independent of declared/live hash equality."""
     count = arm_index_lock_count(arm_dir)
-    observed = count is not None
-    incomplete = False
-    count = count or 0
-    for row in rows:
-        reason = row.get("reasonCode")
-        if reason in {"overlapping-write-queued", "overlapping-write-conflict"}:
-            observed = True
-            count += 1
-        elif reason == "patch-context-mismatch":
-            before, current = row.get("declaredBaseHash"), row.get("currentFileHash")
-            # Equal hashes positively rule out concurrent base drift. A mismatch
-            # alone cannot establish a conflict (a malformed patch also fails).
-            if before and current and before == current:
-                observed = True
-            else:
-                incomplete = True
-        elif row.get("decision") == "accepted" and row.get("terminal") == "committed":
-            observed = True
-    return count if observed and not incomplete else None
+    explicit = {i for i, row in enumerate(rows) if row.get("reasonCode") in {
+        "cross-session-overlap", "overlapping-write-queued", "overlapping-write-conflict"
+    } or row.get("acknowledgedOverlap")}
+    explicit.update(overwrite_conflicts or set())
+    if explicit:
+        return (count or 0) + len(explicit)
+    if any(row.get("reasonCode") == "patch-context-mismatch" for row in rows):
+        return count if count else None
+    return count if count is not None else (0 if rows and all(
+        row.get("crossSessionOverlap") == [] and row.get("decision") == "accepted" for row in rows
+    ) else None)
 
 
 def cross_session_counts(rows):
@@ -864,6 +858,8 @@ def score_arm(arm_name, arm_dir, tasks, base):
     except RuntimeError as exc:
         return snapshot_failure(arm_name, arm_dir, str(exc))
     rows = steward_rows(work)
+    accepted_losses, overwrite_conflicts = journal_evidence(
+        rows, lambda file: blob_text(work, base, file), lambda file: blob_text(work, "HEAD", file))
     final_diff_text = git(work, "diff", f"{base}..HEAD", check=False).stdout
     final_parts = split_patch(final_diff_text)
     blocked_files = {row.get("file") for row in rows if row.get("file") and blocked_steward_write(row)}
@@ -889,6 +885,8 @@ def score_arm(arm_name, arm_dir, tasks, base):
         if instance_id is None and slot - 1 < len(tasks["primary"]["instances"]):
             instance_id = tasks["primary"]["instances"][slot - 1]["instanceId"]
         rejected, rejection_confidence = rejection_for_session(rows, parts.keys(), parts, stdout)
+        indices = rows_for_session(rows, slot, stdout, session_rows_by_proposal)
+        provenance_losses = loss_items(accepted_losses, indices, rows)
         unfinished = []
         session_match = "hunk"
         for file, patch in parts.items():
@@ -915,6 +913,13 @@ def score_arm(arm_name, arm_dir, tasks, base):
                 blocked = rejected
             else:
                 blocked = rejected or file in blocked_files
+            # Remove proven accepted losses from the rejection fallback. Keep any
+            # never-accepted lines as separate unfinished intent on the same file.
+            proven = {line for loss in provenance_losses if loss["file"] == file for line in loss["missingAddedLines"]}
+            if proven:
+                missing = missing_edit_lines(patch, final_text, final_parts.get(file, ""))
+            missing = [line for line in missing if line not in proven]
+            item["missingAddedLines"], item["missingCount"] = missing[:12], len(missing)
             if missing and not blocked:
                 lost.append(item)
                 unfinished.append(item)
@@ -924,6 +929,11 @@ def score_arm(arm_name, arm_dir, tasks, base):
                 unfinished.append(item)
             else:
                 kept.append({"file": file, "missingCount": 0, "match": match})
+        for item in provenance_losses:
+            lost.append(item)
+            unfinished.append(item)
+        reported = any(blocked_steward_write(rows[i]) or rows[i].get("crossSessionOverlap")
+                       or rows[i].get("acknowledgedOverlap") for i in indices)
         sessions.append({
             "slot": slot,
             "evidenceStatus": "ok",
@@ -933,6 +943,7 @@ def score_arm(arm_name, arm_dir, tasks, base):
             "exitCode": exit_code,
             "tokens": tokens_of(session),
             "lostEdits": lost,
+            "silentLostEdits": [] if reported or rejected else lost,
             "unfinishedEdits": unfinished,
             "keptOrRejected": kept,
             "stewardRejected": rejected,
@@ -971,7 +982,9 @@ def score_arm(arm_name, arm_dir, tasks, base):
     boundary = read_boundary_file(arm_dir)
     fields = arm_model_fields(arm_dir)
     index_lock = arm_index_lock_count(arm_dir)
-    resubmissions = recompose_or_retry(arm_dir)
+    resubmissions = journal_resubmissions(rows)
+    if resubmissions is None:
+        resubmissions = recompose_or_retry(arm_dir)
     match_values = [session["lostEditConfidence"] for session in sessions]
     lost_confidence = "low" if "low" in match_values else "hunk"
     attributions = [session["rejectionAttribution"] for session in sessions]
@@ -998,21 +1011,22 @@ def score_arm(arm_name, arm_dir, tasks, base):
         "reasoningEffort": fields["reasoningEffort"],
         "sessions": sessions,
         "lostEditCount": sum(len(session["lostEdits"]) for session in sessions),
-        "silentLostEditCount": sum(len(session["lostEdits"]) for session in sessions),
+        "silentLostEditCount": sum(len(session["silentLostEdits"]) for session in sessions),
         "lostEditConfidence": lost_confidence,
         "rejectionAttribution": attribution,
         "corruption": corruption,
         "indexLockCount": index_lock,
         "gitErrors": git_errors,
-        "conflictCount": conflict_count(arm_dir, rows),
+        "conflictCount": conflict_count(arm_dir, rows, overwrite_conflicts),
         "resolutionTimeMs": None,
         "steward": {
             "writes": len(rows),
             "rejected": rejected_count,
             "resubmissions": resubmissions,
+            "retryCount": resubmissions,
             "recomposeOrRetry": resubmissions,
             **cross_session_counts(rows),
-            "queueWaitMs": [int((row.get("commit") or {}).get("gitIndexLockWaitMs") or 0) for row in rows],
+            "queueWaitMs": [measured_wait(row) for row in rows],
             "writeToCommitMs": latencies,
             "batchSizes": [row.get("batchSize") for row in rows],
             "terminals": [row.get("terminal") for row in rows],
@@ -1447,6 +1461,7 @@ def main():
     payload = {
         "schema": "prereg-v3-smoke.results.v1",
         "label": "smoke/exploratory",
+        "kitGeneration": generation_metadata(Path(__file__).resolve().parents[1]),
         "winClaim": False,
         "status": overall,
         "mode": env.get("PREREG_SMOKE_MODE"),

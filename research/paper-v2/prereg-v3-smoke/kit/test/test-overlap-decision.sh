@@ -44,9 +44,12 @@ assert "rejected-by-design" in decisions, decisions
 assert decisions[-1] == "accepted", decisions
 assert "kit-error" not in decisions, decisions
 codes = [code for code in arm["steward"]["reasonCodes"] if code]
-assert codes == ["overlapping-write-queued"], codes
+assert codes and all(code in {"overlapping-write-queued", "cross-session-overlap", "stale-base"} for code in codes), codes
 assert arm["steward"]["recomposeOrRetry"] > 0, arm["steward"]
 detail = arm["steward"]["writesDetail"]
+assert arm["steward"]["retryCount"] == sum(row["attempt"] > 1 for row in detail), detail
+assert all(row["hashDriftCount"] is None for row in detail), detail
+assert all(wait is None for wait in arm["steward"]["queueWaitMs"]), arm["steward"]
 assert any((row.get("attempt") or 1) >= 2 and row.get("decision") == "accepted" for row in detail), detail
 text = (state / "arm-b" / "work" / "shared.py").read_text(encoding="utf-8")
 assert "beta-one" in text and "delta-two" in text, text

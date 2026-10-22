@@ -67,7 +67,7 @@ const server = net.createServer({ allowHalfOpen: true }, (socket) => {
       return;
     }
     const file = safeFile(req.file);
-    if (!file || typeof req.patch !== 'string' || !req.patch.includes('@@')) {
+    if (!file || typeof req.patch !== 'string') {
       reply(socket, { exitCode: 1, stdout: '', stderr: '拒絕這個寫入請求\n' });
       return;
     }
