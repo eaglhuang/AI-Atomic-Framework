@@ -91,6 +91,7 @@ import json
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(sys.argv[1]).parent))
 spec = importlib.util.spec_from_file_location("evaluate", sys.argv[1])
 mod = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mod)

@@ -88,17 +88,18 @@ if (arm === 'A') {
   while (attempt <= maxRetries + 1) {
     const patchPath = path.join(sessionDir, `file-${file.replaceAll('/', '_')}.a${attempt}.patch`);
     writeFileSync(patchPath, activePatch);
-    const result = spawnSync('atm-write', [
-      file, patchPath,
-      '--actor', `stub-${instanceId}`,
-      '--task', instanceId,
-      '--message', `stub ${instanceId} ${file} attempt ${attempt}`,
-      '--attempt', String(attempt)
-    ], {
-      cwd: work,
-      encoding: 'utf8',
-      env: process.env
-    });
+    const realMode = process.env.PREREG_STUB_WRITE_MODE === 'real';
+    const basePath = path.join(sessionDir, `base.a${attempt}.txt`);
+    writeFileSync(basePath, live);
+    const args = [file, patchPath, '--actor', `stub-${instanceId}`, '--task', instanceId,
+      '--message', `stub ${instanceId} ${file}`];
+    const result = realMode
+      ? spawnSync('/bin/bash', ['-c', 'atm-write "$1" <(cat "$2") "${@:3}"', 'stub', ...args], {
+        cwd: work, encoding: 'utf8', env: process.env
+      })
+      : spawnSync('atm-write', [...args, '--base-file', basePath, '--attempt', String(attempt)], {
+        cwd: work, encoding: 'utf8', env: process.env
+      });
     const record = parseStewardRecord(result.stdout);
     events.push({
       type: 'stub.atm-write',

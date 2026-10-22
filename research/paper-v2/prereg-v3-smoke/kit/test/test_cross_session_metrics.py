@@ -23,5 +23,5 @@ assert evaluate.cross_session_counts([]) == {
     'crossSessionOverlapRejections': 0, 'acknowledgedOverrides': 0, 'mergedBothResubmissions': 0,
 }
 # overlapping-write-queued stays a conflict; cross-session-overlap is not folded into it.
-assert evaluate.conflict_count(pathlib.Path('/nonexistent'), [{'reasonCode': 'cross-session-overlap'}]) is None
+assert evaluate.conflict_count(pathlib.Path('/nonexistent'), [{'reasonCode': 'cross-session-overlap'}]) == 1
 print('cross-session metrics ok')

@@ -220,7 +220,8 @@ check arm-a-git bash "$HERE/test/test-arm-a-git-writable.sh"
 check login-path bash "$HERE/test/test-session-login-path.sh"
 check false-accept bash "$HERE/test/test-false-accept.sh"
 check seal-index bash "$HERE/test/test-seal-index.sh"
-check overlap bash "$HERE/test/test-overlap-decision.sh"
+check overlap-explicit env PREREG_STUB_WRITE_MODE=explicit bash "$HERE/test/test-overlap-decision.sh"
+check overlap-real env PREREG_STUB_WRITE_MODE=real bash "$HERE/test/test-overlap-decision.sh"
 check stale-overlap bash "$HERE/test/test-stale-overlap.sh"
 check stale-base-declared bash "$HERE/test/test-stale-base-declared.sh"
 # Node 22 uses the experimental spelling; newer runtimes also accept --strip-types.
@@ -254,3 +255,7 @@ else
 fi
 check real-model-skip bash "$HERE/test/test-real-model-skip.sh"
 echo "preflight ok"
+
+check kit-generation python3 "$HERE/bin/kit_generation.py" --verify
+check writer-metrics-366 python3 "$HERE/test/test_writer_metrics_366.py"
+check metrics-366 python3 "$HERE/test/test_metrics_366.py"

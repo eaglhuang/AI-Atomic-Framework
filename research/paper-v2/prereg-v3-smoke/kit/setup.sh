@@ -7,9 +7,12 @@ source "$HERE/lib/common.sh"
 # shellcheck disable=SC1091
 source "$HERE/lib/django-venv.sh"
 
+python3 "$HERE/bin/kit_generation.py" --verify
+
 MODE="${PREREG_SMOKE_MODE:-django}"
 new_state_root
 mkdir -p "$STATE_ROOT"
+cp "$HERE/generations/metrics-v11-366.json" "$STATE_ROOT/kit-generation.json"
 
 mkdir -p "$STATE_ROOT/template"
 
