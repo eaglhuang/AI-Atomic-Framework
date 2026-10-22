@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { assertCloseClaimAuthority, pauseCloseClaimRenewal, withCloseClaimRenewal } from '../close-claim-renewal.ts';
+import { assertCloseClaimAuthority, beginCloseClaimRenewal, pauseCloseClaimRenewal, withCloseClaimRenewal } from '../close-claim-renewal.ts';
 const cwd = mkdtempSync(path.join(os.tmpdir(), 'atm-close-claim-renew-'));
 const file = path.join(cwd, '.atm/history/tasks/TASK.json');
 mkdirSync(path.dirname(file), { recursive: true });
@@ -17,7 +17,13 @@ async function renew() {
 }
 try {
   reset();
+  const beforeAdmission = readFileSync(file, 'utf8');
+  await assert.rejects(withCloseClaimRenewal({ cwd, taskId: 'TASK', actorId: 'owner', renew }, async () => { throw new Error('preflight refused'); }), /preflight refused/);
+  assert.equal(readFileSync(file, 'utf8'), beforeAdmission, 'read-only admission failure must preserve the exact task ledger');
+  assert.equal(renewals, 0);
+  reset();
   await withCloseClaimRenewal({ cwd, taskId: 'TASK', actorId: 'owner', renew }, async () => {
+    await beginCloseClaimRenewal();
     assert.equal(renewals, 1, 'automatically renew short authority before preparation');
     await pauseCloseClaimRenewal();
     assert.equal(renewals, 1, 'sufficient remaining authority is not needlessly rewritten');
@@ -32,6 +38,6 @@ try {
     assert.throws(assertCloseClaimAuthority, /ATM_CLOSE_CLAIM_LOST/);
   }), /ATM_CLOSE_CLAIM_LOST/);
   reset();
-  await assert.rejects(withCloseClaimRenewal({ cwd, taskId: 'TASK', actorId: 'owner', renew: async () => { throw new Error('renewal denied'); } }, async () => assert.fail('must stop before writing')), /renewal denied/);
+  await assert.rejects(withCloseClaimRenewal({ cwd, taskId: 'TASK', actorId: 'owner', renew: async () => { throw new Error('renewal denied'); } }, async () => { await beginCloseClaimRenewal(); assert.fail('must stop before writing'); }), /renewal denied/);
   console.log('close-claim-renewal: automatic headroom, close-state preservation and claim generation fencing passed');
 } finally { rmSync(cwd, { recursive: true, force: true }); }

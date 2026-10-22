@@ -30,7 +30,7 @@ async function renewIfNeeded(context: RenewalContext): Promise<void> {
   const current = task(context.cwd, context.taskId), claim = current.claim;
   if (!context.leaseId || current.status !== 'running' || claim?.state !== 'active') return;
   const expires = Date.parse(claim.heartbeatAt ?? claim.claimedAt ?? '') + Number(claim.ttlSeconds ?? 0) * 1000;
-  if (Number.isFinite(expires) && expires - Date.now() >= 2 * 60 * 60 * 1000) return;
+  if (Number.isFinite(expires) && expires - Date.now() >= 15 * 60 * 1000) return;
   if (context.renew) await context.renew();
   else {
     const { runTasksClaimLifecycle } = await import('../tasks/claim-orchestrator.ts');
@@ -41,8 +41,15 @@ async function renewIfNeeded(context: RenewalContext): Promise<void> {
 }
 /** Drain renewal before taking the write lock. Ordinary tasks renew changes
  * status to running, so it must never overlap the close's ledger transition.
- * Four hours of claim headroom covers the bounded locked commit; its mutex
- * continues heartbeating until all writes and cleanup have finished. */
+ * A claim with less than fifteen minutes remaining is extended to four
+ * hours. The mutex continues heartbeating through writes and cleanup.
+ * Begin only after read-only admission has passed. */
+export async function beginCloseClaimRenewal(): Promise<void> {
+  const context = active.getStore();
+  if (!context) return;
+  await renewIfNeeded(context);
+  context.paused = false;
+}
 export async function pauseCloseClaimRenewal(): Promise<void> {
   const context = active.getStore();
   if (!context) return;
@@ -53,9 +60,8 @@ export async function pauseCloseClaimRenewal(): Promise<void> {
 }
 export async function withCloseClaimRenewal<T>(input: { cwd: string; taskId: string; actorId: string; renew?: () => Promise<void> }, action: () => Promise<T>): Promise<T> {
   const claim = task(input.cwd, input.taskId).claim;
-  const context: RenewalContext = { ...input, leaseId: claim?.state === 'active' ? claim.leaseId ?? null : null, paused: false, failure: null, pending: null };
+  const context: RenewalContext = { ...input, leaseId: claim?.state === 'active' ? claim.leaseId ?? null : null, paused: true, failure: null, pending: null };
   return active.run(context, async () => {
-    await renewIfNeeded(context);
     const timer = setInterval(() => {
       if (context.paused || context.pending || context.failure) return;
       context.pending = renewIfNeeded(context).catch((error) => { context.failure = error instanceof Error ? error : new Error(String(error)); })
