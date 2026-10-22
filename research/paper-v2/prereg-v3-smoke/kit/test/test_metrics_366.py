@@ -63,7 +63,7 @@ def test_arm(prior_rejection):
         score = evaluate.score_arm('B', arm, tasks, base)
         assert score['lostEditCount'] == 1, score
         assert score['silentLostEditCount'] == (0 if prior_rejection else 1), score
-        assert score['conflictCount'] >= 1, score
+        assert score['conflictCount'] == 1, score
         loss = score['sessions'][0]['lostEdits'][0]
         assert loss['acceptedProposals'] == ['rec3'] and loss['removedByProposals'] == ['rec5'], loss
         assert loss.get('classified') != 'steward-rejected', loss

@@ -1,0 +1,49 @@
+name: stub-concurrency
+
+on:
+  pull_request:
+    paths:
+      - 'packages/core/src/broker/**'
+      - 'packages/core/src/live-write/**'
+      - 'packages/cli/src/commands/broker/**'
+      - 'packages/cli/src/commands/broker.ts'
+      - 'research/paper-v2/prereg-v3-smoke/kit/**'
+      - 'tests/core/**'
+      - 'tests/cli/unified-patch-*.test.ts'
+      - 'tests/fixtures/unified-patch-v10c/**'
+      - 'package*.json'
+      - '.github/workflows/stub-concurrency.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'packages/core/src/broker/**'
+      - 'packages/core/src/live-write/**'
+      - 'packages/cli/src/commands/broker/**'
+      - 'packages/cli/src/commands/broker.ts'
+      - 'research/paper-v2/prereg-v3-smoke/kit/**'
+      - 'tests/core/**'
+      - 'tests/cli/unified-patch-*.test.ts'
+      - 'tests/fixtures/unified-patch-v10c/**'
+      - 'package*.json'
+      - '.github/workflows/stub-concurrency.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  concurrency:
+    name: Stubbed multi-session concurrency
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - run: npm ci --ignore-scripts
+      - name: Run source contracts and fake codex sessions (no model calls)
+        run: timeout 240 bash research/paper-v2/prereg-v3-smoke/kit/test/run-concurrency-suite.sh
