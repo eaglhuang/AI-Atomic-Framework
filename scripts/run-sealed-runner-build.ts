@@ -1,4 +1,3 @@
-import { assertSealedRunnerClaimLifetime } from './sealed-runner-claim-preflight.ts';
 import { spawnSync } from 'node:child_process';
 import { withSealedBuildLog } from './sealed-build-log-sink.ts';
 import { createHash } from 'node:crypto';
@@ -22,7 +21,7 @@ import {
 import { captureRunnerBuildOutputSnapshot, scanSealedRunnerBuildOutputInventory } from '../packages/core/src/broker/runner-build-output-inventory.ts';
 import type { RunnerSyncAdmissionReport } from '../packages/cli/src/commands/framework-development/runner-sync-admission.ts';
 import { computeBuildInputsTreeHash } from './runner-input-tree.ts';
-import { captureSealedRunnerPublicationSnapshot, resolveSealedRunnerPublication } from './sealed-runner-publication.ts';
+import { assertSealedRunnerClaimLifetime, captureSealedRunnerPublicationSnapshot, resolveSealedRunnerPublication } from './sealed-runner-publication.ts';
 import { hydrateSealedPackageDist, releaseSealedRunnerSteward, syncSealedBuildArtifacts, writeSealedBuildMetadata } from './sealed-runner-artifact-lifecycle.ts';
 import { hydrateVerifiedRootDropBase } from './build-root-drop-release.ts';
 export { computeBuildInputsTreeHash } from './runner-input-tree.ts';
