@@ -4,6 +4,7 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { buildPatchProposalComposition } from '../../packages/core/src/broker/steward-transactional-apply.ts';
+import { composeJsonPointerPatches } from '../../packages/core/src/broker/steward-json-pointer-compose.ts';
 import { brokerAdapterMigration, type MergePlan, type PatchProposal } from '../../packages/core/src/broker/types.ts';
 
 const cwd = mkdtempSync(path.join(os.tmpdir(), 'atm-steward-json-pointer-'));
@@ -44,11 +45,12 @@ try {
 // Independent sessions prepare against one immutable base; arrival order must
 // neither lose a selected edit nor change the byte output or attribution.
 function patchFor(base: string, after: string): string {
-  const oldLines = base.slice(0, -1).split('\n');
-  const newLines = after.slice(0, -1).split('\n');
+  const oldLines = (base.endsWith('\n') ? base.slice(0, -1) : base).split('\n');
+  const newLines = (after.endsWith('\n') ? after.slice(0, -1) : after).split('\n');
   return ['--- a/package.json', '+++ b/package.json',
     `@@ -1,${oldLines.length} +1,${newLines.length} @@`,
-    ...oldLines.map((line) => `-${line}`), ...newLines.map((line) => `+${line}`), ''].join('\n');
+    ...oldLines.map((line) => `-${line}`), ...(base.endsWith('\n') ? [] : ['\\ No newline at end of file']),
+    ...newLines.map((line) => `+${line}`), ...(after.endsWith('\n') ? [] : ['\\ No newline at end of file']), ''].join('\n');
 }
 
 function composeFixture(base: string, sessions: readonly { pointer: string; after: string }[], expected: string | null): void {
@@ -131,4 +133,22 @@ composeFixture(siblings, [
   { pointer: '/a', after: '{"a":3,"ab":2}\n' },
   { pointer: '/a', after: '{"a":4,"ab":2}\n' }
 ], null);
+// Independently valid deletions must not yield invalid JSON when combined.
+composeFixture(siblings, [
+  { pointer: '/a', after: '{"ab":2}\n' },
+  { pointer: '/ab', after: '{"a":1}\n' }
+], null);
+// Invalid anchors and documents delegate to the immutable-base text route.
+for (const pointer of ['', '/a~2', '/a~']) {
+  assert.equal(composeJsonPointerPatches(siblings, [
+    proposal('invalid', 'actor', pointer, patchFor(siblings, '{"a":3,"ab":2}\n'))
+  ]), null);
+}
+assert.equal(composeJsonPointerPatches('invalid JSON', [files, budget]), null);
+// EOF and multibyte characters also remain byte-for-byte unchanged.
+const unicode = '{"keep":"雪😀", "a":1, "ab":2}';
+composeFixture(unicode, [
+  { pointer: '/a', after: unicode.replace('"a":1', '"a":3') },
+  { pointer: '/ab', after: unicode.replace('"ab":2', '"ab":4') }
+], unicode.replace('"a":1', '"a":3').replace('"ab":2', '"ab":4'));
 console.log('[steward-json-pointer-compose] ok');

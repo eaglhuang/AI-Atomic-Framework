@@ -152,3 +152,5 @@ TASK-PRF-0159 milestone 1: reserve fresh follow-up ID for merging current main a
 TASK-PRF-0159 milestone 2: main merged; canonical upstream TASK-PRF-0158 metadata preserved; release runner will be rebuilt from merged source.
 
 TASK-PRF-0159 milestone 3: merged runner rebuilt and frozen prompt smoke passed; regression evidence and close previews complete.
+
+- 2026-10-22: #365 resumed on fix/365-pointer-composition; merged origin/main 97e1193a0. Preserved the existing decoded-prefix/byte-splice fix. Quickfix exceeds 3 files / 80 lines; framework maintenance claim accepted as ATM-FRAMEWORK-TEMP-grok-bot. Main reused historical TASK-PRF-0156 for unrelated P2 work, so its records were preserved and the prior uncommitted build was stashed. Expanded regression coverage for invalid combined deletions, malformed anchors, Unicode and no-final-newline fidelity. Pointer, steward concurrency/queue/rollback/stale-base, CLI containment/receipt/proposal and preclose checks pass.
