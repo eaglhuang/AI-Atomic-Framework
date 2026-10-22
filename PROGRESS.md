@@ -146,3 +146,5 @@ TASK-PRF-0157 milestone 4: sealed build and runner-sync receipt passed; frozen s
 TASK-PRF-0158 milestone 1: helpers consolidated into existing tracked modules; both regressions, lint and typecheck passed; stale generated helper modules removed before rebuilding.
 
 TASK-PRF-0158 milestone 2: sealed rebuild, runner-sync receipt, frozen smoke and close previews passed; closing publication follow-up.
+
+TASK-PRF-0159 milestone 1: reserve fresh follow-up ID for merging current main and resealing PR385; main owns canonical TASK-PRF-0158 history.
