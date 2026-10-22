@@ -106,7 +106,7 @@ export function sealCommitBundleFromCandidateIndex(input: { readonly cwd: string
 }
 
 function readStagedDeletionEntries(input: { readonly cwd: string; readonly paths: readonly string[]; readonly baseRef: string; readonly env?: NodeJS.ProcessEnv; readonly provenance?: SealedCommitEntryProvenance }): readonly SealedCommitBundleEntry[] {
-  const entries = parseRawDiffEntries(candidateGit(input.cwd, ['diff-index', '--cached', '--raw', '--no-abbrev', '--no-renames', '-z', '--diff-filter=D', input.baseRef, '--', ...input.paths], input.env));
+  const entries = parseRawDiffEntries(candidateGit(input.cwd, ['diff-index', '--cached', '--raw', '--no-abbrev', '--no-renames', '-z', '--diff-filter=D', input.baseRef, '--', ...new Set(input.paths)], input.env));
   return entries.map((entry) => ({ ...entry, provenance: input.provenance ?? 'task-scope' }));
 }
 
