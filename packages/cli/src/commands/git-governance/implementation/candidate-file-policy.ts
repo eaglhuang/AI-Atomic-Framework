@@ -1,3 +1,4 @@
+import { assertActiveCloseLease } from '../../taskflow/close-transaction-mutex.ts';
 import { execFileSync } from 'node:child_process';
 import { closeSync, lstatSync, mkdtempSync, openSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
@@ -13,6 +14,7 @@ export interface CandidateFilePolicy {
 }
 
 export function candidateGit(cwd: string, args: readonly string[], env?: NodeJS.ProcessEnv, input?: string): string {
+  assertActiveCloseLease();
   const dir = input === undefined ? null : mkdtempSync(path.join(os.tmpdir(), 'atm-candidate-input-'));
   let fd: number | undefined;
   try {

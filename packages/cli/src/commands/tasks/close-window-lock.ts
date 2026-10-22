@@ -1,3 +1,4 @@
+import { assertActiveCloseLease } from '../taskflow/close-transaction-mutex.ts';
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
@@ -221,6 +222,7 @@ export function runGitIndexMutationWithRetry(input: {
   readonly operation: string;
   readonly run?: () => void;
 }): void {
+  assertActiveCloseLease();
   for (let attempt = 0; ; attempt += 1) {
     try {
       (input.run ?? (() => execFileSync(resolveGitExecutable(), input.args, {
@@ -358,6 +360,7 @@ export function inspectCloseWindowStagedIndexAdmission(input: {
   expectedStageFiles: readonly string[];
   deferForeignStaged?: boolean;
 }): CloseWindowStagedIndexLockReport {
+  assertActiveCloseLease();
   const existing = readCloseWindowStagedIndexLock(input.cwd);
   const unexpectedStagedTasks = inspectForeignStagedTasksForCloseWindow(input);
   const expected = new Set(uniqueSorted(input.expectedStageFiles));
@@ -383,6 +386,7 @@ export function acquireCloseWindowStagedIndexLock(input: {
   maxHandoffWaitMs?: number;
   waitForHandoffPoll?: (delayMs: number) => void;
 }): CloseWindowStagedIndexLockReport {
+  assertActiveCloseLease();
   const lockPath = closeWindowStagedIndexLockPath(input.cwd);
   const firstExisting = readCloseWindowStagedIndexLock(input.cwd);
   let existing = firstExisting;
@@ -493,6 +497,7 @@ export function assertCloseWindowStagingAllowed(input: {
   taskId: string;
   operation: string;
 }): void {
+  assertActiveCloseLease();
   const lock = readCloseWindowStagedIndexLock(input.cwd);
   if (!lock || lock.status !== 'active') return;
   if (lock.taskId === normalizeTaskId(input.taskId)) return;
@@ -518,6 +523,7 @@ export function releaseCloseWindowStagedIndexLock(input: {
   actorId: string;
   outcome: CloseWindowStagedIndexLockOutcome;
 }): CloseWindowStagedIndexLockRecord | null {
+  assertActiveCloseLease();
   const lockPath = closeWindowStagedIndexLockPath(input.cwd);
   const existing = readCloseWindowStagedIndexLock(input.cwd);
   if (!existing || existing.status !== 'active') return null;
