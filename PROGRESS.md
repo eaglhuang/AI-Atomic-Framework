@@ -138,3 +138,5 @@ Both validators pass locally. ATM: TASK-PRF-0136 imported and claimed (lane lane
 TASK-PRF-0157 milestone 1: imported and claimed both governance fixes; origin census found 0156 as highest existing ID.
 
 TASK-PRF-0157 milestone 2: both fixes and regression tests implemented; typecheck, eslint, publication lifecycle and preclose passed.
+
+TASK-PRF-0157 milestone 3: resumed after credits refill; all checks passed, claim renewed, opener fixture corrected and test imports cleaned.

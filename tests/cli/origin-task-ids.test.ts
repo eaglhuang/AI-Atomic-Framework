@@ -2,8 +2,7 @@ import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { resolveHostOpenerPolicyDecision } from '../../packages/cli/src/commands/taskflow/host-opener-policy.ts';
-import type { HostOpenerPolicyInput } from '../../packages/cli/src/commands/taskflow/host-opener-policy.ts';
+import { resolveHostOpenerPolicyDecision, type HostOpenerPolicyInput } from '../../packages/cli/src/commands/taskflow/host-opener-policy.ts';
 import { collectOriginTaskSuffixes } from '../../packages/cli/src/commands/taskflow/origin-task-ids.ts';
 
 mkdirSync('.atm-temp', { recursive: true });
