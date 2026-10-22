@@ -2,7 +2,7 @@
 doc_id: doc_TASK-PRF-0157
 task_id: TASK-PRF-0157
 title: Avoid cross-branch task IDs and reject expiring build claims before compilation
-status: open
+status: done
 owner: grok-bot
 priority: P1
 depends_on: []
@@ -44,6 +44,15 @@ rollback:
   notes: Revert this delivery.
 nonGoals:
 - No tags or npm publication.
+completed_at: "2026-10-22T00:35:19.079Z"
+completed_by_agent: "grok-bot"
+closedAt: "2026-10-22T00:35:19.079Z"
+closedByActor: "grok-bot"
+closedByCommand: atm tasks close
+lastTransitionId: "2026-10-22T00-35-19-079Z-close-88e356b525c9"
+lastTransitionAt: "2026-10-22T00:35:19.079Z"
+ledgerContractVersion: task-ledger/v1
+delivery_commit: "516dab098603a81a6e6f8c4d1be71d8dda31b9cb"
 ---
 
 # TASK-PRF-0157
