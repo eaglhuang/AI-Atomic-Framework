@@ -1,5 +1,5 @@
 import { createHash, randomUUID } from 'node:crypto';
-import { lstatSync, readFileSync, readlinkSync } from 'node:fs';
+import { lstatSync, readFileSync, readlinkSync, rmSync } from 'node:fs';
 import path from 'node:path';
 import { candidateGit, nulPaths, resolveCandidateFiles } from '../git-governance/implementation/candidate-file-policy.ts';
 import { inspectGitIndexOwnership, type GitIndexOwnershipEntry } from '../git-index-ownership.ts';
@@ -86,4 +86,8 @@ export function assertCloseCandidate(snapshot: CloseCandidateSnapshot, input: { 
     const filterIndex = (entries: readonly GitIndexOwnershipEntry[]) => entries.filter((entry) => repo.root !== snapshot.cwd || !parked.has(entry.path));
     if (JSON.stringify(filterIndex(index(repo.root, snapshot.taskId))) !== JSON.stringify(filterIndex(repo.index))) changed(`index ownership/content in ${repo.root}`);
   }
+}
+
+export function clearCloseCandidate(snapshot: CloseCandidateSnapshot): void {
+  rmSync(closeAttemptPaths(snapshot.cwd, snapshot.taskId, snapshot.attemptId).record.replace(/\.json$/, '.candidate.json'), { force: true });
 }
