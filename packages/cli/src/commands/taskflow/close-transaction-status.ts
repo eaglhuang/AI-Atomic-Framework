@@ -1,5 +1,6 @@
 import { existsSync, mkdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
+import { assertActiveCloseLease } from './close-transaction-mutex.ts';
 import { writeCloseAtomic } from './close-attempt.ts';
 
 export const CLOSE_TRANSACTION_STATUS_SCHEMA_ID = 'atm.closeTransactionStatus.v1';
@@ -21,6 +22,7 @@ export interface CloseTransactionStatus {
 }
 export function closeTransactionStatusPath(cwd: string, taskId: string): string { return path.join(cwd, '.atm', 'runtime', 'close-transactions', `${taskId}.json`); }
 export function writeCloseTransactionStatus(input: { cwd: string; taskId: string; phase: CloseTransactionPhase; outcome?: CloseTransactionStatus['outcome']; startedAt?: string; ledgerCommit?: string | null; targetCommit?: string | null; planningCommit?: string | null; cleanupComplete?: boolean; failure?: string | null; }): CloseTransactionStatus {
+  assertActiveCloseLease();
   const now = new Date().toISOString();
   // A new close attempt starts a fresh transaction; only phases of the same
   // attempt inherit its start time and commits (#373).
