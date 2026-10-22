@@ -150,3 +150,5 @@ TASK-PRF-0158 milestone 2: sealed rebuild, runner-sync receipt, frozen smoke and
 TASK-PRF-0159 milestone 1: reserve fresh follow-up ID for merging current main and resealing PR385; main owns canonical TASK-PRF-0158 history.
 
 TASK-PRF-0159 milestone 2: main merged; canonical upstream TASK-PRF-0158 metadata preserved; release runner will be rebuilt from merged source.
+
+TASK-PRF-0159 milestone 3: merged runner rebuilt and frozen prompt smoke passed; regression evidence and close previews complete.
