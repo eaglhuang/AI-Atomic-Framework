@@ -2,7 +2,7 @@
 doc_id: doc_TASK-PRF-0158
 task_id: TASK-PRF-0158
 title: Preserve packaged quickfix behavior while removing ignored publication extras
-status: open
+status: done
 owner: grok-bot
 priority: P1
 depends_on: []
@@ -42,6 +42,15 @@ evidence:
 rollback:
   strategy: revert-commit
   notes: Revert follow-up commit.
+completed_at: "2026-10-22T06:52:43.623Z"
+completed_by_agent: "grok-bot"
+closedAt: "2026-10-22T06:52:43.623Z"
+closedByActor: "grok-bot"
+closedByCommand: atm tasks close
+lastTransitionId: "2026-10-22T06-52-43-623Z-close-dbd719e89de2"
+lastTransitionAt: "2026-10-22T06:52:43.623Z"
+ledgerContractVersion: task-ledger/v1
+delivery_commit: "e9e278d081dec14fdd32cfee42e63c8b8b872673"
 ---
 
 # TASK-PRF-0158

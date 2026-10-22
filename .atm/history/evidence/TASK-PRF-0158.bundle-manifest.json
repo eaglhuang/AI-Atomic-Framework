@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-PRF-0158",
+  "updatedAt": "2026-10-22T00:45:55.972Z",
+  "updatedBy": "grok-bot",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/origin-task-ids.test.ts",
+    "node --strip-types tests/cli/sealed-runner-claim-preflight.test.ts",
+    "preclose:check",
+    "typecheck"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/origin-task-ids.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:fec1c5dbf9032ebb40a3ff18084d2bd04de1ce2e3552c548e4b6b0072b94f608",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/origin-task-ids.test.ts"
+      ],
+      "generatedAt": "2026-10-22T00:45:35.171Z",
+      "startedAt": "2026-10-22T00:45:32.685Z",
+      "finishedAt": "2026-10-22T00:45:35.171Z",
+      "durationMs": 2486,
+      "runnerKind": "dev-source",
+      "sourceCommit": "1e874dfd20de58ab977e3baab780013a13ab6f2f",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/sealed-runner-claim-preflight.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:719d6d473e8695a71bfc9bb448c2ff5201f501bdf3ce0ba5f07019c1483f0de7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/sealed-runner-claim-preflight.test.ts"
+      ],
+      "generatedAt": "2026-10-22T00:45:36.557Z",
+      "startedAt": "2026-10-22T00:45:36.360Z",
+      "finishedAt": "2026-10-22T00:45:36.557Z",
+      "durationMs": 197,
+      "runnerKind": "dev-source",
+      "sourceCommit": "1e874dfd20de58ab977e3baab780013a13ab6f2f",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bdd7d877cb37bbd2436832dbd121e88117a469d33fb730cfbae413344415ff36",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-10-22T00:45:53.234Z",
+      "startedAt": "2026-10-22T00:45:37.813Z",
+      "finishedAt": "2026-10-22T00:45:53.234Z",
+      "durationMs": 15421,
+      "runnerKind": "dev-source",
+      "sourceCommit": "1e874dfd20de58ab977e3baab780013a13ab6f2f",
+      "cached": false
+    },
+    {
+      "command": "npm run preclose:check",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:97573aeeaf77a1531527cdc8dc5ac0d7b357f19ee907fabb0416614de4086003",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "preclose:check"
+      ],
+      "generatedAt": "2026-10-22T00:45:55.970Z",
+      "startedAt": "2026-10-22T00:45:54.708Z",
+      "finishedAt": "2026-10-22T00:45:55.970Z",
+      "durationMs": 1262,
+      "runnerKind": "dev-source",
+      "sourceCommit": "1e874dfd20de58ab977e3baab780013a13ab6f2f",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
