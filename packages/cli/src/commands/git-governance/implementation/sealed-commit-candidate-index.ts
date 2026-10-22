@@ -1,5 +1,5 @@
 /** Git adapter for candidate-index assembly; content always comes from a seal. */
-import { mkdtempSync, rmSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdtempSync, rmSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import {
@@ -36,12 +36,22 @@ export function sealCommitBundleFromLiveIndex(input: { readonly cwd: string; rea
   return sealCommitBundle({ entries, baseTreeSha: input.baseTreeSha ?? null });
 }
 
+/** Reuse stat data only; read-tree still resets every entry to the requested base. */
+function readCandidateBase(cwd: string, env: NodeJS.ProcessEnv, baseRef: string): void {
+  const liveIndex = path.resolve(cwd, runGitCommand(cwd, ['rev-parse', '--git-path', 'index']).trim());
+  const candidateIndex = env.GIT_INDEX_FILE ? path.resolve(cwd, env.GIT_INDEX_FILE) : null;
+  if (candidateIndex && candidateIndex !== liveIndex && existsSync(liveIndex)) {
+    copyFileSync(liveIndex, candidateIndex);
+  }
+  runGitCommandWithEnv(cwd, ['read-tree', baseRef], env, [...QUIET_STDIO]);
+}
+
 export function withWorktreeCandidateIndex<T>(input: { readonly cwd: string; readonly paths: readonly string[]; readonly run: (env: NodeJS.ProcessEnv) => T }): T {
   const paths = [...new Set(input.paths.map(normalizePath).filter(Boolean))].sort();
   const tempDir = mkdtempSync(path.join(os.tmpdir(), 'atm-worktree-candidate-index-'));
   const env = { ...process.env, GIT_INDEX_FILE: path.join(tempDir, 'index') };
   try {
-    runGitCommandWithEnv(input.cwd, ['read-tree', 'HEAD'], env, [...QUIET_STDIO]);
+    readCandidateBase(input.cwd, env, 'HEAD');
     if (paths.length > 0) runGitCommandWithEnv(input.cwd, ['add', '-A', '-f', '--', ...paths], env, [...QUIET_STDIO]);
     return input.run(env);
   } finally { rmSync(tempDir, { recursive: true, force: true }); }
@@ -55,7 +65,7 @@ export function mergeSealedCommitBundles(base: SealedCommitBundle, overlay: Seal
 }
 
 export function assembleSealedCommitIndex(input: { readonly cwd: string; readonly bundle: SealedCommitBundle; readonly env: NodeJS.ProcessEnv; readonly baseRef?: string }): void {
-  runGitCommandWithEnv(input.cwd, ['read-tree', input.baseRef ?? 'HEAD'], input.env, [...QUIET_STDIO]);
+  readCandidateBase(input.cwd, input.env, input.baseRef ?? 'HEAD');
   const paths = input.bundle.entries.map((entry) => entry.path);
   if (paths.length === 0) return;
   runGitCommandWithEnv(input.cwd, ['rm', '--cached', '--quiet', '--ignore-unmatch', '--force', '--', ...paths], input.env, [...QUIET_STDIO]);
