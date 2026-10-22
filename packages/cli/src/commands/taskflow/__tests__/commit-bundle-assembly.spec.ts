@@ -1,6 +1,5 @@
 import { issueWorkAdmissionTicket } from '../../../../../core/src/broker/work-admission-ticket.ts';
 import { test } from 'node:test';
-import { commitRepoWithTemporaryIndex } from '../commit-bundle-assembly.ts';
 import { candidateGit, nulPaths, stageExactCandidateFiles } from '../../git-governance/implementation/candidate-file-policy.ts';
 
 test('post-commit reset preserves foreign staged blobs matching literal special filenames', () => {
@@ -26,7 +25,7 @@ test('post-commit reset preserves foreign staged blobs matching literal special 
     assert.deepEqual(nulPaths(git('diff', '--cached', '--name-only', '-z')).sort(), [...foreign].sort());
   } finally { rmSync(repoRoot, { recursive: true, force: true }); }
 });
-import assert from 'node:assert/strict'; import { execFileSync } from 'node:child_process'; import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'; import os from 'node:os'; import path from 'node:path'; import { buildTaskflowCommitBundle, commitTaskflowDeliveryFiles, deferGovernanceDirtyFiles, finalizeTaskflowCommitBundle, isDeferrableGovernanceDirtyFile, restoreDeferredGovernanceDirtyFiles
+import assert from 'node:assert/strict'; import { execFileSync } from 'node:child_process'; import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'; import os from 'node:os'; import path from 'node:path'; import { buildTaskflowCommitBundle, commitRepoWithTemporaryIndex, commitTaskflowDeliveryFiles, deferGovernanceDirtyFiles, finalizeTaskflowCommitBundle, isDeferrableGovernanceDirtyFile, restoreDeferredGovernanceDirtyFiles
 } from '../commit-bundle-assembly.ts'; import { closeTransactionMutexPath } from '../close-transaction-mutex.ts'; function writeJson(filePath: string, value: unknown) { mkdirSync(path.dirname(filePath), { recursive: true }); writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8'); } function writeText(filePath: string, text: string) { mkdirSync(path.dirname(filePath), { recursive: true });
 writeFileSync(filePath, text, 'utf8'); } function initGitRepo(repo: string) { mkdirSync(repo, { recursive: true }); execFileSync('git', ['init'], { cwd: repo, stdio: 'ignore' }); execFileSync('git', ['config', 'user.email', 'validator@example.invalid'], { cwd: repo, stdio: 'ignore' }); execFileSync('git', ['config', 'user.name', 'ATM Validator'], { cwd: repo, stdio: 'ignore' });
 execFileSync('git', ['commit', '--allow-empty', '-m', 'bootstrap'], { cwd: repo, stdio: 'ignore' }); } const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-commit-bundle-')); const targetRepo = path.join(tempRoot, 'target'); const planningRepo = path.join(tempRoot, 'planning'); initGitRepo(targetRepo); initGitRepo(planningRepo); const planPath = path.join(planningRepo, 'docs/tasks/TASK-BUNDLE-0001.task.md');

@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-10-22T00-32-28-541Z-scope-amendment-e2c80759d9ff",
+  "taskId": "TASK-PRF-0158",
+  "action": "scope-amendment",
+  "actorId": "grok-bot",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0158.json",
+  "taskSha256": "sha256:07a07faac242b91def3598f320f8f1fb48851bf1a0cedd15e3f419c014d86368",
+  "createdAt": "2026-10-22T00:32:28.541Z",
+  "command": "node atm.mjs tasks scope add --task TASK-PRF-0158 --actor grok-bot --add \".atm/history/evidence/TASK-PRF-0158.*,.atm/history/task-events/TASK-PRF-0158/**,.atm/task-plans/TASK-PRF-0158.md\" --reason \"Include this follow-up task own validation evidence, transition events, and planning mirror for governed delivery and close.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Include this follow-up task own validation evidence, transition events, and planning mirror for governed delivery and close."
+  }
+}

@@ -7,6 +7,22 @@ import { assertFinalCandidateIndex, candidateGit, nulPaths, resolveCandidateFile
 import { assembleSealedCommitIndex, readCandidateTreeEntries, sealCommitBundleFromCandidateIndex, withWorktreeCandidateIndex } from './sealed-commit-candidate-index.ts';
 import { sealCommitBundle } from '../../../../../core/src/commit-attribution/sealed-commit-bundle.ts';
 
+test('candidate discovery supports an unborn repository without changing its staged index', () => {
+  const cwd = mkdtempSync(path.join(os.tmpdir(), 'atm-unborn-candidates-'));
+  try {
+    candidateGit(cwd, ['init']);
+    mkdirSync(path.join(cwd, 'src/nested'), { recursive: true });
+    writeFileSync(path.join(cwd, 'src/direct.ts'), 'direct');
+    writeFileSync(path.join(cwd, 'src/nested/child.ts'), 'nested');
+    writeFileSync(path.join(cwd, 'staged.txt'), 'staged bytes');
+    candidateGit(cwd, ['add', '--', 'staged.txt']);
+    const before = candidateGit(cwd, ['ls-files', '-s', '-z']);
+    assert.deepEqual(resolveCandidateFiles(cwd, ['src/**/*.ts'], { scopePaths: ['src/**/*.ts'] }), ['src/direct.ts', 'src/nested/child.ts']);
+    assert.equal(candidateGit(cwd, ['ls-files', '-s', '-z']), before);
+    assert.throws(() => candidateGit(cwd, ['rev-parse', '--verify', 'HEAD']), /HEAD/);
+  } finally { rmSync(cwd, { recursive: true, force: true }); }
+});
+
 const root = mkdtempSync(path.join(os.tmpdir(), 'atm-p2-candidates-'));
 const outside = mkdtempSync(path.join(os.tmpdir(), 'atm-p2-external-'));
 const git = (...args: string[]) => candidateGit(root, args);

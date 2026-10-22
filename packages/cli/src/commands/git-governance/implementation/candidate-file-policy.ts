@@ -27,6 +27,11 @@ export function candidateGit(cwd: string, args: readonly string[], env?: NodeJS.
 
 export const nulPaths = (output: string): string[] => output.split('\0').filter(Boolean);
 
+function hasCandidateHead(cwd: string, env?: NodeJS.ProcessEnv): boolean {
+  try { candidateGit(cwd, ['rev-parse', '--verify', '--quiet', 'HEAD'], env); return true; }
+  catch (error) { if ((error as { status?: number }).status === 1) return false; throw error; }
+}
+
 export function ignoredCandidatePaths(cwd: string, paths: readonly string[]): Set<string> {
   if (!paths.length) return new Set();
   try { return new Set(nulPaths(candidateGit(cwd, ['check-ignore', '--stdin', '-z', '--no-index'], undefined, `${paths.join('\0')}\0`))); }
@@ -70,13 +75,15 @@ export function safeCandidatePath(cwd: string, file: string, gitlinks: ReadonlyS
 }
 
 export function candidateGitlinks(cwd: string, env?: NodeJS.ProcessEnv, baseRef = 'HEAD'): Set<string> {
-  return new Set(nulPaths(candidateGit(cwd, ['ls-tree', '-rz', baseRef], env))
+  const args = baseRef === 'HEAD' && !hasCandidateHead(cwd, env) ? ['ls-files', '-s', '-z'] : ['ls-tree', '-rz', baseRef];
+  return new Set(nulPaths(candidateGit(cwd, args, env))
     .filter((record) => record.startsWith('160000 ')).map((record) => record.slice(record.indexOf('\t') + 1)));
 }
 
 export function resolveCandidateFiles(cwd: string, candidates: readonly string[], policy: CandidateFilePolicy = {}, env?: NodeJS.ProcessEnv): string[] {
   policy = { ...policy, readOnlyPaths: policy.readOnlyPaths?.map((scope) => path.isAbsolute(scope) ? path.relative(cwd, scope).split(path.sep).join('/') : scope) };
-  const tracked = [...new Set([...nulPaths(candidateGit(cwd, ['ls-files', '-z'], env)), ...nulPaths(candidateGit(cwd, ['ls-tree', '-r', '--name-only', '-z', 'HEAD'], env))])];
+  const headFiles = hasCandidateHead(cwd, env) ? nulPaths(candidateGit(cwd, ['ls-tree', '-r', '--name-only', '-z', 'HEAD'], env)) : [];
+  const tracked = [...new Set([...nulPaths(candidateGit(cwd, ['ls-files', '-z'], env)), ...headFiles])];
   const gitlinks = candidateGitlinks(cwd, env);
   const files = new Set<string>();
   const visit = (file: string) => {
