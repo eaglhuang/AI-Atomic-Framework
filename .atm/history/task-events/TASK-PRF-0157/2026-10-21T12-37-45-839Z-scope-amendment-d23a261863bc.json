@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-10-21T12-37-45-839Z-scope-amendment-d23a261863bc",
+  "taskId": "TASK-PRF-0157",
+  "action": "scope-amendment",
+  "actorId": "grok-bot",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0157.json",
+  "taskSha256": "sha256:3e1f00f41c2aa848ce20936575d2f10af441d0d2e65074771dfc03a2326b8391",
+  "createdAt": "2026-10-21T12:37:45.839Z",
+  "command": "node atm.mjs tasks scope add --task TASK-PRF-0157 --actor grok-bot --add packages/cli/src/commands/taskflow/__tests__/framework-opener.spec.ts --reason \"Repair opener regression fixture initial Git base requirement.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Repair opener regression fixture initial Git base requirement."
+  }
+}

@@ -1,0 +1,291 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-PRF-0158",
+  "title": "Repair PR384 duplicate import and unborn Git candidate discovery",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "Every command in `validators` passes and is recorded with `node atm.mjs evidence run`.",
+    "The change is committed with `node atm.mjs git commit --task TASK-PRF-0158` and closed with `node atm.mjs taskflow close --task TASK-PRF-0158`."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/git-governance/implementation/candidate-file-policy.ts",
+    "packages/cli/src/commands/git-governance/implementation/candidate-file-policy.spec.ts",
+    "packages/cli/src/commands/git-governance/implementation/sealed-commit-candidate-index.ts",
+    "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+    "tests/cli/taskflow-scope-untracked-glob.test.ts",
+    "packages/cli/dist/**",
+    "release/atm-onefile/**",
+    "release/atm-root-drop/**"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/git-governance/implementation/candidate-file-policy.ts",
+    "packages/cli/src/commands/git-governance/implementation/candidate-file-policy.spec.ts",
+    "packages/cli/src/commands/git-governance/implementation/sealed-commit-candidate-index.ts",
+    "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+    "tests/cli/taskflow-scope-untracked-glob.test.ts",
+    "packages/cli/dist/**",
+    "release/atm-onefile/**",
+    "release/atm-root-drop/**",
+    ".atm/history/evidence/TASK-PRF-0158.*",
+    ".atm/history/task-events/TASK-PRF-0158/**",
+    ".atm/history/tasks/TASK-PRF-0158.json",
+    ".atm/task-plans/TASK-PRF-0158.md",
+    "packages/cli/src/commands/taskflow/__tests__/runner-publication-bundle-authority.spec.ts",
+    "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+    "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts"
+  ],
+  "validators": [
+    "npm run typecheck"
+  ],
+  "planningRepo": "AI-Atomic-Framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the delivery commit if the change fails validation.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 1 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": ".atm/task-plans/TASK-PRF-0158.md",
+    "sectionTitle": "TASK-PRF-0158",
+    "headingLine": 42,
+    "hash": "9d7708dbd15e7126",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/AI-Atomic-Framework.git",
+      "repoRoot": "/workspace/AI-Atomic-Framework-360/AI-Atomic-Framework",
+      "taskCardPath": ".atm/task-plans/TASK-PRF-0158.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:9d7708dbd15e71264eb3fcc754c06d2c934f805744749cf57bbc19a424ecf270",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-10-22T00:30:09.003Z"
+    }
+  },
+  "importedAt": "2026-10-22T00:30:09.003Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": null
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck",
+      "command": "npm run typecheck",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "dependencies"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-10-22T06-47-00-037Z-close-5c71a57c0b5a",
+  "lastTransitionAt": "2026-10-22T06:47:00.037Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "grok-bot",
+  "reservedAt": "2026-10-22T00:30:44.761Z",
+  "promotedAt": "2026-10-22T00:30:44.764Z",
+  "claim": {
+    "actorId": "grok-bot",
+    "leaseId": "lease-99c0f38f03a5",
+    "claimedAt": "2026-10-22T00:30:44.766Z",
+    "heartbeatAt": "2026-10-22T06:47:00.036Z",
+    "ttlSeconds": 86400,
+    "files": [
+      ".atm/history/evidence/TASK-PRF-0158.*",
+      ".atm/history/task-events/TASK-PRF-0158/**",
+      ".atm/history/tasks/TASK-PRF-0158.json",
+      ".atm/task-plans/TASK-PRF-0158.md",
+      "packages/cli/dist/**",
+      "packages/cli/src/commands/git-governance/implementation/candidate-file-policy.spec.ts",
+      "packages/cli/src/commands/git-governance/implementation/candidate-file-policy.ts",
+      "packages/cli/src/commands/git-governance/implementation/sealed-commit-candidate-index.ts",
+      "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+      "packages/cli/src/commands/taskflow/__tests__/runner-publication-bundle-authority.spec.ts",
+      "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+      "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
+      "release/atm-onefile/**",
+      "release/atm-root-drop/**",
+      "tests/cli/taskflow-scope-untracked-glob.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20261022003044-grok-bot-c5e201abe0",
+      "status": "active",
+      "source": "option",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261022003044-grok-bot-c5e201abe0\""
+    },
+    "reason": "closed"
+  },
+  "startedAt": "2026-10-22T00:30:44.766Z",
+  "startedByActor": "grok-bot",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-fadc90ecd2cd638d",
+    "ticketDigest": "sha256:fadc90ecd2cd638d3d398f5c9f676cfadedd316e6491858ced91b92b2f8bcf1a",
+    "taskId": "TASK-PRF-0158",
+    "origin": "claim",
+    "actorId": "grok-bot",
+    "laneSessionId": "lane-20261022003044-grok-bot-c5e201abe0",
+    "claimGeneration": "lease-99c0f38f03a5",
+    "issuedAt": "2026-10-22T01:06:39.964Z",
+    "expiresAt": "2026-10-23T01:06:39.964Z",
+    "scopeDigest": "sha256:83eebf56d0f05e936941ea984e0d7d2ce4dce8e0ea9fa58aa19e68d7d85bc897",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-10-22T01:06:39.964Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-PRF-0158.*",
+          ".atm/history/evidence/git-head.json",
+          ".atm/history/task-events/TASK-PRF-0158/**",
+          ".atm/history/tasks/TASK-PRF-0158.json",
+          ".atm/task-plans/TASK-PRF-0158.md",
+          "packages/cli/dist/**",
+          "packages/cli/src/commands/git-governance/implementation/candidate-file-policy.spec.ts",
+          "packages/cli/src/commands/git-governance/implementation/candidate-file-policy.ts",
+          "packages/cli/src/commands/git-governance/implementation/sealed-commit-candidate-index.ts",
+          "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+          "packages/cli/src/commands/taskflow/__tests__/runner-publication-bundle-authority.spec.ts",
+          "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+          "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
+          "release/atm-onefile/**",
+          "release/atm-root-drop/**",
+          "tests/cli/taskflow-scope-untracked-glob.test.ts"
+        ],
+        "digest": "sha256:f40596d8abb0d6d09667d35537dc1f56ea69e3955590b67c25833b716d491286"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:bcb386515289e44fdcd42d646710ef1c28605e33ad8bd67ced526a53dc2fa9eb"
+    }
+  },
+  "startedBySessionId": "session-20261022003044-grok-bot-TASK-PRF-0158-d880a1c0cc",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-PRF-0158",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-PRF-0158.*",
+      ".atm/history/task-events/TASK-PRF-0158/**",
+      ".atm/history/tasks/TASK-PRF-0158.json",
+      ".atm/task-plans/TASK-PRF-0158.md",
+      "packages/cli/dist/**",
+      "packages/cli/src/commands/git-governance/implementation/candidate-file-policy.spec.ts",
+      "packages/cli/src/commands/git-governance/implementation/candidate-file-policy.ts",
+      "packages/cli/src/commands/git-governance/implementation/sealed-commit-candidate-index.ts",
+      "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+      "packages/cli/src/commands/taskflow/__tests__/runner-publication-bundle-authority.spec.ts",
+      "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+      "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
+      "release/atm-onefile/**",
+      "release/atm-root-drop/**",
+      "tests/cli/taskflow-scope-untracked-glob.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "/workspace/AI-Atomic-Framework-360/AI-Atomic-Framework/.atm/task-plans/TASK-PRF-0158.md"
+    ],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "518bfa778d4dc548a8d79ccc0c8e8311d77c0816aa9c8e383b2722e1dda6e7fe",
+    "actorId": "grok-bot",
+    "sessionId": null,
+    "laneSession": {
+      "laneSessionId": "lane-20261022003044-grok-bot-c5e201abe0",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261022003044-grok-bot-c5e201abe0\""
+    },
+    "createdAt": "2026-10-22T00:30:46.042Z",
+    "status": "active"
+  },
+  "closedAt": "2026-10-22T06:47:00.036Z",
+  "closedByActor": "grok-bot",
+  "closedBySessionId": "session-20261022003044-grok-bot-TASK-PRF-0158-d880a1c0cc",
+  "closurePacket": ".atm/history/evidence/TASK-PRF-0158.closure-packet.json"
+}

@@ -1,0 +1,221 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-PRF-0158",
+  "targetRepoIdentity": {
+    "kind": "framework",
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "/workspace/AI-Atomic-Framework-360/AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "2865d861849f4481e0ce683fd92af06c795f90e7",
+  "governedTreeSha": "740e7474819f260321b30f2ec98bb4d2aee2be7a",
+  "targetCommitDelta": {
+    "currentCommitSha": "2865d861849f4481e0ce683fd92af06c795f90e7",
+    "parentCommitShas": [
+      "2865d861849f4481e0ce683fd92af06c795f90e7"
+    ],
+    "governedTreeSha": "740e7474819f260321b30f2ec98bb4d2aee2be7a",
+    "changedFiles": [
+      ".atm/task-plans/TASK-PRF-0156.md",
+      "packages/cli/dist/_vendor/core/dist/broker/runner-build-output-inventory.d.ts",
+      "packages/cli/dist/_vendor/core/dist/broker/runner-build-output-inventory.js",
+      "packages/cli/dist/_vendor/core/dist/commit-attribution/sealed-commit-bundle.js",
+      "packages/cli/dist/build-identity.json",
+      "packages/cli/dist/commands/framework-development/runner-publication-close-handoff.js",
+      "packages/cli/dist/commands/framework-development/runner-publication-residue.js",
+      "packages/cli/dist/commands/git-governance/commit-scope-policy.js",
+      "packages/cli/dist/commands/git-governance/implementation/commit-bundle-resolution.js",
+      "packages/cli/dist/commands/git-governance/implementation/sealed-commit-attribution.js",
+      "packages/cli/dist/commands/git-governance/implementation/sealed-commit-candidate-index.js",
+      "packages/cli/dist/commands/git-governance/implementation/task-ignored-deliverable-discovery.js",
+      "packages/cli/dist/commands/hook/pre-commit/implementation.js",
+      "packages/cli/dist/commands/taskflow/commit-bundle-assembly.js",
+      "packages/cli/dist/commands/taskflow/implementation.js",
+      "packages/cli/dist/commands/tasks/scope-lock-diagnostics.js",
+      "packages/cli/dist/commands/work-channels.js",
+      "packages/cli/dist/npm-runtime/build-identity.json",
+      "packages/cli/dist/npm-runtime/manifest.json",
+      "packages/cli/dist/npm-runtime/runtime.mjs",
+      "packages/cli/src/commands/git-governance/implementation/candidate-file-policy.spec.ts",
+      "packages/cli/src/commands/git-governance/implementation/candidate-file-policy.ts",
+      "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+      "packages/cli/src/commands/taskflow/__tests__/runner-publication-bundle-authority.spec.ts",
+      "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+      "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/governance/governance-friction-2026-10.md",
+      "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/runner-build-output-inventory.d.ts",
+      "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/runner-build-output-inventory.js",
+      "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/commit-attribution/sealed-commit-bundle.js",
+      "release/atm-root-drop/packages/cli/dist/build-identity.json",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development/runner-publication-close-handoff.js",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development/runner-publication-residue.js",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/commit-scope-policy.js",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/commit-bundle-resolution.js",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/sealed-commit-attribution.js",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/sealed-commit-candidate-index.js",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/task-ignored-deliverable-discovery.js",
+      "release/atm-root-drop/packages/cli/dist/commands/hook/pre-commit/implementation.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/commit-bundle-assembly.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/implementation.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/scope-lock-diagnostics.js",
+      "release/atm-root-drop/packages/cli/dist/commands/work-channels.js",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/build-identity.json",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/manifest.json",
+      "release/atm-root-drop/packages/cli/dist/npm-runtime/runtime.mjs",
+      "release/atm-root-drop/packages/cli/src/commands/framework-development/runner-publication-close-handoff.ts",
+      "release/atm-root-drop/packages/cli/src/commands/framework-development/runner-publication-residue.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/commit-bundle-resolution.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/publication-delivery-slice.test.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/sealed-commit-attribution.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/sealed-commit-candidate-index.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance/implementation/task-ignored-deliverable-discovery.ts",
+      "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/implementation.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/ignored-artifact-close-bundle.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/runner-publication-bundle-authority.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/implementation.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
+      "release/atm-root-drop/packages/cli/src/commands/work-channels.ts",
+      "release/atm-root-drop/packages/core/dist/broker/runner-build-output-inventory.d.ts",
+      "release/atm-root-drop/packages/core/dist/broker/runner-build-output-inventory.js",
+      "release/atm-root-drop/packages/core/dist/commit-attribution/sealed-commit-bundle.js",
+      "release/atm-root-drop/packages/core/src/broker/runner-build-output-inventory.ts",
+      "release/atm-root-drop/packages/core/src/commit-attribution/sealed-commit-bundle.ts",
+      "release/atm-root-drop/packages/create-atm/dist/build-identity.json",
+      "release/atm-root-drop/release-manifest.json"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bdd7d877cb37bbd2436832dbd121e88117a469d33fb730cfbae413344415ff36",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --test --experimental-strip-types packages/cli/src/commands/git-governance/implementation/candidate-file-policy.spec.ts packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts tests/cli/taskflow-scope-untracked-glob.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:dffcdedc5b2bb7c40710d11c4c9ed3be9db657c667b9799debd81f38c2255950",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "npm run lint",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c30fac0236aef7c96ab7a149e31e943c20cb9f732ed15b470b5aa49237b8d025",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bdd7d877cb37bbd2436832dbd121e88117a469d33fb730cfbae413344415ff36",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "node --test --experimental-strip-types packages/cli/src/commands/git-governance/implementation/candidate-file-policy.spec.ts packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts packages/cli/src/commands/taskflow/__tests__/runner-publication-bundle-authority.spec.ts tests/cli/taskflow-scope-untracked-glob.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:daf773e58dc523e860156f3166b204bb274c0cb06d950a2e8418e0bc41f2bf93",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    },
+    {
+      "command": "npm run lint",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c30fac0236aef7c96ab7a149e31e943c20cb9f732ed15b470b5aa49237b8d025",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.2"
+    }
+  ],
+  "validationPasses": [
+    "typecheck"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-10-22T06:47:00.031Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-PRF-0158.*",
+      ".atm/history/task-events/TASK-PRF-0158/**",
+      ".atm/history/tasks/TASK-PRF-0158.json",
+      ".atm/task-plans/TASK-PRF-0158.md",
+      "packages/cli/dist/**",
+      "packages/cli/src/commands/git-governance/implementation/candidate-file-policy.spec.ts",
+      "packages/cli/src/commands/git-governance/implementation/candidate-file-policy.ts",
+      "packages/cli/src/commands/git-governance/implementation/sealed-commit-candidate-index.ts",
+      "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+      "packages/cli/src/commands/taskflow/__tests__/runner-publication-bundle-authority.spec.ts",
+      "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+      "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
+      "release/atm-onefile/**",
+      "release/atm-root-drop/**",
+      "tests/cli/taskflow-scope-untracked-glob.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/dist/**",
+      "packages/cli/src/commands/git-governance/implementation/candidate-file-policy.spec.ts",
+      "packages/cli/src/commands/git-governance/implementation/candidate-file-policy.ts",
+      "packages/cli/src/commands/git-governance/implementation/sealed-commit-candidate-index.ts",
+      "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+      "packages/cli/src/commands/taskflow/__tests__/runner-publication-bundle-authority.spec.ts",
+      "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+      "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
+      "tests/cli/taskflow-scope-untracked-glob.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck"
+    ]
+  },
+  "evidencePath": ".atm/runtime/evidence-ledger/bundles/TASK-PRF-0158.json",
+  "closedAt": "2026-10-22T06:47:00.032Z",
+  "closedByActor": "grok-bot",
+  "sessionId": "session-20261022003044-grok-bot-TASK-PRF-0158-d880a1c0cc",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "5dd606330c67732bde231be222667f75ede76df7",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/taskflow/__tests__/runner-publication-bundle-authority.spec.ts",
+      "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+      "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/task-events/TASK-PRF-0158/2026-10-22T01-06-40-159Z-scope-amendment-fdc61fb67f19.json",
+      ".atm/history/tasks/TASK-PRF-0158.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

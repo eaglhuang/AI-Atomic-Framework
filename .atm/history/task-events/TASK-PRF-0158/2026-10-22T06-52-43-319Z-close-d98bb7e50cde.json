@@ -1,0 +1,81 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-10-22T06-52-43-319Z-close-d98bb7e50cde",
+  "taskId": "TASK-PRF-0158",
+  "action": "close",
+  "actorId": "grok-bot",
+  "sessionId": "session-20261022004335-grok-bot-TASK-PRF-0158-e46e23f9c7",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0158.json",
+  "taskSha256": "sha256:d1ff38dba4e3436418a4a10f5d6e66583b4f93b4b400253a5405894875c44eaa",
+  "createdAt": "2026-10-22T06:52:43.319Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0158 --actor grok-bot --status done --historical-delivery e9e278d081dec14fdd32cfee42e63c8b8b872673",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20261022004335-grok-bot-TASK-PRF-0158-e46e23f9c7",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0158.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/origin-task-ids.test.ts",
+      "node --strip-types tests/cli/sealed-runner-claim-preflight.test.ts",
+      "preclose:check",
+      "typecheck"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/origin-task-ids.test.ts",
+      "node --strip-types tests/cli/sealed-runner-claim-preflight.test.ts",
+      "preclose:check",
+      "typecheck"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-10-22T06:52:43.308Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0158.*",
+        ".atm/history/task-events/TASK-PRF-0158/**",
+        ".atm/history/tasks/TASK-PRF-0158.json",
+        ".atm/task-plans/TASK-PRF-0157.md",
+        ".atm/task-plans/TASK-PRF-0158.md",
+        "docs/governance/governance-friction-2026-10.md",
+        "packages/cli/dist",
+        "packages/cli/dist/**",
+        "packages/cli/src/commands/plan.ts",
+        "packages/cli/src/commands/taskflow/host-opener-policy.ts",
+        "packages/cli/src/commands/taskflow/origin-task-ids.ts",
+        "PROGRESS.md",
+        "release/atm-onefile/**",
+        "release/atm-root-drop/**",
+        "scripts/run-sealed-runner-build.ts",
+        "scripts/sealed-runner-claim-preflight.ts",
+        "scripts/sealed-runner-publication.ts",
+        "tests/cli/origin-task-ids.test.ts",
+        "tests/cli/sealed-runner-claim-preflight.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/dist",
+        "packages/cli/dist/**",
+        "packages/cli/src/commands/plan.ts",
+        "packages/cli/src/commands/taskflow/host-opener-policy.ts",
+        "packages/cli/src/commands/taskflow/origin-task-ids.ts",
+        "scripts/run-sealed-runner-build.ts",
+        "scripts/sealed-runner-claim-preflight.ts",
+        "scripts/sealed-runner-publication.ts",
+        "tests/cli/origin-task-ids.test.ts",
+        "tests/cli/sealed-runner-claim-preflight.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types tests/cli/origin-task-ids.test.ts",
+        "node --strip-types tests/cli/sealed-runner-claim-preflight.test.ts",
+        "preclose:check",
+        "typecheck"
+      ]
+    }
+  }
+}

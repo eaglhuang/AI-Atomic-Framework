@@ -21,7 +21,7 @@ import {
 import { captureRunnerBuildOutputSnapshot, scanSealedRunnerBuildOutputInventory } from '../packages/core/src/broker/runner-build-output-inventory.ts';
 import type { RunnerSyncAdmissionReport } from '../packages/cli/src/commands/framework-development/runner-sync-admission.ts';
 import { computeBuildInputsTreeHash } from './runner-input-tree.ts';
-import { captureSealedRunnerPublicationSnapshot, resolveSealedRunnerPublication } from './sealed-runner-publication.ts';
+import { assertSealedRunnerClaimLifetime, captureSealedRunnerPublicationSnapshot, resolveSealedRunnerPublication } from './sealed-runner-publication.ts';
 import { hydrateSealedPackageDist, releaseSealedRunnerSteward, syncSealedBuildArtifacts, writeSealedBuildMetadata } from './sealed-runner-artifact-lifecycle.ts';
 import { hydrateVerifiedRootDropBase } from './build-root-drop-release.ts';
 export { computeBuildInputsTreeHash } from './runner-input-tree.ts';
@@ -159,6 +159,7 @@ function runSealedBuild(buildTarget: BuildTarget): void {
       ? 'AGENT_IDENTITY'
       : 'fallback';
   const publicationTaskId = process.env.ATM_RUNNER_PUBLICATION_TASK?.trim() || null;
+  assertSealedRunnerClaimLifetime({ cwd: repoRoot, actorId, taskId: publicationTaskId });
   const sealedSourceSha = readGitScalar(repoRoot, ['rev-parse', '--verify', 'HEAD']);
   if (!sealedSourceSha) fail('Unable to resolve sealed source SHA from HEAD.', 1);
   // A takeover receipt authorizes the pre-existing live surface. Capture it

@@ -1,10 +1,16 @@
 #!/usr/bin/env node
-import { existsSync } from 'node:fs';
+import { existsSync, mkdirSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)));
+// Native Trace2 records every Git subprocess, including hooks and direct adapters.
+if (process.env.ATM_GIT_TIMING === '1') {
+  const timingFile = path.resolve(process.env.ATM_GIT_TIMING_FILE ?? path.join(root, '.atm/runtime/git-timing.jsonl'));
+  mkdirSync(path.dirname(timingFile), { recursive: true });
+  process.env.GIT_TRACE2_EVENT = timingFile;
+}
 const onefileEntrypoint = path.join(root, 'release', 'atm-onefile', 'atm.mjs');
 const distEntrypoint = path.join(root, 'packages', 'cli', 'dist', 'atm.js');
 

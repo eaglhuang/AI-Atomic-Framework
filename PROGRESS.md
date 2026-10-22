@@ -135,4 +135,20 @@ Both validators pass locally. ATM: TASK-PRF-0136 imported and claimed (lane lane
 - D1: a repo-wide steward commit lock (live-write-commit.ts) serializes the stage+commit, and index.lock contention is reported as git-index-contention. D2: each write reports its own commitSha, verified by the proposalId in the commit subject. D3: the journal is written atomically (live-write-journal-store.ts). A torn last line is ignored; any other malformed line gives recovery-required. The kit reader is a generated copy (kit/bin/live-write-journal.generated.mjs), checked by a parity test. D4: message codes are APPLIED / KIT_ERROR / CROSS_SESSION_OVERLAP / QUEUED / REJECTED, and target-missing reports queued:false. AC5: intent/committed/abandoned journal records, with reconcile on the next write (legacy entries count as committed).
 - Tests: the new tests/core/live-write-commit-path.test.ts passed 3 of 3 runs. live-queued-write, cross-session-overlap, stale-base-translation, v10c replay, broker-steward, broker-cowrite, hot-concurrency, rft rollout and kit parity + offline preflight all pass. typecheck, eslint, the 600-line budget gate, the smoke-runbook validator and validate-cli --mode test all pass, checked independently outside the Codex sandbox.
 
-- 2026-10-21: TASK-PRF-0156 (#365) implementation milestone: decoded prefix-disjoint pointer checks and original-byte splices; nested/escaped/sibling/CRLF/order/attribution regressions pass; typecheck passes.
+TASK-PRF-0157 milestone 1: imported and claimed both governance fixes; origin census found 0156 as highest existing ID.
+
+TASK-PRF-0157 milestone 2: both fixes and regression tests implemented; typecheck, eslint, publication lifecycle and preclose passed.
+
+TASK-PRF-0157 milestone 3: resumed after credits refill; all checks passed, claim renewed, opener fixture corrected and test imports cleaned.
+
+TASK-PRF-0157 milestone 4: sealed build and runner-sync receipt passed; frozen smoke and both governed close previews report no blockers.
+
+TASK-PRF-0158 milestone 1: helpers consolidated into existing tracked modules; both regressions, lint and typecheck passed; stale generated helper modules removed before rebuilding.
+
+TASK-PRF-0158 milestone 2: sealed rebuild, runner-sync receipt, frozen smoke and close previews passed; closing publication follow-up.
+
+TASK-PRF-0159 milestone 1: reserve fresh follow-up ID for merging current main and resealing PR385; main owns canonical TASK-PRF-0158 history.
+
+TASK-PRF-0159 milestone 2: main merged; canonical upstream TASK-PRF-0158 metadata preserved; release runner will be rebuilt from merged source.
+
+TASK-PRF-0159 milestone 3: merged runner rebuilt and frozen prompt smoke passed; regression evidence and close previews complete.

@@ -6574,6 +6574,7 @@
     "release/atm-root-drop/tests/cli/onefile-root-drop-build-coordination.test.ts",
     "release/atm-root-drop/tests/cli/onefile-runtime-closure.test.ts",
     "release/atm-root-drop/tests/cli/orient-compact-output.test.ts",
+    "release/atm-root-drop/tests/cli/origin-task-ids.test.ts",
     "release/atm-root-drop/tests/cli/orphan-in-progress-adoption.test.ts",
     "release/atm-root-drop/tests/cli/osv-severity-gate.test.ts",
     "release/atm-root-drop/tests/cli/out-of-scope-write-recorder.test.ts",
@@ -6814,6 +6815,7 @@
     "release/atm-root-drop/tests/cli/sealed-build-log-sink.test.ts",
     "release/atm-root-drop/tests/cli/sealed-runner-build-input-cache.test.ts",
     "release/atm-root-drop/tests/cli/sealed-runner-build-junction-cleanup.test.ts",
+    "release/atm-root-drop/tests/cli/sealed-runner-claim-preflight.test.ts",
     "release/atm-root-drop/tests/cli/sealed-runner-publication-lifecycle.test.ts",
     "release/atm-root-drop/tests/cli/setup-detection.test.ts",
     "release/atm-root-drop/tests/cli/setup-install.test.ts",
@@ -7323,7 +7325,7 @@
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
     "copied": 0,
-    "unchanged": 7287,
+    "unchanged": 7289,
     "removed": 0
   },
   "buildMode": "full",
@@ -13558,7 +13560,7 @@
       },
       {
         "path": "docs/governance/governance-friction-2026-10.md",
-        "digest": "cb88309f89f9f98cbbc6b3cbb2eb12c76abafbcb1c7b512b5203b49af68ae432",
+        "digest": "efd3eb204a7588efb06cd7e3a903fc0a8cfb779ba69191d78b596f6333863cdd",
         "origin": "source",
         "inputPaths": [
           "docs/governance/governance-friction-2026-10.md"
@@ -26545,7 +26547,7 @@
       },
       {
         "path": "packages/cli/dist/build-identity.json",
-        "digest": "24b4b4f7a047d85aff45d6e167d7810d811c25710b0ed1de661255d279a47764",
+        "digest": "15d6da57bdc7468b9e126a0505526ff0c95163c36760b9735c0f1d2e0d1b03d6",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/build-identity.json"
@@ -30163,7 +30165,7 @@
       },
       {
         "path": "packages/cli/dist/commands/plan.js",
-        "digest": "79a0a7f4d6ca4c770dd1b1ac4bfb4aeb1a98d0dc68d49876ac3dfa9a2fa4339f",
+        "digest": "e4af12654c3b3a13d15aa2e7611872082aa35041d7b1a1f16d230ca50dbb7bd1",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/plan.js"
@@ -30928,7 +30930,7 @@
       },
       {
         "path": "packages/cli/dist/commands/taskflow/host-opener-policy.js",
-        "digest": "11e95e13880d720d86b47ced7dd2af95cf9b936b63c1e7e56fad45fd6f699e2c",
+        "digest": "46f87ef0cb3d15c5bc493912db57e7fc1df326e0f5da43859366e57de63591ff",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/taskflow/host-opener-policy.js"
@@ -32674,7 +32676,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/build-identity.json",
-        "digest": "a5939bd9412a0d06d7f01dc4e0f72043ca5cc7dfe2671559db291a3fc3814dc5",
+        "digest": "21a11a6760dd114a0e615f3915b0935cad272d5c0cf1d3619b301830ad95bd1d",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/build-identity.json"
@@ -33403,7 +33405,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/manifest.json",
-        "digest": "66b354f1e02ff974b285242dc229687c928713229fb7108b00f260d835adb7c1",
+        "digest": "e7a8a44d53ec7e02d0784a378c7938967d6600fa057b3e9a8851134704df1f3f",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/manifest.json"
@@ -33412,7 +33414,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/runtime.mjs",
-        "digest": "8df785fcf5bf810c3cf7ac5d85fdc8a23e6775c0a3dab4229ac1594015334584",
+        "digest": "5b6213e2680d7723fd48d904ff57c59d40a5d24031ae1be73e160786f9b8047e",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/runtime.mjs"
@@ -38209,7 +38211,7 @@
       },
       {
         "path": "packages/cli/src/commands/plan.ts",
-        "digest": "5e75a77aac86dd1e11c49d350aa5572645d1f84c9288dac1ce38436faac2ea6c",
+        "digest": "71931e3bbae76ed56f80d3516bdd1e6af79d4b49530b9f94199bd3bceddf8d1e",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/plan.ts"
@@ -38965,7 +38967,7 @@
       },
       {
         "path": "packages/cli/src/commands/taskflow/__tests__/framework-opener.spec.ts",
-        "digest": "165dedc9c0d5c50c1b53f331bdb27fae281dffaa27c571e91b1836faa3363ea5",
+        "digest": "845c2d233071f5127df7638bab150503f23cdb91956f6dcaa918e3955f1ab253",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/taskflow/__tests__/framework-opener.spec.ts"
@@ -39271,7 +39273,7 @@
       },
       {
         "path": "packages/cli/src/commands/taskflow/host-opener-policy.ts",
-        "digest": "95e59e063a9ea2c805fcfd42cb5d0b6e0199807b1d824ec268bfd072e0f29d6a",
+        "digest": "14b0d656a8b316b48ffd8b27104ab7a8911c3fb057e2fc2b016809ea21f38321",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/taskflow/host-opener-policy.ts"
@@ -51322,7 +51324,7 @@
       },
       {
         "path": "packages/create-atm/dist/build-identity.json",
-        "digest": "e3b352f5911166d618002da4020982258e89f62a0ed983d515294022fce27396",
+        "digest": "ba18378d6c73aceeb3adb7c39c37952880a772131883a2e6fc1803eb8212c44c",
         "origin": "source",
         "inputPaths": [
           "packages/create-atm/dist/build-identity.json"
@@ -58513,7 +58515,7 @@
       },
       {
         "path": "scripts/run-sealed-runner-build.ts",
-        "digest": "c1956340c1443f82f5ebffccdacdf2435ab69a70f6d31b36914d6ecf64636af5",
+        "digest": "a5635114a6a36ab6f71de12c6be8a15a92b1ae9be15867f4eb94c9895935d0fe",
         "origin": "source",
         "inputPaths": [
           "scripts/run-sealed-runner-build.ts"
@@ -58648,7 +58650,7 @@
       },
       {
         "path": "scripts/sealed-runner-publication.ts",
-        "digest": "66bd82c02adde447b13c66de840d2f3d60655199b0f9beb38906da6636625dab",
+        "digest": "5e9e78f69bb76e5b15365bd6b260d7951943644fe47aaf7c7e826f7f291d5bba",
         "origin": "source",
         "inputPaths": [
           "scripts/sealed-runner-publication.ts"
@@ -66207,6 +66209,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/cli/origin-task-ids.test.ts",
+        "digest": "1ab0464c95c1b8e8d71a0e9fed489c03ce0abc250d65528bbf136097fba62f3e",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/origin-task-ids.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/cli/orphan-in-progress-adoption.test.ts",
         "digest": "d92ff434fffafbba9002399798fd406c60ba77cfb7004a60653499530b824cf0",
         "origin": "source",
@@ -68363,6 +68374,15 @@
         "origin": "source",
         "inputPaths": [
           "tests/cli/sealed-runner-build-junction-cleanup.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "tests/cli/sealed-runner-claim-preflight.test.ts",
+        "digest": "c1eb877e38eb1db05d0272380d3e85939c059a4e6e4030d821f3c9e9bc6930d4",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/sealed-runner-claim-preflight.test.ts"
         ],
         "replaceable": true
       },
@@ -72912,7 +72932,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:731bef2b626e0fe72b2225d24cddcc33e8fb962a10f628fcb162684e5a221479"
+    "treeDigest": "sha256:c65261fdaf6e86cd91379d108b6086f5d4feada4692826dc996f5c62b10ab608"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -74547,7 +74567,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:f585c4640afc52edd86fe1a24d2201747abf573db320a46085b095911375da78"
+    "digest": "sha256:049a6a25b239b3089673f0a77040abbc1c5d95d60f7ce8d5aaecfdba27d02ee9"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -81095,6 +81115,7 @@
       "release/atm-root-drop/tests/cli/onefile-root-drop-build-coordination.test.ts",
       "release/atm-root-drop/tests/cli/onefile-runtime-closure.test.ts",
       "release/atm-root-drop/tests/cli/orient-compact-output.test.ts",
+      "release/atm-root-drop/tests/cli/origin-task-ids.test.ts",
       "release/atm-root-drop/tests/cli/orphan-in-progress-adoption.test.ts",
       "release/atm-root-drop/tests/cli/osv-severity-gate.test.ts",
       "release/atm-root-drop/tests/cli/out-of-scope-write-recorder.test.ts",
@@ -81335,6 +81356,7 @@
       "release/atm-root-drop/tests/cli/sealed-build-log-sink.test.ts",
       "release/atm-root-drop/tests/cli/sealed-runner-build-input-cache.test.ts",
       "release/atm-root-drop/tests/cli/sealed-runner-build-junction-cleanup.test.ts",
+      "release/atm-root-drop/tests/cli/sealed-runner-claim-preflight.test.ts",
       "release/atm-root-drop/tests/cli/sealed-runner-publication-lifecycle.test.ts",
       "release/atm-root-drop/tests/cli/setup-detection.test.ts",
       "release/atm-root-drop/tests/cli/setup-install.test.ts",
@@ -81846,22 +81868,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:a31054cc03e830d83ee1010d7b2b4ebba5c2ef78b00ce7c7e590222ced749035",
-  "sealedSourceCommit": "e12c4d43d9eadb19598a014121622fc6cabe9452",
+  "buildInputsTreeHash": "sha256:cc87368b470de6364d2ba540929bb8e3b223c54509c9c9f14cd6a468a8c6c920",
+  "sealedSourceCommit": "87a6640a545f8e9b371215f9833be88c60a10960",
   "buildDecision": "fullRebuild",
   "buildDecisionReason": "build-script-change",
-  "incrementalPlanDigest": "sha256:05a296114e1bc5030aace98207452ab19ed30915e63ed31b881b94c99d1a378a",
-  "tsBuildCacheDigest": "sha256:2e2a01bb379a7d56a5b61497e050f0df68461e19276a739b4b6cac0db2109ccd",
+  "incrementalPlanDigest": "sha256:0e0652afef8a84f31dfc4badd4eeb82f91982d943d7323ee2662e2b58aaffb77",
+  "tsBuildCacheDigest": "sha256:c2983af44f8f023102fca5c2f34f965299e42a92d131cbda3f1635f9a6e48078",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 23,
-    "skipDecision": 22,
-    "worktreeSetup": 18714,
-    "typescriptBuild": 21705,
-    "rootDropReleaseAssembly": 21247,
-    "onefileReleaseAssembly": 21247,
-    "artifactSync": 489,
+    "inputHashCalculation": 16,
+    "skipDecision": 43,
+    "worktreeSetup": 8450175,
+    "typescriptBuild": 28648,
+    "rootDropReleaseAssembly": 26556,
+    "onefileReleaseAssembly": 25250,
+    "artifactSync": 610,
     "cleanup": 0,
-    "totalElapsed": 88750
+    "totalElapsed": 8537494
   }
 }
