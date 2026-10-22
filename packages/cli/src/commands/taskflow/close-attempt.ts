@@ -13,6 +13,7 @@ export interface CloseAttempt {
   ownerPid: number | null;
   targetCommit: string | null;
   failure: string | null;
+  closeTiming?: { totalMs: number; lockedMs: number };
 }
 
 export function closeAttemptPaths(cwd: string, taskId: string, attemptId: string) {
