@@ -1,6 +1,6 @@
 // #367: Product CI runs the CLI sweep on every PR, including all four required
-// path families. Keep this discoverable and out of quarantine; the serial sweep
-// entry gives its process stress fixtures an isolated CPU/time budget.
+// path families. Keep this discoverable and out of quarantine. Fixtures use
+// independent temporary repositories, so the normal parallel sweep is safe.
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';

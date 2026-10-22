@@ -9,7 +9,7 @@ bash research/paper-v2/prereg-v3-smoke/kit/test/run-concurrency-suite.sh
 
 The existing Product CI workflow runs its CLI sweep on every PR, including all
 four #367 path families. `tests/cli/stub-concurrency-suite.test.ts` is discovered
-by that sweep and registered as serial so process stress gets an isolated budget.
+by that sweep and uses its default parallel scheduling with independent fixtures.
 The wrapper caps the suite at 170 seconds within the sweep's 180-second deadline.
 Local validation took 70 seconds; all files remain below the 600-line budget.
 There are no model calls, downloaded CLI pins, paid keys, or sealed-run writes.
@@ -26,7 +26,7 @@ There are no model calls, downloaded CLI pins, paid keys, or sealed-run writes.
 | Torn journal, recovery fixtures (#364) | `live-write-commit-path.test.ts`; `test-live-write-journal-parity.mjs` |
 | Lock timeout; killed between rename and commit (#364) | `test-stub-concurrency.mjs`: real 30s lock deadline, unchanged file, release/retry; SIGKILL writer group after rename and before Git index operations, then original-proposal recovery attribution |
 | Fake codex real-session parity and current stub (#366 E6) | `test-stub-concurrency.mjs`: existing `bin/stub-codex.mjs`, two sessions through actual socket steward, both `PREREG_STUB_WRITE_MODE=real` and `stub`; real mode uses process substitution without base/attempt flags |
-| Scorer exactness on synthetic arms (#366) | Existing `test_metrics_366.py`: loss=1, silent loss=0/1, conflict=1, retries=resubmissions=0/1, original/removing proposal attribution, null waits, kit-error invalidation |
+| Scorer synthetic arms (#366) | Immutable `test_metrics_366.py`: loss=1, silent loss=0/1, conflict≥1, retries=resubmissions=0/1, proposal attribution, null waits, kit-error invalidation. Exact conflict-count tightening is deferred by owner to the next approved kit generation. |
 
 The integration fixture supplies a **test-only source CLI bridge**: the kit's
 version handshake expects protocol `0.1.21`, while every write is executed by
