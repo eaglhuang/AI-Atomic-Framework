@@ -2,7 +2,7 @@
 doc_id: doc_TASK-PRF-0158
 task_id: TASK-PRF-0158
 title: "Repair PR384 duplicate import and unborn Git candidate discovery"
-status: planned
+status: done
 owner: grok-bot
 priority: P2
 depends_on:
@@ -37,6 +37,15 @@ rollback:
   notes: "Revert the delivery commit if the change fails validation."
 outOfScope: []
 nonGoals: []
+completed_at: "2026-10-22T06:47:00.274Z"
+completed_by_agent: "grok-bot"
+closedAt: "2026-10-22T06:47:00.274Z"
+closedByActor: "grok-bot"
+closedByCommand: atm tasks close
+lastTransitionId: "2026-10-22T06-47-00-274Z-close-22ced68fb930"
+lastTransitionAt: "2026-10-22T06:47:00.274Z"
+ledgerContractVersion: task-ledger/v1
+delivery_commit: "5dd606330c67732bde231be222667f75ede76df7"
 ---
 
 # TASK-PRF-0158 - Repair PR384 duplicate import and unborn Git candidate discovery
