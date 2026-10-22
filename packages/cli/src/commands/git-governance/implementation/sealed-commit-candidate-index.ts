@@ -1,5 +1,5 @@
 /** Git adapter for candidate-index assembly; content always comes from a seal. */
-import { copyFileSync, existsSync, mkdtempSync, rmSync } from 'node:fs';
+import { mkdtempSync, rmSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import {
@@ -36,22 +36,12 @@ export function sealCommitBundleFromLiveIndex(input: { readonly cwd: string; rea
   return sealCommitBundle({ entries, baseTreeSha: input.baseTreeSha ?? null });
 }
 
-/** Reuse stat data only; read-tree still resets every entry to the requested base. */
-function readCandidateBase(cwd: string, env: NodeJS.ProcessEnv, baseRef: string): void {
-  const liveIndex = path.resolve(cwd, runGitCommand(cwd, ['rev-parse', '--git-path', 'index']).trim());
-  const candidateIndex = env.GIT_INDEX_FILE ? path.resolve(cwd, env.GIT_INDEX_FILE) : null;
-  if (candidateIndex && candidateIndex !== liveIndex && existsSync(liveIndex)) {
-    copyFileSync(liveIndex, candidateIndex);
-  }
-  runGitCommandWithEnv(cwd, ['read-tree', baseRef], env, [...QUIET_STDIO]);
-}
-
 export function withWorktreeCandidateIndex<T>(input: { readonly cwd: string; readonly paths: readonly string[]; readonly run: (env: NodeJS.ProcessEnv) => T }): T {
   const paths = [...new Set(input.paths.map(normalizePath).filter(Boolean))].sort();
   const tempDir = mkdtempSync(path.join(os.tmpdir(), 'atm-worktree-candidate-index-'));
   const env = { ...process.env, GIT_INDEX_FILE: path.join(tempDir, 'index') };
   try {
-    readCandidateBase(input.cwd, env, 'HEAD');
+    runGitCommandWithEnv(input.cwd, ['read-tree', 'HEAD'], env, [...QUIET_STDIO]);
     if (paths.length > 0) runGitCommandWithEnv(input.cwd, ['add', '-A', '-f', '--', ...paths], env, [...QUIET_STDIO]);
     return input.run(env);
   } finally { rmSync(tempDir, { recursive: true, force: true }); }
@@ -65,7 +55,7 @@ export function mergeSealedCommitBundles(base: SealedCommitBundle, overlay: Seal
 }
 
 export function assembleSealedCommitIndex(input: { readonly cwd: string; readonly bundle: SealedCommitBundle; readonly env: NodeJS.ProcessEnv; readonly baseRef?: string }): void {
-  readCandidateBase(input.cwd, input.env, input.baseRef ?? 'HEAD');
+  runGitCommandWithEnv(input.cwd, ['read-tree', input.baseRef ?? 'HEAD'], input.env, [...QUIET_STDIO]);
   const paths = input.bundle.entries.map((entry) => entry.path);
   if (paths.length === 0) return;
   runGitCommandWithEnv(input.cwd, ['rm', '--cached', '--quiet', '--ignore-unmatch', '--force', '--', ...paths], input.env, [...QUIET_STDIO]);
@@ -116,11 +106,15 @@ export function sealCommitBundleFromCandidateIndex(input: { readonly cwd: string
 }
 
 function readStagedDeletionEntries(input: { readonly cwd: string; readonly paths: readonly string[]; readonly baseRef: string; readonly env?: NodeJS.ProcessEnv; readonly provenance?: SealedCommitEntryProvenance }): readonly SealedCommitBundleEntry[] {
-  const output = input.env ? runGitCommandWithEnv(input.cwd, ['diff-index', '--cached', '--raw', '--diff-filter=D', input.baseRef, '--', ...input.paths], input.env, [...QUIET_STDIO]) : runGitCommand(input.cwd, ['diff-index', '--cached', '--raw', '--diff-filter=D', input.baseRef, '--', ...input.paths]);
-  return splitLines(output).flatMap((line) => {
-    const match = line.match(RAW_DIFF_PATTERN);
-    return match ? [{ path: normalizePath(match[6]), mode: match[1], blobId: '', provenance: input.provenance ?? 'task-scope', disposition: 'deleted' as const }] : [];
-  });
+  const args = ['--literal-pathspecs', 'diff-index', '--cached', '--raw', '-z', '--diff-filter=D', input.baseRef, '--', ...new Set(input.paths)];
+  const output = input.env ? runGitCommandWithEnv(input.cwd, args, input.env, [...QUIET_STDIO]) : runGitCommand(input.cwd, args);
+  const records = output.split('\0');
+  const entries: SealedCommitBundleEntry[] = [];
+  for (let offset = 0; offset + 1 < records.length; offset += 2) {
+    const match = records[offset].match(/^:(\d+) \d+ [0-9a-f]+ [0-9a-f]+ D\d*$/i);
+    if (match) entries.push({ path: records[offset + 1], mode: match[1], blobId: '', provenance: input.provenance ?? 'task-scope', disposition: 'deleted' });
+  }
+  return entries;
 }
 
 function isTrackedInBaseTree(input: { readonly cwd: string; readonly env: NodeJS.ProcessEnv; readonly baseRef: string; readonly path: string }): boolean {

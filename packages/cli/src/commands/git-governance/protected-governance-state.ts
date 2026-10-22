@@ -42,8 +42,8 @@ export function classifyProtectedGovernanceStatePath(filePath: string): Pick<Pro
 function listDiffNames(cwd: string, args: readonly string[], env?: NodeJS.ProcessEnv, paths?: readonly string[]): string[] {
   if (paths) {
     const names: string[] = [];
-    forEachPathspecBatch({ paths, fixedArgs: ['--literal-pathspecs', ...args, '-z', '--'] }, (batch) => {
-      names.push(...listDiffNames(cwd, ['--literal-pathspecs', ...args, '-z', '--', ...batch], env));
+    forEachPathspecBatch({ paths, fixedArgs: ['--literal-pathspecs', ...args, '--'] }, (batch) => {
+      names.push(...listDiffNames(cwd, ['--literal-pathspecs', ...args, '--', ...batch], env));
     });
     return names;
   }
