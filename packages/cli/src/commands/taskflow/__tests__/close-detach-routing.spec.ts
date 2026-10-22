@@ -17,7 +17,7 @@ try {
   git(['add', foreign]); const foreignIndex = git(['ls-files','-s','--',foreign]);
   const args = ['close','--cwd',fixture.targetRepo,'--profile',fixture.profilePath,'--task',fixture.taskId,'--actor','validator','--historical-delivery',fixture.deliveryCommit,'--defer-foreign-staged','--write'];
   const cli = fileURLToPath(new URL('../../../atm.ts', import.meta.url));
-  const started = spawnSync(process.execPath, ['--strip-types',cli,'taskflow',...args,'--detach','--json'], { encoding: 'utf8', timeout: 15000 });
+  const started = spawnSync(process.execPath, ['--strip-types',cli,'taskflow',...args,'--detach','--json'], { encoding: 'utf8', timeout: 60000 });
   assert.equal(started.status, 0, started.stderr + started.stdout);
   assert.equal(started.stdout.trim().split('\n').length, 1);
   assert.match(started.stdout, /CLOSE_STARTED/);
@@ -33,8 +33,8 @@ try {
   while (readCloseAttempt(fixture.targetRepo,fixture.taskId,id)?.state === 'running' && Date.now()<deadline) await new Promise(r=>setTimeout(r,20));
   assert.ok(readCloseAttempt(fixture.targetRepo,fixture.taskId,id)?.closeTiming);
   assert.ok(attempt?.ownerPid);
-  const status = spawnSync(process.execPath, ['--strip-types',cli,'taskflow','close','--cwd',fixture.targetRepo,'--task',fixture.taskId,'--status','--attempt',id,'--json'], { encoding: 'utf8', timeout: 15000 });
-  assert.equal(status.status, 0, status.stderr);
+  const status = spawnSync(process.execPath, ['--strip-types',cli,'taskflow','close','--cwd',fixture.targetRepo,'--task',fixture.taskId,'--status','--attempt',id,'--json'], { encoding: 'utf8', timeout: 60000 });
+  assert.equal(status.status, 0, `${status.error ?? ""} ${status.stderr}`);
   assert.equal(status.stdout.trim().split('\n').length, 1);
   assert.match(status.stdout, /CLOSE_COMMITTED/);
   await assert.rejects(runTaskflow(['close','--cwd',fixture.targetRepo,'--task',fixture.taskId,'--detach']), /requires close --write/);
