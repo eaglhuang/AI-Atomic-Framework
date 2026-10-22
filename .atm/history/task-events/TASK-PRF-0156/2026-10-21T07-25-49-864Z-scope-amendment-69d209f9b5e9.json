@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-10-21T07-25-49-864Z-scope-amendment-69d209f9b5e9",
+  "taskId": "TASK-PRF-0156",
+  "action": "scope-amendment",
+  "actorId": "grok-bot",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0156.json",
+  "taskSha256": "sha256:0fd055a8df41baa35e88df06fcab507e69cd724eab12c12438825c943e24a7bc",
+  "createdAt": "2026-10-21T07:25:49.864Z",
+  "command": "node atm.mjs tasks scope add --task TASK-PRF-0156 --actor grok-bot --add \"packages/cli/src/commands/framework-development/runner-publication-close-handoff.ts,packages/cli/src/commands/framework-development/runner-publication-residue.ts,packages/cli/src/commands/hook/pre-commit/implementation.ts,packages/cli/src/commands/work-channels.ts,packages/core/src/broker/generated-output-digests.spec.ts,packages/core/src/broker/generated-output-digests.ts,packages/core/src/broker/runner-build-output-inventory.ts,packages/core/src/commit-attribution/sealed-commit-bundle.ts\" --reason \"Repair original P2 delivery scope: include its candidate-staging integration and generated-output receipt source files already committed in 41eefe252, so historical close matches actual delivered behavior.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Repair original P2 delivery scope: include its candidate-staging integration and generated-output receipt source files already committed in 41eefe252, so historical close matches actual delivered behavior."
+  }
+}

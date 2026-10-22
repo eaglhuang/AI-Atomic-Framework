@@ -1,0 +1,77 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-10-21T14-36-30-278Z-close-d91ad42ef74a",
+  "taskId": "TASK-PRF-0156",
+  "action": "close",
+  "actorId": "grok-bot",
+  "sessionId": "session-20261021051035-grok-bot-TASK-PRF-0156-d1fdce58aa",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0156.json",
+  "taskSha256": "sha256:a350200b635302ce071e75964bd12f7dcde5c0c4258c17b57e71327dc0044489",
+  "createdAt": "2026-10-21T14:36:30.278Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0156 --actor grok-bot --status done --historical-delivery 41eefe252",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20261021051035-grok-bot-TASK-PRF-0156-d1fdce58aa",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0156.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "typecheck"
+    ],
+    "requiredGates": [
+      "typecheck"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-10-21T14:36:30.266Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0156.*",
+        ".atm/history/task-events/TASK-PRF-0156/**",
+        ".atm/history/tasks/TASK-PRF-0156.json",
+        ".atm/task-plans/TASK-PRF-0156.md",
+        "docs/governance/**",
+        "docs/governance/proposals/review-r1-xiaodou-2026-10-21.md",
+        "packages/cli/dist/**",
+        "packages/cli/src/commands/framework-development/runner-publication-close-handoff.ts",
+        "packages/cli/src/commands/framework-development/runner-publication-residue.ts",
+        "packages/cli/src/commands/git-governance/**",
+        "packages/cli/src/commands/git-governance/implementation/sealed-commit-candidate-index.ts",
+        "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+        "packages/cli/src/commands/taskflow/**",
+        "packages/cli/src/commands/work-channels.ts",
+        "packages/core/src/broker/generated-output-digests.spec.ts",
+        "packages/core/src/broker/generated-output-digests.ts",
+        "packages/core/src/broker/runner-build-output-inventory.ts",
+        "packages/core/src/commit-attribution/sealed-commit-bundle.ts",
+        "release/atm-onefile/**",
+        "release/atm-root-drop/**",
+        "tests/**"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/dist/**",
+        "packages/cli/src/commands/framework-development/runner-publication-close-handoff.ts",
+        "packages/cli/src/commands/framework-development/runner-publication-residue.ts",
+        "packages/cli/src/commands/git-governance/**",
+        "packages/cli/src/commands/git-governance/implementation/sealed-commit-candidate-index.ts",
+        "packages/cli/src/commands/hook/pre-commit/implementation.ts",
+        "packages/cli/src/commands/taskflow/**",
+        "packages/cli/src/commands/work-channels.ts",
+        "packages/core/src/broker/generated-output-digests.spec.ts",
+        "packages/core/src/broker/generated-output-digests.ts",
+        "packages/core/src/broker/runner-build-output-inventory.ts",
+        "packages/core/src/commit-attribution/sealed-commit-bundle.ts",
+        "tests/**"
+      ],
+      "requiredGates": [
+        "typecheck"
+      ]
+    }
+  }
+}
