@@ -1,0 +1,47 @@
+{
+  "schemaId": "atm.diagnosticLoopReceipt.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Initial diagnostic loop receipt contract."
+  },
+  "taskId": "TASK-PRF-0156",
+  "symptom": "Four candidate-index defects: literal wildcard expansion, scope boundary bypass, replacement ordering, foreign staged reset",
+  "severity": "blocking",
+  "reproducer": {
+    "command": "node --test --experimental-strip-types packages/cli/src/commands/git-governance/implementation/candidate-file-policy.spec.ts packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+    "exitCode": 1,
+    "stdoutSha256": "sha256:4fb1ab2e611590fe41434d5c5152f0c261893b63e3fec50117772d3caac6a26d",
+    "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "symptomObserved": true,
+  "reproductionRate": 1,
+  "minimizedFixture": "candidate-file-policy.spec.ts and commit-bundle-assembly.spec.ts temporary Git repositories",
+  "candidateDigest": "sha256:f0b7acf16085dfc07ae43f0fef7037db2861decb342ec17b3da8178b2aad8466",
+  "environmentDigest": "sha256:d54f9654f40addc40f50f300ea1027c8461f496110cb8ef730d753a116b677d3",
+  "hypotheses": [
+    {
+      "id": "candidate-boundary",
+      "summary": "Literal selection and final mutation boundaries are inconsistent",
+      "predictedObservation": "The four focused regressions fail before the scoped repairs and pass after them",
+      "experimentCommand": "node --test --experimental-strip-types packages/cli/src/commands/git-governance/implementation/candidate-file-policy.spec.ts packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+      "experimentResult": "matched"
+    }
+  ],
+  "winningHypothesisId": "candidate-boundary",
+  "regressionCaseId": "P2-literal-scope-tombstone-reset",
+  "greenEvidence": {
+    "command": "node --test --experimental-strip-types packages/cli/src/commands/git-governance/implementation/candidate-file-policy.spec.ts packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+    "exitCode": 0,
+    "stdoutSha256": "sha256:423bbd91ec2af283ef975f61a5e12a98646470b5de3f9af9fc3b86b9c5017a59",
+    "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "temporaryInstrumentation": "none",
+  "emergencyRationale": null,
+  "createdAt": "1970-01-01T00:00:00.000Z",
+  "valid": true,
+  "admission": "admit-repair",
+  "reasons": [],
+  "receiptDigest": "sha256:0a7532892571f392e701b4bbd63d7a9382c969913c6adb85c7e6c0b4a920c71b"
+}

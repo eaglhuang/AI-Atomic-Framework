@@ -222,6 +222,8 @@ writeFileSync(
 );
 execFileSync('git', ['add', '.'], { cwd });
 execFileSync('git', ['commit', '-qm', 'fixture'], { cwd });
+// Explicit verified publication inventories authorize ignored build outputs.
+writeFileSync(path.join(cwd, '.gitignore'), 'packages/cli/dist/\n');
 writeFileSync(path.join(cwd, 'packages/cli/dist/atm.d.ts'), 'export { atm: true }\n');
 rmSync(path.join(cwd, 'packages/cli/dist/gone.d.ts'));
 writeFileSync(path.join(cwd, 'release/atm-onefile/atm.mjs'), 'export { built: true }\n');

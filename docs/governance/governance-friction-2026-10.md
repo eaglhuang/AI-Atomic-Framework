@@ -46,6 +46,12 @@ Status legend: *fixed* (already merged), *quick-fixed* (this round, PR linked), 
 | F24 | Claim discovery: `tasks claim` says "not ready", `taskflow open --write` refuses in template-only mode; the working path is `next --claim --task <id> --auto-intent`, and it refuses while any uncommitted WIP intersects the scope | low | yes | proposed (P5 hint text) |
 | F25 | A closed task cannot take a governed commit or publish the runner, so merging main after close (dist conflicts) or a one-line notes update needs a new task | medium | yes | proposed (P4); evidence TASK-PRF-0152, 0153 |
 | F26 | Sealed-build failure result line has a generic hint ("see log") instead of the error | low | no | follow-up to #379 |
+| F27 | `next --claim` drops some card scopePaths from the claim's file grant; close then fails with ATM_WRITE_TICKET_SCOPE_VIOLATION until `tasks scope add --reason` | medium | yes | open; evidence TASK-PRF-0154 |
+| F28 | `--historical-delivery` pointing at a WIP commit fails with `no-scoped-deliverable-files` instead of explaining which deliverable is missing | low | no | open |
+| F29 | Close dry-run passes but `--write` fails with ATM_LANE_BORROWED_ACTOR_BLOCKED when ATM_LANE_SESSION_ID is unset; dry-run should check it | medium | yes | open; evidence TASK-PRF-0154 |
+| F30 | Release manifests (`release/atm-onefile`, `release/atm-root-drop`) conflict across every open sealed-build PR once another merges, forcing a merge task plus rebuild | medium | yes | open; evidence TASK-PRF-0155 |
+| F31 | Box Node 22 and 24.10 cannot run `node --strip-types` scripts; a newer Node 24 must be used for npm scripts | low | yes | environment note |
+| F32 | Codex CLI 0.163 dropped `--full-auto`; use `codex exec -s workspace-write` | low | no | note |
 | F23 | Box environment: default Node 22 lacks `--strip-types`; Codex sandbox cannot spawn `git` (EPERM) | low | no | note |
 
 ## Details
