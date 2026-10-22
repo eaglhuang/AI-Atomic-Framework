@@ -1,4 +1,4 @@
-import { collectOriginTaskSuffixes } from './taskflow/origin-task-ids.ts';
+import { collectOriginTaskSuffixes } from './taskflow/host-opener-policy.ts';
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';

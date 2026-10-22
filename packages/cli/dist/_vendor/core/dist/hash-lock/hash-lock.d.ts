@@ -14,7 +14,7 @@ export declare function computeSha256ForFiles(filePaths: string[] | string): str
  */
 export declare function computeCanonicalJsonDigest(value: unknown): string;
 export declare function createSourceHashSnapshot(options: SourceHashSnapshotOptions): {
-    legacyPlanningId: string | null;
+    legacyPlanningId: string;
     specHash: string;
     codeHash: string;
     testHash: string;

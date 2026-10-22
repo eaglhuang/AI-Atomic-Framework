@@ -144,3 +144,5 @@ TASK-PRF-0157 milestone 3: resumed after credits refill; all checks passed, clai
 TASK-PRF-0157 milestone 4: sealed build and runner-sync receipt passed; frozen smoke and both governed close previews report no blockers.
 
 TASK-PRF-0158 milestone 1: helpers consolidated into existing tracked modules; both regressions, lint and typecheck passed; stale generated helper modules removed before rebuilding.
+
+TASK-PRF-0158 milestone 2: sealed rebuild, runner-sync receipt, frozen smoke and close previews passed; closing publication follow-up.

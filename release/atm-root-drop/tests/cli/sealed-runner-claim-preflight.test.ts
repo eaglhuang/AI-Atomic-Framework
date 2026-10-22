@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { assertSealedRunnerClaimLifetime, MIN_PUBLICATION_CLAIM_REMAINING_SECONDS } from '../../scripts/sealed-runner-claim-preflight.ts';
+import { assertSealedRunnerClaimLifetime, MIN_PUBLICATION_CLAIM_REMAINING_SECONDS } from '../../scripts/sealed-runner-publication.ts';
 
 mkdirSync('.atm-temp', { recursive: true });
 const cwd = mkdtempSync(path.resolve('.atm-temp/claim-preflight-'));

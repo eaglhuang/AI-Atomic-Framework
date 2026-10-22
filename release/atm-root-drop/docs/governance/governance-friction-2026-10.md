@@ -200,3 +200,5 @@ Status legend: *fixed* (already merged), *quick-fixed* (this round, PR linked), 
 
 ### F28 Publication claim expires during sealed compilation (fixed by this PR)
 - A thirty-minute build outlived its publication claim and required a retry. TASK-PRF-0157 checks for two hours of remaining authority before private compilation and prints a concrete four-hour renew command when insufficient; publication still revalidates ownership. Regression coverage includes expiry and a competing session.
+
+- Publication follow-up TASK-PRF-0158 keeps both helpers in existing tracked modules; the known forced-add friction requires a separate index cleanup after normal close.
