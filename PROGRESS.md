@@ -140,3 +140,5 @@ TASK-PRF-0157 milestone 1: imported and claimed both governance fixes; origin ce
 TASK-PRF-0157 milestone 2: both fixes and regression tests implemented; typecheck, eslint, publication lifecycle and preclose passed.
 
 TASK-PRF-0157 milestone 3: resumed after credits refill; all checks passed, claim renewed, opener fixture corrected and test imports cleaned.
+
+TASK-PRF-0157 milestone 4: sealed build and runner-sync receipt passed; frozen smoke and both governed close previews report no blockers.

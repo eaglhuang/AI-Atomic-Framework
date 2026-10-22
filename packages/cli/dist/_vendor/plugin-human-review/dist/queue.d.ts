@@ -74,10 +74,10 @@ export declare const humanReviewQueuePackage: {
 export declare function computeDecisionSnapshotHash(proposal: HumanReviewUpgradeProposalSnapshot | Readonly<Record<string, unknown>>): string;
 export declare function createHumanReviewQueueRecord(proposal: HumanReviewUpgradeProposalSnapshot | Readonly<Record<string, unknown>>, options?: HumanReviewQueueRecordOptions): HumanReviewQueueRecord;
 export declare function createHumanReviewQueueDocument(entries: readonly HumanReviewQueueRecord[], options?: HumanReviewQueueDocumentOptions): HumanReviewQueueDocument;
-export declare function loadHumanReviewQueueDocument(filePath: string): HumanReviewQueueDocument;
+export declare function loadHumanReviewQueueDocument(filePath: string): HumanReviewQueueDocument | null;
 export declare function writeHumanReviewQueueDocument(filePath: string, document: HumanReviewQueueDocument): HumanReviewQueueDocument;
 export declare function normalizeHumanReviewQueueDocument(document: HumanReviewQueueDocument | readonly HumanReviewQueueRecord[]): HumanReviewQueueDocument;
-export declare function findHumanReviewQueueRecord(document: HumanReviewQueueDocument, proposalId: string): HumanReviewQueueRecord;
+export declare function findHumanReviewQueueRecord(document: HumanReviewQueueDocument, proposalId: string): HumanReviewQueueRecord | null;
 export declare function replaceHumanReviewQueueRecord(document: HumanReviewQueueDocument, nextRecord: HumanReviewQueueRecord): HumanReviewQueueDocument;
 export declare function renderHumanReviewQueueMarkdown(document: HumanReviewQueueDocument): string;
 export declare function validateHumanReviewQueueDocument(document: HumanReviewQueueDocument | readonly HumanReviewQueueRecord[]): HumanReviewQueueValidationResult;

@@ -1,3 +1,4 @@
+import { collectOriginTaskSuffixes } from './taskflow/origin-task-ids.js';
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
@@ -297,7 +298,7 @@ function maybeAddPlanDocToRegistry(planningRoot, rawSeries, planDoc, write) {
 function nextTaskId(planningRoot, entry) {
     const tasksDir = path.join(planningRoot, entry.familyDir, 'tasks');
     const matcher = new RegExp(`^${escapeRegExp(entry.prefix)}-(\\d{4})\\b`, 'i');
-    let max = 0;
+    let max = Math.max(0, ...collectOriginTaskSuffixes(planningRoot, `${entry.prefix}-NNNN`, entry.familyDir));
     if (existsSync(tasksDir)) {
         for (const name of readdirSync(tasksDir)) {
             const match = name.match(matcher);

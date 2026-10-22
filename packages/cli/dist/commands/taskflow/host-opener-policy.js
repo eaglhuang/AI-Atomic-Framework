@@ -1,3 +1,4 @@
+import { collectOriginTaskSuffixes } from './origin-task-ids.js';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { CliError } from '../shared.js';
@@ -68,7 +69,7 @@ function allocateTaskIdFromPolicy(cwd, profile, policy) {
     }
     const format = policy.allocateTaskId.format ?? profile.taskId.format;
     const directory = policy.resolveCanonicalOutputPath.directory ?? '.';
-    const existing = collectExistingNumericSuffixes(cwd, directory, format);
+    const existing = [...new Set([...collectExistingNumericSuffixes(cwd, directory, format), ...collectOriginTaskSuffixes(cwd, format, directory)])];
     const nextSuffix = existing.length > 0 ? Math.max(...existing) + 1 : 1;
     const taskId = formatTaskIdFromNumber(format, nextSuffix);
     return {
