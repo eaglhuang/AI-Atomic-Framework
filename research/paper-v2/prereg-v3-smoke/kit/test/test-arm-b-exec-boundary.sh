@@ -350,12 +350,12 @@ saved_home="$PREREG_SESSION_CODEX_HOME"
 saved_root="${PREREG_SESSION_CODEX_ROOT:-}"
 PREREG_SESSION_CODEX_HOME="$CODEX_HOME_A"
 PREREG_SESSION_CODEX_ROOT="$CODEX_ROOT_A"
-session_env_assignments "$ARM_A" "$REPO" | grep -q "CODEX_HOME=${CODEX_HOME_A}"
-session_env_assignments "$ARM_A" "$REPO" | grep -q "XDG_RUNTIME_DIR=${CODEX_HOME_A}/runtime"
+session_env_assignments "$ARM_A" "$REPO" | grep -F "CODEX_HOME=${CODEX_HOME_A}" >/dev/null
+session_env_assignments "$ARM_A" "$REPO" | grep -F "XDG_RUNTIME_DIR=${CODEX_HOME_A}/runtime" >/dev/null
 PREREG_SESSION_CODEX_HOME="$CODEX_HOME_B"
 unset PREREG_SESSION_CODEX_ROOT
-session_env_assignments "$SESSION" "$REPO" | grep -q "CODEX_HOME=${CODEX_HOME_B}"
-session_env_assignments "$SESSION" "$REPO" | grep -q "XDG_RUNTIME_DIR=${CODEX_HOME_B}/runtime"
+session_env_assignments "$SESSION" "$REPO" | grep -F "CODEX_HOME=${CODEX_HOME_B}" >/dev/null
+session_env_assignments "$SESSION" "$REPO" | grep -F "XDG_RUNTIME_DIR=${CODEX_HOME_B}/runtime" >/dev/null
 PREREG_SESSION_CODEX_HOME="$saved_home"
 if [ -n "$saved_root" ]; then
   PREREG_SESSION_CODEX_ROOT="$saved_root"

@@ -89,7 +89,7 @@ with tempfile.TemporaryDirectory() as tmp:
     root = pathlib.Path(tmp)
     (root / 'source.py').write_text('original')
     create_generation(root)
-    assert verify_generation(root)['id'] == 'cli-0.1.22-v12e-367'
+    assert verify_generation(root)['id'] == 'cli-0.1.22-v12f-367'
     try:
         create_generation(root)
         raise AssertionError('generation overwritten')

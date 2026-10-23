@@ -12,7 +12,7 @@ python3 "$HERE/bin/kit_generation.py" --verify
 MODE="${PREREG_SMOKE_MODE:-django}"
 new_state_root
 mkdir -p "$STATE_ROOT"
-cp "$HERE/generations/cli-0.1.22-v12e-367.json" "$STATE_ROOT/kit-generation.json"
+cp "$HERE/generations/cli-0.1.22-v12f-367.json" "$STATE_ROOT/kit-generation.json"
 
 mkdir -p "$STATE_ROOT/template"
 
