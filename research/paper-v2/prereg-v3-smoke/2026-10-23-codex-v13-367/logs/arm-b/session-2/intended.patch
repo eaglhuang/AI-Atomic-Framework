@@ -1,0 +1,19 @@
+diff --git a/django/db/migrations/loader.py b/django/db/migrations/loader.py
+--- a/django/db/migrations/loader.py
++++ b/django/db/migrations/loader.py
+@@ -92,4 +92,0 @@
+-                # getattr() needed on PY36 and older (replace w/attribute access).
+-                if getattr(module, '__file__', None) is None and not isinstance(module.__path__, list):
+-                    self.unmigrated_apps.add(app_config.label)
+-                    continue
+diff --git a/tests/migrations/test_loader.py b/tests/migrations/test_loader.py
+--- a/tests/migrations/test_loader.py
++++ b/tests/migrations/test_loader.py
+@@ -505,5 +505,5 @@
+-        """Migration directories without an __init__.py file are ignored."""
++        """Migration directories without an __init__.py file are loaded."""
+         loader = MigrationLoader(connection)
+         loader.load_disk()
+         migrations = [name for app, name in loader.disk_migrations if app == 'migrations']
+-        self.assertEqual(migrations, [])
++        self.assertEqual(migrations, ['0001_initial'])
