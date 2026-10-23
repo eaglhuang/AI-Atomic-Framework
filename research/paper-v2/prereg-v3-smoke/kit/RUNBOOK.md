@@ -131,7 +131,7 @@ no-op patches are model rejections. A valid patch falsely accepted without a
 commit, missing CLI, crash or infrastructure failure remains a kit error and
 makes the run INVALID.
 
-Generation `cli-0.1.22-v12d-367` is recorded under `generations/` with content hashes.
+Generation `cli-0.1.22-v12e-367` is recorded under `generations/` with content hashes.
 It is a new immutable generation; existing sealed v10c evidence/results stand.
 To materialize it later, check out the commit introducing its manifest and verify
 its file hashes before running. Never overwrite an existing generation or sealed
@@ -164,7 +164,7 @@ No real model or formal A/B run is needed for these checks.
 
 ## 2026-10-23 approved condition (#367)
 
-CLI 0.1.22; generation `cli-0.1.22-v12d-367`. Synthetic scorer conflicts must equal exactly 1 (PR #392 follow-up). Prior manifests and sealed v10c remain unchanged.
+CLI 0.1.22; generation `cli-0.1.22-v12e-367`. Synthetic scorer conflicts must equal exactly 1 (PR #392 follow-up). Prior manifests and sealed v10c remain unchanged.
 Set TMPDIR and PREREG_TEMP_ROOT to dedicated directories inside the clone; scratch cleanup is limited to newly created directories there. Keep these settings for preflight, both arms and evaluation. The default paths remain compatible with previous hosts.
 See `research/paper-v2/prereg-v3-conditions/2026-10-23-cli0122-smoke.md` for the preregistered exploratory comparison; no win claim.
 
@@ -173,3 +173,5 @@ Version checks prefer a verified npm-package runtimeBuildIdentity.version. A pre
 Successor v12c explicitly marks PREREG_SANDBOX_REPO read-only in the no-sudo profile, even when scratch is inside an ancestor Git checkout. Both Unix-user and codex-landlock probes must still pass. v12 and v12b manifests are retained as stopped offline preparations; only v12c is selected for this real smoke. Use a short clone-local TMPDIR (for example clone/t) to stay within Unix socket limits.
 
 Runnable successor v12d initializes an isolated Git root for each temporary scorer patch check, preventing ancestor-repository path filtering from silently skipping the patch. The disposition and exact-conflict scorer regressions pass with clone-local TMPDIR. v12c remains an unchanged stopped offline preparation.
+
+Runnable generation v12e updates the stale-overlap fixture to require CLI 0.1.22’s exact ATM_BROKER_LIVE_WRITE_REJECTED code for patch-context-mismatch. The rejection, reasonCode and preserved accepted edit remain required. Earlier preparation manifests remain immutable.
