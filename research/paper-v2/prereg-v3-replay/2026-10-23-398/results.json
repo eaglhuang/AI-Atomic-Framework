@@ -1,0 +1,107 @@
+{
+  "label": "model-free diagnostic replay",
+  "issue": 398,
+  "commonBase": "98ad327864aed8df245fd19ea9d2743279e11643",
+  "modelCalls": 0,
+  "kitPin": "cli-0.1.22-v13-367",
+  "cliPin": "0.1.22",
+  "originalInputArchive": "r12f",
+  "originalPatchHashesVerified": true,
+  "modes": {
+    "old-kit": [
+      {
+        "step": 1,
+        "slot": "2",
+        "exitCode": 3,
+        "decision": "rejected-by-design",
+        "reasonCode": "patch-malformed",
+        "currentFileHash": "sha256:7dca66d253358f3dfbda3d68ceffb8b9fee4d0f47d8ddef2fa4d25e78ff1b05c",
+        "guardPresentBefore": false,
+        "guardPresentAfter": false,
+        "head": "98ad327864aed8df245fd19ea9d2743279e11643"
+      },
+      {
+        "step": 2,
+        "slot": "1",
+        "exitCode": 0,
+        "decision": "accepted",
+        "reasonCode": null,
+        "currentFileHash": "sha256:bfe273e001c5a0e95d94526e3b003b9aa2abe9f4fc8dacfb7b395816d38f3a55",
+        "guardPresentBefore": false,
+        "guardPresentAfter": true,
+        "head": "b44313b76ac7a1378dfca2136c99cba8a984d4b5"
+      },
+      {
+        "step": 3,
+        "slot": "2",
+        "exitCode": 3,
+        "decision": "rejected-by-design",
+        "reasonCode": "patch-malformed",
+        "currentFileHash": "sha256:bfe273e001c5a0e95d94526e3b003b9aa2abe9f4fc8dacfb7b395816d38f3a55",
+        "guardPresentBefore": true,
+        "guardPresentAfter": true,
+        "head": "b44313b76ac7a1378dfca2136c99cba8a984d4b5"
+      },
+      {
+        "step": 4,
+        "slot": "2",
+        "exitCode": 0,
+        "decision": "accepted",
+        "reasonCode": null,
+        "currentFileHash": "sha256:bef47a52075e71c72b32928f175296dd6a4a43eb79ad679aa8eb7ce7bc7a2a8e",
+        "guardPresentBefore": true,
+        "guardPresentAfter": false,
+        "head": "0eca90580c7130dfeb23f86c32f88b478b7e1700"
+      }
+    ],
+    "direct-cli": [
+      {
+        "step": 1,
+        "slot": "2",
+        "exitCode": 1,
+        "decision": "rejected-by-design",
+        "reasonCode": "patch-malformed",
+        "currentFileHash": "sha256:7dca66d253358f3dfbda3d68ceffb8b9fee4d0f47d8ddef2fa4d25e78ff1b05c",
+        "guardPresentBefore": false,
+        "guardPresentAfter": false,
+        "head": "98ad327864aed8df245fd19ea9d2743279e11643"
+      },
+      {
+        "step": 2,
+        "slot": "1",
+        "exitCode": 0,
+        "decision": "accepted",
+        "reasonCode": null,
+        "currentFileHash": "sha256:bfe273e001c5a0e95d94526e3b003b9aa2abe9f4fc8dacfb7b395816d38f3a55",
+        "guardPresentBefore": false,
+        "guardPresentAfter": true,
+        "head": "e793fcf708af9b0c85e9ba9ffada117bdd97a0c4"
+      },
+      {
+        "step": 3,
+        "slot": "2",
+        "exitCode": 1,
+        "decision": "rejected-by-design",
+        "reasonCode": "patch-malformed",
+        "currentFileHash": "sha256:bfe273e001c5a0e95d94526e3b003b9aa2abe9f4fc8dacfb7b395816d38f3a55",
+        "guardPresentBefore": true,
+        "guardPresentAfter": true,
+        "head": "e793fcf708af9b0c85e9ba9ffada117bdd97a0c4"
+      },
+      {
+        "step": 4,
+        "slot": "2",
+        "exitCode": 1,
+        "decision": "rejected-by-design",
+        "reasonCode": "cross-session-overlap",
+        "currentFileHash": "sha256:bfe273e001c5a0e95d94526e3b003b9aa2abe9f4fc8dacfb7b395816d38f3a55",
+        "guardPresentBefore": true,
+        "guardPresentAfter": true,
+        "head": "e793fcf708af9b0c85e9ba9ffada117bdd97a0c4"
+      }
+    ]
+  },
+  "attribution": "kit early malformed rejection bypasses core original-intent anchor; direct published CLI preserves it",
+  "winClaim": false,
+  "formalEvidence": false
+}

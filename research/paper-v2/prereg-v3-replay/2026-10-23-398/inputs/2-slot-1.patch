@@ -1,0 +1,9 @@
+--- a/django/db/migrations/loader.py
++++ b/django/db/migrations/loader.py
+@@ -92,5 +92,5 @@
+                 # Empty directories are namespaces.
+                 # getattr() needed on PY36 and older (replace w/attribute access).
+-                if getattr(module, '__file__', None) is None:
++                if getattr(module, '__file__', None) is None and not isinstance(module.__path__, list):
+                     self.unmigrated_apps.add(app_config.label)
+                     continue

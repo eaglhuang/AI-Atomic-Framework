@@ -1,0 +1,33 @@
+{
+  "schemaId": "atm.patchProposal.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "prereg-v3 smoke steward proposal"
+  },
+  "proposalId": "prop-prereg-session-slot-2-a1-c0a4f8300f6f",
+  "taskId": "prereg",
+  "actorId": "prereg-session-slot-2",
+  "baseCommit": "7887a8294f50ff59bdcb834990b58e80cd6e6a5d",
+  "fileBeforeHash": "sha256:bfe273e001c5a0e95d94526e3b003b9aa2abe9f4fc8dacfb7b395816d38f3a55",
+  "targetFile": "django/db/migrations/loader.py",
+  "atomRefs": [
+    {
+      "atomId": "atom-prop-prereg-session-slot-2-a1-c0a4f8300f6f",
+      "atomCid": "cid-prop-prereg-session-slot-2-a1-c0a4f8300f6f"
+    }
+  ],
+  "anchors": [
+    {
+      "kind": "line-range",
+      "hint": "88-98"
+    }
+  ],
+  "intent": "prereg-v3-smoke",
+  "patch": "diff --git a/django/db/migrations/loader.py b/django/db/migrations/loader.py\n--- a/django/db/migrations/loader.py\n+++ b/django/db/migrations/loader.py\n@@ -88,11 +88,6 @@\n                     continue\n                 raise\n             else:\n-                # Empty directories are namespaces.\n-                # getattr() needed on PY36 and older (replace w/attribute access).\n-                if getattr(module, '__file__', None) is None and not isinstance(module.__path__, list):\n-                    self.unmigrated_apps.add(app_config.label)\n-                    continue\n                 # Module is not a package (e.g. migrations.py).\n                 if not hasattr(module, '__path__'):\n                     self.unmigrated_apps.add(app_config.label)\n",
+  "validators": [
+    "prereg-v3-smoke"
+  ],
+  "rollback": "還原此檔到套用前的位元組"
+}

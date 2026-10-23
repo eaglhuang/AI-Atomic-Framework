@@ -748,3 +748,9 @@ pilot、主跑、留出集實驗仍不在這次範圍。dev 題沒有 B′ 與 D
 | Generation | Status | Pins | Checksums | Sessions | Measurements |
 | --- | --- | --- | --- | --- | --- |
 | `prereg-v3-pilot/2026-10-23-pilot/` | **pilot — 2 VALID arm runs, 0 INVALID; A ok / B blocked; not formal evidence** | CLI 0.1.22; kit `cli-0.1.22-v13-367` | see generation SHA256SUMS | 4 task sessions | A/B lost=1/1, silent=1/0; B rejected=5; kit-errors=0/2 arms; input=748202, output=7267, reported total=null; B loss includes an unsubmitted intended test hunk; [VERDICT](./prereg-v3-pilot/2026-10-23-pilot/VERDICT.md); no win claim |
+
+## Issue 398 sealed diagnostic replay
+
+| Generation | Status | Evidence |
+| --- | --- | --- |
+| `prereg-v3-replay/2026-10-23-398/` | sealed model-free diagnostic; kit attribution; not formal | Old kit accepts/removes guard; direct published CLI 0.1.22 rejects cross-session-overlap/preserves guard; four original patch hashes verified; zero model calls; see VERDICT.md and SHA256SUMS; no win claim |
