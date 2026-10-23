@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, symlinkSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { runPreCommitHook } from '../../packages/cli/src/commands/hook/pre-commit.ts';
@@ -24,10 +24,11 @@ const claim = (files: string[], prompt = 'Document paper research design and pat
 ]);
 const files = ['research/paper-v2/prereg-v3-kit-design/new-generation/DESIGN.md', 'research/paper-v2/EVIDENCE_INDEX.md', 'scripts/smoke-patch.sh'].sort();
 const result = await claim(files);
-assert.equal(result.evidence.nextAction?.status, 'ready');
+const nextAction = result.evidence.nextAction as { status: string; playbook?: unknown };
+assert.equal(nextAction.status, 'ready');
 assert.deepEqual(readActiveQuickfixLock(cwd)?.allowedFiles, files);
 assert.equal(readActiveQuickfixLock(cwd)?.maxChangedLines, 80);
-assert.ok(result.evidence.nextAction?.playbook);
+assert.ok(nextAction.playbook);
 console.log('ok - explicit research and smoke patch scope claims without magic prompt words');
 for (const scope of [[sealedFile], ['research/paper-v2/prereg-v3-smoke/old-generation/new.txt'],
   ['research/paper-v2/prereg-v3-smoke/old-generation/**'], ['research/paper-v2/prereg-v3-smoke'], ['research'], ['.'], ['**'],
@@ -57,3 +58,11 @@ const over = runPreCommitHook(cwd);
 assert.equal(over.ok, false);
 assert.equal(over.evidence.quickfixLineLimitExceeded, true);
 console.log('ok - direct quickfix also protects seals; research and smoke patch additions share the 80-line budget');
+
+if (process.platform !== 'win32') {
+  const alias = 'research/paper-v2/prereg-v3-kit-design/alias';
+  symlinkSync(path.join(cwd, 'research/paper-v2/prereg-v3-smoke/old-generation'), path.join(cwd, alias));
+  assert.equal((await claim([`${alias}/README.md`])).ok, false);
+  assert.equal((await claim([path.join(cwd, sealedFile)])).ok, false);
+  console.log('ok - absolute paths and symlink aliases cannot escape immutable generation checks');
+}
