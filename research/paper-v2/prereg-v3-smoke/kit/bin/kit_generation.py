@@ -6,7 +6,7 @@ import os
 from pathlib import Path
 import sys
 
-GENERATION = 'cli-0.1.22-v12f-367'
+GENERATION = 'cli-0.1.22-v13-367'
 
 
 def digest(data):

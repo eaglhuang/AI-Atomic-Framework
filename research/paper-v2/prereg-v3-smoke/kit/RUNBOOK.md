@@ -131,7 +131,7 @@ no-op patches are model rejections. A valid patch falsely accepted without a
 commit, missing CLI, crash or infrastructure failure remains a kit error and
 makes the run INVALID.
 
-Generation `cli-0.1.22-v12f-367` is recorded under `generations/` with content hashes.
+Generation `cli-0.1.22-v13-367` is recorded under `generations/` with content hashes.
 It is a new immutable generation; existing sealed v10c evidence/results stand.
 To materialize it later, check out the commit introducing its manifest and verify
 its file hashes before running. Never overwrite an existing generation or sealed
@@ -164,7 +164,7 @@ No real model or formal A/B run is needed for these checks.
 
 ## 2026-10-23 approved condition (#367)
 
-CLI 0.1.22; generation `cli-0.1.22-v12f-367`. Synthetic scorer conflicts must equal exactly 1 (PR #392 follow-up). Prior manifests and sealed v10c remain unchanged.
+CLI 0.1.22; generation `cli-0.1.22-v13-367`. Synthetic scorer conflicts must equal exactly 1 (PR #392 follow-up). Prior manifests and sealed v10c remain unchanged.
 Set TMPDIR and PREREG_TEMP_ROOT to dedicated directories inside the clone; scratch cleanup is limited to newly created directories there. Keep these settings for preflight, both arms and evaluation. The default paths remain compatible with previous hosts.
 See `research/paper-v2/prereg-v3-conditions/2026-10-23-cli0122-smoke.md` for the preregistered exploratory comparison; no win claim.
 
@@ -177,3 +177,7 @@ Runnable successor v12d initializes an isolated Git root for each temporary scor
 Runnable generation v12e updates the stale-overlap fixture to require CLI 0.1.22’s exact ATM_BROKER_LIVE_WRITE_REJECTED code for patch-context-mismatch. The rejection, reasonCode and preserved accepted edit remain required. Earlier preparation manifests remain immutable.
 
 Generation v12f makes exec-boundary environment assertions consume the complete producer output; their exact expected values are unchanged. This avoids grep -q closing a pipe early under pipefail during nested isolation checks. Prior manifests remain unchanged.
+
+## One owner-approved rerun after r12f
+
+Generation cli-0.1.22-v13-367 includes only the two-file capture fix from fa7184ada plus generation metadata: header-only unified diffs gain a canonical diff --git header, Markdown fences are removed, and hunk bodies/counts are preserved. Run 2026-10-23-codex-v13-367 repeats the same CLI/model/effort/boundary/tasks once. r12f stays INVALID/evidence_missing and is neither re-captured nor rescored. Its baseline overwrite and the separate Arm B observation in #398 remain disclosed. No win claim.
