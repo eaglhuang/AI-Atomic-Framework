@@ -4,6 +4,7 @@ import type { TaskClaimRecord, WorkItemRef } from '@ai-atomic-framework/core';
 import { createLocalGovernanceAdapter } from '../../../../plugin-governance-local/src/index.ts';
 import { clearBrokerRuntimeStateForTask, removeBrokerRegistryIfEmpty } from '../../../../core/src/broker/lifecycle.ts';
 import { resolveActorId } from '../actor-registry.ts';
+import { renewFrameworkTempClaim } from './renew-framework-temp.ts';
 import { listActorWorkSessions, updateActorWorkSessionState } from '../actor-session.ts';
 import { buildDependencyCloseoutRecoveryCommand, formatDependencyCloseoutBlockedMessage, assessCloseoutProvenanceGap } from './closeout-provenance.ts';
 import { findTaskClaimDependencyBlockers, type TaskClaimDependencyBlocker } from './dependency-gates.ts';
@@ -37,6 +38,9 @@ export async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'releas
     throw new CliError('ATM_ACTOR_ID_MISSING', 'tasks claim lifecycle requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
   }
   const actorId = resolvedActor.actorId;
+  if (action === 'renew' && options.taskId.startsWith('ATM-FRAMEWORK-TEMP-')) {
+    return renewFrameworkTempClaim({ ...options, actorId });
+  }
   const taskPath = taskPathFor(options.cwd, options.taskId);
   if (!existsSync(taskPath)) {
     throw new CliError('ATM_TASK_NOT_FOUND', `Task file not found for ${options.taskId}.`, {
@@ -235,7 +239,6 @@ export async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'releas
       }
     });
   }
-
   if (action === 'renew') assertRenewAllowedForCloseState({ cwd: options.cwd, taskId: options.taskId, actorId, status: String(taskDocument.status ?? ''), relativeTaskPath: relativePathFrom(options.cwd, taskPath) }); // #373
   if (!currentClaim) {
     throw new CliError('ATM_TASK_CLAIM_MISSING', `Task ${options.taskId} has no active claim record.`, {
@@ -246,7 +249,6 @@ export async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'releas
       }
     });
   }
-
   if (action === 'renew') {
     const laneSession = assertCurrentClaimOwnerForAction({
       cwd: options.cwd,
@@ -322,7 +324,6 @@ export async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'releas
       }
     });
   }
-
   if (action === 'release') {
     assertCurrentClaimOwnerForAction({
       cwd: options.cwd,
@@ -352,7 +353,6 @@ export async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'releas
       reason: options.reason ?? null,
       nowIso
     });
-
     const releasedClaim: TaskClaimRecord = {
       ...currentClaim,
       heartbeatAt: nowIso,
