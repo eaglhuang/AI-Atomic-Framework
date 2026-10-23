@@ -26,7 +26,7 @@ export function tryBuildQuickfixClaimResult(input: {
   readonly integrationBootstrap: ReturnType<typeof inspectIntegrationBootstrap>;
   readonly runtimeAdapterReadiness: ReturnType<typeof inspectRuntimeAdapterReadiness>;
 }) {
-  if (!input.importedTaskQueue.claimableTask
+  if (input.taskIntent?.taskScopeMentioned === false
     && !input.importedTaskQueue.promptScope
     && isQuickfixPrompt(input.promptText)
     && input.quickfixScope.length > 0) {
