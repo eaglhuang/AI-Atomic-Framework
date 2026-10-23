@@ -388,7 +388,7 @@ function readValidatedPublicationTakeover(input: {
   return validated.plan.entries.map((entry) => entry.path);
 }
 
-// Reserve two hours for compilation and publication, before creating a worktree.
+// Reserve two hours for renewable task claims before creating a worktree.
 export const MIN_PUBLICATION_CLAIM_REMAINING_SECONDS = 7200;
 
 export function assertSealedRunnerClaimLifetime(input: {
@@ -403,14 +403,17 @@ export function assertSealedRunnerClaimLifetime(input: {
   try {
     taskId = resolveActiveRunnerPublicationTask({ ...input, now });
   } catch (error) {
+    if (input.taskId?.startsWith('ATM-FRAMEWORK-TEMP-')) {
+      throw new Error(`${error instanceof Error ? error.message : String(error)} Inspect temporary publication authority before reclaiming: node atm.mjs framework-mode status --json`);
+    }
     throw new Error(`${error instanceof Error ? error.message : String(error)} Renew publication authority before building: ${renew(input.taskId || '<task-id>')}`);
   }
   let authority: Record<string, unknown>;
   if (taskId.startsWith('ATM-FRAMEWORK-TEMP-')) {
-    authority = JSON.parse(readFileSync(path.join(input.cwd, '.atm/runtime/locks', `${taskId}.lock.json`), 'utf8')) as Record<string, unknown>;
-    const files = Array.isArray(authority.files) ? authority.files.map(String) : [];
-    // Source-only refreshes revalidate the live claim again at publication.
-    if (!ownsReleaseSurface(files) && ownsCommittedRunnerInputs(input.cwd, files)) return;
+    // Temporary claims have a fixed thirty-minute TTL and cannot use tasks
+    // renew. The resolver above requires live scoped authority; publication
+    // revalidates it again, for both source refreshes and release builds.
+    return;
   } else {
     const task = JSON.parse(readFileSync(path.join(input.cwd, '.atm/history/tasks', `${taskId}.json`), 'utf8')) as { claim: Record<string, unknown> };
     authority = task.claim;
