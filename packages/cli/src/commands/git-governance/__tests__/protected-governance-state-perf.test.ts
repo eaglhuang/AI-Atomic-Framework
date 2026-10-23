@@ -12,8 +12,10 @@ const ledger = '.atm/history/tasks/TASK-OWNER.json';
 const event = '.atm/history/task-events/TASK-OWNER/line\n[one]*.json';
 const calls: { args: readonly string[]; index?: string }[] = [];
 let deleted: string[] = [ledger, event];
+let probeFailure: Error | null = null;
 const stub = mock.method(childProcess, 'execFileSync', (_git: string, args: readonly string[], options: { env?: NodeJS.ProcessEnv }) => {
   calls.push({ args, index: options.env?.GIT_INDEX_FILE });
+  if (probeFailure) throw probeFailure;
   return deleted.join('\0') + '\0';
 });
 syncBuiltinESMExports();
@@ -46,6 +48,16 @@ try {
   deleted = [ledger];
   assert.equal(inspect({ cwd, taskId: 'writer' }).ok, false, 'omitted commitFiles retains repository-wide protection');
   assert.ok(!calls.at(-1)!.args.includes('--'), 'unbounded inspection remains unbounded');
+  for (const failure of [
+    Object.assign(new Error('exit failure'), { status: 128 }),
+    Object.assign(new Error('killed'), { signal: 'SIGTERM' }),
+    Object.assign(new Error('overflow'), { code: 'ENOBUFS' })
+  ]) {
+    probeFailure = failure;
+    assert.throws(() => inspect({ cwd, taskId: 'writer', commitFiles: [ledger] }),
+      (error: any) => error.code === 'ATM_GIT_PROTECTED_STATE_INSPECTION_FAILED',
+      'an unavailable deletion probe must block the commit');
+  }
 } finally {
   stub.mock.restore();
   syncBuiltinESMExports();

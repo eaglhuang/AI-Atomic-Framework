@@ -1,6 +1,7 @@
 import { execFileSync } from 'node:child_process';
 import { appendFileSync, existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
+import { CliError } from '../shared.ts';
 import { forEachPathspecBatch } from './implementation/pathspec-argv-batching.ts';
 import { hasReconciliationEntitlement } from '../../../../core/src/broker/terminal-history-entitlement.ts';
 
@@ -53,10 +54,14 @@ function listDiffNames(cwd: string, args: readonly string[], env?: NodeJS.Proces
       cwd,
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'pipe'],
+      maxBuffer: 64 * 1024 * 1024,
       env
     }).split('\0').map(normalizeRelativePath).filter(Boolean);
-  } catch {
-    return [];
+  } catch (error) {
+    const failure = error as { status?: number; signal?: string; code?: string };
+    throw new CliError('ATM_GIT_PROTECTED_STATE_INSPECTION_FAILED',
+      'Git could not inspect protected governance deletions; commit remains blocked. Repair the Git failure and retry.',
+      { exitCode: 1, details: { status: failure.status ?? null, signal: failure.signal ?? null, code: failure.code ?? null } });
   } finally {
     if (process.env.ATM_GIT_TIMING === '1') {
       try {
