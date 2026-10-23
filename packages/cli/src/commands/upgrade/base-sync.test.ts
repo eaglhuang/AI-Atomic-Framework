@@ -6,6 +6,7 @@ import path from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { runFrameworkBaseSync } from './base-sync.ts';
+import { runIntegrationHookInvocationInProcess } from '../integration-hooks/implementation.ts';
 
 function fixture() {
   const cwd = mkdtempSync(path.join(os.tmpdir(), 'atm-base-sync-'));
@@ -94,5 +95,21 @@ test('CLI routes base-sync to maintenance authority without a source-edit claim'
     assert.equal(output.ok, true);
     assert.equal(output.evidence.status, 'completed');
     assert.equal(f.git('rev-parse', 'HEAD'), f.to);
+  } finally { f.cleanup(); }
+});
+
+
+test('editor pre-tool permits governed base-sync but keeps raw merges and declared source edits blocked', () => {
+  const f = fixture();
+  try {
+    const command = `node atm.mjs upgrade base-sync --actor test-agent --from ${f.from} --to ${f.to} --json`;
+    const hook = (cmd: string, extra: string[] = []) => runIntegrationHookInvocationInProcess(['pre-tool', '--cwd', f.cwd, '--editor', 'claude-code', '--tool-name', 'Bash', '--command', cmd, ...extra]);
+    assert.equal(hook(command).ok, true);
+    assert.equal(hook(`git merge --ff-only ${f.to}`).messages[0]?.code, 'ATM_RAW_GIT_MUTATION_BLOCKED');
+    assert.equal(hook(command, ['--files', 'packages/core/src/index.ts']).ok, false);
+    assert.equal(hook(`${command} && git merge --ff-only ${f.to}`).ok, false);
+    assert.equal(hook(`echo ${command}`).ok, false);
+    assert.equal(hook(`${command}\nnode -e "process.exit(0)"`).ok, false);
+    assert.equal(f.git('rev-parse', 'HEAD'), f.from);
   } finally { f.cleanup(); }
 });
