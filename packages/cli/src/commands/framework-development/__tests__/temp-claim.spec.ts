@@ -388,14 +388,14 @@ assert.match(claimCommand, /--files "a.ts,b.ts"/);
 }
 
 // Expiry cannot abandon source changes left in the old scope.
-{
+for (const oldPath of ['old.ts', 'old\nname.ts', '檔.ts']) {
   const root = tempRoot();
   initializeGitRoot(root);
   writeLock(root, 'agent-one', {
-    workItemId: 'ATM-FRAMEWORK-TEMP-agent-one', files: ['old.ts'],
+    workItemId: 'ATM-FRAMEWORK-TEMP-agent-one', files: [oldPath],
     heartbeatAt: '2026-06-14T00:00:00.000Z'
   });
-  writeFileSync(path.join(root, 'old.ts'), 'pending work');
+  writeFileSync(path.join(root, oldPath), 'pending work');
   await assert.rejects(() => runFrameworkTempClaim(root, 'agent-one', ['new.ts'], 'resume'),
     (err: any) => err.code === 'ATM_FRAMEWORK_STALE_LOCK_CLEANUP_REQUIRED');
   assert.equal(JSON.parse(readFileSync(path.join(root, '.atm/runtime/locks/ATM-FRAMEWORK-TEMP-agent-one.lock.json'), 'utf8')).heartbeatAt, '2026-06-14T00:00:00.000Z');
