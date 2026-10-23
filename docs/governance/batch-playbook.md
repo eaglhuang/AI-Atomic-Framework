@@ -240,12 +240,18 @@ pretending the work was validated one card at a time. See
 Only for small, low-risk edits (typos, missing comments, trivial follow-ups
 from another card). It is **not** a task-card closure path.
 
+One claim may cover several related files for one fix, within **3 files / 80
+changed lines** total (additions plus deletions). Pass `--files <csv>` to choose
+the scope explicitly, or name the paths in the prompt for inference. Explicit
+files take precedence over prompt paths. Claims reject more than 3 scope paths;
+the commit hook enforces both limits against the staged diff. Use framework-mode
+when the fix exceeds these limits.
+
 ```bash
-node atm.mjs next --claim --actor <id> --prompt "<short description>" --json
+node atm.mjs next --claim --actor <id> --prompt "quickfix related fixtures" --files tests/fixture-a.ts,tests/fixture-b.ts --json
 # Edit ONLY the allowed files returned by ATM
 # Run the smallest relevant validator
-git add <changed files>
-git commit -m "<message>"
+node atm.mjs git commit --actor <id> --message "<message>" --auto-stage --json
 ```
 
 ### Don't
