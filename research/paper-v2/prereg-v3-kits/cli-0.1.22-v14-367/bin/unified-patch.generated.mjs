@@ -1,6 +1,6 @@
 // GENERATED FILE. DO NOT EDIT.
 // Source: packages/core/src/broker/unified-patch.ts (type-stripped by kit/bin/generate-unified-patch.mjs).
-// Regenerate: node research/paper-v2/prereg-v3-smoke/kit/bin/generate-unified-patch.mjs
+// Regenerate: node research/paper-v2/prereg-v3-kits/cli-0.1.22-v14-367/bin/generate-unified-patch.mjs
 // Guarded by kit/test/test-hunk-locator-parity.sh (preflight check hunk-locator-parity).
 
 // ATM-GOV-0355 — real unified-diff application for the neutral steward.
