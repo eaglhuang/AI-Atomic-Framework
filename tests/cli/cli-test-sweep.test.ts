@@ -78,6 +78,28 @@ try {
   assert.equal(resolveSweepConcurrency(8, 2), 4);
   assert.equal(resolveSweepConcurrency(8, 8), 8);
   assert.equal(resolveSweepConcurrency(1, 8), 1);
+  // A descendant inheriting stderr must not hold the sweep open after timeout.
+  const parentPidFile = path.join(poolSignals, 'timeout-parent');
+  const childReady = path.join(poolSignals, 'timeout-child-ready');
+  const descendantCode = `require('node:fs').writeFileSync(${JSON.stringify(childReady)},'ready');setInterval(()=>{},1000);`;
+  const timeoutCode = `import {spawn} from 'node:child_process';import {writeFileSync} from 'node:fs';writeFileSync(${JSON.stringify(parentPidFile)},String(process.pid));spawn(process.execPath,['-e',${JSON.stringify(descendantCode)}],{stdio:'inherit'});setInterval(()=>{},1000);`;
+  writeFileSync(path.join(fixture, 'tests', 'pool-descendant.test.ts'), timeoutCode);
+  git('add', 'tests'); git('commit', '--quiet', '-m', 'timeout process tree fixture');
+  let watchdog: ReturnType<typeof setTimeout> | undefined;
+  try {
+    const timed = await Promise.race([
+      runSweep(fixture, { ...config, concurrency: 1 }, ['pool-descendant.test.ts']),
+      new Promise<never>((_, reject) => { watchdog = setTimeout(() => reject(new Error('descendant held sweep stderr open')), 15000); }),
+    ]);
+    assert.equal(readFileSync(childReady, 'utf8'), 'ready', 'the inheriting descendant actually started');
+    assert.equal(timed[0].timedOut, true, 'the unchanged deadline terminates the whole test group');
+  } finally {
+    if (watchdog) clearTimeout(watchdog);
+    if (process.platform !== 'win32') {
+      try { process.kill(-Number(readFileSync(parentPidFile, 'utf8')), 'SIGKILL'); } catch { /* reaped */ }
+    }
+  }
+
 } finally { rmSync(poolSignals, { recursive: true, force: true }); }
 
 const available = Object.keys(tests);

@@ -97,10 +97,21 @@ function preserveBatchChanges(root: string): void {
   // writer's changes, or an older user stash when creation failed.
 }
 
+function terminateTestTree(child: ReturnType<typeof spawn>): void {
+  if (!child.pid) return;
+  if (process.platform === 'win32') {
+    const killed = spawnSync('taskkill', ['/PID', String(child.pid), '/T', '/F'], { stdio: 'ignore', timeout: 5000 });
+    if (killed.status === 0) return;
+  } else {
+    try { process.kill(-child.pid, 'SIGKILL'); return; } catch { /* child already exited */ }
+  }
+  child.kill('SIGKILL');
+}
+
 function runOne(root: string, testDir: string, test: string, timeoutMs: number, logFile?: string): Promise<Omit<TestResult, 'dirtied'>> {
   return new Promise((resolve) => {
     const started = Date.now();
-    const child = spawn(process.execPath, ['--strip-types', path.join(testDir, test)], { cwd: root, stdio: ['ignore', logFile ? 'pipe' : 'ignore', 'pipe'] });
+    const child = spawn(process.execPath, ['--strip-types', path.join(testDir, test)], { cwd: root, detached: process.platform !== 'win32', stdio: ['ignore', logFile ? 'pipe' : 'ignore', 'pipe'] });
     if (logFile) {
       appendFileSync(logFile, `\n[test] ${test}\n`);
       child.stdout?.on('data', (chunk) => appendFileSync(logFile, chunk));
@@ -109,7 +120,7 @@ function runOne(root: string, testDir: string, test: string, timeoutMs: number, 
     let stderr = '';
     child.stderr!.on('data', (chunk) => { stderr = (stderr + chunk).slice(-4000); });
     let timedOut = false;
-    const timer = setTimeout(() => { timedOut = true; child.kill('SIGKILL'); }, timeoutMs);
+    const timer = setTimeout(() => { timedOut = true; terminateTestTree(child); }, timeoutMs);
     child.on('error', (error) => { stderr += `\n${error.message}`; });
     child.on('close', (code) => {
       clearTimeout(timer);
