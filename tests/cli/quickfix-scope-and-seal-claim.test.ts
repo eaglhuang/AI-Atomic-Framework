@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { runNext } from '../../packages/cli/src/commands/next.ts';
 import { readActiveQuickfixLock } from '../../packages/cli/src/commands/work-channels.ts';
-import { resolveActiveRunnerPublicationTask } from '../../scripts/sealed-runner-publication.ts';
+import { assertSealedRunnerClaimLifetime, resolveActiveRunnerPublicationTask } from '../../scripts/sealed-runner-publication.ts';
 
 const cwd = mkdtempSync(path.join(os.tmpdir(), 'atm-scope-seal-'));
 const git = (...args: string[]) => execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
@@ -33,11 +33,12 @@ if (!process.argv.includes('--scope-only')) {
   git('add', 'packages');
   git('-c', 'core.hooksPath=/dev/null', 'commit', '-qm', 'committed framework source');
   const taskId = 'ATM-FRAMEWORK-TEMP-fixture';
-  const lock = { workItemId: taskId, actorId: 'fixture', heartbeatAt: new Date().toISOString(), ttlSeconds: 14400, files: ['packages/cli/src/fixture.ts'] };
+  const lock = { workItemId: taskId, actorId: 'fixture', heartbeatAt: new Date().toISOString(), ttlSeconds: 1800, files: ['packages/cli/src/fixture.ts'] };
   const lockPath = `.atm/runtime/locks/${taskId}.lock.json`;
   const resolve = (actorId = 'fixture') => resolveActiveRunnerPublicationTask({ cwd, actorId, now: new Date().toISOString() });
   write(lockPath, lock);
   assert.equal(resolve(), taskId);
+  assertSealedRunnerClaimLifetime({ cwd, actorId: 'fixture' });
   assert.throws(() => resolve('other'), /found 0/);
   for (const overrides of [{ status: 'released' }, { heartbeatAt: '2000-01-01T00:00:00Z' }, { laneSessionId: 'foreign-lane' }, { files: ['docs/only.md'] }]) {
     write(lockPath, { ...lock, ...overrides });

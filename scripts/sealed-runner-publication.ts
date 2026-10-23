@@ -408,6 +408,9 @@ export function assertSealedRunnerClaimLifetime(input: {
   let authority: Record<string, unknown>;
   if (taskId.startsWith('ATM-FRAMEWORK-TEMP-')) {
     authority = JSON.parse(readFileSync(path.join(input.cwd, '.atm/runtime/locks', `${taskId}.lock.json`), 'utf8')) as Record<string, unknown>;
+    const files = Array.isArray(authority.files) ? authority.files.map(String) : [];
+    // Source-only refreshes revalidate the live claim again at publication.
+    if (!ownsReleaseSurface(files) && ownsCommittedRunnerInputs(input.cwd, files)) return;
   } else {
     const task = JSON.parse(readFileSync(path.join(input.cwd, '.atm/history/tasks', `${taskId}.json`), 'utf8')) as { claim: Record<string, unknown> };
     authority = task.claim;
