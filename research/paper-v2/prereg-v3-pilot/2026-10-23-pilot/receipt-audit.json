@@ -1,0 +1,72 @@
+{
+  "label": "pilot",
+  "rows": [
+    {
+      "proposalId": "prop-prereg-session-slot-1-a1-c3b6a034e2e3",
+      "sessionSlot": "1",
+      "file": "django/db/migrations/loader.py",
+      "decision": "rejected-by-design",
+      "reasonCode": "patch-malformed",
+      "messageCode": null,
+      "terminal": "blocked",
+      "sessionReceiptMatched": true
+    },
+    {
+      "proposalId": "prop-prereg-session-slot-2-a1-837bc0be2313",
+      "sessionSlot": "2",
+      "file": "django/db/migrations/loader.py",
+      "decision": "rejected-by-design",
+      "reasonCode": "patch-malformed",
+      "messageCode": null,
+      "terminal": "blocked",
+      "sessionReceiptMatched": true
+    },
+    {
+      "proposalId": "prop-prereg-session-slot-1-a1-40a78f0faa5d",
+      "sessionSlot": "1",
+      "file": "django/db/migrations/loader.py",
+      "decision": "accepted",
+      "reasonCode": null,
+      "messageCode": "ATM_BROKER_LIVE_WRITE_APPLIED",
+      "terminal": "committed",
+      "sessionReceiptMatched": true,
+      "matchingCommitCount": 1,
+      "attributedCommit": "5232b86022b746c46679519ed513e273f7efd91a",
+      "acceptedCommitMatchesReceiptHash": true,
+      "acceptedFilePreservedInFinalTree": true
+    },
+    {
+      "proposalId": "prop-prereg-session-slot-2-a1-ed443aebf8f5",
+      "sessionSlot": "2",
+      "file": "django/db/migrations/loader.py",
+      "decision": "rejected-by-design",
+      "reasonCode": "overlapping-write-queued",
+      "messageCode": "ATM_BROKER_LIVE_WRITE_QUEUED",
+      "terminal": "blocked",
+      "sessionReceiptMatched": true
+    },
+    {
+      "proposalId": "prop-prereg-session-slot-2-a1-ca5d8b9fb6c6",
+      "sessionSlot": "2",
+      "file": "django/db/migrations/loader.py",
+      "decision": "rejected-by-design",
+      "reasonCode": "patch-malformed",
+      "messageCode": null,
+      "terminal": "blocked",
+      "sessionReceiptMatched": true
+    },
+    {
+      "proposalId": "prop-prereg-session-slot-2-a2-2bbff2491f04",
+      "sessionSlot": "2",
+      "file": "django/db/migrations/loader.py",
+      "decision": "rejected-by-design",
+      "reasonCode": "cross-session-overlap",
+      "messageCode": "ATM_BROKER_LIVE_WRITE_CROSS_SESSION_OVERLAP",
+      "terminal": "blocked",
+      "sessionReceiptMatched": true
+    }
+  ],
+  "rejectionCount": 5,
+  "kitErrorCount": 0,
+  "note": "Pinned scorer B lostEditCount=1 is the unsubmitted intended test-file hunk from B2. The B2 final message explicitly says the test update was not submitted. All six steward rows concern loader.py. This count is retained unchanged and is not evidence of an accepted write being overwritten."
+}

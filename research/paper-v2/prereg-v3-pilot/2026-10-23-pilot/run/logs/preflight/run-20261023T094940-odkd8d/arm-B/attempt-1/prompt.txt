@@ -1,0 +1,11 @@
+This is a preflight probe, not a software task. Do not mention django or any issue.
+Do not edit the repository yourself. Do not run git commit.
+Write a unified diff to $TMPDIR/note.patch that changes note.txt from the single line old to the single line new.
+Then run this exact command and require exit 0:
+
+  /workspace/AI-Atomic-Framework-rel/research/paper-v2/prereg-v3-smoke/kit/bin/atm-write note.txt $TMPDIR/note.patch
+
+After it succeeds, emit that same diff between these markers:
+BEGIN_INTENDED_PATCH
+diff --git a/note.txt b/note.txt
+END_INTENDED_PATCH

@@ -1,0 +1,7 @@
+This is a preflight probe, not a software task. Do not mention django or any issue.
+Edit note.txt so that its only line is new.
+Then run git add note.txt and git commit so that commit succeeds and HEAD contains that line.
+Then emit the unified diff between these markers:
+BEGIN_INTENDED_PATCH
+diff --git a/note.txt b/note.txt
+END_INTENDED_PATCH

@@ -1,0 +1,86 @@
+{
+  "approvalStatus": "PROPOSED; awaiting explicit user sign-off and frozen condition",
+  "formalRunsStarted": false,
+  "pilotSource": "prereg-v3-pilot/2026-10-23-pilot",
+  "kit": "cli-0.1.22-v13-367",
+  "cli": "0.1.22",
+  "model": "gpt-6-luna",
+  "reasoningEffort": "medium",
+  "modelSeed": null,
+  "scheduleRule": "Fixed, not randomized. Repeat 1 A/B, repeat 2 B/A, repeat 3 A/B. Each repeat has fresh state; sessions 1=13820,2=11141.",
+  "perSessionWallCapSeconds": 1200,
+  "perSessionTokenCap": null,
+  "perSessionToolCallCap": null,
+  "estimates": {
+    "proposed": {
+      "G": 1,
+      "mainGroups": 1,
+      "heldOutGroups": 0,
+      "arms": [
+        "A",
+        "B"
+      ],
+      "k": [
+        2
+      ],
+      "staggerSeconds": [
+        0
+      ],
+      "repetitions": 3,
+      "armRuns": 6,
+      "taskSessions": 12,
+      "estimatedWallSecondsIncludingPreflight": 530.972129,
+      "stageGuardCeilingMinutes": 278,
+      "tokenEstimates": {
+        "input_tokens": 2344138,
+        "output_tokens": 22425,
+        "total_tokens": null,
+        "cached_input_tokens": 2135552,
+        "reasoning_output_tokens": 5274
+      },
+      "planningInputPlusOutputProxy": 2366563,
+      "expectedObservedToolCallsIncludingPreflight": 95,
+      "incrementalPaidModelSpendEstimateUSD": 0,
+      "apiEquivalentDollarEstimate": null,
+      "totalTokenBudgetProxyAllowance": 3000000
+    },
+    "cheaper": {
+      "G": 1,
+      "mainGroups": 1,
+      "heldOutGroups": 0,
+      "arms": [
+        "A",
+        "B"
+      ],
+      "k": [
+        2
+      ],
+      "staggerSeconds": [
+        0
+      ],
+      "repetitions": 1,
+      "armRuns": 2,
+      "taskSessions": 4,
+      "estimatedWallSecondsIncludingPreflight": 313.486747,
+      "stageGuardCeilingMinutes": 112,
+      "tokenEstimates": {
+        "input_tokens": 847734,
+        "output_tokens": 7891,
+        "total_tokens": null,
+        "cached_input_tokens": 769024,
+        "reasoning_output_tokens": 1772
+      },
+      "planningInputPlusOutputProxy": 855625,
+      "expectedObservedToolCallsIncludingPreflight": 35,
+      "incrementalPaidModelSpendEstimateUSD": 0,
+      "apiEquivalentDollarEstimate": null,
+      "totalTokenBudgetProxyAllowance": 1000000
+    }
+  },
+  "limitations": [
+    "One pilot-exposed group; no independent held-out group exists in this unchanged kit.",
+    "Token caps/tool-call caps are not enforced by this kit; proxy allowances are planning thresholds checked after an arm, not hard per-session limits.",
+    "Provider-reported total_tokens remains null; input+output proxy is an explicitly derived planning estimate.",
+    "Three-arm design requires separately approved new kit generation supporting isolated worktrees, integration order and resolution sessions, scorer coverage and preregistration."
+  ]
+}
