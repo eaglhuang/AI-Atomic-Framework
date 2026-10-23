@@ -2,8 +2,8 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { runTasksClaimLifecycle } from '../claim-orchestrator.ts';
-import { readFrameworkTempLockProjection } from '../../framework-development/framework-temp-lock-projection.ts';
+import { runTasksClaimLifecycle } from '../../packages/cli/src/commands/tasks/claim-orchestrator.ts';
+import { readFrameworkTempLockProjection } from '../../packages/cli/src/commands/framework-development/framework-temp-lock-projection.ts';
 
 delete process.env.ATM_LANE_SESSION_ID;
 const cwd = mkdtempSync(path.join(os.tmpdir(), 'atm-temp-renew-'));
