@@ -44,6 +44,7 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
     actor: input.actor,
     promptText,
     quickfixScope,
+    explicitFiles: Boolean(input.claimFiles?.length),
     taskIntent: input.taskIntent,
     importedTaskQueue,
     integrationBootstrap: input.integrationBootstrap,
