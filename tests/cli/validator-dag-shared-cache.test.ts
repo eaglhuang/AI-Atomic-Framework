@@ -5,8 +5,9 @@
 // data-backed demotion/archive decisions instead of adding more blind gates.
 
 import assert from 'node:assert/strict';
+import { randomUUID } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { readFileSync, rmSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -14,19 +15,20 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '.
 const runnerPath = path.join(root, 'scripts', 'run-validators.ts');
 const cacheRoot = path.join(root, '.atm', 'runtime', 'validator-cache');
 
+// Each process owns its cache key; parallel fixtures must not clear each other.
+const cacheNonce = randomUUID();
+
 function runValidators(args: string[]): any {
   const stdout = execFileSync(process.execPath, ['--strip-types', runnerPath, ...args], {
     cwd: root,
     encoding: 'utf8',
     env: {
       ...process.env,
-      ATM_VALIDATOR_DAG_TEST: '1'
+      ATM_VALIDATOR_DAG_TEST: cacheNonce
     }
   });
   return JSON.parse(stdout);
 }
-
-rmSync(cacheRoot, { recursive: true, force: true });
 
 const args = [
   'standard',

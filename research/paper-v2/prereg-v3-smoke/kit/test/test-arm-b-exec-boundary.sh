@@ -39,7 +39,7 @@ fi
 case "${HOME:-}" in
   ""|/tmp|/tmp/*) die "命令列檢查需要一個不在 /tmp 裡的 HOME。" ;;
 esac
-BASE="$(mktemp -d "${HOME}/prereg-exec-boundary.XXXXXX")"
+BASE="$(mktemp -d "${PREREG_TEMP_ROOT:-${HOME}}/prereg-exec-boundary.XXXXXX")"
 REPO="$BASE/repo"
 SCRATCH="$BASE/scratch"
 SESSION="$BASE/session"
@@ -332,7 +332,7 @@ fi
 cmp -s "$PREREG_CODEX_AUTH_FILE" "$CODEX_HOME_A/auth.json"
 cmp -s "$PREREG_CODEX_AUTH_FILE" "$CODEX_HOME_B/auth.json"
 case "$CODEX_HOME_A" in
-  /tmp/prereg-sbx.*/codex-home*) ;;
+  "${TMPDIR:-/tmp}"/prereg-sbx.*/codex-home*) ;;
   *) echo "Arm A CODEX_HOME 不在 /tmp/prereg-sbx.*/codex-home.*：$CODEX_HOME_A" >&2; exit 1 ;;
 esac
 case "$CODEX_HOME_B" in
@@ -350,12 +350,12 @@ saved_home="$PREREG_SESSION_CODEX_HOME"
 saved_root="${PREREG_SESSION_CODEX_ROOT:-}"
 PREREG_SESSION_CODEX_HOME="$CODEX_HOME_A"
 PREREG_SESSION_CODEX_ROOT="$CODEX_ROOT_A"
-session_env_assignments "$ARM_A" "$REPO" | grep -q "CODEX_HOME=${CODEX_HOME_A}"
-session_env_assignments "$ARM_A" "$REPO" | grep -q "XDG_RUNTIME_DIR=${CODEX_HOME_A}/runtime"
+session_env_assignments "$ARM_A" "$REPO" | grep -F "CODEX_HOME=${CODEX_HOME_A}" >/dev/null
+session_env_assignments "$ARM_A" "$REPO" | grep -F "XDG_RUNTIME_DIR=${CODEX_HOME_A}/runtime" >/dev/null
 PREREG_SESSION_CODEX_HOME="$CODEX_HOME_B"
 unset PREREG_SESSION_CODEX_ROOT
-session_env_assignments "$SESSION" "$REPO" | grep -q "CODEX_HOME=${CODEX_HOME_B}"
-session_env_assignments "$SESSION" "$REPO" | grep -q "XDG_RUNTIME_DIR=${CODEX_HOME_B}/runtime"
+session_env_assignments "$SESSION" "$REPO" | grep -F "CODEX_HOME=${CODEX_HOME_B}" >/dev/null
+session_env_assignments "$SESSION" "$REPO" | grep -F "XDG_RUNTIME_DIR=${CODEX_HOME_B}/runtime" >/dev/null
 PREREG_SESSION_CODEX_HOME="$saved_home"
 if [ -n "$saved_root" ]; then
   PREREG_SESSION_CODEX_ROOT="$saved_root"

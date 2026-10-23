@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /**
- * Arm B 寫入只走公開 npm CLI @ai-atomic-framework/cli@0.1.21：
+ * Arm B 寫入只走公開 npm CLI @ai-atomic-framework/cli@0.1.22：
  *   broker steward apply-live
  * 一次只送一筆 proposal，不先算合併計畫，也不等 compose 視窗。
- * CLI 不存在或版本不是 0.1.21 時直接失敗。沒有 claim 退路，也不載入 TypeScript。
+ * CLI 不存在或版本不是 0.1.22 時直接失敗。沒有 claim 退路，也不載入 TypeScript。
  */
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
@@ -25,7 +25,7 @@ import {
 } from './unified-patch.generated.mjs';
 
 const STEWARD_ID = 'neutral-write-steward';
-const CLI_PACKAGE = '@ai-atomic-framework/cli@0.1.21';
+const CLI_PACKAGE = '@ai-atomic-framework/cli@0.1.22';
 
 function fail(code, message, extra = {}) {
   const payload = { ok: false, code, message, ...extra };
@@ -120,7 +120,7 @@ function readJson(file) {
 function loadConfig(cwd) {
   const configPath = path.join(cwd, '.prereg-smoke', 'session-write.json');
   if (!existsSync(configPath)) {
-    fail('cli-unavailable', '缺少 session-write.json。Arm B 必須先確認公開 CLI 0.1.21，沒有 claim 退路。', { configPath });
+    fail('cli-unavailable', '缺少 session-write.json。Arm B 必須先確認公開 CLI 0.1.22，沒有 claim 退路。', { configPath });
   }
   return readJson(configPath);
 }
@@ -131,6 +131,8 @@ function cliVersion(cli, safePath) {
     env: { ...process.env, PATH: safePath }
   });
   const payload = parseCli(result);
+  const identity = payload?.evidence?.runtimeBuildIdentity;
+  if (identity) return identity.status === 'verified' && identity.executionMode === 'npm-package' ? identity.version : '';
   return payload?.evidence?.frameworkVersion || '';
 }
 
@@ -356,7 +358,7 @@ function submitLive(input) {
   const head = gitText(input.writableRoot, ['rev-parse', 'HEAD'], input.safePath);
   if (head.status !== 0) return malformedPatch(input, `無法讀取 HEAD：${head.stderr}`, 'git-head-unavailable', 'kit-error');
   const baseCommit = head.stdout.trim();
-  if (!input.cli || !existsSync(input.cli) || cliVersion(input.cli, input.safePath) !== '0.1.21') {
+  if (!input.cli || !existsSync(input.cli) || cliVersion(input.cli, input.safePath) !== '0.1.22') {
     return malformedPatch(input, `公開 CLI ${CLI_PACKAGE} 不可用`, 'cli-unavailable', 'kit-error');
   }
   const fileBeforeHash = declaredBase.hash;

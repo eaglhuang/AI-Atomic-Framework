@@ -6,7 +6,7 @@ import os
 from pathlib import Path
 import sys
 
-GENERATION = 'metrics-v11-366'
+GENERATION = 'cli-0.1.22-v13-367'
 
 
 def digest(data):
@@ -29,7 +29,7 @@ def create_generation(root):
     target.parent.mkdir(parents=True, exist_ok=True)
     with target.open('x', encoding='utf-8') as stream:
         json.dump({'schema': 'prereg-v3-smoke.kitGeneration.v1', 'generation': GENERATION,
-                   'issue': 366, 'winClaim': False, 'files': files}, stream, indent=2, sort_keys=True)
+                   'issue': 367, 'winClaim': False, 'files': files}, stream, indent=2, sort_keys=True)
         stream.write('\n')
     return target
 

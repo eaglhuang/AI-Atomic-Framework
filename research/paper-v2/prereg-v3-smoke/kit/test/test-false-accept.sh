@@ -14,7 +14,7 @@ import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 
 if (process.argv.includes('--version')) {
-  process.stdout.write(`${JSON.stringify({ evidence: { frameworkVersion: '0.1.21' } })}\n`);
+  process.stdout.write(`${JSON.stringify({ evidence: { frameworkVersion: '0.1.22' } })}\n`);
   process.exit(0);
 }
 const index = process.argv.indexOf('--proposal-file');
@@ -67,7 +67,7 @@ repo, cli = sys.argv[1:]
 payload = {
     "writableRoot": repo,
     "cli": cli,
-    "cliVersion": "0.1.21",
+    "cliVersion": "0.1.22",
     "safePath": "/usr/bin:/bin",
 }
 path = pathlib.Path(repo) / ".prereg-smoke" / "session-write.json"

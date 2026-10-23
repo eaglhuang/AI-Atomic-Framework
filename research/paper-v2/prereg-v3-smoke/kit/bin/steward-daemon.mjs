@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * 以工作樹擁有者的身份聽一個 Unix socket。
- * session 只送 file 與 patch。這個行程再呼叫 atm-write.mjs，由它走公開 CLI 0.1.21 的 apply-live。
+ * session 只送 file 與 patch。這個行程再呼叫 atm-write.mjs，由它走公開 CLI 0.1.22 的 apply-live。
  * 不接受任意指令。
  */
 import { spawn } from 'node:child_process';

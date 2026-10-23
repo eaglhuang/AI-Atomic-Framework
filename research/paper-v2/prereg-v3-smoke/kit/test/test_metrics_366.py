@@ -63,7 +63,7 @@ def test_arm(prior_rejection):
         score = evaluate.score_arm('B', arm, tasks, base)
         assert score['lostEditCount'] == 1, score
         assert score['silentLostEditCount'] == (0 if prior_rejection else 1), score
-        assert score['conflictCount'] >= 1, score
+        assert score['conflictCount'] == 1, score
         loss = score['sessions'][0]['lostEdits'][0]
         assert loss['acceptedProposals'] == ['rec3'] and loss['removedByProposals'] == ['rec5'], loss
         assert loss.get('classified') != 'steward-rejected', loss
@@ -89,7 +89,7 @@ with tempfile.TemporaryDirectory() as tmp:
     root = pathlib.Path(tmp)
     (root / 'source.py').write_text('original')
     create_generation(root)
-    assert verify_generation(root)['id'] == 'metrics-v11-366'
+    assert verify_generation(root)['id'] == 'cli-0.1.22-v13-367'
     try:
         create_generation(root)
         raise AssertionError('generation overwritten')

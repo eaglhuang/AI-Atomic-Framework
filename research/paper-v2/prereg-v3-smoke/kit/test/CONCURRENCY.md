@@ -29,7 +29,7 @@ There are no model calls, downloaded CLI pins, paid keys, or sealed-run writes.
 | Scorer synthetic arms (#366) | Immutable `test_metrics_366.py`: loss=1, silent loss=0/1, conflict≥1, retries=resubmissions=0/1, proposal attribution, null waits, kit-error invalidation. Exact conflict-count tightening is deferred by owner to the next approved kit generation. |
 
 The integration fixture supplies a **test-only source CLI bridge**: the kit's
-version handshake expects protocol `0.1.21`, while every write is executed by
+version handshake expects protocol `0.1.22`, while every write is executed by
 this checkout's `runBroker`. This isolates source regressions without changing
 the pinned runbook or claiming published-CLI parity. All repositories, sockets,
 Git interception and crash signals are temporary. The crash fixture lets the
