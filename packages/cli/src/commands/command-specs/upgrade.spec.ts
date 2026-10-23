@@ -10,10 +10,11 @@ export default defineCommandSpec({
   name: 'upgrade',
   summary: 'Propose upgrade evolution from report evidence inputs or plan safe ATM onboarding upgrades.',
   positional: [
-    { name: 'action', summary: 'plan | apply | rollback | experimental-api (or legacy --propose / --scan)', required: false }
+    { name: 'action', summary: 'base-sync | plan | apply | rollback | experimental-api (or legacy --propose / --scan)', required: false }
   ],
   options: [
     commonCwdOption,
+    { flag: '--actor', value: 'id', summary: 'Required actor for governed framework base-sync.' },
     { flag: '--out', value: 'path', summary: 'Write a safe upgrade plan JSON file.' },
     { flag: '--allow-unknown-chart', summary: 'Allow upgrade plan generation when the local ATMChart version is unknown.' },
     { flag: '--from-plan', value: 'path', summary: 'Apply a previously reviewed safe upgrade plan.' },
@@ -25,8 +26,8 @@ export default defineCommandSpec({
     { flag: '--scan', summary: 'Run the evidence-driven draft bridge from detector reports.' },
     { flag: '--dry-run', summary: 'Generate proposal without mutating persisted artifacts.' },
     { flag: '--atom', value: 'id', summary: 'Target atom id.' },
-    { flag: '--from', value: 'version', summary: 'Source version.' },
-    { flag: '--to', value: 'version', summary: 'Target version.' },
+    { flag: '--from', value: 'version', summary: 'Source version; expected full HEAD SHA for base-sync.' },
+    { flag: '--to', value: 'version', summary: 'Target version; descendant full commit SHA for base-sync.' },
     { flag: '--target', value: 'kind', summary: 'Target kind: atom | map.' },
     { flag: '--map', value: 'id', summary: 'Target map id when target kind is map.' },
     { flag: '--replacement-mode', value: 'mode', summary: 'Requested replacement rollout mode for map proposals: draft | shadow | canary | active | legacy-retired.' },
@@ -52,6 +53,7 @@ export default defineCommandSpec({
     commonHelpOption
   ],
   examples: [
+    'node atm.mjs upgrade base-sync --cwd ../ATM-source --actor grok-bot --from <full-current-SHA> --to <full-target-SHA> --json',
     'node atm.mjs upgrade plan --cwd . --out .atm/history/reports/upgrade-plan.json --json',
     'node atm.mjs upgrade plan --cwd . --allow-unknown-chart --json',
     'node atm.mjs upgrade apply --from-plan .atm/history/reports/upgrade-plan.json --json',
