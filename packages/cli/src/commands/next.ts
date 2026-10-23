@@ -296,7 +296,7 @@ async function runNextRoute(argv: string[]): Promise<NextCommandResult> {
   const claimedQuickfixPrompt = Boolean(
     options.claim
     && taskIntent?.taskScopeMentioned === false
-    && isQuickfixPrompt(unscopedPrompt)
+    && (options.files.length > 0 || isQuickfixPrompt(unscopedPrompt))
     && (options.files.length > 0 || resolveQuickfixScope(unscopedPrompt).length > 0),
   );
   if (taskIntent && taskIntent.taskScopeMentioned === false && !claimedQuickfixPrompt) {
