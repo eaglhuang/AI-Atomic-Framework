@@ -126,6 +126,7 @@ def rewrite_patch_paths(patch_text):
 def hunk_present(final_text, hunk_patch):
     """hunk 的修改後內容就在最終檔裡時，git apply --reverse --check 會過。"""
     with tempfile.TemporaryDirectory() as directory:
+        subprocess.run(["/usr/bin/git", "init", "-q", directory], check=True, capture_output=True)
         target = Path(directory) / "target"
         target.write_text(final_text, encoding="utf-8")
         patch = Path(directory) / "p.diff"
@@ -175,6 +176,7 @@ def split_patch(text):
 
 def apply_to_text(base_text, patch_text):
     with tempfile.TemporaryDirectory() as directory:
+        subprocess.run(["/usr/bin/git", "init", "-q", directory], check=True, capture_output=True)
         target = Path(directory) / "target"
         target.write_text(base_text, encoding="utf-8")
         patch = Path(directory) / "p.diff"

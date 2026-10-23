@@ -56,7 +56,7 @@ static_launchers() {
   grep -q 'evidence_missing' "$HERE/bin/evaluate.py"
   grep -q -- '--verbosity", "2"' "$HERE/bin/evaluate.py"
   grep -q 'broker steward apply-live' "$HERE/bin/atm-write.mjs"
-  grep -q '0.1.21' "$HERE/bin/atm-write.mjs"
+  grep -q '0.1.22' "$HERE/bin/atm-write.mjs"
   if grep -nE 'packages/core/src|shared-compose-inbox' "$HERE/bin/atm-write.mjs"; then
     echo "atm-write 仍直接載入 TypeScript" >&2
     return 1
@@ -87,7 +87,7 @@ static_launchers() {
   grep -q 'prepare_session_codex_home' "$HERE/lib/common.sh"
   grep -q 'release_session_codex_home' "$HERE/lib/common.sh"
   grep -q 'CODEX_HOME=' "$HERE/lib/common.sh"
-  grep -q '/tmp/prereg-sbx' "$HERE/lib/common.sh"
+  grep -q 'prereg-sbx' "$HERE/lib/common.sh"
   grep -q 'prefer-offline' "$HERE/lib/common.sh"
   grep -q 'EAI_AGAIN' "$HERE/lib/common.sh"
   grep -q 'codex-daemon-' "$HERE/lib/sandbox-boundary.sh"

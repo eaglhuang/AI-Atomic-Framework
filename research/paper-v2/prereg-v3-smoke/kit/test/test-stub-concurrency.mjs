@@ -22,12 +22,12 @@ if (process.env.ATM_SUITE_LOCK_HOLDER) {
   const temp = mkdtempSync(path.join(tmpdir(), 'atm367-'));
   const children = new Set();
   try {
-    // The kit pins its CLI protocol to 0.1.21. This TEST-ONLY bridge advertises
+    // The kit pins its CLI protocol to 0.1.22. This TEST-ONLY bridge advertises
     // that protocol while executing this checkout's real runBroker, never a
     // fabricated write result. It does not validate the published npm pin.
     const cli = path.join(temp, 'source-cli.mjs');
     writeFileSync(cli, `import {runBroker} from ${JSON.stringify(source('packages/cli/src/commands/broker.ts'))};
-if(process.argv.includes('--version')) console.log(JSON.stringify({evidence:{frameworkVersion:'0.1.21'}}));
+if(process.argv.includes('--version')) console.log(JSON.stringify({evidence:{frameworkVersion:'0.1.22'}}));
 else console.log(JSON.stringify(await runBroker(process.argv.slice(3).filter(x=>x!=='--json'))));\n`);
     const bin = path.join(temp, 'bin');
     mkdirSync(bin);

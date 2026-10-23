@@ -57,9 +57,12 @@ write_codex_sandbox_profile() {
     echo '[permissions.prereg-session]'
     echo 'extends = ":workspace"'
     echo
-    if [ "$#" -gt 0 ]; then
+    if [ "$#" -gt 0 ] || [ -n "${PREREG_SANDBOX_REPO:-}" ]; then
       echo '[permissions.prereg-session.filesystem]'
       local dir
+      if [ -n "${PREREG_SANDBOX_REPO:-}" ]; then
+        printf '%s = "read"\n' "$(toml_quote "$PREREG_SANDBOX_REPO")"
+      fi
       for dir in "$@"; do
         [ -n "$dir" ] || continue
         printf '%s = "write"\n' "$(toml_quote "$dir")"
@@ -74,7 +77,7 @@ write_codex_sandbox_profile() {
 # Unix socket 路徑含結尾 NUL 不能超過 108。工作樹放在 state 目錄時，socket 不能跟過去。
 allocate_sandbox_scratch() {
   local scratch sample
-  scratch="$(mktemp -d /tmp/prereg-sbx.XXXXXX)"
+  scratch="$(mktemp -d "${TMPDIR:-/tmp}/prereg-sbx.XXXXXX")"
   sample="${scratch}/s.sock"
   if [ "${#sample}" -gt 100 ]; then
     rm -rf "$scratch"
@@ -88,7 +91,7 @@ allocate_sandbox_scratch() {
 release_sandbox_scratch() {
   local scratch="${1:-${PREREG_SANDBOX_SCRATCH:-}}"
   case "$scratch" in
-    /tmp/prereg-sbx.*)
+    "${TMPDIR:-/tmp}"/prereg-sbx.*)
       rm -rf "$scratch"
       ;;
   esac
@@ -277,7 +280,7 @@ run_codex_sandboxed() {
   fi
   local scratch="$PREREG_SANDBOX_SCRATCH"
   local home extras=() status=0
-  home="$(mktemp -d /tmp/prereg-codex-home.XXXXXX)"
+  home="$(mktemp -d "${TMPDIR:-/tmp}/prereg-codex-home.XXXXXX")"
   if [ "${PREREG_SANDBOX_EXTRA_WRITES+x}" = x ]; then
     extras=("${PREREG_SANDBOX_EXTRA_WRITES[@]}")
   fi

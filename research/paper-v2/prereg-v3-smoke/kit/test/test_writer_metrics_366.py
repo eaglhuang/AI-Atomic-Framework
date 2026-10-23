@@ -18,7 +18,7 @@ with tempfile.TemporaryDirectory() as tmp:
                     'commit', '-qm', 'base'], check=True)
     base = subprocess.check_output(['/usr/bin/git', '-C', str(root), 'rev-parse', 'HEAD'], text=True).strip()
     cli = root / 'fake-cli.mjs'
-    cli.write_text("if(process.argv.includes('--version')) console.log(JSON.stringify({evidence:{frameworkVersion:'0.1.21'}})); "
+    cli.write_text("if(process.argv.includes('--version')) console.log(JSON.stringify({evidence:{frameworkVersion:'0.1.22'}})); "
                    "else console.log(JSON.stringify({evidence:{liveWrites:[{decision:'rejected-by-design',reasonCode:'cross-session-overlap'}]}}));")
     smoke = root / '.prereg-smoke'
     smoke.mkdir()

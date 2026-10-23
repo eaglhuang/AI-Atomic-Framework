@@ -93,7 +93,7 @@ prepare_probe_repo() {
   mkdir -p "$repo/.prereg-smoke"
 }
 
-# 與正式 Arm B 相同：公開 CLI 0.1.21 確認之後才寫 session-write.json，沒有 claim 退路。
+# 與正式 Arm B 相同：公開 CLI 0.1.22 確認之後才寫 session-write.json，沒有 claim 退路。
 # unix-user 要等檔案寫完才 own_worktree，session 讀得到設定，但不能寫已追蹤檔。
 prepare_probe_arm_b() {
   local repo="$1"
@@ -166,7 +166,7 @@ run_real_attempt() {
   local arm="$1" mode="$2" attempt="$3"
   local repo session
   if [ "$arm" = "B" ] && { [ "$mode" = "codex-landlock" ] || [ "$mode" = "bwrap-ro" ]; }; then
-    repo="$(mktemp -d "${HOME}/prereg-real.XXXXXX")"
+    repo="$(mktemp -d "${PREREG_TEMP_ROOT:-${HOME}}/prereg-real.XXXXXX")"
   else
     repo="$(mktemp -d)"
   fi

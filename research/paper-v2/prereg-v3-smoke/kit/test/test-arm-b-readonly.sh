@@ -135,7 +135,7 @@ run_sandbox_probe() {
   case "${HOME:-}" in
     ""|/tmp|/tmp/*) die "沙盒探測需要一個不在 /tmp 裡的 HOME。" ;;
   esac
-  SANDBOX_BASE="$(mktemp -d "${HOME}/prereg-nosudo-probe.XXXXXX")"
+  SANDBOX_BASE="$(mktemp -d "${PREREG_TEMP_ROOT:-${HOME}}/prereg-nosudo-probe.XXXXXX")"
   case "$SANDBOX_BASE" in
     /tmp|/tmp/*) die "沙盒探測目錄落在 /tmp，Codex :workspace 會把它當成可寫根。" ;;
   esac

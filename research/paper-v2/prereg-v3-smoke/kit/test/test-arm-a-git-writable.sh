@@ -10,7 +10,7 @@ source "$HERE/lib/common.sh"
 case "${HOME:-}" in
   ""|/tmp|/tmp/*) echo "Arm A git 檢查需要一個不在 /tmp 裡的 HOME。" >&2; exit 1 ;;
 esac
-BASE="$(mktemp -d "${HOME}/prereg-arm-a.XXXXXX")"
+BASE="$(mktemp -d "${PREREG_TEMP_ROOT:-${HOME}}/prereg-arm-a.XXXXXX")"
 cleanup() { chmod -R u+w "$BASE" 2>/dev/null || true; rm -rf "$BASE"; }
 trap cleanup EXIT
 

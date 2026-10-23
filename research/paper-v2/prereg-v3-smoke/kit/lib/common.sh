@@ -3,9 +3,9 @@
 set -euo pipefail
 
 KIT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-PUBLIC_CLI_VERSION="0.1.21"
+PUBLIC_CLI_VERSION="0.1.22"
 PUBLIC_CLI_PACKAGE="@ai-atomic-framework/cli@${PUBLIC_CLI_VERSION}"
-# 安裝位置必須在這個 git workspace 外面，否則 npm 會連到倉庫內的 workspace 套件，而不是 registry 上的 0.1.21。
+# 安裝位置必須在這個 git workspace 外面，否則 npm 會連到倉庫內的 workspace 套件，而不是 registry 上的 0.1.22。
 # Linux 上還必須讓 prereg-steward 讀得到。使用者家目錄通常不可穿越，所以預設放在 /var/cache。
 STEWARD_USER="${PREREG_STEWARD_USER:-prereg-steward}"
 SESSION_USER="${PREREG_SESSION_USER:-prereg-session}"
@@ -117,9 +117,9 @@ default_public_cli_root() {
   if [ -n "${PREREG_ATM_CLI_ROOT:-}" ]; then
     printf '%s\n' "$PREREG_ATM_CLI_ROOT"
   elif linux_sudo_ok; then
-    printf '%s\n' /var/cache/prereg-v3-atm-cli-0.1.21
+    printf '%s\n' /var/cache/prereg-v3-atm-cli-0.1.22
   else
-    printf '%s\n' "${HOME}/.cache/prereg-v3-atm-cli-0.1.21"
+    printf '%s\n' "${HOME}/.cache/prereg-v3-atm-cli-0.1.22"
   fi
 }
 
@@ -132,7 +132,7 @@ cli_is_public_0120() {
   local cli="$1"
   [ -f "$cli" ] || return 1
   local version
-  version="$(node "$cli" --version 2>/dev/null | jq -r '.evidence.frameworkVersion // empty' || true)"
+  version="$(node "$cli" --version 2>/dev/null | jq -r 'if .evidence.runtimeBuildIdentity then (if .evidence.runtimeBuildIdentity.status == "verified" and .evidence.runtimeBuildIdentity.executionMode == "npm-package" then .evidence.runtimeBuildIdentity.version else empty end) else .evidence.frameworkVersion // empty end' || true)"
   [ "$version" = "$PUBLIC_CLI_VERSION" ]
 }
 
@@ -176,7 +176,7 @@ seed_cli_from_local() {
     return 1
   fi
   local candidate cache
-  for candidate in /tmp/atm-cli-0.1.21 "${HOME}/.cache/prereg-v3-atm-cli-0.1.21"; do
+  for candidate in /tmp/atm-cli-0.1.22 "${HOME}/.cache/prereg-v3-atm-cli-0.1.22"; do
     cache="$(cli_cache_path "$candidate")"
     if cli_is_public_0120 "$cache"; then
       mkdir -p "$root"
@@ -187,7 +187,7 @@ seed_cli_from_local() {
   return 1
 }
 
-# 只接受正好是公開 0.1.21 的 CLI。其他版本即使已經裝好也不採用。
+# 只接受正好是公開 0.1.22 的 CLI。其他版本即使已經裝好也不採用。
 find_installed_public_cli() {
   local candidate prefix cache root
   if [ -n "${PREREG_ATM_CLI:-}" ] && cli_is_public_0120 "$PREREG_ATM_CLI"; then
@@ -223,7 +223,7 @@ npm_failure_is_network() {
   grep -Eq 'EAI_AGAIN|ENOTFOUND|ETIMEDOUT|ECONNRESET|ECONNREFUSED|getaddrinfo|network timeout|registry\.npmjs\.org' "$log"
 }
 
-# 先用本機 npm cache（--prefer-offline）。網路失敗就退避重試。成功後仍只接受 0.1.21。
+# 先用本機 npm cache（--prefer-offline）。網路失敗就退避重試。成功後仍只接受 0.1.22。
 install_public_cli_from_npm() {
   local root="$1"
   local log attempt=0 delay
@@ -257,7 +257,7 @@ install_public_cli_from_npm() {
   return 1
 }
 
-# 只接受 npm 上的公開 0.1.21 CLI。倉庫內 frozen runner 與 TypeScript 直接載入都不是這條路徑。
+# 只接受 npm 上的公開 0.1.22 CLI。倉庫內 frozen runner 與 TypeScript 直接載入都不是這條路徑。
 resolve_public_cli() {
   local found root cache
   if found="$(find_installed_public_cli)"; then
@@ -287,7 +287,7 @@ require_public_cli() {
   printf '%s\n' "$cli"
 }
 
-# 正式 Arm B 與真實模型探測共用這一個寫入。先確認公開 CLI 正好是 0.1.21，再寫檔。
+# 正式 Arm B 與真實模型探測共用這一個寫入。先確認公開 CLI 正好是 0.1.22，再寫檔。
 # 確認失敗就中止，沒有 claim 退路。unix-user 必須在 own_worktree 之前呼叫：
 # 之後整棵工作樹屬於 steward，session 讀得到這份設定，但不能寫已追蹤檔。
 write_session_write_config() {
@@ -309,7 +309,7 @@ dest, work, cli, node_bin, boundary = sys.argv[1:]
 payload = {
     "writableRoot": work,
     "cli": cli,
-    "cliVersion": "0.1.21",
+    "cliVersion": "0.1.22",
     "safePath": f"{node_bin}:/usr/bin:/bin",
     "composeWindowMs": 4000,
     "boundary": boundary,
@@ -730,7 +730,7 @@ codex_login_auth_file() {
 codex_home_is_disposable() {
   local home="$1"
   case "$home" in
-    /tmp/prereg-sbx.*/codex-home*) return 0 ;;
+    "${TMPDIR:-/tmp}"/prereg-sbx.*/codex-home*) return 0 ;;
   esac
   if [ -n "${PREREG_SANDBOX_SCRATCH:-}" ]; then
     case "$home" in
@@ -746,7 +746,7 @@ prepare_session_codex_home() {
   if [ -n "${PREREG_SANDBOX_SCRATCH:-}" ] && [ -d "$PREREG_SANDBOX_SCRATCH" ]; then
     root="$PREREG_SANDBOX_SCRATCH"
   else
-    root="$(mktemp -d /tmp/prereg-sbx.XXXXXX)"
+    root="$(mktemp -d "${TMPDIR:-/tmp}/prereg-sbx.XXXXXX")"
     PREREG_SESSION_CODEX_ROOT="$root"
     export PREREG_SESSION_CODEX_ROOT
   fi
@@ -793,7 +793,7 @@ release_session_codex_home() {
     fi
   fi
   case "$root" in
-    /tmp/prereg-sbx.*)
+    "${TMPDIR:-/tmp}"/prereg-sbx.*)
       if [ -d "$root" ]; then
         rm -r -- "$root"
       fi

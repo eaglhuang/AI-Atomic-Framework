@@ -13,7 +13,7 @@ with tempfile.TemporaryDirectory() as tmp:
     subprocess.run(['git','-C',str(repo),'-c','user.name=test','-c','user.email=test@localhost','commit','-qm','base'],check=True)
     patch=root/'change.patch'; patch.write_text('--- a/note.txt\n+++ b/note.txt\n@@ -1 +1 @@\n-old\n+new\n')
     cli=root/'fake-cli.mjs';cli.write_text('''import {readFileSync} from 'node:fs';
-if(process.argv.includes('--version')) { console.log(JSON.stringify({evidence:{frameworkVersion:'0.1.21'}})); }
+if(process.argv.includes('--version')) { console.log(JSON.stringify({evidence:{frameworkVersion:'0.1.22'}})); }
 else {let p=JSON.parse(readFileSync(process.argv[process.argv.indexOf('--proposal-file')+1]));console.log(JSON.stringify({ok:false,messages:[{code:'ATM_BROKER_LIVE_WRITE_BLOCKED'}],evidence:{liveWrites:[{decision:'rejected-by-design',verdict:'blocked',reasonCode:'patch-context-mismatch',currentFileHash:p.fileBeforeHash}]}}));}
 ''')
     (repo/'.prereg-smoke/session-write.json').write_text(json.dumps({'writableRoot':str(repo),'cli':str(cli),'safePath':'/usr/bin:/bin'}))

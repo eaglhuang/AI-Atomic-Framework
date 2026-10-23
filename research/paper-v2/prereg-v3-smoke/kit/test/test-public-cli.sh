@@ -1,5 +1,5 @@
 #!/bin/bash
-# 公開 CLI 必須正好是 0.1.21。先用已安裝的版本與 npm cache，網路失敗要退避重試後中止。
+# 公開 CLI 必須正好是 0.1.22。先用已安裝的版本與 npm cache，網路失敗要退避重試後中止。
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
 # shellcheck disable=SC1091
@@ -15,7 +15,7 @@ BAD="$BASE/bad/atm.mjs"
 mkdir -p "$(dirname "$GOOD")" "$(dirname "$BAD")"
 cat > "$GOOD" <<'EOF'
 if (process.argv.includes("--version")) {
-  process.stdout.write(JSON.stringify({evidence:{frameworkVersion:"0.1.21"}}) + "\n");
+  process.stdout.write(JSON.stringify({evidence:{frameworkVersion:"0.1.2",runtimeBuildIdentity:{status:"verified",executionMode:"npm-package",version:"0.1.22"}}}) + "\n");
 }
 EOF
 cat > "$BAD" <<'EOF'
@@ -32,7 +32,7 @@ if [ "$1" = "prefix" ] && [ "$2" = "-g" ]; then
 fi
 if [ "$1" = "install" ]; then
   printf '%s\n' "$*" | grep -q -- '--prefer-offline' || exit 2
-  printf '%s\n' "$*" | grep -q '@ai-atomic-framework/cli@0.1.21' || exit 2
+  printf '%s\n' "$*" | grep -q '@ai-atomic-framework/cli@0.1.22' || exit 2
   count=0
   if [ -f "${NPM_COUNT:?}" ]; then
     count="$(cat "$NPM_COUNT")"
@@ -87,7 +87,7 @@ run_resolve() {
   printf '%s\n' "$status"
 }
 
-# 全域已經有正好 0.1.21 時，不下載。
+# 全域已經有正好 0.1.22 時，不下載。
 rm -f "$BASE/npm.log" "$BASE/npm.count"
 global_cli="$BASE/global-prefix/lib/node_modules/@ai-atomic-framework/cli/dist/npm-runtime"
 mkdir -p "$global_cli"
@@ -96,7 +96,7 @@ status="$(run_resolve global-hit)"
 [ "$status" = "0" ]
 grep -q "$global_cli/atm.mjs" "$BASE/global-hit.out"
 if grep -q '^install ' "$BASE/npm.log"; then
-  echo "global 0.1.21 still downloaded" >&2
+  echo "global 0.1.22 still downloaded" >&2
   exit 1
 fi
 
@@ -114,13 +114,13 @@ fi
 attempts="$(cat "$BASE/npm.count")"
 [ "$attempts" = "3" ]
 
-# 前兩次 DNS 失敗，第三次用 prefer-offline 裝上 0.1.21。
+# 前兩次 DNS 失敗，第三次用 prefer-offline 裝上 0.1.22。
 rm -f "$BASE/npm.log" "$BASE/npm.count"
 status="$(run_resolve retry NPM_SUCCEED_ON=3)"
 [ "$status" = "0" ]
 installed="$(cat "$BASE/retry.out")"
-version="$(node "$installed" --version | jq -r '.evidence.frameworkVersion')"
-[ "$version" = "0.1.21" ]
+version="$(node "$installed" --version | jq -r '.evidence.runtimeBuildIdentity.version // .evidence.frameworkVersion')"
+[ "$version" = "0.1.22" ]
 [ "$(cat "$BASE/npm.count")" = "3" ]
 grep -q -- '--prefer-offline' "$BASE/npm.log"
 

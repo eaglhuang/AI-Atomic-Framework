@@ -1,6 +1,6 @@
 #!/bin/bash
 # 離線檢查：真實模型探測的 Arm B 倉庫，在每種邊界都有有效的 session-write.json。
-# 不呼叫 Codex。公開 CLI 用回報 0.1.21 的 stub。沒有 0.1.21 時不得寫檔，也沒有 claim 退路。
+# 不呼叫 Codex。公開 CLI 用回報 0.1.22 的 stub。沒有 0.1.22 時不得寫檔，也沒有 claim 退路。
 # unix-user 走 own_worktree：session 讀得到設定，但不能寫已追蹤檔。
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
@@ -23,7 +23,7 @@ STUB_CLI="$BASE/prefix/lib/node_modules/@ai-atomic-framework/cli/dist/npm-runtim
 mkdir -p "$(dirname "$STUB_CLI")"
 cat > "$STUB_CLI" <<'EOF'
 if (process.argv.includes("--version")) {
-  process.stdout.write(JSON.stringify({evidence:{frameworkVersion:"0.1.21"}}) + "\n");
+  process.stdout.write(JSON.stringify({evidence:{frameworkVersion:"0.1.22"}}) + "\n");
 }
 EOF
 
@@ -54,7 +54,7 @@ if payload.get("writableRoot") != repo:
     raise SystemExit(f"writableRoot {payload.get('writableRoot')!r} != {repo!r}")
 if payload.get("cli") != cli:
     raise SystemExit(f"cli {payload.get('cli')!r} != {cli!r}")
-if payload.get("cliVersion") != "0.1.21":
+if payload.get("cliVersion") != "0.1.22":
     raise SystemExit(f"cliVersion {payload.get('cliVersion')!r}")
 if payload.get("boundary") != mode:
     raise SystemExit(f"boundary {payload.get('boundary')!r} != {mode!r}")
@@ -79,7 +79,7 @@ EOF
   set -e
   err="$(cat "$BASE/atm-write.err" 2>/dev/null || true)"
   if [ "$status" -eq 2 ] || printf '%s\n%s\n' "$out" "$err" | grep -q '缺少 session-write.json\|"code":"cli-unavailable"'; then
-    echo "session-write.json 沒有讓 atm-write 通過 0.1.21 檢查 (${mode}, exit ${status})" >&2
+    echo "session-write.json 沒有讓 atm-write 通過 0.1.22 檢查 (${mode}, exit ${status})" >&2
     printf '%s\n' "$out" >&2
     printf '%s\n' "$err" >&2
     exit 1
@@ -99,7 +99,7 @@ assert_unix_user_ownership() {
   esac
   local text
   text="$(as_root -u "$SESSION_USER" -- cat "$config")"
-  printf '%s\n' "$text" | grep -q '"cliVersion": "0.1.21"'
+  printf '%s\n' "$text" | grep -q '"cliVersion": "0.1.22"'
   printf '%s\n' "$text" | grep -q '"boundary": "unix-user"'
   set +e
   as_root -u "$SESSION_USER" -- bash -c 'printf leaked >> "$1"' bash "$repo/note.txt" \
@@ -144,7 +144,7 @@ set +e
 bad_status=$?
 set -e
 if [ "$bad_status" -eq 0 ]; then
-  echo "沒有 0.1.21 時仍然寫入了探測設定" >&2
+  echo "沒有 0.1.22 時仍然寫入了探測設定" >&2
   exit 1
 fi
 if [ -f "$bad_repo/.prereg-smoke/session-write.json" ]; then
