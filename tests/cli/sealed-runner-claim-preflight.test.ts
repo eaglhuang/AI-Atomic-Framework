@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { assertSealedRunnerClaimLifetime, MIN_PUBLICATION_CLAIM_REMAINING_SECONDS } from '../../scripts/sealed-runner-publication.ts';
+import { assertSealedRunnerClaimLifetime, MIN_PUBLICATION_CLAIM_REMAINING_SECONDS, resolveActiveRunnerPublicationTask } from '../../scripts/sealed-runner-publication.ts';
 
 mkdirSync('.atm-temp', { recursive: true });
 const cwd = mkdtempSync(path.resolve('.atm-temp/claim-preflight-'));
@@ -31,6 +31,29 @@ check();
 // Concurrent ownership change remains authoritative, never renewed implicitly.
 claim(14400, 'other-session');
 assert.throws(() => check(1800), /found 0/);
+// Fixed-TTL temporary release claims use live authority at both boundaries.
+const tempTaskId = `ATM-FRAMEWORK-TEMP-${actorId}`;
+const lockPath = path.join(cwd, '.atm/runtime/locks', `${tempTaskId}.lock.json`);
+mkdirSync(path.dirname(lockPath), { recursive: true });
+function tempClaim(extras: Record<string, unknown> = {}): void {
+  writeFileSync(lockPath, JSON.stringify({ workItemId: tempTaskId, actorId,
+    lockedAt: new Date(start).toISOString(), ttlSeconds: 1800,
+    files: ['release/atm-onefile/**'], ...extras }));
+}
+function tempCheck(elapsedSeconds = 0): void {
+  assertSealedRunnerClaimLifetime({ cwd, actorId, taskId: tempTaskId,
+    now: new Date(start + elapsedSeconds * 1000).toISOString() });
+}
+tempClaim();
+tempCheck();
+tempCheck(1799);
+assert.throws(() => tempCheck(1801), /found 0.*framework-mode status --json/);
+assert.throws(() => resolveActiveRunnerPublicationTask({ cwd, actorId, taskId: tempTaskId,
+  now: new Date(start + 1801 * 1000).toISOString() }), /found 0/);
+for (const invalid of [{ actorId: 'other-session' }, { status: 'released' }, { files: ['unrelated.txt'] }]) {
+  tempClaim(invalid);
+  assert.throws(() => tempCheck(), /found 0/);
+}
 const build = readFileSync('scripts/run-sealed-runner-build.ts', 'utf8');
 assert.ok(build.indexOf('assertSealedRunnerClaimLifetime({') < build.indexOf('const preBuildPublicationSnapshots ='));
 assert.ok(build.indexOf('assertSealedRunnerClaimLifetime({') < build.indexOf("timePhase(timings, 'inputHashCalculationMs'", build.indexOf('function runSealedBuild')));
