@@ -1,0 +1,51 @@
+============================= test session starts ==============================
+platform linux -- Python 3.8.20, pytest-6.2.5, py-1.11.0, pluggy-1.5.0 -- /workspace/AI-Atomic-Framework-rel/n0/sympy-validation-venv/bin/python
+cachedir: .pytest_cache
+architecture: 64-bit
+cache:        yes
+ground types: python 
+
+rootdir: /workspace/AI-Atomic-Framework-rel/n0/sympy-validation/sympy__sympy-15345/sympy__sympy-15345/work
+collecting ... collected 10 items
+
+sympy/printing/tests/test_mathematica.py::test_Integer PASSED            [ 10%]
+sympy/printing/tests/test_mathematica.py::test_Rational PASSED           [ 20%]
+sympy/printing/tests/test_mathematica.py::test_Function FAILED           [ 30%]
+sympy/printing/tests/test_mathematica.py::test_Pow PASSED                [ 40%]
+sympy/printing/tests/test_mathematica.py::test_Mul PASSED                [ 50%]
+sympy/printing/tests/test_mathematica.py::test_constants PASSED          [ 60%]
+sympy/printing/tests/test_mathematica.py::test_containers PASSED         [ 70%]
+sympy/printing/tests/test_mathematica.py::test_Integral PASSED           [ 80%]
+sympy/printing/tests/test_mathematica.py::test_Derivative PASSED         [ 90%]
+sympy/printing/tests/test_mathematica.py::test_Sum PASSED                [100%]
+
+=================================== FAILURES ===================================
+________________________________ test_Function _________________________________
+sympy/printing/tests/test_mathematica.py:31: in test_Function
+    assert mcode(Max(x,y,z)*Min(y,z)) == "Max[x, y, z]*Min[y, z]"
+E   AssertionError: assert 'Max(x, y, z)*Min(y, z)' == 'Max[x, y, z]*Min[y, z]'
+E     - Max[x, y, z]*Min[y, z]
+E     ?    ^       ^    ^    ^
+E     + Max(x, y, z)*Min(y, z)
+E     ?    ^       ^    ^    ^
+=============================== warnings summary ===============================
+sympy/solvers/diophantine.py:3188
+  /workspace/AI-Atomic-Framework-rel/n0/sympy-validation/sympy__sympy-15345/sympy__sympy-15345/work/sympy/solvers/diophantine.py:3188: SyntaxWarning: "is" with a literal. Did you mean "=="?
+    if feasible is 1:  # it's prime and k == 2
+
+-- Docs: https://docs.pytest.org/en/stable/warnings.html
+==================================== PASSES ====================================
+- generated xml file: /workspace/AI-Atomic-Framework-rel/n0/sympy-validation/sympy__sympy-15345/sympy__sympy-15345/baseline.xml -
+                                DO *NOT* COMMIT!                                
+=========================== short test summary info ============================
+PASSED sympy/printing/tests/test_mathematica.py::test_Integer
+PASSED sympy/printing/tests/test_mathematica.py::test_Rational
+PASSED sympy/printing/tests/test_mathematica.py::test_Pow
+PASSED sympy/printing/tests/test_mathematica.py::test_Mul
+PASSED sympy/printing/tests/test_mathematica.py::test_constants
+PASSED sympy/printing/tests/test_mathematica.py::test_containers
+PASSED sympy/printing/tests/test_mathematica.py::test_Integral
+PASSED sympy/printing/tests/test_mathematica.py::test_Derivative
+PASSED sympy/printing/tests/test_mathematica.py::test_Sum
+FAILED sympy/printing/tests/test_mathematica.py::test_Function - AssertionErr...
+==================== 1 failed, 9 passed, 1 warning in 0.06s ====================

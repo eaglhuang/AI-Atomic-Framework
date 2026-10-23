@@ -1,0 +1,7 @@
+# Six-pair eligibility generation
+
+Automated eligibility only; no model outcomes or formal runs. Four main pairs and two held-out pairs, with twelve distinct instance IDs. Original task text and patches retained. The pilot-exposed Django migrations pair is forced main; among unexposed eligible selected pairs, the last two by the preregistered split hash are held out. Selection includes four runnable Django pairs and two instance-disjoint SymPy pairs (23950/24066 and 15345/15349); all screened applicability failures are retained compressed. This is an eligibility inventory, not a claim about the full dataset distribution.
+
+Every required fail-to-pass test fails before its original gold patch and passes afterward; required pass-to-pass tests pass both phases. Original 11141 test patch uses the previously audited common-base rebase. Python 3.10.22 for Django; Python 3.8.20, pytest 6.2.5 and mpmath 1.2.1 for SymPy. Dependencies and runner commands are recorded in eligibility logs. No model sessions on held-out groups. Combined-gold compatibility remains a launcher preflight requirement.
+
+Upstream source licenses are copied under licenses/. SWE-bench data contains upstream-derived issue/patch material; retain its upstream notices and dataset provenance. Missing model token/tool/cost observations are null (no model usage was requested). CLI pin remains 0.1.22; this inventory does not depend on 0.1.23.
