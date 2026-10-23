@@ -1,0 +1,286 @@
+{
+  "label": "pilot",
+  "formalEvidence": false,
+  "winClaim": false,
+  "generation": "2026-10-23-pilot",
+  "kitGeneration": {
+    "id": "cli-0.1.22-v13-367",
+    "manifestHash": "sha256:bb675b8a043df576bd3e021dab15c57609ba774e89b4fd905f1448f5ffbbdefa"
+  },
+  "pairedScorerStatus": "blocked",
+  "armRuns": 2,
+  "sessions": [
+    {
+      "arm": "A",
+      "slot": 1,
+      "instanceId": "django__django-13820",
+      "startedAt": "2026-10-23T17:53:21,602362719+08:00",
+      "endedAt": "2026-10-23T17:53:42,363939186+08:00",
+      "wallSeconds": 20.761577,
+      "exitCode": 0,
+      "capReached": false,
+      "tokens": {
+        "input_tokens": 123632,
+        "output_tokens": 1113,
+        "total_tokens": null,
+        "cached_input_tokens": 111104,
+        "reasoning_output_tokens": 319,
+        "events": 1
+      },
+      "observedToolCalls": 6,
+      "observedToolCallsByType": {
+        "command_execution": 5,
+        "file_change": 1
+      },
+      "toolCallObservationComplete": true,
+      "malformedJsonLines": 0,
+      "terminalTurnEvents": 1
+    },
+    {
+      "arm": "A",
+      "slot": 2,
+      "instanceId": "django__django-11141",
+      "startedAt": "2026-10-23T17:53:21,604722553+08:00",
+      "endedAt": "2026-10-23T17:53:54,258112882+08:00",
+      "wallSeconds": 32.65339,
+      "exitCode": 0,
+      "capReached": false,
+      "tokens": {
+        "input_tokens": 232929,
+        "output_tokens": 1958,
+        "total_tokens": null,
+        "cached_input_tokens": 214400,
+        "reasoning_output_tokens": 291,
+        "events": 1
+      },
+      "observedToolCalls": 8,
+      "observedToolCallsByType": {
+        "command_execution": 7,
+        "file_change": 1
+      },
+      "toolCallObservationComplete": true,
+      "malformedJsonLines": 0,
+      "terminalTurnEvents": 1
+    },
+    {
+      "arm": "B",
+      "slot": 1,
+      "instanceId": "django__django-13820",
+      "startedAt": "2026-10-23T17:53:57,212359546+08:00",
+      "endedAt": "2026-10-23T17:54:23,348168573+08:00",
+      "wallSeconds": 26.135809,
+      "exitCode": 0,
+      "capReached": false,
+      "tokens": {
+        "input_tokens": 144824,
+        "output_tokens": 1554,
+        "total_tokens": null,
+        "cached_input_tokens": 130176,
+        "reasoning_output_tokens": 576,
+        "events": 1
+      },
+      "observedToolCalls": 6,
+      "observedToolCallsByType": {
+        "command_execution": 6
+      },
+      "toolCallObservationComplete": true,
+      "malformedJsonLines": 0,
+      "terminalTurnEvents": 1
+    },
+    {
+      "arm": "B",
+      "slot": 2,
+      "instanceId": "django__django-11141",
+      "startedAt": "2026-10-23T17:53:57,218653488+08:00",
+      "endedAt": "2026-10-23T17:54:33,195614948+08:00",
+      "wallSeconds": 35.976961,
+      "exitCode": 0,
+      "capReached": false,
+      "tokens": {
+        "input_tokens": 246817,
+        "output_tokens": 2642,
+        "total_tokens": null,
+        "cached_input_tokens": 227584,
+        "reasoning_output_tokens": 565,
+        "events": 1
+      },
+      "observedToolCalls": 10,
+      "observedToolCallsByType": {
+        "command_execution": 10
+      },
+      "toolCallObservationComplete": true,
+      "malformedJsonLines": 0,
+      "terminalTurnEvents": 1
+    }
+  ],
+  "arms": [
+    {
+      "arm": "A",
+      "status": "ok",
+      "validity": "VALID",
+      "wallSeconds": 33.418559,
+      "observedKitErrorCount": 0,
+      "lostEditCount": 1,
+      "silentLostEditCount": 1,
+      "conflictCount": 0,
+      "stewardRejected": 0,
+      "stewardReasonCodes": [],
+      "tests": [
+        {
+          "instanceId": "django__django-13820",
+          "passed": 23,
+          "failed": 2,
+          "kitError": null,
+          "failToPass": {
+            "denominator": 1,
+            "passed": 1,
+            "failed": 0,
+            "notSeen": 0
+          },
+          "passToPass": {
+            "denominator": 24,
+            "passed": 22,
+            "failed": 2,
+            "notSeen": 0
+          }
+        },
+        {
+          "instanceId": "django__django-11141",
+          "passed": 24,
+          "failed": 1,
+          "kitError": null,
+          "failToPass": {
+            "denominator": 1,
+            "passed": 1,
+            "failed": 0,
+            "notSeen": 0
+          },
+          "passToPass": {
+            "denominator": 24,
+            "passed": 23,
+            "failed": 1,
+            "notSeen": 0
+          }
+        }
+      ]
+    },
+    {
+      "arm": "B",
+      "status": "blocked",
+      "validity": "VALID",
+      "wallSeconds": 39.045325,
+      "observedKitErrorCount": 0,
+      "lostEditCount": 1,
+      "silentLostEditCount": 0,
+      "conflictCount": 2,
+      "stewardRejected": 5,
+      "stewardReasonCodes": [
+        "patch-malformed",
+        "patch-malformed",
+        null,
+        "overlapping-write-queued",
+        "patch-malformed",
+        "cross-session-overlap"
+      ],
+      "tests": [
+        {
+          "instanceId": "django__django-13820",
+          "passed": 25,
+          "failed": 0,
+          "kitError": null,
+          "failToPass": {
+            "denominator": 1,
+            "passed": 1,
+            "failed": 0,
+            "notSeen": 0
+          },
+          "passToPass": {
+            "denominator": 24,
+            "passed": 24,
+            "failed": 0,
+            "notSeen": 0
+          }
+        },
+        {
+          "instanceId": "django__django-11141",
+          "passed": 24,
+          "failed": 1,
+          "kitError": null,
+          "failToPass": {
+            "denominator": 1,
+            "passed": 0,
+            "failed": 1,
+            "notSeen": 0
+          },
+          "passToPass": {
+            "denominator": 24,
+            "passed": 24,
+            "failed": 0,
+            "notSeen": 0
+          }
+        }
+      ]
+    }
+  ],
+  "validArmRuns": 2,
+  "invalidArmRuns": 0,
+  "kitErrorArmRate": 0.0,
+  "observedKitErrorCount": 0,
+  "measuredTokenAggregates": {
+    "input_tokens": 748202,
+    "output_tokens": 7267,
+    "total_tokens": null,
+    "cached_input_tokens": 683264,
+    "reasoning_output_tokens": 1751
+  },
+  "preflightSessions": [
+    {
+      "path": "run/logs/preflight/run-20261023T094940-odkd8d/arm-A/attempt-1/stdout.jsonl",
+      "wallSeconds": 12.971148,
+      "tokens": {
+        "input_tokens": 71197,
+        "output_tokens": 362,
+        "total_tokens": null,
+        "cached_input_tokens": 64896,
+        "reasoning_output_tokens": 21
+      },
+      "observedToolCalls": 4
+    },
+    {
+      "path": "run/logs/preflight/run-20261023T094940-odkd8d/arm-B/attempt-1/stdout.jsonl",
+      "wallSeconds": 7.516085,
+      "tokens": {
+        "input_tokens": 28335,
+        "output_tokens": 262,
+        "total_tokens": null,
+        "cached_input_tokens": 20864,
+        "reasoning_output_tokens": 0
+      },
+      "observedToolCalls": 1
+    }
+  ],
+  "preflightTokenAggregates": {
+    "input_tokens": 99532,
+    "output_tokens": 624,
+    "total_tokens": null,
+    "cached_input_tokens": 85760,
+    "reasoning_output_tokens": 21
+  },
+  "pilotIncludingPreflightTokenAggregates": {
+    "input_tokens": 847734,
+    "output_tokens": 7891,
+    "total_tokens": null,
+    "cached_input_tokens": 769024,
+    "reasoning_output_tokens": 1772
+  },
+  "observedToolCalls": 30,
+  "pairedArmWallSeconds": 72.46388400000001,
+  "measurementNotes": [
+    "Token values are copied from the unchanged pinned scorer. Missing totals remain null; input/output are not relabelled as reported total_tokens.",
+    "Tool calls count unique Codex JSONL item IDs of command_execution, file_change, mcp_tool_call, web_search or tool_call; started/completed pairs count once. Shell subcommands are not separate calls.",
+    "Tool counts are observed lower bounds if the stream is incomplete; completeness is reported per session.",
+    "Wall time is launcher started-at to ended-at, including command startup and CLI latency. Arm wall time includes setup/cleanup within that launcher.",
+    "Preflight probes and offline stub checks are excluded from the two task arm runs and four task sessions.",
+    "Kit-error arm rate is affected task arm runs divided by attempted task arm runs, not a population estimate."
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "label": "pilot",
+  "formalEvidence": false,
+  "winClaim": false,
+  "ownerDecision": "2026-10-23 17:46 Asia/Taipei",
+  "generation": "2026-10-23-pilot",
+  "kit": "cli-0.1.22-v13-367",
+  "cli": "0.1.22",
+  "model": "gpt-6-luna",
+  "effort": "medium",
+  "codex": "0.163.0",
+  "boundary": "unix-user",
+  "taskGroups": 1,
+  "taskIds": [
+    "django__django-13820",
+    "django__django-11141"
+  ],
+  "k": 2,
+  "staggerSeconds": 0,
+  "repetitions": 1,
+  "armOrder": [
+    "A",
+    "B"
+  ],
+  "armRunCount": 2,
+  "sessionCount": 4,
+  "modelSeed": null,
+  "order": "fixed A then B; session 1=13820, session 2=11141",
+  "perSessionWallCapSeconds": 1200,
+  "tokenCap": null,
+  "toolCallCap": null,
+  "cleanupRoot": "/workspace/AI-Atomic-Framework-rel/p0",
+  "overlapCondition": "none",
+  "quotaPolicy": "stop; no paid fallback",
+  "invalidityRule": "any kit-error makes the affected arm run INVALID; paired pilot INVALID if any arm INVALID",
+  "scopeReduction": "Owner approved one runnable pairing, k=2, A once B once. No second group or k=4.",
+  "earlierOfflineScratchRoots": [
+    "/workspace/AI-Atomic-Framework-rel/p367.j0qn98m8",
+    "/workspace/AI-Atomic-Framework-rel/p.7ytctxor"
+  ],
+  "offlinePreflightStop": "Attempt 1 stopped before model calls: clone-local Unix socket path 105 >100. Retry uses fresh shorter clone-local scratch, no kit changes."
+}

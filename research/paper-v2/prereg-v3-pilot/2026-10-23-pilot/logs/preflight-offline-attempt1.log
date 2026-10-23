@@ -1,0 +1,53 @@
+== static
+ok static
+== parser
+parser fixture ok
+ok parser
+== v4-regressions
+v4 regressions ok
+ok v4-regressions
+== v5-regressions
+v5 regressions ok
+ok v5-regressions
+== evidence
+evidence_missing ok
+ok evidence
+== seal-secrets
+sealed /workspace/AI-Atomic-Framework-rel/p367.j0qn98m8/t/tmp.NoZAqp4iXD/sealed-clean
+row: | `prereg-v3-smoke/sealed-clean/` | smoke / exploratory, not results | no win claim | mode=fixture; model=unrecorded; base=abc123 |
+seal allowlist and secret scan ok
+ok seal-secrets
+== public-cli
+public cli selection ok
+ok public-cli
+== fail-fast
+preflight fail-fast ok
+ok fail-fast
+== reasoning-effort
+results.json reasoningEffort ok
+reasoning effort ok
+ok reasoning-effort
+== no-rm
+no-rm state ok
+ok no-rm
+== gold
+gold isolation ok
+ok gold
+== atm-write-path
+atm-write path ok
+ok atm-write-path
+== readonly-steward
+blocked direct-write (exit 1)
+blocked chmod (exit 1)
+blocked rename (exit 1)
+blocked rm (exit 1)
+blocked sudo (exit 1)
+blocked mv-agents (exit 1)
+{"schema":"prereg-v3-smoke.stewardWrite.v1","ok":true,"decision":"accepted","reasonCode":null,"messageCode":"ATM_BROKER_LIVE_WRITE_APPLIED","verdict":"applied","phase":"commit","terminal":"committed","stopReason":null,"proposalId":"prop-session-b-a1-5341c925595c","taskId":"fixture-b","actorId":"session-b","sessionSlot":null,"file":"shared.py","declaredBaseHash":"sha256:4fdbc441ea7b546100e086ac1e4fc5ae6749b7314311c99db05be450eca12996","hunkOffsets":[{"declaredOldStart":2,"appliedOldStart":2,"offset":0}],"crossSessionOverlap":null,"acknowledgedOverlap":null,"currentFileText":"alpha\nbeta-one\ngamma\n","currentFileHash":"sha256:e2b2cefcdb151e53eed2a74e62406191a63d332968eed686c4ebec90d1d25ff5","batchSize":1,"attempt":1,"retryCount":0,"intentSpans":[[2,2]],"patchHash":"sha256:74d9f8da2139e609351bce144766dc17dcbc3d833c6ac5f557c63c62ff8572be","hashDriftCount":null,"writeToCommitMs":256,"commit":{"gitIndexLockWaitMs":null,"headMoves":null},"planRequired":false,"cli":"@ai-atomic-framework/cli@0.1.22","entry":"broker steward apply-live"}
+blocked direct-write-after (exit 1)
+blocked chmod-after (exit 1)
+unix-user boundary verified on Debian GNU/Linux 13 (trixie) Linux 6.12.94+ x86_64
+unprivileged mechanism=codex-landlock
+prereg-v3-smoke: steward socket 路徑長度 105 超過 Unix 上限：/workspace/AI-Atomic-Framework-rel/p367.j0qn98m8/t/prereg-nosudo-probe.by6dl4/scratch/s2596892-25171.sock
+FAIL readonly-steward
+preflight failed

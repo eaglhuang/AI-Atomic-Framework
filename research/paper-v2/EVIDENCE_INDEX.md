@@ -742,3 +742,9 @@ pilot、主跑、留出集實驗仍不在這次範圍。dev 題沒有 B′ 與 D
 | `prereg-v3-smoke/2026-10-19-codex-v10c/` | smoke / exploratory, not results — blocked (arm B) | no win claim | mode=django; model=gpt-6-luna; base=98ad327864aed8df245fd19ea9d2743279e11643 |
 | `prereg-v3-smoke/2026-10-23-codex-v12-367/` | INVALID / evidence_missing — Arm B session-1 header-only intended diff was discarded by capture | no win claim | CLI=0.1.22; kit=cli-0.1.22-v12f-367; raw exit codes A/B=0; Arm A real baseline overwrite; Arm B accepted-removal audit #398; see 2026-10-23-codex-v12-367-FORENSICS.md |
 | `prereg-v3-smoke/2026-10-23-codex-v13-367/` | smoke / exploratory, not results | no win claim | mode=django; model=gpt-6-luna; base=98ad327864aed8df245fd19ea9d2743279e11643  CLI=0.1.22; kit=cli-0.1.22-v13-367; valid pipeline, zero kit-errors; B model reports loader blocked; see v13 SUMMARY; #398 unresolved |
+
+## prereg-v3 pilot (2026-10-23)
+
+| Generation | Status | Pins | Checksums | Sessions | Measurements |
+| --- | --- | --- | --- | --- | --- |
+| `prereg-v3-pilot/2026-10-23-pilot/` | **pilot — 2 VALID arm runs, 0 INVALID; A ok / B blocked; not formal evidence** | CLI 0.1.22; kit `cli-0.1.22-v13-367` | see generation SHA256SUMS | 4 task sessions | A/B lost=1/1, silent=1/0; B rejected=5; kit-errors=0/2 arms; input=748202, output=7267, reported total=null; B loss includes an unsubmitted intended test hunk; [VERDICT](./prereg-v3-pilot/2026-10-23-pilot/VERDICT.md); no win claim |
