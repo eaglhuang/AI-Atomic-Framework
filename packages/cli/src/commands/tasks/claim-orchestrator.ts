@@ -407,7 +407,6 @@ export async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'releas
       }
     });
   }
-
   if (action === 'handoff') {
     if (!options.handoffTo) {
       throw new CliError('ATM_CLI_USAGE', 'tasks handoff requires --to <actor-id>.', { exitCode: 2 });
