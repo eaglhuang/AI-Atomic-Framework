@@ -367,3 +367,36 @@ assert.match(claimCommand, /--files "a.ts,b.ts"/);
   assert.equal((refreshed.taskDirectionLock as { taskId?: string }).taskId, 'TASK-PROJECTION', 'same-owner lock refresh must retain embedded task-direction authority');
   assert.deepEqual(refreshed.files, ['y.ts'], 'the short-lived scope projection may refresh without replacing canonical direction authority');
 }
+
+// Explicit same-actor reclaim can retire an expired, unlinked, clean scope.
+{
+  const root = tempRoot();
+  initializeGitRoot(root);
+  writeLock(root, 'agent-one', {
+    workItemId: 'ATM-FRAMEWORK-TEMP-agent-one', files: ['old.ts'],
+    heartbeatAt: '2026-06-14T00:00:00.000Z'
+  });
+  const result = await runFrameworkTempClaim(root, 'agent-one', ['new.ts'], 'resume expired maintenance');
+  assert.equal(result.ok, true);
+  const receipt = (result.evidence as any).autoReconcile;
+  assert.equal(receipt.staleLock.kind, 'stale-ttl-expired');
+  assert.equal(receipt.outcome, 'reclaimed');
+  assert.equal(receipt.actorId, 'agent-one');
+  const persisted = JSON.parse(readFileSync(path.join(root, receipt.auditPath), 'utf8').trim());
+  assert.equal(persisted.reclaimTaskId, 'ATM-FRAMEWORK-TEMP-agent-one');
+  assert.deepEqual(persisted.scopedFiles, ['new.ts']);
+}
+
+// Expiry cannot abandon source changes left in the old scope.
+{
+  const root = tempRoot();
+  initializeGitRoot(root);
+  writeLock(root, 'agent-one', {
+    workItemId: 'ATM-FRAMEWORK-TEMP-agent-one', files: ['old.ts'],
+    heartbeatAt: '2026-06-14T00:00:00.000Z'
+  });
+  writeFileSync(path.join(root, 'old.ts'), 'pending work');
+  await assert.rejects(() => runFrameworkTempClaim(root, 'agent-one', ['new.ts'], 'resume'),
+    (err: any) => err.code === 'ATM_FRAMEWORK_STALE_LOCK_CLEANUP_REQUIRED');
+  assert.equal(JSON.parse(readFileSync(path.join(root, '.atm/runtime/locks/ATM-FRAMEWORK-TEMP-agent-one.lock.json'), 'utf8')).heartbeatAt, '2026-06-14T00:00:00.000Z');
+}
