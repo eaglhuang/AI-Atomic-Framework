@@ -262,6 +262,22 @@ node atm.mjs git commit --actor <id> --message "<message>" --auto-stage --json
 
 ---
 
+## Governed framework source base update
+
+Agents updating a vendored ATM source checkout may use the maintenance entry
+`node atm.mjs upgrade base-sync --cwd /path/to/ATM-source --actor grok-bot --from <full-current-SHA> --to <full-target-SHA> --json`.
+Run a runner containing this command (an older checkout can use an updated runner
+by absolute path). This entry authorizes importing existing commits without a
+source-edit claim or task card. It requires a framework source repository root,
+a clean index/worktree (including untracked files), HEAD equal to `--from`, and
+`--to` a strict descendant commit. Fetch the target beforehand. It runs only
+`git merge --ff-only` against the pinned SHA; divergent, dirty, missing-object,
+and wrong-base requests fail without forcing or resetting. It records actor,
+from/to, and pending/completed/failed status in the target's Git metadata at
+`git rev-parse --git-path atm-base-sync`. Keep exclusive access to the checkout
+during the operation. The receipt path is returned in JSON; no source commit is
+created. This authority does not permit editing framework source.
+
 ## Cross-channel principles
 
 ### Evidence is command-backed
