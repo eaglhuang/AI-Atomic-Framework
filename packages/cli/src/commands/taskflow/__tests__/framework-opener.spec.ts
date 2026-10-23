@@ -124,6 +124,23 @@ assert.equal(explicitFallback.evidence.hostPolicyDecision.sources.outputPath, 'e
 assert.ok(readFileSync(path.join(explicitFallbackFixture.targetRepo, 'docs/tasks/TASK-FALLBACK-0001.task.md'), 'utf8').includes('TASK-FALLBACK-0001'));
 assert.ok(readFileSync(path.join(explicitFallbackFixture.targetRepo, '.atm/history/tasks/TASK-FALLBACK-0001.json'), 'utf8').includes('TASK-FALLBACK-0001'));
 
+// A framework checkout without a host profile must offer a governed route,
+// preserving the declared actor and scope instead of recommending tasks new.
+const frameworkFallbackFixture = makeFixture();
+writeJson(path.join(frameworkFallbackFixture.targetRepo, 'package.json'), { name: 'ai-atomic-framework', type: 'module' });
+await assert.rejects(() => runTaskflow([
+  'open', '--cwd', frameworkFallbackFixture.targetRepo, '--write',
+  '--actor', 'fixture-worker', '--scope-path', 'packages/cli/src/example.ts',
+  '--title', 'Repair framework opener', '--json'
+]), (err: any) => {
+  assert.equal(err.code, 'ATM_TASKFLOW_TEMPLATE_ONLY_FALLBACK');
+  assert.equal(err.details.recommendedCommand,
+    'node atm.mjs framework-mode claim --actor "fixture-worker" --files "packages/cli/src/example.ts" --reason "Repair framework opener" --json');
+  assert.equal(err.details.requiredCommand, err.details.recommendedCommand);
+  assert.equal(err.details.fallbackChannel, 'framework-maintenance');
+  return true;
+});
+
 const fixture = makeFixture();
 writeProfile(fixture.planningRepo, { family: 'ATM-GOV' });
 const profilePath = path.join(fixture.planningRepo, 'taskflow.profile.json');
