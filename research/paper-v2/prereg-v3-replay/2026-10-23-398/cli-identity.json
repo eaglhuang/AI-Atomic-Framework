@@ -1,0 +1,125 @@
+{
+  "ok": true,
+  "command": "version",
+  "mode": "standalone",
+  "cwd": "/workspace/AI-Atomic-Framework-rel",
+  "messages": [
+    {
+      "level": "info",
+      "code": "ATM_CLI_VERSION",
+      "text": "ATM framework version 0.1.2.",
+      "data": {}
+    }
+  ],
+  "evidence": {
+    "frameworkVersion": "0.1.2",
+    "runtimeBuildIdentity": {
+      "schemaId": "atm.runtimeIdentity.v1",
+      "packageName": "@ai-atomic-framework/cli",
+      "executionMode": "npm-package",
+      "version": "0.1.22",
+      "status": "verified",
+      "sourceCommit": "b0ec7c1c21c5eab1d95323e968a8a40cbfe9a678",
+      "sourceDigest": "92cc7230033c7f2c0a074a7fab133349dfecfb944072b984500dc37d748fb33f",
+      "buildId": "3802786da73b8050c9cc8970fa119cd2e6bd48635db10af30e1ddf5be8e94ed0"
+    },
+    "runnerMode": {
+      "schemaId": "atm.runnerMode.v1",
+      "mode": "npm-package",
+      "entrypoint": ".worklogs/public-cli/node_modules/@ai-atomic-framework/cli/dist/npm-runtime/atm.mjs",
+      "sourceDrift": {
+        "schemaId": "atm.runnerSourceDrift.v1",
+        "entrypoint": ".worklogs/public-cli/node_modules/@ai-atomic-framework/cli/dist/npm-runtime/atm.mjs",
+        "frozenEntrypoint": false,
+        "runnerPath": "release/atm-onefile/atm.mjs",
+        "runnerMtime": "2026-10-23T01:04:41.102Z",
+        "newestSourceMtime": "2026-10-23T11:07:52.865Z",
+        "sourceSeal": {
+          "present": true,
+          "valid": false,
+          "digest": "sha256:ccc829a51c3853a4fd8e39b34ee0c8fcaf98d28ace7898d10d99e41f1f12d94c"
+        },
+        "syncRequired": false,
+        "advisory": "Current entrypoint is not the frozen runner; source-first/source-import diagnostics may differ from node atm.mjs.",
+        "syncCommand": "ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build"
+      },
+      "normalGovernanceCommand": "node /workspace/AI-Atomic-Framework-rel/.worklogs/public-cli/node_modules/@ai-atomic-framework/cli/dist/npm-runtime/atm.mjs ...",
+      "sourceFirstCommand": "node atm.dev.mjs ...",
+      "sourceFirstOnlyWhen": "explicit source-first framework validation is requested for unbuilt source changes",
+      "syncCommand": "ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build",
+      "frozenRunnerSources": [
+        "release/atm-onefile/atm.mjs",
+        "packages/cli/dist/atm.js"
+      ],
+      "guidance": "Use node /workspace/AI-Atomic-Framework-rel/.worklogs/public-cli/node_modules/@ai-atomic-framework/cli/dist/npm-runtime/atm.mjs for normal governance routing. If ATM_RUNNER_SYNC_REQUIRED appears, run ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build and rerun the frozen entrypoint."
+    },
+    "runnerSourceDrift": {
+      "schemaId": "atm.runnerSourceDrift.v1",
+      "entrypoint": ".worklogs/public-cli/node_modules/@ai-atomic-framework/cli/dist/npm-runtime/atm.mjs",
+      "frozenEntrypoint": false,
+      "runnerPath": "release/atm-onefile/atm.mjs",
+      "runnerMtime": "2026-10-23T01:04:41.102Z",
+      "newestSourceMtime": "2026-10-23T11:07:52.865Z",
+      "sourceSeal": {
+        "present": true,
+        "valid": false,
+        "digest": "sha256:ccc829a51c3853a4fd8e39b34ee0c8fcaf98d28ace7898d10d99e41f1f12d94c"
+      },
+      "syncRequired": false,
+      "advisory": "Current entrypoint is not the frozen runner; source-first/source-import diagnostics may differ from node atm.mjs.",
+      "syncCommand": "ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build"
+    },
+    "publicSurface": "adopter-core"
+  },
+  "nextAction": null,
+  "taskIntent": null,
+  "userNotice": null,
+  "runnerMode": {
+    "schemaId": "atm.runnerMode.v1",
+    "mode": "npm-package",
+    "entrypoint": ".worklogs/public-cli/node_modules/@ai-atomic-framework/cli/dist/npm-runtime/atm.mjs",
+    "sourceDrift": {
+      "schemaId": "atm.runnerSourceDrift.v1",
+      "entrypoint": ".worklogs/public-cli/node_modules/@ai-atomic-framework/cli/dist/npm-runtime/atm.mjs",
+      "frozenEntrypoint": false,
+      "runnerPath": "release/atm-onefile/atm.mjs",
+      "runnerMtime": "2026-10-23T01:04:41.102Z",
+      "newestSourceMtime": "2026-10-23T11:07:52.865Z",
+      "sourceSeal": {
+        "present": true,
+        "valid": false,
+        "digest": "sha256:ccc829a51c3853a4fd8e39b34ee0c8fcaf98d28ace7898d10d99e41f1f12d94c"
+      },
+      "syncRequired": false,
+      "advisory": "Current entrypoint is not the frozen runner; source-first/source-import diagnostics may differ from node atm.mjs.",
+      "syncCommand": "ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build"
+    },
+    "normalGovernanceCommand": "node /workspace/AI-Atomic-Framework-rel/.worklogs/public-cli/node_modules/@ai-atomic-framework/cli/dist/npm-runtime/atm.mjs ...",
+    "sourceFirstCommand": "node atm.dev.mjs ...",
+    "sourceFirstOnlyWhen": "explicit source-first framework validation is requested for unbuilt source changes",
+    "syncCommand": "ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build",
+    "frozenRunnerSources": [
+      "release/atm-onefile/atm.mjs",
+      "packages/cli/dist/atm.js"
+    ],
+    "guidance": "Use node /workspace/AI-Atomic-Framework-rel/.worklogs/public-cli/node_modules/@ai-atomic-framework/cli/dist/npm-runtime/atm.mjs for normal governance routing. If ATM_RUNNER_SYNC_REQUIRED appears, run ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build and rerun the frozen entrypoint."
+  },
+  "frameworkReport": null,
+  "frameworkClaim": null,
+  "evidenceSummary": null,
+  "guardReport": null,
+  "taskflowReadiness": null,
+  "commitBundle": null,
+  "skillGrowth": null,
+  "laneSession": null,
+  "severity": "success",
+  "exitCode": 0,
+  "blocking": false,
+  "diagnostics": {
+    "errorCodes": [],
+    "warningCodes": [],
+    "infoCodes": [
+      "ATM_CLI_VERSION"
+    ]
+  }
+}

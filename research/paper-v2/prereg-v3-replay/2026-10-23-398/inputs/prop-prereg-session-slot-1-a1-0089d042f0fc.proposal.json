@@ -1,0 +1,33 @@
+{
+  "schemaId": "atm.patchProposal.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "prereg-v3 smoke steward proposal"
+  },
+  "proposalId": "prop-prereg-session-slot-1-a1-0089d042f0fc",
+  "taskId": "prereg",
+  "actorId": "prereg-session-slot-1",
+  "baseCommit": "98ad327864aed8df245fd19ea9d2743279e11643",
+  "fileBeforeHash": "sha256:7dca66d253358f3dfbda3d68ceffb8b9fee4d0f47d8ddef2fa4d25e78ff1b05c",
+  "targetFile": "django/db/migrations/loader.py",
+  "atomRefs": [
+    {
+      "atomId": "atom-prop-prereg-session-slot-1-a1-0089d042f0fc",
+      "atomCid": "cid-prop-prereg-session-slot-1-a1-0089d042f0fc"
+    }
+  ],
+  "anchors": [
+    {
+      "kind": "line-range",
+      "hint": "92-96"
+    }
+  ],
+  "intent": "prereg-v3-smoke",
+  "patch": "--- a/django/db/migrations/loader.py\n+++ b/django/db/migrations/loader.py\n@@ -92,5 +92,5 @@\n                 # Empty directories are namespaces.\n                 # getattr() needed on PY36 and older (replace w/attribute access).\n-                if getattr(module, '__file__', None) is None:\n+                if getattr(module, '__file__', None) is None and not isinstance(module.__path__, list):\n                     self.unmigrated_apps.add(app_config.label)\n                     continue\n",
+  "validators": [
+    "prereg-v3-smoke"
+  ],
+  "rollback": "還原此檔到套用前的位元組"
+}
