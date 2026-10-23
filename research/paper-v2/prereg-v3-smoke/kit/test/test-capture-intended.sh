@@ -36,3 +36,22 @@ if not text.endswith("\n"):
     raise SystemExit("patch missing trailing newline")
 PY
 echo "capture intended patch ok"
+
+# Header-only unified diffs are evidence too; normalize headers, never hunk bodies.
+for fence in bare fenced; do
+  mkdir -p "$BASE/$fence"
+  python3 - "$BASE/$fence/stdout.jsonl" "$fence" <<'PYTEST'
+import json, pathlib, sys
+patch = "--- a/shared.py\n+++ b/shared.py\n@@ -1 +1 @@\n-old\n+new\n"
+body = "```diff\n" + patch + "```\n" if sys.argv[2] == "fenced" else patch
+text = "BEGIN_INTENDED_PATCH\n" + body + "END_INTENDED_PATCH"
+pathlib.Path(sys.argv[1]).write_text(json.dumps({"item": {"type": "agent_message", "text": text}}) + "\n")
+PYTEST
+  capture_intended_patch "$BASE/$fence"
+  python3 - "$BASE/$fence/intended.patch" <<'PYTEST'
+import pathlib, sys
+expected = "diff --git a/shared.py b/shared.py\n--- a/shared.py\n+++ b/shared.py\n@@ -1 +1 @@\n-old\n+new\n"
+assert pathlib.Path(sys.argv[1]).read_text() == expected
+PYTEST
+done
+echo "header-only and fenced capture ok"

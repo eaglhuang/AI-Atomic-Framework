@@ -993,7 +993,7 @@ capture_intended_patch() {
   local stdout="$session_dir/stdout.jsonl"
   [ -f "$stdout" ] || return 0
   python3 - "$session_dir" "$stdout" <<'PY'
-import json, pathlib, sys
+import json, pathlib, re, sys
 session = pathlib.Path(sys.argv[1])
 raw = pathlib.Path(sys.argv[2]).read_text(encoding="utf-8", errors="replace")
 
@@ -1027,6 +1027,15 @@ end = "\nEND_INTENDED_PATCH"
 if begin not in text:
     raise SystemExit(0)
 patch = text.split(begin, 1)[1].split(end, 1)[0]
+lines = patch.strip("\n").splitlines()
+if lines and lines[0].strip() in {"```", "```diff", "```patch"}:
+    lines = lines[1:]
+if lines and lines[-1].strip() == "```":
+    lines = lines[:-1]
+patch = "\n".join(lines) + "\n"
+if "diff --git " not in patch:
+    patch = re.sub(r"(?m)^--- (a/[^\n]+)\n\+\+\+ (b/[^\n]+)\n",
+                   r"diff --git \1 \2\n--- \1\n+++ \2\n", patch)
 if "diff --git " not in patch:
     raise SystemExit(0)
 if not patch.endswith("\n"):
