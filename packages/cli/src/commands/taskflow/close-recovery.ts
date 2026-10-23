@@ -1,6 +1,9 @@
+import { assertActiveCloseLease } from './close-transaction-mutex.ts';
+import { acquireKernelAdvisoryLock, releaseKernelAdvisoryLock } from '../../../../core/src/broker/steward-kernel-lock.ts';
+import { writeCloseAtomic } from './close-attempt.ts';
 import { execFileSync } from 'node:child_process';
 import { createHash, randomBytes } from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync } from 'node:fs';
 import path from 'node:path';
 import { CliError, makeResult, message, parseArgsForCommand, relativePathFrom } from '../shared.ts';
 import { readCloseWindowStagedIndexLockReport, releaseCloseWindowStagedIndexLock } from '../tasks/close-window-lock.ts';
@@ -61,6 +64,7 @@ export function closeRecoverySnapshotPath(cwd: string, taskId: string): string {
 
 /** Persist the in-memory rollback snapshot so a later process can abort a close whose holder died. */
 export function persistCloseRecoverySnapshot(input: { cwd: string; taskId: string; actorId: string; snapshot: CloseWriteRollbackSnapshot }): void {
+  assertActiveCloseLease();
   const filePath = closeRecoverySnapshotPath(input.cwd, input.taskId);
   const previous = readCloseRecoverySnapshot(input.cwd, input.taskId);
   const record: CloseRecoverySnapshot = {
@@ -72,10 +76,11 @@ export function persistCloseRecoverySnapshot(input: { cwd: string; taskId: strin
     ownerPid: process.pid
   };
   mkdirSync(path.dirname(filePath), { recursive: true });
-  writeFileSync(filePath, `${JSON.stringify(record, null, 2)}\n`, 'utf8');
+  writeCloseAtomic(filePath, `${JSON.stringify(record, null, 2)}\n`);
 }
 
 export function clearCloseRecoverySnapshot(cwd: string, taskId: string): void {
+  assertActiveCloseLease();
   rmSync(closeRecoverySnapshotPath(cwd, taskId), { force: true });
 }
 
@@ -87,6 +92,8 @@ export function clearCloseRecoverySnapshot(cwd: string, taskId: string): void {
  */
 export function recordCloseWriteOutcome(input: { cwd: string; taskId: string; outcome: 'completed' | 'rolled-back' | 'failed'; failure?: string | null }): void {
   if (!readCloseTransactionStatus(input.cwd, input.taskId) && input.outcome !== 'completed') return;
+  const window = readCloseWindowStagedIndexLockReport(input.cwd);
+  if (input.outcome !== 'failed' && window?.status === 'active' && window.taskId === input.taskId) throw new Error('Close cleanup must finish before terminal persistence');
   if (input.outcome === 'completed') {
     const head = (git(input.cwd, ['rev-parse', 'HEAD']) ?? '').trim() || null;
     writeCloseTransactionStatus({ cwd: input.cwd, taskId: input.taskId, phase: 'post-cleanup-complete', outcome: 'completed', targetCommit: head, cleanupComplete: true, failure: null });
@@ -226,8 +233,8 @@ export function inspectCloseRecovery(input: { cwd: string; taskId: string; stale
   const transitionSource = closeEvent ?? latestCloseEvent?.event ?? null;
   const closeTransition = transitionSource ? { transitionId: String(transitionSource.transitionId ?? ''), action: typeof transitionSource.action === 'string' ? transitionSource.action : null, fromStatus: typeof transitionSource.fromStatus === 'string' ? transitionSource.fromStatus : null, toStatus: typeof transitionSource.toStatus === 'string' ? transitionSource.toStatus : null } : null;
   const workingEqualsIndex = index !== null && working !== null && index.text === working.text;
-  const stuck = heldByTask || !transactionTerminal;
   const snapshot = readCloseRecoverySnapshot(cwd, taskId);
+  const stuck = heldByTask || !transactionTerminal || snapshot !== null;
   const rollReasons: string[] = [];
   if (!index || !CLOSED_STATUSES.has(index.status ?? '')) rollReasons.push('the staged ledger is not in a closed status');
   if (!workingEqualsIndex) rollReasons.push('the working ledger differs from the staged close ledger (changed after the close was interrupted)');
@@ -292,12 +299,14 @@ function appendRecoveryReceipt(cwd: string, taskId: string, entry: Record<string
   }
   receipt.entries.push(entry);
   mkdirSync(path.dirname(absolute), { recursive: true });
-  writeFileSync(absolute, `${JSON.stringify(receipt, null, 2)}\n`, 'utf8');
+  writeCloseAtomic(absolute, `${JSON.stringify(receipt, null, 2)}\n`);
   return relative;
 }
 
 function releaseDeadHolderMutex(holder: CloseHolderLiveness): boolean {
   if (holder.alive || !existsSync(holder.mutexPath)) return false;
+  const current = inspectCloseHolderLiveness({ cwd: path.resolve(holder.mutexPath, '../../../..'), taskId: holder.taskId, staleAfterMs: 0 });
+  if (current.alive || current.leaseId !== holder.leaseId) return false;
   rmSync(holder.mutexPath, { force: true });
   return true;
 }
@@ -309,16 +318,16 @@ function inspectionSummary(inspection: CloseRecoveryInspection) {
 function finalizeLanded(input: { cwd: string; taskId: string; actorId: string; reason: string; inspection: CloseRecoveryInspection; commitSha: string | null; mode: 'recover' }) {
   const { cwd, taskId, inspection } = input;
   const targetCommit = input.commitSha ?? inspection.landedCommit;
-  writeCloseTransactionStatus({ cwd, taskId, phase: 'post-cleanup-complete', outcome: 'completed', targetCommit, cleanupComplete: true, failure: null });
   const released = releaseCloseWindowStagedIndexLock({ cwd, taskId, actorId: input.actorId, outcome: 'committed' });
   const mutexRemoved = releaseDeadHolderMutex(inspection.holder);
   const snapshot = readCloseRecoverySnapshot(cwd, taskId);
-  clearCloseRecoverySnapshot(cwd, taskId);
   const receiptPath = appendRecoveryReceipt(cwd, taskId, {
     recoveryId: `close-recovery-${Date.now()}-${randomBytes(3).toString('hex')}`, action: input.commitSha ? 'roll-forward-commit' : 'roll-forward-landed',
     actorId: input.actorId, reason: input.reason, at: new Date().toISOString(), before: inspectionSummary(inspection),
     targetCommit, lockReleased: released ? released.releaseOutcome : null, deadMutexRemoved: mutexRemoved, snapshotCleared: snapshot !== null
   });
+  writeCloseTransactionStatus({ cwd, taskId, phase: 'post-cleanup-complete', outcome: 'completed', targetCommit, cleanupComplete: true, failure: null });
+  clearCloseRecoverySnapshot(cwd, taskId);
   return { targetCommit, lockReleased: released !== null, mutexRemoved, receiptPath };
 }
 
@@ -370,7 +379,7 @@ function abortInterruptedClose(input: { cwd: string; taskId: string; actorId: st
   const restored: Array<{ path: string; source: string; sha256: string | null }> = [];
   const workingIsClosed = working !== null && CLOSED_STATUSES.has(working.status ?? '');
   if (snapshot && snapshot.previousTaskContent && workingIsClosed) {
-    writeFileSync(workingAbsolute, snapshot.previousTaskContent, 'utf8');
+    writeCloseAtomic(workingAbsolute, snapshot.previousTaskContent);
     restored.push({ path: ledgerPath, source: 'pre-close-snapshot', sha256: sha256Text(snapshot.previousTaskContent) });
   } else if (working) {
     // No snapshot (or the ledger was reopened after the close): keep later
@@ -391,7 +400,7 @@ function abortInterruptedClose(input: { cwd: string; taskId: string; actorId: st
     }
     const text = `${JSON.stringify(document, null, 2)}\n`;
     if (text !== working.text) {
-      writeFileSync(workingAbsolute, text, 'utf8');
+      writeCloseAtomic(workingAbsolute, text);
       restored.push({ path: ledgerPath, source: workingIsClosed ? 'reconstructed-from-close-transition' : 'close-fields-removed', sha256: sha256Text(text) });
     }
   }
@@ -411,7 +420,7 @@ function abortInterruptedClose(input: { cwd: string; taskId: string; actorId: st
     const chosen = candidates.find((entry) => entry.text !== null && sealed !== null && sha256Text(entry.text) === sealed)
       ?? candidates.slice(0, 2).find((entry) => entry.text !== null) ?? null;
     if (chosen?.text != null && chosen.text !== current) {
-      writeFileSync(absolute, chosen.text, 'utf8');
+      writeCloseAtomic(absolute, chosen.text);
       restored.push({ path: cardPath, source: chosen.source, sha256: sha256Text(chosen.text) });
     }
     const finalText = existsSync(absolute) ? readFileSync(absolute, 'utf8') : null;
@@ -419,22 +428,22 @@ function abortInterruptedClose(input: { cwd: string; taskId: string; actorId: st
   }
 
   // 5. Terminal transaction, released lock, cleared runtime, auditable receipt.
-  writeCloseTransactionStatus({ cwd, taskId, phase: 'rolled-back', outcome: 'rolled-back', failure: `aborted by governed close recovery (${input.actorId}): ${input.reason}` });
   const released = releaseCloseWindowStagedIndexLock({ cwd, taskId, actorId: input.actorId, outcome: 'aborted' });
   const mutexRemoved = releaseDeadHolderMutex(inspection.holder);
-  if (snapshot) {
-    mkdirSync(archiveRoot, { recursive: true });
-    renameSync(closeRecoverySnapshotPath(cwd, taskId), path.join(archiveRoot, path.basename(closeRecoverySnapshotPath(cwd, taskId))));
-  }
   const receiptPath = appendRecoveryReceipt(cwd, taskId, {
     recoveryId, action: 'abort', actorId: input.actorId, reason: input.reason, at: new Date().toISOString(), before: inspectionSummary(inspection),
     unstaged: unstage, archived, restored, card, lockReleased: released ? released.releaseOutcome : null, deadMutexRemoved: mutexRemoved,
     archiveRoot: relativePathFrom(cwd, archiveRoot)
   });
+  writeCloseTransactionStatus({ cwd, taskId, phase: 'rolled-back', outcome: 'rolled-back', failure: `aborted by governed close recovery (${input.actorId}): ${input.reason}` });
+  if (snapshot) {
+    mkdirSync(archiveRoot, { recursive: true });
+    renameSync(closeRecoverySnapshotPath(cwd, taskId), path.join(archiveRoot, path.basename(closeRecoverySnapshotPath(cwd, taskId))));
+  }
   return { recoveryId, unstaged: unstage, archived, restored, card, lockReleased: released !== null, mutexRemoved, receiptPath };
 }
 
-export async function runTaskflowCloseRecovery(parsed: ReturnType<typeof parseArgsForCommand>, cwd: string) {
+async function runTaskflowCloseRecoveryLocked(parsed: ReturnType<typeof parseArgsForCommand>, cwd: string) {
   const options = parsed.options as Record<string, unknown>;
   const taskId = String(options.task ?? '').trim();
   const mode: 'recover' | 'abort' = options.abort ? 'abort' : 'recover';
@@ -478,4 +487,16 @@ export async function runTaskflowCloseRecovery(parsed: ReturnType<typeof parseAr
   const commitSha = inspection.landed ? null : await commitStagedClose({ cwd, taskId, actorId, reason, inspection });
   const result = finalizeLanded({ cwd, taskId, actorId, reason, inspection, commitSha, mode });
   return done(true, 'info', 'ATM_CLOSE_RECOVERY_COMPLETED', `Recovered the interrupted close of ${taskId} as completed (${result.targetCommit ?? 'no commit'}).`, { result, after: inspectCloseRecovery({ cwd, taskId }) });
+}
+
+/** Serialize recovery with close acquisition; re-inspect only after the OS lock. */
+export async function runTaskflowCloseRecovery(parsed: ReturnType<typeof parseArgsForCommand>, cwd: string) {
+  if (!parsed.options.write) return runTaskflowCloseRecoveryLocked(parsed, cwd);
+  const taskId = String(parsed.options.task ?? '').trim();
+  if (!taskId) return runTaskflowCloseRecoveryLocked(parsed, cwd);
+  const lock = `${inspectCloseHolderLiveness({ cwd, taskId }).mutexPath}.kernel`;
+  try { acquireKernelAdvisoryLock(lock, 0, 1, taskId); }
+  catch { return makeResult({ ok: false, command: 'taskflow close', cwd, mode: 'write', messages: [message('error', 'ATM_CLOSE_RECOVERY_HOLDER_ALIVE', 'Close or recovery still owns the kernel lock; retry after it exits.')] }); }
+  try { return await runTaskflowCloseRecoveryLocked(parsed, cwd); }
+  finally { releaseKernelAdvisoryLock(lock); }
 }

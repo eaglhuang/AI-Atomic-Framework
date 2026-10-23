@@ -1,6 +1,6 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
 import { randomUUID } from 'node:crypto';
-import { closeSync, existsSync, fsyncSync, mkdirSync, openSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, rmSync } from 'node:fs';
 import path from 'node:path';
 import { acquireKernelAdvisoryLock, releaseKernelAdvisoryLock } from '../../../../core/src/broker/steward-kernel-lock.ts';
 import { inspectCloseHolderLiveness } from '../tasks/close-holder-liveness.ts';
@@ -69,8 +69,7 @@ export function acquireCloseTransactionMutex(options: AcquireCloseTransactionMut
       acquiredAt: new Date(nowMs).toISOString(), heartbeatAt: new Date(nowMs).toISOString(), expiresAt: new Date(nowMs + ttlMs).toISOString(),
       ttlMs, ttlReason: DEFAULT_CLOSE_TRANSACTION_MUTEX_TTL_REASON, lockPath
     };
-    const fd = openSync(lockPath, 'wx', 0o600);
-    try { writeFileSync(fd, `${JSON.stringify(lease, null, 2)}\n`); fsyncSync(fd); } finally { closeSync(fd); }
+    writeCloseAtomic(lockPath, `${JSON.stringify(lease, null, 2)}\n`);
     held.set(lockPath, lease.leaseId);
     return lease;
   } catch (error) { releaseKernelAdvisoryLock(kernelDirectory(lockPath)); throw error; }
