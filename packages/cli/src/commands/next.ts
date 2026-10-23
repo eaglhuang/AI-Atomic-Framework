@@ -297,7 +297,7 @@ async function runNextRoute(argv: string[]): Promise<NextCommandResult> {
     options.claim
     && taskIntent?.taskScopeMentioned === false
     && isQuickfixPrompt(unscopedPrompt)
-    && resolveQuickfixScope(unscopedPrompt).length > 0,
+    && (options.files.length > 0 || resolveQuickfixScope(unscopedPrompt).length > 0),
   );
   if (taskIntent && taskIntent.taskScopeMentioned === false && !claimedQuickfixPrompt) {
     // An unscoped prompt is exactly where silent auto-attach to whatever is
