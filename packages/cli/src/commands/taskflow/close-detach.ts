@@ -2,7 +2,9 @@ import { spawn } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { closeSync, fsyncSync, mkdirSync, openSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { makeResult, message } from '../shared.ts';
+import { readCloseWindowStagedIndexLockReport } from '../tasks/close-window-lock.ts';
 import { isProcessAlive } from '../tasks/close-holder-liveness.ts';
 import { closeAttemptPaths, closeResultLine, readCloseAttempt, writeCloseAtomic, writeCloseAttempt, type CloseAttempt } from './close-attempt.ts';
 import { readCloseTransactionStatus } from './close-transaction-status.ts';
@@ -15,6 +17,23 @@ function result(cwd: string, record: CloseAttempt | null, taskId: string, attemp
   closeResultLine: closeResultLine({ code, status, log, hint: `attempt=${attemptId} ${hint}` }) };
 }
 
+function detachedRunner(): string {
+  const caller = process.argv[1];
+  if (caller && /^atm(?:-public|\.dev)?\.(?:mjs|js|ts)$/.test(path.basename(caller))) return path.resolve(caller);
+  const own = fileURLToPath(import.meta.url);
+  if (/^atm.*\.mjs$/.test(path.basename(own))) return own;
+  return path.resolve(path.dirname(own), '../..', own.endsWith('.ts') ? 'atm.ts' : 'atm.js');
+}
+function workerExecArgs(): string[] {
+  const result: string[] = [];
+  for (let i = 0; i < process.execArgv.length; i++) {
+    const arg = process.execArgv[i];
+    if (['-e', '--eval', '-p', '--print', '--input-type'].includes(arg)) { i++; continue; }
+    if (/^--(?:inspect|test|input-type|eval|print)(?:[=-]|$)/.test(arg)) continue;
+    result.push(arg);
+  }
+  return result;
+}
 /** The worker must acknowledge a durable attempt before the caller reports started. */
 export async function startDetachedClose(input: { cwd: string; taskId: string; actorId: string; argv: string[]; runner?: string }) {
   if (!input.taskId || !input.actorId) throw new Error('--detach requires --task and --actor');
@@ -28,8 +47,16 @@ export async function startDetachedClose(input: { cwd: string; taskId: string; a
   const fd = openSync(paths.log, 'a', 0o600);
   let child: ReturnType<typeof spawn>;
   try {
-    const argv = input.argv.filter((arg) => !['--detach', '--json', '--pretty'].includes(arg));
-    child = spawn(process.execPath, [...process.execArgv.filter((arg) => !arg.startsWith('--inspect')), input.runner ?? process.argv[1], 'taskflow', ...argv, '--json'], {
+    const argv: string[] = [];
+    for (let i = 0; i < input.argv.length; i++) {
+      const arg = input.argv[i];
+      if (['--detach', '--json', '--pretty'].includes(arg) || arg.startsWith('--cwd=')) continue;
+      if (arg === '--cwd') { i++; continue; }
+      argv.push(arg);
+      if (arg === '--profile' && input.argv[i + 1]) argv.push(path.resolve(input.argv[++i]));
+    }
+    argv.push('--cwd', input.cwd);
+    child = spawn(process.execPath, [...workerExecArgs(), input.runner ?? detachedRunner(), 'taskflow', ...argv, '--json'], {
       cwd: input.cwd, detached: true, stdio: ['ignore', fd, fd],
       env: { ...process.env, ATM_CLOSE_ATTEMPT_ID: attemptId, ATM_CLOSE_ATTEMPT_TASK: input.taskId }
     });
@@ -66,9 +93,11 @@ export async function queryCloseAttempt(input: { cwd: string; taskId: string; at
     if (!record) return result(input.cwd, null, input.taskId, input.attemptId, 'CLOSE_ATTEMPT_MISSING', 'fail', 'attempt does not exist');
     const transaction = readCloseTransactionStatus(input.cwd, input.taskId);
     // Recovery can complete a dead child's attempt without rerunning the worker.
-    const completed = (record.state === 'completed' && record.targetCommit !== null) || (transaction?.attemptId === input.attemptId && transaction.outcome === 'completed' && transaction.cleanupComplete && transaction.targetCommit !== null);
-    if (completed) return result(input.cwd, record, input.taskId, input.attemptId, 'CLOSE_COMMITTED', 'ok', `committed=${record.targetCommit ?? transaction?.targetCommit}`);
     const alive = record.ownerPid !== null && isProcessAlive(record.ownerPid);
+    const window = readCloseWindowStagedIndexLockReport(input.cwd);
+    const cleanupPending = window?.status === 'active' && window.taskId === input.taskId;
+    const completed = (record.state === 'completed' && record.targetCommit !== null) || (!alive && !cleanupPending && transaction?.attemptId === input.attemptId && transaction.outcome === 'completed' && transaction.cleanupComplete && transaction.targetCommit !== null);
+    if (completed) return result(input.cwd, record, input.taskId, input.attemptId, 'CLOSE_COMMITTED', 'ok', `committed=${record.targetCommit ?? transaction?.targetCommit}${record.closeTiming ? ` locked_ms=${record.closeTiming.lockedMs} total_ms=${record.closeTiming.totalMs}` : ''}`);
     const recover = `node atm.mjs taskflow close --task ${input.taskId} --actor ${record.actorId} --recover (or --abort); inspect dry-run first`;
     if (record.state === 'failed' || (!alive && record.state !== 'starting')) return result(input.cwd, record, input.taskId, input.attemptId, 'CLOSE_INTERRUPTED', 'fail', recover);
     if (!input.wait || Date.now() >= deadline) return result(input.cwd, record, input.taskId, input.attemptId,
@@ -89,13 +118,14 @@ export async function runCloseAttemptWorker<T extends { ok?: boolean }>(input: {
   let value: T;
   try { value = await input.action(); }
   catch (error) { finish(false, error instanceof Error ? error.message : String(error)); throw error; }
-  finish(value.ok === true, value.ok ? null : 'close returned failure');
+  const timing = (value as T & { evidence?: { closeTiming?: CloseAttempt['closeTiming'] } }).evidence?.closeTiming;
+  finish(value.ok === true, value.ok ? null : 'close returned failure', timing);
   return value;
 
-  function finish(ok: boolean, failure: string | null) {
+  function finish(ok: boolean, failure: string | null, closeTiming?: CloseAttempt['closeTiming']) {
     const transaction = readCloseTransactionStatus(input.cwd, input.taskId);
     const committed = ok && transaction?.attemptId === input.attemptId && transaction.outcome === 'completed' && transaction.cleanupComplete && transaction.targetCommit !== null;
-    const final: CloseAttempt = { ...running, state: committed ? 'completed' : 'failed', updatedAt: new Date().toISOString(),
+    const final: CloseAttempt = { ...running, closeTiming, state: committed ? 'completed' : 'failed', updatedAt: new Date().toISOString(),
       targetCommit: transaction?.attemptId === input.attemptId ? transaction.targetCommit : null, failure: failure ?? (committed ? null : 'close did not commit') };
     writeCloseAttempt(input.cwd, final);
     writeCloseAtomic(closeAttemptPaths(input.cwd, input.taskId, input.attemptId).result,
