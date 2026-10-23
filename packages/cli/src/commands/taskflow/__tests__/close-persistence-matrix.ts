@@ -1,3 +1,4 @@
+import { availableParallelism } from 'node:os';
 import assert from 'node:assert/strict';
 import { execFileSync, spawn } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync, rmSync } from 'node:fs';
@@ -59,7 +60,7 @@ if (!result.ok) throw new Error(JSON.stringify(result.messages));
 export async function runPersistenceMatrix(side: 'before' | 'after', selected?: string[]) {
   const boundaries = ['owner','attempt-running','candidate','mutex','window-initial','foreign-snapshot','window-prepared','park-index','rollback', 'transaction-started','close-event','ledger','transaction-ledger-written','seal','target-commit','planning-commit','index-fsync','window-release','window-directory-fsync','window-release-fsync','transaction-post-cleanup-complete','snapshot-clear','candidate-clear','attempt-completed','result'];
   const module = pathToFileURL(path.resolve('packages/cli/src/commands/taskflow.ts')).href;
-  for (const boundary of selected ?? boundaries) {
+  await runCloseCases(selected ?? boundaries, async (boundary) => {
     const f = await makeDualRepoCloseFixture(`persistence-${side}-${boundary}`, { closePlanningStatus: 'running' });
     const root = path.dirname(f.targetRepo);
     const task = f.taskId;
@@ -117,13 +118,14 @@ export async function runPersistenceMatrix(side: 'before' | 'after', selected?: 
       if(child.exitCode===null && child.signalCode===null) { try { if(process.platform==='win32')child.kill('SIGKILL');else process.kill(-child.pid!,'SIGKILL'); } catch {} await exited; }
       rmSync(root,{recursive:true,force:true});
     }
-  }
+  });
 }
 
 export async function runRecoveryPersistenceMatrix() {
   const module = pathToFileURL(path.resolve('packages/cli/src/commands/taskflow.ts')).href;
-  for (const mode of ['recover','abort']) for (const side of ['before','after']) {
-    for (const boundary of ['window-release','recovery-receipt',mode==='recover'?'transaction-post-cleanup-complete':'transaction-rolled-back']) {
+  const cases = ['recover','abort'].flatMap(mode => ['before','after'].flatMap(side =>
+    ['window-release','recovery-receipt',mode==='recover'?'transaction-post-cleanup-complete':'transaction-rolled-back'].map(boundary => ({ mode, side, boundary }))));
+  await runCloseCases(cases, async ({ mode, side, boundary }) => {
       const f=await makeDualRepoCloseFixture(`replay-${mode}-${side}-${boundary}`,{closePlanningStatus:'running'});
       const root=path.dirname(f.targetRepo), task=f.taskId, attempt='attempt-recovery';
       const git=(args:string[])=>execFileSync('git',args,{cwd:f.targetRepo,encoding:'utf8'});
@@ -162,8 +164,7 @@ export async function runRecoveryPersistenceMatrix() {
         assert.equal(git(['rev-parse','HEAD']),head);assert.equal(git(['ls-files','-s','--',foreign]),identity);
         console.log(`recovery ${mode} ${side} ${boundary}: safe replay`);
       } finally {rmSync(root,{recursive:true,force:true});}
-    }
-  }
+  });
 }
 
 export async function runConcurrentCloseMatrix() {
@@ -198,4 +199,19 @@ export async function runConcurrentCloseMatrix() {
     for(const child of children)if(child.exitCode===null&&child.signalCode===null)child.kill('SIGKILL');
     rmSync(root,{recursive:true,force:true});
   }
+}
+
+/** Each case owns a separate repository/process group. Drain cleanup on failure. */
+async function runCloseCases<T>(cases: readonly T[], run: (value: T) => Promise<void>): Promise<void> {
+  const concurrency = Math.max(1, Math.min(4, availableParallelism()));
+  let next = 0;
+  let failure: unknown;
+  let failed = false;
+  await Promise.all(Array.from({ length: Math.min(concurrency, cases.length) }, async () => {
+    while (!failed && next < cases.length) {
+      const value = cases[next++];
+      try { await run(value); } catch (error) { failed = true; failure = error; }
+    }
+  }));
+  if (failed) throw failure;
 }

@@ -1,3 +1,4 @@
+import { availableParallelism } from 'node:os';
 // Runs every tests/cli/*.test.ts file that is not quarantined, so tests that no
 // validator lists still run in CI. A test fails the sweep when it exits non-zero,
 // times out, or leaves the worktree dirty. Quarantined tests must name a reason
@@ -42,6 +43,7 @@ export interface SweepBatchTrace {
   readonly attempt: 'initial' | 'retry';
   readonly durationMs: number;
   readonly dirtyRetry: boolean;
+  readonly concurrency?: number;
 }
 
 export interface SweepRunOptions {
@@ -108,6 +110,7 @@ function runOne(root: string, testDir: string, test: string, timeoutMs: number, 
     child.stderr!.on('data', (chunk) => { stderr = (stderr + chunk).slice(-4000); });
     let timedOut = false;
     const timer = setTimeout(() => { timedOut = true; child.kill('SIGKILL'); }, timeoutMs);
+    child.on('error', (error) => { stderr += `\n${error.message}`; });
     child.on('close', (code) => {
       clearTimeout(timer);
       resolve({ test, exitCode: code, timedOut, durationMs: Date.now() - started, stderrTail: stderr.slice(-600) });
@@ -115,20 +118,44 @@ function runOne(root: string, testDir: string, test: string, timeoutMs: number, 
   });
 }
 
+/** Keep I/O overlap bounded by both declared capacity and available CPUs. */
+export function resolveSweepConcurrency(requested: number, cpus = availableParallelism()): number {
+  return Math.max(1, Math.min(requested, Math.max(1, cpus) * 2));
+}
+
+async function runPool<T, R>(items: readonly T[], concurrency: number, action: (item: T) => Promise<R>): Promise<R[]> {
+  const results = new Array<R>(items.length);
+  let next = 0;
+  let failure: unknown;
+  let failed = false;
+  await Promise.all(Array.from({ length: Math.min(concurrency, items.length) }, async () => {
+    while (!failed && next < items.length) {
+      const index = next++;
+      try { results[index] = await action(items[index]); }
+      catch (error) { failed = true; failure = error; }
+    }
+  }));
+  if (failed) throw failure;
+  return results;
+}
+
 export async function runSweep(root: string, config: SweepConfig, only?: readonly string[], options: SweepRunOptions = {}, attempt: SweepBatchTrace['attempt'] = 'initial'): Promise<TestResult[]> {
   const testDir = path.join(root, config.testDir);
   const tests = only ?? readdirSync(testDir).filter((name) => name.endsWith('.test.ts')).sort();
   const results: TestResult[] = [];
-  // Dirty detection needs a stable baseline, so concurrent tests are attributed
-  // as a batch and a dirty batch is rerun one test at a time to find the writer.
-  for (let index = 0; index < tests.length; index += config.concurrency) {
-    const batch = tests.slice(index, index + config.concurrency);
+  const concurrency = resolveSweepConcurrency(config.concurrency);
+  // Refill slots as files finish, rather than waiting for the slowest file
+  // after every handful. Checkpoint groups bound dirty attribution/retries;
+  // all workers drain before preserving writes or retrying serially.
+  const checkpointSize = concurrency === 1 ? 1 : concurrency * 8;
+  for (let index = 0; index < tests.length; index += checkpointSize) {
+    const batch = tests.slice(index, index + checkpointSize);
     const before = worktreeState(root);
     if (attempt === 'initial' && before.size > 0) {
       throw new Error('CLI sweep requires a clean dedicated worktree; existing WIP is preserved. Use an isolated test checkout.');
     }
     const batchStarted = Date.now();
-    const outcomes = await Promise.all(batch.map((test) => runOne(root, testDir, test, config.timeoutMs, options.logFile)));
+    const outcomes = await runPool(batch, concurrency, (test) => runOne(root, testDir, test, config.timeoutMs, options.logFile));
     const added = [...worktreeState(root)].filter((line) => !before.has(line));
     const dirtyRetry = added.length > 0 && batch.length > 1;
     options.onBatch?.({
@@ -137,6 +164,7 @@ export async function runSweep(root: string, config: SweepConfig, only?: readonl
       attempt,
       durationMs: Date.now() - batchStarted,
       dirtyRetry,
+      concurrency: Math.min(concurrency, batch.length),
     });
     if (added.length === 0 || batch.length === 1) {
       for (const outcome of outcomes) results.push({ ...outcome, dirtied: batch.length === 1 ? added : [] });
@@ -182,12 +210,16 @@ async function main(logFile?: string): Promise<void> {
   const quarantined = new Set(config.quarantine.map((entry) => entry.test));
   const includeQuarantine = process.argv.includes('--check-quarantine');
   const batches: SweepBatchTrace[] = [];
+  const recordBatch = (trace: SweepBatchTrace) => {
+    batches.push(trace);
+    console.error(`[cli-sweep] ${trace.attempt} checkpoint: ${trace.tests.length} files, ${trace.durationMs}ms, workers=${trace.concurrency ?? 1}, dirty-retry=${trace.dirtyRetry}`);
+  };
   const startedAt = Date.now();
   const selected = available.filter((test) => includeQuarantine ? quarantined.has(test) : !quarantined.has(test)).sort();
   const serial = new Set((config.serial ?? []).map((entry) => entry.test));
-  const results = await runSweep(root, config, selected.filter((test) => !serial.has(test)), { logFile, onBatch: (trace) => batches.push(trace) });
+  const results = await runSweep(root, config, selected.filter((test) => !serial.has(test)), { logFile, onBatch: recordBatch });
   if (worktreeState(root).size === 0) {
-    results.push(...await runSweep(root, { ...config, concurrency: 1 }, selected.filter((test) => serial.has(test)), { logFile, onBatch: (trace) => batches.push(trace) }));
+    results.push(...await runSweep(root, { ...config, concurrency: 1 }, selected.filter((test) => serial.has(test)), { logFile, onBatch: recordBatch }));
   }
   const completedTests = new Set(results.map((result) => result.test));
   const skippedTests = selected.filter((test) => !completedTests.has(test));
