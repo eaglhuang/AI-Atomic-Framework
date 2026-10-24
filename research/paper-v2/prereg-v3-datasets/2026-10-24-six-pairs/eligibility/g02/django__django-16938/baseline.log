@@ -1,0 +1,1719 @@
+Testing against Django installed in '/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django'
+Importing application serializers
+Found 135 test(s).
+Skipping setup of unused database(s): other.
+Operations to perform:
+  Synchronize unmigrated apps: auth, contenttypes, messages, serializers, sessions, staticfiles
+  Apply all migrations: admin, sites
+Synchronizing apps without migrations:
+  Creating tables...
+    Creating table django_content_type
+    Creating table auth_permission
+    Creating table auth_group
+    Creating table auth_user
+    Creating table django_session
+    Creating table serializers_categorymetadata
+    Creating table serializers_category
+    Creating table serializers_author
+    Creating table serializers_topic
+    Creating table serializers_article
+    Creating table serializers_authorprofile
+    Creating table serializers_actor
+    Creating table serializers_movie
+    Creating table serializers_score
+    Creating table serializers_player
+    Creating table serializers_basemodel
+    Creating table serializers_complexmodel
+    Creating table serializers_binarydata
+    Creating table serializers_booleandata
+    Creating table serializers_chardata
+    Creating table serializers_datedata
+    Creating table serializers_datetimedata
+    Creating table serializers_decimaldata
+    Creating table serializers_emaildata
+    Creating table serializers_filedata
+    Creating table serializers_filepathdata
+    Creating table serializers_floatdata
+    Creating table serializers_integerdata
+    Creating table serializers_bigintegerdata
+    Creating table serializers_genericipaddressdata
+    Creating table serializers_positivebigintegerdata
+    Creating table serializers_positiveintegerdata
+    Creating table serializers_positivesmallintegerdata
+    Creating table serializers_slugdata
+    Creating table serializers_smalldata
+    Creating table serializers_textdata
+    Creating table serializers_timedata
+    Creating table serializers_tag
+    Creating table serializers_genericdata
+    Creating table serializers_anchor
+    Creating table serializers_uniqueanchor
+    Creating table serializers_fkdata
+    Creating table serializers_m2mdata
+    Creating table serializers_o2odata
+    Creating table serializers_fkselfdata
+    Creating table serializers_m2mselfdata
+    Creating table serializers_fkdatatofield
+    Creating table serializers_fkdatatoo2o
+    Creating table serializers_m2mintermediatedata
+    Creating table serializers_intermediate
+    Creating table serializers_booleanpkdata
+    Creating table serializers_charpkdata
+    Creating table serializers_datepkdata
+    Creating table serializers_datetimepkdata
+    Creating table serializers_decimalpkdata
+    Creating table serializers_emailpkdata
+    Creating table serializers_filepathpkdata
+    Creating table serializers_floatpkdata
+    Creating table serializers_integerpkdata
+    Creating table serializers_genericipaddresspkdata
+    Creating table serializers_positiveintegerpkdata
+    Creating table serializers_positivesmallintegerpkdata
+    Creating table serializers_slugpkdata
+    Creating table serializers_smallpkdata
+    Creating table serializers_uuiddata
+    Creating table serializers_uuiddefaultdata
+    Creating table serializers_fktouuid
+    Creating table serializers_autonowdatetimedata
+    Creating table serializers_modifyingsavedata
+    Creating table serializers_inheritabstractmodel
+    Creating table serializers_inheritbasemodel
+    Creating table serializers_explicitinheritbasemodel
+    Creating table serializers_lengthmodel
+    Creating table serializers_parent
+    Creating table serializers_child
+    Creating table serializers_naturalkeyanchor
+    Creating table serializers_fkdatanaturalkey
+    Creating table serializers_naturalkeything
+    Creating table serializers_naturalpkwithdefault
+    Creating table serializers_fkaspknonaturalkey
+    Running deferred SQL...
+Running migrations:
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying sites.0001_initial... OK
+  Applying sites.0002_alter_domain_unique... OK
+System check identified no issues (1 silenced).
+Creating test database for alias 'default' ('file:memorydb_default?mode=memory&cache=shared')...
+test_altering_serialized_output (serializers.test_json.JsonSerializerTestCase)
+The ability to create new objects by modifying serialized content. ... ERROR
+test_custom_encoder (serializers.test_json.JsonSerializerTestCase) ... ok
+test_custom_field_serialization (serializers.test_json.JsonSerializerTestCase)
+Custom fields serialize and deserialize intact ... ok
+test_deferred_field_serialization (serializers.test_json.JsonSerializerTestCase) ... ok
+test_deserialize_force_insert (serializers.test_json.JsonSerializerTestCase)
+Deserialized content can be saved with force_insert as a parameter. ... ERROR
+test_deterministic_mapping_ordering (serializers.test_json.JsonSerializerTestCase)
+Mapping such as fields should be deterministically ordered. (#24558) ... ERROR
+test_float_serialization (serializers.test_json.JsonSerializerTestCase)
+Float values serialize and deserialize intact ... ok
+test_helpful_error_message_for_foreign_keys (serializers.test_json.JsonSerializerTestCase)
+Invalid foreign keys with a natural key should throw a helpful error ... ok
+test_helpful_error_message_for_many2many_natural1 (serializers.test_json.JsonSerializerTestCase)
+Invalid many-to-many keys should throw a helpful error message. ... ok
+test_helpful_error_message_for_many2many_natural2 (serializers.test_json.JsonSerializerTestCase)
+Invalid many-to-many keys should throw a helpful error message. This ... ok
+test_helpful_error_message_for_many2many_non_natural (serializers.test_json.JsonSerializerTestCase)
+Invalid many-to-many keys should throw a helpful error message. ... ok
+test_helpful_error_message_for_many2many_not_iterable (serializers.test_json.JsonSerializerTestCase)
+Not iterable many-to-many field value throws a helpful error message. ... ok
+test_helpful_error_message_invalid_field (serializers.test_json.JsonSerializerTestCase)
+If there is an invalid field value, the error message should contain ... ok
+test_helpful_error_message_invalid_pk (serializers.test_json.JsonSerializerTestCase)
+If there is an invalid primary key, the error message should contain ... ok
+test_indentation_whitespace (serializers.test_json.JsonSerializerTestCase) ... ok
+test_json_deserializer_exception (serializers.test_json.JsonSerializerTestCase) ... ok
+test_one_to_one_as_pk (serializers.test_json.JsonSerializerTestCase)
+If you use your own primary key field (such as a OneToOneField), it ... ok
+test_pkless_serialized_strings (serializers.test_json.JsonSerializerTestCase)
+Serialized strings without PKs can be turned into models ... ok
+test_pre_1000ad_date (serializers.test_json.JsonSerializerTestCase)
+Year values before 1000AD are properly formatted ... ERROR
+test_serialize (serializers.test_json.JsonSerializerTestCase)
+Basic serialization works. ... ERROR
+test_serialize_field_subset (serializers.test_json.JsonSerializerTestCase)
+Output can be restricted to a subset of fields ... ok
+test_serialize_inherited_fields (serializers.test_json.JsonSerializerTestCase) ... ok
+test_serialize_no_only_pk_with_natural_keys (serializers.test_json.JsonSerializerTestCase) ... ERROR
+test_serialize_only_pk (serializers.test_json.JsonSerializerTestCase) ... ERROR
+test_serialize_prefetch_related_m2m (serializers.test_json.JsonSerializerTestCase) ... ERROR
+test_serialize_progressbar (serializers.test_json.JsonSerializerTestCase) ... ERROR
+test_serialize_proxy_model (serializers.test_json.JsonSerializerTestCase) ... ok
+test_serialize_specific_fields (serializers.test_json.JsonSerializerTestCase) ... ok
+test_serialize_superfluous_queries (serializers.test_json.JsonSerializerTestCase)
+Ensure no superfluous queries are made when serializing ForeignKeys ... ok
+test_serialize_to_stream (serializers.test_json.JsonSerializerTestCase) ... ok
+test_serialize_unicode_roundtrip (serializers.test_json.JsonSerializerTestCase)
+Unicode makes the roundtrip intact ... ok
+test_serialize_with_null_pk (serializers.test_json.JsonSerializerTestCase)
+Serialized data with no primary key results ... ok
+test_serializer_roundtrip (serializers.test_json.JsonSerializerTestCase)
+Serialized content can be deserialized. ... ERROR
+test_unicode_serialization (serializers.test_json.JsonSerializerTestCase) ... ok
+test_altering_serialized_output (serializers.test_jsonl.JsonlSerializerTestCase)
+The ability to create new objects by modifying serialized content. ... ERROR
+test_custom_encoder (serializers.test_jsonl.JsonlSerializerTestCase) ... ok
+test_custom_field_serialization (serializers.test_jsonl.JsonlSerializerTestCase)
+Custom fields serialize and deserialize intact ... ok
+test_deferred_field_serialization (serializers.test_jsonl.JsonlSerializerTestCase) ... ok
+test_deserialize_force_insert (serializers.test_jsonl.JsonlSerializerTestCase)
+Deserialized content can be saved with force_insert as a parameter. ... ERROR
+test_deterministic_mapping_ordering (serializers.test_jsonl.JsonlSerializerTestCase)
+Mapping such as fields should be deterministically ordered. (#24558) ... ERROR
+test_float_serialization (serializers.test_jsonl.JsonlSerializerTestCase)
+Float values serialize and deserialize intact ... ok
+test_helpful_error_message_for_foreign_keys (serializers.test_jsonl.JsonlSerializerTestCase)
+Invalid foreign keys with a natural key throws a helpful error message, ... ok
+test_helpful_error_message_for_many2many_natural1 (serializers.test_jsonl.JsonlSerializerTestCase)
+Invalid many-to-many keys throws a helpful error message where one of a ... ok
+test_helpful_error_message_for_many2many_natural2 (serializers.test_jsonl.JsonlSerializerTestCase)
+Invalid many-to-many keys throws a helpful error message where a ... ok
+test_helpful_error_message_for_many2many_non_natural (serializers.test_jsonl.JsonlSerializerTestCase)
+Invalid many-to-many keys throws a helpful error message. ... ok
+test_helpful_error_message_for_many2many_not_iterable (serializers.test_jsonl.JsonlSerializerTestCase)
+Not iterable many-to-many field value throws a helpful error message. ... ok
+test_helpful_error_message_invalid_field (serializers.test_jsonl.JsonlSerializerTestCase)
+If there is an invalid field value, the error message contains the ... ok
+test_helpful_error_message_invalid_pk (serializers.test_jsonl.JsonlSerializerTestCase)
+If there is an invalid primary key, the error message contains the ... ok
+test_json_deserializer_exception (serializers.test_jsonl.JsonlSerializerTestCase) ... ok
+test_no_indentation (serializers.test_jsonl.JsonlSerializerTestCase) ... ok
+test_one_to_one_as_pk (serializers.test_jsonl.JsonlSerializerTestCase)
+If you use your own primary key field (such as a OneToOneField), it ... ok
+test_pkless_serialized_strings (serializers.test_jsonl.JsonlSerializerTestCase)
+Serialized strings without PKs can be turned into models ... ok
+test_pre_1000ad_date (serializers.test_jsonl.JsonlSerializerTestCase)
+Year values before 1000AD are properly formatted ... ERROR
+test_serialize (serializers.test_jsonl.JsonlSerializerTestCase)
+Basic serialization works. ... ERROR
+test_serialize_field_subset (serializers.test_jsonl.JsonlSerializerTestCase)
+Output can be restricted to a subset of fields ... ok
+test_serialize_inherited_fields (serializers.test_jsonl.JsonlSerializerTestCase) ... ok
+test_serialize_no_only_pk_with_natural_keys (serializers.test_jsonl.JsonlSerializerTestCase) ... ERROR
+test_serialize_only_pk (serializers.test_jsonl.JsonlSerializerTestCase) ... ERROR
+test_serialize_prefetch_related_m2m (serializers.test_jsonl.JsonlSerializerTestCase) ... ERROR
+test_serialize_progressbar (serializers.test_jsonl.JsonlSerializerTestCase) ... ERROR
+test_serialize_proxy_model (serializers.test_jsonl.JsonlSerializerTestCase) ... ok
+test_serialize_specific_fields (serializers.test_jsonl.JsonlSerializerTestCase) ... ok
+test_serialize_superfluous_queries (serializers.test_jsonl.JsonlSerializerTestCase)
+Ensure no superfluous queries are made when serializing ForeignKeys ... ok
+test_serialize_to_stream (serializers.test_jsonl.JsonlSerializerTestCase) ... ok
+test_serialize_unicode_roundtrip (serializers.test_jsonl.JsonlSerializerTestCase)
+Unicode makes the roundtrip intact ... ok
+test_serialize_with_null_pk (serializers.test_jsonl.JsonlSerializerTestCase)
+Serialized data with no primary key results ... ok
+test_serializer_roundtrip (serializers.test_jsonl.JsonlSerializerTestCase)
+Serialized content can be deserialized. ... ERROR
+test_unicode_serialization (serializers.test_jsonl.JsonlSerializerTestCase) ... ok
+test_altering_serialized_output (serializers.test_xml.XmlSerializerTestCase)
+The ability to create new objects by modifying serialized content. ... ERROR
+test_control_char_failure (serializers.test_xml.XmlSerializerTestCase)
+Serializing control characters with XML should fail as those characters ... ERROR
+test_custom_field_serialization (serializers.test_xml.XmlSerializerTestCase)
+Custom fields serialize and deserialize intact ... ok
+test_deferred_field_serialization (serializers.test_xml.XmlSerializerTestCase) ... ok
+test_deserialize_force_insert (serializers.test_xml.XmlSerializerTestCase)
+Deserialized content can be saved with force_insert as a parameter. ... ERROR
+test_deterministic_mapping_ordering (serializers.test_xml.XmlSerializerTestCase)
+Mapping such as fields should be deterministically ordered. (#24558) ... ERROR
+test_float_serialization (serializers.test_xml.XmlSerializerTestCase)
+Float values serialize and deserialize intact ... ok
+test_no_dtd (serializers.test_xml.XmlSerializerTestCase)
+The XML deserializer shouldn't allow a DTD. ... ok
+test_one_to_one_as_pk (serializers.test_xml.XmlSerializerTestCase)
+If you use your own primary key field (such as a OneToOneField), it ... ok
+test_pkless_serialized_strings (serializers.test_xml.XmlSerializerTestCase)
+Serialized strings without PKs can be turned into models ... ok
+test_pre_1000ad_date (serializers.test_xml.XmlSerializerTestCase)
+Year values before 1000AD are properly formatted ... ERROR
+test_serialize (serializers.test_xml.XmlSerializerTestCase)
+Basic serialization works. ... ERROR
+test_serialize_field_subset (serializers.test_xml.XmlSerializerTestCase)
+Output can be restricted to a subset of fields ... ok
+test_serialize_inherited_fields (serializers.test_xml.XmlSerializerTestCase) ... ok
+test_serialize_no_only_pk_with_natural_keys (serializers.test_xml.XmlSerializerTestCase) ... ERROR
+test_serialize_only_pk (serializers.test_xml.XmlSerializerTestCase) ... ERROR
+test_serialize_prefetch_related_m2m (serializers.test_xml.XmlSerializerTestCase) ... ERROR
+test_serialize_progressbar (serializers.test_xml.XmlSerializerTestCase) ... ERROR
+test_serialize_proxy_model (serializers.test_xml.XmlSerializerTestCase) ... ok
+test_serialize_specific_fields (serializers.test_xml.XmlSerializerTestCase) ... ok
+test_serialize_superfluous_queries (serializers.test_xml.XmlSerializerTestCase)
+Ensure no superfluous queries are made when serializing ForeignKeys ... ok
+test_serialize_to_stream (serializers.test_xml.XmlSerializerTestCase) ... ok
+test_serialize_unicode_roundtrip (serializers.test_xml.XmlSerializerTestCase)
+Unicode makes the roundtrip intact ... ok
+test_serialize_with_null_pk (serializers.test_xml.XmlSerializerTestCase)
+Serialized data with no primary key results ... ok
+test_serializer_roundtrip (serializers.test_xml.XmlSerializerTestCase)
+Serialized content can be deserialized. ... ERROR
+test_unicode_serialization (serializers.test_xml.XmlSerializerTestCase) ... ok
+test_altering_serialized_output (serializers.test_yaml.YamlSerializerTestCase)
+The ability to create new objects by modifying serialized content. ... ERROR
+test_custom_field_serialization (serializers.test_yaml.YamlSerializerTestCase)
+Custom fields serialize and deserialize intact ... ok
+test_deferred_field_serialization (serializers.test_yaml.YamlSerializerTestCase) ... ok
+test_deserialize_force_insert (serializers.test_yaml.YamlSerializerTestCase)
+Deserialized content can be saved with force_insert as a parameter. ... ERROR
+test_deterministic_mapping_ordering (serializers.test_yaml.YamlSerializerTestCase)
+Mapping such as fields should be deterministically ordered. (#24558) ... ERROR
+test_float_serialization (serializers.test_yaml.YamlSerializerTestCase)
+Float values serialize and deserialize intact ... ok
+test_one_to_one_as_pk (serializers.test_yaml.YamlSerializerTestCase)
+If you use your own primary key field (such as a OneToOneField), it ... ok
+test_pkless_serialized_strings (serializers.test_yaml.YamlSerializerTestCase)
+Serialized strings without PKs can be turned into models ... ok
+test_pre_1000ad_date (serializers.test_yaml.YamlSerializerTestCase)
+Year values before 1000AD are properly formatted ... ERROR
+test_serialize (serializers.test_yaml.YamlSerializerTestCase)
+Basic serialization works. ... ERROR
+test_serialize_field_subset (serializers.test_yaml.YamlSerializerTestCase)
+Output can be restricted to a subset of fields ... ok
+test_serialize_inherited_fields (serializers.test_yaml.YamlSerializerTestCase) ... ok
+test_serialize_no_only_pk_with_natural_keys (serializers.test_yaml.YamlSerializerTestCase) ... ERROR
+test_serialize_only_pk (serializers.test_yaml.YamlSerializerTestCase) ... ERROR
+test_serialize_prefetch_related_m2m (serializers.test_yaml.YamlSerializerTestCase) ... ERROR
+test_serialize_progressbar (serializers.test_yaml.YamlSerializerTestCase) ... ERROR
+test_serialize_proxy_model (serializers.test_yaml.YamlSerializerTestCase) ... ok
+test_serialize_specific_fields (serializers.test_yaml.YamlSerializerTestCase) ... ok
+test_serialize_superfluous_queries (serializers.test_yaml.YamlSerializerTestCase)
+Ensure no superfluous queries are made when serializing ForeignKeys ... ok
+test_serialize_to_stream (serializers.test_yaml.YamlSerializerTestCase) ... ok
+test_serialize_unicode_roundtrip (serializers.test_yaml.YamlSerializerTestCase)
+Unicode makes the roundtrip intact ... ok
+test_serialize_with_null_pk (serializers.test_yaml.YamlSerializerTestCase)
+Serialized data with no primary key results ... ok
+test_serializer_roundtrip (serializers.test_yaml.YamlSerializerTestCase)
+Serialized content can be deserialized. ... ERROR
+test_unicode_serialization (serializers.test_yaml.YamlSerializerTestCase) ... ok
+test_yaml_deserializer_exception (serializers.test_yaml.YamlSerializerTestCase) ... ok
+test_lazy_string_encoding (serializers.test_json.DjangoJSONEncoderTests) ... ok
+test_timedelta (serializers.test_json.DjangoJSONEncoderTests) ... ok
+test_forward_refs (serializers.test_json.JsonSerializerTransactionTestCase)
+Objects ids can be referenced before they are ... ok
+test_forward_refs (serializers.test_jsonl.JsonSerializerTransactionTestCase)
+Objects ids can be referenced before they are ... ok
+test_forward_refs (serializers.test_xml.XmlSerializerTransactionTestCase)
+Objects ids can be referenced before they are ... ok
+test_deserializer_pyyaml_error_message (serializers.test_yaml.NoYamlSerializerTestCase)
+Using yaml deserializer without pyyaml raises ImportError ... ok
+test_dumpdata_pyyaml_error_message (serializers.test_yaml.NoYamlSerializerTestCase)
+Calling dumpdata produces an error when yaml package missing ... ok
+test_serializer_pyyaml_error_message (serializers.test_yaml.NoYamlSerializerTestCase)
+Using yaml serializer without pyyaml raises ImportError ... ok
+test_forward_refs (serializers.test_yaml.YamlSerializerTransactionTestCase)
+Objects ids can be referenced before they are ... ok
+test_stream_class (serializers.tests.SerializerAPITests) ... ok
+test_builtin_serializers (serializers.tests.SerializerRegistrationTests)
+Requesting a list of serializer formats populates the registry ... ok
+test_get_unknown_deserializer (serializers.tests.SerializerRegistrationTests) ... ok
+test_get_unknown_serializer (serializers.tests.SerializerRegistrationTests)
+#15889: get_serializer('nonsense') raises a SerializerDoesNotExist ... ok
+test_register (serializers.tests.SerializerRegistrationTests)
+Registering a new serializer populates the full registry. Refs #14823 ... ok
+test_unregister (serializers.tests.SerializerRegistrationTests)
+Unregistering a serializer doesn't cause the registry to be ... ok
+test_unregister_unknown_serializer (serializers.tests.SerializerRegistrationTests) ... ok
+
+======================================================================
+ERROR: test_altering_serialized_output (serializers.test_json.JsonSerializerTestCase)
+The ability to create new objects by modifying serialized content.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/tests/serializers/tests.py", line 181, in test_altering_serialized_output
+    serial_str = serializers.serialize(self.serializer_name, Article.objects.all())
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/__init__.py", line 134, in serialize
+    s.serialize(queryset, **options)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/base.py", line 143, in serialize
+    self.handle_m2m_field(obj, field)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in handle_m2m_field
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in <listcomp>
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 515, in _iterator
+    yield from iterable
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 90, in __iter__
+    results = compiler.execute_sql(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1549, in execute_sql
+    sql, params = self.as_sql()
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 736, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 279, in get_select
+    related_klass_infos = self.get_related_selections(select, select_mask)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1211, in get_related_selections
+    if not select_related_descend(f, restricted, requested, select_mask):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query_utils.py", line 347, in select_related_descend
+    raise FieldError(
+django.core.exceptions.FieldError: Field Topic.category cannot be both deferred and traversed using select_related at the same time.
+
+======================================================================
+ERROR: test_deserialize_force_insert (serializers.test_json.JsonSerializerTestCase)
+Deserialized content can be saved with force_insert as a parameter.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/tests/serializers/tests.py", line 381, in test_deserialize_force_insert
+    serial_str = serializers.serialize(self.serializer_name, [self.a1])
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/__init__.py", line 134, in serialize
+    s.serialize(queryset, **options)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/base.py", line 143, in serialize
+    self.handle_m2m_field(obj, field)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in handle_m2m_field
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in <listcomp>
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 515, in _iterator
+    yield from iterable
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 90, in __iter__
+    results = compiler.execute_sql(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1549, in execute_sql
+    sql, params = self.as_sql()
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 736, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 279, in get_select
+    related_klass_infos = self.get_related_selections(select, select_mask)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1211, in get_related_selections
+    if not select_related_descend(f, restricted, requested, select_mask):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query_utils.py", line 347, in select_related_descend
+    raise FieldError(
+django.core.exceptions.FieldError: Field Topic.category cannot be both deferred and traversed using select_related at the same time.
+
+======================================================================
+ERROR: test_deterministic_mapping_ordering (serializers.test_json.JsonSerializerTestCase)
+Mapping such as fields should be deterministically ordered. (#24558)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/tests/serializers/tests.py", line 366, in test_deterministic_mapping_ordering
+    output = serializers.serialize(self.serializer_name, [self.a1], indent=2)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/__init__.py", line 134, in serialize
+    s.serialize(queryset, **options)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/base.py", line 143, in serialize
+    self.handle_m2m_field(obj, field)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in handle_m2m_field
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in <listcomp>
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 515, in _iterator
+    yield from iterable
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 90, in __iter__
+    results = compiler.execute_sql(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1549, in execute_sql
+    sql, params = self.as_sql()
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 736, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 279, in get_select
+    related_klass_infos = self.get_related_selections(select, select_mask)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1211, in get_related_selections
+    if not select_related_descend(f, restricted, requested, select_mask):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query_utils.py", line 347, in select_related_descend
+    raise FieldError(
+django.core.exceptions.FieldError: Field Topic.category cannot be both deferred and traversed using select_related at the same time.
+
+======================================================================
+ERROR: test_pre_1000ad_date (serializers.test_json.JsonSerializerTestCase)
+Year values before 1000AD are properly formatted
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/tests/serializers/tests.py", line 348, in test_pre_1000ad_date
+    serial_str = serializers.serialize(self.serializer_name, [a])
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/__init__.py", line 134, in serialize
+    s.serialize(queryset, **options)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/base.py", line 143, in serialize
+    self.handle_m2m_field(obj, field)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in handle_m2m_field
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in <listcomp>
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 515, in _iterator
+    yield from iterable
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 90, in __iter__
+    results = compiler.execute_sql(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1549, in execute_sql
+    sql, params = self.as_sql()
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 736, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 279, in get_select
+    related_klass_infos = self.get_related_selections(select, select_mask)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1211, in get_related_selections
+    if not select_related_descend(f, restricted, requested, select_mask):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query_utils.py", line 347, in select_related_descend
+    raise FieldError(
+django.core.exceptions.FieldError: Field Topic.category cannot be both deferred and traversed using select_related at the same time.
+
+======================================================================
+ERROR: test_serialize (serializers.test_json.JsonSerializerTestCase)
+Basic serialization works.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/tests/serializers/tests.py", line 134, in test_serialize
+    serial_str = serializers.serialize(self.serializer_name, Article.objects.all())
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/__init__.py", line 134, in serialize
+    s.serialize(queryset, **options)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/base.py", line 143, in serialize
+    self.handle_m2m_field(obj, field)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in handle_m2m_field
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in <listcomp>
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 515, in _iterator
+    yield from iterable
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 90, in __iter__
+    results = compiler.execute_sql(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1549, in execute_sql
+    sql, params = self.as_sql()
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 736, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 279, in get_select
+    related_klass_infos = self.get_related_selections(select, select_mask)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1211, in get_related_selections
+    if not select_related_descend(f, restricted, requested, select_mask):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query_utils.py", line 347, in select_related_descend
+    raise FieldError(
+django.core.exceptions.FieldError: Field Topic.category cannot be both deferred and traversed using select_related at the same time.
+
+======================================================================
+ERROR: test_serialize_no_only_pk_with_natural_keys (serializers.test_json.JsonSerializerTestCase)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/tests/serializers/tests.py", line 428, in test_serialize_no_only_pk_with_natural_keys
+    serializers.serialize(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/__init__.py", line 134, in serialize
+    s.serialize(queryset, **options)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/base.py", line 143, in serialize
+    self.handle_m2m_field(obj, field)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in handle_m2m_field
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in <listcomp>
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 515, in _iterator
+    yield from iterable
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 90, in __iter__
+    results = compiler.execute_sql(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1549, in execute_sql
+    sql, params = self.as_sql()
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 736, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 279, in get_select
+    related_klass_infos = self.get_related_selections(select, select_mask)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1211, in get_related_selections
+    if not select_related_descend(f, restricted, requested, select_mask):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query_utils.py", line 347, in select_related_descend
+    raise FieldError(
+django.core.exceptions.FieldError: Field Topic.category cannot be both deferred and traversed using select_related at the same time.
+
+======================================================================
+ERROR: test_serialize_only_pk (serializers.test_json.JsonSerializerTestCase)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/tests/serializers/tests.py", line 413, in test_serialize_only_pk
+    serializers.serialize(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/__init__.py", line 134, in serialize
+    s.serialize(queryset, **options)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/base.py", line 143, in serialize
+    self.handle_m2m_field(obj, field)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in handle_m2m_field
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in <listcomp>
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 515, in _iterator
+    yield from iterable
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 90, in __iter__
+    results = compiler.execute_sql(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1549, in execute_sql
+    sql, params = self.as_sql()
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 736, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 279, in get_select
+    related_klass_infos = self.get_related_selections(select, select_mask)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1211, in get_related_selections
+    if not select_related_descend(f, restricted, requested, select_mask):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query_utils.py", line 347, in select_related_descend
+    raise FieldError(
+django.core.exceptions.FieldError: Field Topic.category cannot be both deferred and traversed using select_related at the same time.
+
+======================================================================
+ERROR: test_serialize_prefetch_related_m2m (serializers.test_json.JsonSerializerTestCase)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/tests/serializers/tests.py", line 288, in test_serialize_prefetch_related_m2m
+    serializers.serialize(self.serializer_name, Article.objects.all())
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/__init__.py", line 134, in serialize
+    s.serialize(queryset, **options)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/base.py", line 143, in serialize
+    self.handle_m2m_field(obj, field)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in handle_m2m_field
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in <listcomp>
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 515, in _iterator
+    yield from iterable
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 90, in __iter__
+    results = compiler.execute_sql(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1549, in execute_sql
+    sql, params = self.as_sql()
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 736, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 279, in get_select
+    related_klass_infos = self.get_related_selections(select, select_mask)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1211, in get_related_selections
+    if not select_related_descend(f, restricted, requested, select_mask):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query_utils.py", line 347, in select_related_descend
+    raise FieldError(
+django.core.exceptions.FieldError: Field Topic.category cannot be both deferred and traversed using select_related at the same time.
+
+======================================================================
+ERROR: test_serialize_progressbar (serializers.test_json.JsonSerializerTestCase)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/tests/serializers/tests.py", line 252, in test_serialize_progressbar
+    serializers.serialize(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/__init__.py", line 134, in serialize
+    s.serialize(queryset, **options)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/base.py", line 143, in serialize
+    self.handle_m2m_field(obj, field)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in handle_m2m_field
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in <listcomp>
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 515, in _iterator
+    yield from iterable
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 90, in __iter__
+    results = compiler.execute_sql(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1549, in execute_sql
+    sql, params = self.as_sql()
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 736, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 279, in get_select
+    related_klass_infos = self.get_related_selections(select, select_mask)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1211, in get_related_selections
+    if not select_related_descend(f, restricted, requested, select_mask):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query_utils.py", line 347, in select_related_descend
+    raise FieldError(
+django.core.exceptions.FieldError: Field Topic.category cannot be both deferred and traversed using select_related at the same time.
+
+======================================================================
+ERROR: test_serializer_roundtrip (serializers.test_json.JsonSerializerTestCase)
+Serialized content can be deserialized.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/tests/serializers/tests.py", line 139, in test_serializer_roundtrip
+    serial_str = serializers.serialize(self.serializer_name, Article.objects.all())
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/__init__.py", line 134, in serialize
+    s.serialize(queryset, **options)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/base.py", line 143, in serialize
+    self.handle_m2m_field(obj, field)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in handle_m2m_field
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in <listcomp>
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 515, in _iterator
+    yield from iterable
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 90, in __iter__
+    results = compiler.execute_sql(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1549, in execute_sql
+    sql, params = self.as_sql()
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 736, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 279, in get_select
+    related_klass_infos = self.get_related_selections(select, select_mask)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1211, in get_related_selections
+    if not select_related_descend(f, restricted, requested, select_mask):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query_utils.py", line 347, in select_related_descend
+    raise FieldError(
+django.core.exceptions.FieldError: Field Topic.category cannot be both deferred and traversed using select_related at the same time.
+
+======================================================================
+ERROR: test_altering_serialized_output (serializers.test_jsonl.JsonlSerializerTestCase)
+The ability to create new objects by modifying serialized content.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/tests/serializers/tests.py", line 181, in test_altering_serialized_output
+    serial_str = serializers.serialize(self.serializer_name, Article.objects.all())
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/__init__.py", line 134, in serialize
+    s.serialize(queryset, **options)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/base.py", line 143, in serialize
+    self.handle_m2m_field(obj, field)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in handle_m2m_field
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in <listcomp>
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 515, in _iterator
+    yield from iterable
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 90, in __iter__
+    results = compiler.execute_sql(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1549, in execute_sql
+    sql, params = self.as_sql()
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 736, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 279, in get_select
+    related_klass_infos = self.get_related_selections(select, select_mask)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1211, in get_related_selections
+    if not select_related_descend(f, restricted, requested, select_mask):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query_utils.py", line 347, in select_related_descend
+    raise FieldError(
+django.core.exceptions.FieldError: Field Topic.category cannot be both deferred and traversed using select_related at the same time.
+
+======================================================================
+ERROR: test_deserialize_force_insert (serializers.test_jsonl.JsonlSerializerTestCase)
+Deserialized content can be saved with force_insert as a parameter.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/tests/serializers/tests.py", line 381, in test_deserialize_force_insert
+    serial_str = serializers.serialize(self.serializer_name, [self.a1])
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/__init__.py", line 134, in serialize
+    s.serialize(queryset, **options)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/base.py", line 143, in serialize
+    self.handle_m2m_field(obj, field)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in handle_m2m_field
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in <listcomp>
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 515, in _iterator
+    yield from iterable
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 90, in __iter__
+    results = compiler.execute_sql(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1549, in execute_sql
+    sql, params = self.as_sql()
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 736, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 279, in get_select
+    related_klass_infos = self.get_related_selections(select, select_mask)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1211, in get_related_selections
+    if not select_related_descend(f, restricted, requested, select_mask):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query_utils.py", line 347, in select_related_descend
+    raise FieldError(
+django.core.exceptions.FieldError: Field Topic.category cannot be both deferred and traversed using select_related at the same time.
+
+======================================================================
+ERROR: test_deterministic_mapping_ordering (serializers.test_jsonl.JsonlSerializerTestCase)
+Mapping such as fields should be deterministically ordered. (#24558)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/tests/serializers/tests.py", line 366, in test_deterministic_mapping_ordering
+    output = serializers.serialize(self.serializer_name, [self.a1], indent=2)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/__init__.py", line 134, in serialize
+    s.serialize(queryset, **options)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/base.py", line 143, in serialize
+    self.handle_m2m_field(obj, field)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in handle_m2m_field
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in <listcomp>
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 515, in _iterator
+    yield from iterable
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 90, in __iter__
+    results = compiler.execute_sql(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1549, in execute_sql
+    sql, params = self.as_sql()
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 736, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 279, in get_select
+    related_klass_infos = self.get_related_selections(select, select_mask)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1211, in get_related_selections
+    if not select_related_descend(f, restricted, requested, select_mask):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query_utils.py", line 347, in select_related_descend
+    raise FieldError(
+django.core.exceptions.FieldError: Field Topic.category cannot be both deferred and traversed using select_related at the same time.
+
+======================================================================
+ERROR: test_pre_1000ad_date (serializers.test_jsonl.JsonlSerializerTestCase)
+Year values before 1000AD are properly formatted
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/tests/serializers/tests.py", line 348, in test_pre_1000ad_date
+    serial_str = serializers.serialize(self.serializer_name, [a])
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/__init__.py", line 134, in serialize
+    s.serialize(queryset, **options)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/base.py", line 143, in serialize
+    self.handle_m2m_field(obj, field)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in handle_m2m_field
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in <listcomp>
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 515, in _iterator
+    yield from iterable
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 90, in __iter__
+    results = compiler.execute_sql(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1549, in execute_sql
+    sql, params = self.as_sql()
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 736, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 279, in get_select
+    related_klass_infos = self.get_related_selections(select, select_mask)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1211, in get_related_selections
+    if not select_related_descend(f, restricted, requested, select_mask):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query_utils.py", line 347, in select_related_descend
+    raise FieldError(
+django.core.exceptions.FieldError: Field Topic.category cannot be both deferred and traversed using select_related at the same time.
+
+======================================================================
+ERROR: test_serialize (serializers.test_jsonl.JsonlSerializerTestCase)
+Basic serialization works.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/tests/serializers/tests.py", line 134, in test_serialize
+    serial_str = serializers.serialize(self.serializer_name, Article.objects.all())
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/__init__.py", line 134, in serialize
+    s.serialize(queryset, **options)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/base.py", line 143, in serialize
+    self.handle_m2m_field(obj, field)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in handle_m2m_field
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in <listcomp>
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 515, in _iterator
+    yield from iterable
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 90, in __iter__
+    results = compiler.execute_sql(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1549, in execute_sql
+    sql, params = self.as_sql()
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 736, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 279, in get_select
+    related_klass_infos = self.get_related_selections(select, select_mask)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1211, in get_related_selections
+    if not select_related_descend(f, restricted, requested, select_mask):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query_utils.py", line 347, in select_related_descend
+    raise FieldError(
+django.core.exceptions.FieldError: Field Topic.category cannot be both deferred and traversed using select_related at the same time.
+
+======================================================================
+ERROR: test_serialize_no_only_pk_with_natural_keys (serializers.test_jsonl.JsonlSerializerTestCase)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/tests/serializers/tests.py", line 428, in test_serialize_no_only_pk_with_natural_keys
+    serializers.serialize(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/__init__.py", line 134, in serialize
+    s.serialize(queryset, **options)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/base.py", line 143, in serialize
+    self.handle_m2m_field(obj, field)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in handle_m2m_field
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in <listcomp>
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 515, in _iterator
+    yield from iterable
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 90, in __iter__
+    results = compiler.execute_sql(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1549, in execute_sql
+    sql, params = self.as_sql()
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 736, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 279, in get_select
+    related_klass_infos = self.get_related_selections(select, select_mask)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1211, in get_related_selections
+    if not select_related_descend(f, restricted, requested, select_mask):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query_utils.py", line 347, in select_related_descend
+    raise FieldError(
+django.core.exceptions.FieldError: Field Topic.category cannot be both deferred and traversed using select_related at the same time.
+
+======================================================================
+ERROR: test_serialize_only_pk (serializers.test_jsonl.JsonlSerializerTestCase)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/tests/serializers/tests.py", line 413, in test_serialize_only_pk
+    serializers.serialize(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/__init__.py", line 134, in serialize
+    s.serialize(queryset, **options)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/base.py", line 143, in serialize
+    self.handle_m2m_field(obj, field)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in handle_m2m_field
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in <listcomp>
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 515, in _iterator
+    yield from iterable
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 90, in __iter__
+    results = compiler.execute_sql(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1549, in execute_sql
+    sql, params = self.as_sql()
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 736, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 279, in get_select
+    related_klass_infos = self.get_related_selections(select, select_mask)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1211, in get_related_selections
+    if not select_related_descend(f, restricted, requested, select_mask):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query_utils.py", line 347, in select_related_descend
+    raise FieldError(
+django.core.exceptions.FieldError: Field Topic.category cannot be both deferred and traversed using select_related at the same time.
+
+======================================================================
+ERROR: test_serialize_prefetch_related_m2m (serializers.test_jsonl.JsonlSerializerTestCase)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/tests/serializers/tests.py", line 288, in test_serialize_prefetch_related_m2m
+    serializers.serialize(self.serializer_name, Article.objects.all())
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/__init__.py", line 134, in serialize
+    s.serialize(queryset, **options)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/base.py", line 143, in serialize
+    self.handle_m2m_field(obj, field)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in handle_m2m_field
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in <listcomp>
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 515, in _iterator
+    yield from iterable
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 90, in __iter__
+    results = compiler.execute_sql(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1549, in execute_sql
+    sql, params = self.as_sql()
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 736, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 279, in get_select
+    related_klass_infos = self.get_related_selections(select, select_mask)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1211, in get_related_selections
+    if not select_related_descend(f, restricted, requested, select_mask):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query_utils.py", line 347, in select_related_descend
+    raise FieldError(
+django.core.exceptions.FieldError: Field Topic.category cannot be both deferred and traversed using select_related at the same time.
+
+======================================================================
+ERROR: test_serialize_progressbar (serializers.test_jsonl.JsonlSerializerTestCase)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/tests/serializers/tests.py", line 252, in test_serialize_progressbar
+    serializers.serialize(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/__init__.py", line 134, in serialize
+    s.serialize(queryset, **options)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/base.py", line 143, in serialize
+    self.handle_m2m_field(obj, field)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in handle_m2m_field
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in <listcomp>
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 515, in _iterator
+    yield from iterable
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 90, in __iter__
+    results = compiler.execute_sql(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1549, in execute_sql
+    sql, params = self.as_sql()
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 736, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 279, in get_select
+    related_klass_infos = self.get_related_selections(select, select_mask)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1211, in get_related_selections
+    if not select_related_descend(f, restricted, requested, select_mask):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query_utils.py", line 347, in select_related_descend
+    raise FieldError(
+django.core.exceptions.FieldError: Field Topic.category cannot be both deferred and traversed using select_related at the same time.
+
+======================================================================
+ERROR: test_serializer_roundtrip (serializers.test_jsonl.JsonlSerializerTestCase)
+Serialized content can be deserialized.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/tests/serializers/tests.py", line 139, in test_serializer_roundtrip
+    serial_str = serializers.serialize(self.serializer_name, Article.objects.all())
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/__init__.py", line 134, in serialize
+    s.serialize(queryset, **options)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/base.py", line 143, in serialize
+    self.handle_m2m_field(obj, field)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in handle_m2m_field
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in <listcomp>
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 515, in _iterator
+    yield from iterable
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 90, in __iter__
+    results = compiler.execute_sql(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1549, in execute_sql
+    sql, params = self.as_sql()
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 736, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 279, in get_select
+    related_klass_infos = self.get_related_selections(select, select_mask)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1211, in get_related_selections
+    if not select_related_descend(f, restricted, requested, select_mask):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query_utils.py", line 347, in select_related_descend
+    raise FieldError(
+django.core.exceptions.FieldError: Field Topic.category cannot be both deferred and traversed using select_related at the same time.
+
+======================================================================
+ERROR: test_altering_serialized_output (serializers.test_xml.XmlSerializerTestCase)
+The ability to create new objects by modifying serialized content.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/tests/serializers/tests.py", line 181, in test_altering_serialized_output
+    serial_str = serializers.serialize(self.serializer_name, Article.objects.all())
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/__init__.py", line 134, in serialize
+    s.serialize(queryset, **options)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/base.py", line 143, in serialize
+    self.handle_m2m_field(obj, field)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/xml_serializer.py", line 164, in handle_m2m_field
+    for relobj in m2m_iter:
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 515, in _iterator
+    yield from iterable
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 90, in __iter__
+    results = compiler.execute_sql(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1549, in execute_sql
+    sql, params = self.as_sql()
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 736, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 279, in get_select
+    related_klass_infos = self.get_related_selections(select, select_mask)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1211, in get_related_selections
+    if not select_related_descend(f, restricted, requested, select_mask):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query_utils.py", line 347, in select_related_descend
+    raise FieldError(
+django.core.exceptions.FieldError: Field Topic.category cannot be both deferred and traversed using select_related at the same time.
+
+======================================================================
+ERROR: test_control_char_failure (serializers.test_xml.XmlSerializerTestCase)
+Serializing control characters with XML should fail as those characters
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/tests/serializers/test_xml.py", line 76, in test_control_char_failure
+    serializers.serialize(self.serializer_name, [self.a1]),
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/__init__.py", line 134, in serialize
+    s.serialize(queryset, **options)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/base.py", line 143, in serialize
+    self.handle_m2m_field(obj, field)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/xml_serializer.py", line 164, in handle_m2m_field
+    for relobj in m2m_iter:
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 515, in _iterator
+    yield from iterable
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 90, in __iter__
+    results = compiler.execute_sql(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1549, in execute_sql
+    sql, params = self.as_sql()
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 736, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 279, in get_select
+    related_klass_infos = self.get_related_selections(select, select_mask)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1211, in get_related_selections
+    if not select_related_descend(f, restricted, requested, select_mask):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query_utils.py", line 347, in select_related_descend
+    raise FieldError(
+django.core.exceptions.FieldError: Field Topic.category cannot be both deferred and traversed using select_related at the same time.
+
+======================================================================
+ERROR: test_deserialize_force_insert (serializers.test_xml.XmlSerializerTestCase)
+Deserialized content can be saved with force_insert as a parameter.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/tests/serializers/tests.py", line 381, in test_deserialize_force_insert
+    serial_str = serializers.serialize(self.serializer_name, [self.a1])
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/__init__.py", line 134, in serialize
+    s.serialize(queryset, **options)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/base.py", line 143, in serialize
+    self.handle_m2m_field(obj, field)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/xml_serializer.py", line 164, in handle_m2m_field
+    for relobj in m2m_iter:
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 515, in _iterator
+    yield from iterable
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 90, in __iter__
+    results = compiler.execute_sql(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1549, in execute_sql
+    sql, params = self.as_sql()
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 736, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 279, in get_select
+    related_klass_infos = self.get_related_selections(select, select_mask)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1211, in get_related_selections
+    if not select_related_descend(f, restricted, requested, select_mask):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query_utils.py", line 347, in select_related_descend
+    raise FieldError(
+django.core.exceptions.FieldError: Field Topic.category cannot be both deferred and traversed using select_related at the same time.
+
+======================================================================
+ERROR: test_deterministic_mapping_ordering (serializers.test_xml.XmlSerializerTestCase)
+Mapping such as fields should be deterministically ordered. (#24558)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/tests/serializers/tests.py", line 366, in test_deterministic_mapping_ordering
+    output = serializers.serialize(self.serializer_name, [self.a1], indent=2)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/__init__.py", line 134, in serialize
+    s.serialize(queryset, **options)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/base.py", line 143, in serialize
+    self.handle_m2m_field(obj, field)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/xml_serializer.py", line 164, in handle_m2m_field
+    for relobj in m2m_iter:
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 515, in _iterator
+    yield from iterable
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 90, in __iter__
+    results = compiler.execute_sql(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1549, in execute_sql
+    sql, params = self.as_sql()
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 736, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 279, in get_select
+    related_klass_infos = self.get_related_selections(select, select_mask)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1211, in get_related_selections
+    if not select_related_descend(f, restricted, requested, select_mask):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query_utils.py", line 347, in select_related_descend
+    raise FieldError(
+django.core.exceptions.FieldError: Field Topic.category cannot be both deferred and traversed using select_related at the same time.
+
+======================================================================
+ERROR: test_pre_1000ad_date (serializers.test_xml.XmlSerializerTestCase)
+Year values before 1000AD are properly formatted
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/tests/serializers/tests.py", line 348, in test_pre_1000ad_date
+    serial_str = serializers.serialize(self.serializer_name, [a])
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/__init__.py", line 134, in serialize
+    s.serialize(queryset, **options)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/base.py", line 143, in serialize
+    self.handle_m2m_field(obj, field)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/xml_serializer.py", line 164, in handle_m2m_field
+    for relobj in m2m_iter:
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 515, in _iterator
+    yield from iterable
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 90, in __iter__
+    results = compiler.execute_sql(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1549, in execute_sql
+    sql, params = self.as_sql()
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 736, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 279, in get_select
+    related_klass_infos = self.get_related_selections(select, select_mask)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1211, in get_related_selections
+    if not select_related_descend(f, restricted, requested, select_mask):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query_utils.py", line 347, in select_related_descend
+    raise FieldError(
+django.core.exceptions.FieldError: Field Topic.category cannot be both deferred and traversed using select_related at the same time.
+
+======================================================================
+ERROR: test_serialize (serializers.test_xml.XmlSerializerTestCase)
+Basic serialization works.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/tests/serializers/tests.py", line 134, in test_serialize
+    serial_str = serializers.serialize(self.serializer_name, Article.objects.all())
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/__init__.py", line 134, in serialize
+    s.serialize(queryset, **options)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/base.py", line 143, in serialize
+    self.handle_m2m_field(obj, field)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/xml_serializer.py", line 164, in handle_m2m_field
+    for relobj in m2m_iter:
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 515, in _iterator
+    yield from iterable
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 90, in __iter__
+    results = compiler.execute_sql(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1549, in execute_sql
+    sql, params = self.as_sql()
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 736, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 279, in get_select
+    related_klass_infos = self.get_related_selections(select, select_mask)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1211, in get_related_selections
+    if not select_related_descend(f, restricted, requested, select_mask):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query_utils.py", line 347, in select_related_descend
+    raise FieldError(
+django.core.exceptions.FieldError: Field Topic.category cannot be both deferred and traversed using select_related at the same time.
+
+======================================================================
+ERROR: test_serialize_no_only_pk_with_natural_keys (serializers.test_xml.XmlSerializerTestCase)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/tests/serializers/tests.py", line 428, in test_serialize_no_only_pk_with_natural_keys
+    serializers.serialize(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/__init__.py", line 134, in serialize
+    s.serialize(queryset, **options)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/base.py", line 143, in serialize
+    self.handle_m2m_field(obj, field)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/xml_serializer.py", line 164, in handle_m2m_field
+    for relobj in m2m_iter:
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 515, in _iterator
+    yield from iterable
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 90, in __iter__
+    results = compiler.execute_sql(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1549, in execute_sql
+    sql, params = self.as_sql()
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 736, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 279, in get_select
+    related_klass_infos = self.get_related_selections(select, select_mask)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1211, in get_related_selections
+    if not select_related_descend(f, restricted, requested, select_mask):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query_utils.py", line 347, in select_related_descend
+    raise FieldError(
+django.core.exceptions.FieldError: Field Topic.category cannot be both deferred and traversed using select_related at the same time.
+
+======================================================================
+ERROR: test_serialize_only_pk (serializers.test_xml.XmlSerializerTestCase)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/tests/serializers/tests.py", line 413, in test_serialize_only_pk
+    serializers.serialize(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/__init__.py", line 134, in serialize
+    s.serialize(queryset, **options)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/base.py", line 143, in serialize
+    self.handle_m2m_field(obj, field)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/xml_serializer.py", line 164, in handle_m2m_field
+    for relobj in m2m_iter:
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 515, in _iterator
+    yield from iterable
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 90, in __iter__
+    results = compiler.execute_sql(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1549, in execute_sql
+    sql, params = self.as_sql()
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 736, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 279, in get_select
+    related_klass_infos = self.get_related_selections(select, select_mask)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1211, in get_related_selections
+    if not select_related_descend(f, restricted, requested, select_mask):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query_utils.py", line 347, in select_related_descend
+    raise FieldError(
+django.core.exceptions.FieldError: Field Topic.category cannot be both deferred and traversed using select_related at the same time.
+
+======================================================================
+ERROR: test_serialize_prefetch_related_m2m (serializers.test_xml.XmlSerializerTestCase)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/tests/serializers/tests.py", line 288, in test_serialize_prefetch_related_m2m
+    serializers.serialize(self.serializer_name, Article.objects.all())
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/__init__.py", line 134, in serialize
+    s.serialize(queryset, **options)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/base.py", line 143, in serialize
+    self.handle_m2m_field(obj, field)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/xml_serializer.py", line 164, in handle_m2m_field
+    for relobj in m2m_iter:
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 515, in _iterator
+    yield from iterable
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 90, in __iter__
+    results = compiler.execute_sql(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1549, in execute_sql
+    sql, params = self.as_sql()
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 736, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 279, in get_select
+    related_klass_infos = self.get_related_selections(select, select_mask)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1211, in get_related_selections
+    if not select_related_descend(f, restricted, requested, select_mask):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query_utils.py", line 347, in select_related_descend
+    raise FieldError(
+django.core.exceptions.FieldError: Field Topic.category cannot be both deferred and traversed using select_related at the same time.
+
+======================================================================
+ERROR: test_serialize_progressbar (serializers.test_xml.XmlSerializerTestCase)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/tests/serializers/tests.py", line 252, in test_serialize_progressbar
+    serializers.serialize(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/__init__.py", line 134, in serialize
+    s.serialize(queryset, **options)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/base.py", line 143, in serialize
+    self.handle_m2m_field(obj, field)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/xml_serializer.py", line 164, in handle_m2m_field
+    for relobj in m2m_iter:
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 515, in _iterator
+    yield from iterable
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 90, in __iter__
+    results = compiler.execute_sql(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1549, in execute_sql
+    sql, params = self.as_sql()
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 736, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 279, in get_select
+    related_klass_infos = self.get_related_selections(select, select_mask)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1211, in get_related_selections
+    if not select_related_descend(f, restricted, requested, select_mask):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query_utils.py", line 347, in select_related_descend
+    raise FieldError(
+django.core.exceptions.FieldError: Field Topic.category cannot be both deferred and traversed using select_related at the same time.
+
+======================================================================
+ERROR: test_serializer_roundtrip (serializers.test_xml.XmlSerializerTestCase)
+Serialized content can be deserialized.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/tests/serializers/tests.py", line 139, in test_serializer_roundtrip
+    serial_str = serializers.serialize(self.serializer_name, Article.objects.all())
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/__init__.py", line 134, in serialize
+    s.serialize(queryset, **options)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/base.py", line 143, in serialize
+    self.handle_m2m_field(obj, field)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/xml_serializer.py", line 164, in handle_m2m_field
+    for relobj in m2m_iter:
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 515, in _iterator
+    yield from iterable
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 90, in __iter__
+    results = compiler.execute_sql(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1549, in execute_sql
+    sql, params = self.as_sql()
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 736, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 279, in get_select
+    related_klass_infos = self.get_related_selections(select, select_mask)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1211, in get_related_selections
+    if not select_related_descend(f, restricted, requested, select_mask):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query_utils.py", line 347, in select_related_descend
+    raise FieldError(
+django.core.exceptions.FieldError: Field Topic.category cannot be both deferred and traversed using select_related at the same time.
+
+======================================================================
+ERROR: test_altering_serialized_output (serializers.test_yaml.YamlSerializerTestCase)
+The ability to create new objects by modifying serialized content.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/tests/serializers/tests.py", line 181, in test_altering_serialized_output
+    serial_str = serializers.serialize(self.serializer_name, Article.objects.all())
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/__init__.py", line 134, in serialize
+    s.serialize(queryset, **options)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/base.py", line 143, in serialize
+    self.handle_m2m_field(obj, field)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in handle_m2m_field
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in <listcomp>
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 515, in _iterator
+    yield from iterable
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 90, in __iter__
+    results = compiler.execute_sql(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1549, in execute_sql
+    sql, params = self.as_sql()
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 736, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 279, in get_select
+    related_klass_infos = self.get_related_selections(select, select_mask)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1211, in get_related_selections
+    if not select_related_descend(f, restricted, requested, select_mask):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query_utils.py", line 347, in select_related_descend
+    raise FieldError(
+django.core.exceptions.FieldError: Field Topic.category cannot be both deferred and traversed using select_related at the same time.
+
+======================================================================
+ERROR: test_deserialize_force_insert (serializers.test_yaml.YamlSerializerTestCase)
+Deserialized content can be saved with force_insert as a parameter.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/tests/serializers/tests.py", line 381, in test_deserialize_force_insert
+    serial_str = serializers.serialize(self.serializer_name, [self.a1])
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/__init__.py", line 134, in serialize
+    s.serialize(queryset, **options)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/base.py", line 143, in serialize
+    self.handle_m2m_field(obj, field)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in handle_m2m_field
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in <listcomp>
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 515, in _iterator
+    yield from iterable
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 90, in __iter__
+    results = compiler.execute_sql(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1549, in execute_sql
+    sql, params = self.as_sql()
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 736, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 279, in get_select
+    related_klass_infos = self.get_related_selections(select, select_mask)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1211, in get_related_selections
+    if not select_related_descend(f, restricted, requested, select_mask):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query_utils.py", line 347, in select_related_descend
+    raise FieldError(
+django.core.exceptions.FieldError: Field Topic.category cannot be both deferred and traversed using select_related at the same time.
+
+======================================================================
+ERROR: test_deterministic_mapping_ordering (serializers.test_yaml.YamlSerializerTestCase)
+Mapping such as fields should be deterministically ordered. (#24558)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/tests/serializers/tests.py", line 366, in test_deterministic_mapping_ordering
+    output = serializers.serialize(self.serializer_name, [self.a1], indent=2)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/__init__.py", line 134, in serialize
+    s.serialize(queryset, **options)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/base.py", line 143, in serialize
+    self.handle_m2m_field(obj, field)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in handle_m2m_field
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in <listcomp>
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 515, in _iterator
+    yield from iterable
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 90, in __iter__
+    results = compiler.execute_sql(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1549, in execute_sql
+    sql, params = self.as_sql()
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 736, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 279, in get_select
+    related_klass_infos = self.get_related_selections(select, select_mask)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1211, in get_related_selections
+    if not select_related_descend(f, restricted, requested, select_mask):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query_utils.py", line 347, in select_related_descend
+    raise FieldError(
+django.core.exceptions.FieldError: Field Topic.category cannot be both deferred and traversed using select_related at the same time.
+
+======================================================================
+ERROR: test_pre_1000ad_date (serializers.test_yaml.YamlSerializerTestCase)
+Year values before 1000AD are properly formatted
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/tests/serializers/tests.py", line 348, in test_pre_1000ad_date
+    serial_str = serializers.serialize(self.serializer_name, [a])
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/__init__.py", line 134, in serialize
+    s.serialize(queryset, **options)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/base.py", line 143, in serialize
+    self.handle_m2m_field(obj, field)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in handle_m2m_field
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in <listcomp>
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 515, in _iterator
+    yield from iterable
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 90, in __iter__
+    results = compiler.execute_sql(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1549, in execute_sql
+    sql, params = self.as_sql()
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 736, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 279, in get_select
+    related_klass_infos = self.get_related_selections(select, select_mask)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1211, in get_related_selections
+    if not select_related_descend(f, restricted, requested, select_mask):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query_utils.py", line 347, in select_related_descend
+    raise FieldError(
+django.core.exceptions.FieldError: Field Topic.category cannot be both deferred and traversed using select_related at the same time.
+
+======================================================================
+ERROR: test_serialize (serializers.test_yaml.YamlSerializerTestCase)
+Basic serialization works.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/tests/serializers/tests.py", line 134, in test_serialize
+    serial_str = serializers.serialize(self.serializer_name, Article.objects.all())
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/__init__.py", line 134, in serialize
+    s.serialize(queryset, **options)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/base.py", line 143, in serialize
+    self.handle_m2m_field(obj, field)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in handle_m2m_field
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in <listcomp>
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 515, in _iterator
+    yield from iterable
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 90, in __iter__
+    results = compiler.execute_sql(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1549, in execute_sql
+    sql, params = self.as_sql()
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 736, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 279, in get_select
+    related_klass_infos = self.get_related_selections(select, select_mask)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1211, in get_related_selections
+    if not select_related_descend(f, restricted, requested, select_mask):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query_utils.py", line 347, in select_related_descend
+    raise FieldError(
+django.core.exceptions.FieldError: Field Topic.category cannot be both deferred and traversed using select_related at the same time.
+
+======================================================================
+ERROR: test_serialize_no_only_pk_with_natural_keys (serializers.test_yaml.YamlSerializerTestCase)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/tests/serializers/tests.py", line 428, in test_serialize_no_only_pk_with_natural_keys
+    serializers.serialize(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/__init__.py", line 134, in serialize
+    s.serialize(queryset, **options)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/base.py", line 143, in serialize
+    self.handle_m2m_field(obj, field)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in handle_m2m_field
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in <listcomp>
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 515, in _iterator
+    yield from iterable
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 90, in __iter__
+    results = compiler.execute_sql(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1549, in execute_sql
+    sql, params = self.as_sql()
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 736, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 279, in get_select
+    related_klass_infos = self.get_related_selections(select, select_mask)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1211, in get_related_selections
+    if not select_related_descend(f, restricted, requested, select_mask):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query_utils.py", line 347, in select_related_descend
+    raise FieldError(
+django.core.exceptions.FieldError: Field Topic.category cannot be both deferred and traversed using select_related at the same time.
+
+======================================================================
+ERROR: test_serialize_only_pk (serializers.test_yaml.YamlSerializerTestCase)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/tests/serializers/tests.py", line 413, in test_serialize_only_pk
+    serializers.serialize(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/__init__.py", line 134, in serialize
+    s.serialize(queryset, **options)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/base.py", line 143, in serialize
+    self.handle_m2m_field(obj, field)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in handle_m2m_field
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in <listcomp>
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 515, in _iterator
+    yield from iterable
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 90, in __iter__
+    results = compiler.execute_sql(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1549, in execute_sql
+    sql, params = self.as_sql()
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 736, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 279, in get_select
+    related_klass_infos = self.get_related_selections(select, select_mask)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1211, in get_related_selections
+    if not select_related_descend(f, restricted, requested, select_mask):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query_utils.py", line 347, in select_related_descend
+    raise FieldError(
+django.core.exceptions.FieldError: Field Topic.category cannot be both deferred and traversed using select_related at the same time.
+
+======================================================================
+ERROR: test_serialize_prefetch_related_m2m (serializers.test_yaml.YamlSerializerTestCase)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/tests/serializers/tests.py", line 288, in test_serialize_prefetch_related_m2m
+    serializers.serialize(self.serializer_name, Article.objects.all())
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/__init__.py", line 134, in serialize
+    s.serialize(queryset, **options)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/base.py", line 143, in serialize
+    self.handle_m2m_field(obj, field)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in handle_m2m_field
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in <listcomp>
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 515, in _iterator
+    yield from iterable
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 90, in __iter__
+    results = compiler.execute_sql(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1549, in execute_sql
+    sql, params = self.as_sql()
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 736, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 279, in get_select
+    related_klass_infos = self.get_related_selections(select, select_mask)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1211, in get_related_selections
+    if not select_related_descend(f, restricted, requested, select_mask):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query_utils.py", line 347, in select_related_descend
+    raise FieldError(
+django.core.exceptions.FieldError: Field Topic.category cannot be both deferred and traversed using select_related at the same time.
+
+======================================================================
+ERROR: test_serialize_progressbar (serializers.test_yaml.YamlSerializerTestCase)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/tests/serializers/tests.py", line 252, in test_serialize_progressbar
+    serializers.serialize(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/__init__.py", line 134, in serialize
+    s.serialize(queryset, **options)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/base.py", line 143, in serialize
+    self.handle_m2m_field(obj, field)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in handle_m2m_field
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in <listcomp>
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 515, in _iterator
+    yield from iterable
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 90, in __iter__
+    results = compiler.execute_sql(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1549, in execute_sql
+    sql, params = self.as_sql()
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 736, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 279, in get_select
+    related_klass_infos = self.get_related_selections(select, select_mask)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1211, in get_related_selections
+    if not select_related_descend(f, restricted, requested, select_mask):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query_utils.py", line 347, in select_related_descend
+    raise FieldError(
+django.core.exceptions.FieldError: Field Topic.category cannot be both deferred and traversed using select_related at the same time.
+
+======================================================================
+ERROR: test_serializer_roundtrip (serializers.test_yaml.YamlSerializerTestCase)
+Serialized content can be deserialized.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/tests/serializers/tests.py", line 139, in test_serializer_roundtrip
+    serial_str = serializers.serialize(self.serializer_name, Article.objects.all())
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/__init__.py", line 134, in serialize
+    s.serialize(queryset, **options)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/base.py", line 143, in serialize
+    self.handle_m2m_field(obj, field)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in handle_m2m_field
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/core/serializers/python.py", line 88, in <listcomp>
+    self._current[field.name] = [m2m_value(related) for related in m2m_iter]
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 515, in _iterator
+    yield from iterable
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query.py", line 90, in __iter__
+    results = compiler.execute_sql(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1549, in execute_sql
+    sql, params = self.as_sql()
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 736, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 279, in get_select
+    related_klass_infos = self.get_related_selections(select, select_mask)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/sql/compiler.py", line 1211, in get_related_selections
+    if not select_related_descend(f, restricted, requested, select_mask):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g2/django__django-16938/work/django/db/models/query_utils.py", line 347, in select_related_descend
+    raise FieldError(
+django.core.exceptions.FieldError: Field Topic.category cannot be both deferred and traversed using select_related at the same time.
+
+----------------------------------------------------------------------
+Ran 135 tests in 0.234s
+
+FAILED (errors=41)
+Destroying test database for alias 'default' ('file:memorydb_default?mode=memory&cache=shared')...

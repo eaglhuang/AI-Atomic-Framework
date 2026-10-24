@@ -1,0 +1,70 @@
+Testing against Django installed in '/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g3/django__django-13810/work/django'
+Importing application middleware_exceptions
+Skipping setup of unused database(s): default, other.
+System check identified no issues (0 silenced).
+test_exception_in_async_render_passed_to_process_exception (middleware_exceptions.tests.AsyncMiddlewareTests) ... ok
+test_exception_in_render_passed_to_process_exception (middleware_exceptions.tests.AsyncMiddlewareTests) ... ok
+test_process_template_response (middleware_exceptions.tests.AsyncMiddlewareTests) ... ok
+test_process_template_response_returns_none (middleware_exceptions.tests.AsyncMiddlewareTests) ... ok
+test_process_view_return_response (middleware_exceptions.tests.AsyncMiddlewareTests) ... ok
+test_view_exception_handled_by_process_exception (middleware_exceptions.tests.AsyncMiddlewareTests) ... ok
+test_async_and_sync_middleware_chain_async_call (middleware_exceptions.tests.MiddlewareNotUsedTests) ... ERROR
+test_do_not_log_when_debug_is_false (middleware_exceptions.tests.MiddlewareNotUsedTests) ... ok
+test_log (middleware_exceptions.tests.MiddlewareNotUsedTests) ... ok
+test_log_custom_message (middleware_exceptions.tests.MiddlewareNotUsedTests) ... ok
+test_raise_exception (middleware_exceptions.tests.MiddlewareNotUsedTests) ... ok
+test_async_and_sync_middleware_async_call (middleware_exceptions.tests.MiddlewareSyncAsyncTests) ... ok
+test_async_and_sync_middleware_sync_call (middleware_exceptions.tests.MiddlewareSyncAsyncTests) ... ok
+test_async_middleware (middleware_exceptions.tests.MiddlewareSyncAsyncTests) ... ok
+test_async_middleware_async (middleware_exceptions.tests.MiddlewareSyncAsyncTests) ... ok
+test_async_process_template_response_returns_none_with_sync_client (middleware_exceptions.tests.MiddlewareSyncAsyncTests) ... /workspace/AI-Atomic-Framework-rel/n0/validation-venv/lib/python3.10/site-packages/asgiref/sync.py:569: UserWarning: async_to_sync was passed a non-async-marked callable
+  return AsyncToSync(
+ok
+test_not_sync_or_async_middleware (middleware_exceptions.tests.MiddlewareSyncAsyncTests) ... ok
+test_sync_decorated_middleware (middleware_exceptions.tests.MiddlewareSyncAsyncTests) ... ok
+test_sync_middleware (middleware_exceptions.tests.MiddlewareSyncAsyncTests) ... ok
+test_sync_middleware_async (middleware_exceptions.tests.MiddlewareSyncAsyncTests) ... ok
+test_exception_in_middleware_converted_before_prior_middleware (middleware_exceptions.tests.MiddlewareTests) ... ok
+test_exception_in_render_passed_to_process_exception (middleware_exceptions.tests.MiddlewareTests) ... ok
+test_process_template_response (middleware_exceptions.tests.MiddlewareTests) ... ok
+test_process_template_response_returns_none (middleware_exceptions.tests.MiddlewareTests) ... ok
+test_process_view_return_none (middleware_exceptions.tests.MiddlewareTests) ... ok
+test_process_view_return_response (middleware_exceptions.tests.MiddlewareTests) ... ok
+test_response_from_process_exception_short_circuits_remainder (middleware_exceptions.tests.MiddlewareTests) ... ok
+test_response_from_process_exception_when_return_response (middleware_exceptions.tests.MiddlewareTests) ... ok
+test_templateresponse_from_process_view_passed_to_process_template_response (middleware_exceptions.tests.MiddlewareTests)
+TemplateResponses returned from process_view() should be passed to any ... ok
+test_templateresponse_from_process_view_rendered (middleware_exceptions.tests.MiddlewareTests)
+TemplateResponses returned from process_view() must be rendered before ... ok
+test_view_exception_converted_before_middleware (middleware_exceptions.tests.MiddlewareTests) ... ok
+test_view_exception_handled_by_process_exception (middleware_exceptions.tests.MiddlewareTests) ... ok
+test_missing_root_urlconf (middleware_exceptions.tests.RootUrlconfTests) ... ok
+
+======================================================================
+ERROR: test_async_and_sync_middleware_chain_async_call (middleware_exceptions.tests.MiddlewareNotUsedTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/AI-Atomic-Framework-rel/n0/validation-venv/lib/python3.10/site-packages/asgiref/sync.py", line 254, in __call__
+    return call_result.result()
+  File "/home/box/.local/share/uv/python/cpython-3.10-linux-x86_64-gnu/lib/python3.10/concurrent/futures/_base.py", line 451, in result
+    return self.__get_result()
+  File "/home/box/.local/share/uv/python/cpython-3.10-linux-x86_64-gnu/lib/python3.10/concurrent/futures/_base.py", line 403, in __get_result
+    raise self._exception
+  File "/workspace/AI-Atomic-Framework-rel/n0/validation-venv/lib/python3.10/site-packages/asgiref/sync.py", line 331, in main_wrap
+    result = await self.awaitable(*args, **kwargs)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g3/django__django-13810/work/django/test/utils.py", line 375, in inner
+    return await func(*args, **kwargs)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g3/django__django-13810/work/tests/middleware_exceptions/tests.py", line 190, in test_async_and_sync_middleware_chain_async_call
+    response = await self.async_client.get('/middleware_exceptions/view/')
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g3/django__django-13810/work/django/test/client.py", line 903, in request
+    response = await self.handler(scope)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g3/django__django-13810/work/django/test/client.py", line 192, in __call__
+    response = await self.get_response_async(request)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g3/django__django-13810/work/django/core/handlers/base.py", line 148, in get_response_async
+    response = await self._middleware_chain(request)
+TypeError: object HttpResponse can't be used in 'await' expression
+
+----------------------------------------------------------------------
+Ran 33 tests in 0.097s
+
+FAILED (errors=1)

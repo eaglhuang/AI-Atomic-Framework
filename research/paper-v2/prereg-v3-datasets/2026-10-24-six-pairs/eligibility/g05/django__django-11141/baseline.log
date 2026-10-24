@@ -1,0 +1,107 @@
+Testing against Django installed in '/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g5/django__django-11141/work/django'
+Importing application migrations
+Operations to perform:
+  Synchronize unmigrated apps: auth, contenttypes, messages, migrations, sessions, staticfiles
+  Apply all migrations: admin, sites
+Synchronizing apps without migrations:
+  Creating tables...
+    Creating table django_content_type
+    Creating table auth_permission
+    Creating table auth_group
+    Creating table auth_user
+    Creating table django_session
+    Creating table migrations_modelwithcustombase
+    Creating table migrations_unmigratedmodel
+    Running deferred SQL...
+Running migrations:
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying sites.0001_initial... OK
+  Applying sites.0002_alter_domain_unique... OK
+Operations to perform:
+  Synchronize unmigrated apps: auth, contenttypes, messages, migrations, sessions, staticfiles
+  Apply all migrations: admin, sites
+Synchronizing apps without migrations:
+  Creating tables...
+    Creating table django_content_type
+    Creating table auth_permission
+    Creating table auth_group
+    Creating table auth_user
+    Creating table django_session
+    Creating table migrations_modelwithcustombase
+    Creating table migrations_unmigratedmodel
+    Running deferred SQL...
+Running migrations:
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying sites.0001_initial... OK
+  Applying sites.0002_alter_domain_unique... OK
+System check identified no issues (0 silenced).
+Creating test database for alias 'default' ('file:memorydb_default?mode=memory&cache=shared')...
+Creating test database for alias 'other' ('file:memorydb_other?mode=memory&cache=shared')...
+test_check_consistent_history (migrations.test_loader.LoaderTests) ... ok
+test_check_consistent_history_squashed (migrations.test_loader.LoaderTests)
+MigrationLoader.check_consistent_history() should ignore unapplied ... ok
+test_explicit_missing_module (migrations.test_loader.LoaderTests)
+If a MIGRATION_MODULES override points to a missing module, the error ... ok
+test_first (migrations.test_loader.LoaderTests)
+Makes sure the '__first__' migrations build correctly. ... ok
+test_ignore_files (migrations.test_loader.LoaderTests)
+Files prefixed with underscore, tilde, or dot aren't loaded. ... ok
+test_load (migrations.test_loader.LoaderTests)
+Makes sure the loader can load the migrations for the test apps, ... ok
+test_load_empty_dir (migrations.test_loader.LoaderTests) ... ok
+test_load_import_error (migrations.test_loader.LoaderTests) ... ok
+test_load_module_file (migrations.test_loader.LoaderTests) ... ok
+test_load_unmigrated_dependency (migrations.test_loader.LoaderTests)
+Makes sure the loader can load migrations with a dependency on an unmigrated app. ... ok
+test_loading_namespace_package (migrations.test_loader.LoaderTests)
+Migration directories without an __init__.py file are loaded. ... ERROR
+test_loading_squashed (migrations.test_loader.LoaderTests)
+Tests loading a squashed migration ... ok
+test_loading_squashed_complex (migrations.test_loader.LoaderTests)
+Tests loading a complex set of squashed migrations ... ok
+test_loading_squashed_complex_multi_apps (migrations.test_loader.LoaderTests) ... ok
+test_loading_squashed_complex_multi_apps_partially_applied (migrations.test_loader.LoaderTests) ... ok
+test_loading_squashed_erroneous (migrations.test_loader.LoaderTests)
+Tests loading a complex but erroneous set of squashed migrations ... ok
+test_loading_squashed_ref_squashed (migrations.test_loader.LoaderTests)
+Tests loading a squashed migration with a new migration referencing it ... ok
+test_marked_as_migrated (migrations.test_loader.LoaderTests)
+Undefined MIGRATION_MODULES implies default migration module. ... ok
+test_marked_as_unmigrated (migrations.test_loader.LoaderTests)
+MIGRATION_MODULES allows disabling of migrations for a particular app. ... ok
+test_name_match (migrations.test_loader.LoaderTests)
+Tests prefix name matching ... ok
+test_plan_handles_repeated_migrations (migrations.test_loader.LoaderTests)
+_generate_plan() doesn't readd migrations already in the plan (#29180). ... ok
+test_run_before (migrations.test_loader.LoaderTests)
+Makes sure the loader uses Migration.run_before. ... ok
+test_apply (migrations.test_loader.RecorderTests)
+Tests marking migrations as applied/unapplied. ... ok
+test_invalid (migrations.test_loader.PycLoaderTests)
+MigrationLoader reraises ImportErrors caused by "bad magic number" pyc ... ok
+test_valid (migrations.test_loader.PycLoaderTests)
+To support frozen environments, MigrationLoader loads .pyc migrations. ... ok
+
+======================================================================
+ERROR: test_loading_namespace_package (migrations.test_loader.LoaderTests)
+Migration directories without an __init__.py file are loaded.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g5/django__django-11141/work/django/test/utils.py", line 382, in inner
+    return func(*args, **kwargs)
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g5/django__django-11141/work/tests/migrations/test_loader.py", line 512, in test_loading_namespace_package
+    migration_loader.graph.forwards_plan(('migrations', '0001_initial')),
+  File "/workspace/AI-Atomic-Framework-rel/n0/pair-validation/g5/django__django-11141/work/django/db/migrations/graph.py", line 204, in forwards_plan
+    raise NodeNotFoundError("Node %r not a valid node" % (target,), target)
+django.db.migrations.exceptions.NodeNotFoundError: Node ('migrations', '0001_initial') not a valid node
+
+----------------------------------------------------------------------
+Ran 25 tests in 0.104s
+
+FAILED (errors=1)
+Destroying test database for alias 'default' ('file:memorydb_default?mode=memory&cache=shared')...
+Destroying test database for alias 'other' ('file:memorydb_other?mode=memory&cache=shared')...
