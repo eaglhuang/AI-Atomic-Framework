@@ -756,3 +756,5 @@ pilot、主跑、留出集實驗仍不在這次範圍。dev 題沒有 B′ 與 D
 | `prereg-v3-replay/2026-10-23-398/` | sealed model-free diagnostic; kit attribution; not formal | Old kit accepts/removes guard; direct published CLI 0.1.22 rejects cross-session-overlap/preserves guard; four original patch hashes verified; zero model calls; see VERDICT.md and SHA256SUMS; no win claim |
 
 | `prereg-v3-datasets/2026-10-24-six-pairs/` | eligibility only, four main + two held-out; no model/formal runs | CLI 0.1.22 | `e60bbfc445aeff7302797ce280372354c618b289ad2c63a88a56794a9711dc03` | 99 | [inventory](./prereg-v3-datasets/2026-10-24-six-pairs/inventory.json) |
+
+| `prereg-v3-kits/cli-0.1.22-v14-367/` | sealed kit; three arms, four main + two held-out pairs; no formal runs | CLI 0.1.22 | `99eddee12e33fe25666bab53e54853249a47d3bb58c50576d8f6bd8f6c3eee8b` | 25 | [manifest](./prereg-v3-kits/cli-0.1.22-v14-367/MANIFEST.json) |

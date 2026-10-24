@@ -1,0 +1,37 @@
+{
+  "djangoPython": {
+    "command": [
+      "n0/validation-venv/bin/python",
+      "--version"
+    ],
+    "output": "Python 3.10.22"
+  },
+  "djangoDependencies": {
+    "command": [
+      "n0/validation-venv/bin/pip",
+      "freeze"
+    ],
+    "output": "asgiref==3.8.1\npytz==2025.2\nPyYAML==6.0.2\nsqlparse==0.5.3\ntyping_extensions==4.16.0"
+  },
+  "sympyPython": {
+    "command": [
+      "n0/sympy-validation-venv/bin/python",
+      "--version"
+    ],
+    "output": "Python 3.8.20"
+  },
+  "sympyDependencies": {
+    "command": [
+      "n0/sympy-validation-venv/bin/pip",
+      "freeze"
+    ],
+    "output": "attrs==25.3.0\niniconfig==2.1.0\nmpmath==1.2.1\npackaging==26.2\npluggy==1.5.0\npy==1.11.0\npytest==6.2.5\ntoml==0.10.2"
+  },
+  "kernel": {
+    "command": [
+      "uname",
+      "-srm"
+    ],
+    "output": "Linux 6.12.94+ x86_64"
+  }
+}
