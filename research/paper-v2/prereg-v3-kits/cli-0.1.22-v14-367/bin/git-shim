@@ -1,0 +1,13 @@
+#!/bin/bash
+# Arm B enforcement shim. Read-only git is forwarded. Mutations are refused.
+# atm-write calls /usr/bin/git directly and is not affected by PATH.
+set -euo pipefail
+REAL="${PREREG_REAL_GIT:-/usr/bin/git}"
+cmd="${1:-}"
+case "$cmd" in
+  commit|add|apply|am|checkout|switch|restore|reset|merge|rebase|stash|pull|push|cherry-pick|clean|mv|rm)
+    echo "prereg-v3-smoke: git $cmd is blocked in arm B. Write and commit only through atm-write." >&2
+    exit 86
+    ;;
+esac
+exec "$REAL" "$@"
