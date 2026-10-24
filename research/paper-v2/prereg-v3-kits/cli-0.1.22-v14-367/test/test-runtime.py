@@ -32,7 +32,7 @@ def integration_fixture(label,resolve):
  for i in range(2):
   private=d/f'p{i}';subprocess.run(['git','clone','-q',base,private],check=True);w=d/f'w{i}';git(private,'worktree','add','-q','-b',f's{i}',str(w));(w/'guard').write_text(f'slot{i+1}\n');git(w,'add','guard');git(w,'-c','user.name=test','-c','user.email=test@localhost','commit','-qm',f'slot{i+1}');branches.append(w);privates.append(private/'.git')
  work=d/'integration';subprocess.run(['git','clone','-q',base,work],check=True)
- arm={'resolvers':[]};group={'commonBase':sha,'tasks':[{'repo':'django/django','instance_id':f't{i}','problem_statement':f'preserve slot{i+1}'} for i in range(2)]}
+ arm={'resolvers':[]};group={'commonBase':sha,'publicTests':['migrations.test_loader'],'tasks':[{'repo':'django/django','instance_id':f't{i}','problem_statement':f'preserve slot{i+1}'} for i in range(2)]}
  integrate(SimpleNamespace(python=sys.executable),group,d,work,branches,privates,arm,resolve=resolve)
  assert [x['slot'] for x in arm['merges']]==[1,2]
  assert not arm['merges'][0]['conflictingPaths'] and arm['merges'][1]['conflictingPaths']==['guard']
@@ -44,3 +44,10 @@ a,w=integration_fixture('resolved',resolves);assert len(a['resolvers'])==1 and a
 def unresolved(*args,**kw):return {'modelCalls':0,'fixture':True}
 a,w=integration_fixture('unresolved',unresolved);assert len(a['resolvers'])==2 and a['unresolved'] is True
 print('PASS: actual launcher fixed-order integration, native conflict paths, one-round resolution and R_max=2 exhaustion; modelCalls=0')
+
+# A successful uncommitted edit is reported separately from submitted-branch loss.
+sessions[0]['submittedSnapshot']=s;sessions[1]['submittedSnapshot']=s
+sessions[0]['submittedOracle']=[o('s1',False)];sessions[1]['submittedOracle']=[o('s2',False)]
+r=score({'arm':'B-wt','sessions':sessions,'finalSnapshot':s,'finalOracle':[o('s1',False),o('s2',False)],'notifications':[]})
+assert r['validity']=='VALID' and r['lostCount']==0 and r['losses'][0]['unsubmittedSuccessfulEnd'] is True
+print('PASS: successful uncommitted B-wt work is separate from submitted losses')

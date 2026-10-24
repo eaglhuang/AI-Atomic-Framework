@@ -93,23 +93,30 @@ def session(arm,slot,task,work,dest,python,privategit=None,socket=None,base=None
  else:snap=snapshot(work,snapdest,base);obs['snapshotPath']=str(snapdest)
  obs['endSnapshot']=snap;dump(dest/'session.json',obs);return obs
 
+def public_command(g,python):
+ if g['tasks'][0]['repo']=='django/django':return [python,'tests/runtests.py','--settings=test_sqlite','--parallel','1',*g['publicTests']]
+ return [python,'-m','pytest','-v',*g['publicTests']]
+
 def integrate(a,g,root,work,works,privates,arm,resolve=session):
  arm['merges']=[]
  for i in range(2):
+  merge_start=time.monotonic()
   branch=git(works[i],'rev-parse','HEAD');dump(root/f'branch-{i+1}.json',{'slot':i+1,'head':branch,'base':g['commonBase'],'log':git(works[i],'log','--format=fuller',g['commonBase']+'..'+branch),'diff':git(works[i],'diff','--binary',g['commonBase'],branch)})
   checked(['git','-C',work,'fetch','--quiet',str(privates[i].parent),branch])
   q=command(['git','-C',work,'-c','user.name=integrator','-c','user.email=integrator@localhost','merge','--no-edit',branch]);conflicts=git(work,'diff','--name-only','--diff-filter=U').splitlines();receipt={'slot':i+1,'commit':branch,'initialExitCode':q.returncode,'conflictingPaths':conflicts,'resolved':not conflicts}
   if q.returncode and not conflicts:raise RuntimeError('kit-error: merge failed without conflicts: '+q.stderr)
   for round in range(1,3) if conflicts else []:
-   prompt=RESOLVER+'\n\nIssues:\n'+'\n\n'.join(t['problem_statement'] for t in g['tasks'])+'\nConflicting paths: '+', '.join(conflicts)+'\nPublic test command: '+a.python+' tests/runtests.py --settings=test_sqlite --parallel 1 migrations.test_loader\n'
+   prompt=RESOLVER+'\n\nIssues:\n'+'\n\n'.join(t['problem_statement'] for t in g['tasks'])+'\nConflicting paths: '+', '.join(conflicts)+'\nPublic test command: '+__import__('shlex').join(list(map(str,public_command(g,a.python))))+'\n'
    s=resolve('B-wt',round,g['tasks'][i],work,root/f'resolver-{i+1}-{round}',a.python,work/'.git',base=git(work,'rev-parse','HEAD'),resolver=True,prompt_override=prompt);arm['resolvers'].append(s)
    conflicts=git(work,'diff','--name-only','--diff-filter=U').splitlines()
    if not conflicts:
-    public=command([a.python,'tests/runtests.py','--settings=test_sqlite','--parallel','1','migrations.test_loader'],work,env={**os.environ,'PYTHONPATH':str(work)},timeout=300) if g['tasks'][0]['repo']=='django/django' else command([a.python,'bin/test','-v'],work,timeout=300)
+    public=command(public_command(g,a.python),work,env={**os.environ,'PYTHONPATH':str(work),'PYTEST_DISABLE_PLUGIN_AUTOLOAD':'1'},timeout=300)
     (root/f'resolver-public-{i+1}-{round}.log').write_text(public.stdout+public.stderr);s['publicTestExitCode']=public.returncode
     if public.returncode:continue
     if (work/'.git/MERGE_HEAD').exists():git(work,'-c','user.name=integrator','-c','user.email=integrator@localhost','commit','--no-edit')
     receipt['resolved']=True;break
+  receipt['wallSeconds']=time.monotonic()-merge_start
+  receipt['snapshot']=snapshot(work,root/f'integration-snapshot-{i+1}',g['commonBase'])
   arm['merges'].append(receipt)
   if not receipt['resolved']:arm['unresolved']=True;break
 
@@ -120,6 +127,8 @@ def main():
  a.dataset=a.dataset.resolve();a.mirror=a.mirror.resolve()
  a.scratch=a.scratch.resolve();a.scratch.mkdir(exist_ok=False);root=a.scratch;arm_start=time.monotonic()
  inv=json.loads((a.dataset/'inventory.json').read_text());g=next(g for g in inv['groups'] if g['groupId']==a.group);assert g['split']=='main','held-out model sessions are forbidden in smoke'
+ paths={p for t in g['tasks'] for p in __import__('re').findall(r'^diff --git a/(\S+) b/',(a.dataset/t['testPatch']).read_text(),__import__('re').M)}
+ g['publicTests']=sorted({p[len('tests/'):-3].replace('/','.') for p in paths if p.startswith('tests/') and p.endswith('.py')}) if g['tasks'][0]['repo']=='django/django' else sorted(paths)
  env=os.environ;env['TMPDIR']=str(root);template=root/'template'
  checked(['git','init','--quiet',template]);checked(['git','-C',template,'fetch','--quiet','--depth=1',a.mirror,g['commonBase']]);git(template,'checkout','--quiet','--detach','FETCH_HEAD')
  work=root/'work';checked(['git','clone','--quiet',template,work]);git(work,'checkout','--quiet','--detach',g['commonBase'])
@@ -148,12 +157,20 @@ def main():
    for f in fs:arm['sessions'].append(f.result())
   arm['taskPhaseWallSeconds']=time.monotonic()-begin
   if any(s['quotaStop'] for s in arm['sessions']):arm['quotaStop']=True
-  if a.arm=='B-wt':integrate(a,g,root,work,works,privates,arm)
+  if a.arm=='B-wt':
+   for i,s in enumerate(arm['sessions']):
+    submitted=root/f'submitted-{i+1}';checked(['git','clone','--quiet',privates[i].parent,submitted]);git(submitted,'checkout','--quiet','--detach',git(works[i],'rev-parse','HEAD'))
+    s['submittedSnapshot']=snapshot(submitted,root/f'submitted-snapshot-{i+1}',g['commonBase'])
+   integrate(a,g,root,work,works,privates,arm)
   if a.arm=='B':checked(['sudo','-n','chown','-R',str(os.getuid())+':'+str(os.getgid()),work])
   arm['finalSnapshot']=snapshot(work,root/'final-snapshot',g['commonBase'])
+  oracle_start=time.monotonic()
   for s in arm['sessions']:
+   if a.arm=='B-wt':
+    sp=root/('submitted-snapshot-'+str(s['slot']));s['submittedOracle']=oracle(sp/'source.bundle',s['submittedSnapshot']['commit'],g,a.dataset,a.python,root/('oracle-submitted-'+str(s['slot'])))
    sp=Path(s['snapshotPath']);s['endOracle']=oracle(sp/'source.bundle',s['endSnapshot']['commit'],g,a.dataset,a.python,root/('oracle-end-'+str(s['slot'])))
   arm['finalOracle']=oracle(root/'final-snapshot/source.bundle',arm['finalSnapshot']['commit'],g,a.dataset,a.python,root/'oracle-final')
+  arm['oraclePhaseWallSeconds']=time.monotonic()-oracle_start
  except Exception as error:arm['kitErrors'].append(str(error))
  finally:
   if daemon:

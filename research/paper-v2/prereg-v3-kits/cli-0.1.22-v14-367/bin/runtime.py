@@ -65,16 +65,19 @@ def snapshot(work,dest,base=None):
     raise RuntimeError('kit-error: source changed during all bounded snapshot attempts')
 
 def measurements(path):
-    p=Path(path); tokens=None;calls=set();seen=False
+    p=Path(path); tokens=None;calls=set();seen=False;usage=[]
     if not p.exists():return {'tokens':None,'toolCalls':None}
     for line in p.read_text(errors='replace').splitlines():
         try:x=json.loads(line)
         except json.JSONDecodeError:continue
         seen=True
-        if x.get('type')=='turn.completed':tokens=x.get('usage')
+        if x.get('type')=='turn.completed' and x.get('usage') is not None:usage.append(x['usage'])
         item=x.get('item',{})
         if item.get('type') in {'command_execution','mcp_tool_call','web_search','file_change','tool_call'} and item.get('id'):calls.add(item['id'])
-    return {'tokens':tokens,'toolCalls':len(calls) if seen else None}
+    if usage:
+        keys=set().union(*(x.keys() for x in usage))|{'total_tokens'}
+        tokens={k:sum(x[k] for x in usage) if all(x.get(k) is not None for x in usage) else None for k in keys}
+    return {'tokens':tokens,'usageEvents':usage,'toolCalls':len(calls) if seen else None}
 
 def parse_django(output,labels):
     # Split repeated headers on concatenated subTest progress lines.
@@ -104,6 +107,7 @@ def oracle(bundle,snapshot_commit,group,dataset,python,out):
     tree=git(work,'rev-parse','HEAD^{tree}');results=[]
     base_snapshot=json.loads((Path(bundle).parent/'snapshot.json').read_text())['baseCommit']
     for task in group['tasks']:
+        task_start=time.monotonic()
         # Fresh checkout per task avoids tests contaminating peers.
         d=out/task['instance_id'];d.mkdir();w=d/'work'
         q=command(['git','clone','--shared','--quiet',work,w]);assert q.returncode==0,q.stderr
@@ -131,19 +135,20 @@ def oracle(bundle,snapshot_commit,group,dataset,python,out):
             if (d/'tests.xml').exists():
                 for t in ET.parse(d/'tests.xml').iter('testcase'):seen[t.attrib['name']]='fail' if t.find('failure') is not None or t.find('error') is not None else 'skip' if t.find('skipped') is not None else 'pass'
             statuses={s:seen.get(s) for s in labels}
-        result={'instanceId':task['instance_id'],'sourceTree':tree,'exitCode':q.returncode,'tests':statuses,'missing':sum(v is None for v in statuses.values()),'success':all(v=='pass' for v in statuses.values()) if all(v is not None for v in statuses.values()) else None}
+        result={'instanceId':task['instance_id'],'sourceTree':tree,'exitCode':q.returncode,'wallSeconds':time.monotonic()-task_start,'tests':statuses,'missing':sum(v is None for v in statuses.values()),'success':all(v=='pass' for v in statuses.values()) if all(v is not None for v in statuses.values()) else None}
         results.append(result)
     dump(out/'oracle.json',results);return results
 
 def score(arm):
     errors=list(arm.get('kitErrors',[]));sessions=arm.get('sessions',[]);final=arm.get('finalOracle')
     if len(sessions)!=2:errors.append('missing sessions')
-    for session in sessions:
+    for session in sessions+arm.get('resolvers',[]):
         m=session.get('measurements') or {}
         if session.get('exitCode') is None or session.get('wallSeconds') is None or m.get('tokens') is None or m.get('toolCalls') is None:errors.append('missing session accounting')
     if final is None:errors.append('missing final oracle')
     if not arm.get('finalSnapshot') or any(t.get('sourceTree')!=arm.get('finalSnapshot',{}).get('tree') for t in final or []):errors.append('final oracle tree provenance mismatch')
     for session in sessions:
+        if arm.get('arm')=='B-wt' and any(t.get('sourceTree')!=session.get('submittedSnapshot',{}).get('tree') for t in session.get('submittedOracle',[])):errors.append('submitted oracle tree provenance mismatch')
         if any(t.get('sourceTree')!=session.get('endSnapshot',{}).get('tree') for t in session.get('endOracle',[])):errors.append('end oracle tree provenance mismatch')
     losses=[]
     for s in sessions:
@@ -151,8 +156,14 @@ def score(arm):
         end=next((x for x in s.get('endOracle',[]) if x['instanceId']==s['instanceId']),None)
         fin=next((x for x in final or [] if x['instanceId']==s['instanceId']),None)
         if end is None or fin is None or end.get('success') is None or fin.get('success') is None:errors.append('missing required oracle tests');loss=None
-        else:loss=end['success'] and not fin['success']
-        losses.append({'instanceId':s['instanceId'],'successfulAtEnd':end.get('success') if end else None,'successfulAtFinal':fin.get('success') if fin else None,'lost':loss,'silentLost':(loss and not arm.get('notifications')) if loss is not None and arm.get('notifications') is not None else None})
+        else:
+            submitted=next((x for x in s.get('submittedOracle',[]) if x['instanceId']==s['instanceId']),None)
+            eligible=end['success']
+            if arm.get('arm')=='B-wt':
+                if submitted is None or submitted.get('success') is None:errors.append('missing submitted branch oracle');eligible=None
+                else:eligible=submitted['success']
+            loss=(eligible and not fin['success']) if eligible is not None else None
+        losses.append({'instanceId':s['instanceId'],'unsubmittedSuccessfulEnd':bool(end and end.get('success') and arm.get('arm')=='B-wt' and any(t['instanceId']==s['instanceId'] and t.get('success') is False for t in s.get('submittedOracle',[]))),'successfulAtEnd':end.get('success') if end else None,'successfulAtFinal':fin.get('success') if fin else None,'lost':loss,'silentLost':(loss and not arm.get('notifications')) if loss is not None and arm.get('notifications') is not None else None})
     return {'validity':'INVALID' if errors else 'VALID','kitErrors':errors,'losses':losses,'lostCount':sum(x['lost'] for x in losses) if all(x['lost'] is not None for x in losses) else None,'silentLostCount':sum(x['silentLost'] for x in losses) if all(x['silentLost'] is not None for x in losses) else None,'acceptedWriteLossCount':arm.get('acceptedWriteLossCount')}
 
 
