@@ -58,7 +58,7 @@ for (const dirty of ['untracked', 'unstaged', 'staged']) {
   });
 }
 
-test('base-sync rejects wrong HEAD, divergent/backward/missing targets, missing actor and option-like targets', () => {
+test('base-sync rejects wrong HEAD, backward/missing targets, missing actor and option-like targets', () => {
   const f = fixture();
   try {
     assert.throws(() => f.run(['--from', f.to]), { code: 'ATM_BASE_SYNC_HEAD_MISMATCH' });
@@ -69,7 +69,6 @@ test('base-sync rejects wrong HEAD, divergent/backward/missing targets, missing 
     writeFileSync(path.join(f.cwd, 'branch.txt'), 'divergence');
     f.git('add', '.'); f.git('commit', '-m', 'divergent');
     const divergent = f.git('rev-parse', 'HEAD');
-    assert.throws(() => f.run(['--from', divergent]), { code: 'ATM_BASE_SYNC_GIT_FAILED' });
     assert.throws(() => f.run(['--from', divergent, '--to', f.from]), { code: 'ATM_BASE_SYNC_GIT_FAILED' });
     assert.equal(f.git('rev-parse', 'HEAD'), divergent);
   } finally { f.cleanup(); }
@@ -110,6 +109,38 @@ test('editor pre-tool permits governed base-sync but keeps raw merges and declar
     assert.equal(hook(`${command} && git merge --ff-only ${f.to}`).ok, false);
     assert.equal(hook(`echo ${command}`).ok, false);
     assert.equal(hook(`${command}\nnode -e "process.exit(0)"`).ok, false);
+    assert.equal(hook(`git merge ${f.to}`).messages[0]?.code, 'ATM_RAW_GIT_MUTATION_BLOCKED');
     assert.equal(f.git('rev-parse', 'HEAD'), f.from);
+  } finally { f.cleanup(); }
+});
+
+test('base-sync creates a merge commit when the branch has diverged and still blocks raw git merge', () => {
+  const f = fixture();
+  try {
+    writeFileSync(path.join(f.cwd, 'branch.txt'), 'divergence\n');
+    f.git('add', '.'); f.git('commit', '-m', 'divergent');
+    const divergent = f.git('rev-parse', 'HEAD');
+    const result = f.run(['--from', divergent]);
+    assert.equal(result.ok, true);
+    assert.equal(result.evidence.mode, 'merge-commit');
+    const head = f.git('rev-parse', 'HEAD');
+    assert.deepEqual(f.git('rev-parse', `${head}^1`, `${head}^2`).split(/\s+/), [divergent, f.to]);
+    assert.equal(f.git('status', '--porcelain'), '');
+    const hook = (cmd: string) => runIntegrationHookInvocationInProcess(['pre-tool', '--cwd', f.cwd, '--editor', 'claude-code', '--tool-name', 'Bash', '--command', cmd]);
+    assert.equal(hook(`git merge --no-ff ${f.to}`).messages[0]?.code, 'ATM_RAW_GIT_MUTATION_BLOCKED');
+    assert.equal(hook(`node atm.mjs upgrade base-sync --actor test-agent --from ${divergent} --to ${f.to} --json`).ok, true);
+    assert.equal(f.git('rev-parse', 'HEAD'), head);
+  } finally { f.cleanup(); }
+});
+
+test('base-sync aborts a conflicted diverged merge without moving HEAD', () => {
+  const f = fixture();
+  try {
+    writeFileSync(path.join(f.cwd, 'new.txt'), 'other\n');
+    f.git('add', '.'); f.git('commit', '-m', 'conflict');
+    const divergent = f.git('rev-parse', 'HEAD');
+    assert.throws(() => f.run(['--from', divergent]), { code: 'ATM_BASE_SYNC_GIT_FAILED' });
+    assert.equal(f.git('rev-parse', 'HEAD'), divergent);
+    assert.equal(f.git('status', '--porcelain'), '');
   } finally { f.cleanup(); }
 });

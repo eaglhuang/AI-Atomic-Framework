@@ -270,13 +270,17 @@ Run a runner containing this command (an older checkout can use an updated runne
 by absolute path). This entry authorizes importing existing commits without a
 source-edit claim or task card. It requires a framework source repository root,
 a clean index/worktree (including untracked files), HEAD equal to `--from`, and
-`--to` a strict descendant commit. Fetch the target beforehand. It runs only
-`git merge --ff-only` against the pinned SHA; divergent, dirty, missing-object,
-and wrong-base requests fail without forcing or resetting. It records actor,
-from/to, and pending/completed/failed status in the target's Git metadata at
-`git rev-parse --git-path atm-base-sync`. Keep exclusive access to the checkout
-during the operation. The receipt path is returned in JSON; no source commit is
-created. This authority does not permit editing framework source.
+`--to` a different full commit SHA. Fetch the target beforehand. A descendant
+is imported with `git merge --ff-only`. When the branch and the target have
+diverged, the same command creates one merge commit of those two pinned SHAs
+and does not resolve conflicts: a conflict aborts and leaves HEAD unchanged.
+Dirty, missing-object, backward, and already-contained requests fail without
+forcing or resetting. It records actor, from/to, mode, and pending/completed/failed
+status in the target's Git metadata at `git rev-parse --git-path atm-base-sync`.
+Keep exclusive access to the checkout during the operation. The receipt path is
+returned in JSON. A fast-forward creates no source commit; a diverged update
+creates only that merge commit. This authority does not permit editing framework
+source or raw `git merge`.
 
 ## Cross-channel principles
 
