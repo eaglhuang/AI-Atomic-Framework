@@ -6,6 +6,16 @@ import path from 'node:path';
 // Treat every committed collection/generation directory as immutable, including
 // generations without a checksum manifest. Top-level indexes remain editable.
 const researchRoot = 'research/paper-v2';
+const sealManifest = /(?:^|[/\\])(?:SHA\d+SUMS|MD5SUMS)$/i;
+
+export function isQuickfixSealManifestPath(entry: string): boolean {
+  return sealManifest.test(entry);
+}
+
+function isExactConditionCollectionFile(relative: string): boolean {
+  const parts = relative.split('/');
+  return parts.length === 4 && Boolean(path.extname(relative)) && /(?:^|-)conditions$/i.test(parts[2] ?? '');
+}
 
 export function inspectQuickfixResearchScope(cwd: string, files: readonly string[]) {
   const blocked: string[] = [];
@@ -30,7 +40,9 @@ export function inspectQuickfixResearchScope(cwd: string, files: readonly string
         continue;
       }
       if (parts.length < 5) {
-        // Only exact files may enter this bounded channel; root index files are OK.
+        // Root indexes and exact condition-collection files are records, not
+        // generation members. Generation members start at five segments.
+        if (isExactConditionCollectionFile(relative)) continue;
         if (parts.length !== 3 || !path.extname(relative)) blocked.push(file);
         continue;
       }
