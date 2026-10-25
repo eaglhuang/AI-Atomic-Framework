@@ -47,17 +47,41 @@ export function runFrameworkBaseSync(argv: readonly string[]) {
   if (git('rev-parse', '--verify', `${to}^{commit}`) !== to.toLowerCase() || from.toLowerCase() === to.toLowerCase()) {
     throw new CliError('ATM_BASE_SYNC_TARGET_INVALID', '--to must identify a different commit.', { exitCode: 1 });
   }
-  git('merge-base', '--is-ancestor', from, to);
-  const receipt = { schemaId: 'atm.frameworkBaseSync.v1', actor, cwd, from, to, startedAt: new Date().toISOString(), status: 'pending' };
+  const ancestor = (older: string, newer: string) => {
+    const result = spawnSync('git', ['merge-base', '--is-ancestor', older, newer], { cwd, encoding: 'utf8' });
+    if (result.status === 0 || result.status === 1) return result.status === 0;
+    throw new CliError('ATM_BASE_SYNC_GIT_FAILED', 'git merge-base failed; base sync refused.', { exitCode: 1, details: { stderr: result.stderr, stdout: result.stdout } });
+  };
+  // Fast-forward a descendant. Otherwise create one merge commit, unless HEAD already contains the target.
+  const fastForward = ancestor(from, to);
+  if (!fastForward && ancestor(to, from)) {
+    throw new CliError('ATM_BASE_SYNC_GIT_FAILED', '--to is already contained by HEAD; base sync refused.', { exitCode: 1 });
+  }
+  const mode = fastForward ? 'fast-forward' : 'merge-commit';
+  const receipt = { schemaId: 'atm.frameworkBaseSync.v1', actor, cwd, from, to, mode, startedAt: new Date().toISOString(), status: 'pending' };
   // Prove the receipt can be persisted before changing HEAD. Pending receipts survive interruption.
   writeFileSync(receiptPath, `${JSON.stringify(receipt, null, 2)}\n`, { flag: 'wx' });
   try {
-    git('merge', '--ff-only', '--no-edit', to);
-    if (git('rev-parse', 'HEAD') !== to.toLowerCase()) throw new Error('HEAD did not reach the target');
-    writeFileSync(receiptPath, `${JSON.stringify({ ...receipt, status: 'completed', completedAt: new Date().toISOString() }, null, 2)}\n`);
+    if (fastForward) {
+      git('merge', '--ff-only', '--no-edit', to);
+      if (git('rev-parse', 'HEAD') !== to.toLowerCase()) throw new Error('HEAD did not reach the target');
+    } else {
+      git('merge', '--no-ff', '--no-edit', '-m', `atm base-sync: merge ${to} into ${from}`, to);
+      const recorded = git('rev-list', '--parents', '-n', '1', 'HEAD').split(/\s+/);
+      if (recorded.length !== 3 || recorded[1] !== from.toLowerCase() || recorded[2] !== to.toLowerCase()) {
+        git('reset', '--keep', from);
+        throw new Error('HEAD did not record a merge of the pinned commits');
+      }
+    }
+    if (git('status', '--porcelain', '--untracked-files=all')) throw new Error('worktree dirty after base sync');
+    writeFileSync(receiptPath, `${JSON.stringify({ ...receipt, status: 'completed', completedAt: new Date().toISOString(), head: git('rev-parse', 'HEAD') }, null, 2)}\n`);
   } catch (error) {
+    spawnSync('git', ['merge', '--abort'], { cwd, encoding: 'utf8' });
     writeFileSync(receiptPath, `${JSON.stringify({ ...receipt, status: 'failed', head: git('rev-parse', 'HEAD') }, null, 2)}\n`);
     throw error;
   }
-  return makeResult({ ok: true, command: 'upgrade', cwd, messages: [message('info', 'ATM_BASE_SYNC_COMPLETED', 'Framework base advanced by fast-forward only.')], evidence: { ...receipt, status: 'completed', receiptPath } });
+  const summary = fastForward
+    ? 'Framework base advanced by fast-forward only.'
+    : 'Framework branch advanced by a governed merge commit of the pinned target.';
+  return makeResult({ ok: true, command: 'upgrade', cwd, messages: [message('info', 'ATM_BASE_SYNC_COMPLETED', summary)], evidence: { ...receipt, status: 'completed', receiptPath, head: git('rev-parse', 'HEAD') } });
 }
