@@ -1,0 +1,90 @@
+{
+  "fixtures": [
+    {
+      "id": "disjoint",
+      "filename": "shared.txt",
+      "base": "alpha\nbeta\ngamma\ndelta\nepsilon\nzeta\n",
+      "base_absent": false,
+      "full_reject_allowed": false,
+      "proposals": [
+        {"id": 1, "operation": "edit", "line_index": 1, "replacement": "BETA", "signature": "BETA"},
+        {"id": 2, "operation": "edit", "line_index": 4, "replacement": "EPSILON", "signature": "EPSILON"}
+      ],
+      "allowed": [
+        {"ids": [1], "maximal": false, "body": "alpha\nBETA\ngamma\ndelta\nepsilon\nzeta\n"},
+        {"ids": [2], "maximal": false, "body": "alpha\nbeta\ngamma\ndelta\nEPSILON\nzeta\n"},
+        {"ids": [1, 2], "maximal": true, "body": "alpha\nBETA\ngamma\ndelta\nEPSILON\nzeta\n"}
+      ]
+    },
+    {
+      "id": "same-region-mergeable",
+      "filename": "shared.txt",
+      "base": "alpha\nbeta\ngamma\ndelta\nepsilon\nzeta\n",
+      "base_absent": false,
+      "full_reject_allowed": false,
+      "proposals": [
+        {"id": 1, "operation": "edit", "line_index": 0, "replacement": "ALPHA", "signature": "ALPHA"},
+        {"id": 2, "operation": "edit", "line_index": 2, "replacement": "GAMMA", "signature": "GAMMA"}
+      ],
+      "allowed": [
+        {"ids": [1], "maximal": false, "body": "ALPHA\nbeta\ngamma\ndelta\nepsilon\nzeta\n"},
+        {"ids": [2], "maximal": false, "body": "alpha\nbeta\nGAMMA\ndelta\nepsilon\nzeta\n"},
+        {"ids": [1, 2], "maximal": true, "body": "ALPHA\nbeta\nGAMMA\ndelta\nepsilon\nzeta\n"}
+      ]
+    },
+    {
+      "id": "true-conflict",
+      "filename": "shared.txt",
+      "base": "alpha\nbeta\ngamma\ndelta\nepsilon\nzeta\n",
+      "base_absent": false,
+      "full_reject_allowed": false,
+      "proposals": [
+        {"id": 1, "operation": "edit", "line_index": 1, "replacement": "BETA-A", "signature": "BETA-A"},
+        {"id": 2, "operation": "edit", "line_index": 1, "replacement": "BETA-B", "signature": "BETA-B"}
+      ],
+      "allowed": [
+        {"ids": [1], "maximal": true, "body": "alpha\nBETA-A\ngamma\ndelta\nepsilon\nzeta\n"},
+        {"ids": [2], "maximal": true, "body": "alpha\nBETA-B\ngamma\ndelta\nepsilon\nzeta\n"}
+      ]
+    },
+    {
+      "id": "create",
+      "filename": "shared.txt",
+      "base": "",
+      "base_absent": true,
+      "full_reject_allowed": false,
+      "proposals": [
+        {"id": 1, "operation": "create", "replacement": "created", "signature": "created"}
+      ],
+      "allowed": [
+        {"ids": [1], "maximal": true, "body": "created\n"}
+      ]
+    },
+    {
+      "id": "delete",
+      "filename": "shared.txt",
+      "base": "temp\n",
+      "base_absent": false,
+      "full_reject_allowed": false,
+      "proposals": [
+        {"id": 1, "operation": "delete", "signature": ""}
+      ],
+      "allowed": [
+        {"ids": [1], "maximal": true, "body": ""}
+      ]
+    },
+    {
+      "id": "rename",
+      "filename": "old.txt",
+      "base": "body\n",
+      "base_absent": false,
+      "full_reject_allowed": false,
+      "proposals": [
+        {"id": 1, "operation": "rename", "rename_to": "new.txt", "signature": "body"}
+      ],
+      "allowed": [
+        {"ids": [1], "maximal": true, "body": "body\n"}
+      ]
+    }
+  ]
+}
