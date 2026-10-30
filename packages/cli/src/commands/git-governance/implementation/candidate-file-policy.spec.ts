@@ -6,6 +6,8 @@ import path from 'node:path';
 import { assertFinalCandidateIndex, candidateGit, nulPaths, resolveCandidateFiles, stageExactCandidateFiles } from './candidate-file-policy.ts';
 import { assembleSealedCommitIndex, readCandidateTreeEntries, sealCommitBundleFromCandidateIndex, withWorktreeCandidateIndex } from './sealed-commit-candidate-index.ts';
 import { sealCommitBundle } from '../../../../../core/src/commit-attribution/sealed-commit-bundle.ts';
+import { buildRunnerBuildOutputInventory } from '../../../../../core/src/broker/runner-build-output-inventory.ts';
+import { resolveRunnerPublicationCloseHandoff } from '../../framework-development/runner-publication-close-handoff.ts';
 
 test('candidate discovery supports an unborn repository without changing its staged index', () => {
   const cwd = mkdtempSync(path.join(os.tmpdir(), 'atm-unborn-candidates-'));
@@ -175,3 +177,35 @@ test('sealed index applies tombstones before directory-to-file and file-to-direc
     candidateGit(cwd, ['write-tree'], env);
   } finally { rmSync(indexDir, { recursive: true, force: true }); }
 }));
+
+test('tracked outputs under an ignored directory stay candidates; new ignored outputs need an exact declaration', () => {
+  const cwd = mkdtempSync(path.join(os.tmpdir(), 'atm-tracked-ignored-'));
+  const indexDir = mkdtempSync(path.join(os.tmpdir(), 'atm-tracked-ignored-index-'));
+  try {
+    const run = (...args: string[]) => candidateGit(cwd, args);
+    run('init'); run('config', 'user.email', 'p2@example.invalid'); run('config', 'user.name', 'P2 regression');
+    mkdirSync(path.join(cwd, 'dist'), { recursive: true });
+    writeFileSync(path.join(cwd, '.gitignore'), 'dist/\n');
+    writeFileSync(path.join(cwd, 'dist/tracked.js'), 'old\n');
+    stageExactCandidateFiles(cwd, ['.gitignore', 'dist/tracked.js']);
+    run('-c', 'core.hooksPath=/dev/null', 'commit', '-m', 'fixture');
+    writeFileSync(path.join(cwd, 'dist/tracked.js'), 'rebuilt\n');
+    writeFileSync(path.join(cwd, 'dist/new-module.js'), 'new\n');
+    const taskId = 'TASK-P2-0002';
+    const outputs = ['dist/tracked.js', 'dist/new-module.js'];
+    const outputInventory = buildRunnerBuildOutputInventory({ cwd, sealedSourceSha: 'source', outputPaths: outputs, currentTaskId: taskId, ownership: outputs.map((file) => ({ path: file, ownerTaskId: taskId })) });
+    const receipt = { schemaId: 'atm.runnerSyncReceipt.v1', taskId, outputInventory, memberTaskIds: [taskId], groupManifest: { memberTaskIds: [taskId] }, childAttribution: { complete: true, members: [{ taskId }] } };
+    assert.deepEqual(resolveRunnerPublicationCloseHandoff({ taskId, receipt, cwd }).stageFiles, ['dist/tracked.js'], 'tracked receipt-owned output is delivered; untracked ignored output is not');
+    const scope = { scopePaths: ['dist/**'] };
+    assert.deepEqual(resolveCandidateFiles(cwd, ['dist/**'], scope), ['dist/tracked.js']);
+    const declared = { ...scope, declaredPaths: ['dist/new-module.js'] };
+    assert.deepEqual(resolveCandidateFiles(cwd, ['dist/**'], declared), ['dist/new-module.js', 'dist/tracked.js']);
+    const env = { GIT_INDEX_FILE: path.join(indexDir, 'index') };
+    candidateGit(cwd, ['read-tree', 'HEAD'], env);
+    stageExactCandidateFiles(cwd, ['dist/tracked.js'], env);
+    assertFinalCandidateIndex(cwd, env, scope);
+    stageExactCandidateFiles(cwd, ['dist/new-module.js'], env);
+    assert.throws(() => assertFinalCandidateIndex(cwd, env, scope), /undeclared ignored/i);
+    assertFinalCandidateIndex(cwd, env, declared);
+  } finally { rmSync(cwd, { recursive: true, force: true }); rmSync(indexDir, { recursive: true, force: true }); }
+});

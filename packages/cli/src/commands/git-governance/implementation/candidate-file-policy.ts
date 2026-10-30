@@ -114,8 +114,11 @@ export function resolveCandidateFiles(cwd: string, candidates: readonly string[]
     } else visit(candidate);
     for (const file of tracked) if (literal ? file === candidate || file.startsWith(`${candidate}/`) : matchesCandidateScope(file, candidate)) visit(file);
   }
+  // `check-ignore --no-index` also matches tracked files (e.g. committed
+  // packages/cli/dist under `dist/`); Git itself never ignores tracked paths.
+  const trackedSet = new Set(tracked);
   const ignored = ignoredCandidatePaths(cwd, [...files]);
-  return [...files].filter((file) => !ignored.has(file) || isDeclaredCandidate(file, policy, cwd) || !stat(path.join(cwd, file))).sort();
+  return [...files].filter((file) => !ignored.has(file) || trackedSet.has(file) || isDeclaredCandidate(file, policy, cwd) || !stat(path.join(cwd, file))).sort();
 }
 
 export function stageExactCandidateFiles(cwd: string, files: readonly string[], env?: NodeJS.ProcessEnv): void {
@@ -133,6 +136,9 @@ export function assertFinalCandidateIndex(cwd: string, env: NodeJS.ProcessEnv, p
   const indexed = nulPaths(candidateGit(cwd, ['ls-files', '-s', '-z'], env));
   for (const record of indexed) if (record.startsWith('160000 ')) gitlinks.add(record.slice(record.indexOf('\t') + 1));
   const symlinks = new Set(indexed.filter((record) => record.startsWith('120000 ')).map((record) => record.slice(record.indexOf('\t') + 1)));
-  const bad = present.filter((file) => ((ignored.has(file) || symlinks.has(file)) && !isDeclaredCandidate(file, policy, cwd)) || !safeCandidatePath(cwd, file, gitlinks));
+  // Only newly added ignored paths need an exact declaration; a modified
+  // path is already tracked at baseRef, so Git does not ignore it.
+  const added = new Set(nulPaths(candidateGit(cwd, ['diff', '--cached', '--name-only', '--no-renames', '--diff-filter=A', '-z', baseRef], env)));
+  const bad = present.filter((file) => (((ignored.has(file) && added.has(file)) || symlinks.has(file)) && !isDeclaredCandidate(file, policy, cwd)) || !safeCandidatePath(cwd, file, gitlinks));
   if (bad.length) throw new CliError('ATM_COMMIT_UNDECLARED_IGNORED_PATH', 'Final candidate index contains undeclared ignored or unsafe paths.', { exitCode: 1, details: { paths: bad } });
 }

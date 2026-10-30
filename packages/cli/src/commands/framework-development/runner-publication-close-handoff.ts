@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process';
 import { validateRunnerBuildOutputInventory } from '../../../../core/src/broker/runner-build-output-inventory.ts';
 
 export interface RunnerPublicationCloseHandoff {
@@ -85,9 +86,15 @@ export function resolveRunnerPublicationCloseHandoff(input: {
   if (foreign.length > 0) {
     return { ok: false, stageFiles: [], reason: 'runner-sync receipt inventory contains output not owned by the closing task or its attested producer group' };
   }
+  // `generated` comes from `check-ignore --no-index`, which also matches
+  // tracked files (committed packages/cli/dist under `dist/`). Those are
+  // ordinary deliveries; only untracked ignored output stays verification data.
+  const tracked = input.cwd && validated.inventory.entries.some((entry) => entry.generated)
+    ? new Set(execFileSync('git', ['ls-files', '-z'], { cwd: input.cwd, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }).split('\0').filter(Boolean))
+    : new Set<string>();
   return {
     ok: true,
-    stageFiles: [...new Set(validated.inventory.entries.filter((entry) => !entry.generated).map((entry) => entry.path))].sort((a, b) => a.localeCompare(b)),
+    stageFiles: [...new Set(validated.inventory.entries.filter((entry) => !entry.generated || tracked.has(entry.path)).map((entry) => entry.path))].sort((a, b) => a.localeCompare(b)),
     reason: null
   };
 }
