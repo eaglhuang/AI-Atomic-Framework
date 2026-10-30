@@ -1,3 +1,4 @@
+import { runFrameworkBaseSync } from './upgrade/base-sync.js';
 import { proposeAtomicUpgrade } from '../_vendor/core/dist/upgrade/propose.js';
 import { runUpgradeMapPropose } from './upgrade-map-propose.js';
 import { makeResult, message } from './shared.js';
@@ -7,6 +8,8 @@ import { firstSafeUpgradeAction, parseSafeUpgradeOptions, runSafeUpgradeApply, r
 import { runUpgradeScan } from './upgrade/scan.js';
 import { discoverInputDocuments, evaluateUpgradeContextBudget, inferInputKind, isGuidedLegacyDryRun, loadExplicitInputDocuments, parseUpgradeOptions, runGuidedLegacyDryRunProposal } from './upgrade/proposal.js';
 export async function runUpgrade(argv) {
+    if (argv[0] === 'base-sync')
+        return runFrameworkBaseSync(argv);
     const experimentalAction = firstExperimentalUpgradeAction(argv);
     if (experimentalAction === 'experimental-api') {
         return runUpgradeExperimentalApi(argv);

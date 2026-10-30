@@ -240,12 +240,18 @@ pretending the work was validated one card at a time. See
 Only for small, low-risk edits (typos, missing comments, trivial follow-ups
 from another card). It is **not** a task-card closure path.
 
+One claim may cover several related files for one fix, within **3 files / 80
+changed lines** total (additions plus deletions). Pass `--files <csv>` to choose
+the scope explicitly, or name the paths in the prompt for inference. Explicit
+files take precedence over prompt paths. Claims reject more than 3 scope paths;
+the commit hook enforces both limits against the staged diff. Use framework-mode
+when the fix exceeds these limits.
+
 ```bash
-node atm.mjs next --claim --actor <id> --prompt "<short description>" --json
+node atm.mjs next --claim --actor <id> --prompt "quickfix related fixtures" --files tests/fixture-a.ts,tests/fixture-b.ts --json
 # Edit ONLY the allowed files returned by ATM
 # Run the smallest relevant validator
-git add <changed files>
-git commit -m "<message>"
+node atm.mjs git commit --actor <id> --message "<message>" --auto-stage --json
 ```
 
 ### Don't
@@ -255,6 +261,26 @@ git commit -m "<message>"
 - ❌ Do not expand the scope after the quickfix lock is created.
 
 ---
+
+## Governed framework source base update
+
+Agents updating a vendored ATM source checkout may use the maintenance entry
+`node atm.mjs upgrade base-sync --cwd /path/to/ATM-source --actor grok-bot --from <full-current-SHA> --to <full-target-SHA> --json`.
+Run a runner containing this command (an older checkout can use an updated runner
+by absolute path). This entry authorizes importing existing commits without a
+source-edit claim or task card. It requires a framework source repository root,
+a clean index/worktree (including untracked files), HEAD equal to `--from`, and
+`--to` a different full commit SHA. Fetch the target beforehand. A descendant
+is imported with `git merge --ff-only`. When the branch and the target have
+diverged, the same command creates one merge commit of those two pinned SHAs
+and does not resolve conflicts: a conflict aborts and leaves HEAD unchanged.
+Dirty, missing-object, backward, and already-contained requests fail without
+forcing or resetting. It records actor, from/to, mode, and pending/completed/failed
+status in the target's Git metadata at `git rev-parse --git-path atm-base-sync`.
+Keep exclusive access to the checkout during the operation. The receipt path is
+returned in JSON. A fast-forward creates no source commit; a diverged update
+creates only that merge commit. This authority does not permit editing framework
+source or raw `git merge`.
 
 ## Cross-channel principles
 

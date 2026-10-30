@@ -1,3 +1,4 @@
+import { generatedOutputDigest, ignoredGeneratedOutputs } from './generated-output-digests.ts';
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
@@ -12,6 +13,8 @@ export type RunnerBuildOutputDisposition =
 export interface RunnerBuildOutputInventoryEntry {
   readonly path: string;
   readonly disposition: RunnerBuildOutputDisposition;
+  readonly generated?: true;
+  readonly contentDigest?: string;
   readonly ownerTaskId: string | null;
   readonly ownerActorId: string | null;
 }
@@ -98,6 +101,7 @@ export function isRunnerPublicationArtifactPath(filePath: string): boolean {
 }
 
 export function deriveRunnerBuildOutputInventory(input: {
+  readonly cwd?: string;
   readonly sealedSourceSha: string;
   readonly observedPaths: readonly string[];
   readonly currentTaskId?: string | null;
@@ -135,6 +139,7 @@ export function scanSealedRunnerBuildOutputInventory(input: {
   const preexistingDirtyPaths = new Set(input.beforeBuildSnapshot.preexistingDirtyPaths.map(normalizePath));
   const takeoverPaths = new Set((input.takeoverPaths ?? []).map(normalizePath));
   return deriveRunnerBuildOutputInventory({
+    cwd: input.cwd,
     sealedSourceSha: input.sealedSourceSha,
     observedPaths: outputPaths,
     currentTaskId: input.taskId,
@@ -232,6 +237,7 @@ export function validateRunnerPublicationTakeoverPlan(input: {
 }
 
 export function buildRunnerBuildOutputInventory(input: {
+  readonly cwd?: string;
   readonly sealedSourceSha: string;
   readonly outputPaths: readonly string[];
   readonly currentTaskId?: string | null;
@@ -240,6 +246,7 @@ export function buildRunnerBuildOutputInventory(input: {
   const ownershipByPath = new Map(
     (input.ownership ?? []).map((entry) => [normalizePath(entry.path), entry])
   );
+  const ignored = input.cwd ? ignoredGeneratedOutputs(input.cwd, input.outputPaths) : new Set<string>();
   const entries = uniquePaths(input.outputPaths).map((outputPath) => {
     const ownership = ownershipByPath.get(outputPath);
     const ownerTaskId = ownership?.ownerTaskId?.trim() || null;
@@ -251,7 +258,7 @@ export function buildRunnerBuildOutputInventory(input: {
         : ownerTaskId
           ? 'stale-recovery-input'
           : 'unowned';
-    return { path: outputPath, disposition, ownerTaskId, ownerActorId };
+    return { path: outputPath, disposition, ownerTaskId, ownerActorId, ...(input.cwd && ignored.has(outputPath) && existsSync(path.join(input.cwd, outputPath)) ? { generated: true as const, contentDigest: generatedOutputDigest(input.cwd, outputPath) } : {}) };
   });
   const sealedSourceSha = input.sealedSourceSha.trim();
   return {
@@ -264,7 +271,7 @@ export function buildRunnerBuildOutputInventory(input: {
 
 export function inventoryPathsForPublication(inventory: RunnerBuildOutputInventory): readonly string[] {
   return inventory.entries
-    .filter((entry) => entry.disposition === 'owned-current')
+    .filter((entry) => entry.disposition === 'owned-current' && !entry.generated)
     .map((entry) => entry.path);
 }
 
@@ -279,11 +286,12 @@ export function evaluateRunnerPublicationDisposition(input: {
   readonly terminalDisposition?: 'published' | 'recovery-retained' | null;
 }): RunnerPublicationDispositionReport {
   const inventoryPaths = new Set(input.inventory.entries.map((entry) => entry.path));
+  const generatedPaths = new Set(input.inventory.entries.filter((entry) => entry.generated).map((entry) => entry.path));
   const dirtyPaths = uniquePaths(input.dirtyPaths);
   // A foreign task's evidence receipt is not an artifact of this generation.
   // It is relevant only when this inventory explicitly named it.
   const publicationDirtyPaths = dirtyPaths.filter((entry) => (
-    inventoryPaths.has(entry) || isRunnerPublicationArtifactPath(entry)
+    !generatedPaths.has(entry) && (inventoryPaths.has(entry) || isRunnerPublicationArtifactPath(entry))
   ));
   const dirtyInventoryPaths = publicationDirtyPaths.filter((entry) => inventoryPaths.has(entry));
   const extraOutputPaths = publicationDirtyPaths.filter((entry) => !inventoryPaths.has(entry));
@@ -381,7 +389,7 @@ export function verifyRunnerBuildOutputParity(
  * by the build writer. Consumers must not accept a merely shape-compatible
  * inventory, because it could describe a different sealed generation.
  */
-export function validateRunnerBuildOutputInventory(value: unknown): RunnerBuildOutputInventoryValidation {
+export function validateRunnerBuildOutputInventory(value: unknown, cwd?: string): RunnerBuildOutputInventoryValidation {
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
     return { ok: false, inventory: null, reason: 'inventory must be an object' };
   }
@@ -404,11 +412,17 @@ export function validateRunnerBuildOutputInventory(value: unknown): RunnerBuildO
     if (!path || !['owned-current', 'foreign-live', 'stale-recovery-input', 'unowned'].includes(String(disposition))) {
       return { ok: false, inventory: null, reason: 'inventory contains an invalid path or disposition' };
     }
+    if (raw.generated !== undefined && (raw.generated !== true || !/^sha256:[a-f0-9]{64}$/.test(String(raw.contentDigest)))) return { ok: false, inventory: null, reason: 'generated output requires a content digest' };
+    if (cwd && raw.generated === true) {
+      try { if (generatedOutputDigest(cwd, path) !== raw.contentDigest) return { ok: false, inventory: null, reason: 'generated output digest mismatch' }; }
+      catch { return { ok: false, inventory: null, reason: 'generated output is missing or unsafe' }; }
+    }
     entries.push({
       path,
       disposition: disposition as RunnerBuildOutputDisposition,
       ownerTaskId: typeof raw.ownerTaskId === 'string' && raw.ownerTaskId.trim() ? raw.ownerTaskId.trim() : null,
-      ownerActorId: typeof raw.ownerActorId === 'string' && raw.ownerActorId.trim() ? raw.ownerActorId.trim() : null
+      ownerActorId: typeof raw.ownerActorId === 'string' && raw.ownerActorId.trim() ? raw.ownerActorId.trim() : null,
+      ...(raw.generated === true ? { generated: true as const, contentDigest: String(raw.contentDigest) } : {})
     });
   }
   const paths = entries.map((entry) => entry.path);
@@ -450,7 +464,7 @@ function uniquePaths(paths: readonly string[]): string[] {
 }
 
 function normalizePath(value: string): string {
-  return value.replace(/\\/g, '/').replace(/^\.\//, '').trim();
+  return value.replace(/^\.\//, '');
 }
 
 function publicationRoots(cwd: string, buildTarget: RunnerBuildOutputTarget): string[] {

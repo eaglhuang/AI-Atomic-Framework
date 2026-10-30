@@ -213,14 +213,17 @@ type BrokerTransactionInput = {
 
 export function commitBrokerRegistryTransaction(input: BrokerTransactionInput): BrokerTransactionReceipt {
   // Rebase only pure registry mutations, never reuse a stale admission decision.
-  // Yield briefly to the short compare/write section; permanent errors fail immediately.
+  // Seven 1ms retries can all run while one fsync writer is descheduled.
+  // Bound contention by both elapsed time and attempts; revalidate each retry.
+  const deadline = performance.now() + 1_000;
+  const waitCell = new Int32Array(new SharedArrayBuffer(4));
   for (let attempt = 0; ; attempt++) {
     try {
       return commitBrokerRegistryTransactionOnce(input);
     } catch (error) {
       if (!(error instanceof BrokerRegistryStoreError)
-        || error.code !== 'ATM_BROKER_REGISTRY_CAS_CONFLICT' || attempt >= 7) throw error;
-      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 1);
+        || error.code !== 'ATM_BROKER_REGISTRY_CAS_CONFLICT' || attempt >= 63 || performance.now() >= deadline) throw error;
+      Atomics.wait(waitCell, 0, 0, Math.min(2 ** Math.min(attempt, 4), deadline - performance.now()));
     }
   }
 }

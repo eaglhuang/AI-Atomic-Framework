@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { runFrameworkBaseSync } from './upgrade/base-sync.ts';
 import { proposeAtomicUpgrade } from '../../../core/src/upgrade/propose.ts';
 import { runUpgradeMapPropose } from './upgrade-map-propose.ts';
 import { makeResult, message, resolveValue } from './shared.ts';
@@ -23,6 +24,7 @@ import {
 } from './upgrade/proposal.ts';
 
 export async function runUpgrade(argv: string[]) {
+  if (argv[0] === 'base-sync') return runFrameworkBaseSync(argv);
   const experimentalAction = firstExperimentalUpgradeAction(argv);
   if (experimentalAction === 'experimental-api') {
     return runUpgradeExperimentalApi(argv);

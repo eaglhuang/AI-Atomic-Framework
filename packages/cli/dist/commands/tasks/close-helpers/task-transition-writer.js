@@ -1,3 +1,4 @@
+import { assertActiveCloseLease, activeCloseLeaseIsOwned } from '../../taskflow/close-transaction-mutex.js';
 // TASK-RFT-0013 — extracted verbatim from packages/cli/src/commands/tasks.ts.
 // Task-transition writer cluster: persist a task document with a governed
 // transition event. Re-exports the transition-command builder and the closure
@@ -10,6 +11,7 @@ import { appendTaskTransitionEvent, createTaskTransitionId } from '../../task-le
 import { normalizeTaskDocumentId } from '../normalize-task-document-id-helper.js';
 import { taskIdsEqual } from '../task-import-validators.js';
 function writeTaskDocument(taskPath, document) {
+    assertActiveCloseLease();
     const directory = path.dirname(taskPath);
     const temporaryPath = path.join(directory, `.${path.basename(taskPath)}.${process.pid}.${Date.now()}.tmp`);
     let descriptor = null;
@@ -23,6 +25,8 @@ function writeTaskDocument(taskPath, document) {
         renameSync(temporaryPath, taskPath);
     }
     catch (error) {
+        if (!activeCloseLeaseIsOwned())
+            throw error;
         if (descriptor !== null)
             closeSync(descriptor);
         rmSync(temporaryPath, { force: true });
@@ -38,6 +42,8 @@ function verifyPersistedTaskDocument(input) {
         persisted = parseJsonText(readFileSync(input.taskPath, 'utf8'));
     }
     catch (error) {
+        if (!activeCloseLeaseIsOwned())
+            throw error;
         throw new CliError('ATM_TASK_LEDGER_WRITE_INVALID_JSON', `Task ${input.taskId} was written by ${input.action}, but the persisted JSON is unreadable.`, {
             details: {
                 taskId: input.taskId,
@@ -63,6 +69,7 @@ function verifyPersistedTaskDocument(input) {
     }
 }
 export function writeTaskDocumentWithTransition(input) {
+    assertActiveCloseLease();
     const nextStatus = typeof input.taskDocument.status === 'string' ? input.taskDocument.status : null;
     const createdAt = new Date().toISOString();
     const transitionId = createTaskTransitionId({
@@ -101,6 +108,8 @@ export function writeTaskDocumentWithTransition(input) {
         return transition.eventPath;
     }
     catch (error) {
+        if (!activeCloseLeaseIsOwned())
+            throw error;
         if (transition)
             rmSync(path.resolve(input.cwd, transition.eventPath), { force: true });
         throw error;

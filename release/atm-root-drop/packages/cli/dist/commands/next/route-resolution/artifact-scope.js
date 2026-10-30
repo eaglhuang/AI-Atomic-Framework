@@ -5,6 +5,7 @@ import { isTaskDirectionPathCandidate, partitionTaskScope } from '../../task-dir
 import { extractPathLikeStringsFromPrompt } from '../../work-channels.js';
 import { normalizeOptionalTaskPath } from '../intent-normalizers.js';
 import { uniqueSorted } from '../view-projections.js';
+import { extractPromptFileTokens } from './intent.js';
 import { listFilesRecursive } from './task-card-discovery.js';
 export function finalizeImportedTaskSummary(task, cwd) {
     const partition = partitionTaskScope(task, cwd ? { cwd } : undefined);
@@ -208,8 +209,9 @@ function addValidateTopicPaths(paths, topic) {
     paths.add(`scripts/validate-${topic}.ts`);
 }
 export function resolveQuickfixScope(prompt) {
-    return uniqueSorted([
+    const scope = uniqueSorted([
         ...extractPathLikeStringsFromText(prompt),
         ...extractPathLikeStringsFromPrompt(prompt)
     ]);
+    return scope.length > 0 ? scope : extractPromptFileTokens(prompt);
 }

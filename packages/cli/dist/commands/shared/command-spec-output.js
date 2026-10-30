@@ -233,6 +233,11 @@ export function makeHelpResult(spec, cwd = process.cwd(), subcommand) {
     });
 }
 export function writeResult(result, stream, outputFormat = 'json', projectionOptions) {
+    const closeLine = result.closeResultLine;
+    if (result.command === 'taskflow close' && typeof closeLine === 'string') {
+        stream.write(closeLine);
+        return;
+    }
     const withLane = carryLaneSessionIntoPrintedCommands(result);
     const enriched = 'severity' in withLane && 'exitCode' in withLane && 'blocking' in withLane && 'diagnostics' in withLane
         ? withLane

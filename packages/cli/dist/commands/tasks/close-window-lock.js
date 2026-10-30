@@ -1,5 +1,7 @@
+import { writeCloseAtomic } from '../taskflow/close-attempt.js';
+import { assertActiveCloseLease } from '../taskflow/close-transaction-mutex.js';
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
+import { closeSync, existsSync, fsyncSync, mkdirSync, openSync, readFileSync, unlinkSync } from 'node:fs';
 import path from 'node:path';
 import { normalizeTaskId } from './task-import-validators.js';
 import { normalizeRelativePath } from './task-file-io-helpers.js';
@@ -46,15 +48,15 @@ function closeWindowStagedIndexLockPath(cwd) {
     return path.join(cwd, '.atm', 'runtime', 'locks', 'close-window-staged-index.lock.json');
 }
 function uniqueSorted(values) {
-    return [...new Set(values.map((entry) => normalizeRelativePath(entry)).filter(Boolean))].sort((left, right) => left.localeCompare(right));
+    return [...new Set(values.filter(Boolean))].sort((left, right) => left.localeCompare(right));
 }
 function readStagedFiles(repoRoot) {
     try {
-        return uniqueSorted(execFileSync(resolveGitExecutable(), ['diff', '--cached', '--name-only'], {
+        return uniqueSorted(execFileSync(resolveGitExecutable(), ['diff', '--cached', '--name-only', '-z'], {
             cwd: repoRoot,
             encoding: 'utf8',
             stdio: ['ignore', 'pipe', 'ignore']
-        }).split(/\r?\n/));
+        }).split('\0'));
     }
     catch {
         return [];
@@ -135,6 +137,7 @@ function waitForIndexLockRetry(delayMs) {
  * hand-off interval after a child commit/hook releases the shared index.
  */
 export function runGitIndexMutationWithRetry(input) {
+    assertActiveCloseLease();
     for (let attempt = 0;; attempt += 1) {
         try {
             (input.run ?? (() => execFileSync(resolveGitExecutable(), input.args, {
@@ -167,14 +170,14 @@ function readStagedIndexEntries(cwd, files, receiptTaskIds = new Map()) {
     const requested = uniqueSorted(files);
     if (requested.length === 0)
         return [];
-    const output = execFileSync(resolveGitExecutable(), ['ls-files', '-s', '--', ...requested], {
+    const output = execFileSync(resolveGitExecutable(), ['ls-files', '-s', '-z', '--', ...requested], {
         cwd,
         encoding: 'utf8',
         stdio: ['ignore', 'pipe', 'pipe']
     });
-    const present = new Map(output.split(/\r?\n/).flatMap((line) => {
-        const match = /^(\d+)\s+([0-9a-f]{40,})\s+\d+\t(.+)$/.exec(line.trim());
-        return match ? [{ mode: match[1], blobId: match[2], path: normalizeRelativePath(match[3]) }] : [];
+    const present = new Map(output.split('\0').flatMap((line) => {
+        const match = /^(\d+) ([0-9a-f]{40,}) 0\t([\s\S]+)$/.exec(line);
+        return match ? [{ mode: match[1], blobId: match[2], path: match[3] }] : [];
     }).filter((entry) => entry.path).map((entry) => [entry.path, entry]));
     return requested.map((filePath) => {
         const entry = present.get(filePath);
@@ -188,13 +191,13 @@ function writeForeignStagedSnapshot(cwd, taskId, files, receiptTaskIds = new Map
     const entries = readStagedIndexEntries(cwd, files, receiptTaskIds);
     const snapshotPath = `.atm/runtime/snapshots/close-window-foreign-staged-${taskId}-${Date.now()}.json`;
     mkdirSync(path.dirname(path.join(cwd, snapshotPath)), { recursive: true });
-    writeFileSync(path.join(cwd, snapshotPath), `${JSON.stringify({
+    persistCloseWindow(path.join(cwd, snapshotPath), `${JSON.stringify({
         schemaId: 'atm.closeWindowForeignStagedSnapshot.v1',
         taskId,
         createdAt: new Date().toISOString(),
         files: uniqueSorted(files),
         entries
-    }, null, 2)}\n`, 'utf8');
+    }, null, 2)}\n`);
     return { snapshotPath, entries };
 }
 function restoreForeignStagedEntries(cwd, entries, recoveryReference) {
@@ -207,6 +210,18 @@ function restoreForeignStagedEntries(cwd, entries, recoveryReference) {
                 remediation: 'The close-window lock and recovery snapshot were retained. Repair the durable snapshot before retrying release; do not delete the snapshot or claim success.'
             }
         });
+    }
+    // Validate the whole set before any restore: another writer's newer stage
+    // must never be overwritten, including during a repeated recovery.
+    const current = readStagedIndexEntries(cwd, entries.map(e => e.path));
+    const same = (a, b) => a.mode === b.mode && a.blobId === b.blobId;
+    for (let i = 0; i < entries.length; i++) {
+        const original = entries[i];
+        const head = execFileSync(resolveGitExecutable(), ['ls-tree', '-z', 'HEAD', '--', original.path], { cwd, encoding: 'utf8' });
+        const match = /^(\d+) blob ([0-9a-f]+)\t/.exec(head);
+        const parked = { ...original, mode: match?.[1] ?? null, blobId: match?.[2] ?? null };
+        if (!same(current[i], original) && !same(current[i], parked))
+            throw new CliError('ATM_CLOSE_WINDOW_FOREIGN_STAGED_TASKS', 'Foreign index changed after parking; retain the recovery record and resolve ownership before release.', { exitCode: 1 });
     }
     for (const entry of entries) {
         const args = entry.mode === null || entry.blobId === null
@@ -235,7 +250,7 @@ function restoreForeignStagedEntries(cwd, entries, recoveryReference) {
         });
     }
 }
-function deferForeignStagedFiles(cwd, taskId, files, ownership = []) {
+function deferForeignStagedFiles(cwd, taskId, files, ownership = [], persist) {
     const normalizedFiles = uniqueSorted(files);
     if (normalizedFiles.length === 0)
         return null;
@@ -246,6 +261,7 @@ function deferForeignStagedFiles(cwd, taskId, files, ownership = []) {
         }
     }
     const snapshot = writeForeignStagedSnapshot(cwd, taskId, normalizedFiles, receiptTaskIds);
+    persist?.(snapshot);
     runGitIndexMutationWithRetry({
         cwd,
         args: ['restore', '--staged', '--', ...files],
@@ -254,6 +270,7 @@ function deferForeignStagedFiles(cwd, taskId, files, ownership = []) {
     return snapshot;
 }
 function cleanupForeignStagedSnapshot(cwd, snapshotPath) {
+    assertActiveCloseLease();
     if (!snapshotPath)
         return;
     const absolutePath = path.join(cwd, snapshotPath);
@@ -267,6 +284,7 @@ function cleanupForeignStagedSnapshot(cwd, snapshotPath) {
     }
 }
 export function inspectCloseWindowStagedIndexAdmission(input) {
+    assertActiveCloseLease();
     const existing = readCloseWindowStagedIndexLock(input.cwd);
     const unexpectedStagedTasks = inspectForeignStagedTasksForCloseWindow(input);
     const expected = new Set(uniqueSorted(input.expectedStageFiles));
@@ -282,6 +300,7 @@ export function inspectCloseWindowStagedIndexAdmission(input) {
         provenResidueEntries: diagnosis.provenResidueEntries };
 }
 export function acquireCloseWindowStagedIndexLock(input) {
+    assertActiveCloseLease();
     const lockPath = closeWindowStagedIndexLockPath(input.cwd);
     const firstExisting = readCloseWindowStagedIndexLock(input.cwd);
     let existing = firstExisting;
@@ -356,20 +375,17 @@ export function acquireCloseWindowStagedIndexLock(input) {
         releaseOutcome: null
     };
     mkdirSync(path.dirname(lockPath), { recursive: true });
-    writeFileSync(lockPath, `${JSON.stringify(record, null, 2)}\n`, 'utf8');
+    persistCloseWindow(lockPath, `${JSON.stringify(record, null, 2)}\n`);
     try {
         if (unexpectedStagedFiles.length > 0 && input.deferForeignStaged) {
-            const deferred = deferForeignStagedFiles(input.cwd, input.taskId, unexpectedStagedFiles, unexpectedStagedTasks);
-            record = {
-                ...record,
-                foreignStagedSnapshotPath: deferred?.snapshotPath ?? null,
-                foreignStagedEntries: deferred?.entries ?? []
-            };
-            writeFileSync(lockPath, `${JSON.stringify(record, null, 2)}\n`, 'utf8');
+            deferForeignStagedFiles(input.cwd, input.taskId, unexpectedStagedFiles, unexpectedStagedTasks, (snapshot) => {
+                record = { ...record, foreignStagedSnapshotPath: snapshot.snapshotPath, foreignStagedEntries: snapshot.entries };
+                persistCloseWindow(lockPath, `${JSON.stringify(record, null, 2)}\n`);
+            });
         }
     }
     catch (error) {
-        unlinkSync(lockPath);
+        // Preserve durable restore identity if parking failed partway.
         throw error;
     }
     return {
@@ -388,6 +404,7 @@ export function acquireCloseWindowStagedIndexLock(input) {
     };
 }
 export function assertCloseWindowStagingAllowed(input) {
+    assertActiveCloseLease();
     const lock = readCloseWindowStagedIndexLock(input.cwd);
     if (!lock || lock.status !== 'active')
         return;
@@ -409,6 +426,7 @@ export function assertCloseWindowStagingAllowed(input) {
     });
 }
 export function releaseCloseWindowStagedIndexLock(input) {
+    assertActiveCloseLease();
     const lockPath = closeWindowStagedIndexLockPath(input.cwd);
     const existing = readCloseWindowStagedIndexLock(input.cwd);
     if (!existing || existing.status !== 'active')
@@ -417,8 +435,13 @@ export function releaseCloseWindowStagedIndexLock(input) {
         return existing;
     if (existing.foreignStagedSnapshotPath) {
         restoreForeignStagedEntries(input.cwd, existing.foreignStagedEntries ?? [], existing.foreignStagedSnapshotPath);
-        cleanupForeignStagedSnapshot(input.cwd, existing.foreignStagedSnapshotPath);
     }
+    // Git index mutations must be durable before cleanupComplete can be true.
+    const index = path.resolve(input.cwd, execFileSync(resolveGitExecutable(), ['rev-parse', '--git-path', 'index'], { cwd: input.cwd, encoding: 'utf8' }).trim());
+    if (existsSync(index))
+        syncCloseWindowPath(index);
+    if (process.platform !== 'win32')
+        syncCloseWindowPath(path.dirname(index));
     const released = {
         ...existing,
         status: 'released',
@@ -429,10 +452,20 @@ export function releaseCloseWindowStagedIndexLock(input) {
         unlinkSync(lockPath);
     }
     catch {
-        writeFileSync(lockPath, `${JSON.stringify(released, null, 2)}\n`, 'utf8');
+        persistCloseWindow(lockPath, `${JSON.stringify(released, null, 2)}\n`);
     }
+    if (process.platform !== 'win32')
+        syncCloseWindowPath(path.dirname(lockPath));
+    cleanupForeignStagedSnapshot(input.cwd, existing.foreignStagedSnapshotPath);
     return released;
 }
 export function readCloseWindowStagedIndexLockReport(cwd) {
     return readCloseWindowStagedIndexLock(cwd);
 }
+function persistCloseWindow(file, content) { assertActiveCloseLease(); writeCloseAtomic(file, content); }
+function syncCloseWindowPath(file) { assertActiveCloseLease(); const fd = openSync(file, 'r'); try {
+    fsyncSync(fd);
+}
+finally {
+    closeSync(fd);
+} }
