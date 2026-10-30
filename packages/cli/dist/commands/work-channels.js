@@ -1,7 +1,9 @@
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { CliError } from './shared.js';
 import { normalizeStoredPlanningPathForIdentity } from './planning-repo-root.js';
+import { inspectQuickfixResearchScope } from './next/quickfix-scope-policy.js';
 const quickfixLockPath = ['.atm', 'runtime', 'quickfix-lock.json'];
 const batchRunPath = ['.atm', 'runtime', 'batch-run.json'];
 const batchRunsPath = ['.atm', 'runtime', 'batch-runs'];
@@ -21,6 +23,13 @@ export function readActiveQuickfixLock(cwd) {
 }
 export function writeQuickfixLock(input) {
     const filePath = path.join(input.cwd, ...quickfixLockPath);
+    const allowedFiles = uniqueStrings(input.allowedFiles.map(normalizeRelativePath).filter(Boolean));
+    if (allowedFiles.length > (input.maxFiles ?? 3)) {
+        throw new CliError('ATM_QUICKFIX_FILE_LIMIT_EXCEEDED', 'Quickfix scope exceeds the fast-channel file limit (3 files by default). Use framework-mode for a larger fix.', { exitCode: 2 });
+    }
+    const scopeBlock = inspectQuickfixResearchScope(input.cwd, allowedFiles);
+    if (scopeBlock)
+        throw new CliError(scopeBlock.code, scopeBlock.reason, { exitCode: 2, details: scopeBlock });
     const record = {
         schemaId: 'atm.quickfixLock.v1',
         specVersion: '0.1.0',
@@ -28,7 +37,7 @@ export function writeQuickfixLock(input) {
         prompt: input.prompt,
         promptHash: sha256(input.prompt),
         reason: input.reason ?? null,
-        allowedFiles: uniqueStrings(input.allowedFiles.map(normalizeRelativePath).filter(Boolean)),
+        allowedFiles,
         maxFiles: input.maxFiles ?? 3,
         maxChangedLines: input.maxChangedLines ?? 80,
         createdAt: new Date().toISOString(),
@@ -338,6 +347,8 @@ export function isPathAllowedByScope(filePath, allowedFiles) {
         const candidate = normalizeRelativePath(entry).toLowerCase();
         if (!candidate)
             return false;
+        if (candidate.endsWith('/**') && normalizedFile === candidate.slice(0, -3))
+            return true;
         if (candidate.includes('*')) {
             // `dir/**/*.ts` must match `dir/foo.ts` (zero intermediate directories).
             // Treat `**/` as an optional path prefix before single-segment wildcards.

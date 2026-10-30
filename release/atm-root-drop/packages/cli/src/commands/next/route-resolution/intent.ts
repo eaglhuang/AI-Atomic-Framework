@@ -76,6 +76,7 @@ import {
 
 import { extractTaskFamilyRootHintsFromPrompt, extractTaskIdReferencesFromPrompt, expandTaskIdReferenceAliases, extractTaskRootHintsFromPrompt, isHandoffPrompt } from './matching.ts';
 import { inspectImportedTaskQueue } from './queue-inspection.ts';
+import { isQuickfixSealManifestPath } from '../quickfix-scope-policy.ts';
 
 export type NextClaimIntent = 'write' | 'closeout-only';
 
@@ -256,8 +257,9 @@ export function extractPromptFileTokens(prompt: string): readonly string[] {
     .filter((entry) => !/^[a-z][a-z0-9+.-]*:\/\//i.test(entry))
     .filter((entry) => {
       const extension = /\.([A-Za-z0-9]+)$/.exec(entry)?.[1]?.toLowerCase();
-      if (!extension || entry.length <= extension.length + 1) return false;
-      return /[\\/]/.test(entry) || PROMPT_FILE_EXTENSIONS.has(extension);
+      if (extension && entry.length > extension.length + 1 && (/[\\/]/.test(entry) || PROMPT_FILE_EXTENSIONS.has(extension))) return true;
+      // Checksum seals such as SHA256SUMS have no extension, but a slash-qualified token is still a file.
+      return /[\\/]/.test(entry) && isQuickfixSealManifestPath(entry);
     }));
 }
 

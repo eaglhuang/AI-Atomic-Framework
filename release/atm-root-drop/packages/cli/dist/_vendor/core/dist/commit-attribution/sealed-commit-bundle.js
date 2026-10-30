@@ -29,7 +29,7 @@ export function isTombstone(entry) {
     return dispositionOf(entry) === 'deleted';
 }
 function normalizePath(value) {
-    return value.replace(/\\/g, '/').replace(/^\.\//, '').trim();
+    return value.replace(/^\.\//, '');
 }
 /**
  * Git writes regular files as `100644` but the index and `diff-tree` disagree

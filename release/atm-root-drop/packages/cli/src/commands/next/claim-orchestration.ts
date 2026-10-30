@@ -38,12 +38,13 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
   const promptScopeRuntime = input.importedTaskQueue.promptScope?.status === 'queue' ? reconcilePromptScopeRuntimeForClaim(input.cwd, input.taskIntent, input.importedTaskQueue.promptScope.selectedTasks) : null;
   const importedTaskQueue = promptScopeRuntime ? { ...input.importedTaskQueue, claimableTask: promptScopeRuntime.queueHeadTask ?? input.importedTaskQueue.claimableTask, selectedTask: promptScopeRuntime.queueHeadTask ?? input.importedTaskQueue.selectedTask } : input.importedTaskQueue;
   const promptText = input.taskIntent?.userPrompt?.trim() ?? '';
-  const quickfixScope = promptText ? resolveQuickfixScope(promptText) : [];
+  const quickfixScope = input.claimFiles?.length ? input.claimFiles : promptText ? resolveQuickfixScope(promptText) : [];
   const quickfixResult = tryBuildQuickfixClaimResult({
     cwd: input.cwd,
     actor: input.actor,
     promptText,
     quickfixScope,
+    explicitFiles: Boolean(input.claimFiles?.length),
     taskIntent: input.taskIntent,
     importedTaskQueue,
     integrationBootstrap: input.integrationBootstrap,

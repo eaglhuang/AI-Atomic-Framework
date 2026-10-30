@@ -4,15 +4,17 @@
 // evidence-driven tier/rollback summary without changing validator execution.
 
 import assert from 'node:assert/strict';
+import { randomUUID } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { rmSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildValidatorLifecycleSummary } from '../../packages/core/src/evidence/validator-lifecycle.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const runnerPath = path.join(root, 'scripts', 'run-validators.ts');
-const cacheRoot = path.join(root, '.atm', 'runtime', 'validator-cache');
+
+// Each process owns its cache key; parallel fixtures must not clear each other.
+const cacheNonce = randomUUID();
 
 function runValidators(args: string[]): any {
   const stdout = execFileSync(process.execPath, ['--strip-types', runnerPath, ...args], {
@@ -20,13 +22,11 @@ function runValidators(args: string[]): any {
     encoding: 'utf8',
     env: {
       ...process.env,
-      ATM_VALIDATOR_LIFECYCLE_TEST: '1'
+      ATM_VALIDATOR_LIFECYCLE_TEST: cacheNonce
     }
   });
   return JSON.parse(stdout);
 }
-
-rmSync(cacheRoot, { recursive: true, force: true });
 
 const args = [
   'standard',

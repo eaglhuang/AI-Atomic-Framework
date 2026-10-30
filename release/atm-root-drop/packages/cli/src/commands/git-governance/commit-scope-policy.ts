@@ -161,6 +161,7 @@ export function pathMatchesTaskScope(filePath: string, scope: string): boolean {
   const file = normalizeRelativePath(filePath).toLowerCase();
   const candidate = normalizeRelativePath(scope).toLowerCase();
   if (!candidate) return false;
+  if (candidate.endsWith('/**') && file === candidate.slice(0, -3)) return true;
   if (candidate.includes('*')) {
     // `dir/**/*.ts` must match `dir/foo.ts` (zero intermediate directories).
     // Treat `**/` as an optional path prefix before single-segment wildcards.

@@ -58,7 +58,7 @@ export function inspectCloseHolderLiveness(input) {
     const expiresMs = leaseExpiresAt ? Date.parse(leaseExpiresAt) : NaN;
     const acquiredMs = input.lockAcquiredAt ? Date.parse(input.lockAcquiredAt) : NaN;
     const lockAgeMs = Number.isFinite(acquiredMs) ? Math.max(0, nowMs - acquiredMs) : null;
-    const base = { taskId: input.taskId, mutexPath, ownerPid, ownerPidAlive, leaseExpiresAt, lockAcquiredAt: input.lockAcquiredAt ?? null, lockAgeMs, staleAfterMs };
+    const base = { leaseId: typeof lease?.leaseId === 'string' ? lease.leaseId : null, taskId: input.taskId, mutexPath, ownerPid, ownerPidAlive, leaseExpiresAt, lockAcquiredAt: input.lockAcquiredAt ?? null, lockAgeMs, staleAfterMs };
     if (ownerPidAlive === true)
         return { ...base, alive: true, reason: 'owner-pid-alive' };
     if (lease && ownerPid === null && Number.isFinite(expiresMs) && expiresMs > nowMs)

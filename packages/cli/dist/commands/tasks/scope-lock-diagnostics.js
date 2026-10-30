@@ -6,6 +6,7 @@ import { sanitizeTaskDirectionAllowedFiles } from '../task-direction.js';
 import { normalizeRelativePath } from './task-file-io-helpers.js';
 import { pathMatchesTaskScope } from './historical-delivery.js';
 import { readCloseWindowStagedIndexLockReport } from './close-window-lock.js';
+import { resolveVerifiedGeneratedOutputPaths } from '../taskflow/generated-output-advisory.js';
 import { gitHeadEvidencePath, gitHeadEvidencePaths, readLatestGitHeadReceiptTaskId } from '../git-head-evidence.js';
 function isHistoricalDeliveredFile(filePath, deliverableFiles, historicalDeliveredFiles) {
     return deliverableFiles.some((declared) => pathMatchesTaskScope(filePath, declared)
@@ -89,7 +90,7 @@ export function evaluateFrameworkCloseDirtyGuard(input) {
         // repositories migrate to the compact tracked receipt.
         allowedAdvisoryGovernanceFiles.add(gitHeadEvidencePaths.jsonl);
     }
-    const allowedAdvisoryDirtyFiles = new Set(uniqueStrings((input.allowedAdvisoryDirtyFiles ?? []).map(normalizeRelativePath).filter(Boolean)));
+    const allowedAdvisoryDirtyFiles = new Set(uniqueStrings([...(input.allowedAdvisoryDirtyFiles ?? []), ...resolveVerifiedGeneratedOutputPaths(input.cwd, input.taskId)].map(normalizeRelativePath).filter(Boolean)));
     const buckets = {
         scopeTrackedDirtyFiles: [],
         governanceTrackedDirtyFiles: [],

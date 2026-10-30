@@ -181,7 +181,8 @@ if (staticEvidenceArtifactFiles.length > 0 && !isAuthorizedStaticEvidenceArtifac
 editor: options.editor, blockedFiles: staticEvidenceArtifactFiles, nextStep: 'Use node atm.mjs evidence add ... for closure proof, and generate report artifacts through atm/validator commands instead of direct file edits.' })], evidence: { action: 'hook pre-tool', editor: options.editor, toolName: options.toolName, toolFiles, blockedFiles: staticEvidenceArtifactFiles, toolCommand, frameworkStatus: status }
 });
 }
-if (criticalFiles.length > 0 && !hasFrameworkTempClaim && activeDirectionLocks.length === 0) {
+const baseSyncInvocation = options.files.length === 0 && extractFilesFromPayload(options.stdinPayload).length === 0 && criticalFiles.every(file => file === 'atm.mjs') && isFrameworkBaseSyncInvocation(toolCommand);
+if (criticalFiles.length > 0 && !hasFrameworkTempClaim && activeDirectionLocks.length === 0 && !baseSyncInvocation) {
 const claimCommand = buildFrameworkTempClaimCommand(criticalFiles, 'temporary framework maintenance before tool edit'); return makeResult({ ok: false, command: 'integration', cwd: options.cwd, messages: [message('error', 'ATM_INTEGRATION_PRE_TOOL_FRAMEWORK_CLAIM_REQUIRED', 'Framework critical source edit is blocked until ATM framework work is claimed.', { editor: options.editor, criticalFiles, nextStep: claimCommand
 })], evidence: { action: 'hook pre-tool', editor: options.editor, toolName: options.toolName, toolFiles, criticalFiles, frameworkClaimCommand: claimCommand, frameworkStatus: status }
 });
@@ -429,6 +430,16 @@ const tokens = tokenizeShellLike(command); if (tokens.length === 0) return [];
 const segments: string[][] = [[]]; for (const token of tokens) { if (token === '&&' || token === '||' || token === ';' || token === '|' || token === '&') { segments.push([]); continue; }
 segments[segments.length - 1]!.push(token); }
 return segments.filter((segment) => segment.length > 0); }
+// The runner token is an executable, not a declared source edit. The command
+// owns clean-tree, expected-HEAD, ancestry, and receipt checks.
+function isFrameworkBaseSyncInvocation(command: string | null): boolean {
+if (!command || /[$`<>\n\r]/.test(command)) return false;
+const segments = splitCommandSegments(command);
+if (segments.length !== 1) return false;
+const [executable, runner, group, action] = segments[0];
+return /^(node|node.exe)$/i.test(path.basename(executable ?? ''))
+&& path.basename(runner ?? '') === 'atm.mjs' && group === 'upgrade' && action === 'base-sync';
+}
 function tokenizeShellLike(command: string | null): readonly string[] { if (!command?.trim()) return [];
 const tokens: string[] = [];
 const pattern = /"([^"]*)"|'([^']*)'|(&&|\|\||[;|&])|([^\s;|&]+)/g; for (const match of command.matchAll(pattern)) { tokens.push(match[1] ?? match[2] ?? match[3] ?? match[4] ?? ''); }

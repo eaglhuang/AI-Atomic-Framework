@@ -52,6 +52,8 @@ export interface SealedCommitBundleEntry {
   /** Content identity: a blob object id, or any digest the adapter seals. Empty for a tombstone. */
   readonly blobId: string;
   readonly provenance: SealedCommitEntryProvenance;
+  /** Exact declaration admitted within task scope; automatic inventory is not a declaration. */
+  readonly declared?: boolean;
   /** Defaults to `present` so existing callers keep their meaning. */
   readonly disposition?: SealedCommitEntryDisposition;
 }
@@ -127,7 +129,7 @@ export function isTombstone(entry: SealedCommitBundleEntry): boolean {
 }
 
 function normalizePath(value: string): string {
-  return value.replace(/\\/g, '/').replace(/^\.\//, '').trim();
+  return value.replace(/^\.\//, '');
 }
 
 /**

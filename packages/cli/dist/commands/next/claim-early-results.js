@@ -10,10 +10,11 @@ import { normalizeTaskRouteStatus } from './intent-normalizers.js';
 import { quoteCliToken, quoteCliValue } from './view-projections.js';
 import { editDistance } from '../shared/usage-error-hints.js';
 import { requireGitRepository } from '../shared/git-base-remediation.js';
+import { inspectQuickfixResearchScope } from './quickfix-scope-policy.js';
 export function tryBuildQuickfixClaimResult(input) {
-    if (!input.importedTaskQueue.claimableTask
+    if (input.taskIntent?.taskScopeMentioned === false
         && !input.importedTaskQueue.promptScope
-        && isQuickfixPrompt(input.promptText)
+        && (input.explicitFiles || isQuickfixPrompt(input.promptText))
         && input.quickfixScope.length > 0) {
         const resolvedActor = resolveActorId(input.actor ?? undefined, input.cwd);
         if (!resolvedActor) {
@@ -21,6 +22,15 @@ export function tryBuildQuickfixClaimResult(input) {
         }
         // A quickfix ends in a governed commit; refuse before taking the lock.
         requireGitRepository(input.cwd, 'next --claim');
+        const scopeBlock = inspectQuickfixResearchScope(input.cwd, input.quickfixScope);
+        if (scopeBlock)
+            return makeResult({
+                ok: false, command: 'next', cwd: input.cwd,
+                messages: [message('error', scopeBlock.code, scopeBlock.reason, scopeBlock)],
+                evidence: { nextAction: { status: 'blocked', reason: scopeBlock.reason,
+                        reasonCode: scopeBlock.code, allowedFiles: [], blockedFiles: scopeBlock.files,
+                        recovery: 'Create a new generation and rerun next --claim with its exact files; existing generations remain immutable.' } }
+            });
         const quickfixLock = writeQuickfixLock({
             cwd: input.cwd,
             actorId: resolvedActor.actorId,

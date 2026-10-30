@@ -15,6 +15,8 @@ import {
 } from '../packages/core/src/broker/runner-build-output-inventory.ts';
 import { getActiveTasks } from '../packages/core/src/broker/cross-task-mutation-guard.ts';
 import { normalizeIdentitySegment } from '../packages/cli/src/commands/shared/identity-normalization.ts';
+import { resolveFrameworkTempPublicationCapability } from '../packages/cli/src/commands/framework-development/framework-temp-publication-capability.ts';
+import { RUNNER_INPUT_TREE_PATHS } from '../packages/core/src/broker/runner-version-contract.ts';
 
 /**
  * The narrow publication boundary for a sealed candidate. Candidate compilation
@@ -262,11 +264,16 @@ export function resolveActiveRunnerPublicationTask(input: {
   const lockRoot = path.join(input.cwd, '.atm', 'runtime', 'locks');
   const nowMs = Date.parse(input.now);
   const explicitlyRequested = input.taskId?.trim();
+  const sourceClaim = resolveFrameworkTempPublicationCapability({
+    cwd: input.cwd, actorId: input.actorId, taskId: explicitlyRequested,
+    laneSessionId: process.env.ATM_LANE_SESSION_ID, now: nowMs
+  });
   const frameworkTempCandidates = readFrameworkTempLockProjection(input.cwd, nowMs)
     .filter((lock) => lock.workItemId.startsWith('ATM-FRAMEWORK-TEMP-'))
     .filter((lock) => sameActorIdentity(lock.actorId, input.actorId) && lock.disposition === 'foreign-live')
     .filter((lock) => !explicitlyRequested || lock.workItemId === explicitlyRequested || lock.linkedTaskId === explicitlyRequested)
-    .filter((lock) => ownsReleaseSurface(lock.files))
+    .filter((lock) => ownsReleaseSurface(lock.files)
+      || (lock.workItemId === sourceClaim?.taskId && ownsCommittedRunnerInputs(input.cwd, lock.files)))
     // A temporary claim linked to a live delivery card delegates the runner
     // publication surface to that card.  Count that authority once unless the
     // caller explicitly selected the temporary work item itself.
@@ -329,6 +336,15 @@ function ownsReleaseSurface(files: readonly string[]): boolean {
     .some((surface) => files.some((file) => pathMatchesWriteScope(surface, file)));
 }
 
+function ownsCommittedRunnerInputs(cwd: string, files: readonly string[]): boolean {
+  if (files.length === 0) return false;
+  const git = (args: string[]) => spawnSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+  const tracked = git(['ls-tree', '-r', '--name-only', 'HEAD', '--', ...files]);
+  const dirty = git(['status', '--porcelain', '--untracked-files=all', '--', ...files]);
+  return tracked.status === 0 && dirty.status === 0 && !dirty.stdout.trim()
+    && tracked.stdout.trim().split('\n').some((file) => RUNNER_INPUT_TREE_PATHS.some((root) => file === root || file.startsWith(`${root}/`)));
+}
+
 function hasActiveLedgerClaim(cwd: string, taskId: string, actorId: string, nowMs: number): boolean {
   try {
     const task = JSON.parse(readFileSync(path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`), 'utf8')) as { claim?: Record<string, unknown> };
@@ -372,7 +388,7 @@ function readValidatedPublicationTakeover(input: {
   return validated.plan.entries.map((entry) => entry.path);
 }
 
-// Reserve two hours for compilation and publication, before creating a worktree.
+// Reserve two hours for renewable task claims before creating a worktree.
 export const MIN_PUBLICATION_CLAIM_REMAINING_SECONDS = 7200;
 
 export function assertSealedRunnerClaimLifetime(input: {
@@ -387,11 +403,17 @@ export function assertSealedRunnerClaimLifetime(input: {
   try {
     taskId = resolveActiveRunnerPublicationTask({ ...input, now });
   } catch (error) {
+    if (input.taskId?.startsWith('ATM-FRAMEWORK-TEMP-')) {
+      throw new Error(`${error instanceof Error ? error.message : String(error)} Inspect temporary publication authority before reclaiming: node atm.mjs framework-mode status --json`);
+    }
     throw new Error(`${error instanceof Error ? error.message : String(error)} Renew publication authority before building: ${renew(input.taskId || '<task-id>')}`);
   }
   let authority: Record<string, unknown>;
   if (taskId.startsWith('ATM-FRAMEWORK-TEMP-')) {
-    authority = JSON.parse(readFileSync(path.join(input.cwd, '.atm/runtime/locks', `${taskId}.lock.json`), 'utf8')) as Record<string, unknown>;
+    // Temporary claims have a fixed thirty-minute TTL and cannot use tasks
+    // renew. The resolver above requires live scoped authority; publication
+    // revalidates it again, for both source refreshes and release builds.
+    return;
   } else {
     const task = JSON.parse(readFileSync(path.join(input.cwd, '.atm/history/tasks', `${taskId}.json`), 'utf8')) as { claim: Record<string, unknown> };
     authority = task.claim;

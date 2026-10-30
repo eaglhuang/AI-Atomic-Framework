@@ -1,3 +1,4 @@
+import { assertActiveCloseLease, activeCloseLeaseIsOwned } from '../../taskflow/close-transaction-mutex.ts';
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, unlinkSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
@@ -177,6 +178,7 @@ export async function executeCloseWrites(input: {
   readonly closurePacketPath: string | null;
   readonly closurePacket: ClosurePacket | null;
 }) {
+  assertActiveCloseLease();
   const { options, actorId } = input;
   writeCloseTransactionStatus({ cwd: options.cwd, taskId: options.taskId, phase: 'started' });
   let closurePacketPath = input.closurePacketPath;
@@ -238,6 +240,7 @@ export async function executeCloseWrites(input: {
       try {
         stageTaskCloseArtifacts(options.cwd, closeArtifactFiles);
       } catch (error) {
+        if (!activeCloseLeaseIsOwned()) throw error;
         // The transaction cannot learn the transition path until runWrites returns.
         // Remove artifacts produced by this callback before rethrowing so its outer
         // ledger rollback restores the pre-close state as one atomic operation.

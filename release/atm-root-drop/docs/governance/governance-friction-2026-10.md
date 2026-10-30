@@ -46,7 +46,19 @@ Status legend: *fixed* (already merged), *quick-fixed* (this round, PR linked), 
 | F24 | Claim discovery: `tasks claim` says "not ready", `taskflow open --write` refuses in template-only mode; the working path is `next --claim --task <id> --auto-intent`, and it refuses while any uncommitted WIP intersects the scope | low | yes | proposed (P5 hint text) |
 | F25 | A closed task cannot take a governed commit or publish the runner, so merging main after close (dist conflicts) or a one-line notes update needs a new task | medium | yes | proposed (P4); evidence TASK-PRF-0152, 0153 |
 | F26 | Sealed-build failure result line has a generic hint ("see log") instead of the error | low | no | follow-up to #379 |
+| F27 | `next --claim` drops some card scopePaths from the claim's file grant; close then fails with ATM_WRITE_TICKET_SCOPE_VIOLATION until `tasks scope add --reason` | medium | yes | open; evidence TASK-PRF-0154 |
+| F28 | `--historical-delivery` pointing at a WIP commit fails with `no-scoped-deliverable-files` instead of explaining which deliverable is missing | low | no | open |
+| F29 | Close dry-run passes but `--write` fails with ATM_LANE_BORROWED_ACTOR_BLOCKED when ATM_LANE_SESSION_ID is unset; dry-run should check it | medium | yes | open; evidence TASK-PRF-0154 |
+| F30 | Release manifests (`release/atm-onefile`, `release/atm-root-drop`) conflict across every open sealed-build PR once another merges, forcing a merge task plus rebuild | medium | yes | open; evidence TASK-PRF-0155 |
+| F31 | Box Node 22 and 24.10 cannot run `node --strip-types` scripts; a newer Node 24 must be used for npm scripts | low | yes | environment note |
+| F32 | Codex CLI 0.163 dropped `--full-auto`; use `codex exec -s workspace-write` | low | no | note |
 | F23 | Box environment: default Node 22 lacks `--strip-types`; Codex sandbox cannot spawn `git` (EPERM) | low | no | note |
+| F33 | Next-free task ID allocation ignored IDs on unmerged branches (2026-10-21/22) | high | yes | fixed in PR #385; remote-head card discovery |
+| F34 | Claims expired during long sealed builds (2026-10-21/22) | high | yes | fixed in PR #385; publication lease headroom check |
+| F35 | `atm git commit --auto-stage` ran unscoped `git diff --diff-filter=D`, costing 35s–8min per call and 3h33m for one commit (2026-10-21/22) | high | yes | fixed in PR #386; scoped diff benchmark 95.8s → 0.05s per diff |
+| F36 | `taskflow close` refused from a non-owner lane (2026-10-21/22) | medium | yes | open; owner-lane requirement, related dry-run mismatch in F29 |
+| F37 | Every `taskflow close` re-adds two ignored mirror fixtures to the index, requiring repeated index cleanup even after a successful close (2026-10-21/22) | medium | yes | open; automatic close staging must exclude undeclared ignored mirror fixtures (P2) |
+| F38 | New task claim refused with `ATM_NEXT_ACTIVE_CLAIM_RESUMABLE` while stale claims ATM-GOV-0288 and TASK-PRF-0040 remain held (2026-10-22) | high | yes | open; stale active claims block the new-task route |
 
 ## Details
 
@@ -195,10 +207,10 @@ Status legend: *fixed* (already merged), *quick-fixed* (this round, PR linked), 
 4. Re-running and re-reading the same validators (F10).
 5. CI polling (F12).
 
-### F27 Cross-branch task-ID collision (fixed by this PR)
+### F33 Cross-branch task-ID collision (fixed in PR #385)
 - Parallel branches allocated TASK-PRF-0156 from local/main state. TASK-PRF-0157 refreshes all origin heads and scans remote card names and contents before automatic allocation; two-session regression coverage includes newly published unmerged cards and unavailable origin.
 
-### F28 Publication claim expires during sealed compilation (fixed by this PR)
+### F34 Publication claim expires during sealed compilation (fixed in PR #385)
 - A thirty-minute build outlived its publication claim and required a retry. TASK-PRF-0157 checks for two hours of remaining authority before private compilation and prints a concrete four-hour renew command when insufficient; publication still revalidates ownership. Regression coverage includes expiry and a competing session.
 
 - Publication follow-up TASK-PRF-0158 keeps both helpers in existing tracked modules; the known forced-add friction requires a separate index cleanup after normal close.

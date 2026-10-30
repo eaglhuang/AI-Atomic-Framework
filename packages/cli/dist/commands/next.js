@@ -103,8 +103,8 @@ async function runNextRoute(argv) {
     const unscopedPrompt = taskIntent?.userPrompt?.trim() ?? '';
     const claimedQuickfixPrompt = Boolean(options.claim
         && taskIntent?.taskScopeMentioned === false
-        && isQuickfixPrompt(unscopedPrompt)
-        && resolveQuickfixScope(unscopedPrompt).length > 0);
+        && (options.files.length > 0 || isQuickfixPrompt(unscopedPrompt))
+        && (options.files.length > 0 || resolveQuickfixScope(unscopedPrompt).length > 0));
     if (taskIntent && taskIntent.taskScopeMentioned === false && !claimedQuickfixPrompt) {
         // An unscoped prompt is exactly where silent auto-attach to whatever is
         // already in flight is the risk, so divergence is decided before guidance

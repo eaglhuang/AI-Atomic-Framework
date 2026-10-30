@@ -310,6 +310,11 @@ export function writeResult(
   outputFormat = 'json',
   projectionOptions?: { summary?: boolean; fields?: string[] | null }
 ) {
+  const closeLine = (result as CommandResult & { closeResultLine?: string }).closeResultLine;
+  if (result.command === 'taskflow close' && typeof closeLine === 'string') {
+    stream.write(closeLine);
+    return;
+  }
   const withLane = carryLaneSessionIntoPrintedCommands(result);
   const enriched = 'severity' in withLane && 'exitCode' in withLane && 'blocking' in withLane && 'diagnostics' in withLane
     ? withLane as EnrichedCommandResult

@@ -43,7 +43,7 @@ export function reconcileReceiptOnlyRunnerPublicationResidue(input: {
   const absoluteReceipt = path.join(input.cwd, receiptRef);
   if (!existsSync(absoluteReceipt)) throw new Error(`ATM_RUNNER_PUBLICATION_INVENTORY_INCOMPLETE: receipt does not exist: ${receiptRef}.`);
   const currentRaw = readFileSync(absoluteReceipt, 'utf8');
-  const currentDocument = parseRunnerReceipt(currentRaw, receiptRef);
+  const currentDocument = parseRunnerReceipt(currentRaw, receiptRef, input.cwd);
   const currentInventory = currentDocument.inventory;
   if (String(currentDocument.document.taskId ?? '') !== legacyTaskId) throw new Error(`ATM_RUNNER_PUBLICATION_INVENTORY_INCOMPLETE: receipt task attribution does not match ${receiptRef}.`);
   const stewardWorkId = typeof currentDocument.document.stewardWorkId === 'string' ? currentDocument.document.stewardWorkId.trim() : '';
@@ -109,7 +109,7 @@ export function readRunnerPublicationReceipts(cwd: string): Array<{ readonly pat
   return readdirSync(evidenceRoot).filter((entry) => entry.endsWith('.runner-sync-receipt.json')).map((entry) => path.join(evidenceRoot, entry)).map((absolute) => {
     try {
       const document = JSON.parse(readFileSync(absolute, 'utf8')) as Record<string, unknown>;
-      const validated = validateRunnerBuildOutputInventory(document.outputInventory);
+      const validated = validateRunnerBuildOutputInventory(document.outputInventory, cwd);
       if (!validated.ok || !validated.inventory) return null;
       const disposition = document.publicationDisposition;
       return { path: path.relative(cwd, absolute).replace(/\\/g, '/'), inventory: validated.inventory, terminalDisposition: disposition === 'published' || disposition === 'recovery-retained' ? disposition : null, mtimeMs: statSync(absolute).mtimeMs };
@@ -129,7 +129,7 @@ export function readRunnerPublicationReceiptAtPath(cwd: string, receiptRef: stri
   if (!absolute.startsWith(path.resolve(cwd) + path.sep) || !existsSync(absolute)) return null;
   try {
     const document = JSON.parse(readFileSync(absolute, 'utf8')) as Record<string, unknown>;
-    const validated = validateRunnerBuildOutputInventory(document.outputInventory);
+    const validated = validateRunnerBuildOutputInventory(document.outputInventory, cwd);
     if (!validated.ok || !validated.inventory) return null;
     const disposition = document.publicationDisposition;
     return { path: receiptRef, inventory: validated.inventory, terminalDisposition: disposition === 'published' || disposition === 'recovery-retained' ? disposition : null };
@@ -141,11 +141,11 @@ function taskIdFromRunnerReceiptPath(receiptRef: string): string | null {
   return match?.[1] ?? null;
 }
 
-function parseRunnerReceipt(raw: string, receiptRef: string): { document: Record<string, unknown>; inventory: RunnerBuildOutputInventory } {
+function parseRunnerReceipt(raw: string, receiptRef: string, cwd?: string): { document: Record<string, unknown>; inventory: RunnerBuildOutputInventory } {
   let document: Record<string, unknown>;
   try { document = JSON.parse(raw) as Record<string, unknown>; } catch { throw new Error(`ATM_RUNNER_PUBLICATION_INVENTORY_INCOMPLETE: receipt is not valid JSON: ${receiptRef}.`); }
   if (document.schemaId !== 'atm.runnerSyncReceipt.v1') throw new Error(`ATM_RUNNER_PUBLICATION_INVENTORY_INCOMPLETE: receipt schema is invalid: ${receiptRef}.`);
-  const validated = validateRunnerBuildOutputInventory(document.outputInventory);
+  const validated = validateRunnerBuildOutputInventory(document.outputInventory, cwd);
   if (!validated.ok || !validated.inventory) throw new Error(`ATM_RUNNER_PUBLICATION_INVENTORY_INCOMPLETE: receipt inventory is invalid: ${validated.reason ?? receiptRef}.`);
   return { document, inventory: validated.inventory };
 }

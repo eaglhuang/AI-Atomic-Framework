@@ -231,6 +231,7 @@ export function runPreCommitHook(cwd: string) {
     ? authorizesRunnerPublicationCloseCommit({
       taskId: committingTaskIdForHook,
       receipt: runnerPublicationReceipt,
+      cwd: root,
       criticalChangedFiles: frameworkStatus.criticalChangedFiles
     })
     : false;

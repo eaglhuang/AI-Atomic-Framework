@@ -15,20 +15,22 @@ import type { inspectRuntimeAdapterReadiness } from '../runtime-adapter-readines
 import type { NextActionLike } from './next-action-assembly.ts';
 import { editDistance } from '../shared/usage-error-hints.ts';
 import { requireGitRepository } from '../shared/git-base-remediation.ts';
+import { inspectQuickfixResearchScope } from './quickfix-scope-policy.ts';
 
 export function tryBuildQuickfixClaimResult(input: {
   readonly cwd: string;
   readonly actor: string | undefined;
   readonly promptText: string;
   readonly quickfixScope: readonly string[];
+  readonly explicitFiles?: boolean;
   readonly taskIntent: TaskIntent | null;
   readonly importedTaskQueue: ImportedTaskQueue;
   readonly integrationBootstrap: ReturnType<typeof inspectIntegrationBootstrap>;
   readonly runtimeAdapterReadiness: ReturnType<typeof inspectRuntimeAdapterReadiness>;
 }) {
-  if (!input.importedTaskQueue.claimableTask
+  if (input.taskIntent?.taskScopeMentioned === false
     && !input.importedTaskQueue.promptScope
-    && isQuickfixPrompt(input.promptText)
+    && (input.explicitFiles || isQuickfixPrompt(input.promptText))
     && input.quickfixScope.length > 0) {
     const resolvedActor = resolveActorId(input.actor ?? undefined, input.cwd);
     if (!resolvedActor) {
@@ -36,6 +38,14 @@ export function tryBuildQuickfixClaimResult(input: {
     }
     // A quickfix ends in a governed commit; refuse before taking the lock.
     requireGitRepository(input.cwd, 'next --claim');
+    const scopeBlock = inspectQuickfixResearchScope(input.cwd, input.quickfixScope);
+    if (scopeBlock) return makeResult({
+      ok: false, command: 'next', cwd: input.cwd,
+      messages: [message('error', scopeBlock.code, scopeBlock.reason, scopeBlock)],
+      evidence: { nextAction: { status: 'blocked', reason: scopeBlock.reason,
+        reasonCode: scopeBlock.code, allowedFiles: [], blockedFiles: scopeBlock.files,
+        recovery: 'Create a new generation and rerun next --claim with its exact files; existing generations remain immutable.' } }
+    });
     const quickfixLock = writeQuickfixLock({
       cwd: input.cwd,
       actorId: resolvedActor.actorId,

@@ -486,14 +486,14 @@ function readStagedDeletionSet(cwd: string, stagedFiles: readonly string[]): Rea
   if (stagedFiles.length === 0) return deletions;
   try {
     forEachPathspecBatch(
-      { paths: stagedFiles, fixedArgs: ['diff', '--cached', '--diff-filter=D', '--name-only', '--'] },
+      { paths: stagedFiles, fixedArgs: ['--literal-pathspecs', 'diff', '--cached', '--diff-filter=D', '--name-only', '-z', '--'] },
       (batch) => {
-        const output = execFileSync('git', ['diff', '--cached', '--diff-filter=D', '--name-only', '--', ...batch], {
+        const output = execFileSync('git', ['--literal-pathspecs', 'diff', '--cached', '--diff-filter=D', '--name-only', '-z', '--', ...batch], {
           cwd,
           encoding: 'utf8',
           stdio: ['ignore', 'pipe', 'ignore']
         });
-        for (const filePath of output.split(/\r?\n/)) {
+        for (const filePath of output.split('\0')) {
           const normalized = normalizeRelativePath(filePath).toLowerCase();
           if (normalized) deletions.add(normalized);
         }

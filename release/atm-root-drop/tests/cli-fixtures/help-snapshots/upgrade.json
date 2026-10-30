@@ -4,7 +4,7 @@
   "positional": [
     {
       "name": "action",
-      "summary": "plan | apply | rollback | experimental-api (or legacy --propose / --scan)",
+      "summary": "base-sync | plan | apply | rollback | experimental-api (or legacy --propose / --scan)",
       "required": false
     }
   ],
@@ -13,6 +13,11 @@
       "flag": "--cwd",
       "value": "path",
       "summary": "Run the command against a specific repository root."
+    },
+    {
+      "flag": "--actor",
+      "value": "id",
+      "summary": "Required actor for governed framework base-sync."
     },
     {
       "flag": "--out",
@@ -67,12 +72,12 @@
     {
       "flag": "--from",
       "value": "version",
-      "summary": "Source version."
+      "summary": "Source version; expected full HEAD SHA for base-sync."
     },
     {
       "flag": "--to",
       "value": "version",
-      "summary": "Target version."
+      "summary": "Target version; descendant full commit SHA for base-sync."
     },
     {
       "flag": "--target",
@@ -189,6 +194,7 @@
     }
   ],
   "examples": [
+    "node atm.mjs upgrade base-sync --cwd ../ATM-source --actor grok-bot --from <full-current-SHA> --to <full-target-SHA> --json",
     "node atm.mjs upgrade plan --cwd . --out .atm/history/reports/upgrade-plan.json --json",
     "node atm.mjs upgrade plan --cwd . --allow-unknown-chart --json",
     "node atm.mjs upgrade apply --from-plan .atm/history/reports/upgrade-plan.json --json",

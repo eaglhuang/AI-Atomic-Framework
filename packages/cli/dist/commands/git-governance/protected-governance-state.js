@@ -1,6 +1,8 @@
 import { execFileSync } from 'node:child_process';
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { appendFileSync, existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
+import { CliError } from '../shared.js';
+import { forEachPathspecBatch } from './implementation/pathspec-argv-batching.js';
 import { hasReconciliationEntitlement } from '../../_vendor/core/dist/broker/terminal-history-entitlement.js';
 export const ATM_PROTECTED_GOVERNANCE_STATE_DESTRUCTIVE_WRITE = 'ATM_PROTECTED_GOVERNANCE_STATE_DESTRUCTIVE_WRITE';
 function normalizeRelativePath(filePath) {
@@ -19,17 +21,35 @@ export function classifyProtectedGovernanceStatePath(filePath) {
         return { pathClass: 'task-evidence', ownerTaskId: match[1]?.toUpperCase() ?? null };
     return null;
 }
-function listDiffNames(cwd, args, env) {
+function listDiffNames(cwd, args, env, paths) {
+    if (paths) {
+        const names = [];
+        forEachPathspecBatch({ paths, fixedArgs: ['--literal-pathspecs', ...args, '--'] }, (batch) => {
+            names.push(...listDiffNames(cwd, ['--literal-pathspecs', ...args, '--', ...batch], env));
+        });
+        return names;
+    }
+    const started = performance.now();
     try {
-        return execFileSync('git', [...args, '-z'], {
+        return execFileSync('git', [...args], {
             cwd,
             encoding: 'utf8',
             stdio: ['ignore', 'pipe', 'pipe'],
+            maxBuffer: 64 * 1024 * 1024,
             env
         }).split('\0').map(normalizeRelativePath).filter(Boolean);
     }
-    catch {
-        return [];
+    catch (error) {
+        const failure = error;
+        throw new CliError('ATM_GIT_PROTECTED_STATE_INSPECTION_FAILED', 'Git could not inspect protected governance deletions; commit remains blocked. Repair the Git failure and retry.', { exitCode: 1, details: { status: failure.status ?? null, signal: failure.signal ?? null, code: failure.code ?? null } });
+    }
+    finally {
+        if (process.env.ATM_GIT_TIMING === '1') {
+            try {
+                appendFileSync(process.env.ATM_GIT_TIMING_FILE ?? path.join(cwd, '.atm/runtime/git-timing.jsonl'), `${JSON.stringify({ pid: process.pid, args, index: env?.GIT_INDEX_FILE ?? null, elapsedMs: performance.now() - started })}\n`);
+            }
+            catch { /* Diagnostics must not change governance decisions. */ }
+        }
     }
 }
 export function inspectProtectedGovernanceStateDestructiveChanges(input) {
@@ -37,9 +57,15 @@ export function inspectProtectedGovernanceStateDestructiveChanges(input) {
         ? new Set(input.commitFiles.map(normalizeRelativePath))
         : null;
     const authorizedGeneratedResidueDeletions = new Set((input.authorizedGeneratedResidueDeletions ?? []).map(normalizeRelativePath));
+    // Only protected paths that can enter this commit need a worktree comparison.
+    // A read-tree candidate has no stat cache: an unscoped diff rehashes the entire
+    // worktree on every call. Do not cache results across mutable index snapshots.
+    const protectedPaths = commitFileSet
+        ? [...commitFileSet].filter((filePath) => classifyProtectedGovernanceStatePath(filePath) !== null)
+        : undefined;
     const deleted = new Set([
-        ...listDiffNames(input.cwd, ['diff', '--cached', '--name-only', '--diff-filter=D'], input.env),
-        ...listDiffNames(input.cwd, ['diff', '--name-only', '--diff-filter=D'], input.env)
+        ...listDiffNames(input.cwd, ['diff', '--cached', '--name-only', '--diff-filter=D', '-z'], input.env, protectedPaths),
+        ...listDiffNames(input.cwd, ['diff', '--name-only', '--diff-filter=D', '-z'], input.env, protectedPaths)
     ]);
     const violations = [];
     for (const filePath of [...deleted].sort()) {

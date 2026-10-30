@@ -6,6 +6,7 @@ import { sanitizeTaskDirectionAllowedFiles } from '../task-direction.ts';
 import { normalizeRelativePath } from './task-file-io-helpers.ts';
 import { pathMatchesTaskScope } from './historical-delivery.ts';
 import { readCloseWindowStagedIndexLockReport } from './close-window-lock.ts';
+import { resolveVerifiedGeneratedOutputPaths } from '../taskflow/generated-output-advisory.ts';
 import { gitHeadEvidencePath, gitHeadEvidencePaths, readLatestGitHeadReceiptTaskId } from '../git-head-evidence.ts';
 
 export interface TaskCloseScopedDiffIsolationReport {
@@ -188,7 +189,7 @@ export function evaluateFrameworkCloseDirtyGuard(input: {
     allowedAdvisoryGovernanceFiles.add(gitHeadEvidencePaths.jsonl);
   }
   const allowedAdvisoryDirtyFiles = new Set(
-    uniqueStrings((input.allowedAdvisoryDirtyFiles ?? []).map(normalizeRelativePath).filter(Boolean))
+    uniqueStrings([...(input.allowedAdvisoryDirtyFiles ?? []), ...resolveVerifiedGeneratedOutputPaths(input.cwd, input.taskId)].map(normalizeRelativePath).filter(Boolean))
   );
   const buckets: Record<DirtyBucketId, string[]> = {
     scopeTrackedDirtyFiles: [],

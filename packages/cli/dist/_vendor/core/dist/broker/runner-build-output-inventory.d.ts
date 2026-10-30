@@ -2,6 +2,8 @@ export type RunnerBuildOutputDisposition = 'owned-current' | 'foreign-live' | 's
 export interface RunnerBuildOutputInventoryEntry {
     readonly path: string;
     readonly disposition: RunnerBuildOutputDisposition;
+    readonly generated?: true;
+    readonly contentDigest?: string;
     readonly ownerTaskId: string | null;
     readonly ownerActorId: string | null;
 }
@@ -65,6 +67,7 @@ export declare function isRunnerBuildOutputPath(filePath: string): boolean;
 /** Build artifacts whose unexpected dirty state must match a sealed inventory. */
 export declare function isRunnerPublicationArtifactPath(filePath: string): boolean;
 export declare function deriveRunnerBuildOutputInventory(input: {
+    readonly cwd?: string;
     readonly sealedSourceSha: string;
     readonly observedPaths: readonly string[];
     readonly currentTaskId?: string | null;
@@ -111,6 +114,7 @@ export declare function validateRunnerPublicationTakeoverPlan(input: {
     readonly reason: string | null;
 };
 export declare function buildRunnerBuildOutputInventory(input: {
+    readonly cwd?: string;
     readonly sealedSourceSha: string;
     readonly outputPaths: readonly string[];
     readonly currentTaskId?: string | null;
@@ -135,4 +139,4 @@ export declare function verifyRunnerBuildOutputParity(inventory: RunnerBuildOutp
  * by the build writer. Consumers must not accept a merely shape-compatible
  * inventory, because it could describe a different sealed generation.
  */
-export declare function validateRunnerBuildOutputInventory(value: unknown): RunnerBuildOutputInventoryValidation;
+export declare function validateRunnerBuildOutputInventory(value: unknown, cwd?: string): RunnerBuildOutputInventoryValidation;

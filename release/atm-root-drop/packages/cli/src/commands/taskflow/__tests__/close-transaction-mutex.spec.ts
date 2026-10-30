@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { spawn } from 'node:child_process';
 import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -8,7 +9,10 @@ import {
   CLOSE_TRANSACTION_MUTEX_SAFETY_MARGIN_MS,
   DEFAULT_CLOSE_TRANSACTION_MUTEX_TTL_MS,
   GOVERNED_GIT_COMMIT_DEFAULT_TIMEOUT_MS,
-  releaseCloseTransactionMutex
+  releaseCloseTransactionMutex,
+  renewCloseTransactionMutex,
+  assertActiveCloseLease,
+  withCloseTransactionMutex
 } from '../close-transaction-mutex.ts';
 
 const repoRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-close-mutex-'));
@@ -64,13 +68,10 @@ try {
     ttlReason: 'test fixture',
     lockPath: expiredPath
   }, null, 2)}\n`, 'utf8');
-  const reclaimed = acquireCloseTransactionMutex({
-    repoRoot,
-    taskId: expiredTaskId,
-    actorId: 'validator',
-    nowMs: 1_784_100_002_000
-  });
-  assert.equal(reclaimed.actorId, 'validator', 'expired close mutex must be reclaimable');
+  assert.throws(() => acquireCloseTransactionMutex({ repoRoot, taskId: expiredTaskId, actorId: 'validator', nowMs: 1_784_100_002_000 }), /already held/, 'a live PID remains valid despite heartbeat expiry, just as in recovery');
+  rmSync(expiredPath);
+  writeFileSync(expiredPath, JSON.stringify({ taskId: expiredTaskId, leaseId: 'legacy-pidless', actorId: 'legacy', acquiredAt: new Date(1_784_100_000_000).toISOString(), expiresAt: new Date(1_784_100_001_000).toISOString() }));
+  const reclaimed = acquireCloseTransactionMutex({ repoRoot, taskId: expiredTaskId, actorId: 'validator', nowMs: 1_784_100_122_000 });
   releaseCloseTransactionMutex(reclaimed);
 
   const deadOwnerTaskId = 'TASK-MUTEX-DEAD';
@@ -95,6 +96,58 @@ try {
   });
   assert.equal(recovered.actorId, 'validator', 'dead owner close mutex must be recoverable before TTL expiry');
   releaseCloseTransactionMutex(recovered);
+
+  const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+  await withCloseTransactionMutex({ repoRoot, taskId: 'HEARTBEAT', actorId: 'validator', ttlMs: 1000 }, async (heartbeat) => {
+    await wait(1250);
+    const record = JSON.parse(readFileSync(heartbeat.lockPath, 'utf8'));
+    assert.ok(Date.parse(record.expiresAt) > Date.parse(heartbeat.expiresAt), 'heartbeat extends a long-running lease');
+    await withCloseTransactionMutex({ repoRoot, taskId: 'HEARTBEAT', actorId: 'validator' }, (nested) => assert.equal(nested.leaseId, heartbeat.leaseId));
+    assertActiveCloseLease();
+  });
+  const { candidateGit } = await import('../../git-governance/implementation/candidate-file-policy.ts');
+  const { writeCloseTransactionStatus } = await import('../close-transaction-status.ts');
+  const { releaseCloseWindowStagedIndexLock } = await import('../../tasks/close-window-lock.ts');
+  const { writeTaskDocumentWithTransition } = await import('../../tasks/close-helpers/task-transition-writer.ts');
+  let replacement = '', replacedPath = '';
+  await assert.rejects(withCloseTransactionMutex({ repoRoot, taskId: 'LOST', actorId: 'validator' }, async (original) => {
+    replacedPath = original.lockPath;
+    replacement = JSON.stringify({ ...original, leaseId: 'newer-holder' });
+    writeFileSync(original.lockPath, replacement);
+    assert.throws(() => renewCloseTransactionMutex(original), /ATM_CLOSE_LEASE_LOST/);
+    assert.throws(() => candidateGit(repoRoot, ['status']), /ATM_CLOSE_LEASE_LOST/);
+    assert.throws(() => writeCloseTransactionStatus({ cwd: repoRoot, taskId: 'LOST', phase: 'ledger-written' }), /ATM_CLOSE_LEASE_LOST/);
+    assert.throws(() => releaseCloseWindowStagedIndexLock({ cwd: repoRoot, taskId: 'LOST', actorId: 'validator', outcome: 'aborted' }), /ATM_CLOSE_LEASE_LOST/);
+    assert.throws(() => writeTaskDocumentWithTransition({ cwd: repoRoot, taskId: 'LOST', taskPath: 'must-not-write.json', taskDocument: {}, action: 'close', actorId: 'validator', previousStatus: 'running' }), /ATM_CLOSE_LEASE_LOST/);
+  }), /ATM_CLOSE_LEASE_LOST/);
+  assert.equal(readFileSync(replacedPath, 'utf8'), replacement, 'lost owner never renews or removes replacement token');
+  assert.equal(existsSync(path.join(repoRoot, '.atm/runtime/close-transactions/LOST.json')), false);
+  rmSync(replacedPath);
+
+  const old = acquireCloseTransactionMutex({ repoRoot, taskId: 'REACQUIRE', actorId: 'validator' });
+  releaseCloseTransactionMutex(old);
+  const newer = acquireCloseTransactionMutex({ repoRoot, taskId: 'REACQUIRE', actorId: 'validator' });
+  releaseCloseTransactionMutex(old);
+  assert.equal(JSON.parse(readFileSync(newer.lockPath, 'utf8')).leaseId, newer.leaseId, 'an older finally cannot release a later kernel holder');
+  releaseCloseTransactionMutex(newer);
+
+  const ready = path.join(repoRoot, 'holder-ready');
+  const script = path.join(repoRoot, 'holder.mjs');
+  writeFileSync(script, `import { writeFileSync } from 'node:fs';
+import { acquireCloseTransactionMutex } from ${JSON.stringify(new URL('../close-transaction-mutex.ts', import.meta.url).href)};
+acquireCloseTransactionMutex({repoRoot: ${JSON.stringify(repoRoot)}, taskId: 'PROCESS', actorId: 'child'});
+writeFileSync(${JSON.stringify(ready)}, 'ready');
+setInterval(() => {}, 1000);`);
+  const child = spawn(process.execPath, ['--strip-types', script], { stdio: 'ignore' });
+  try {
+    const deadline = Date.now() + 10_000;
+    while (!existsSync(ready)) { assert.ok(Date.now() < deadline); await wait(20); }
+    assert.throws(() => acquireCloseTransactionMutex({ repoRoot, taskId: 'PROCESS', actorId: 'competitor' }), /already held/);
+    child.kill('SIGKILL');
+    await new Promise<void>((resolve) => child.once('exit', () => resolve()));
+    const afterKill = acquireCloseTransactionMutex({ repoRoot, taskId: 'PROCESS', actorId: 'recovery' });
+    releaseCloseTransactionMutex(afterKill);
+  } finally { child.kill('SIGKILL'); }
 
   console.log('[close-transaction-mutex.spec] ok');
 } finally {

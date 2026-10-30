@@ -1,8 +1,10 @@
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { CliError } from './shared.ts';
 import type { TaskDirectionTask, TaskQueueRecord } from './task-direction.ts';
 import { normalizeStoredPlanningPathForIdentity } from './planning-repo-root.ts';
+import { inspectQuickfixResearchScope } from './next/quickfix-scope-policy.ts';
 
 export interface QuickfixLock {
   readonly [key: string]: unknown;
@@ -99,6 +101,12 @@ export function writeQuickfixLock(input: {
   readonly maxChangedLines?: number;
 }) {
   const filePath = path.join(input.cwd, ...quickfixLockPath);
+  const allowedFiles = uniqueStrings(input.allowedFiles.map(normalizeRelativePath).filter(Boolean));
+  if (allowedFiles.length > (input.maxFiles ?? 3)) {
+    throw new CliError('ATM_QUICKFIX_FILE_LIMIT_EXCEEDED', 'Quickfix scope exceeds the fast-channel file limit (3 files by default). Use framework-mode for a larger fix.', { exitCode: 2 });
+  }
+  const scopeBlock = inspectQuickfixResearchScope(input.cwd, allowedFiles);
+  if (scopeBlock) throw new CliError(scopeBlock.code, scopeBlock.reason, { exitCode: 2, details: scopeBlock });
   const record: QuickfixLock = {
     schemaId: 'atm.quickfixLock.v1',
     specVersion: '0.1.0',
@@ -106,7 +114,7 @@ export function writeQuickfixLock(input: {
     prompt: input.prompt,
     promptHash: sha256(input.prompt),
     reason: input.reason ?? null,
-    allowedFiles: uniqueStrings(input.allowedFiles.map(normalizeRelativePath).filter(Boolean)),
+    allowedFiles,
     maxFiles: input.maxFiles ?? 3,
     maxChangedLines: input.maxChangedLines ?? 80,
     createdAt: new Date().toISOString(),
@@ -422,6 +430,7 @@ export function isPathAllowedByScope(filePath: string, allowedFiles: readonly st
   return allowedFiles.some((entry) => {
     const candidate = normalizeRelativePath(entry).toLowerCase();
     if (!candidate) return false;
+    if (candidate.endsWith('/**') && normalizedFile === candidate.slice(0, -3)) return true;
     if (candidate.includes('*')) {
       // `dir/**/*.ts` must match `dir/foo.ts` (zero intermediate directories).
       // Treat `**/` as an optional path prefix before single-segment wildcards.

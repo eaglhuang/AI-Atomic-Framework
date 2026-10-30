@@ -1,9 +1,30 @@
 import { consumeGitIndexOverrideLease, parkGitIndexLease, restoreGitIndexLease } from '../../git-index-ownership.js';
+import { renewFrameworkTempClaim } from '../../tasks/renew-framework-temp.js';
 import { executeTaskScopedCommitTransaction } from '../task-scoped-commit-transaction.js';
 import * as hookBypassCommitBoundary from './hook-bypass-commit-boundary.js';
 import { writeGitCommitAttemptStatus } from './git-process-port.js';
 import { recordGitIndexRestoreFailure, withTaskScopedCommitIndex } from './git-index-transaction.js';
 import { resolveGovernedCommitSeal } from './sealed-commit-attribution.js';
+/** Same holder extension `tasks renew` applies to a live temporary claim.
+ * Sealing a generation hashes the admitted tree before the commit hook reads
+ * that claim again, and the default TTL can elapse in that interval. */
+const SEAL_COMMIT_FRAMEWORK_TEMP_TTL_SECONDS = 14400;
+export function renewFrameworkTempClaimForSealCommit(input) {
+    if (!input.taskId?.startsWith('ATM-FRAMEWORK-TEMP-'))
+        return;
+    renewFrameworkTempClaim({
+        cwd: input.cwd,
+        taskId: input.taskId,
+        actorId: input.actorId,
+        ttlSeconds: SEAL_COMMIT_FRAMEWORK_TEMP_TTL_SECONDS,
+    });
+}
+function frameworkTempTaskIdForSeal(input) {
+    const fromEnv = typeof input.commitEnv?.ATM_COMMIT_TASK_ID === 'string' ? input.commitEnv.ATM_COMMIT_TASK_ID.trim() : '';
+    const fromOptions = typeof input.options?.taskId === 'string' ? input.options.taskId.trim() : '';
+    const taskId = fromEnv || fromOptions;
+    return taskId.startsWith('ATM-FRAMEWORK-TEMP-') ? taskId : null;
+}
 /**
  * Preserve the wrapper's explicit attribution when an isolated candidate index
  * contributes its temporary Git environment. Candidate construction inherits
@@ -13,6 +34,11 @@ export function mergeCandidateCommitEnv(commitEnv, scopedEnv) {
     return { ...scopedEnv, ...commitEnv };
 }
 export function executeCommitAttempt(input) {
+    renewFrameworkTempClaimForSealCommit({
+        cwd: input.options.cwd,
+        actorId: input.actorId,
+        taskId: frameworkTempTaskIdForSeal(input),
+    });
     let protectedOverrideAudit = input.protectedOverrideAudit;
     const runCommit = (env) => {
         const boundary = hookBypassCommitBoundary.executeHookBypassCommitBoundary({

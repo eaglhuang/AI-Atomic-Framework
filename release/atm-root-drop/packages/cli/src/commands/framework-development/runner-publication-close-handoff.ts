@@ -63,6 +63,7 @@ function resolveAuthorizedProducerTaskIds(input: {
 export function resolveRunnerPublicationCloseHandoff(input: {
   readonly taskId: string;
   readonly receipt: Record<string, unknown> | null;
+  readonly cwd?: string;
 }): RunnerPublicationCloseHandoff {
   if (!input.receipt || input.receipt.schemaId !== 'atm.runnerSyncReceipt.v1') {
     return { ok: false, stageFiles: [], reason: 'runner-sync receipt is missing or has an invalid schema' };
@@ -70,10 +71,11 @@ export function resolveRunnerPublicationCloseHandoff(input: {
   if (String(input.receipt.taskId ?? '').trim() !== input.taskId) {
     return { ok: false, stageFiles: [], reason: 'runner-sync receipt task attribution does not match the closing task' };
   }
-  const validated = validateRunnerBuildOutputInventory(input.receipt.outputInventory);
+  const validated = validateRunnerBuildOutputInventory(input.receipt.outputInventory, input.cwd);
   if (!validated.ok || !validated.inventory) {
     return { ok: false, stageFiles: [], reason: 'runner-sync receipt output inventory is invalid' };
   }
+  if (validated.inventory.entries.some((entry) => entry.generated) && !input.cwd) return { ok: false, stageFiles: [], reason: 'generated output verification requires a repository root' };
   const producers = resolveAuthorizedProducerTaskIds({ closingTaskId: input.taskId, receipt: input.receipt });
   if (producers.reason) {
     return { ok: false, stageFiles: [], reason: producers.reason };
@@ -85,7 +87,7 @@ export function resolveRunnerPublicationCloseHandoff(input: {
   }
   return {
     ok: true,
-    stageFiles: [...new Set(validated.inventory.entries.map((entry) => entry.path))].sort((a, b) => a.localeCompare(b)),
+    stageFiles: [...new Set(validated.inventory.entries.filter((entry) => !entry.generated).map((entry) => entry.path))].sort((a, b) => a.localeCompare(b)),
     reason: null
   };
 }
@@ -98,8 +100,9 @@ export function authorizesRunnerPublicationCloseCommit(input: {
   readonly taskId: string;
   readonly receipt: Record<string, unknown> | null;
   readonly criticalChangedFiles: readonly string[];
+  readonly cwd?: string;
 }): boolean {
-  const handoff = resolveRunnerPublicationCloseHandoff({ taskId: input.taskId, receipt: input.receipt });
+  const handoff = resolveRunnerPublicationCloseHandoff({ taskId: input.taskId, receipt: input.receipt, cwd: input.cwd });
   if (!handoff.ok) return false;
   const ownedFiles = new Set(handoff.stageFiles);
   return input.criticalChangedFiles.length > 0

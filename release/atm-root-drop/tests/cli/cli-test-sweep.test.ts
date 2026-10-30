@@ -8,7 +8,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseAtmResultLine } from '../../scripts/lib/atm-result-line.ts';
-import { isClean, runSweep, validateConfig, type SweepBatchTrace, type SweepConfig } from '../../scripts/run-cli-test-sweep.ts';
+import { isClean, runSweep, resolveSweepConcurrency, validateConfig, type SweepBatchTrace, type SweepConfig } from '../../scripts/run-cli-test-sweep.ts';
 
 const frameworkRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const fixture = mkdtempSync(path.join(os.tmpdir(), 'atm-cli-sweep-'));
@@ -53,6 +53,54 @@ try {
 } finally {
   rmSync(streamLog, { force: true });
 }
+
+// A free slot must start queued work while a slower file is still running.
+// The slow file waits for the queued file: fixed batches time out here.
+const poolSignals = mkdtempSync(path.join(os.tmpdir(), 'atm-sweep-pool-signals-'));
+try {
+  const marker = path.join(poolSignals, 'queued-started');
+  const events = path.join(poolSignals, 'events');
+  const eventCode = (event: string) => `appendFileSync(${JSON.stringify(events)}, ${JSON.stringify(event + '\n')});`;
+  const bodies: Record<string, string> = {
+    'pool-a-slow.test.ts': `import {appendFileSync,existsSync} from 'node:fs'; ${eventCode('start:slow')} const timer=setInterval(()=>{if(existsSync(${JSON.stringify(marker)})){clearInterval(timer);${eventCode('end:slow')}}},10);`,
+    'pool-b-fast.test.ts': `import {appendFileSync} from 'node:fs'; ${eventCode('start:fast')} ${eventCode('end:fast')}`,
+    'pool-c-queued.test.ts': `import {appendFileSync,writeFileSync} from 'node:fs'; ${eventCode('start:queued')} writeFileSync(${JSON.stringify(marker)},'ready'); ${eventCode('end:queued')}`,
+  };
+  for (const [name, body] of Object.entries(bodies)) writeFileSync(path.join(fixture, 'tests', name), body);
+  git('add', 'tests'); git('commit', '--quiet', '-m', 'pool scheduling fixture');
+  const poolResults = await runSweep(fixture, { ...config, concurrency: 2 }, Object.keys(bodies));
+  assert.ok(poolResults.every(isClean), 'queued work releases the slow file without a timeout');
+  const observed = readFileSync(events, 'utf8').trim().split('\n');
+  assert.ok(observed.indexOf('start:queued') < observed.indexOf('end:slow'), 'slots are replenished before slow files finish');
+  let active = 0, maximum = 0;
+  for (const event of observed) { active += event.startsWith('start:') ? 1 : -1; maximum = Math.max(maximum, active); }
+  assert.equal(active, 0); assert.ok(maximum <= 2, 'the declared worker bound is preserved');
+  assert.equal(resolveSweepConcurrency(8, 2), 4);
+  assert.equal(resolveSweepConcurrency(8, 8), 8);
+  assert.equal(resolveSweepConcurrency(1, 8), 1);
+  // A descendant inheriting stderr must not hold the sweep open after timeout.
+  const parentPidFile = path.join(poolSignals, 'timeout-parent');
+  const childReady = path.join(poolSignals, 'timeout-child-ready');
+  const descendantCode = `require('node:fs').writeFileSync(${JSON.stringify(childReady)},'ready');setInterval(()=>{},1000);`;
+  const timeoutCode = `import {spawn} from 'node:child_process';import {writeFileSync} from 'node:fs';writeFileSync(${JSON.stringify(parentPidFile)},String(process.pid));spawn(process.execPath,['-e',${JSON.stringify(descendantCode)}],{stdio:'inherit'});setInterval(()=>{},1000);`;
+  writeFileSync(path.join(fixture, 'tests', 'pool-descendant.test.ts'), timeoutCode);
+  git('add', 'tests'); git('commit', '--quiet', '-m', 'timeout process tree fixture');
+  let watchdog: ReturnType<typeof setTimeout> | undefined;
+  try {
+    const timed = await Promise.race([
+      runSweep(fixture, { ...config, concurrency: 1 }, ['pool-descendant.test.ts']),
+      new Promise<never>((_, reject) => { watchdog = setTimeout(() => reject(new Error('descendant held sweep stderr open')), 15000); }),
+    ]);
+    assert.equal(readFileSync(childReady, 'utf8'), 'ready', 'the inheriting descendant actually started');
+    assert.equal(timed[0].timedOut, true, 'the unchanged deadline terminates the whole test group');
+  } finally {
+    if (watchdog) clearTimeout(watchdog);
+    if (process.platform !== 'win32') {
+      try { process.kill(-Number(readFileSync(parentPidFile, 'utf8')), 'SIGKILL'); } catch { /* reaped */ }
+    }
+  }
+
+} finally { rmSync(poolSignals, { recursive: true, force: true }); }
 
 const available = Object.keys(tests);
 assert.deepEqual(validateConfig({ ...config, quarantine: [{ test: 'fail.test.ts', reason: 'failing-on-main', detail: 'exit 3', disposition: 'triage' }] }, available), []);
