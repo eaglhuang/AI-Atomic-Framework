@@ -18,7 +18,8 @@ pilot-r2 停在第 748 格（`disjoint-ordering-bias-pr10-pr11`，steward，種�
 5. **時鐘不連續作廢規則（A9）。** `validity.cell_validity` 合併一格內所有雙時鐘戳記：任兩點之間 |Δ牆鐘 − Δ單調| > 1 秒，或觀察到的送出間隔（任一時鐘）超出設計間隔 1 秒以上，該格標成 `environment-invalid:clock-discontinuity`。這條規則只讀時鐘，不讀結果。作廢格要封存、列出、不進任何計數，由 stage runner 以相同種子／順序／間隔重跑一次；第二次又作廢是 harness 失敗；作廢比例超過計畫格 1% 時整個 stage 停止（`stage_should_stop`）。
 6. **steward 的第一次送出。** v3 在 barrier 之前就開始計時，並把 `arrived_at` 設成「開始計時 + 設計延遲」。v4 的第一次送出是 barrier 與設計延遲之後寫 inbox 的那一刻，`arrived_at` 就是那個單調時間。v3 在 rename 被拒時仍把整批成員寫成接受或衝突；v4 這時把成員寫成 `timeout`，原因依各成員自己的第一次送出計算。
 7. **driver。** 子行程逾時（40 秒）會停掉同一格的所有寫入者，並以 `RuntimeError` 回報，不留下孤兒行程。
-8. **測試掛勾。** `run_fixture(..., test_wall_jump_s={order_index: 秒})` 只在測試使用：在指定寫入者通過 barrier 後，讓它的牆鐘標籤跳動，單調時鐘不變。正式執行一律不帶這個參數。
+8. **固定 hunk 套用器。** v2／v3 的 `node/apply-patch.ts` 直接 import 現行 `packages/core/src/broker/unified-patch.ts`。core 在 2026-10-20（a7dd5da6e7 起）加了 offset locator，之後歷史 hunk 在位移後也能套上：已知題 `django:dev:15705_16703` 的 file_lock 臂從 `rejected-conflict` 變成 `committed`，v3 今天重跑也一樣。pilot-r2（10-15）不受影響。file_lock、steward 的 mine 推導與 `legal.py` 的合法子集都走這個套用器，所以 v4 把 CORE_MERGE `cb25242433` 版本逐位元組放進 `node/pinned/unified-patch.cb252424.ts`（無 import），`apply-patch.ts` 改 import 這份。`atm` 臂的 `shared-compose-inbox.ts` 從 cb25242433 起沒有改動，仍 import 現行 core。
+9. **測試掛勾。** `run_fixture(..., test_wall_jump_s={order_index: 秒})` 只在測試使用：在指定寫入者通過 barrier 後，讓它的牆鐘標籤跳動，單調時鐘不變。正式執行一律不帶這個參數。
 
 `atm` 臂沒有改：它的期限在 `packages/core` 的 coordinator 裡，不在這個 harness。v4 把它列為探索臂，不計算它的 validity，pilot-r3 也不跑它。
 
@@ -30,6 +31,8 @@ pilot-r2 停在第 748 格（`disjoint-ordering-bias-pr10-pr11`，steward，種�
 - 牆鐘跳 110 秒、單調不變：判定與不跳時相同，validity 標成作廢（單行程與多行程各一）。
 - 送出間隔超出設計 1 秒以上會作廢；1% 停止門檻。
 - 模擬 agent 乾跑：catalog 六個 fixture × 三條比較臂 × 間隔 0／500，全部有效、全部共用同一個 T_stop、臂與評分器的停止點一致。
+
+`tests/test_v4_pinned_applier.py`：`apply-patch.ts` 只 import 固定副本；固定副本的 sha256；本地有 cb25242433 歷史時與 `git show` 位元組相同。
 
 v3 的測試全部保留並通過。
 
