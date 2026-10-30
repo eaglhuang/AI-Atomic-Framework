@@ -1,0 +1,61 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-10-30T00-45-24-984Z-close-a503faa0a73b",
+  "taskId": "TASK-PRF-0160",
+  "action": "close",
+  "actorId": "grok-bot",
+  "sessionId": "session-20261030003925-grok-bot-TASK-PRF-0160-efb8c3da72",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0160.json",
+  "taskSha256": "sha256:c3f441d9c3ffdc12bb02a0b39f6e092716bae9d33aad613c5a71090a3de437de",
+  "createdAt": "2026-10-30T00:45:24.984Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0160 --actor grok-bot --status done --historical-delivery 63d3b1572b9217ca4677f38faad506c974fd863f",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20261030003925-grok-bot-TASK-PRF-0160-efb8c3da72",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0160.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "validate:governance-fix-wave",
+      "validate:quick"
+    ],
+    "requiredGates": [
+      "validate:governance-fix-wave",
+      "validate:quick"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-10-30T00:45:24.971Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0160.*",
+        ".atm/history/task-events/TASK-PRF-0160/**",
+        ".atm/history/tasks/TASK-PRF-0160.json",
+        ".atm/task-plans/TASK-PRF-0160.md",
+        "packages/cli/dist",
+        "packages/cli/dist/**",
+        "packages/cli/dist/atm.js",
+        "PROGRESS.md",
+        "release/atm-onefile/**",
+        "release/atm-onefile/atm.mjs",
+        "release/atm-onefile/release-manifest.json",
+        "release/atm-root-drop/**"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/dist",
+        "packages/cli/dist/**",
+        "packages/cli/dist/atm.js"
+      ],
+      "requiredGates": [
+        "validate:governance-fix-wave",
+        "validate:quick"
+      ]
+    }
+  }
+}
