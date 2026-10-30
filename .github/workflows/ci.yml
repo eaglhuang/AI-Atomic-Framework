@@ -48,6 +48,11 @@ jobs:
       - name: Build
         run: npm run build -- --validation-only
 
+      # The frozen runner and npm package ship the committed packages/cli/dist,
+      # so a source change without a rebuilt dist must fail here.
+      - name: Committed CLI dist is fresh
+        run: npm run validate:cli-dist-freshness
+
       - name: Typecheck
         run: npm run typecheck
 
