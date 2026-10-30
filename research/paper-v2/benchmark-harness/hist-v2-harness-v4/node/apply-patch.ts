@@ -1,6 +1,9 @@
-// Apply one unified diff with the ATM core applier. Conflict-free or a refusal.
+// Apply one unified diff with the ATM core applier pinned at CORE_MERGE cb25242433
+// (packages/core/src/broker/unified-patch.ts, vendored byte for byte). The live
+// core gained an offset locator on 2026-10-20; importing it would silently move
+// the file_lock baseline and the legality check. Conflict-free or a refusal.
 import { readFileSync } from 'node:fs';
-import { applyUnifiedPatch } from '../../../../../packages/core/src/broker/unified-patch.ts';
+import { applyUnifiedPatch } from './pinned/unified-patch.cb252424.ts';
 
 const jobPath = process.argv[2];
 if (!jobPath) {
