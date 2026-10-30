@@ -406,7 +406,7 @@ export function assertSealedRunnerClaimLifetime(input: {
     if (input.taskId?.startsWith('ATM-FRAMEWORK-TEMP-')) {
       throw new Error(`${error instanceof Error ? error.message : String(error)} Inspect temporary publication authority before reclaiming: node atm.mjs framework-mode status --json`);
     }
-    throw new Error(`${error instanceof Error ? error.message : String(error)} Renew publication authority before building: ${renew(input.taskId || '<task-id>')}`);
+    throw new Error(`${error instanceof Error ? error.message : String(error)} Renew publication authority before building: ${renew(input.taskId || '<task-id>')}. If no live claim exists to renew, acquire temporary authority: node atm.mjs framework-mode claim --actor ${input.actorId} --files release/atm-onefile/atm.mjs,release/atm-root-drop --reason "<reason>" --json, then release it after the build with node atm.mjs framework-mode release --actor ${input.actorId} --json. Set ATM_ACTOR_ID to your actor; the build defaults to release-steward.`);
   }
   let authority: Record<string, unknown>;
   if (taskId.startsWith('ATM-FRAMEWORK-TEMP-')) {

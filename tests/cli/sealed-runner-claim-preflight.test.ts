@@ -26,6 +26,7 @@ check(14400 - MIN_PUBLICATION_CLAIM_REMAINING_SECONDS);
 assert.throws(() => check(14401), /Renew publication authority before building/);
 claim(14400, 'other-session');
 assert.throws(() => check(), /Renew publication authority/);
+assert.throws(() => check(), /framework-mode claim --actor fixture-bot --files release\/atm-onefile\/atm\.mjs,release\/atm-root-drop.*framework-mode release.*ATM_ACTOR_ID/);
 claim(14400);
 check();
 // Concurrent ownership change remains authoritative, never renewed implicitly.
