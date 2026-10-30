@@ -3,6 +3,7 @@ import path from 'node:path';
 import { createLocalGovernanceAdapter } from '../../_vendor/plugin-governance-local/dist/index.js';
 import { clearBrokerRuntimeStateForTask, removeBrokerRegistryIfEmpty } from '../../_vendor/core/dist/broker/lifecycle.js';
 import { resolveActorId } from '../actor-registry.js';
+import { renewFrameworkTempClaim } from './renew-framework-temp.js';
 import { listActorWorkSessions, updateActorWorkSessionState } from '../actor-session.js';
 import { buildDependencyCloseoutRecoveryCommand, formatDependencyCloseoutBlockedMessage, assessCloseoutProvenanceGap } from './closeout-provenance.js';
 import { findTaskClaimDependencyBlockers } from './dependency-gates.js';
@@ -37,6 +38,9 @@ export async function runTasksClaimLifecycle(action, argv) {
         throw new CliError('ATM_ACTOR_ID_MISSING', 'tasks claim lifecycle requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
     }
     const actorId = resolvedActor.actorId;
+    if (action === 'renew' && options.taskId.startsWith('ATM-FRAMEWORK-TEMP-')) {
+        return renewFrameworkTempClaim({ ...options, actorId });
+    }
     const taskPath = taskPathFor(options.cwd, options.taskId);
     if (!existsSync(taskPath)) {
         throw new CliError('ATM_TASK_NOT_FOUND', `Task file not found for ${options.taskId}.`, {

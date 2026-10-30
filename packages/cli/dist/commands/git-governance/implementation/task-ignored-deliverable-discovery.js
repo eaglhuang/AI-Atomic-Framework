@@ -1,4 +1,4 @@
-import { runGitCommand } from './git-process-port.js';
+import { candidateGit, nulPaths } from './candidate-file-policy.js';
 import { normalizeRelativePath, pathMatchesTaskScope, uniqueSorted } from '../commit-scope-policy.js';
 function readIgnoredUntrackedFiles(cwd, declaredScope) {
     try {
@@ -19,14 +19,11 @@ function readIgnoredUntrackedFiles(cwd, declaredScope) {
             return parentSlash >= 0 ? entry.slice(0, parentSlash) || '.' : '.';
         }));
         const pathspecBytes = searchRoots.reduce((total, entry) => total + Buffer.byteLength(entry, 'utf8') + 1, 0);
-        const args = ['ls-files', '--others', '--ignored', '--exclude-standard'];
+        const args = ['ls-files', '--others', '--ignored', '--exclude-standard', '-z'];
         if (searchRoots.length > 0 && pathspecBytes <= 8_000) {
             args.push('--', ...searchRoots);
         }
-        return runGitCommand(cwd, args)
-            .split(/\r?\n/)
-            .map(normalizeRelativePath)
-            .filter(Boolean);
+        return nulPaths(candidateGit(cwd, args));
     }
     catch {
         return [];

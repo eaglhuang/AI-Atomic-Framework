@@ -71,7 +71,7 @@ import {
   uniqueSorted
 } from '../view-projections.ts';
 
-import { normalizeOptionalString } from './intent.ts';
+import { extractPromptFileTokens, normalizeOptionalString } from './intent.ts';
 import { listFilesRecursive } from './task-card-discovery.ts';
 
 export interface ImportedTaskSummaryWithOutOfScope extends ImportedTaskSummary {
@@ -287,8 +287,9 @@ function addValidateTopicPaths(paths: Set<string>, topic: string | undefined) {
 }
 
 export function resolveQuickfixScope(prompt: string) {
-  return uniqueSorted([
+  const scope = uniqueSorted([
     ...extractPathLikeStringsFromText(prompt),
     ...extractPathLikeStringsFromPrompt(prompt)
   ]);
+  return scope.length > 0 ? scope : extractPromptFileTokens(prompt);
 }

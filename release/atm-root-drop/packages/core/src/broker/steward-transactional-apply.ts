@@ -3,6 +3,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync,
 import os from 'node:os';
 import path from 'node:path';
 import { sortProposalsForCompose } from './merge-plan.ts';
+import { composeJsonPointerPatches } from './steward-json-pointer-compose.ts';
 import {
   commitCanonicalFiles,
   defaultStewardCommitLockRoot,
@@ -161,13 +162,6 @@ export function buildPatchProposalComposition(input: {
 }
 
 /**
- * Compose each proposal against the same immutable source bytes.  Text patches
- * go through the base composer, which resolves every hunk against the base and
- * fails closed on overlap.  JSON-pointer proposals are different: their
- * declared pointers describe disjoint semantic slices, so they are merged as
- * JSON values and fall back to the text route on any hidden mutation.
- */
-/**
  * Proposals whose declared `fileBeforeHash` is not `before` are translated from
  * their committed base to `before` (#363). Region-identity proposals keep the
  * region rebase. A base that is not in history is `stale-base`; a translation
@@ -200,96 +194,8 @@ function translateStaleProposals(cwd: string, filePath: string, before: string, 
 }
 
 function composeProposalPatchesAgainstImmutableBase(filePath: string, before: string, proposals: readonly PatchProposal[]): BaseCompositionResult {
-  const textRoute = () => composeTextPatchesAgainstBase(filePath, before, proposals);
-  const pointers = proposals.map((proposal) => declaredSingleJsonPointer(proposal));
-  const useJsonPointerComposition = pointers.every((pointer): pointer is string => pointer !== null)
-    && new Set(pointers).size === pointers.length;
-  if (!useJsonPointerComposition) return textRoute();
-
-  let baseDocument: unknown;
-  try {
-    baseDocument = JSON.parse(before);
-  } catch {
-    return textRoute();
-  }
-  if (!isJsonObject(baseDocument)) return textRoute();
-
-  const composed = structuredClone(baseDocument) as Record<string, unknown>;
-  for (const [index, proposal] of proposals.entries()) {
-    const pointer = pointers[index] as string;
-    let patched: unknown;
-    try {
-      patched = JSON.parse(applyUnifiedPatch(before, proposal.patch)) as unknown;
-    } catch (error) {
-      if (!(error instanceof UnifiedPatchApplicationError) && !(error instanceof SyntaxError)) throw error;
-      return textRoute();
-    }
-    if (!isJsonObject(patched) || !isOnlyDeclaredPointerMutation(baseDocument, patched, pointer)) {
-      // A JSON anchor is an authority boundary, never a hint: any hidden
-      // mutation falls back to the strict text route and fails closed if stale.
-      return textRoute();
-    }
-    setJsonPointer(composed, pointer, readJsonPointer(patched, pointer));
-  }
-  return { ok: true, content: `${JSON.stringify(composed, null, 2)}\n`, checkedPermutationCount: 1 };
-}
-
-function declaredSingleJsonPointer(proposal: PatchProposal): string | null {
-  if (proposal.anchors.length !== 1 || proposal.anchors[0]?.kind !== 'json-pointer') return null;
-  const pointer = proposal.anchors[0]?.hint;
-  return typeof pointer === 'string' && pointer.startsWith('/') ? pointer : null;
-}
-
-function isOnlyDeclaredPointerMutation(before: unknown, after: unknown, pointer: string): boolean {
-  const beforeWithoutPointer = structuredClone(before);
-  const afterWithoutPointer = structuredClone(after);
-  deleteJsonPointer(beforeWithoutPointer, pointer);
-  deleteJsonPointer(afterWithoutPointer, pointer);
-  return JSON.stringify(beforeWithoutPointer) === JSON.stringify(afterWithoutPointer);
-}
-
-function isJsonObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
-
-function pointerTokens(pointer: string): string[] {
-  return pointer.slice(1).split('/').map((token) => token.replace(/~1/g, '/').replace(/~0/g, '~'));
-}
-
-function readJsonPointer(document: unknown, pointer: string): unknown {
-  let current: unknown = document;
-  for (const token of pointerTokens(pointer)) {
-    if (!isJsonObject(current) || !(token in current)) return undefined;
-    current = current[token];
-  }
-  return structuredClone(current);
-}
-
-function setJsonPointer(document: Record<string, unknown>, pointer: string, value: unknown): void {
-  const tokens = pointerTokens(pointer);
-  let current: Record<string, unknown> = document;
-  for (const token of tokens.slice(0, -1)) {
-    const next = current[token];
-    if (!isJsonObject(next)) current[token] = {};
-    current = current[token] as Record<string, unknown>;
-  }
-  const leaf = tokens.at(-1);
-  if (!leaf) throw new Error('JSON pointer must target a property.');
-  if (value === undefined) delete current[leaf];
-  else current[leaf] = value;
-}
-
-function deleteJsonPointer(document: unknown, pointer: string): void {
-  if (!isJsonObject(document)) return;
-  const tokens = pointerTokens(pointer);
-  let current: Record<string, unknown> = document;
-  for (const token of tokens.slice(0, -1)) {
-    const next = current[token];
-    if (!isJsonObject(next)) return;
-    current = next;
-  }
-  const leaf = tokens.at(-1);
-  if (leaf) delete current[leaf];
+  return composeJsonPointerPatches(before, proposals)
+    ?? composeTextPatchesAgainstBase(filePath, before, proposals);
 }
 
 export function buildStewardSemanticValidationReceipt(input: {

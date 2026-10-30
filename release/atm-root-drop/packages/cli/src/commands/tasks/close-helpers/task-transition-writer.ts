@@ -1,3 +1,4 @@
+import { assertActiveCloseLease, activeCloseLeaseIsOwned } from '../../taskflow/close-transaction-mutex.ts';
 // TASK-RFT-0013 — extracted verbatim from packages/cli/src/commands/tasks.ts.
 // Task-transition writer cluster: persist a task document with a governed
 // transition event. Re-exports the transition-command builder and the closure
@@ -12,6 +13,7 @@ import { normalizeTaskDocumentId } from '../normalize-task-document-id-helper.ts
 import { taskIdsEqual } from '../task-import-validators.ts';
 
 function writeTaskDocument(taskPath: string, document: Record<string, unknown>) {
+  assertActiveCloseLease();
   const directory = path.dirname(taskPath);
   const temporaryPath = path.join(directory, `.${path.basename(taskPath)}.${process.pid}.${Date.now()}.tmp`);
   let descriptor: number | null = null;
@@ -24,6 +26,7 @@ function writeTaskDocument(taskPath: string, document: Record<string, unknown>) 
     descriptor = null;
     renameSync(temporaryPath, taskPath);
   } catch (error) {
+    if (!activeCloseLeaseIsOwned()) throw error;
     if (descriptor !== null) closeSync(descriptor);
     rmSync(temporaryPath, { force: true });
     throw new CliError('ATM_TASK_LEDGER_WRITE_FAILED', `Task ledger write failed for ${taskPath}; the prior ledger state was retained.`, {
@@ -47,6 +50,7 @@ function verifyPersistedTaskDocument(input: {
   try {
     persisted = parseJsonText(readFileSync(input.taskPath, 'utf8')) as Record<string, unknown>;
   } catch (error) {
+    if (!activeCloseLeaseIsOwned()) throw error;
     throw new CliError('ATM_TASK_LEDGER_WRITE_INVALID_JSON', `Task ${input.taskId} was written by ${input.action}, but the persisted JSON is unreadable.`, {
       details: {
         taskId: input.taskId,
@@ -84,6 +88,7 @@ export function writeTaskDocumentWithTransition(input: {
   readonly closureMetadata?: TaskTransitionClosureMetadata | null;
   readonly command?: string;
 }) {
+  assertActiveCloseLease();
   const nextStatus = typeof input.taskDocument.status === 'string' ? input.taskDocument.status : null;
   const createdAt = new Date().toISOString();
   const transitionId = createTaskTransitionId({
@@ -121,6 +126,7 @@ export function writeTaskDocumentWithTransition(input: {
     });
     return transition.eventPath;
   } catch (error) {
+    if (!activeCloseLeaseIsOwned()) throw error;
     if (transition) rmSync(path.resolve(input.cwd, transition.eventPath), { force: true });
     throw error;
   }
