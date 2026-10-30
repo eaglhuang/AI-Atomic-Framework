@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-10-30T03-47-35-365Z-scope-amendment-5d470f977066",
+  "taskId": "TASK-PRF-0161",
+  "action": "scope-amendment",
+  "actorId": "grok-bot",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0161.json",
+  "taskSha256": "sha256:e08713bc38619df4c6582fa2fe66ed50068a134f0f2a8faeaa29c06fea8ad7aa",
+  "createdAt": "2026-10-30T03:47:35.365Z",
+  "command": "node atm.mjs tasks scope add --task TASK-PRF-0161 --actor grok-bot --add \".atm/task-plans/TASK-PRF-0161.md,PROGRESS.md,packages/cli/dist,packages/cli/dist/**,release/atm-onefile/**,release/atm-root-drop/**\" --reason \"runtime scope = card scopePaths (as TASK-PRF-0160 claim)\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "runtime scope = card scopePaths (as TASK-PRF-0160 claim)"
+  }
+}

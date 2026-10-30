@@ -1,0 +1,92 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-10-30T03-50-45-221Z-close-b750f0e8905a",
+  "taskId": "TASK-PRF-0161",
+  "action": "close",
+  "actorId": "grok-bot",
+  "sessionId": "session-20261030034303-grok-bot-TASK-PRF-0161-6c5dbd1e15",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PRF-0161.json",
+  "taskSha256": "sha256:afe8d1c96176be21bc58c7940aceaa86fe96a6cc9dd8537780d2eb260c44da78",
+  "createdAt": "2026-10-30T03:50:45.221Z",
+  "command": "node atm.mjs tasks close --task TASK-PRF-0161 --actor grok-bot --status done --historical-delivery 896209cdde6c540af93ff82440bb3e303d60a4b7",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20261030034303-grok-bot-TASK-PRF-0161-6c5dbd1e15",
+    "closurePacketPath": ".atm/history/evidence/TASK-PRF-0161.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "validate:quick"
+    ],
+    "requiredGates": [
+      "validate:quick"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-10-30T03:50:45.210Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PRF-0161.*",
+        ".atm/history/task-events/TASK-PRF-0161/**",
+        ".atm/history/tasks/TASK-PRF-0161.json",
+        ".atm/task-plans/TASK-PRF-0161.md",
+        "packages/cli/dist",
+        "packages/cli/dist/_vendor/core/dist/broker/generated-output-digests.js",
+        "packages/cli/dist/_vendor/core/dist/broker/steward-json-pointer-compose.js",
+        "packages/cli/dist/**",
+        "packages/cli/dist/atm.js",
+        "packages/cli/dist/commands/git-governance/implementation/candidate-file-policy.js",
+        "packages/cli/dist/commands/next/quickfix-scope-policy.js",
+        "packages/cli/dist/commands/taskflow/close-attempt.js",
+        "packages/cli/dist/commands/taskflow/close-candidate.js",
+        "packages/cli/dist/commands/taskflow/close-claim-renewal.js",
+        "packages/cli/dist/commands/taskflow/close-detach.js",
+        "packages/cli/dist/commands/taskflow/generated-output-advisory.js",
+        "packages/cli/dist/commands/tasks/renew-framework-temp.js",
+        "packages/cli/dist/commands/upgrade/base-sync.js",
+        "PROGRESS.md",
+        "release/atm-onefile/**",
+        "release/atm-onefile/atm.mjs",
+        "release/atm-onefile/release-manifest.json",
+        "release/atm-root-drop/**",
+        "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/generated-output-digests.js",
+        "release/atm-root-drop/packages/cli/dist/_vendor/core/dist/broker/steward-json-pointer-compose.js",
+        "release/atm-root-drop/packages/cli/dist/commands/git-governance/implementation/candidate-file-policy.js",
+        "release/atm-root-drop/packages/cli/dist/commands/next/quickfix-scope-policy.js",
+        "release/atm-root-drop/packages/cli/dist/commands/taskflow/close-attempt.js",
+        "release/atm-root-drop/packages/cli/dist/commands/taskflow/close-candidate.js",
+        "release/atm-root-drop/packages/cli/dist/commands/taskflow/close-claim-renewal.js",
+        "release/atm-root-drop/packages/cli/dist/commands/taskflow/close-detach.js",
+        "release/atm-root-drop/packages/cli/dist/commands/taskflow/generated-output-advisory.js",
+        "release/atm-root-drop/packages/cli/dist/commands/tasks/renew-framework-temp.js",
+        "release/atm-root-drop/packages/cli/dist/commands/upgrade/base-sync.js",
+        "release/atm-root-drop/release-manifest.json"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/dist",
+        "packages/cli/dist/_vendor/core/dist/broker/generated-output-digests.js",
+        "packages/cli/dist/_vendor/core/dist/broker/steward-json-pointer-compose.js",
+        "packages/cli/dist/**",
+        "packages/cli/dist/atm.js",
+        "packages/cli/dist/commands/git-governance/implementation/candidate-file-policy.js",
+        "packages/cli/dist/commands/next/quickfix-scope-policy.js",
+        "packages/cli/dist/commands/taskflow/close-attempt.js",
+        "packages/cli/dist/commands/taskflow/close-candidate.js",
+        "packages/cli/dist/commands/taskflow/close-claim-renewal.js",
+        "packages/cli/dist/commands/taskflow/close-detach.js",
+        "packages/cli/dist/commands/taskflow/generated-output-advisory.js",
+        "packages/cli/dist/commands/tasks/renew-framework-temp.js",
+        "packages/cli/dist/commands/upgrade/base-sync.js"
+      ],
+      "requiredGates": [
+        "validate:quick"
+      ]
+    }
+  }
+}
