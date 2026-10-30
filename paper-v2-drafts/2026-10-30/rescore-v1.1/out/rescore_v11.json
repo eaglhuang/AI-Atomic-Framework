@@ -1,0 +1,166 @@
+{
+ "base_valid_pairs": 52,
+ "base_valid_pairs_by_runner_family": {
+  "django": 20,
+  "pytest": 32
+ },
+ "base_validity": {
+  "django": "conditional: skipped and expected-failure were counted as pass in b, b+A, b+B (F2P may gain or lose tests)",
+  "pytest": "conditional: XFAIL counted as pass (skips were already not-pass because SKIPPED lines were never parsed)"
+ },
+ "corrected_by_arm": {
+  "bare_composer": {
+   "no_regression_status_independent": 134,
+   "not_evaluable": 126
+  },
+  "file_lock": {
+   "no_regression_status_independent": 250,
+   "not_evaluable": 10
+  },
+  "git_three_way": {
+   "indeterminate": 9,
+   "no_regression_status_independent": 224,
+   "not_evaluable": 27
+  },
+  "occ": {
+   "no_regression_status_independent": 249,
+   "not_evaluable": 11
+  },
+  "steward": {
+   "no_regression_status_independent": 168,
+   "not_evaluable": 92
+  }
+ },
+ "indeterminate_runs": [
+  {
+   "family": "pytest",
+   "n_tests": 327,
+   "pair_id": "pytest:13955_13956",
+   "recorded_arm_regression": [],
+   "run": "pytest_13955_13956__git_three_way__s1",
+   "source": "main__pytest.json"
+  },
+  {
+   "family": "pytest",
+   "n_tests": 327,
+   "pair_id": "pytest:13955_13956",
+   "recorded_arm_regression": [],
+   "run": "pytest_13955_13956__git_three_way__s2",
+   "source": "main__pytest.json"
+  },
+  {
+   "family": "pytest",
+   "n_tests": 327,
+   "pair_id": "pytest:13955_13956",
+   "recorded_arm_regression": [],
+   "run": "pytest_13955_13956__git_three_way__s3",
+   "source": "main__pytest.json"
+  },
+  {
+   "family": "pytest",
+   "n_tests": 327,
+   "pair_id": "pytest:13955_13956",
+   "recorded_arm_regression": [],
+   "run": "pytest_13955_13956__git_three_way__s4",
+   "source": "main__pytest.json"
+  },
+  {
+   "family": "pytest",
+   "n_tests": 136,
+   "pair_id": "xarray:9378_9482",
+   "recorded_arm_regression": [],
+   "run": "xarray_9378_9482__git_three_way__s0",
+   "source": "main__xarray.json"
+  },
+  {
+   "family": "pytest",
+   "n_tests": 136,
+   "pair_id": "xarray:9378_9482",
+   "recorded_arm_regression": [],
+   "run": "xarray_9378_9482__git_three_way__s1",
+   "source": "main__xarray.json"
+  },
+  {
+   "family": "pytest",
+   "n_tests": 136,
+   "pair_id": "xarray:9378_9482",
+   "recorded_arm_regression": [],
+   "run": "xarray_9378_9482__git_three_way__s2",
+   "source": "main__xarray.json"
+  },
+  {
+   "family": "pytest",
+   "n_tests": 136,
+   "pair_id": "xarray:9378_9482",
+   "recorded_arm_regression": [],
+   "run": "xarray_9378_9482__git_three_way__s3",
+   "source": "main__xarray.json"
+  },
+  {
+   "family": "pytest",
+   "n_tests": 136,
+   "pair_id": "xarray:9378_9482",
+   "recorded_arm_regression": [],
+   "run": "xarray_9378_9482__git_three_way__s4",
+   "source": "main__xarray.json"
+  }
+ ],
+ "inputs_sha256": {
+  "semantic/out/main__django.json": "09fa7116f9502908c4baedd0211184c0b6986bfd4503c3eb6b4c1eac014ac463",
+  "semantic/out/main__fastapi__st0.32.0.post1.json": "93659a66c3332fe49ba2f4a04037bea3bb921a8ef78b0c6524e18a8504e2c0b2",
+  "semantic/out/main__fastapi__st0.35.1.json": "4df20437c4763b63793221d651d8d892522c31e6c78ee9e2a1099217fa9a06d1",
+  "semantic/out/main__fastapi__st0.36.3.json": "fe33954a237f96b35bc2130698abf829cab8f0829d529fc7182acc450b50977f",
+  "semantic/out/main__fastapi__st0.37.2.json": "496b258aa410377020a9687f490037f9df0bad2d34187a7d92cdfab311d0a093",
+  "semantic/out/main__fastapi__st0.41.3.json": "f9ec82414f3a581d89283e62df7f373ce747b1ee37623fdf79160a841881fe06",
+  "semantic/out/main__fastapi__st0.45.3.json": "065f1e01198bc37b99a4914ac8cc257ee34df58e1f90f9fab3cc1302d9ad06fc",
+  "semantic/out/main__fastapi__st0.49.3.json": "ad9b7b41274684a22bf74654f8c2d6d7d665a0cbe71f90b05f81c6531a3fdd07",
+  "semantic/out/main__pytest.json": "b5afa0dcb9be5f1a1d90ba7fbd16a62c169135f58367cdc350aa39e8253d3e15",
+  "semantic/out/main__sphinx.json": "40c6ae927522c080a33857574a7062d343567c3f8aa978147dcee71250617b26",
+  "semantic/out/main__sympy.json": "e25a864e254cb1877fa37da35d1ba806805521ac131afdd8bae02f51cee5195e",
+  "semantic/out/main__xarray.json": "072bbd2d46916646b9386e238c0a08a84aaa747a812e0e8f2d79fe1adc434be3",
+  "semantic/out/o0__django.json": "5e1b1de72bf9d921beb6ab2ff34a195b2ccbbd413914c1013be105eafb72a4c0",
+  "semantic/out/o0__fastapi__st0.37.2.json": "9b206d5ac7cd6cf268c17b3c34bbc23fcf900dd06050351b8313f282a7fcf5aa",
+  "semantic/out/o0__fastapi__st0.45.3.json": "13fb835eda64b7faf007a5b2af403da37b4093660c9860d76f4dfaf2504b14c3",
+  "semantic/out/o0__pytest.json": "8bcc47a06589ab6219e28acd6dd07c48d3118d1e56404b27bde83b958125054b",
+  "semantic/out/o0__sphinx.json": "f9560357b59900ace01b488a2ad4dcceeb8d32f5205bcb58cf529e874f67f4ab",
+  "semantic/out/o0__sympy.json": "fab07180770bc91fb6ffa0e4e5ae389dac23670749010c45fd4038f715c2aced",
+  "semantic/out/o0__xarray.json": "94ebdab9a284f552634468af9025df520f1ebf10fb1eefdd99571bd60f06413b"
+ },
+ "original_by_arm": {
+  "bare_composer": {
+   "evaluated": 134,
+   "not_evaluable": 126,
+   "regression_runs": 0
+  },
+  "file_lock": {
+   "evaluated": 250,
+   "not_evaluable": 10,
+   "regression_runs": 0
+  },
+  "git_three_way": {
+   "evaluated": 233,
+   "not_evaluable": 27,
+   "regression_runs": 0
+  },
+  "occ": {
+   "evaluated": 249,
+   "not_evaluable": 11,
+   "regression_runs": 0
+  },
+  "steward": {
+   "evaluated": 168,
+   "not_evaluable": 92,
+   "regression_runs": 0
+  }
+ },
+ "pair_status_counts": {
+  "evaluated": 52,
+  "evaluated-base-invalid": 125,
+  "not-evaluable:no-test-modules": 28,
+  "not-evaluable:union-test-patch-conflict": 14
+ },
+ "scorer_sha256": {
+  "semantic/semantic_multi.py": "fd0eab303a11e35a0a66d0a0757963de79b35dcba6cd3ee35539095c7abe51d7"
+ },
+ "sealed_dir": "/workspace/AI-Atomic-Framework-gov/AI-Atomic-Framework/research/paper-v2/benchmark-main/2026-10-10-hist-main-v2"
+}

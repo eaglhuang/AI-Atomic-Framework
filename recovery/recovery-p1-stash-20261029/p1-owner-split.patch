@@ -1,0 +1,234 @@
+diff --git a/packages/cli/src/commands/command-specs/taskflow.spec.ts b/packages/cli/src/commands/command-specs/taskflow.spec.ts
+index f1304184c..002a01e01 100644
+--- a/packages/cli/src/commands/command-specs/taskflow.spec.ts
++++ b/packages/cli/src/commands/command-specs/taskflow.spec.ts
+@@ -16,6 +16,11 @@ export default defineCommandSpec({
+     commonCwdOption,
+     { flag: '--dry-run', summary: 'Return the orchestration plan without writing. Default when --write is omitted.' },
+     { flag: '--write', summary: 'Run the governed orchestration entry when prerequisites are satisfied; otherwise fail closed.' },
++    { flag: '--detach', summary: 'For close --write: start a detached worker; return one CLOSE_STARTED line with an attempt ID after durable child acknowledgement. Started is not committed.' },
++    { flag: '--status', summary: 'For close: read one specific --attempt and return one result line.' },
++    { flag: '--wait', summary: 'For close: wait for one specific --attempt; return one result line.' },
++    { flag: '--attempt', value: 'id', summary: 'Attempt ID returned by close --detach; required for close --status/--wait.' },
++    { flag: '--timeout-ms', value: 'ms', summary: 'Maximum wait duration in milliseconds (default 30000); a timeout does not imply failure or commit.' },
+     { flag: '--no-commit', summary: 'For taskflow close --write: exact-stage the target and planning repo bundle, but do not commit. Auto-commit is on by default.' },
+     { flag: '--profile', value: 'path', summary: 'Path to the taskflow profile JSON file.' },
+     { flag: '--task', value: 'id', summary: 'Task id for taskflow close orchestration.' },
+diff --git a/packages/cli/src/commands/shared/command-spec-output.ts b/packages/cli/src/commands/shared/command-spec-output.ts
+index 7b7f38085..c0ab1066a 100644
+--- a/packages/cli/src/commands/shared/command-spec-output.ts
++++ b/packages/cli/src/commands/shared/command-spec-output.ts
+@@ -310,6 +310,11 @@ export function writeResult(
+   outputFormat = 'json',
+   projectionOptions?: { summary?: boolean; fields?: string[] | null }
+ ) {
++  const closeLine = (result as CommandResult & { closeResultLine?: string }).closeResultLine;
++  if (result.command === 'taskflow close' && typeof closeLine === 'string') {
++    stream.write(closeLine);
++    return;
++  }
+   const withLane = carryLaneSessionIntoPrintedCommands(result);
+   const enriched = 'severity' in withLane && 'exitCode' in withLane && 'blocking' in withLane && 'diagnostics' in withLane
+     ? withLane as EnrichedCommandResult
+diff --git a/packages/cli/src/commands/taskflow/close-attempt.ts b/packages/cli/src/commands/taskflow/close-attempt.ts
+new file mode 100644
+index 000000000..8e7849438
+--- /dev/null
++++ b/packages/cli/src/commands/taskflow/close-attempt.ts
+@@ -0,0 +1,54 @@
++import { randomUUID } from 'node:crypto';
++import { closeSync, fsyncSync, mkdirSync, openSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
++import path from 'node:path';
++
++export interface CloseAttempt {
++  schemaId: 'atm.closeAttempt.v1';
++  taskId: string;
++  attemptId: string;
++  actorId: string;
++  state: 'starting' | 'running' | 'completed' | 'failed';
++  startedAt: string;
++  updatedAt: string;
++  ownerPid: number | null;
++  targetCommit: string | null;
++  failure: string | null;
++}
++
++export function closeAttemptPaths(cwd: string, taskId: string, attemptId: string) {
++  for (const id of [taskId, attemptId]) {
++    if (!/^[A-Za-z0-9][A-Za-z0-9_.-]*$/.test(id)) throw new Error('Invalid close task/attempt ID');
++  }
++  const base = path.join(cwd, '.atm/runtime/close', taskId, attemptId);
++  return { record: `${base}.json`, log: `${base}.log`, result: `${base}.result` };
++}
++
++/** Publish only complete durable records, including after a host power loss. */
++export function writeCloseAtomic(file: string, content: string): void {
++  mkdirSync(path.dirname(file), { recursive: true });
++  const temporary = `${file}.${process.pid}.${randomUUID()}.tmp`;
++  const fd = openSync(temporary, 'wx', 0o600);
++  try { writeFileSync(fd, content, 'utf8'); fsyncSync(fd); } finally { closeSync(fd); }
++  renameSync(temporary, file);
++  // Linux directory fsync makes the rename durable, not merely atomic.
++  if (process.platform !== 'win32') {
++    const directory = openSync(path.dirname(file), 'r');
++    try { fsyncSync(directory); } finally { closeSync(directory); }
++  }
++}
++
++export function readCloseAttempt(cwd: string, taskId: string, attemptId: string): CloseAttempt | null {
++  const file = closeAttemptPaths(cwd, taskId, attemptId).record;
++  try {
++    const value = JSON.parse(readFileSync(file, 'utf8')) as CloseAttempt;
++    return value.schemaId === 'atm.closeAttempt.v1' && value.taskId === taskId && value.attemptId === attemptId ? value : null;
++  } catch { return null; }
++}
++
++export function writeCloseAttempt(cwd: string, record: CloseAttempt): void {
++  writeCloseAtomic(closeAttemptPaths(cwd, record.taskId, record.attemptId).record, `${JSON.stringify(record, null, 2)}\n`);
++}
++
++export function closeResultLine(input: { code: string; status: 'ok' | 'fail' | 'running'; log: string; hint: string }): string {
++  return `ATM-RESULT step=close status=${input.status} code=${input.code} log=${JSON.stringify(input.log)} hint=${JSON.stringify(input.hint)}\n`;
++}
+diff --git a/packages/cli/src/commands/taskflow/close-detach.ts b/packages/cli/src/commands/taskflow/close-detach.ts
+new file mode 100644
+index 000000000..b162e882d
+--- /dev/null
++++ b/packages/cli/src/commands/taskflow/close-detach.ts
+@@ -0,0 +1,97 @@
++import { spawn } from 'node:child_process';
++import { randomUUID } from 'node:crypto';
++import { closeSync, mkdirSync, openSync } from 'node:fs';
++import path from 'node:path';
++import { makeResult, message } from '../shared.ts';
++import { isProcessAlive } from '../tasks/close-holder-liveness.ts';
++import { closeAttemptPaths, closeResultLine, readCloseAttempt, writeCloseAtomic, writeCloseAttempt, type CloseAttempt } from './close-attempt.ts';
++import { readCloseTransactionStatus } from './close-transaction-status.ts';
++
++const delay = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
++function result(cwd: string, record: CloseAttempt | null, taskId: string, attemptId: string, code: string, status: 'ok' | 'fail' | 'running', hint: string) {
++  const log = closeAttemptPaths(cwd, taskId, attemptId).log;
++  return { ...makeResult({ ok: status !== 'fail', command: 'taskflow close', cwd, mode: 'attempt',
++    messages: [message(status === 'fail' ? 'error' : 'info', code, hint)], evidence: { taskId, attemptId, attempt: record } }),
++  closeResultLine: closeResultLine({ code, status, log, hint: `attempt=${attemptId} ${hint}` }) };
++}
++
++/** The worker must acknowledge a durable attempt before the caller reports started. */
++export async function startDetachedClose(input: { cwd: string; taskId: string; actorId: string; argv: string[]; runner?: string }) {
++  if (!input.taskId || !input.actorId) throw new Error('--detach requires --task and --actor');
++  const attemptId = randomUUID();
++  const paths = closeAttemptPaths(input.cwd, input.taskId, attemptId);
++  const now = new Date().toISOString();
++  const record: CloseAttempt = { schemaId: 'atm.closeAttempt.v1', taskId: input.taskId, actorId: input.actorId, attemptId,
++    state: 'starting', startedAt: now, updatedAt: now, ownerPid: null, targetCommit: null, failure: null };
++  writeCloseAttempt(input.cwd, record);
++  mkdirSync(path.dirname(paths.log), { recursive: true });
++  const fd = openSync(paths.log, 'a', 0o600);
++  let child: ReturnType<typeof spawn>;
++  try {
++    const argv = input.argv.filter((arg) => !['--detach', '--json', '--pretty'].includes(arg));
++    child = spawn(process.execPath, [...process.execArgv.filter((arg) => !arg.startsWith('--inspect')), input.runner ?? process.argv[1], 'taskflow', ...argv, '--json'], {
++      cwd: input.cwd, detached: true, stdio: ['ignore', fd, fd],
++      env: { ...process.env, ATM_CLOSE_ATTEMPT_ID: attemptId, ATM_CLOSE_ATTEMPT_TASK: input.taskId }
++    });
++  } finally { closeSync(fd); }
++  let failed: string | null = null;
++  child.on('error', (error) => { failed = error.message; });
++  child.unref();
++  const deadline = Date.now() + 30_000;
++  while (Date.now() < deadline) {
++    const current = readCloseAttempt(input.cwd, input.taskId, attemptId);
++    if (current?.ownerPid === child.pid) {
++      return result(input.cwd, current, input.taskId, attemptId, 'CLOSE_STARTED', 'ok', 'started; query --status/--wait with this attempt ID');
++    }
++    if (failed || child.exitCode !== null || child.signalCode !== null) break;
++    await delay(25);
++  }
++  // Never overwrite a late worker acknowledgement. Unknown startup is recoverable,
++  // but is never acknowledged as CLOSE_STARTED.
++  return result(input.cwd, readCloseAttempt(input.cwd, input.taskId, attemptId), input.taskId, attemptId,
++    'CLOSE_START_UNCONFIRMED', 'fail', failed ?? 'child start unconfirmed; inspect this attempt before retrying');
++}
++
++export async function queryCloseAttempt(input: { cwd: string; taskId: string; attemptId: string; wait?: boolean; timeoutMs?: number }) {
++  if (!input.taskId || !input.attemptId) throw new Error('--status/--wait requires --task and --attempt');
++  const timeout = input.timeoutMs ?? 30_000;
++  if (!Number.isFinite(timeout) || timeout < 0) throw new Error('--timeout-ms must be finite and nonnegative');
++  const deadline = Date.now() + timeout;
++  while (true) {
++    const record = readCloseAttempt(input.cwd, input.taskId, input.attemptId);
++    if (!record) return result(input.cwd, null, input.taskId, input.attemptId, 'CLOSE_ATTEMPT_MISSING', 'fail', 'attempt does not exist');
++    const transaction = readCloseTransactionStatus(input.cwd, input.taskId);
++    // Recovery can complete a dead child's attempt without rerunning the worker.
++    const completed = record.state === 'completed' || (transaction?.attemptId === input.attemptId && transaction.outcome === 'completed' && transaction.cleanupComplete);
++    if (completed) return result(input.cwd, record, input.taskId, input.attemptId, 'CLOSE_COMMITTED', 'ok', `committed=${record.targetCommit ?? transaction?.targetCommit}`);
++    const alive = record.ownerPid !== null && isProcessAlive(record.ownerPid);
++    const recover = `node atm.mjs taskflow close --task ${input.taskId} --actor ${record.actorId} --recover (or --abort); inspect dry-run first`;
++    if (record.state === 'failed' || (!alive && record.state !== 'starting')) return result(input.cwd, record, input.taskId, input.attemptId, 'CLOSE_INTERRUPTED', 'fail', recover);
++    if (!input.wait || Date.now() >= deadline) return result(input.cwd, record, input.taskId, input.attemptId,
++      input.wait ? 'CLOSE_WAIT_TIMEOUT' : 'CLOSE_RUNNING', 'running', `started is not committed; ${recover}`);
++    await delay(Math.min(100, Math.max(1, deadline - Date.now())));
++  }
++}
++
++export async function runCloseAttemptWorker<T extends { ok?: boolean }>(input: { cwd: string; taskId: string; attemptId: string; action: () => Promise<T> }): Promise<T> {
++  const record = readCloseAttempt(input.cwd, input.taskId, input.attemptId);
++  if (!record || record.state !== 'starting' || record.ownerPid !== null) throw new Error('Close attempt is missing or already started');
++  const running: CloseAttempt = { ...record, state: 'running', ownerPid: process.pid, updatedAt: new Date().toISOString() };
++  writeCloseAttempt(input.cwd, running);
++  let value: T;
++  try { value = await input.action(); }
++  catch (error) { finish(false, error instanceof Error ? error.message : String(error)); throw error; }
++  finish(value.ok === true, value.ok ? null : 'close returned failure');
++  return value;
++
++  function finish(ok: boolean, failure: string | null) {
++    const transaction = readCloseTransactionStatus(input.cwd, input.taskId);
++    const committed = ok && transaction?.attemptId === input.attemptId && transaction.outcome === 'completed' && transaction.cleanupComplete;
++    const final: CloseAttempt = { ...running, state: committed ? 'completed' : 'failed', updatedAt: new Date().toISOString(),
++      targetCommit: transaction?.attemptId === input.attemptId ? transaction.targetCommit : null, failure: failure ?? (committed ? null : 'close did not commit') };
++    writeCloseAttempt(input.cwd, final);
++    writeCloseAtomic(closeAttemptPaths(input.cwd, input.taskId, input.attemptId).result,
++      closeResultLine({ status: committed ? 'ok' : 'fail', code: committed ? 'CLOSE_COMMITTED' : 'CLOSE_FAILED', log: closeAttemptPaths(input.cwd, input.taskId, input.attemptId).log,
++        hint: `attempt=${input.attemptId} ${final.failure ?? `committed=${final.targetCommit}`}` }));
++  }
++}
+diff --git a/packages/cli/src/commands/taskflow/close-transaction-status.ts b/packages/cli/src/commands/taskflow/close-transaction-status.ts
+index ba2ac3d6e..b1a0a0407 100644
+--- a/packages/cli/src/commands/taskflow/close-transaction-status.ts
++++ b/packages/cli/src/commands/taskflow/close-transaction-status.ts
+@@ -1,11 +1,14 @@
+-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
++import { existsSync, mkdirSync, readFileSync } from 'node:fs';
+ import path from 'node:path';
++import { writeCloseAtomic } from './close-attempt.ts';
++import { assertActiveCloseLease } from './close-transaction-mutex.ts';
+ 
+ export const CLOSE_TRANSACTION_STATUS_SCHEMA_ID = 'atm.closeTransactionStatus.v1';
+ export type CloseTransactionPhase = 'started' | 'ledger-written' | 'target-commit-created' | 'planning-commit-created' | 'post-cleanup-complete' | 'rolled-back' | 'failed';
+ export interface CloseTransactionStatus {
+   readonly schemaId: typeof CLOSE_TRANSACTION_STATUS_SCHEMA_ID;
+   readonly taskId: string;
++  readonly attemptId?: string | null;
+   readonly phase: CloseTransactionPhase;
+   readonly outcome: 'in-progress' | 'completed' | 'rolled-back' | 'failed';
+   readonly startedAt: string;
+@@ -19,15 +22,16 @@ export interface CloseTransactionStatus {
+ }
+ export function closeTransactionStatusPath(cwd: string, taskId: string): string { return path.join(cwd, '.atm', 'runtime', 'close-transactions', `${taskId}.json`); }
+ export function writeCloseTransactionStatus(input: { cwd: string; taskId: string; phase: CloseTransactionPhase; outcome?: CloseTransactionStatus['outcome']; startedAt?: string; ledgerCommit?: string | null; targetCommit?: string | null; planningCommit?: string | null; cleanupComplete?: boolean; failure?: string | null; }): CloseTransactionStatus {
++  assertActiveCloseLease();
+   const now = new Date().toISOString();
+   // A new close attempt starts a fresh transaction; only phases of the same
+   // attempt inherit its start time and commits (#373).
+   const previous = input.phase === 'started' ? null : readCloseTransactionStatus(input.cwd, input.taskId);
+   const outcome = input.outcome ?? (input.phase === 'post-cleanup-complete' ? 'completed' : input.phase === 'rolled-back' ? 'rolled-back' : input.phase === 'failed' ? 'failed' : 'in-progress');
+-  const record: CloseTransactionStatus = { schemaId: CLOSE_TRANSACTION_STATUS_SCHEMA_ID, taskId: input.taskId, phase: input.phase, outcome, startedAt: input.startedAt ?? previous?.startedAt ?? now, updatedAt: now, ledgerCommit: input.ledgerCommit === undefined ? previous?.ledgerCommit ?? null : input.ledgerCommit, targetCommit: input.targetCommit === undefined ? previous?.targetCommit ?? null : input.targetCommit, planningCommit: input.planningCommit === undefined ? previous?.planningCommit ?? null : input.planningCommit, cleanupComplete: input.cleanupComplete ?? previous?.cleanupComplete ?? false, recoveryCommand: outcome === 'in-progress' || outcome === 'failed' ? `node atm.mjs taskflow close --task ${input.taskId} --actor <actor-id> --recover --json` : `node atm.mjs taskflow status --task ${input.taskId} --json`, failure: input.failure === undefined ? previous?.failure ?? null : input.failure };
++  const record: CloseTransactionStatus = { schemaId: CLOSE_TRANSACTION_STATUS_SCHEMA_ID, taskId: input.taskId, attemptId: previous?.attemptId ?? (process.env.ATM_CLOSE_ATTEMPT_TASK === input.taskId ? process.env.ATM_CLOSE_ATTEMPT_ID ?? null : null), phase: input.phase, outcome, startedAt: input.startedAt ?? previous?.startedAt ?? now, updatedAt: now, ledgerCommit: input.ledgerCommit === undefined ? previous?.ledgerCommit ?? null : input.ledgerCommit, targetCommit: input.targetCommit === undefined ? previous?.targetCommit ?? null : input.targetCommit, planningCommit: input.planningCommit === undefined ? previous?.planningCommit ?? null : input.planningCommit, cleanupComplete: input.cleanupComplete ?? previous?.cleanupComplete ?? false, recoveryCommand: outcome === 'in-progress' || outcome === 'failed' ? `node atm.mjs taskflow close --task ${input.taskId} --actor <actor-id> --recover --json` : `node atm.mjs taskflow status --task ${input.taskId} --json`, failure: input.failure === undefined ? previous?.failure ?? null : input.failure };
+   const filePath = closeTransactionStatusPath(input.cwd, input.taskId);
+   mkdirSync(path.dirname(filePath), { recursive: true });
+-  writeFileSync(filePath, `${JSON.stringify(record, null, 2)}\n`, 'utf8');
++  writeCloseAtomic(filePath, `${JSON.stringify(record, null, 2)}\n`);
+   return record;
+ }
+ export function readCloseTransactionStatus(cwd: string, taskId: string): CloseTransactionStatus | null { const filePath = closeTransactionStatusPath(cwd, taskId); if (!existsSync(filePath)) return null; try { const parsed = JSON.parse(readFileSync(filePath, 'utf8')) as Partial<CloseTransactionStatus>; return parsed.schemaId === CLOSE_TRANSACTION_STATUS_SCHEMA_ID && parsed.taskId === taskId ? parsed as CloseTransactionStatus : null; } catch { return null; } }
