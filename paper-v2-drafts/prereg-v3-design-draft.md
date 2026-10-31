@@ -47,10 +47,11 @@ ATM **不是**要贏過或取代 git。git 的設計是「commit 之後、merge 
 
 - **粒度**（D1，已決定）：主要分析一律 `file` 層級 claim。`symbol` 層級（函式／類別，用 tree-sitter 或 Python AST 決定）列為**附加實驗**（次要／探索性），另開臂 `ATM-sym`，只做描述與探索性比較，不進主要假設族。
 - **重疊政策**（D2，已決定）：固定為 `share-and-steward`：
-  1. claim 與現有 lease 重疊 → ATM 立即回 `CLAIM_OVERLAP`（記為 P0 偵測），告知雙方 agent ID 與重疊範圍；
+  1. claim 與現有 lease 重疊 → ATM 立即回 `CLAIM_OVERLAP`（記為 P0 偵測），通知雙方：後來者在 claim 回應中得知，原 holder 在其下一個 atm 指令輸出中得知（W4-Q1）；訊息只說重疊檔案與「寫入會經 steward 合併」，不透露對方 actor 名或 claim id（W4-Q3，維持 D5）；
   2. 雙方自動成為**共享 claim**，各自繼續工作，**不等待、不縮小範圍**；所有寫入與提交經 steward 合併（ack + deadline + 原子替換），steward 拒絕的衝突 hunk 退回原 agent 重做並計入 `WW`；
   3. lease 有 TTL，commit 或逾時釋放。等待／縮小範圍政策不在主要設計中（如需可日後另立探索性分析）。
-- **未 claim 的寫入**：第一次寫入未 claim 的檔案時做同樣檢查；重疊時記為 P1 偵測。
+- **未 claim 的寫入**：第一次寫入未 claim 的檔案時做同樣檢查；重疊時記為 P1 偵測。寫入一律允許，記 `unclaimed-write` 事件（P1 證據）並自動補 claim（W4-Q7，量測不干預）。
+- **W4 實作決定（文一，2026-10-31）**：share 模式是獨立薄 claim 層，不改 broker 的 queue/compose 決策邏輯，HIST-v2 行為不變（Q2）；每個 Codex session 各自 `ATM_ACTOR_ID`＋含 git identity 的 profile（Q4）；ATM 臂一律經 `broker steward apply-live` 由 steward 代 commit（Q5）；lease TTL 900s、每次 atm 指令自動續約、commit 時釋放（Q6）。
 
 ---
 
@@ -84,11 +85,12 @@ ATM **不是**要贏過或取代 git。git 的設計是「commit 之後、merge 
 | 代碼 | 階段 | 例 |
 |---|---|---|
 | P0 | **寫之前**（pre-edit） | ATM `CLAIM_OVERLAP`；LOCK 第一次寫入前取鎖失敗不算（那屬 P1） |
-| P1 | **寫到一半**（mid-edit，已寫入衝突檔、尚未 commit/submit） | ATM 未 claim 檔案的第一次寫入檢查；LOCK 取鎖失敗 |
+| P1 | **寫到一半**（mid-edit，已寫入衝突檔、尚未 commit/submit） | ATM `unclaimed-write`（未 claim 檔第一次寫入，W4-Q7）；LOCK 取鎖失敗 |
 | P2 | **提交時**（commit／submit） | ATM steward 拒絕；SHARED commit 時 index／HEAD 競爭 |
 | P3 | **合併時**（merge／integration） | GIT `git merge` 回報衝突 |
 | P4 | **從未被告知**（silent） | 覆蓋、遺失，或合併後測試失敗才發現 |
 
+- **ATM 告知時間**（W4-Q1）：後來者以 `claim-overlap` 事件時間為準；原 holder 以 `overlap-notice-delivered`（其下一個 atm 指令輸出）時間為準；另報兩者延遲分布。
 - **早期偵測率** `EDR = #(P0 ∪ P1) / #真衝突對`。
 - **偵測前工作量** `W_det`：被告知那一刻，受影響 agent 已在衝突範圍上產生的工作：L1 = 已寫入的 diff 行數（依 commit 時間內插）；L2 = 已寫入行數 + 已花 token + 牆鐘秒數。
 
@@ -263,7 +265,7 @@ ATM **不是**要贏過或取代 git。git 的設計是「commit 之後、merge 
 
 - 兩個 agent 同時改同一 hunk 的合成任務：GIT 必在 P3、ATM 必在 P0、SHARED 必出現 M1；
 - 不相交任務：ATM 不應出現 `G_text` 偵測（只可能是假警報，需列出）；
-- 故意未 claim 的寫入：ATM 必在 P1 偵測。
+- 故意未 claim 的寫入：ATM 必在 P1 偵測（記 `unclaimed-write` 並自動補 claim）。
 
 ### 8.4 正式規模（pilot 後重算，**需文一批准**）
 
@@ -307,7 +309,7 @@ ATM **不是**要贏過或取代 git。git 的設計是「commit 之後、merge 
 | W1 | L1 時間線 miner | `gh api` 抓 PR commit 清單與每 commit 檔案；Django 開發集 + flask／requests 保留集；封存 | 1 天 |
 | W2 | L1 事件模擬器 | 決定性離散事件模擬，四臂政策、S1/S2/S3 claim、checkpoint；重用 v4 applier | 2–3 天 |
 | W3 | 真衝突基準 | `G_text`／`G_file` 計算（L1、L2 共用），`G_sem`（L2 測試） | 1 天 |
-| W4 | **ATM 開工前 claim／lease** | 先讀碼確認現有 `framework-mode claim`、quickfix claim、lane-sessions 能否給任意 agent 用；缺的話補：檔案 lease（主要）、共享 claim 模式（重疊時不阻擋、轉 steward 合併）、TTL、`CLAIM_OVERLAP` 回報與通知、未 claim 寫入檢查；符號 lease 只為附加實驗，可延後、帶時間戳事件記錄 | 2–4 天（讀碼後再估） |
+| W4 | **ATM 開工前 claim／lease** | 已讀碼（`w4-claim-audit.md`，擴充不重寫）；依 W4 Q1–Q7 決定：獨立薄 claim 層（不改 broker 決策）、檔案 lease TTL 900s 自動續約／commit 釋放、`CLAIM_OVERLAP`（只給檔案＋steward 合併說明）、holder 通知附在下一個 atm 指令輸出、append-only 事件 log、`unclaimed-write` 記錄＋自動補 claim、每 session 獨立 actor 身分、steward apply-live 代 commit | 3–5 天 |
 | W5 | 偵測時點儀器 | inotify 檔案監看、git hook 記 commit／merge 衝突，統一事件格式 | 1 天 |
 | W6 | L2 kit v15 | 以 v14 為基礎：k 個 Codex session 啟動器、三臂、Δ、上限、`codex login status` 檢查、seal 腳本 | 2–3 天 |
 | W7 | k = 4 任務組 | 依 six-pairs 流程建四件組並跑 eligibility | 2 天 |

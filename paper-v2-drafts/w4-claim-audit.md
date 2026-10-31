@@ -94,42 +94,56 @@
 
 ## 3. 建議實作輪廓（extend）
 
-- `atm claim --files a,b [--ttl 900] --actor $ATM_ACTOR_ID`：內部產生最小 WriteIntent（atomRefs/sharedSurfaces 空）呼叫 registry；`policy=share` 時 overlap 不進 queue，回 `ok:true, writeAuthorized:true, code: CLAIM_OVERLAP, overlaps:[{file, sinceAt}]`（不帶對方 actor 名稱以免洩漏 agent 存在 → 見決策 Q3）。
+- `atm claim --files a,b [--ttl 900] --actor $ATM_ACTOR_ID`：內部產生最小 WriteIntent（atomRefs/sharedSurfaces 空）呼叫 registry；`policy=share` 時 overlap 不進 queue，回 `ok:true, writeAuthorized:true, code: CLAIM_OVERLAP, overlaps:[{file, sinceAt}]`（不帶對方 actor 名稱以免洩漏 agent 存在 → 決策 Q3 已定：不帶）。
 - holder 端：registry 上標 `pendingOverlapNotices`，下一次該 actor 任何 atm 指令（claim/renew/apply-live/status）輸出附帶並記 `overlap-notice-delivered` 事件＋ack。
 - apply-live 入口：檔案不在該 actor 有效 claim 內 → 照寫（或依決策），記 `unclaimed-write`（P1）。
 - 事件：`claim-granted / claim-overlap / overlap-notice-delivered / overlap-ack / lease-renewed / lease-released / lease-expired / steward-accepted / steward-rejected(cross-session-overlap|stale-base…) / unclaimed-write`，每筆 `{seq, at(ISO), monoNs, actorId, files, claimId, relatedClaimIds}`。
 
-## 4. 待 文一 決策（多選，附建議）
+## 4. 文一 決策（2026-10-31 全部已決定，Q1–Q7 皆採建議 A/B）
 
-**Q1 overlap 通知怎麼送到 holder？**
+| Q | 決定 |
+|---|---|
+| Q1 | ✅ overlap 通知附在 holder 下一個 atm 指令輸出（pull；不裝 hook／推播），記 `overlap-notice-delivered` 時間 |
+| Q2 | ✅ share 模式為獨立薄 claim 層；broker 決策邏輯（queue/compose）**不改**，保留 HIST-v2 行為 |
+| Q3 | ✅ `CLAIM_OVERLAP` 只說檔案＋「寫入會經 steward 合併」；不給 actor 名／claim id（維持 D5） |
+| Q4 | ✅ 每個 Codex session 各自 `ATM_ACTOR_ID`＋actor profile（含 git identity） |
+| Q5 | ✅ ATM arm 一律經 `broker steward apply-live` 由 steward 代 commit，agent 不直接 git commit |
+| Q6 | ✅ lease TTL 900s，每次 atm 指令自動 renew，commit 時 release |
+| Q7 | ✅ 未 claim 寫入允許，記 `unclaimed-write`（P1 證據）並自動補 claim |
+
+W4 估計維持 3–5 天。以下保留原選項供追溯。
+
+### 原選項
+
+**Q1 overlap 通知怎麼送到 holder？（✅ 已決定：A）**
 - A. piggyback 在 holder 下一個 atm 指令輸出（pull，延遲 = 下一次指令間隔）**← 建議**（不需改 Codex、可記 delivered 時間）
 - B. Codex hook / 檔案 watcher 推播（較即時，但每個 agent 環境都要裝，threat to validity 多）
 - C. 只通知後來者，不通知 holder（偏離 D1「告知雙方」）
 
-**Q2 share 模式放哪？**
+**Q2 share 模式放哪？（✅ 已決定：B）**
 - A. broker 內加 `policy: share` 旗標（改 decision / registry-actions 分支）
 - B. 獨立薄 claim 層，只借 registry 存取＋resource-overlap，不碰 broker 決策 **← 建議**（不影響既有 HIST/v2 broker 行為與封存 prereg）
 - C. 改 broker 預設行為（不建議）
 
-**Q3 `CLAIM_OVERLAP` 回給 agent 的內容？**
+**Q3 `CLAIM_OVERLAP` 回給 agent 的內容？（✅ 已決定：A）**
 - A. 只給檔案＋「此檔有其他進行中的修改，寫入會經 steward 合併」，不給 actor 名 **← 建議**（符合「不告訴 agent 有其他 agent」的最小揭露）
 - B. 給對方 actor id／claim id
 - C. 只回 code 不給說明
 
-**Q4 actor 身分**
+**Q4 actor 身分（✅ 已決定：A）**
 - A. 每個 Codex session 一個 `ATM_ACTOR_ID`＋actor registry profile（含 git identity）**← 建議**
 - B. 共用 repo default identity（會被 `ATM_ACTOR_ID_EXPLICIT_REQUIRED` 擋，且無法區分 P0 雙方）
 
-**Q5 commit 路徑與既有 guard**
+**Q5 commit 路徑與既有 guard（✅ 已決定：A）**
 - A. ATM arm 所有寫入走 `broker steward apply-live`（steward 代 commit），agent 不直接 git commit **← 建議**（cross-task-mutation-guard 不介入、P2/P3 判定集中）
 - B. agent 自行 commit，share 模式下把 cross-task-mutation-guard 降級為事件
 - C. 維持 guard 原樣（會誤擋共享檔，違反 D2）
 
-**Q6 lease TTL**
+**Q6 lease TTL（✅ 已決定：A）**
 - A. 900s＋每次 atm 指令自動 renew，release on commit **← 建議**
 - B. 沿用 registry 預設 1800s
 - C. 不設 TTL，只在 commit/結束時 release
 
-**Q7 未 claim 檔第一次寫入（P1）**
+**Q7 未 claim 檔第一次寫入（P1）（✅ 已決定：A）**
 - A. 允許寫入並記 `unclaimed-write`＋自動補 claim **← 建議**（量測不干預）
 - B. 拒絕寫入要求先 claim（會改變 agent 行為，混入 P1 定義）
