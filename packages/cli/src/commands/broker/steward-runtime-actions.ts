@@ -31,6 +31,7 @@ import { loadComposeProposals, normalizeEvidencePath, type ParsedBrokerOptions, 
 import { readSharedSurfaceFreezeRecords, writeSharedSurfaceFreezeRecords, readSharedSurfaceQueues, writeSharedSurfaceQueues, readRunnerSyncStewardQueue, writeRunnerSyncStewardQueue, toRunnerSyncReleaseCliError, readGeneratedProjectionSteward, writeGeneratedProjectionSteward } from './persistence.ts';
 import { updateSharedSurfaceQueues, createSharedSurfaceFreezeRecords, markReleasedSharedSurfaceFreezes, shouldQueueSharedSurface, resolveSharedSurfaceQueueAdmission, replaceIntentLane, assertBrokerRegisterCliParity, syncTeamRunRearbitrationSnapshots } from './shared-surface.ts';
 
+import { claimShareAfterLiveApply, claimShareBeforeLiveApply } from './claim-share-actions.ts';
 import { classifyExplicitMutationRequest, buildMutationEvidence, extractMutationRequestTransactionIds } from './mutation-helpers.ts';
 
 function persistComposedMergePlan(cwd: string, mergePlan: MergePlan): { readonly path: string; readonly digest: string } {
@@ -47,6 +48,7 @@ function persistComposedMergePlan(cwd: string, mergePlan: MergePlan): { readonly
 
 function applyLiveStewardWrites(options: ParsedBrokerOptions) {
   const proposals = loadComposeProposals(options);
+  const claimShareBefore = claimShareBeforeLiveApply(options.cwd, proposals);
   const result = applyLiveQueuedWrites({
     cwd: options.cwd,
     proposals,
@@ -57,6 +59,8 @@ function applyLiveStewardWrites(options: ParsedBrokerOptions) {
   const rejected = result.writes.filter((write) => write.decision !== 'accepted');
   const acceptedCount = result.writes.length - rejected.length;
   const crossSession = rejected.filter((write) => write.reasonCode === 'cross-session-overlap');
+  const claimShareAfter = claimShareAfterLiveApply(options.cwd, proposals, result.writes);
+  const claimShareMessages = (claimShareBefore?.overlaps ?? []).map((overlap) => message('warn', overlap.code, overlap.message, { files: overlap.overlapFiles, writeAuthorized: true }));
   return makeResult({
     ok: result.ok,
     command: 'broker',
@@ -81,10 +85,14 @@ function applyLiveStewardWrites(options: ParsedBrokerOptions) {
           acknowledgedOverlap: result.writes.flatMap((write) => write.acknowledgedOverlap ?? []),
           planRequired: false
         }
-      )
+      ),
+      ...claimShareMessages
     ],
     evidence: {
       action: 'steward-apply-live',
+      ...(claimShareBefore || claimShareAfter
+        ? { claimShare: { unclaimedWrites: claimShareBefore?.unclaimed ?? [], releasedFiles: claimShareAfter?.releasedFiles ?? [] } }
+        : {}),
       stewardId: options.stewardId ?? 'neutral-write-steward',
       planRequired: false,
       queuePath: result.queuePath,

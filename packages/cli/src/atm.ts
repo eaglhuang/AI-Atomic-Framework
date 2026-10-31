@@ -8,6 +8,7 @@ import { getCommandSpec, listCommandSpecs } from './commands/command-specs.ts';
 import { createFirstRunContract, resolveFirstRunRuntime, rootHelpSubcommand } from './commands/first-run.ts';
 import { applyLaneSessionFlagFromArgv } from './commands/shared/lane-session-flag.ts';
 import { withUnsupportedOptionHints } from './commands/shared/usage-error-hints.ts';
+import { attachClaimShareTouch, touchClaimShareForCommand } from './commands/shared/claim-share-touch.ts';
 import { applyOutputProjectionFlagsFromArgv, CliError, enrichCommandResult, makeHelpResult, makeResult, message, readFrameworkVersion, writeResult, type CommandResult } from './commands/shared.ts';
 import { checkStartupKnownBadVersion, isKnownBadReadOnlyCommand } from './startup-known-bad.ts';
 import { checkStartupIntegrity, resolveBundledIntegrityRoot } from './startup-integrity.ts';
@@ -276,9 +277,10 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
     return result.exitCode;
   }
 
+  const claimShareTouch = touchClaimShareForCommand(commandName, commandArgs);
   try {
     const rawResult = await runner(commandArgs);
-    const result = enrichCommandResult(rawResult as CommandResult);
+    const result = enrichCommandResult(attachClaimShareTouch(rawResult as CommandResult, claimShareTouch));
     recordCommandGateTelemetry(process.cwd(), commandName, commandStartedAt, result, commandArgs);
     writeResult(result, outputFormat === 'json' || result.ok ? io.stdout : io.stderr, outputFormat);
     return result.exitCode;
@@ -288,13 +290,13 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
       : new CliError('ATM_CLI_UNHANDLED', error instanceof Error ? error.message : String(error), {
         details: { stack: error instanceof Error ? error.stack ?? null : null }
       });
-    const result = enrichCommandResult(makeResult({
+    const result = enrichCommandResult(attachClaimShareTouch(makeResult({
       ok: false,
       command: commandName,
       cwd: process.cwd(),
       messages: [message('error', cliError.code, cliError.message, withUnsupportedOptionHints(commandName, commandArgs, cliError.message, cliError.details))],
       evidence: {}
-    }), { cliErrorExitCode: cliError.exitCode });
+    }), claimShareTouch), { cliErrorExitCode: cliError.exitCode });
     recordCommandGateTelemetry(process.cwd(), commandName, commandStartedAt, result, commandArgs);
     writeResult(result, outputFormat === 'json' ? io.stdout : io.stderr, outputFormat);
     return result.exitCode;

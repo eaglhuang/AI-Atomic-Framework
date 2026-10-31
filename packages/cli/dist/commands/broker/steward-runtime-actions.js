@@ -9,6 +9,7 @@ import { buildTeamBrokerRuntimeActivationHandshake } from '../../_vendor/core/di
 import { readBrokerProposalFile, validateBrokerProposal } from '../../_vendor/core/dist/broker/proposal.js';
 import { hashContent } from '../../_vendor/core/dist/broker/adapters/cas.js';
 import { loadComposeProposals } from './parser.js';
+import { claimShareAfterLiveApply, claimShareBeforeLiveApply } from './claim-share-actions.js';
 function persistComposedMergePlan(cwd, mergePlan) {
     const relativePath = path.join('.atm', 'runtime', 'broker-merge-plans', `${mergePlan.mergePlanId}.json`);
     const absolutePath = path.join(cwd, relativePath);
@@ -22,6 +23,7 @@ function persistComposedMergePlan(cwd, mergePlan) {
 }
 function applyLiveStewardWrites(options) {
     const proposals = loadComposeProposals(options);
+    const claimShareBefore = claimShareBeforeLiveApply(options.cwd, proposals);
     const result = applyLiveQueuedWrites({
         cwd: options.cwd,
         proposals,
@@ -32,6 +34,8 @@ function applyLiveStewardWrites(options) {
     const rejected = result.writes.filter((write) => write.decision !== 'accepted');
     const acceptedCount = result.writes.length - rejected.length;
     const crossSession = rejected.filter((write) => write.reasonCode === 'cross-session-overlap');
+    const claimShareAfter = claimShareAfterLiveApply(options.cwd, proposals, result.writes);
+    const claimShareMessages = (claimShareBefore?.overlaps ?? []).map((overlap) => message('warn', overlap.code, overlap.message, { files: overlap.overlapFiles, writeAuthorized: true }));
     return makeResult({
         ok: result.ok,
         command: 'broker',
@@ -51,10 +55,14 @@ function applyLiveStewardWrites(options) {
                 crossSessionOverlap: crossSession.flatMap((write) => write.crossSessionOverlap ?? []).map(({ actorId, proposalId, commitSha }) => ({ actorId, proposalId, commitSha })),
                 acknowledgedOverlap: result.writes.flatMap((write) => write.acknowledgedOverlap ?? []),
                 planRequired: false
-            })
+            }),
+            ...claimShareMessages
         ],
         evidence: {
             action: 'steward-apply-live',
+            ...(claimShareBefore || claimShareAfter
+                ? { claimShare: { unclaimedWrites: claimShareBefore?.unclaimed ?? [], releasedFiles: claimShareAfter?.releasedFiles ?? [] } }
+                : {}),
             stewardId: options.stewardId ?? 'neutral-write-steward',
             planRequired: false,
             queuePath: result.queuePath,

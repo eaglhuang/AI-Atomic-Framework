@@ -403,7 +403,10 @@ try {
   // #359 / #361: strict parser, exact-context offset locator, v10c replay.
   for (const [label, test] of [
     ['unified-patch locator', 'tests/cli/unified-patch-locator.test.ts'],
-    ['unified-patch v10c replay', 'tests/cli/unified-patch-v10c-replay.test.ts']
+    ['unified-patch v10c replay', 'tests/cli/unified-patch-v10c-replay.test.ts'],
+    // prereg v3 W4: file-level claim share layer and append-only claim event log.
+    ['claim share layer', 'tests/core/claim-share.test.ts'],
+    ['broker claim CLI', 'tests/cli/broker-claim-share.test.ts']
   ] as const) {
     const run = spawnSync(process.execPath, ['--strip-types', path.join(root, test)], { cwd: root, encoding: 'utf8' });
     check(run.status === 0, `${label} regression must pass:\n${run.stdout}\n${run.stderr}`);
