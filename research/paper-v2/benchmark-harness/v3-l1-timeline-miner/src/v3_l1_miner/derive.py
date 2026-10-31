@@ -13,14 +13,29 @@ Pure functions; no I/O. Definitions (draft section 6.2, D3):
 - S3: directories of S1 (coarse claim, false-alarm upper bound).
 - line_timeline: cumulative additions+deletions after each non-merge commit,
   stamped with that commit's author date.
-Quality flags are recorded, never used to drop records here; exclusion rules
-belong to the frozen prereg.
+Quality flags are recorded, never used to drop records here.
+
+Exclusion rule A (approved by the author 2026-10-31, id EXCLUSION_RULE_ID) is a
+derivation, not a deletion: `timeline_ok` is false and `exclusion_reasons` is
+non-empty when the observable history cannot give a trustworthy t_start:
+- start-after-submit / negative-dev-seconds: first own commit authored after
+  the PR was opened (history rewritten by rebase/force-push/re-authoring);
+- author-order-differs: PR commit order disagrees with author dates (reorder
+  or cherry-pick sign, so the first commit is not the earliest work);
+- no-own-commits: t_start undefined.
+Force-push events (when fetched) are recorded as a flag but do not exclude by
+themselves: Django routinely force-pushes after review without moving t_start.
+The sensitivity value t_start_imputed = created_at - median(dev_seconds of
+timeline_ok records) needs the whole dataset; see sensitivity.apply().
 """
 
 from __future__ import annotations
 
 import posixpath
 from datetime import datetime, timezone
+
+EXCLUSION_RULE_ID = "A-v1-2026-10-31"
+EXCLUDING_REASONS = ("start-after-submit", "negative-dev-seconds", "author-order-differs", "no-own-commits")
 
 
 def parse_ts(value: str) -> datetime:
@@ -55,9 +70,21 @@ def derive(rec: dict) -> dict:
         "n_commits_fetched": len(commits),
         "n_merge_commits": len(commits) - len(own),
         "flags": flags,
+        "timeline_ok": False,
+        "exclusion_reasons": [],
+        "t_start_imputed": None,
+        "t_start_sens": None,
+        "n_force_pushes": None,
     }
+    pushes = rec.get("force_pushes")
+    if pushes is not None:
+        out["n_force_pushes"] = len(pushes)
+        sub = parse_ts(rec["created_at"])
+        if any(parse_ts(e["at"]) > sub for e in pushes):
+            flags.append("force-pushed-after-submit")
     if not own:
         flags.append("no-own-commits")
+        _apply_rule_a(out)
         return out
     first = own[0]
     out["first_commit_sha"] = first["sha"]
@@ -107,4 +134,14 @@ def derive(rec: dict) -> dict:
         flags.append("s1-not-subset-of-s2")
     if not first["files"]:
         flags.append("first-commit-empty")
+    _apply_rule_a(out)
     return out
+
+
+def _apply_rule_a(out: dict) -> None:
+    reasons = [r for r in EXCLUDING_REASONS if r in out["flags"]]
+    if out["dev_seconds"] is not None and out["dev_seconds"] < 0:
+        reasons.append("negative-dev-seconds")
+    out["exclusion_reasons"] = sorted(set(reasons), key=list(EXCLUDING_REASONS).index)
+    out["timeline_ok"] = not out["exclusion_reasons"]
+    out["t_start_sens"] = out["t_start"] if out["timeline_ok"] else None

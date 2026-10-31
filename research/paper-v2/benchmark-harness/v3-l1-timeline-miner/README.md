@@ -20,13 +20,31 @@
 
 PR 分支裡的 merge commit（例如把 main 併進分支）保留在 commit 清單，但**不抓它的檔案**：GitHub 對 merge commit 只跟第一個 parent 比，檔案清單會混進上游別人的改動。
 
-`flags` 只記錄資料品質（例如 `start-after-submit` 表示歷史被 rebase／force-push 改寫、`committed-after-submit` 表示開 PR 後還有修改），這裡**不排除**任何 PR；排除規則屬於凍結的 prereg。
+`flags` 只記錄資料品質（例如 `start-after-submit` 表示歷史被 rebase／force-push 改寫、`committed-after-submit` 表示開 PR 後還有修改），flags 本身不刪任何資料。
+
+### 排除規則 A（作者 2026-10-31 批准，`A-v1-2026-10-31`）
+
+排除是**推導欄位**，不是刪資料：
+
+| 欄位 | 意義 |
+|---|---|
+| `timeline_ok` | `false` = 主分析排除 |
+| `exclusion_reasons` | `start-after-submit`、`negative-dev-seconds`（第一個自己的 commit 晚於開 PR，歷史被 rebase／force-push／重寫）、`author-order-differs`（commit 順序與 author 時間矛盾，重排或 cherry-pick 的跡象）、`no-own-commits`（t_start 無定義） |
+| `t_start_imputed` | 只給被排除的 PR：`created_at − M`，M = 同一資料集 `timeline_ok` PR 的 `dev_seconds` 中位數（四捨五入到秒）；敏感度分析用 |
+| `t_start_sens` | 敏感度分析的 t_start：`timeline_ok` 用 `t_start`，否則用 `t_start_imputed` |
+| `n_force_pushes` | `mine --events` 才抓 issue timeline 的 `head_ref_force_pushed` 事件；只記旗標 `force-pushed-after-submit`，**不單獨排除**（Django 審查後常態 force-push，不一定動到 t_start） |
+
+M 需要整個資料集，所以 `rederive` 先逐筆推導、再做資料集層的 `sensitivity.apply()`；`--summary` 另寫描述統計（旗標比例、排除率、S1/S2/S3 大小與 S1 對 S2 的 recall／precision、dev_seconds 分位數）。逐筆 `mine` 寫出的 `t_start_imputed` 一律是 null，要跑過 `rederive` 才有值。
 
 ## 用法
 
 在本目錄：
 
 ```bash
+# 列出固定時間窗內已合併的 PR（search API；查詢字串、列出時間與 SHA256 寫進 <out>.listing.json）
+PYTHONPATH=src python3 -m v3_l1_miner list-window --repo django/django \
+  --since 2026-09-01T00:00:00Z --until 2026-10-01T00:00:00Z --out <工作目錄>/pr_list.jsonl
+
 # 單元測試（只用 fixture，不連網）
 cd tests && PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s . -v
 
@@ -36,7 +54,7 @@ PYTHONPATH=src python3 -m v3_l1_miner mine --repo django/django \
   --limit 5 --out <工作目錄>/l1-timelines
 
 PYTHONPATH=src python3 -m v3_l1_miner validate --in <工作目錄>/l1-timelines/timelines.jsonl
-PYTHONPATH=src python3 -m v3_l1_miner rederive --in <舊.jsonl> --out <新.jsonl>
+PYTHONPATH=src python3 -m v3_l1_miner rederive --in <舊.jsonl> --out <新.jsonl> --summary <summary.json>
 ```
 
 - **可中斷續跑**：`timelines.jsonl` 逐筆 append + fsync；重跑同一個指令會跳過已完成的 PR，並修掉被中斷時寫一半的最後一行（box 還原後直接重跑即可）。`MANIFEST.json` 記筆數、旗標統計、API 呼叫數與 SHA256。
