@@ -36,3 +36,17 @@ prereg v3 設計草稿 §6.1／§11 W1 的 L1 開發集探勘。只呼叫 GitHub
 - `--events` 另抓 issue timeline 的 force-push 事件。它只當旗標，不單獨排除。
 - 接著跑 `rederive --summary`：逐筆推導，再做資料集層的規則 A 補值，最後跑 `validate`。
 - 可中斷續跑；box 還原後重跑同一個指令即可。原始輸出若超過 100 MB，就壓縮保存。
+
+## 探勘結果（2026-10-31 追加；以上宣告未修改）
+
+- 執行：2026-10-31T14:23:56Z → 14:25:46Z（台北 22:23–22:25），約 110 秒；`--events` 開啟。
+- API 呼叫：本次 mine 283 次（記錄內累計 281；差 2 次尚未逐筆核對來源，無錯誤）；listing 1 次。錯誤 0、略過 0。全程免費 gh API，無付費模型。
+- 紀錄：52/52 探勘成功；`validate` invalid=0（原始與 derived 皆然）。
+- 排除規則 A（A-v1-2026-10-31）：timeline_ok 43、排除 9（17.31%）。
+  - start-after-submit + negative-dev-seconds：6；author-order-differs：3。
+  - 敏感度插補中位數（clean PR dev_seconds）：671 秒。
+- 旗標率：committed-after-submit 78.85%、force-pushed-after-submit 76.92%（僅旗標、不排除）、start-after-submit 11.54%、author-order-differs 5.77%。
+- dev_seconds（timeline_ok，n=43）：p25 186.5、中位 671、p75 4910.5 秒；52 筆中 38 筆 < 1 小時。
+- 宣告集合（timeline_ok，n=43）：S1 中位 3、S2 中位 3、S3 中位 2；S1⊆S2 100%；S1==S2 93.02%；S1 對 S2 recall 平均 0.966。
+- 資料量：整個 generation 目錄約 436 KB，未達 100 MB，未壓縮。
+- 明細：`summary.json`、`MANIFEST.json`、`data/timelines.derived.jsonl`。
