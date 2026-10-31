@@ -20,3 +20,10 @@
 2. Supply parent/head texts in the dev-replay binding (DIAGNOSIS §6).
 3. Record all post-freeze harness changes as deviations (05 §5.10).
 4. Owner sign-off for stage 2.
+
+## Status 2026-10-31 — pilot-r3 (pilot only, NOT results)
+
+- Attempt 1, `P/benchmark-trials/2026-10-30-hist-v2-pilot-r3/`: stopped fail-closed at cell 577/1,740 (whole-VM pause; `benchmark-design/hist-v2-pilot-r3/STALL_DIAGNOSIS.md`). Fails A10. Never pooled.
+- Attempt 2, `P/benchmark-trials/2026-10-31-hist-v2-pilot-r3/`: harness v4, same 29 dev items / 3 arms / 60 cells per item. 1,740/1,740 executed; A9 invalid 0 (max |Δrt−Δmono| 2.8 ms); arm/scorer stop disagreements 0; counterexamples 0; error terminals 0; negative controls 5/5 caught; model tokens 0; wall 2,342.5 s (1.35 s/cell). Meets the A10 counts, pending author acceptance and A8–A10 freeze.
+- Per-arm counts are pilot diagnostics only and must not appear in any results table (§8 stage 2).
+- Precondition list above: items 1–3 are addressed by harness v4 (A8), dev-replay/2 and the v2.1 amendment; item 4 (sign-off for stage 3) remains, plus G16 (host-pause rule) and G17 (raw storage).

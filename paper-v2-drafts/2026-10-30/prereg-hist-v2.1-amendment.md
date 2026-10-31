@@ -79,3 +79,8 @@ Category key: **I** = implementation of a frozen rule (no method change); **C** 
 2. Build harness v4 (A8) with the tests in `pilot-r2-rootcause.md` §3.5 — engineering, no run.
 3. Pilot-r3 on harness v4 (stage 2) — **[SIGN-OFF]**.
 4. Main (stage 3) and held-out (stage 4) — **[SIGN-OFF]** each.
+
+## Addendum 2026-10-31 — proposed, NOT adopted
+
+- **A12 (proposed)** host-pause validity: pilot-r3 attempt 1 stopped on a whole-VM pause in which realtime and monotonic advanced together (~146 s), invisible to A9. Proposal: a driver heartbeat samples monotonic every 100 ms; a gap > 1 s inside a cell labels it `environment-invalid:host-pause`, handled exactly like A9 (sealed, excluded, re-run once, > 1 % stops the stage). Outcome-blind (reads only clocks). Needs harness v5 + tests, then author sign-off. Attempt 1 stays a failed pilot under current rules.
+- **A13 (proposed)** main-run resumability and storage: checkpoint by cell index; raw cells archived per shard (tar.gz + SHA256SUMS), summaries/observations in git, archives off-git with hashes in git.
