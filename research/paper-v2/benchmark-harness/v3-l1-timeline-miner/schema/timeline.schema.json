@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "atm.paper-v3.l1-timeline.v1",
+  "title": "Prereg v3 L1 PR timeline record (one JSONL line per PR)",
+  "type": "object",
+  "required": ["schema", "miner_version", "fetched_at", "raw", "derived"],
+  "properties": {
+    "schema": {"const": "atm.paper-v3.l1-timeline.v1"},
+    "miner_version": {"type": "string"},
+    "fetched_at": {"$ref": "#/$defs/ts"},
+    "raw": {
+      "type": "object",
+      "required": ["repo", "number", "created_at", "commits", "pull_files", "n_commits_reported", "api_calls"],
+      "properties": {
+        "repo": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+        "number": {"type": "integer", "minimum": 1},
+        "created_at": {"$ref": "#/$defs/ts"},
+        "merged_at": {"anyOf": [{"$ref": "#/$defs/ts"}, {"type": "null"}]},
+        "closed_at": {"anyOf": [{"$ref": "#/$defs/ts"}, {"type": "null"}]},
+        "base_ref": {"type": ["string", "null"]},
+        "base_sha": {"type": ["string", "null"]},
+        "head_sha": {"type": ["string", "null"]},
+        "merge_commit_sha": {"type": ["string", "null"]},
+        "n_commits_reported": {"type": ["integer", "null"]},
+        "n_changed_files_reported": {"type": ["integer", "null"]},
+        "commits": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["index", "sha", "author_date", "committer_date", "parents", "is_merge", "files"],
+            "properties": {
+              "index": {"type": "integer"},
+              "sha": {"$ref": "#/$defs/sha"},
+              "author_date": {"$ref": "#/$defs/ts"},
+              "committer_date": {"$ref": "#/$defs/ts"},
+              "parents": {"type": "array", "items": {"$ref": "#/$defs/sha"}},
+              "is_merge": {"type": "boolean"},
+              "files": {"description": "null for merge commits (not fetched; first-parent diff includes upstream work)",
+                        "anyOf": [{"type": "null"}, {"type": "array", "items": {"$ref": "#/$defs/file"}}]}
+            }
+          }
+        },
+        "pull_files": {"type": "array", "items": {"$ref": "#/$defs/file"}},
+        "api_calls": {"type": "integer"},
+        "pull_files_truncated": {"type": "boolean"},
+        "commit_files_truncated": {"type": "array", "items": {"$ref": "#/$defs/sha"}}
+      }
+    },
+    "derived": {
+      "type": "object",
+      "required": ["t_start", "t_start_min_author", "t_submit", "t_submit_alt", "first_commit_sha", "s1_files", "s2_files", "s3_dirs", "t_write", "line_timeline", "total_lines", "dev_seconds", "n_commits_fetched", "n_merge_commits", "flags"],
+      "properties": {
+        "t_start": {"anyOf": [{"$ref": "#/$defs/ts"}, {"type": "null"}]},
+        "t_start_min_author": {"anyOf": [{"$ref": "#/$defs/ts"}, {"type": "null"}]},
+        "t_submit": {"$ref": "#/$defs/ts"},
+        "t_submit_alt": {"anyOf": [{"$ref": "#/$defs/ts"}, {"type": "null"}]},
+        "first_commit_sha": {"anyOf": [{"$ref": "#/$defs/sha"}, {"type": "null"}]},
+        "s1_files": {"type": "array", "items": {"type": "string"}},
+        "s2_files": {"type": "array", "items": {"type": "string"}},
+        "s3_dirs": {"type": "array", "items": {"type": "string"}},
+        "t_write": {"type": "object", "additionalProperties": {"$ref": "#/$defs/ts"}},
+        "line_timeline": {"type": "array", "items": {"type": "object", "required": ["sha", "at", "lines", "cum_lines"]}},
+        "total_lines": {"type": "integer"},
+        "dev_seconds": {"type": ["integer", "null"]},
+        "n_commits_fetched": {"type": "integer"},
+        "n_merge_commits": {"type": "integer"},
+        "flags": {"type": "array", "items": {"enum": ["no-own-commits", "author-order-differs", "start-after-submit", "committed-after-submit", "has-merge-commits", "commit-count-mismatch", "commits-truncated", "pull-files-truncated", "commit-files-truncated", "s1-not-subset-of-s2", "first-commit-empty"]}}
+      }
+    }
+  },
+  "$defs": {
+    "ts": {"type": "string", "pattern": "^\\d{4}-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\dZ$"},
+    "sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "file": {
+      "type": "object",
+      "required": ["path", "status", "additions", "deletions"],
+      "properties": {
+        "path": {"type": "string"},
+        "previous_path": {"type": "string"},
+        "status": {"type": ["string", "null"]},
+        "additions": {"type": "integer"},
+        "deletions": {"type": "integer"}
+      }
+    }
+  }
+}
