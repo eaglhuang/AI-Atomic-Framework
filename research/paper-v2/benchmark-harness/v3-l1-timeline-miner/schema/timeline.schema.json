@@ -43,7 +43,8 @@
         "pull_files": {"type": "array", "items": {"$ref": "#/$defs/file"}},
         "api_calls": {"type": "integer"},
         "pull_files_truncated": {"type": "boolean"},
-        "commit_files_truncated": {"type": "array", "items": {"$ref": "#/$defs/sha"}}
+        "commit_files_truncated": {"type": "array", "items": {"$ref": "#/$defs/sha"}},
+        "force_pushes": {"description": "head_ref_force_pushed events; null = not fetched", "anyOf": [{"type": "null"}, {"type": "array", "items": {"type": "object", "required": ["at"], "properties": {"at": {"$ref": "#/$defs/ts"}, "commit_id": {"type": ["string", "null"]}}}}]}
       }
     },
     "derived": {
@@ -64,7 +65,12 @@
         "dev_seconds": {"type": ["integer", "null"]},
         "n_commits_fetched": {"type": "integer"},
         "n_merge_commits": {"type": "integer"},
-        "flags": {"type": "array", "items": {"enum": ["no-own-commits", "author-order-differs", "start-after-submit", "committed-after-submit", "has-merge-commits", "commit-count-mismatch", "commits-truncated", "pull-files-truncated", "commit-files-truncated", "s1-not-subset-of-s2", "first-commit-empty"]}}
+        "flags": {"type": "array", "items": {"enum": ["no-own-commits", "author-order-differs", "start-after-submit", "committed-after-submit", "has-merge-commits", "commit-count-mismatch", "commits-truncated", "pull-files-truncated", "commit-files-truncated", "s1-not-subset-of-s2", "first-commit-empty", "force-pushed-after-submit"]}},
+        "timeline_ok": {"type": "boolean", "description": "exclusion rule A-v1-2026-10-31: false = excluded from the primary analysis"},
+        "exclusion_reasons": {"type": "array", "items": {"enum": ["start-after-submit", "negative-dev-seconds", "author-order-differs", "no-own-commits"]}},
+        "t_start_imputed": {"anyOf": [{"$ref": "#/$defs/ts"}, {"type": "null"}], "description": "excluded records only: created_at - median dev_seconds of timeline_ok records (dataset pass)"},
+        "t_start_sens": {"anyOf": [{"$ref": "#/$defs/ts"}, {"type": "null"}], "description": "sensitivity t_start: t_start if timeline_ok else t_start_imputed"},
+        "n_force_pushes": {"type": ["integer", "null"], "description": "head_ref_force_pushed events; null when the timeline was not fetched"}
       }
     }
   },
