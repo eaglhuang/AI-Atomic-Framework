@@ -1,0 +1,246 @@
+{
+  "arm": "file_lock",
+  "base_sha256": "01d957b560ea4c7e80b975a7a031ffbf56fb7b1a2801fa7b76b5a2262863bb51",
+  "dirty": true,
+  "dirty_entries": [
+    "?? research/paper-v2/benchmark-trials/.2026-10-31-hist-v2-pilot-r3.staging/",
+    "?? research/paper-v2/benchmark-trials/2026-10-30-hist-v2-pilot-r3/"
+  ],
+  "driver_clock_stamps": [
+    {
+      "event": "cell_start",
+      "mono": 45031.428488152,
+      "wall": 1793408620.60145
+    },
+    {
+      "event": "cell_end",
+      "mono": 45032.16545133,
+      "wall": 1793408621.3384132
+    }
+  ],
+  "events": [
+    {
+      "arm": "file_lock",
+      "order_index": 0,
+      "proposal_id": 27040,
+      "type": "proposal"
+    },
+    {
+      "attempt": 0,
+      "inside_lock": true,
+      "proposal_id": 27040,
+      "type": "attempt"
+    },
+    {
+      "ack_at": 45031.637628824,
+      "proposal_id": 27040,
+      "rename_at": 45031.636946302,
+      "type": "commit"
+    },
+    {
+      "arm": "file_lock",
+      "order_index": 1,
+      "proposal_id": 27043,
+      "type": "proposal"
+    },
+    {
+      "attempt": 0,
+      "inside_lock": true,
+      "proposal_id": 27043,
+      "type": "attempt"
+    },
+    {
+      "arm": "file_lock",
+      "order_index": 0,
+      "proposal_id": 27040,
+      "type": "proposal"
+    },
+    {
+      "attempt": 0,
+      "inside_lock": true,
+      "proposal_id": 27040,
+      "type": "attempt"
+    },
+    {
+      "ack_at": 45031.637628824,
+      "proposal_id": 27040,
+      "rename_at": 45031.636946302,
+      "type": "commit"
+    },
+    {
+      "arm": "file_lock",
+      "order_index": 1,
+      "proposal_id": 27043,
+      "type": "proposal"
+    },
+    {
+      "attempt": 0,
+      "inside_lock": true,
+      "proposal_id": 27043,
+      "type": "attempt"
+    }
+  ],
+  "fixture_id": "sympy:dev:27040_27043:sympy/physics/vector/vector.py",
+  "formal_run": false,
+  "git_head": "a88ffb3223dcb25a17caed19f846303de47ab5ae",
+  "harness": "hist-v2-harness-v4",
+  "inter_arrival_ms": 500,
+  "lockfile_sha256": "867d358ffd60ceb2ceb3feb53a88455340cfb22af7d658ad97b53ba3240b41ee",
+  "node": "v24.21.0",
+  "observed_sha256": "b47c62f8731d20e0f5c7e7c347a5d7b6f52eb766c4e8ce4966ebff4bd3f6ec6a",
+  "order": "forward",
+  "os": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "patches": [
+    {
+      "patch_sha256": "c474aeef7d165d6e043380a2df7275287cd11302829221f77b62059124382935",
+      "proposal_id": 27040
+    },
+    {
+      "patch_sha256": "c474aeef7d165d6e043380a2df7275287cd11302829221f77b62059124382935",
+      "proposal_id": 27043
+    }
+  ],
+  "proposals": [
+    {
+      "accepted": true,
+      "accepted_ids": [
+        27040
+      ],
+      "ack_at": 45031.637628824,
+      "arm": "file_lock",
+      "arm_terminal": "committed",
+      "attempts": 1,
+      "batch_id": null,
+      "batch_size": 1,
+      "clocks": {
+        "clock": "monotonic",
+        "effective_stop": 45061.547338929,
+        "item_stop": 45061.547338929,
+        "own_deadline": 45061.547338929,
+        "stamps": [
+          {
+            "event": "barrier_exit",
+            "mono": 45031.544525526,
+            "wall": 1793408620.7174876
+          },
+          {
+            "event": "submit",
+            "mono": 45031.547338929,
+            "wall": 1793408620.7203038
+          },
+          {
+            "event": "rename",
+            "mono": 45031.636946302,
+            "wall": 1793408620.8105857
+          },
+          {
+            "event": "ack",
+            "mono": 45031.637628824,
+            "wall": 1793408620.81059
+          }
+        ]
+      },
+      "detail": null,
+      "events": [
+        {
+          "arm": "file_lock",
+          "order_index": 0,
+          "proposal_id": 27040,
+          "type": "proposal"
+        },
+        {
+          "attempt": 0,
+          "inside_lock": true,
+          "proposal_id": 27040,
+          "type": "attempt"
+        },
+        {
+          "ack_at": 45031.637628824,
+          "proposal_id": 27040,
+          "rename_at": 45031.636946302,
+          "type": "commit"
+        }
+      ],
+      "executable_seconds": 30.0,
+      "first_submit": 45031.547338929,
+      "metrics": {
+        "blocked_count": 0,
+        "lock_hold_ms": 89.97721299965633,
+        "lock_wait_ms": 0.006712005415465683,
+        "serialization_delay_ms": 0.006712005415465683
+      },
+      "proposal_id": 27040,
+      "rename_at": 45031.636946302,
+      "retries": 0,
+      "stop_reason": "acked-in-window"
+    },
+    {
+      "accepted": false,
+      "accepted_ids": [],
+      "ack_at": null,
+      "arm": "file_lock",
+      "arm_terminal": "rejected-conflict",
+      "attempts": 1,
+      "batch_id": null,
+      "batch_size": 0,
+      "clocks": {
+        "clock": "monotonic",
+        "effective_stop": 45061.547338929,
+        "item_stop": 45061.547338929,
+        "own_deadline": 45062.044471766,
+        "stamps": [
+          {
+            "event": "barrier_exit",
+            "mono": 45031.536641186,
+            "wall": 1793408620.7096028
+          },
+          {
+            "event": "submit",
+            "mono": 45032.044471766,
+            "wall": 1793408621.2174442
+          }
+        ]
+      },
+      "detail": "patch context mismatch at line 234: expected \"                if ar[i][0][j] == 1:\", found \"                if v[0][j] == 1:\"",
+      "events": [
+        {
+          "arm": "file_lock",
+          "order_index": 1,
+          "proposal_id": 27043,
+          "type": "proposal"
+        },
+        {
+          "attempt": 0,
+          "inside_lock": true,
+          "proposal_id": 27043,
+          "type": "attempt"
+        }
+      ],
+      "executable_seconds": 29.502867162998882,
+      "first_submit": 45032.044471766,
+      "metrics": {
+        "blocked_count": 0,
+        "lock_hold_ms": 102.23068800405599,
+        "lock_wait_ms": 0.009900999430101365,
+        "serialization_delay_ms": 0.009900999430101365
+      },
+      "proposal_id": 27043,
+      "rename_at": null,
+      "retries": 0,
+      "stop_reason": "conflict"
+    }
+  ],
+  "python": "3.13.5",
+  "schema": "hist-v2-harness-manifest/2",
+  "seed": 1,
+  "validity": {
+    "designed_spread_s": 0.5049675714738858,
+    "label": null,
+    "max_realtime_minus_monotonic_s": 0.0006776207956136204,
+    "observed_spread_monotonic_s": 0.4971328370011179,
+    "observed_spread_wall_s": 0.49714040756225586,
+    "reasons": [],
+    "stamp_count": 8,
+    "valid": true
+  }
+}
