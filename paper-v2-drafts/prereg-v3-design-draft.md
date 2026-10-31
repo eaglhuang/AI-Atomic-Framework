@@ -37,19 +37,19 @@ ATM **不是**要贏過或取代 git。git 的設計是「commit 之後、merge 
 | 代碼 | 名稱 | 規則 | 代表的真實作法 | L1 | L2 |
 |---|---|---|---|---|---|
 | **GIT** | git-branch-late-merge（主要基準） | 每個 agent 一個 branch／worktree，各自 commit；結束後由整合者按**完成順序** `git merge` 回主線；衝突交給解衝突協定（§6.5） | 目前多 agent 主流作法（Claude Code worktree、Codex 各自分支、PR 流程） | ✔ | ✔ |
-| **ATM** | ATM（處理組） | 開工前 agent 對要改的範圍做 **claim／lease**（檔案或符號層級，§2.1）；重疊時 ATM **當場**回報並依政策處理（等待／協調／縮小範圍）；寫入與提交一律經 steward（CORE_MERGE `cb25242433` 的 batch coordinator，ack + deadline + 原子替換）；未 claim 就碰到的檔案在第一次寫入時觸發 lease 檢查 | 本研究評估的作法 | ✔ | ✔ |
+| **ATM** | ATM（處理組） | 開工前 agent 對要改的範圍做 **claim／lease**（檔案或符號層級，§2.1）；主要分析為**檔案層級**（D1）；重疊時 ATM **當場**回報（P0），雙方**共享範圍、不等待、不縮小**，改動一律交給 steward 合併（D2）；寫入與提交一律經 steward（CORE_MERGE `cb25242433` 的 batch coordinator，ack + deadline + 原子替換）；未 claim 就碰到的檔案在第一次寫入時觸發 lease 檢查 | 本研究評估的作法 | ✔ | ✔ |
 | **SHARED** | 無保護共用工作樹（下限，floor） | 所有 agent 直接改同一個工作樹，自行 `git add/commit`；無鎖、無隔離 | 最天真的多 agent 作法 | ✔ | ✔（建議） |
 | **LOCK** | file_lock（可選） | 第一次寫某檔時取得排他鎖，持有到 submit；拿不到就等 | 傳統悲觀鎖 | ✔ | ✗（預設不跑，待決） |
 
 主要比較：**ATM vs GIT**（H1、H3、H4、H5）；**ATM vs SHARED**（H2）。LOCK 用來分離「提早發現」與「單純序列化」的效果：如果 ATM 的好處只是鎖，ATM 和 LOCK 在 H1 會相同，但 ATM 在 H4（進度）應較好。
 
-### 2.1 ATM claim 的定義（凍結前要由文一確認粒度與政策）
+### 2.1 ATM claim 的定義（D1、D2 已由文一於 2026-10-31 決定）
 
-- **粒度**（決策 D1）：預設 `file`；探索性 `symbol`（函式／類別，用 tree-sitter 或 Python AST 決定）。
-- **重疊政策**（決策 D2）：預設 `wait-or-narrow`：
-  1. claim 與現有 lease 重疊 → ATM 立即回 `CLAIM_OVERLAP`（記為 P0 偵測），告知對方 agent ID 與重疊範圍；
-  2. agent 可等待（lease 釋放後自動通知）、縮小範圍重新 claim、或宣告「共享 claim」，共享時寫入必須經 steward 合併；
-  3. lease 有 TTL，commit 或逾時釋放。
+- **粒度**（D1，已決定）：主要分析一律 `file` 層級 claim。`symbol` 層級（函式／類別，用 tree-sitter 或 Python AST 決定）列為**附加實驗**（次要／探索性），另開臂 `ATM-sym`，只做描述與探索性比較，不進主要假設族。
+- **重疊政策**（D2，已決定）：固定為 `share-and-steward`：
+  1. claim 與現有 lease 重疊 → ATM 立即回 `CLAIM_OVERLAP`（記為 P0 偵測），告知雙方 agent ID 與重疊範圍；
+  2. 雙方自動成為**共享 claim**，各自繼續工作，**不等待、不縮小範圍**；所有寫入與提交經 steward 合併（ack + deadline + 原子替換），steward 拒絕的衝突 hunk 退回原 agent 重做並計入 `WW`；
+  3. lease 有 TTL，commit 或逾時釋放。等待／縮小範圍政策不在主要設計中（如需可日後另立探索性分析）。
 - **未 claim 的寫入**：第一次寫入未 claim 的檔案時做同樣檢查；重疊時記為 P1 偵測。
 
 ---
@@ -109,7 +109,7 @@ ATM **不是**要贏過或取代 git。git 的設計是「commit 之後、merge 
 
 - **makespan** = 第一個 agent 開工到最後一個子任務併入主線（含解衝突）；
 - **吞吐量** = 完成子任務數 ÷ makespan；
-- **ATM 等待時間** = lease 等待 + steward 排隊總和（代價面，必報）；
+- **ATM 等待時間** = steward 排隊總和（D2 下無 lease 等待；代價面，必報）；
 - **最終測試** T_pass = 最終樹上所有子任務的 FAIL_TO_PASS 與 PASS_TO_PASS 全過（L2；L1 只在可跑測試的子集描述）。
 
 ---
@@ -126,9 +126,10 @@ ATM **不是**要贏過或取代 git。git 的設計是「commit 之後、merge 
 | **H4 規模** | k 增加時 GIT 的晚期衝突與白做工超線性增加，ATM 保持低；且 ATM makespan 不劣於 GIT | (a) 混合模型 `metric ~ arm × log2(k) + O + (1|group)` 中 arm×log2(k) 交互作用；(b) makespan 比值 | (a) 交互作用 CI 含 0 或方向相反；(b) 任一 k 的 `makespan(ATM)/makespan(GIT)` CI 上界 > **1.10**（非劣性失敗） | L1 主（k=2..16）、L2（k=2,4） |
 | **H5 品質** | ATM 最終樹測試通過率不劣於 GIT | `T_pass(ATM) − T_pass(GIT)` | CI 下界 < **−5 個百分點** | L2 主 |
 
+- **主要分析只用檔案層級 ATM 臂**（D1）；`ATM-sym` 結果另節報告、不做校正後推論。
 - **多重比較**：H1、H2、H3 為主要族，Holm 校正；H4、H5 為非劣性／交互作用檢定，單獨報告；分層（O、k、類別）只描述。
 - **不寫「ATM 勝出」**；報告估計值、CI、反例與代價（假警報率、等待時間）。
-- **預期中可能失敗的地方**（先寫出來以示誠實）：O0／O1 為主的工作負載中，ATM 的假警報與等待可能使 H4(b) 失敗；這必須如實報告，並以「claim 粒度」作為探索性解釋。
+- **預期中可能失敗的地方**（先寫出來以示誠實）：O0／O1 為主的工作負載中，ATM 的假警報與等待可能使 H4(b) 失敗；這必須如實報告，並以 `ATM-sym` 附加實驗（符號層級 claim，D1）作為探索性解釋。
 
 ---
 
@@ -162,7 +163,7 @@ ATM **不是**要贏過或取代 git。git 的設計是「commit 之後、merge 
 ### 6.4 各臂在 L1 的模擬規則
 
 - **GIT**：各自寫到 `t_submit`；依 `t_submit` 順序合併；衝突在 P3 被發現，`W_det` = 該 PR 全部 diff 行數；解衝突以「重做衝突 hunk 行數 × 1」計 `WW_lines`（L1 無法模擬 agent 解衝突，以此為代理量，限制見 §6.5）。
-- **ATM**：`t_start` 時以 S1/S2/S3 claim；重疊 → P0；依政策 D2 等待到對方 lease 釋放（等待計入 makespan）或共享 claim（之後經 steward 合併，衝突 hunk 於 P2 被拒則計入 `WW_lines`）；S1 之外的檔案在 `t_write(f)` 檢查 → P1，`W_det` = 當時已寫行數。
+- **ATM**：`t_start` 時以 S1/S2/S3 claim；重疊 → P0；依 D2 一律共享 claim、不等待（之後經 steward 合併，衝突 hunk 於 P2 被拒則計入 `WW_lines`）；`ATM-sym` 附加臂同規則、改用符號層級 claim；S1 之外的檔案在 `t_write(f)` 檢查 → P1，`W_det` = 當時已寫行數。
 - **SHARED**：每次 commit 時把該 PR 該檔的 post-image 寫入共用樹（後寫者覆蓋），無偵測；被覆蓋的已 commit 修改計 M1，衝突計 P4。
 - **LOCK**：`t_write(f)` 時取鎖，持有到 `t_submit`；取不到等待 → P1。
 
@@ -288,10 +289,11 @@ ATM **不是**要贏過或取代 git。git 的設計是「commit 之後、merge 
 
 | 項目 | 處理 |
 |---|---|
-| HIST-v2 prereg r7 與 v2.1 修正（A1–A11） | **保留**，凍結內容不改。降為論文的**次要研究**：「ATM 的合併能力與 git 同等」。 |
+| 論文定位（D9，文一 2026-10-31 決定） | **v3 為論文主要研究**；HIST-v2 降為**次要研究**。 |
+| HIST-v2 prereg r7 與 v2.1 修正（A1–A11） | **保留**，凍結內容不改。作為次要研究：「ATM 的合併能力與 git 同等」（合併同等性附帶證據）。 |
 | v2 正式主跑（2,288 題） | 文一 2026-10-31 決定**先不跑**；v3 不依賴它。是否日後跑另行決定。 |
 | A12、A13（提案） | 仍只屬 v2 提案；A13 的分片／checkpoint 作法 v3 直接沿用為工程作法。 |
-| pilot-r3（PR #427，未合併） | 在論文中報告為 **pilot**（非正式結果）：0 token、1,740 cells、steward 與 textual_merge_file 在 579/580 組相同，並解釋為「同演算法上限」；那 1 個不一致組逐筆說明。 |
+| pilot-r3（PR #427，未合併） | 在論文中作為次要研究的**合併同等性附帶證據**，標明為 **pilot**（非正式結果）：0 token、1,740 cells、steward 與 textual_merge_file 在 579/580 組相同，並解釋為「同演算法上限」；那 1 個不一致組逐筆說明。 |
 | harness v4（PR #426） | v3 L1 模擬器沿用其 hunk applier（CORE_MERGE `cb25242433`）、monotonic 時鐘、A9 規則與 jitter 種子格式。 |
 | 舊 v3 稿（2026-10-15） | 研究問題改為「偵測時點」；臂、M1–M9、提示控制、成本公式、six-pairs、v14 kit 沿用；舊稿 H1–H5 由本稿 §5 取代。 |
 | 論文章節 09 | 改寫為 v3 兩層設計；06c 仍待 v2 決定。 |
@@ -305,26 +307,27 @@ ATM **不是**要贏過或取代 git。git 的設計是「commit 之後、merge 
 | W1 | L1 時間線 miner | `gh api` 抓 PR commit 清單與每 commit 檔案；Django 開發集 + flask／requests 保留集；封存 | 1 天 |
 | W2 | L1 事件模擬器 | 決定性離散事件模擬，四臂政策、S1/S2/S3 claim、checkpoint；重用 v4 applier | 2–3 天 |
 | W3 | 真衝突基準 | `G_text`／`G_file` 計算（L1、L2 共用），`G_sem`（L2 測試） | 1 天 |
-| W4 | **ATM 開工前 claim／lease** | 先讀碼確認現有 `framework-mode claim`、quickfix claim、lane-sessions 能否給任意 agent 用；缺的話補：檔案／符號 lease、TTL、`CLAIM_OVERLAP` 回報與通知、未 claim 寫入檢查、帶時間戳事件記錄 | 2–4 天（讀碼後再估） |
+| W4 | **ATM 開工前 claim／lease** | 先讀碼確認現有 `framework-mode claim`、quickfix claim、lane-sessions 能否給任意 agent 用；缺的話補：檔案 lease（主要）、共享 claim 模式（重疊時不阻擋、轉 steward 合併）、TTL、`CLAIM_OVERLAP` 回報與通知、未 claim 寫入檢查；符號 lease 只為附加實驗，可延後、帶時間戳事件記錄 | 2–4 天（讀碼後再估） |
 | W5 | 偵測時點儀器 | inotify 檔案監看、git hook 記 commit／merge 衝突，統一事件格式 | 1 天 |
 | W6 | L2 kit v15 | 以 v14 為基礎：k 個 Codex session 啟動器、三臂、Δ、上限、`codex login status` 檢查、seal 腳本 | 2–3 天 |
 | W7 | k = 4 任務組 | 依 six-pairs 流程建四件組並跑 eligibility | 2 天 |
 | W8 | scorer | EDR、W_det、M1/M2、WW、makespan、T_pass；單元測試含負控 | 2 天 |
+| W4b | 符號層級 claim（附加實驗，D1） | tree-sitter／Python AST 符號範圍判定、`ATM-sym` 臂；不擋主線，可最後做或刪減 | 1–2 天 |
 | W9 | 預先登記文件 | 凍結成 `P/prereg-v3-<date>/`（含 SHA256SUMS、verify.sh、EVIDENCE_INDEX 列）— governance 紀錄，需文一同意 | 0.5 天 |
 
-合計約 13–17 個工作天（可平行）。W1–W3、W8 不花錢；W6 的測試只用乾跑（不呼叫模型）。
+合計約 13–17 個工作天（可平行）；D2 固定共享政策省去等待／縮小範圍邏輯（W2、W4 約省 0.5–1 天），但 W4b 附加實驗加 1–2 天，總估計不變。W1–W3、W8 不花錢；W6 的測試只用乾跑（不呼叫模型）。
 
 ---
 
 ## 12. 需要文一決定的事項
 
-1. **D1 claim 粒度**：檔案（預設）或符號。
-2. **D2 重疊政策**：等待／縮小範圍／共享 claim + steward（預設三者都允許、由 agent 選）——或固定一種較好分析。
+1. **D1 claim 粒度** — ✅ **已決定（文一，2026-10-31）**：主要分析為檔案層級；符號層級為附加實驗（次要／探索性）。
+2. **D2 重疊政策** — ✅ **已決定（文一，2026-10-31）**：重疊時共享範圍、改動交給 steward 合併；主要設計不等待、不縮小範圍。
 3. **D3 L1 主要 claim 推導**：S1「第一個 commit 的檔案」（建議）vs S2 完美預知。
 4. **D4 LOCK 臂**：只在 L1 跑（建議），或 L2 也跑。
 5. **D5** 是否告訴 agent 有其他 agent 同時在工作。
 6. **D6 GIT 解衝突**：Codex 解、R_max = 2（建議），或人工解。
 7. **D7 MCE 門檻**：H1 +50 個百分點／W_det 比 ≤ 0.5；H3 減少 ≥ 20%；H4 makespan 非劣性 10%；H5 非劣性 5 個百分點。
 8. **D8 L2 規模與小豆額度**：pilot 6 session 是否可以先跑；正式 240／120／60 session 哪一個；Codex 模型與推理等級。
-9. **D9** 是否把 v3 定為論文主研究、HIST-v2 降為次要（本稿的假設）。
+9. **D9 論文主研究** — ✅ **已決定（文一，2026-10-31）**：v3 為主要研究；HIST-v2 降為次要研究，pilot-r3 作為合併同等性附帶證據。
 10. **D10** 何時把本稿凍結成正式 prereg 目錄（governance 紀錄，需同意）。
