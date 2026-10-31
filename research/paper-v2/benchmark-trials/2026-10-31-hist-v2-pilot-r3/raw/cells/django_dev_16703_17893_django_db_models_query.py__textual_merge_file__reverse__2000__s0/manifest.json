@@ -1,0 +1,282 @@
+{
+  "arm": "textual_merge_file",
+  "base_sha256": "0c8cc324246cb1724f93721abdab1e64cb6940d22e038cf6fa583a30cdd89d23",
+  "dirty": true,
+  "dirty_entries": [
+    "?? research/paper-v2/benchmark-trials/.2026-10-31-hist-v2-pilot-r3.staging/",
+    "?? research/paper-v2/benchmark-trials/2026-10-30-hist-v2-pilot-r3/"
+  ],
+  "driver_clock_stamps": [
+    {
+      "event": "cell_start",
+      "mono": 43251.662874603,
+      "wall": 1793406840.835837
+    },
+    {
+      "event": "cell_end",
+      "mono": 43253.921607702,
+      "wall": 1793406843.0945702
+    }
+  ],
+  "events": [
+    {
+      "arm": "textual_merge_file",
+      "order_index": 0,
+      "proposal_id": 16703,
+      "type": "proposal"
+    },
+    {
+      "attempt": 0,
+      "decision": null,
+      "proposal_id": 16703,
+      "type": "attempt"
+    },
+    {
+      "proposal_id": 16703,
+      "rename_at": 43251.922133872,
+      "type": "commit"
+    },
+    {
+      "arm": "textual_merge_file",
+      "order_index": 1,
+      "proposal_id": 17893,
+      "type": "proposal"
+    },
+    {
+      "attempt": 0,
+      "decision": null,
+      "proposal_id": 17893,
+      "type": "attempt"
+    },
+    {
+      "proposal_id": 17893,
+      "rename_at": 43253.898297013,
+      "type": "commit"
+    },
+    {
+      "arm": "textual_merge_file",
+      "order_index": 0,
+      "proposal_id": 16703,
+      "type": "proposal"
+    },
+    {
+      "attempt": 0,
+      "decision": null,
+      "proposal_id": 16703,
+      "type": "attempt"
+    },
+    {
+      "proposal_id": 16703,
+      "rename_at": 43251.922133872,
+      "type": "commit"
+    },
+    {
+      "outside_candidate_sha256": "25aa3bdc0bb9a07d4ae5a1fc8afe725cba19799c3114264167233b3efda53308"
+    },
+    {
+      "arm": "textual_merge_file",
+      "order_index": 1,
+      "proposal_id": 17893,
+      "type": "proposal"
+    },
+    {
+      "attempt": 0,
+      "decision": null,
+      "proposal_id": 17893,
+      "type": "attempt"
+    },
+    {
+      "proposal_id": 17893,
+      "rename_at": 43253.898297013,
+      "type": "commit"
+    },
+    {
+      "outside_candidate_sha256": "df581c2852ce6f29af10f12b2823f680f7819eca323a09a2bfd83ef40b90c29f"
+    }
+  ],
+  "fixture_id": "django:dev:16703_17893:django/db/models/query.py",
+  "formal_run": false,
+  "git_head": "a88ffb3223dcb25a17caed19f846303de47ab5ae",
+  "harness": "hist-v2-harness-v4",
+  "inter_arrival_ms": 2000,
+  "lockfile_sha256": "867d358ffd60ceb2ceb3feb53a88455340cfb22af7d658ad97b53ba3240b41ee",
+  "node": "v24.21.0",
+  "observed_sha256": "df581c2852ce6f29af10f12b2823f680f7819eca323a09a2bfd83ef40b90c29f",
+  "order": "reverse",
+  "os": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "patches": [
+    {
+      "patch_sha256": "19ed6814137c3013c7263ba57bd0d00df362afa4d671719600d7ee214719ee9e",
+      "proposal_id": 16703
+    },
+    {
+      "patch_sha256": "6583857c390b708947fc020eb81984fe36eb88d51752e080cc10fb03918a21e4",
+      "proposal_id": 17893
+    }
+  ],
+  "proposals": [
+    {
+      "accepted": true,
+      "accepted_ids": [
+        16703
+      ],
+      "ack_at": 43251.922680519,
+      "arm": "textual_merge_file",
+      "arm_terminal": "committed",
+      "attempts": 1,
+      "batch_id": null,
+      "batch_size": 1,
+      "clocks": {
+        "clock": "monotonic",
+        "effective_stop": 43281.802883449,
+        "item_stop": 43281.802883449,
+        "own_deadline": 43281.802883449,
+        "stamps": [
+          {
+            "event": "barrier_exit",
+            "mono": 43251.79470999,
+            "wall": 1793406840.9676723
+          },
+          {
+            "event": "submit",
+            "mono": 43251.802883449,
+            "wall": 1793406840.9758499
+          },
+          {
+            "event": "rename",
+            "mono": 43251.922133872,
+            "wall": 1793406841.0956373
+          },
+          {
+            "event": "ack",
+            "mono": 43251.922680519,
+            "wall": 1793406841.095642
+          }
+        ]
+      },
+      "detail": null,
+      "events": [
+        {
+          "arm": "textual_merge_file",
+          "order_index": 0,
+          "proposal_id": 16703,
+          "type": "proposal"
+        },
+        {
+          "attempt": 0,
+          "decision": null,
+          "proposal_id": 16703,
+          "type": "attempt"
+        },
+        {
+          "proposal_id": 16703,
+          "rename_at": 43251.922133872,
+          "type": "commit"
+        },
+        {
+          "outside_candidate_sha256": "25aa3bdc0bb9a07d4ae5a1fc8afe725cba19799c3114264167233b3efda53308"
+        }
+      ],
+      "executable_seconds": 30.0,
+      "first_submit": 43251.802883449,
+      "metrics": {
+        "blocked_count": 0,
+        "lock_hold_ms": 2.829766999639105,
+        "lock_wait_ms": 0.007276001269929111,
+        "serialization_delay_ms": 0.007276001269929111
+      },
+      "proposal_id": 16703,
+      "rename_at": 43251.922133872,
+      "retries": 0,
+      "stop_reason": "acked-in-window"
+    },
+    {
+      "accepted": true,
+      "accepted_ids": [
+        17893
+      ],
+      "ack_at": 43253.899169256,
+      "arm": "textual_merge_file",
+      "arm_terminal": "committed",
+      "attempts": 1,
+      "batch_id": null,
+      "batch_size": 1,
+      "clocks": {
+        "clock": "monotonic",
+        "effective_stop": 43281.802883449,
+        "item_stop": 43281.802883449,
+        "own_deadline": 43283.790592496,
+        "stamps": [
+          {
+            "event": "barrier_exit",
+            "mono": 43251.789359608,
+            "wall": 1793406840.9623215
+          },
+          {
+            "event": "submit",
+            "mono": 43253.790592496,
+            "wall": 1793406842.963565
+          },
+          {
+            "event": "rename",
+            "mono": 43253.898297013,
+            "wall": 1793406843.0721254
+          },
+          {
+            "event": "ack",
+            "mono": 43253.899169256,
+            "wall": 1793406843.0721312
+          }
+        ]
+      },
+      "detail": null,
+      "events": [
+        {
+          "arm": "textual_merge_file",
+          "order_index": 1,
+          "proposal_id": 17893,
+          "type": "proposal"
+        },
+        {
+          "attempt": 0,
+          "decision": null,
+          "proposal_id": 17893,
+          "type": "attempt"
+        },
+        {
+          "proposal_id": 17893,
+          "rename_at": 43253.898297013,
+          "type": "commit"
+        },
+        {
+          "outside_candidate_sha256": "df581c2852ce6f29af10f12b2823f680f7819eca323a09a2bfd83ef40b90c29f"
+        }
+      ],
+      "executable_seconds": 28.012290953003685,
+      "first_submit": 43253.790592496,
+      "metrics": {
+        "blocked_count": 0,
+        "lock_hold_ms": 4.037446000438649,
+        "lock_wait_ms": 0.010433999705128372,
+        "serialization_delay_ms": 0.010433999705128372
+      },
+      "proposal_id": 17893,
+      "rename_at": 43253.898297013,
+      "retries": 0,
+      "stop_reason": "acked-in-window"
+    }
+  ],
+  "python": "3.13.5",
+  "schema": "hist-v2-harness-manifest/2",
+  "seed": 0,
+  "validity": {
+    "designed_spread_s": 1.9929925205064691,
+    "label": null,
+    "max_realtime_minus_monotonic_s": 0.0008661375104566105,
+    "observed_spread_monotonic_s": 1.987709046996315,
+    "observed_spread_wall_s": 1.987715244293213,
+    "reasons": [],
+    "stamp_count": 10,
+    "valid": true
+  }
+}

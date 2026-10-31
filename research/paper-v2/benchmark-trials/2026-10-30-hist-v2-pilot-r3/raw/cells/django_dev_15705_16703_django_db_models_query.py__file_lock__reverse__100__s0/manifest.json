@@ -1,0 +1,245 @@
+{
+  "arm": "file_lock",
+  "base_sha256": "b155ace14f5d92be0f9b88599ae1008ff69273299cab437404d51bfd74db33f2",
+  "dirty": true,
+  "dirty_entries": [
+    "?? research/paper-v2/benchmark-trials/.2026-10-30-hist-v2-pilot-r3.staging/"
+  ],
+  "driver_clock_stamps": [
+    {
+      "event": "cell_start",
+      "mono": 36557.792991695,
+      "wall": 1793372583.897234
+    },
+    {
+      "event": "cell_end",
+      "mono": 36558.201942633,
+      "wall": 1793372584.3061845
+    }
+  ],
+  "events": [
+    {
+      "arm": "file_lock",
+      "order_index": 0,
+      "proposal_id": 16703,
+      "type": "proposal"
+    },
+    {
+      "attempt": 0,
+      "inside_lock": true,
+      "proposal_id": 16703,
+      "type": "attempt"
+    },
+    {
+      "arm": "file_lock",
+      "order_index": 1,
+      "proposal_id": 15705,
+      "type": "proposal"
+    },
+    {
+      "attempt": 0,
+      "inside_lock": true,
+      "proposal_id": 15705,
+      "type": "attempt"
+    },
+    {
+      "ack_at": 36558.178823421,
+      "proposal_id": 15705,
+      "rename_at": 36558.178160119,
+      "type": "commit"
+    },
+    {
+      "arm": "file_lock",
+      "order_index": 0,
+      "proposal_id": 16703,
+      "type": "proposal"
+    },
+    {
+      "attempt": 0,
+      "inside_lock": true,
+      "proposal_id": 16703,
+      "type": "attempt"
+    },
+    {
+      "arm": "file_lock",
+      "order_index": 1,
+      "proposal_id": 15705,
+      "type": "proposal"
+    },
+    {
+      "attempt": 0,
+      "inside_lock": true,
+      "proposal_id": 15705,
+      "type": "attempt"
+    },
+    {
+      "ack_at": 36558.178823421,
+      "proposal_id": 15705,
+      "rename_at": 36558.178160119,
+      "type": "commit"
+    }
+  ],
+  "fixture_id": "django:dev:15705_16703:django/db/models/query.py",
+  "formal_run": false,
+  "git_head": "a88ffb3223dcb25a17caed19f846303de47ab5ae",
+  "harness": "hist-v2-harness-v4",
+  "inter_arrival_ms": 100,
+  "lockfile_sha256": "867d358ffd60ceb2ceb3feb53a88455340cfb22af7d658ad97b53ba3240b41ee",
+  "node": "v24.21.0",
+  "observed_sha256": "3d23b5ccc9a620d0ee2941dfbe7239f5b507e617d53edb3687c72dab3e2f8eb0",
+  "order": "reverse",
+  "os": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "patches": [
+    {
+      "patch_sha256": "19ed6814137c3013c7263ba57bd0d00df362afa4d671719600d7ee214719ee9e",
+      "proposal_id": 16703
+    },
+    {
+      "patch_sha256": "69f630e8f84abdd00e4cf514c533397480fac3ae7c427d4607841c881c8597ca",
+      "proposal_id": 15705
+    }
+  ],
+  "proposals": [
+    {
+      "accepted": false,
+      "accepted_ids": [],
+      "ack_at": null,
+      "arm": "file_lock",
+      "arm_terminal": "rejected-conflict",
+      "attempts": 1,
+      "batch_id": null,
+      "batch_size": 0,
+      "clocks": {
+        "clock": "monotonic",
+        "effective_stop": 36587.960864649,
+        "item_stop": 36587.960864649,
+        "own_deadline": 36587.960864649,
+        "stamps": [
+          {
+            "event": "barrier_exit",
+            "mono": 36557.951623946,
+            "wall": 1793372584.0558665
+          },
+          {
+            "event": "submit",
+            "mono": 36557.960864649,
+            "wall": 1793372584.0651097
+          }
+        ]
+      },
+      "detail": "patch context mismatch at line 200: expected \"        query = queryset.query\", found \"\"",
+      "events": [
+        {
+          "arm": "file_lock",
+          "order_index": 0,
+          "proposal_id": 16703,
+          "type": "proposal"
+        },
+        {
+          "attempt": 0,
+          "inside_lock": true,
+          "proposal_id": 16703,
+          "type": "attempt"
+        }
+      ],
+      "executable_seconds": 30.0,
+      "first_submit": 36557.960864649,
+      "metrics": {
+        "blocked_count": 0,
+        "lock_hold_ms": 104.57512099674204,
+        "lock_wait_ms": 0.013299999409355223,
+        "serialization_delay_ms": 0.013299999409355223
+      },
+      "proposal_id": 16703,
+      "rename_at": null,
+      "retries": 0,
+      "stop_reason": "conflict"
+    },
+    {
+      "accepted": true,
+      "accepted_ids": [
+        15705
+      ],
+      "ack_at": 36558.178823421,
+      "arm": "file_lock",
+      "arm_terminal": "committed",
+      "attempts": 1,
+      "batch_id": null,
+      "batch_size": 1,
+      "clocks": {
+        "clock": "monotonic",
+        "effective_stop": 36587.960864649,
+        "item_stop": 36587.960864649,
+        "own_deadline": 36588.053363643,
+        "stamps": [
+          {
+            "event": "barrier_exit",
+            "mono": 36557.94641371,
+            "wall": 1793372584.050656
+          },
+          {
+            "event": "submit",
+            "mono": 36558.053363643,
+            "wall": 1793372584.1576142
+          },
+          {
+            "event": "rename",
+            "mono": 36558.178160119,
+            "wall": 1793372584.2830603
+          },
+          {
+            "event": "ack",
+            "mono": 36558.178823421,
+            "wall": 1793372584.2830646
+          }
+        ]
+      },
+      "detail": null,
+      "events": [
+        {
+          "arm": "file_lock",
+          "order_index": 1,
+          "proposal_id": 15705,
+          "type": "proposal"
+        },
+        {
+          "attempt": 0,
+          "inside_lock": true,
+          "proposal_id": 15705,
+          "type": "attempt"
+        },
+        {
+          "ack_at": 36558.178823421,
+          "proposal_id": 15705,
+          "rename_at": 36558.178160119,
+          "type": "commit"
+        }
+      ],
+      "executable_seconds": 29.907501006004168,
+      "first_submit": 36558.053363643,
+      "metrics": {
+        "blocked_count": 1,
+        "lock_hold_ms": 113.00397900049575,
+        "lock_wait_ms": 11.797480001405347,
+        "serialization_delay_ms": 11.797480001405347
+      },
+      "proposal_id": 15705,
+      "rename_at": 36558.178160119,
+      "retries": 0,
+      "stop_reason": "acked-in-window"
+    }
+  ],
+  "python": "3.13.5",
+  "schema": "hist-v2-harness-manifest/2",
+  "seed": 0,
+  "validity": {
+    "designed_spread_s": 0.09797573309734889,
+    "label": null,
+    "max_realtime_minus_monotonic_s": 0.0006579252585652284,
+    "observed_spread_monotonic_s": 0.09249899399583228,
+    "observed_spread_wall_s": 0.09250450134277344,
+    "reasons": [],
+    "stamp_count": 8,
+    "valid": true
+  }
+}
