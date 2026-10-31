@@ -39,7 +39,7 @@ ATM **不是**要贏過或取代 git。git 的設計是「commit 之後、merge 
 | **GIT** | git-branch-late-merge（主要基準） | 每個 agent 一個 branch／worktree，各自 commit；結束後由整合者按**完成順序** `git merge` 回主線；衝突交給解衝突協定（§6.5） | 目前多 agent 主流作法（Claude Code worktree、Codex 各自分支、PR 流程） | ✔ | ✔ |
 | **ATM** | ATM（處理組） | 開工前 agent 對要改的範圍做 **claim／lease**（檔案或符號層級，§2.1）；主要分析為**檔案層級**（D1）；重疊時 ATM **當場**回報（P0），雙方**共享範圍、不等待、不縮小**，改動一律交給 steward 合併（D2）；寫入與提交一律經 steward（CORE_MERGE `cb25242433` 的 batch coordinator，ack + deadline + 原子替換）；未 claim 就碰到的檔案在第一次寫入時觸發 lease 檢查 | 本研究評估的作法 | ✔ | ✔ |
 | **SHARED** | 無保護共用工作樹（下限，floor） | 所有 agent 直接改同一個工作樹，自行 `git add/commit`；無鎖、無隔離 | 最天真的多 agent 作法 | ✔ | ✔（建議） |
-| **LOCK** | file_lock（可選） | 第一次寫某檔時取得排他鎖，持有到 submit；拿不到就等 | 傳統悲觀鎖 | ✔ | ✗（預設不跑，待決） |
+| **LOCK** | file_lock | 第一次寫某檔時取得排他鎖，持有到 submit；拿不到就等 | 傳統悲觀鎖 | ✔ | ✗（D4，文一 2026-10-31 決定：只在 L1 跑） |
 
 主要比較：**ATM vs GIT**（H1、H3、H4、H5）；**ATM vs SHARED**（H2）。LOCK 用來分離「提早發現」與「單純序列化」的效果：如果 ATM 的好處只是鎖，ATM 和 LOCK 在 H1 會相同，但 ATM 在 H4（進度）應較好。
 
@@ -116,7 +116,7 @@ ATM **不是**要贏過或取代 git。git 的設計是「commit 之後、merge 
 
 ## 5. 假設與主要指標（預先指定、可否證）
 
-最小關注效果（MCE）為建議值，凍結前由文一確認（決策 D7）。
+最小關注效果（MCE）目前採下表建議值（D7，文一 2026-10-31 決定）：**暫定**使用；L1／L2 pilot 結束後可依 pilot 數據**調整一次**，調整內容與理由須寫成修正紀錄；之後**在任何正式跑之前凍結**，凍結後不得再改。
 
 | 假設 | 主張 | 主要指標 | 可否證條件（任一成立即視為「未支持」） | 層 |
 |---|---|---|---|---|
@@ -149,7 +149,7 @@ ATM **不是**要贏過或取代 git。git 的設計是「commit 之後、merge 
 | 每檔第一次寫入 `t_write(f)` | 第一個碰到 f 的 commit 的 author date | commit 粒度粗，寫入時點只能落在 commit 上 |
 | 提交 `t_submit` | PR `created_at`（開 PR = 宣告完成） | 敏感度：最後一個 commit 的 committer date |
 | 合併 `t_merge` | GIT 臂中依模擬順序決定；歷史 `merged_at` 只用來排序 | |
-| ATM claim 範圍 | 三種，**主要分析用 S1**：S1「第一個 commit 改到的檔案」（開工時合理能知道的範圍）；S2「最終 diff 的全部檔案」（完美預知，上限）；S3「S1 所在目錄」（粗 claim，假警報上限） | S2 會高估 ATM，只當上限報告；S1 之外後來才碰到的檔案走 P1 檢查 |
+| ATM claim 範圍 | 三種，**主要分析用 S1**（D3，文一 2026-10-31 決定；S2、S3 只做敏感度分析）：S1「第一個 commit 改到的檔案」（開工時合理能知道的範圍）；S2「最終 diff 的全部檔案」（完美預知，上限）；S3「S1 所在目錄」（粗 claim，假警報上限） | S2 會高估 ATM，只當上限報告；S1 之外後來才碰到的檔案走 P1 檢查 |
 | 工作量 | diff 行數依 commit 時間累積 | L1 沒有 token，只用行數 |
 
 ### 6.3 並行情境的建構
@@ -165,7 +165,7 @@ ATM **不是**要贏過或取代 git。git 的設計是「commit 之後、merge 
 - **GIT**：各自寫到 `t_submit`；依 `t_submit` 順序合併；衝突在 P3 被發現，`W_det` = 該 PR 全部 diff 行數；解衝突以「重做衝突 hunk 行數 × 1」計 `WW_lines`（L1 無法模擬 agent 解衝突，以此為代理量，限制見 §6.5）。
 - **ATM**：`t_start` 時以 S1/S2/S3 claim；重疊 → P0；依 D2 一律共享 claim、不等待（之後經 steward 合併，衝突 hunk 於 P2 被拒則計入 `WW_lines`）；`ATM-sym` 附加臂同規則、改用符號層級 claim；S1 之外的檔案在 `t_write(f)` 檢查 → P1，`W_det` = 當時已寫行數。
 - **SHARED**：每次 commit 時把該 PR 該檔的 post-image 寫入共用樹（後寫者覆蓋），無偵測；被覆蓋的已 commit 修改計 M1，衝突計 P4。
-- **LOCK**：`t_write(f)` 時取鎖，持有到 `t_submit`；取不到等待 → P1。
+- **LOCK**（只在 L1，D4）：`t_write(f)` 時取鎖，持有到 `t_submit`；取不到等待 → P1。
 
 ### 6.5 L1 效度威脅（必寫進論文）
 
@@ -197,10 +197,10 @@ ATM **不是**要贏過或取代 git。git 的設計是「commit 之後、merge 
 
 - 每個（組 × k × Δ × 臂 × 重複）是一個 **run**；run 內 k 個 Codex CLI 無頭 session 同時啟動（依 Δ 錯開），每個 session 一個子任務。
 - 各臂設定：
-  - GIT：每 session 一個 worktree + branch；全部結束後由 harness 依完成順序 merge，衝突交給一個新的 Codex session 解，最多 R_max = 2 輪，超過記為「需人工」；
+  - GIT：每 session 一個 worktree + branch；全部結束後由 harness 依完成順序 merge，衝突交給一個新的 Codex session 解，最多 R_max = 2 輪（D6，文一 2026-10-31 決定）；2 輪後仍未解決記為**失敗**（該子任務計為未完成，解衝突 session 的 token 計入 `WW_tok`），不做人工解；
   - ATM：共用工作樹，提示附固定的 ATM 使用說明（claim → 編輯 → `atm` 提交），raw git 寫入依 ATM 政策封鎖；
   - SHARED：共用工作樹、無說明。
-- 提示：三臂任務文字逐字相同；ATM 說明與基準的中性說明長度相近（沿用舊 v3 稿 §5.2）。是否告知「有其他 agent 同時工作」= 決策 D5。
+- 提示：三臂任務文字逐字相同；ATM 說明與基準的中性說明長度相近（沿用舊 v3 稿 §5.2）。**所有臂都不告訴 agent 有其他 agent 同時在工作**（D5，文一 2026-10-31 決定）；提示中不得出現其他 session、併行或衝突的字眼，ATM 的效果必須來自它自己的機制（claim 回報、steward）。
 - 每 session 上限：牆鐘 20 分鐘、token 上限（pilot 後訂）；達上限記為未完成。
 - 跑完由 harness（不是 agent）跑最終測試與 oracle。
 
@@ -323,11 +323,11 @@ ATM **不是**要贏過或取代 git。git 的設計是「commit 之後、merge 
 
 1. **D1 claim 粒度** — ✅ **已決定（文一，2026-10-31）**：主要分析為檔案層級；符號層級為附加實驗（次要／探索性）。
 2. **D2 重疊政策** — ✅ **已決定（文一，2026-10-31）**：重疊時共享範圍、改動交給 steward 合併；主要設計不等待、不縮小範圍。
-3. **D3 L1 主要 claim 推導**：S1「第一個 commit 的檔案」（建議）vs S2 完美預知。
-4. **D4 LOCK 臂**：只在 L1 跑（建議），或 L2 也跑。
-5. **D5** 是否告訴 agent 有其他 agent 同時在工作。
-6. **D6 GIT 解衝突**：Codex 解、R_max = 2（建議），或人工解。
-7. **D7 MCE 門檻**：H1 +50 個百分點／W_det 比 ≤ 0.5；H3 減少 ≥ 20%；H4 makespan 非劣性 10%；H5 非劣性 5 個百分點。
+3. **D3 L1 主要 claim 推導** — ✅ **已決定（文一，2026-10-31）**：主要分析用 S1「第一個 commit 改到的檔案」；S2 完美預知、S3 整個目錄為敏感度分析。
+4. **D4 LOCK 臂** — ✅ **已決定（文一，2026-10-31）**：只在 L1 跑；L2 只有 GIT／ATM／SHARED 三臂（L2 session 數不變）。
+5. **D5 是否告知併行** — ✅ **已決定（文一，2026-10-31）**：所有臂都不告訴 agent 有其他 agent 同時在工作。
+6. **D6 GIT 解衝突** — ✅ **已決定（文一，2026-10-31）**：由 Codex 解，最多 2 輪；2 輪後未解決記為失敗。
+7. **D7 MCE 門檻** — ✅ **已決定（文一，2026-10-31）**：暫用建議值，pilot 後可調整一次，正式跑前凍結。建議值：H1 +50 個百分點／W_det 比 ≤ 0.5；H3 減少 ≥ 20%；H4 makespan 非劣性 10%；H5 非劣性 5 個百分點。
 8. **D8 L2 規模與小豆額度**：pilot 6 session 是否可以先跑；正式 240／120／60 session 哪一個；Codex 模型與推理等級。
 9. **D9 論文主研究** — ✅ **已決定（文一，2026-10-31）**：v3 為主要研究；HIST-v2 降為次要研究，pilot-r3 作為合併同等性附帶證據。
 10. **D10** 何時把本稿凍結成正式 prereg 目錄（governance 紀錄，需同意）。
