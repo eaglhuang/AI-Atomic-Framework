@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { spawnSync } from 'node:child_process';
+import { spawn } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
@@ -11,28 +11,38 @@ function read(relativePath: string): string {
   return readFileSync(absolutePath, 'utf8');
 }
 
-function runTest(relativePath: string): void {
+// Each sub-test builds its own mkdtemp fixture and only reads the repo, so they
+// run concurrently; the gate still requires every one to exit 0.
+function runTest(relativePath: string): Promise<void> {
   const absolutePath = path.join(root, relativePath);
   assert.equal(existsSync(absolutePath), true, `${relativePath} must exist`);
-  const result = spawnSync(process.execPath, ['--strip-types', absolutePath], {
-    cwd: root,
-    encoding: 'utf8',
-    stdio: ['ignore', 'pipe', 'pipe']
+  return new Promise((resolve, reject) => {
+    const child = spawn(process.execPath, ['--strip-types', absolutePath], { cwd: root, stdio: ['ignore', 'pipe', 'pipe'] });
+    let stdout = '';
+    let stderr = '';
+    child.stdout.setEncoding('utf8').on('data', (chunk: string) => { stdout += chunk; });
+    child.stderr.setEncoding('utf8').on('data', (chunk: string) => { stderr += chunk; });
+    child.on('error', reject);
+    child.on('close', (status) => {
+      try {
+        assert.equal(status, 0, `${relativePath} must pass directly, not via source-text inspection\nstdout:\n${stdout}\nstderr:\n${stderr}`);
+        resolve();
+      } catch (error) {
+        reject(error);
+      }
+    });
   });
-  assert.equal(
-    result.status,
-    0,
-    `${relativePath} must pass directly, not via source-text inspection\nstdout:\n${result.stdout}\nstderr:\n${result.stderr}`
-  );
 }
 
 const validatorCatalog = read('scripts/validators.config.json');
 
-runTest('tests/cli/pre-team-dual-captain-e2e.test.ts');
-runTest('packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts');
-runTest('packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts');
-runTest('tests/cli/runner-sync-foreign-dirty-owner.test.ts');
-runTest('tests/cli/runner-sync-framework-temp-hotfix.test.ts');
+await Promise.all([
+  runTest('tests/cli/pre-team-dual-captain-e2e.test.ts'),
+  runTest('packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts'),
+  runTest('packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts'),
+  runTest('tests/cli/runner-sync-foreign-dirty-owner.test.ts'),
+  runTest('tests/cli/runner-sync-framework-temp-hotfix.test.ts')
+]);
 
 const validators = JSON.parse(validatorCatalog) as {
   readonly validators?: ReadonlyArray<{ readonly name?: string; readonly entry?: string; readonly tags?: readonly string[] }>;
