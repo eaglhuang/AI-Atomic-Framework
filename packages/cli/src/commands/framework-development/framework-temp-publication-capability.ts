@@ -1,5 +1,5 @@
 import { pathMatchesWriteScope } from '../../../../core/src/broker/write-scope-policy.ts';
-import { existsSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, lstatSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 import {
   inspectFrameworkTempLockProjection,
@@ -20,6 +20,10 @@ export interface FrameworkTempPublicationCapability {
   readonly heartbeatAt: string;
   readonly ttlSeconds: number;
   readonly allowedFiles: readonly string[];
+  /** Literal declarations from this canonical lock only, never derived inventory. */
+  readonly declaredFiles: readonly string[];
+  /** Existing lock generation, stable across the holder's heartbeat renewal. */
+  readonly generation: string;
 }
 
 export interface FrameworkCommitAuthorityContext {
@@ -27,6 +31,7 @@ export interface FrameworkCommitAuthorityContext {
   /** A taskless framework commit is valid only when its current lane resolves one live temporary claim. */
   readonly frameworkClaimRequired: boolean;
   readonly frameworkClaimFiles: readonly string[] | null;
+  readonly frameworkClaimAuthority?: FrameworkTempPublicationCapability | null;
   /** The exact live lock identity used by hook attribution; never reconstruct it from an actor id. */
   readonly frameworkClaimTaskId: string | null;
   /** Fail-closed diagnostic facts for a rejected taskless commit; never authority. */
@@ -68,6 +73,7 @@ export function resolveFrameworkCommitAuthorityContext(input: {
     // channel's own commit authority; pre-commit bounds it to allowedFiles.
     frameworkClaimRequired: !input.taskExists && readActiveQuickfixLock(input.cwd)?.actorId !== input.actorId,
     frameworkClaimFiles: capability?.allowedFiles ?? null,
+    frameworkClaimAuthority: capability,
     frameworkClaimTaskId: capability?.taskId ?? null,
     frameworkClaimResolution: resolution.summary,
   };
@@ -234,6 +240,21 @@ export function frameworkTempPublicationCapabilityCovers(
 
 function toCapability(cwd: string, lock: FrameworkTempLockProjection): FrameworkTempPublicationCapability | null {
   if (!lock.heartbeatAt || lock.ttlSeconds === null) return null;
+  if (path.basename(lock.workItemId) !== lock.workItemId || lock.workItemId.includes('\\')) return null;
+  let generation: string;
+  try {
+    const raw = JSON.parse(readFileSync(path.join(cwd, '.atm/runtime/locks', `${lock.workItemId}.lock.json`), 'utf8'));
+    const rawFiles = [...new Set<string>((Array.isArray(raw.files) ? raw.files : [])
+      .filter((value: unknown): value is string => typeof value === 'string')
+      .map((value: string) => value.replace(/\\/g, '/').replace(/^\.\//, '').trim()).filter(Boolean))].sort();
+    if (String(raw.workItemId ?? '').trim() !== lock.workItemId
+      || String(raw.actorId ?? raw.lockedBy ?? '').trim() !== lock.actorId
+      || (typeof raw.laneSessionId === 'string' ? raw.laneSessionId.trim() || null : null) !== lock.laneSessionId
+      || String(raw.heartbeatAt ?? raw.lockedAt ?? '').trim() !== lock.heartbeatAt
+      || Number(raw.ttlSeconds) !== lock.ttlSeconds || String(raw.status ?? '').trim().toLowerCase() === 'released'
+      || JSON.stringify(rawFiles) !== JSON.stringify(lock.files)) return null;
+    generation = JSON.stringify([raw.leaseId ?? null, raw.leaseEpoch ?? null, raw.lockedAt ?? null]);
+  } catch { return null; }
   const receiptPath = `.atm/history/evidence/${lock.workItemId}.runner-sync-receipt.json`;
   return {
     taskId: lock.workItemId,
@@ -241,6 +262,12 @@ function toCapability(cwd: string, lock: FrameworkTempLockProjection): Framework
     laneSessionId: lock.laneSessionId,
     heartbeatAt: lock.heartbeatAt,
     ttlSeconds: lock.ttlSeconds,
+    generation,
+    declaredFiles: lock.files.filter((file) => {
+      if (path.isAbsolute(file) || /[*?[]/.test(file) || file.endsWith('/') || file.split('/').some((part) => !part || part === '..' || part === '.git')) return false;
+      try { return !lstatSync(path.join(cwd, file)).isDirectory(); }
+      catch (error) { return (error as NodeJS.ErrnoException).code === 'ENOENT'; }
+    }),
     // A runner-sync receipt is part of the sealed publication proof, not
     // optional residue. Keep this derivation at the capability boundary so
     // callers cannot accidentally publish bytes without their receipt.

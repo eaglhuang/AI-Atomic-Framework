@@ -1,4 +1,4 @@
-import { assertFinalCandidateIndex } from './candidate-file-policy.ts';
+import { assertFinalCandidateIndex, matchesCandidateScope, type CandidateFilePolicy } from './candidate-file-policy.ts';
 /**
  * Git adapter for the sealed commit attribution contract.
  *
@@ -129,15 +129,20 @@ export function resolveGovernedCommitSeal(input: {
   readonly admittedBundle?: SealedCommitBundle | null;
   readonly paths: readonly string[];
   readonly provenance: SealedCommitEntryProvenance;
+  readonly policy?: CandidateFilePolicy;
 }): SealedCommitSealSource {
-  return {
-    kind: 'sealed-bundle',
-    bundle: input.admittedBundle ?? sealCommitBundleFromLiveIndex({
-      cwd: input.cwd,
-      paths: input.paths,
-      provenance: input.provenance
-    })
-  };
+  if (input.admittedBundle) return { kind: 'sealed-bundle', bundle: input.admittedBundle };
+  const bundle = sealCommitBundleFromLiveIndex({ cwd: input.cwd, paths: input.paths,
+    provenance: input.provenance, policy: input.policy });
+  const readOnly = input.policy?.readOnlyPaths?.map(scope => path.isAbsolute(scope)
+    ? path.relative(input.cwd, scope).split(path.sep).join('/') : scope);
+  const outside = bundle.entries.filter(entry =>
+    (input.policy?.scopePaths && !input.policy.scopePaths.some(scope => matchesCandidateScope(entry.path, scope)))
+    || readOnly?.some(scope => matchesCandidateScope(entry.path, scope)));
+  if (outside.length) throw new CliError('ATM_COMMIT_CANDIDATE_SCOPE_VIOLATION',
+    'Fallback seal violates its canonical scope or read-only boundary.',
+    { exitCode: 1, details: { paths: outside.map(entry => entry.path) } });
+  return { kind: 'sealed-bundle', bundle };
 }
 
 /**
