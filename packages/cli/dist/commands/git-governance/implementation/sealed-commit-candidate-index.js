@@ -6,17 +6,24 @@ import path from 'node:path';
 import { ATM_COMMIT_ATTRIBUTION_MISMATCH, findSealedBundleProvenanceConflicts, isTombstone, sealCommitBundle } from '../../../_vendor/core/dist/commit-attribution/sealed-commit-bundle.js';
 import { CliError } from '../../shared.js';
 import { runGitCommandWithEnv } from './git-process-port.js';
+import { forEachPathspecBatch } from './pathspec-argv-batching.js';
 const QUIET_STDIO = ['ignore', 'pipe', 'pipe'];
 const LS_FILES_STAGE_PATTERN = /^(\d+) ([0-9a-f]+) \d+\t([\s\S]+)$/i;
 const LS_TREE_PATTERN = /^(\d+) blob ([0-9a-f]+)\t([\s\S]+)$/i;
 const NULL_OBJECT_ID = /^0+$/;
 function normalizePath(value) { return String(value ?? '').replace(/^\.\//, ''); }
+/** Bulk path queries must fit one process command line (Windows caps it near 32K); batch output concatenates losslessly. */
+function candidateGitForPaths(cwd, fixedArgs, paths, env) {
+    const output = [];
+    forEachPathspecBatch({ paths, fixedArgs }, (batch) => { output.push(candidateGit(cwd, [...fixedArgs, ...batch], env)); });
+    return output.join('');
+}
 export function sealCommitBundleFromLiveIndex(input) {
     const paths = [...new Set(input.paths.map(normalizePath).filter(Boolean))].sort();
     if (paths.length === 0)
         return sealCommitBundle({ entries: [], baseTreeSha: input.baseTreeSha ?? null });
     const entries = [];
-    for (const line of nulPaths(candidateGit(input.cwd, ['ls-files', '-s', '-z', '--', ...paths]))) {
+    for (const line of nulPaths(candidateGitForPaths(input.cwd, ['ls-files', '-s', '-z', '--'], paths))) {
         const match = line.match(LS_FILES_STAGE_PATTERN);
         if (match)
             entries.push({ path: normalizePath(match[3]), mode: match[1], blobId: match[2], provenance: input.provenance, declared: isDeclaredCandidate(normalizePath(match[3]), input.policy ?? {}, input.cwd), disposition: 'present' });
@@ -68,7 +75,7 @@ export function readCandidateTreeEntries(input) {
     const sealedPaths = [...new Set((input.sealedPaths ?? []).map(normalizePath).filter(Boolean))].sort();
     const entries = new Map();
     if (sealedPaths.length > 0)
-        for (const line of nulPaths(candidateGit(input.cwd, ['ls-files', '-s', '-z', '--', ...sealedPaths], input.env))) {
+        for (const line of nulPaths(candidateGitForPaths(input.cwd, ['ls-files', '-s', '-z', '--'], sealedPaths, input.env))) {
             const match = line.match(LS_FILES_STAGE_PATTERN);
             if (match)
                 entries.set(normalizePath(match[3]), { path: normalizePath(match[3]), mode: match[1], blobId: match[2], disposition: 'present' });
@@ -82,7 +89,7 @@ export function readCommittedTreeEntries(cwd, commitSha, sealedPaths = []) {
     const normalized = [...new Set(sealedPaths.map(normalizePath).filter(Boolean))].sort();
     const entries = new Map();
     if (normalized.length > 0)
-        for (const line of nulPaths(candidateGit(cwd, ['ls-tree', '-r', '-z', commitSha, '--', ...normalized]))) {
+        for (const line of nulPaths(candidateGitForPaths(cwd, ['ls-tree', '-r', '-z', commitSha, '--'], normalized))) {
             const match = line.match(LS_TREE_PATTERN);
             if (match)
                 entries.set(normalizePath(match[3]), { path: normalizePath(match[3]), mode: match[1], blobId: match[2], disposition: 'present' });
@@ -97,7 +104,7 @@ export function sealCommitBundleFromCandidateIndex(input) {
     if (paths.length === 0)
         return sealCommitBundle({ entries: [], baseTreeSha: input.baseTreeSha ?? null });
     const entries = [];
-    for (const line of nulPaths(candidateGit(input.cwd, ['ls-files', '-s', '-z', '--', ...paths], input.env))) {
+    for (const line of nulPaths(candidateGitForPaths(input.cwd, ['ls-files', '-s', '-z', '--'], paths, input.env))) {
         const match = line.match(LS_FILES_STAGE_PATTERN);
         if (match)
             entries.push({ path: normalizePath(match[3]), mode: match[1], blobId: match[2], provenance: input.provenance ?? 'governance-evidence', declared: isDeclaredCandidate(normalizePath(match[3]), input.policy ?? {}, input.cwd), disposition: 'present' });
@@ -107,7 +114,7 @@ export function sealCommitBundleFromCandidateIndex(input) {
     return sealCommitBundle({ entries, baseTreeSha: input.baseTreeSha ?? null });
 }
 function readStagedDeletionEntries(input) {
-    const entries = parseRawDiffEntries(candidateGit(input.cwd, ['diff-index', '--cached', '--raw', '--no-abbrev', '--no-renames', '-z', '--diff-filter=D', input.baseRef, '--', ...new Set(input.paths)], input.env));
+    const entries = parseRawDiffEntries(candidateGitForPaths(input.cwd, ['diff-index', '--cached', '--raw', '--no-abbrev', '--no-renames', '-z', '--diff-filter=D', input.baseRef, '--'], [...new Set(input.paths)], input.env));
     return entries.map((entry) => ({ ...entry, provenance: input.provenance ?? 'task-scope' }));
 }
 function parseRawDiffEntries(output) {

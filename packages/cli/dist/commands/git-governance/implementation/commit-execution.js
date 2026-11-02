@@ -112,6 +112,7 @@ export function executeGitCommit(options, context) {
                 retryCommand,
                 rawCopyableCommitCommand,
                 taskScopedBundleReport,
+                frameworkClaimAuthority: context.frameworkClaimAuthority,
                 ...candidate,
             });
         });
