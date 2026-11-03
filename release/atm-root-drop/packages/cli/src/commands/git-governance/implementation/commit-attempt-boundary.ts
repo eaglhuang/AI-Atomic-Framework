@@ -5,6 +5,8 @@ import * as hookBypassCommitBoundary from './hook-bypass-commit-boundary.ts';
 import { writeGitCommitAttemptStatus } from './git-process-port.ts';
 import { recordGitIndexRestoreFailure, withTaskScopedCommitIndex } from './git-index-transaction.ts';
 import { resolveGovernedCommitSeal } from './sealed-commit-attribution.ts';
+import { frameworkTempPublicationCapabilityCovers, resolveFrameworkTempPublicationCapability, type FrameworkTempPublicationCapability } from '../../framework-development/framework-temp-publication-capability.ts';
+import { CliError } from '../../shared.ts';
 
 type LegacyValue = ReturnType<typeof JSON.parse>;
 
@@ -44,10 +46,24 @@ export function mergeCandidateCommitEnv(commitEnv: LegacyValue, scopedEnv: Legac
 }
 
 export function executeCommitAttempt(input: LegacyValue): LegacyValue {
+  const selected = input.taskScopedBundleReport?.sealedBundle ? null : input.frameworkClaimAuthority;
+  const policy = selected ? frameworkDeclarationPolicyForSeal({
+    cwd: input.options.cwd, actorId: input.actorId, laneSessionId: input.laneSessionId,
+    selected, paths: input.stagedCommitSurface,
+  }) : undefined;
+  const renewalTaskId = frameworkTempTaskIdForSeal(input);
+  if (selected && renewalTaskId !== selected.taskId) {
+    throw new CliError('ATM_GIT_COMMIT_FRAMEWORK_CLAIM_REQUIRED',
+      'The seal renewal task does not match the selected canonical declaration authority.', { exitCode: 1 });
+  }
   renewFrameworkTempClaimForSealCommit({
     cwd: input.options.cwd,
     actorId: input.actorId,
-    taskId: frameworkTempTaskIdForSeal(input),
+    taskId: renewalTaskId,
+  });
+  if (selected) frameworkDeclarationPolicyForSeal({
+    cwd: input.options.cwd, actorId: input.actorId, laneSessionId: input.laneSessionId,
+    selected, paths: input.stagedCommitSurface, renewedByAttempt: true,
   });
   let protectedOverrideAudit = input.protectedOverrideAudit;
   const runCommit = (env: LegacyValue) => {
@@ -100,6 +116,7 @@ export function executeCommitAttempt(input: LegacyValue): LegacyValue {
             : null,
         paths: input.stagedCommitSurface,
         provenance: 'pre-staged-index',
+        policy,
       }),
     );
   const indexLeaseAuthorization = input.taskScopedBundleReport?.indexLeaseAuthorization;
@@ -128,4 +145,25 @@ export function executeCommitAttempt(input: LegacyValue): LegacyValue {
     commitScopedBundle();
   }
   return protectedOverrideAudit;
+}
+
+/** Revalidate the same canonical authority before sealing; staged bytes never grant declarations. */
+export function frameworkDeclarationPolicyForSeal(input: {
+  readonly cwd: string; readonly actorId: string; readonly laneSessionId: string | null;
+  readonly selected: FrameworkTempPublicationCapability; readonly paths: readonly string[];
+  readonly renewedByAttempt?: boolean;
+}) {
+  const current = resolveFrameworkTempPublicationCapability({ cwd: input.cwd, taskId: null,
+    actorId: input.actorId, laneSessionId: input.laneSessionId });
+  const identity = (capability: FrameworkTempPublicationCapability) => JSON.stringify([
+    capability.taskId, capability.actorId, capability.laneSessionId, capability.generation,
+    capability.allowedFiles, capability.declaredFiles,
+    ...(input.renewedByAttempt ? [] : [capability.heartbeatAt, capability.ttlSeconds]),
+  ]);
+  if (!current || identity(current) !== identity(input.selected)
+    || !frameworkTempPublicationCapabilityCovers(current, input.paths)) {
+    throw new CliError('ATM_GIT_COMMIT_FRAMEWORK_CLAIM_REQUIRED',
+      'The canonical temporary declaration authority changed or no longer covers the sealed candidate.', { exitCode: 1 });
+  }
+  return { declaredPaths: current.declaredFiles, scopePaths: current.allowedFiles };
 }

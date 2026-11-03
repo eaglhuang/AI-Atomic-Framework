@@ -1,5 +1,5 @@
 import { pathMatchesWriteScope } from '../../_vendor/core/dist/broker/write-scope-policy.js';
-import { existsSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, lstatSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { inspectFrameworkTempLockProjection, } from './framework-temp-lock-projection.js';
 import { readActiveQuickfixLock } from '../work-channels.js';
@@ -16,6 +16,7 @@ export function resolveFrameworkCommitAuthorityContext(input) {
         // channel's own commit authority; pre-commit bounds it to allowedFiles.
         frameworkClaimRequired: !input.taskExists && readActiveQuickfixLock(input.cwd)?.actorId !== input.actorId,
         frameworkClaimFiles: capability?.allowedFiles ?? null,
+        frameworkClaimAuthority: capability,
         frameworkClaimTaskId: capability?.taskId ?? null,
         frameworkClaimResolution: resolution.summary,
     };
@@ -139,6 +140,26 @@ export function frameworkTempPublicationCapabilityCovers(capability, files) {
 function toCapability(cwd, lock) {
     if (!lock.heartbeatAt || lock.ttlSeconds === null)
         return null;
+    if (path.basename(lock.workItemId) !== lock.workItemId || lock.workItemId.includes('\\'))
+        return null;
+    let generation;
+    try {
+        const raw = JSON.parse(readFileSync(path.join(cwd, '.atm/runtime/locks', `${lock.workItemId}.lock.json`), 'utf8'));
+        const rawFiles = [...new Set((Array.isArray(raw.files) ? raw.files : [])
+                .filter((value) => typeof value === 'string')
+                .map((value) => value.replace(/\\/g, '/').replace(/^\.\//, '').trim()).filter(Boolean))].sort();
+        if (String(raw.workItemId ?? '').trim() !== lock.workItemId
+            || String(raw.actorId ?? raw.lockedBy ?? '').trim() !== lock.actorId
+            || (typeof raw.laneSessionId === 'string' ? raw.laneSessionId.trim() || null : null) !== lock.laneSessionId
+            || String(raw.heartbeatAt ?? raw.lockedAt ?? '').trim() !== lock.heartbeatAt
+            || Number(raw.ttlSeconds) !== lock.ttlSeconds || String(raw.status ?? '').trim().toLowerCase() === 'released'
+            || JSON.stringify(rawFiles) !== JSON.stringify(lock.files))
+            return null;
+        generation = JSON.stringify([raw.leaseId ?? null, raw.leaseEpoch ?? null, raw.lockedAt ?? null]);
+    }
+    catch {
+        return null;
+    }
     const receiptPath = `.atm/history/evidence/${lock.workItemId}.runner-sync-receipt.json`;
     return {
         taskId: lock.workItemId,
@@ -146,6 +167,17 @@ function toCapability(cwd, lock) {
         laneSessionId: lock.laneSessionId,
         heartbeatAt: lock.heartbeatAt,
         ttlSeconds: lock.ttlSeconds,
+        generation,
+        declaredFiles: lock.files.filter((file) => {
+            if (path.isAbsolute(file) || /[*?[]/.test(file) || file.endsWith('/') || file.split('/').some((part) => !part || part === '..' || part === '.git'))
+                return false;
+            try {
+                return !lstatSync(path.join(cwd, file)).isDirectory();
+            }
+            catch (error) {
+                return error.code === 'ENOENT';
+            }
+        }),
         // A runner-sync receipt is part of the sealed publication proof, not
         // optional residue. Keep this derivation at the capability boundary so
         // callers cannot accidentally publish bytes without their receipt.

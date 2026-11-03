@@ -58,7 +58,7 @@ export function runGitCommit(options) {
     const taskDocument = options.taskId
         ? readTaskDocument(options.cwd, options.taskId)
         : null;
-    const { usesFrameworkClaimCommit, frameworkClaimRequired, frameworkClaimFiles, frameworkClaimTaskId, frameworkClaimResolution } = resolveFrameworkCommitAuthorityContext({
+    const { usesFrameworkClaimCommit, frameworkClaimRequired, frameworkClaimFiles, frameworkClaimTaskId, frameworkClaimResolution, frameworkClaimAuthority } = resolveFrameworkCommitAuthorityContext({
         cwd: options.cwd, taskId: options.taskId, actorId, taskExists: taskDocument !== null,
     });
     const selectedAttribution = resolveCandidateAttribution({
@@ -233,5 +233,5 @@ export function runGitCommit(options) {
         liveIndexResidueRollback: [],
     });
     assertDryRunReachedNoExecutor(dryRunPurity, { taskId: options.taskId ?? null, usesFrameworkClaimCommit });
-    return executeGitCommit(options, { liveIndexRestorationSnapshotBeforeCommitAttempt, actorId, args, autoStagedFrameworkPaths, branchName, branchRef, bypassesActiveSession, claimForTrailers, commitAttemptStartedAt, commitAttemptStatusPath, commitCommand, commitTimeoutMs, deferredForeignStagedSnapshotPath, frameworkClaimCommitFiles, gitEmail, gitHeadEvidenceSnapshotBeforeCommitAttempt, gitName, headShaAtCommitStart, headShaBeforeCommit, hookBypassRequest, hookTaskId, laneSessionId, liveIndexSnapshotBeforeCommitAttempt, profile, protectedOverrideAudit, protectedOverrideOutcome, rawCopyableCommitCommand, retryCommand, session, statusCommand, taskDocument, taskScopedBundleReport, trailers });
+    return executeGitCommit(options, { liveIndexRestorationSnapshotBeforeCommitAttempt, actorId, args, autoStagedFrameworkPaths, branchName, branchRef, bypassesActiveSession, claimForTrailers, commitAttemptStartedAt, commitAttemptStatusPath, commitCommand, commitTimeoutMs, deferredForeignStagedSnapshotPath, frameworkClaimCommitFiles, frameworkClaimAuthority, gitEmail, gitHeadEvidenceSnapshotBeforeCommitAttempt, gitName, headShaAtCommitStart, headShaBeforeCommit, hookBypassRequest, hookTaskId, laneSessionId, liveIndexSnapshotBeforeCommitAttempt, profile, protectedOverrideAudit, protectedOverrideOutcome, rawCopyableCommitCommand, retryCommand, session, statusCommand, taskDocument, taskScopedBundleReport, trailers });
 }

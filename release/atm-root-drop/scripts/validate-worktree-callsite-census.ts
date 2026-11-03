@@ -25,6 +25,10 @@ const productionReceipts: Readonly<Record<string, { readonly classification: Pro
     classification: 'historical-read-only-discrimination',
     receiptContract: 'atm.frameworkWorktreeReadinessReceipt.v1'
   },
+  'scripts/validate-cli-dist-freshness.ts': {
+    classification: 'non-development-sealed-packaging',
+    receiptContract: 'atm.runnerSyncReceipt.v1'
+  },
   'packages/cli/src/commands/validation-obligations.ts': {
     classification: 'non-development-sealed-packaging',
     receiptContract: 'atm.validationObligationCleanCheckoutReceipt.v1'

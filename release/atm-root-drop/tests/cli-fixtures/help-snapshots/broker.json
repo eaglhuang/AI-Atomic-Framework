@@ -4,7 +4,7 @@
   "positional": [
     {
       "name": "action",
-      "summary": "register | decision | status | release | cleanup | proposal | compose | steward | runtime | runner-sync | projection | plan-batch | schedule | batch | parallel-admission | replay | heat-status | heat-reset | post-compose-semantic-validation",
+      "summary": "register | decision | status | release | cleanup | proposal | compose | steward | runtime | runner-sync | projection | plan-batch | schedule | batch | parallel-admission | replay | heat-status | heat-reset | post-compose-semantic-validation | claim",
       "required": true
     },
     {
@@ -30,6 +30,11 @@
     {
       "name": "replay-action",
       "summary": "status | run | dogfood",
+      "required": false
+    },
+    {
+      "name": "claim-action",
+      "summary": "init | release | status (omit to claim --files)",
       "required": false
     },
     {
@@ -67,7 +72,12 @@
     {
       "flag": "--ttl-seconds",
       "value": "number",
-      "summary": "TTL lease duration in seconds for registering write intent."
+      "summary": "TTL lease duration in seconds for registering write intent (broker claim defaults to 900)."
+    },
+    {
+      "flag": "--files",
+      "value": "a,b",
+      "summary": "Comma-separated files for broker claim / broker claim release. Repeatable."
     },
     {
       "flag": "--sealed-source-sha",
@@ -293,6 +303,10 @@
     "node atm.mjs broker replay status --json",
     "node atm.mjs broker replay run --json",
     "node atm.mjs broker replay dogfood --surface docs/governance/atm-3-replay-evidence.md --json",
+    "node atm.mjs broker claim init --json",
+    "node atm.mjs broker claim --files src/a.ts,src/b.ts --actor worker-1 --json",
+    "node atm.mjs broker claim status --json",
+    "node atm.mjs broker claim release --actor worker-1 --json",
     "node atm.mjs broker heat-status --json",
     "node atm.mjs broker heat-reset --actor worker-1 --surface packages/core/src/broker/team-lane.ts --json"
   ]

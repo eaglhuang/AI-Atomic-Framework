@@ -176,6 +176,7 @@ try {
           retryCommand,
           rawCopyableCommitCommand,
           taskScopedBundleReport,
+          frameworkClaimAuthority: context.frameworkClaimAuthority,
           ...candidate,
         });
       },

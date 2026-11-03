@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { sealCommitBundle } from '../../../../../core/src/commit-attribution/sealed-commit-bundle.ts';
@@ -11,6 +11,7 @@ import {
 } from './sealed-commit-attribution.ts';
 import { withTaskScopedCommitIndex } from './git-index-transaction.ts';
 import { ensureGovernedGitHeadEvidenceStagedForTaskScopedCommit } from './git-head-evidence-transaction.ts';
+import { createGitHeadEvidenceCheck, gitHeadEvidencePaths, readLatestGitHeadReceiptTaskId } from '../../git-head-evidence.ts';
 
 const repo = mkdtempSync(path.join(os.tmpdir(), 'atm-sealed-commit-parity-'));
 execFileSync('git', ['init'], { cwd: repo, stdio: 'ignore' });
@@ -68,9 +69,8 @@ assert.notEqual(
   'fixture must prove that the transaction detects a post-commit mismatch after HEAD advances'
 );
 
-// Transaction-produced governance evidence is intentionally ignored by the
-// live worktree. Its producer must force-stage it into the sealed candidate,
-// otherwise the consumer seals a path that Git never commits.
+// Git-head observations are runtime-only diagnostics. Their producer and
+// reader must agree without adding runtime or legacy receipts to the seal.
 writeFileSync(path.join(repo, '.gitignore'), '.atm/\n');
 execFileSync('git', ['add', '.gitignore'], { cwd: repo, stdio: 'ignore' });
 execFileSync('git', ['commit', '-m', 'ignore runtime'], { cwd: repo, stdio: 'ignore' });
@@ -80,21 +80,25 @@ const candidateDir = mkdtempSync(path.join(os.tmpdir(), 'atm-sealed-candidate-')
 const candidateEnv = { ...process.env, GIT_INDEX_FILE: path.join(candidateDir, 'index') };
 execFileSync('git', ['read-tree', 'HEAD'], { cwd: repo, env: candidateEnv, stdio: 'ignore' });
 execFileSync('git', ['add', '--', 'packages/core/example.ts'], { cwd: repo, env: candidateEnv, stdio: 'ignore' });
-assert.ok(ensureGovernedGitHeadEvidenceStagedForTaskScopedCommit(
+const beforeObservationIndex = execFileSync('git', ['ls-files', '--stage'], { cwd: repo, env: candidateEnv, encoding: 'utf8' });
+const observation = ensureGovernedGitHeadEvidenceStagedForTaskScopedCommit(
   repo,
   'validator',
   'ATM-GOV-0371',
   ['packages/core/example.ts'],
   candidateEnv
-));
-assert.doesNotThrow(
-  () => execFileSync('git', ['ls-files', '--error-unmatch', '.atm/history/evidence/git-head.jsonl'], { cwd: repo, env: candidateEnv, stdio: 'ignore' }),
-  'ignored transaction-produced git-head evidence must be force-staged in the candidate index'
 );
+assert.equal(observation?.evidencePath, null);
+assert.equal(observation?.runtimeEvidencePath, gitHeadEvidencePaths.runtimeJsonl);
+assert.equal(execFileSync('git', ['ls-files', '--stage'], { cwd: repo, env: candidateEnv, encoding: 'utf8' }), beforeObservationIndex);
+assert.equal(existsSync(path.join(repo, gitHeadEvidencePaths.jsonl)), false);
+const runtimeObservation = JSON.parse(readFileSync(path.join(repo, gitHeadEvidencePaths.runtimeJsonl), 'utf8').trim().split('\n').at(-1)!);
+assert.equal(runtimeObservation.evidence[0].details.git.treeSha, observation?.treeSha);
+assert.equal(runtimeObservation.evidence[0].details.actorId, 'validator');
+assert.equal(readLatestGitHeadReceiptTaskId(repo), 'ATM-GOV-0371');
 
-// The public transaction boundary must commit the producer-generated evidence,
-// not merely stage it in the ephemeral candidate index. This catches frozen
-// runner drift where a producer and its post-commit consumer disagree.
+// The public transaction commits the sealed source, while runtime observations
+// remain readable and excluded from both the candidate and committed history.
 const governedSourceBlob = execFileSync('git', ['hash-object', 'packages/core/example.ts'], { cwd: repo, encoding: 'utf8' }).trim();
 const governedSeal = sealCommitBundle({
   entries: [{ path: 'packages/core/example.ts', mode: '100644', blobId: governedSourceBlob, provenance: 'task-scope', disposition: 'present' }]
@@ -108,11 +112,15 @@ withTaskScopedCommitIndex(
   { kind: 'sealed-bundle', bundle: governedSeal },
 );
 const provenanceCommitFiles = execFileSync('git', ['show', '--format=', '--name-only', 'HEAD'], { cwd: repo, encoding: 'utf8' });
-assert.match(
-  provenanceCommitFiles,
-  /\.atm\/history\/evidence\/git-head\.jsonl/,
-  'a governed transaction must include its generated git-head evidence in the final commit tree'
-);
+assert.match(provenanceCommitFiles, /packages\/core\/example\.ts/);
+assert.doesNotMatch(provenanceCommitFiles, /\.atm\/(?:history\/evidence|runtime\/telemetry)\/git-head\.jsonl/);
+assert.equal(readLatestGitHeadReceiptTaskId(repo), 'ATM-GOV-0371');
+const runtimeCoverage = createGitHeadEvidenceCheck(repo, { config: {} });
+assert.equal(runtimeCoverage.ok, true);
+assert.ok('matchedEvidencePath' in runtimeCoverage.details);
+assert.ok('matchedBy' in runtimeCoverage.details);
+assert.equal(runtimeCoverage.details.matchedEvidencePath, gitHeadEvidencePaths.runtimeJsonl);
+assert.equal(runtimeCoverage.details.matchedBy, 'treeSha+parentCommitShas');
 
 // Task-scoped cleanup commonly carries ignored governance evidence.  It must
 // survive candidate-index assembly just like an ordinary source path; otherwise
@@ -120,7 +128,7 @@ assert.match(
 mkdirSync(path.join(repo, '.atm', 'history', 'protected-override-audit'), { recursive: true });
 const ignoredEvidencePath = '.atm/history/protected-override-audit/audit.json';
 writeFileSync(path.join(repo, ignoredEvidencePath), '{"schemaId":"atm.protectedOverrideAudit.v1"}\n');
-const ignoredEvidenceBlob = execFileSync('git', ['hash-object', ignoredEvidencePath], { cwd: repo, encoding: 'utf8' }).trim();
+const ignoredEvidenceBlob = execFileSync('git', ['hash-object', '-w', ignoredEvidencePath], { cwd: repo, encoding: 'utf8' }).trim();
 withTaskScopedCommitIndex(
   repo,
   [ignoredEvidencePath],
@@ -137,7 +145,7 @@ withTaskScopedCommitIndex(
   {
     kind: 'sealed-bundle',
     bundle: sealCommitBundle({
-      entries: [{ path: ignoredEvidencePath, mode: '100644', blobId: ignoredEvidenceBlob, provenance: 'governance-evidence', disposition: 'present' }]
+      entries: [{ path: ignoredEvidencePath, mode: '100644', blobId: ignoredEvidenceBlob, provenance: 'governance-evidence', declared: true, disposition: 'present' }]
     })
   }
 );
