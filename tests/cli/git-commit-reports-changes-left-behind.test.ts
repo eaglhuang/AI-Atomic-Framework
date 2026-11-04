@@ -8,12 +8,9 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 // A governed commit only takes the claimed files. Edits outside the claim
 // used to stay behind silently, so an agent believed every change landed.
 const publicCli = pathToFileURL(path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', 'packages', 'cli', 'src', 'atm-public.ts')).href;
-// The stdin-pathspec preflight scans every git process on the machine, so a
-// parallel sweep sibling's own `git add` would fail this unrelated commit.
-const isolatedEnv = { ...process.env, ATM_GIT_STDIN_PATHSPEC_PREFLIGHT: '0' };
 function atm(cwd: string, args: readonly string[]) {
   const script = `const { runPublicCli } = await import(${JSON.stringify(publicCli)}); process.exitCode = await runPublicCli(JSON.parse(process.argv[1]));`;
-  const run = spawnSync(process.execPath, ['--strip-types', '--input-type=module', '-e', script, JSON.stringify([...args, '--json'])], { cwd, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, env: isolatedEnv });
+  const run = spawnSync(process.execPath, ['--strip-types', '--input-type=module', '-e', script, JSON.stringify([...args, '--json'])], { cwd, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
   const out = (run.stdout ?? '').includes('{') ? run.stdout : run.stderr ?? '';
   return JSON.parse(out.slice(out.indexOf('{')));
 }
