@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, writeFileSync, } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readlinkSync, writeFileSync, } from "node:fs";
 import path from "node:path";
 import { actorRegistryRelativePath, inspectTrackedActorRegistryState, } from "../../actor-registry.js";
 import { hasAtmCriticalNonDocSurface } from "../../framework-development/path-classification.js";
@@ -98,7 +98,37 @@ export function runGitCommandWithEnv(cwd, args, env, stdio = ["ignore", "pipe", 
         env: createSanitizedGitEnv(env),
     });
 }
-export function inspectStdinPathspecGitAddProcesses() {
+export function inspectStdinPathspecGitAddProcesses(repoCwd) {
+    return listStdinPathspecGitAddProcesses().filter((entry) => runsInRepository(entry, repoCwd));
+}
+/**
+ * A stuck helper only hangs commits in its own repository. Linux exposes each
+ * process cwd, so helpers elsewhere on the host are ignored; where the cwd is
+ * unknown the process still counts (fail closed).
+ */
+function runsInRepository(entry, repoCwd) {
+    if (!repoCwd)
+        return true;
+    let processCwd = typeof entry.cwd === "string" ? entry.cwd : null;
+    if (!processCwd && entry.pid && process.platform === "linux") {
+        try {
+            processCwd = readlinkSync(`/proc/${entry.pid}/cwd`);
+        }
+        catch {
+            processCwd = null;
+        }
+    }
+    if (!processCwd)
+        return true;
+    // Either may be a subdirectory of the other: the commit can run from a
+    // nested cwd while the helper sits at the repository root, or vice versa.
+    const within = (outer, inner) => {
+        const relative = path.relative(path.resolve(outer), path.resolve(inner));
+        return !relative.startsWith("..") && !path.isAbsolute(relative);
+    };
+    return within(repoCwd, processCwd) || within(processCwd, repoCwd);
+}
+function listStdinPathspecGitAddProcesses() {
     if (process.env.ATM_GIT_STDIN_PATHSPEC_PREFLIGHT === "0") {
         return [];
     }
@@ -117,6 +147,7 @@ export function inspectStdinPathspecGitAddProcesses() {
                 return {
                     pid: typeof record.pid === "number" ? record.pid : null,
                     commandLine,
+                    ...(typeof record.cwd === "string" ? { cwd: record.cwd } : {}),
                 };
             })
                 .filter((entry) => Boolean(entry?.commandLine))
@@ -177,7 +208,7 @@ export function isStdinPathspecGitAddProcess(processInfo) {
         commandLine.includes("--pathspec-file-nul"));
 }
 export function assertNoStdinPathspecGitAddPreflight(cwd) {
-    const processes = inspectStdinPathspecGitAddProcesses();
+    const processes = inspectStdinPathspecGitAddProcesses(cwd);
     if (processes.length === 0)
         return;
     throw new CliError("ATM_GIT_COMMIT_STDIN_PATHSPEC_ADD_ACTIVE", "ATM detected an active git add --pathspec-from-file=- process before commit. This usually means an editor staging helper is waiting on stdin and can make the commit appear hung.", {

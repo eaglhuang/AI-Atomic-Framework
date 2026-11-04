@@ -224,7 +224,7 @@ export function runGitCommitStatus(options) {
     const actorId = resolvedActor.actorId;
     const status = readGitCommitAttemptStatus(options.cwd, actorId, options.taskId);
     const branchQueueStatus = inspectCurrentBranchCommitQueueStatus(options.cwd);
-    const stdinPathspecGitAddProcesses = inspectStdinPathspecGitAddProcesses();
+    const stdinPathspecGitAddProcesses = inspectStdinPathspecGitAddProcesses(options.cwd);
     const label = `${actorId}${options.taskId ? ` / ${options.taskId}` : ""}`;
     return makeResult({
         ok: true,

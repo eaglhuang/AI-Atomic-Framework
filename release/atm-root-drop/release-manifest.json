@@ -774,6 +774,7 @@
     "release/atm-root-drop/docs/release-trust-ops.md",
     "release/atm-root-drop/docs/releases/0.1.22.md",
     "release/atm-root-drop/docs/releases/0.1.23.md",
+    "release/atm-root-drop/docs/releases/0.1.24.md",
     "release/atm-root-drop/docs/reports/TASK-TMP-0007-target-side-attestation.md",
     "release/atm-root-drop/docs/reports/agr-conflict-arbitration-benchmark.md",
     "release/atm-root-drop/docs/reports/atm-2-1-final-closure.md",
@@ -7234,6 +7235,7 @@
     "release/atm-root-drop/tests/cli/standards-spec-review-receipt.test.ts",
     "release/atm-root-drop/tests/cli/startup-known-bad.test.ts",
     "release/atm-root-drop/tests/cli/status-active-workers.test.ts",
+    "release/atm-root-drop/tests/cli/stdin-pathspec-preflight-repo-scope.test.ts",
     "release/atm-root-drop/tests/cli/steward-path-containment.test.ts",
     "release/atm-root-drop/tests/cli/steward-receipt-error-contract.test.ts",
     "release/atm-root-drop/tests/cli/steward-receipt-pre-commit-gate.test.ts",
@@ -7728,7 +7730,7 @@
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
     "copied": 0,
-    "unchanged": 7692,
+    "unchanged": 7694,
     "removed": 0
   },
   "buildMode": "full",
@@ -14417,6 +14419,15 @@
         "origin": "source",
         "inputPaths": [
           "docs/releases/0.1.23.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "docs/releases/0.1.24.md",
+        "digest": "d56133b47cc4c7828bb5826df1a55c8e6cd39dd3e66aa081c7699087204dc89b",
+        "origin": "source",
+        "inputPaths": [
+          "docs/releases/0.1.24.md"
         ],
         "replaceable": true
       },
@@ -28534,7 +28545,7 @@
       },
       {
         "path": "packages/cli/dist/build-identity.json",
-        "digest": "735150013954cbfee1a9d2e8397bdd54a22f3c979ffcaaaa34098a1bb709a133",
+        "digest": "c375b7413046f20a50485a824e30594527ea0453a0707d2ebd335e37453d1f37",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/build-identity.json"
@@ -30703,7 +30714,7 @@
       },
       {
         "path": "packages/cli/dist/commands/git-governance/implementation/git-process-port.js",
-        "digest": "2f7349d224c9ca37203b2da9f58add6bbed31b3fabccb671b151aa024dc0c85d",
+        "digest": "501fcfd88f218a255296f665b9c71ddbecabf2cb2bde77fb57825c52b64d64c2",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/git-governance/implementation/git-process-port.js"
@@ -30730,7 +30741,7 @@
       },
       {
         "path": "packages/cli/dist/commands/git-governance/implementation/identity-check-command.js",
-        "digest": "b58bcd853abf67fe0b76227438ac48ef15e870d8d7468c45ce9435c53fc5ebee",
+        "digest": "19963d099cfe7577aeb0c5c933182e12fa31b10415446b6e6db29e948a34184a",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/git-governance/implementation/identity-check-command.js"
@@ -34771,7 +34782,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/build-identity.json",
-        "digest": "6f25242cff2131c741bee6fb710f0f2baaee4057c0bd1d78d86fcd104cf6ea01",
+        "digest": "418ae1ee4782052375f6b8604b8d214633553f4420f24807f4186d9543307f2d",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/build-identity.json"
@@ -35500,7 +35511,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/manifest.json",
-        "digest": "1952134f2fffd7df85ee454e3f52e1149e35d957113c558d2af57d55bc87e21a",
+        "digest": "d1e5ce9b8babb19562d956b12a35ebf5162d650a73d4a431ddd174787b96dbbe",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/manifest.json"
@@ -35509,7 +35520,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/runtime.mjs",
-        "digest": "624f6104e96542ac4494102ab98be90bbb0a0cedf7facd3a6efe31b6167fd21b",
+        "digest": "e23bc2303bfb3a082e235da071043413839b1ad97967fedec1664d42f409a877",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/runtime.mjs"
@@ -38506,7 +38517,7 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/implementation/git-process-port.ts",
-        "digest": "4edf792c5be562360dff6ff10e89c3ebeff2568741e4d1503f37f8f1fe16f1bb",
+        "digest": "98b895539713e4e7611cca9ea871ce2636237049765b813ecd5d472450cc8f15",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/implementation/git-process-port.ts"
@@ -38542,7 +38553,7 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/implementation/identity-check-command.ts",
-        "digest": "70839627fa1ab317f6e3931e5c490e4cf2f7bd0e7db78d459b60a16b16b0a85f",
+        "digest": "0014b8452ce1467a5e9b5265cf2b57de2916c7077992cbeb262d4496ac527bb7",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/implementation/identity-check-command.ts"
@@ -55201,7 +55212,7 @@
       },
       {
         "path": "packages/create-atm/dist/build-identity.json",
-        "digest": "9eae5c3b9e9bbe5784b475afb30741f2f89de32bbb4c663f387a16c794015567",
+        "digest": "a7984aa0053d4b275d969b9da5787e2cb85f5fd67807214e283a56b19255b20d",
         "origin": "source",
         "inputPaths": [
           "packages/create-atm/dist/build-identity.json"
@@ -72552,6 +72563,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/cli/stdin-pathspec-preflight-repo-scope.test.ts",
+        "digest": "7e10929f75713fb9aeb919e9557da2f39e6a503778f40f03b86555b5b5ae9a47",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/stdin-pathspec-preflight-repo-scope.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/cli/steward-path-containment.test.ts",
         "digest": "ed8a068b9a2979bcd75fb46b373b2fb41bcdd6098782f89005e99efd7e70c894",
         "origin": "source",
@@ -76962,7 +76982,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:fe0a745a13589e862c15cad6c5d2e1cdee125f73fd00d7c0629f3610749ad1f6"
+    "treeDigest": "sha256:f46a5da0c11628cbd985a2711b47e2b16670d80648b51006f2b26b43e937bc47"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -78623,7 +78643,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:b1de1a4fb1e0fcb88d89b9793c174f53a2039823b812e82638c1690d0e26e8fe"
+    "digest": "sha256:35e89ad739c585af6aa6bb50f1c32310587b0ce8ab7d5700bb25e83162c2cf2c"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -79371,6 +79391,7 @@
       "release/atm-root-drop/docs/release-trust-ops.md",
       "release/atm-root-drop/docs/releases/0.1.22.md",
       "release/atm-root-drop/docs/releases/0.1.23.md",
+      "release/atm-root-drop/docs/releases/0.1.24.md",
       "release/atm-root-drop/docs/reports/TASK-TMP-0007-target-side-attestation.md",
       "release/atm-root-drop/docs/reports/agr-conflict-arbitration-benchmark.md",
       "release/atm-root-drop/docs/reports/atm-2-1-final-closure.md",
@@ -85831,6 +85852,7 @@
       "release/atm-root-drop/tests/cli/standards-spec-review-receipt.test.ts",
       "release/atm-root-drop/tests/cli/startup-known-bad.test.ts",
       "release/atm-root-drop/tests/cli/status-active-workers.test.ts",
+      "release/atm-root-drop/tests/cli/stdin-pathspec-preflight-repo-scope.test.ts",
       "release/atm-root-drop/tests/cli/steward-path-containment.test.ts",
       "release/atm-root-drop/tests/cli/steward-receipt-error-contract.test.ts",
       "release/atm-root-drop/tests/cli/steward-receipt-pre-commit-gate.test.ts",
@@ -86327,22 +86349,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:49d1d7c4c3643b2cdd84ca88909abf34c032da654789145eda91da0711a0b911",
-  "sealedSourceCommit": "b3d9f2ec09421a6c54f1131c2dd2b4aca9d7d2b6",
-  "buildDecision": "fullRebuild",
-  "buildDecisionReason": "build-script-change",
-  "incrementalPlanDigest": "sha256:10585e1e941699cfd793c3413a5d8cbab5f288b8172aca8c9c78ecabcc1ad7c9",
-  "tsBuildCacheDigest": "sha256:3dd3ee507610cc33d9857f9ef4d8c410620a4dcd0cf6a77aeca1d71f7c8cf094",
+  "buildInputsTreeHash": "sha256:acd2347cea9229724bcb9408b7ed79054fb63d3114b0bf88dfc2091a12033d06",
+  "sealedSourceCommit": "8646ab177f9faa0460559fd790d898bc5273ac74",
+  "buildDecision": "incrementalBuild",
+  "buildDecisionReason": "diff planner selected 1 affected package(s)",
+  "incrementalPlanDigest": "sha256:1dcb14712848cd273e209e68be514172fa9e5dfa3f1f2b492c71a62137d26f0a",
+  "tsBuildCacheDigest": "sha256:3c6ebecad4feadd52b7083ec797b9aaee1f83c65d755f78b8640398c2beba801",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 42,
-    "skipDecision": 63,
-    "worktreeSetup": 290476,
-    "typescriptBuild": 30513,
-    "rootDropReleaseAssembly": 54859,
-    "onefileReleaseAssembly": 47879,
-    "artifactSync": 18354,
+    "inputHashCalculation": 56,
+    "skipDecision": 75,
+    "worktreeSetup": 255213,
+    "typescriptBuild": 40333,
+    "rootDropReleaseAssembly": 55016,
+    "onefileReleaseAssembly": 49889,
+    "artifactSync": 19888,
     "cleanup": 0,
-    "totalElapsed": 480181
+    "totalElapsed": 462793
   }
 }
