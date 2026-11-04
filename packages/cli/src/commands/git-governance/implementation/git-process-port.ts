@@ -8,6 +8,7 @@ import {
   mkdtempSync,
   readFileSync,
   readdirSync,
+  readlinkSync,
   rmSync,
   statSync,
   writeFileSync,
@@ -166,7 +167,36 @@ export function runGitCommandWithEnv(
   });
 }
 
-export function inspectStdinPathspecGitAddProcesses() {
+export function inspectStdinPathspecGitAddProcesses(repoCwd?: string) {
+  return listStdinPathspecGitAddProcesses().filter((entry: LegacyValue) => runsInRepository(entry, repoCwd));
+}
+
+/**
+ * A stuck helper only hangs commits in its own repository. Linux exposes each
+ * process cwd, so helpers elsewhere on the host are ignored; where the cwd is
+ * unknown the process still counts (fail closed).
+ */
+function runsInRepository(entry: LegacyValue, repoCwd?: string) {
+  if (!repoCwd) return true;
+  let processCwd: string | null = typeof entry.cwd === "string" ? entry.cwd : null;
+  if (!processCwd && entry.pid && process.platform === "linux") {
+    try {
+      processCwd = readlinkSync(`/proc/${entry.pid}/cwd`);
+    } catch {
+      processCwd = null;
+    }
+  }
+  if (!processCwd) return true;
+  // Either may be a subdirectory of the other: the commit can run from a
+  // nested cwd while the helper sits at the repository root, or vice versa.
+  const within = (outer: string, inner: string) => {
+    const relative = path.relative(path.resolve(outer), path.resolve(inner));
+    return !relative.startsWith("..") && !path.isAbsolute(relative);
+  };
+  return within(repoCwd, processCwd) || within(processCwd, repoCwd);
+}
+
+function listStdinPathspecGitAddProcesses() {
   if (process.env.ATM_GIT_STDIN_PATHSPEC_PREFLIGHT === "0") {
     return [];
   }
@@ -184,6 +214,7 @@ export function inspectStdinPathspecGitAddProcesses() {
           return {
             pid: typeof record.pid === "number" ? record.pid : null,
             commandLine,
+            ...(typeof record.cwd === "string" ? { cwd: record.cwd } : {}),
           };
         })
         .filter((entry: LegacyValue) => Boolean(entry?.commandLine))
@@ -248,7 +279,7 @@ export function isStdinPathspecGitAddProcess(processInfo: LegacyValue) {
 }
 
 export function assertNoStdinPathspecGitAddPreflight(cwd: LegacyValue) {
-  const processes = inspectStdinPathspecGitAddProcesses();
+  const processes = inspectStdinPathspecGitAddProcesses(cwd);
   if (processes.length === 0) return;
   throw new CliError(
     "ATM_GIT_COMMIT_STDIN_PATHSPEC_ADD_ACTIVE",

@@ -347,7 +347,7 @@ export function runGitCommitStatus(options: LegacyValue) {
     options.taskId,
   );
   const branchQueueStatus = inspectCurrentBranchCommitQueueStatus(options.cwd);
-  const stdinPathspecGitAddProcesses = inspectStdinPathspecGitAddProcesses();
+  const stdinPathspecGitAddProcesses = inspectStdinPathspecGitAddProcesses(options.cwd);
   const label = `${actorId}${options.taskId ? ` / ${options.taskId}` : ""}`;
   return makeResult({
     ok: true,
