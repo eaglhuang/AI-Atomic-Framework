@@ -10,12 +10,13 @@ export default defineCommandSpec({
   name: 'broker',
   summary: 'Manage write intents, proposal capsules, compose merge plans, runtime activation, steward apply, parallel admission policy, and inspect the local write-broker registry.',
   positional: [
-    { name: 'action', summary: 'register | decision | status | release | cleanup | proposal | compose | steward | runtime | runner-sync | projection | plan-batch | schedule | batch | parallel-admission | replay | heat-status | heat-reset | post-compose-semantic-validation', required: true },
+    { name: 'action', summary: 'register | decision | status | release | cleanup | proposal | compose | steward | runtime | runner-sync | projection | plan-batch | schedule | batch | parallel-admission | replay | heat-status | heat-reset | post-compose-semantic-validation | claim', required: true },
     { name: 'proposal-action', summary: 'create | list | show | validate', required: false },
     { name: 'steward-action', summary: 'plan | apply | apply-live', required: false },
     { name: 'runtime-action', summary: 'activate', required: false },
     { name: 'parallel-admission-action', summary: 'status | set | trip | reset', required: false },
     { name: 'replay-action', summary: 'status | run | dogfood', required: false },
+    { name: 'claim-action', summary: 'init | release | status (omit to claim --files)', required: false },
     { name: 'proposal-id', summary: 'Proposal id for show / validate.', required: false }
   ],
   options: [
@@ -24,7 +25,8 @@ export default defineCommandSpec({
     { flag: '--actor', value: 'id', summary: 'Actor id for register payload parity checks or runtime activate.' },
     { flag: '--intent-file', value: 'path', summary: 'Path to WriteIntent JSON payload.' },
     { flag: '--queue-ticket', value: 'id', summary: 'Explicitly revalidate an eligible native serial ticket using the unchanged scope and current repository HEAD.' },
-    { flag: '--ttl-seconds', value: 'number', summary: 'TTL lease duration in seconds for registering write intent.' },
+    { flag: '--ttl-seconds', value: 'number', summary: 'TTL lease duration in seconds for registering write intent (broker claim defaults to 900).' },
+    { flag: '--files', value: 'a,b', summary: 'Comma-separated files for broker claim / broker claim release. Repeatable.' },
     { flag: '--sealed-source-sha', value: 'sha', summary: 'Sealed source SHA for broker runner-sync enqueue.' },
     { flag: '--surface', value: 'path', summary: 'Release surface path for broker runner-sync enqueue, or file path for broker heat-reset. Repeatable.' },
     { flag: '--steward-work-id', value: 'id', summary: 'Runner-sync steward work id to release after one coalesced build.' },
@@ -100,6 +102,10 @@ export default defineCommandSpec({
     'node atm.mjs broker replay status --json',
     'node atm.mjs broker replay run --json',
     'node atm.mjs broker replay dogfood --surface docs/governance/atm-3-replay-evidence.md --json',
+    'node atm.mjs broker claim init --json',
+    'node atm.mjs broker claim --files src/a.ts,src/b.ts --actor worker-1 --json',
+    'node atm.mjs broker claim status --json',
+    'node atm.mjs broker claim release --actor worker-1 --json',
     'node atm.mjs broker heat-status --json',
     'node atm.mjs broker heat-reset --actor worker-1 --surface packages/core/src/broker/team-lane.ts --json'
   ]

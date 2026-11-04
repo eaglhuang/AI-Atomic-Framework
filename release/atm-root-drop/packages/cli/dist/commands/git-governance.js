@@ -27,7 +27,7 @@ export async function runAtmGit(argv) {
     const taskId = readOption(argv, '--task');
     if (!taskId || (action !== 'commit' && action !== 'push')) {
         const result = await runAtmGitImplementation(argv);
-        return action === 'commit' ? withChangesLeftBehind(result, readOption(argv, '--cwd') ?? process.cwd(), null) : result;
+        return action === 'commit' ? withChangesLeftBehind(result, readOption(argv, '--cwd') ?? process.cwd(), null, argv) : result;
     }
     const cwd = readOption(argv, '--cwd') ?? process.cwd();
     const actorId = readOption(argv, '--actor') ?? '';
@@ -84,7 +84,7 @@ export async function runAtmGit(argv) {
     const governedArgv = action === 'commit' && ticket
         ? appendWorkAdmissionTrailer(argv, ticket.ticketId, ticket.ticketDigest)
         : argv;
-    const result = withChangesLeftBehind(await runAtmGitImplementation(governedArgv), cwd, action === 'commit' ? taskId : undefined);
+    const result = withChangesLeftBehind(await runAtmGitImplementation(governedArgv), cwd, action === 'commit' ? taskId : undefined, argv);
     const recorded = derivedAtoms && result.ok !== false && derivedAtoms.refs.length > 0
         ? safeRecordDerivedAtoms(cwd, taskId, actorId, derivedAtoms.refs)
         : false;
@@ -414,9 +414,10 @@ function readStagedFiles(cwd) {
  * changed files it left behind, so an agent does not assume every edit
  * landed. ATM's own runtime state under .atm/ is not reported.
  */
-function withChangesLeftBehind(result, cwd, taskId) {
+function withChangesLeftBehind(result, cwd, taskId, argv) {
     const shape = result;
-    if (taskId === undefined || shape.ok === false)
+    // A dry-run commits nothing, so "the commit landed" would be false.
+    if (taskId === undefined || shape.ok === false || argv.includes('--dry-run'))
         return result;
     let leftBehind = [];
     try {

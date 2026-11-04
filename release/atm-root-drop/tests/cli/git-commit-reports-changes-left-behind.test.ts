@@ -54,6 +54,11 @@ try {
   const claimed = atm(project, ['next', '--claim', '--actor', 'ai-a', '--task', taskId]);
   const lane = JSON.stringify(claimed).match(/lane-\d+-ai-a-[0-9a-f]+/)?.[0] ?? '';
   writeFileSync(path.join(project, 'src', 'g.js'), 'export const g = 1;\n');
+  // A dry-run commits nothing, so it must not claim a commit landed.
+  writeFileSync(path.join(project, 'src', 'stray.js'), 'export const s = 1;');
+  const preview = atm(project, ['git', 'commit', '--actor', 'ai-a', '--task', taskId, '--message', 'feat: g', '--auto-stage', '--lane-session', lane, '--dry-run']);
+  assert.equal(leftBehind(preview), undefined, 'dry-run does not report left-behind files');
+  rmSync(path.join(project, 'src', 'stray.js'));
   const delivered = atm(project, ['git', 'commit', '--actor', 'ai-a', '--task', taskId, '--message', 'feat: g', '--auto-stage', '--lane-session', lane]);
   assert.ok((delivered.messages ?? []).some((entry: { code: string }) => entry.code === 'ATM_GIT_COMMIT_OK'), JSON.stringify(delivered.messages));
   assert.equal(leftBehind(delivered), undefined, `the uncommitted card is not reported: ${JSON.stringify(leftBehind(delivered)?.data?.files)}`);

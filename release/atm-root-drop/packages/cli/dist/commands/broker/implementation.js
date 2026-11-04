@@ -12,8 +12,12 @@ import { handleBrokerBatchExecute } from './batch-execute-actions.js';
 import { handleBrokerParallelAdmissionPolicy } from './policy-actions.js';
 import { handleBrokerReplayActions } from './replay-actions.js';
 import { handleBrokerHeatActions } from './heat-actions.js';
+import { handleBrokerClaimShareActions } from './claim-share-actions.js';
 import { runPostComposeSemanticValidation } from './post-compose-semantic-validation.js';
 export async function runBroker(argv) {
+    const claimShareResult = handleBrokerClaimShareActions(argv);
+    if (claimShareResult)
+        return claimShareResult;
     const options = parseBrokerArgs(argv);
     const context = {
         registryPath: path.join(options.cwd, '.atm', 'runtime', 'write-broker.registry.json'),
@@ -59,5 +63,5 @@ export async function runBroker(argv) {
     const heatResult = handleBrokerHeatActions(options);
     if (heatResult)
         return heatResult;
-    throw new CliError('ATM_CLI_USAGE', 'broker supports: register, decision, status, release, acknowledge, cleanup, proposal, compose, steward, runtime, runner-sync, projection, plan-batch, schedule, batch, parallel-admission, replay, heat-status, heat-reset, post-compose-semantic-validation', { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', 'broker supports: register, decision, status, release, acknowledge, cleanup, proposal, compose, steward, runtime, runner-sync, projection, plan-batch, schedule, batch, parallel-admission, replay, heat-status, heat-reset, post-compose-semantic-validation, claim', { exitCode: 2 });
 }
