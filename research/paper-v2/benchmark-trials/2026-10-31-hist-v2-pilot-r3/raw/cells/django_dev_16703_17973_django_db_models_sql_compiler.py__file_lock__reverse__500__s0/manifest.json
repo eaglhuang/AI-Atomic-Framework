@@ -1,0 +1,246 @@
+{
+  "arm": "file_lock",
+  "base_sha256": "12f264b69e3bd1c81851cf4f422a0effd070f7bbd68a07b5f0446ca0d5045dc9",
+  "dirty": true,
+  "dirty_entries": [
+    "?? research/paper-v2/benchmark-trials/.2026-10-31-hist-v2-pilot-r3.staging/",
+    "?? research/paper-v2/benchmark-trials/2026-10-30-hist-v2-pilot-r3/"
+  ],
+  "driver_clock_stamps": [
+    {
+      "event": "cell_start",
+      "mono": 43404.710469918,
+      "wall": 1793406993.8834324
+    },
+    {
+      "event": "cell_end",
+      "mono": 43405.453014293,
+      "wall": 1793406994.6259766
+    }
+  ],
+  "events": [
+    {
+      "arm": "file_lock",
+      "order_index": 0,
+      "proposal_id": 16703,
+      "type": "proposal"
+    },
+    {
+      "attempt": 0,
+      "inside_lock": true,
+      "proposal_id": 16703,
+      "type": "attempt"
+    },
+    {
+      "ack_at": 43404.924951194,
+      "proposal_id": 16703,
+      "rename_at": 43404.923902458,
+      "type": "commit"
+    },
+    {
+      "arm": "file_lock",
+      "order_index": 1,
+      "proposal_id": 17973,
+      "type": "proposal"
+    },
+    {
+      "attempt": 0,
+      "inside_lock": true,
+      "proposal_id": 17973,
+      "type": "attempt"
+    },
+    {
+      "arm": "file_lock",
+      "order_index": 0,
+      "proposal_id": 16703,
+      "type": "proposal"
+    },
+    {
+      "attempt": 0,
+      "inside_lock": true,
+      "proposal_id": 16703,
+      "type": "attempt"
+    },
+    {
+      "ack_at": 43404.924951194,
+      "proposal_id": 16703,
+      "rename_at": 43404.923902458,
+      "type": "commit"
+    },
+    {
+      "arm": "file_lock",
+      "order_index": 1,
+      "proposal_id": 17973,
+      "type": "proposal"
+    },
+    {
+      "attempt": 0,
+      "inside_lock": true,
+      "proposal_id": 17973,
+      "type": "attempt"
+    }
+  ],
+  "fixture_id": "django:dev:16703_17973:django/db/models/sql/compiler.py",
+  "formal_run": false,
+  "git_head": "a88ffb3223dcb25a17caed19f846303de47ab5ae",
+  "harness": "hist-v2-harness-v4",
+  "inter_arrival_ms": 500,
+  "lockfile_sha256": "867d358ffd60ceb2ceb3feb53a88455340cfb22af7d658ad97b53ba3240b41ee",
+  "node": "v24.21.0",
+  "observed_sha256": "a2908e8cc2fefc6a5f5d8e9744fcff5462793b5d96dcf506c963a95ef6d0f851",
+  "order": "reverse",
+  "os": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "patches": [
+    {
+      "patch_sha256": "87756ace1a41b88761aa252c2621216051d9100258081b40b7fc25e59ffcb199",
+      "proposal_id": 16703
+    },
+    {
+      "patch_sha256": "67d767a46385c608ec23a501d49aeb6b77bf3404abe8b0e5fa6ac26e452187a4",
+      "proposal_id": 17973
+    }
+  ],
+  "proposals": [
+    {
+      "accepted": true,
+      "accepted_ids": [
+        16703
+      ],
+      "ack_at": 43404.924951194,
+      "arm": "file_lock",
+      "arm_terminal": "committed",
+      "attempts": 1,
+      "batch_id": null,
+      "batch_size": 1,
+      "clocks": {
+        "clock": "monotonic",
+        "effective_stop": 43434.829246585,
+        "item_stop": 43434.829246585,
+        "own_deadline": 43434.829246585,
+        "stamps": [
+          {
+            "event": "barrier_exit",
+            "mono": 43404.828670659,
+            "wall": 1793406994.0016325
+          },
+          {
+            "event": "submit",
+            "mono": 43404.829246585,
+            "wall": 1793406994.0022092
+          },
+          {
+            "event": "rename",
+            "mono": 43404.923902458,
+            "wall": 1793406994.0979083
+          },
+          {
+            "event": "ack",
+            "mono": 43404.924951194,
+            "wall": 1793406994.0979125
+          }
+        ]
+      },
+      "detail": null,
+      "events": [
+        {
+          "arm": "file_lock",
+          "order_index": 0,
+          "proposal_id": 16703,
+          "type": "proposal"
+        },
+        {
+          "attempt": 0,
+          "inside_lock": true,
+          "proposal_id": 16703,
+          "type": "attempt"
+        },
+        {
+          "ack_at": 43404.924951194,
+          "proposal_id": 16703,
+          "rename_at": 43404.923902458,
+          "type": "commit"
+        }
+      ],
+      "executable_seconds": 30.0,
+      "first_submit": 43404.829246585,
+      "metrics": {
+        "blocked_count": 0,
+        "lock_hold_ms": 95.54802699858556,
+        "lock_wait_ms": 0.006761998520232737,
+        "serialization_delay_ms": 0.006761998520232737
+      },
+      "proposal_id": 16703,
+      "rename_at": 43404.923902458,
+      "retries": 0,
+      "stop_reason": "acked-in-window"
+    },
+    {
+      "accepted": false,
+      "accepted_ids": [],
+      "ack_at": null,
+      "arm": "file_lock",
+      "arm_terminal": "rejected-conflict",
+      "attempts": 1,
+      "batch_id": null,
+      "batch_size": 0,
+      "clocks": {
+        "clock": "monotonic",
+        "effective_stop": 43434.829246585,
+        "item_stop": 43434.829246585,
+        "own_deadline": 43435.319886474,
+        "stamps": [
+          {
+            "event": "barrier_exit",
+            "mono": 43404.818722927,
+            "wall": 1793406993.991685
+          },
+          {
+            "event": "submit",
+            "mono": 43405.319886474,
+            "wall": 1793406994.4928584
+          }
+        ]
+      },
+      "detail": "patch context mismatch at line 1621: expected \"        # tuples with integers and strings. Flatten them out into strings.\", found \"            lhs_sql, lhs_params = self.compile(select_col)\"",
+      "events": [
+        {
+          "arm": "file_lock",
+          "order_index": 1,
+          "proposal_id": 17973,
+          "type": "proposal"
+        },
+        {
+          "attempt": 0,
+          "inside_lock": true,
+          "proposal_id": 17973,
+          "type": "attempt"
+        }
+      ],
+      "executable_seconds": 29.509360111005662,
+      "first_submit": 43405.319886474,
+      "metrics": {
+        "blocked_count": 0,
+        "lock_hold_ms": 93.72540699405363,
+        "lock_wait_ms": 0.010937998013105243,
+        "serialization_delay_ms": 0.010937998013105243
+      },
+      "proposal_id": 17973,
+      "rename_at": null,
+      "retries": 0,
+      "stop_reason": "conflict"
+    }
+  ],
+  "python": "3.13.5",
+  "schema": "hist-v2-harness-manifest/2",
+  "seed": 0,
+  "validity": {
+    "designed_spread_s": 0.5005066996945255,
+    "label": null,
+    "max_realtime_minus_monotonic_s": 0.0010433301285956986,
+    "observed_spread_monotonic_s": 0.4906398889943375,
+    "observed_spread_wall_s": 0.4906492233276367,
+    "reasons": [],
+    "stamp_count": 8,
+    "valid": true
+  }
+}

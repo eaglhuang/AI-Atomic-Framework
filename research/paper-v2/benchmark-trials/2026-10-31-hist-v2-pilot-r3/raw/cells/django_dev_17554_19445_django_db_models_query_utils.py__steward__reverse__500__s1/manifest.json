@@ -1,0 +1,199 @@
+{
+  "arm": "steward",
+  "base_sha256": "42f2cb3d2d7c7fa649131e771407efbabe09017e721251650f54ebe87a5e9029",
+  "dirty": true,
+  "dirty_entries": [
+    "?? research/paper-v2/benchmark-trials/.2026-10-31-hist-v2-pilot-r3.staging/",
+    "?? research/paper-v2/benchmark-trials/2026-10-30-hist-v2-pilot-r3/"
+  ],
+  "driver_clock_stamps": [
+    {
+      "event": "cell_start",
+      "mono": 44262.726970596,
+      "wall": 1793407851.8999324
+    },
+    {
+      "event": "cell_end",
+      "mono": 44263.661394008,
+      "wall": 1793407852.8343558
+    }
+  ],
+  "events": [
+    {
+      "arm": "steward",
+      "proposal_id": 17554,
+      "type": "proposal"
+    },
+    {
+      "arm": "steward",
+      "proposal_id": 19445,
+      "type": "proposal"
+    },
+    {
+      "accepted_ids": [
+        17554,
+        19445
+      ],
+      "batch_id": "steward-17554",
+      "batch_size": 2,
+      "type": "batch"
+    },
+    {
+      "batch_id": "steward-17554",
+      "batch_size": 2,
+      "type": "batch"
+    },
+    {
+      "batch_id": "steward-17554",
+      "batch_size": 2,
+      "type": "batch"
+    }
+  ],
+  "fixture_id": "django:dev:17554_19445:django/db/models/query_utils.py",
+  "formal_run": false,
+  "git_head": "a88ffb3223dcb25a17caed19f846303de47ab5ae",
+  "harness": "hist-v2-harness-v4",
+  "inter_arrival_ms": 500,
+  "lockfile_sha256": "867d358ffd60ceb2ceb3feb53a88455340cfb22af7d658ad97b53ba3240b41ee",
+  "node": "v24.21.0",
+  "observed_sha256": "c3a92fa408abbb6e02a29ac10ecb6c162fe9a8eeda573896a288cb057f854b49",
+  "order": "reverse",
+  "os": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "patches": [
+    {
+      "patch_sha256": "f9eecf645f1d586505abb9482f9a24dbe87f434e859c01936a3e9d9b96bce362",
+      "proposal_id": 17554
+    },
+    {
+      "patch_sha256": "b825b25d4b6a770a4b5d371ce63c4737618f55465c34acc73da4ba6516290c53",
+      "proposal_id": 19445
+    }
+  ],
+  "proposals": [
+    {
+      "accepted": true,
+      "accepted_ids": [
+        17554,
+        19445
+      ],
+      "ack_at": 44263.642819409,
+      "arm": "steward",
+      "arm_terminal": "committed",
+      "attempts": 1,
+      "batch_id": "steward-17554",
+      "batch_size": 2,
+      "clocks": {
+        "clock": "monotonic",
+        "effective_stop": 44292.951334628,
+        "item_stop": 44292.951334628,
+        "own_deadline": 44292.951334628,
+        "stamps": [
+          {
+            "event": "barrier_exit",
+            "mono": 44262.847915999,
+            "wall": 1793407852.0208778
+          },
+          {
+            "event": "submit",
+            "mono": 44262.951334628,
+            "wall": 1793407852.1243026
+          },
+          {
+            "event": "rename",
+            "mono": 44263.642351579,
+            "wall": 1793407852.8157778
+          },
+          {
+            "event": "ack",
+            "mono": 44263.642819409,
+            "wall": 1793407852.8157806
+          }
+        ]
+      },
+      "detail": null,
+      "events": [
+        {
+          "batch_id": "steward-17554",
+          "batch_size": 2,
+          "type": "batch"
+        }
+      ],
+      "executable_seconds": 30.0,
+      "first_submit": 44262.951334628,
+      "metrics": {
+        "blocked_count": 0,
+        "lock_hold_ms": 691.7034650032292,
+        "lock_wait_ms": 0.008529998012818396,
+        "serialization_delay_ms": 0.008529998012818396
+      },
+      "proposal_id": 17554,
+      "rename_at": 44263.642351579,
+      "retries": 0,
+      "stop_reason": "acked-in-window"
+    },
+    {
+      "accepted": true,
+      "accepted_ids": [
+        17554,
+        19445
+      ],
+      "ack_at": 44263.642819409,
+      "arm": "steward",
+      "arm_terminal": "committed",
+      "attempts": 1,
+      "batch_id": "steward-17554",
+      "batch_size": 2,
+      "clocks": {
+        "clock": "monotonic",
+        "effective_stop": 44292.951334628,
+        "item_stop": 44292.951334628,
+        "own_deadline": 44293.434110045,
+        "stamps": [
+          {
+            "event": "barrier_exit",
+            "mono": 44262.840837254,
+            "wall": 1793407852.0137987
+          },
+          {
+            "event": "submit",
+            "mono": 44263.434110045,
+            "wall": 1793407852.6070762
+          }
+        ]
+      },
+      "detail": null,
+      "events": [
+        {
+          "batch_id": "steward-17554",
+          "batch_size": 2,
+          "type": "batch"
+        }
+      ],
+      "executable_seconds": 29.517224583003554,
+      "first_submit": 44263.434110045,
+      "metrics": {
+        "blocked_count": 1,
+        "lock_hold_ms": 0.6359190010698512,
+        "lock_wait_ms": 209.1215309992549,
+        "serialization_delay_ms": 209.1215309992549
+      },
+      "proposal_id": 19445,
+      "rename_at": 44263.642351579,
+      "retries": 0,
+      "stop_reason": "acked-in-window"
+    }
+  ],
+  "python": "3.13.5",
+  "schema": "hist-v2-harness-manifest/2",
+  "seed": 1,
+  "validity": {
+    "designed_spread_s": 0.4927202964305711,
+    "label": null,
+    "max_realtime_minus_monotonic_s": 0.00046441113227047026,
+    "observed_spread_monotonic_s": 0.48277541699644644,
+    "observed_spread_wall_s": 0.4827735424041748,
+    "reasons": [],
+    "stamp_count": 8,
+    "valid": true
+  }
+}
