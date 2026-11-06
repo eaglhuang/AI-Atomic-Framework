@@ -33,6 +33,7 @@ class RawPull:
     calls: int
     pull_files_truncated: bool
     commit_files_truncated: list  # shas whose file list hit the page cap
+    force_pushes: list | None = None  # head_ref_force_pushed events; None = not fetched
 
 
 def _paged(transport: Transport, base: str, per_page: int, max_pages: int) -> tuple[list, int, bool]:
@@ -51,7 +52,7 @@ def _paged(transport: Transport, base: str, per_page: int, max_pages: int) -> tu
 
 
 def fetch_pull(transport: Transport, repo: str, number: int,
-               on_call: Callable[[], None] | None = None) -> RawPull:
+               on_call: Callable[[], None] | None = None, events: bool = False) -> RawPull:
     calls = 0
     pull = transport.get(f"repos/{repo}/pulls/{number}")
     calls += 1
@@ -81,8 +82,15 @@ def fetch_pull(transport: Transport, repo: str, number: int,
         commit_files[sha] = files
         if on_call:
             on_call()
+    pushes = None
+    if events:
+        timeline, c, _ = _paged(transport, f"repos/{repo}/issues/{number}/timeline",
+                                PER_PAGE_FILES, MAX_FILE_PAGES)
+        calls += c
+        pushes = [{"at": e.get("created_at"), "commit_id": e.get("commit_id")}
+                  for e in timeline if e.get("event") == "head_ref_force_pushed"]
     return RawPull(repo, number, pull, commits, pull_files, commit_files, calls,
-                   pf_trunc, truncated)
+                   pf_trunc, truncated, pushes)
 
 
 def _file_entry(f: dict) -> dict:
@@ -130,4 +138,5 @@ def normalize(raw: RawPull) -> dict:
         "api_calls": raw.calls,
         "pull_files_truncated": raw.pull_files_truncated,
         "commit_files_truncated": list(raw.commit_files_truncated),
+        "force_pushes": raw.force_pushes,
     }

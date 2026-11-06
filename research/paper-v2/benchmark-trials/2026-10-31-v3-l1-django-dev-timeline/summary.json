@@ -1,0 +1,178 @@
+{
+ "api_calls_recorded": 281,
+ "claim_sets_all": {
+  "s1_equals_s2_rate": 0.8462,
+  "s1_precision_vs_s2": {
+   "max": 1.0,
+   "mean": 1.0,
+   "median": 1.0,
+   "min": 1.0,
+   "n": 52,
+   "p25": 1.0,
+   "p75": 1.0
+  },
+  "s1_recall_of_s2": {
+   "max": 1.0,
+   "mean": 0.915,
+   "median": 1.0,
+   "min": 0.0909,
+   "n": 52,
+   "p25": 1.0,
+   "p75": 1.0
+  },
+  "s1_size": {
+   "max": 89,
+   "mean": 5.25,
+   "median": 2.0,
+   "min": 1,
+   "n": 52,
+   "p25": 1.0,
+   "p75": 4.0
+  },
+  "s1_subset_of_s2_rate": 1.0,
+  "s2_size": {
+   "max": 95,
+   "mean": 6.019,
+   "median": 3.0,
+   "min": 1,
+   "n": 52,
+   "p25": 1.0,
+   "p75": 5.25
+  },
+  "s3_size": {
+   "max": 53,
+   "mean": 3.885,
+   "median": 2.0,
+   "min": 1,
+   "n": 52,
+   "p25": 1.0,
+   "p75": 4.0
+  }
+ },
+ "claim_sets_timeline_ok": {
+  "s1_equals_s2_rate": 0.9302,
+  "s1_precision_vs_s2": {
+   "max": 1.0,
+   "mean": 1.0,
+   "median": 1.0,
+   "min": 1.0,
+   "n": 43,
+   "p25": 1.0,
+   "p75": 1.0
+  },
+  "s1_recall_of_s2": {
+   "max": 1.0,
+   "mean": 0.966,
+   "median": 1.0,
+   "min": 0.0909,
+   "n": 43,
+   "p25": 1.0,
+   "p75": 1.0
+  },
+  "s1_size": {
+   "max": 89,
+   "mean": 5.512,
+   "median": 3.0,
+   "min": 1,
+   "n": 43,
+   "p25": 1.0,
+   "p75": 4.0
+  },
+  "s1_subset_of_s2_rate": 1.0,
+  "s2_size": {
+   "max": 95,
+   "mean": 5.907,
+   "median": 3.0,
+   "min": 1,
+   "n": 43,
+   "p25": 1.0,
+   "p75": 4.0
+  },
+  "s3_size": {
+   "max": 53,
+   "mean": 4.186,
+   "median": 2.0,
+   "min": 1,
+   "n": 43,
+   "p25": 1.0,
+   "p75": 4.0
+  }
+ },
+ "dev_seconds_all_defined": {
+  "max": 13122349,
+  "mean": 139354.923,
+  "median": 400.0,
+  "min": -6303239,
+  "n": 52,
+  "p25": 99.0,
+  "p75": 4260.25
+ },
+ "dev_seconds_timeline_ok": {
+  "max": 13122349,
+  "mean": 461228.442,
+  "median": 671.0,
+  "min": 7,
+  "n": 43,
+  "p25": 186.5,
+  "p75": 4910.5
+ },
+ "flag_counts": {
+  "author-order-differs": 3,
+  "committed-after-submit": 41,
+  "force-pushed-after-submit": 40,
+  "start-after-submit": 6
+ },
+ "flag_rates": {
+  "author-order-differs": 0.0577,
+  "committed-after-submit": 0.7885,
+  "force-pushed-after-submit": 0.7692,
+  "start-after-submit": 0.1154
+ },
+ "force_pushes": {
+  "max": 9,
+  "mean": 2.635,
+  "median": 2.5,
+  "min": 0,
+  "n": 52,
+  "p25": 1.0,
+  "p75": 4.0
+ },
+ "own_commits": {
+  "max": 10,
+  "mean": 1.404,
+  "median": 1.0,
+  "min": 1,
+  "n": 52,
+  "p25": 1.0,
+  "p75": 1.0
+ },
+ "records": 52,
+ "rule_a": {
+  "excluded": 9,
+  "excluding_reasons": [
+   "start-after-submit",
+   "negative-dev-seconds",
+   "author-order-differs",
+   "no-own-commits"
+  ],
+  "exclusion_rate": 0.1731,
+  "imputation_median_dev_seconds": 671,
+  "reason_counts": {
+   "author-order-differs": 3,
+   "negative-dev-seconds": 6,
+   "start-after-submit": 6
+  },
+  "records": 52,
+  "rule": "A-v1-2026-10-31",
+  "timeline_ok": 43
+ },
+ "total_lines": {
+  "max": 1393,
+  "mean": 106.0,
+  "median": 43.5,
+  "min": 1,
+  "n": 52,
+  "p25": 12.0,
+  "p75": 95.5
+ }
+}

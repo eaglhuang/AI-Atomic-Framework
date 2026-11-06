@@ -7,4 +7,4 @@ cumulative line timeline. Zero model calls; GitHub REST only.
 """
 
 SCHEMA_ID = "atm.paper-v3.l1-timeline.v1"
-MINER_VERSION = "1"
+MINER_VERSION = "2"

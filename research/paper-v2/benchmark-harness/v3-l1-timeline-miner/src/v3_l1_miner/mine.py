@@ -39,6 +39,7 @@ class Miner:
     repo: str
     allow_holdout: bool = False
     max_calls: int | None = None
+    events: bool = False
     rate_reserve: int = 50
     sleep: Callable[[float], None] = time.sleep
     now: Callable[[], datetime] = lambda: datetime.now(timezone.utc)
@@ -73,7 +74,7 @@ class Miner:
         last: Exception | None = None
         for attempt in range(2):
             try:
-                return fetch_pull(self.transport, self.repo, number)
+                return fetch_pull(self.transport, self.repo, number, events=self.events)
             except TransportError as exc:
                 last = exc
                 if exc.status == 404:

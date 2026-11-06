@@ -5,6 +5,7 @@ from __future__ import annotations
 import re
 
 from . import SCHEMA_ID
+from .derive import EXCLUDING_REASONS, parse_ts
 
 TS = re.compile(r"^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ$")
 SHA = re.compile(r"^[0-9a-f]{40}$")
@@ -45,4 +46,19 @@ def errors(rec: dict) -> list[str]:
     if der.get("t_start") and isinstance(der.get("t_write"), dict):
         for f in der.get("s1_files") or []:
             need(der["t_write"].get(f) == der["t_start"], f"t_write[{f}] == t_start for S1")
+    # exclusion rule A (miner_version >= 2 records carry these fields)
+    if "timeline_ok" in der:
+        reasons = der.get("exclusion_reasons")
+        need(isinstance(reasons, list) and all(r in EXCLUDING_REASONS for r in reasons), "derived.exclusion_reasons")
+        need(der["timeline_ok"] is (not reasons), "timeline_ok iff no exclusion_reasons")
+        if der["timeline_ok"]:
+            need(der.get("t_start_imputed") is None, "t_start_imputed null when timeline_ok")
+            need(der.get("t_start_sens") == der.get("t_start"), "t_start_sens == t_start when timeline_ok")
+            need(isinstance(der.get("dev_seconds"), int) and der["dev_seconds"] >= 0, "dev_seconds >= 0 when timeline_ok")
+        else:
+            imp = der.get("t_start_imputed")
+            need(imp is None or bool(TS.match(imp)), "derived.t_start_imputed")
+            need(der.get("t_start_sens") == imp, "t_start_sens == t_start_imputed when excluded")
+            if imp and TS.match(imp) and TS.match(str(raw.get("created_at", ""))):
+                need(parse_ts(imp) <= parse_ts(raw["created_at"]), "t_start_imputed <= created_at")
     return e
