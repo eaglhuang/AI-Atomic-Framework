@@ -32,6 +32,25 @@ try {
   const beforeWrongOwner = readFileSync(path.join(cwd, '.atm', 'history', 'tasks', 'ATM-GOV-0414.json'), 'utf8');
   assert.throws(() => applyMetadataOnlyImport({ cwd, taskId: 'ATM-GOV-0414', actorId: 'other', importedValidators: ['bad'], importedPlanningSourceSeal: { bad: true }, command: 'test' }), (error: unknown) => (error as { code?: string }).code === 'ATM_TASK_METADATA_ONLY_IMPORT_OWNER_MISMATCH');
   assert.equal(readFileSync(path.join(cwd, '.atm', 'history', 'tasks', 'ATM-GOV-0414.json'), 'utf8'), beforeWrongOwner);
+
+  const releasedPath = path.join(cwd, '.atm', 'history', 'tasks', 'ATM-GOV-0415.json');
+  const released = { ...task, workItemId: 'ATM-GOV-0415', status: 'running', validators: ['ledger-validator'], scopePaths: ['packages/amended.ts'], claim: { ...task.claim, state: 'released' } };
+  writeFileSync(releasedPath, `${JSON.stringify(released, null, 2)}
+`);
+  const releasedReceipt = applyMetadataOnlyImport({ cwd, taskId: 'ATM-GOV-0415', actorId: 'codex-captain', importedValidators: [], importedPlanningSourceSeal: { planningCommitSha: 'def', contentDigest: 'drifted', amendmentEpoch: 2 }, command: 'test released owner' });
+  const releasedUpdated = JSON.parse(readFileSync(releasedPath, 'utf8'));
+  assert.deepEqual(releasedUpdated.validators, ['ledger-validator']);
+  assert.deepEqual(releasedUpdated.scopePaths, ['packages/amended.ts']);
+  assert.deepEqual(releasedUpdated.claim, released.claim);
+  assert.equal(releasedUpdated.source.planningSourceSeal.contentDigest, 'drifted');
+  assert.deepEqual(releasedReceipt.changedKeys, ['source.planningSourceSeal']);
+  const beforeReleasedOther = readFileSync(releasedPath, 'utf8');
+  assert.throws(() => applyMetadataOnlyImport({ cwd, taskId: 'ATM-GOV-0415', actorId: 'other', importedValidators: [], importedPlanningSourceSeal: { bad: true }, command: 'test' }), (error: unknown) => (error as { code?: string }).code === 'ATM_TASK_METADATA_ONLY_IMPORT_CLAIM_REQUIRED');
+  assert.equal(readFileSync(releasedPath, 'utf8'), beforeReleasedOther);
+  const donePath = path.join(cwd, '.atm', 'history', 'tasks', 'ATM-GOV-0416.json');
+  writeFileSync(donePath, `${JSON.stringify({ ...released, workItemId: 'ATM-GOV-0416', status: 'done' }, null, 2)}
+`);
+  assert.throws(() => applyMetadataOnlyImport({ cwd, taskId: 'ATM-GOV-0416', actorId: 'codex-captain', importedValidators: [], importedPlanningSourceSeal: { bad: true }, command: 'test' }), (error: unknown) => (error as { code?: string }).code === 'ATM_TASK_METADATA_ONLY_IMPORT_CLAIM_REQUIRED');
 } finally { rmSync(cwd, { recursive: true, force: true }); }
 
 console.log('tasks-import-metadata-only-preserve-claim: ok');

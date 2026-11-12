@@ -7,6 +7,9 @@ import { inspectStdinPathspecGitAddProcesses } from '../../packages/cli/src/comm
 // helper in an unrelated repository failed this one's commit.
 const helper = 'git add -A -f --pathspec-from-file=- --pathspec-file-nul';
 const repo = path.resolve('/work/shop');
+// The CLI sweep disables the live preflight for its children; this test
+// drives the preflight through its process fixture instead.
+delete process.env.ATM_GIT_STDIN_PATHSPEC_PREFLIGHT;
 
 function inspect(processes: readonly Record<string, unknown>[], cwd?: string) {
   process.env.ATM_GIT_STDIN_PATHSPEC_PROCESS_FIXTURE = JSON.stringify(processes);
