@@ -108,10 +108,14 @@ function terminateTestTree(child: ReturnType<typeof spawn>): void {
   child.kill('SIGKILL');
 }
 
+// The stdin-pathspec preflight scans every git process on the host, so a
+// parallel sibling's own `git add` would fail an unrelated test's commit.
+const sweepChildEnv = { ...process.env, ATM_GIT_STDIN_PATHSPEC_PREFLIGHT: '0' };
+
 function runOne(root: string, testDir: string, test: string, timeoutMs: number, logFile?: string): Promise<Omit<TestResult, 'dirtied'>> {
   return new Promise((resolve) => {
     const started = Date.now();
-    const child = spawn(process.execPath, ['--strip-types', path.join(testDir, test)], { cwd: root, detached: process.platform !== 'win32', stdio: ['ignore', logFile ? 'pipe' : 'ignore', 'pipe'] });
+    const child = spawn(process.execPath, ['--strip-types', path.join(testDir, test)], { cwd: root, env: sweepChildEnv, detached: process.platform !== 'win32', stdio: ['ignore', logFile ? 'pipe' : 'ignore', 'pipe'] });
     if (logFile) {
       appendFileSync(logFile, `\n[test] ${test}\n`);
       child.stdout?.on('data', (chunk) => appendFileSync(logFile, chunk));
