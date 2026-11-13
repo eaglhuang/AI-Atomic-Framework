@@ -132,7 +132,7 @@ export function uniqueSorted(values) {
     return [...new Set(values.map(normalizeRelativePath).filter(Boolean))].sort();
 }
 // Editor-generated companion files that sit beside the path they describe.
-// Cocos Creator writes `<asset>.meta` for every asset and folder; a folder's
+// Some editors write `<asset>.meta` for every asset and folder; a folder's
 // meta lands outside the folder, so a `dir/**` scope would otherwise miss it.
 export const SCOPE_COMPANION_SUFFIXES = ['.meta'];
 export function pathMatchesTaskScope(filePath, scope) {
