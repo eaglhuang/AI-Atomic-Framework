@@ -34,6 +34,20 @@ semver version from consumers using version ranges. For strong prerelease
 isolation, publish a prerelease version; promoting a tag never changes the
 immutable version string.
 
+## Preparing a release version
+
+Source manifests must carry the release version before the tag is pushed.
+The publish workflow verifies this and fails before any build when the tag
+does not match the root `package.json` version; it never writes versions back
+to the default branch.
+
+1. In the release PR, run `npm run release:prepare -- --version <MAJOR.MINOR.PATCH>`.
+   It updates every workspace manifest, internal dependency pins, and the lockfile.
+2. Rebuild the frozen runner so `node release/atm-onefile/atm.mjs --version` reports the new version.
+3. Add `docs/releases/<version>.md`, merge the PR, then tag the merged commit as `v<version>`.
+
+Prerelease tags such as `v<version>-beta.1` are accepted when the source holds `<version>`.
+
 ## Trusted Publishing prerequisites
 
 The workflow pins npm 11.21.0, which supports OIDC dist-tag operations. Both

@@ -90,6 +90,9 @@ jobs:
           if [[ "$RELEASE_DRY_RUN" == "true" ]]; then
             version="${RELEASE_VERSION_INPUT:-0.0.0-beta.0}"
             echo "Dry-run mode: simulating package version $version"
+          else
+            # Versions are set in the release PR, never written back after publish.
+            node --experimental-strip-types scripts/release-prepare.ts --check-tag "$GITHUB_REF_NAME"
           fi
           # These packages are versioned as one unpublished workspace closure.
           # Do not ask npm to refresh workspace links from the public registry
