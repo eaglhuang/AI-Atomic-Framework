@@ -776,6 +776,7 @@
     "release/atm-root-drop/docs/releases/0.1.23.md",
     "release/atm-root-drop/docs/releases/0.1.24.md",
     "release/atm-root-drop/docs/releases/0.1.25.md",
+    "release/atm-root-drop/docs/releases/0.1.26.md",
     "release/atm-root-drop/docs/reports/TASK-TMP-0007-target-side-attestation.md",
     "release/atm-root-drop/docs/reports/agr-conflict-arbitration-benchmark.md",
     "release/atm-root-drop/docs/reports/atm-2-1-final-closure.md",
@@ -7211,6 +7212,7 @@
     "release/atm-root-drop/tests/cli/runtime-telemetry-boundary.test.ts",
     "release/atm-root-drop/tests/cli/scope-amendment-rearbitration.test.ts",
     "release/atm-root-drop/tests/cli/scope-amendment-work-admission-ticket.test.ts",
+    "release/atm-root-drop/tests/cli/scope-companion-sidecar.test.ts",
     "release/atm-root-drop/tests/cli/seal-temp-claim-expiry.test.ts",
     "release/atm-root-drop/tests/cli/sealed-build-log-sink.test.ts",
     "release/atm-root-drop/tests/cli/sealed-candidate-index-large-pathspec.test.ts",
@@ -7730,7 +7732,7 @@
   ],
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
-    "copied": 0,
+    "copied": 2,
     "unchanged": 7695,
     "removed": 0
   },
@@ -14438,6 +14440,15 @@
         "origin": "source",
         "inputPaths": [
           "docs/releases/0.1.25.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "docs/releases/0.1.26.md",
+        "digest": "71b11b446259f72c51fe07e5f4bec9e84265519e23af792172fd37ba2fbd2e87",
+        "origin": "source",
+        "inputPaths": [
+          "docs/releases/0.1.26.md"
         ],
         "replaceable": true
       },
@@ -28555,7 +28566,7 @@
       },
       {
         "path": "packages/cli/dist/build-identity.json",
-        "digest": "85a9b80bd40aedaabe8fffdbf100588399ecd39a710238d3f829a7094d648e58",
+        "digest": "2478c5dbf687b31a656e77562388734ac22662bd9df3a803397261c2209a357c",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/build-identity.json"
@@ -30481,7 +30492,7 @@
       },
       {
         "path": "packages/cli/dist/commands/git-governance/commit-scope-policy.js",
-        "digest": "1bddbace22ebcf0f83585185608ab51ee1a8e9daae439083dadae897382bc869",
+        "digest": "21a83731f39939bc94d3b02ecc60de72e028fd7111896efcdc30cfef0fcd5b73",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/git-governance/commit-scope-policy.js"
@@ -34792,7 +34803,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/build-identity.json",
-        "digest": "819b6606931215ad63bae872de33890e2c3385679e47204949864cd34c158995",
+        "digest": "7effcdf18e860de53bc210a86a57f27a2249e439548446d7c2d2d0e71529180a",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/build-identity.json"
@@ -35521,7 +35532,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/manifest.json",
-        "digest": "131dbf04e3b03824679ff0a3253e65a6d9369055e1f1e249d9c9f843f8ee12dd",
+        "digest": "f5adab5296cc390c7929f211e0395e53d39ee56dbdb68b5feb41e0e19aa26765",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/manifest.json"
@@ -35530,7 +35541,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/runtime.mjs",
-        "digest": "d2e601e41ba9037b635404e8635d5612490f1ff3de73544bfaf3f48b865312eb",
+        "digest": "dd34f980e309cb0bd12ce8ce962be42c540822d2a221e3fea1230b7cf1522053",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/runtime.mjs"
@@ -38203,7 +38214,7 @@
       },
       {
         "path": "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
-        "digest": "87a1cfafc89328c8e49c34d22651e49c72ade567190c74641b3e68fdcc68fbcb",
+        "digest": "3e8c8dc231bebb946b98fba625f9bd069dc387b974aeb3a99a7b17afa9f38fc9",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/git-governance/commit-scope-policy.ts"
@@ -55222,7 +55233,7 @@
       },
       {
         "path": "packages/create-atm/dist/build-identity.json",
-        "digest": "b111a9a9548661027fab399a14d96670571c95f77e065876f7a86ad65417ea11",
+        "digest": "2e059ba17d0fa2f187abe75e75ebec415c7ba01f21474eadf4c644089271decc",
         "origin": "source",
         "inputPaths": [
           "packages/create-atm/dist/build-identity.json"
@@ -72348,6 +72359,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/cli/scope-companion-sidecar.test.ts",
+        "digest": "e5cbea142838eaf4e7808c91df561c5ea6bee619c9b286a4549388d233ea713b",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/scope-companion-sidecar.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/cli/seal-temp-claim-expiry.test.ts",
         "digest": "d8ce7000c074ee508b7dca1a81f3f7d43173026b8dea22daec92203ec9a8d8b4",
         "origin": "source",
@@ -76992,7 +77012,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:8d1eb7704ba4fefff95bb9e9d447295e1d669c1b29d2b0a305a5cab04cd713dc"
+    "treeDigest": "sha256:2a1effdfa98859af8efb458934637e01955608c9eebacf5135ffdd351f0f1641"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -78653,7 +78673,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:c65c3aa8956ab62ced6e5d117ea546880736a00605bbf48830be9217e5537304"
+    "digest": "sha256:64bbdea72999450670e5eebee7473ee1d3b8959037b9b032386e9955c24a3992"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -79403,6 +79423,7 @@
       "release/atm-root-drop/docs/releases/0.1.23.md",
       "release/atm-root-drop/docs/releases/0.1.24.md",
       "release/atm-root-drop/docs/releases/0.1.25.md",
+      "release/atm-root-drop/docs/releases/0.1.26.md",
       "release/atm-root-drop/docs/reports/TASK-TMP-0007-target-side-attestation.md",
       "release/atm-root-drop/docs/reports/agr-conflict-arbitration-benchmark.md",
       "release/atm-root-drop/docs/reports/atm-2-1-final-closure.md",
@@ -85838,6 +85859,7 @@
       "release/atm-root-drop/tests/cli/runtime-telemetry-boundary.test.ts",
       "release/atm-root-drop/tests/cli/scope-amendment-rearbitration.test.ts",
       "release/atm-root-drop/tests/cli/scope-amendment-work-admission-ticket.test.ts",
+      "release/atm-root-drop/tests/cli/scope-companion-sidecar.test.ts",
       "release/atm-root-drop/tests/cli/seal-temp-claim-expiry.test.ts",
       "release/atm-root-drop/tests/cli/sealed-build-log-sink.test.ts",
       "release/atm-root-drop/tests/cli/sealed-candidate-index-large-pathspec.test.ts",
@@ -86360,22 +86382,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:ddc7e5a9d632d65c5d70e9bbefee8c8172a4f32b47f1b92468fb4e0ae308d330",
-  "sealedSourceCommit": "89360de9a07fb34214eb174d8a093e7df4e7e67b",
-  "buildDecision": "fullRebuild",
-  "buildDecisionReason": "build-script-change",
-  "incrementalPlanDigest": "sha256:46b6c36d5b9e9d9a0bed1dc2ff744b2b0ae63c99e57ebd280c4ae51e5c9da5ee",
-  "tsBuildCacheDigest": "sha256:bdc447a568d1f731d5b2508be264f42e6a814d2c3065a45f64643196c0d206f1",
+  "buildInputsTreeHash": "sha256:e99fd36eda831fe3f5b6009da8199f7d81b66c5b00f037293b07b0725372f732",
+  "sealedSourceCommit": "9a28c5d171632ed20fe77c599ea21f0233b3cb3a",
+  "buildDecision": "incrementalBuild",
+  "buildDecisionReason": "diff planner selected 1 affected package(s)",
+  "incrementalPlanDigest": "sha256:d83c250d3cffcbcc7ad2ac0cbc9aa77caa1033d0e5951c87a4fe0c27e13c3fc9",
+  "tsBuildCacheDigest": "sha256:be2ac797c0815b351244e307bfa3505d54094a8e091bfcf7b982251fda01e222",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 62,
-    "skipDecision": 87,
-    "worktreeSetup": 402424,
-    "typescriptBuild": 57283,
-    "rootDropReleaseAssembly": 66564,
-    "onefileReleaseAssembly": 59814,
-    "artifactSync": 26077,
+    "inputHashCalculation": 55,
+    "skipDecision": 66,
+    "worktreeSetup": 251199,
+    "typescriptBuild": 39058,
+    "rootDropReleaseAssembly": 56112,
+    "onefileReleaseAssembly": 49209,
+    "artifactSync": 14294,
     "cleanup": 0,
-    "totalElapsed": 644220
+    "totalElapsed": 454463
   }
 }
