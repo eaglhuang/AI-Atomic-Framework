@@ -6095,6 +6095,7 @@
     "release/atm-root-drop/scripts/product-ci-burn-in-workflow-scope.json",
     "release/atm-root-drop/scripts/release-artifact-manifest.ts",
     "release/atm-root-drop/scripts/release-candidate.ts",
+    "release/atm-root-drop/scripts/release-prepare.ts",
     "release/atm-root-drop/scripts/render-agent-matrix.ts",
     "release/atm-root-drop/scripts/render-atm-admission-report.ts",
     "release/atm-root-drop/scripts/repro/bug-atm-0045-planning-root-preference.mjs",
@@ -7142,6 +7143,7 @@
     "release/atm-root-drop/tests/cli/recover-push-fail-timeout.test.ts",
     "release/atm-root-drop/tests/cli/related-task-batching-wave-surface.test.ts",
     "release/atm-root-drop/tests/cli/release-drops-clean-copy-smoke.test.ts",
+    "release/atm-root-drop/tests/cli/release-prepare-tag-gate.test.ts",
     "release/atm-root-drop/tests/cli/release-prepublish-gate.test.ts",
     "release/atm-root-drop/tests/cli/release-public-registry-gate.test.ts",
     "release/atm-root-drop/tests/cli/release-publication-steward.test.ts",
@@ -7734,7 +7736,7 @@
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
     "copied": 0,
-    "unchanged": 7698,
+    "unchanged": 7700,
     "removed": 0
   },
   "buildMode": "full",
@@ -8884,7 +8886,7 @@
       },
       {
         "path": "docs/NPM_RELEASE_PARITY.md",
-        "digest": "e85350b92bcd765c0c60f958ae126e46f3a7051917d1ec05ba4f7ac9dcdb37bd",
+        "digest": "483fefc96c46cf4f2a8ac1d782cba4ed9d1549e3a2729243ecd41a239124d818",
         "origin": "source",
         "inputPaths": [
           "docs/NPM_RELEASE_PARITY.md"
@@ -18577,7 +18579,7 @@
       },
       {
         "path": "package.json",
-        "digest": "f350c52a346c539d9d373b7dcab42741a9ba31c1b9775acd5429ee162156e904",
+        "digest": "f0b5958078bc01eca008f735c1be064a233fa504af435cca4ecc0b73486fe416",
         "origin": "source",
         "inputPaths": [
           "package.json"
@@ -28576,7 +28578,7 @@
       },
       {
         "path": "packages/cli/dist/build-identity.json",
-        "digest": "6aa29e3e2dbaddfa1df99466a7e83e357bf829fa8f76ea2101dc49716ecd0be6",
+        "digest": "b7b6a504311053be8e3e18a6d298ce9e777891c2fffea24e554caa8a7aad93dd",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/build-identity.json"
@@ -34813,7 +34815,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/build-identity.json",
-        "digest": "fe81adbcaef8e17222091158aaa0f6bb3bc5ed8b2c1ea851364b5849e32440f0",
+        "digest": "ff2f004f5026a2532e5e53243ad3c7d2dba4b833d82c8ebff74119d0f16b7d98",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/build-identity.json"
@@ -35542,7 +35544,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/manifest.json",
-        "digest": "3e609d08c0ed4ea1c333782ffde9aeb3b0a72e8e663b39d69c3f670addf222f6",
+        "digest": "fb08e4a4db2e03fbb59b4c52068d9c964857a78fa4b29d6b8d22213c2f8af422",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/manifest.json"
@@ -55243,7 +55245,7 @@
       },
       {
         "path": "packages/create-atm/dist/build-identity.json",
-        "digest": "f3f60580ded21dab16199b334d62304c44219bd8c22cb9dae341fd18005feed1",
+        "digest": "d07fb23f2f07dbf2823ae7b5df6b6cea239557b745cdf7b29fe66f2fbdf13731",
         "origin": "source",
         "inputPaths": [
           "packages/create-atm/dist/build-identity.json"
@@ -62303,6 +62305,15 @@
         "origin": "source",
         "inputPaths": [
           "scripts/release-candidate.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "scripts/release-prepare.ts",
+        "digest": "e368c8afc032b0cd75979f71710323117934fedc77f6a916d91e4ad97ecdc80e",
+        "origin": "source",
+        "inputPaths": [
+          "scripts/release-prepare.ts"
         ],
         "replaceable": true
       },
@@ -71730,6 +71741,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/cli/release-prepare-tag-gate.test.ts",
+        "digest": "f0d9b23b061050b8beacc631f98abf208d68289e091c13e2016ed24e53dbcd69",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/release-prepare-tag-gate.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/cli/release-prepublish-gate.test.ts",
         "digest": "9a7f9411feb6f2a0d5bfcec9c42e90f473b37ac94eca72dcc72afd2242fffe68",
         "origin": "source",
@@ -77022,7 +77042,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:29c211e688bf2d6cc25430b50a83c103a8e9096a91d054093385e5dc626b2bd7"
+    "treeDigest": "sha256:ee3eb3203b8963d3b82f87e774a9008ae6dc6ab192c900358f49e63ab362754a"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -78683,7 +78703,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:636e21d92d7f781645e090d828cf00e9d6fdaa47a3b3e560fb5675023e51d872"
+    "digest": "sha256:142ec6704682e61249a3521c330fa693fe006eb1e09320ef11450c21ff4296e9"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -84752,6 +84772,7 @@
       "release/atm-root-drop/scripts/product-ci-burn-in-workflow-scope.json",
       "release/atm-root-drop/scripts/release-artifact-manifest.ts",
       "release/atm-root-drop/scripts/release-candidate.ts",
+      "release/atm-root-drop/scripts/release-prepare.ts",
       "release/atm-root-drop/scripts/render-agent-matrix.ts",
       "release/atm-root-drop/scripts/render-atm-admission-report.ts",
       "release/atm-root-drop/scripts/repro/bug-atm-0045-planning-root-preference.mjs",
@@ -85799,6 +85820,7 @@
       "release/atm-root-drop/tests/cli/recover-push-fail-timeout.test.ts",
       "release/atm-root-drop/tests/cli/related-task-batching-wave-surface.test.ts",
       "release/atm-root-drop/tests/cli/release-drops-clean-copy-smoke.test.ts",
+      "release/atm-root-drop/tests/cli/release-prepare-tag-gate.test.ts",
       "release/atm-root-drop/tests/cli/release-prepublish-gate.test.ts",
       "release/atm-root-drop/tests/cli/release-public-registry-gate.test.ts",
       "release/atm-root-drop/tests/cli/release-publication-steward.test.ts",
@@ -86393,22 +86415,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:710dc4ad4f7742636d6ef9cfe0f729adfc67be16e52e7641cd67aa27c4fc7560",
-  "sealedSourceCommit": "fdf34037f03c44831af7d7b897b5ff604b0bebe8",
+  "buildInputsTreeHash": "sha256:5da0ce2f518a0aa400568f2d41e999c68eb8b9d44a1d566e3b8919e6e9c5ce21",
+  "sealedSourceCommit": "1acf36dca1892c8e41bb9c5c7385580c57c0c055",
   "buildDecision": "fullRebuild",
   "buildDecisionReason": "build-script-change",
-  "incrementalPlanDigest": "sha256:37e17e6a9e351dca6ed872e5c6b48669a94328c7a9e8bc8d685c53dfb46d3ad8",
+  "incrementalPlanDigest": "sha256:b2ab3fa08dbae316c7cd132cb8e578fad06762f5818aff9b57fe76bb3de20297",
   "tsBuildCacheDigest": "sha256:be2ac797c0815b351244e307bfa3505d54094a8e091bfcf7b982251fda01e222",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 53,
-    "skipDecision": 69,
-    "worktreeSetup": 193633,
-    "typescriptBuild": 63276,
-    "rootDropReleaseAssembly": 45460,
-    "onefileReleaseAssembly": 41964,
-    "artifactSync": 15257,
+    "inputHashCalculation": 58,
+    "skipDecision": 65,
+    "worktreeSetup": 218923,
+    "typescriptBuild": 76879,
+    "rootDropReleaseAssembly": 85691,
+    "onefileReleaseAssembly": 65755,
+    "artifactSync": 36360,
     "cleanup": 0,
-    "totalElapsed": 381940
+    "totalElapsed": 515387
   }
 }
