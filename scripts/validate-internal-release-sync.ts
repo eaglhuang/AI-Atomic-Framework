@@ -4,6 +4,7 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { runInternalRelease, runInternalReleaseSync } from '../packages/cli/src/commands/internal-release.ts';
+import { findVerificationRegressions } from '../packages/cli/src/commands/internal-release/target-sync.ts';
 
 const mode = process.argv.includes('--mode')
   ? process.argv[process.argv.indexOf('--mode') + 1]
@@ -71,7 +72,8 @@ try {
     verify: false,
     allowVerifyFailure: false,
     source: sourceRunner,
-    keepTemp: false
+    keepTemp: false,
+    commit: false
   });
   assert(report.ok === true, 'sync report must be ok when copied target succeeds and second target is skipped');
   assert(report.sourceSha256 === sourceHash, 'sync report must include source runner hash');
@@ -101,7 +103,8 @@ try {
     verify: false,
     allowVerifyFailure: false,
     source: sourceRunner,
-    keepTemp: false
+    keepTemp: false,
+    commit: false
   });
   assert(dryRun.ok === true, 'dry-run must be ok');
   assert(dryRun.targets[0]?.newSha256 === sourceHash, 'dry-run target must show planned source hash');
@@ -110,8 +113,49 @@ try {
   const cliResult = runInternalRelease(['sync', '--cwd', fixtureFrameworkRoot, '--repo', targetC, '--source', sourceRunner, '--no-build', '--dry-run', '--no-verify']);
   assert(cliResult.ok === true, 'internal-release sync CLI runner must support dry-run no-build no-verify');
 
+  // Regression-only verification: a check failing before and after the swap
+  // is pre-existing; only a check that passed before and fails after blocks.
+  const run = (command: string, ok: boolean) => ({ command, cwd: '.', exitCode: ok ? 0 : 1, stdoutSha256: '', stderrSha256: '', ok });
+  assert(findVerificationRegressions([run('doctor', false)], [run('doctor', false)]).length === 0, 'pre-existing failure must not be a regression');
+  assert(findVerificationRegressions([run('doctor', true)], [run('doctor', false)])[0] === 'doctor', 'pass-to-fail must be a regression');
+  assert(findVerificationRegressions([], [run('doctor', false)])[0] === 'doctor', 'without a baseline every failure counts');
+
+  // --commit: commits only the runner sync paths and leaves other staged work alone.
+  const targetD = path.join(tempRoot, 'host-d');
+  mkdirSync(targetD, { recursive: true });
+  writeJson(path.join(targetD, '.atm', 'config.json'), { schemaVersion: 'atm.config.v0.1' });
+  writeFileSync(path.join(targetD, 'atm.mjs'), 'process.exit(1);\n', 'utf8');
+  writeJson(path.join(targetD, '.atm', 'runtime', 'pinned-runner.json'), { status: 'old' });
+  runGit(targetD, ['init']);
+  runGit(targetD, ['config', 'user.email', 'atm-validator@example.invalid']);
+  runGit(targetD, ['config', 'user.name', 'ATM Validator']);
+  runGit(targetD, ['add', '.']);
+  runGit(targetD, ['commit', '-m', 'host-d baseline']);
+  writeFileSync(path.join(targetD, 'other-work.txt'), 'staged by someone else\n', 'utf8');
+  runGit(targetD, ['add', 'other-work.txt']);
+  const committed = runInternalReleaseSync({
+    cwd: fixtureFrameworkRoot,
+    repos: [targetD],
+    skips: [],
+    build: false,
+    dryRun: false,
+    verify: true,
+    allowVerifyFailure: false,
+    source: sourceRunner,
+    keepTemp: false,
+    commit: true
+  });
+  const hostD = committed.targets[0];
+  assert(committed.ok === true && hostD?.regressions.length === 0, 'old-runner failures that the new runner fixes must not block the sync');
+  assert(hostD?.baselineVerification.length === 3 && hostD.baselineVerification.every((entry) => !entry.ok), 'baseline must run every check with the previous runner');
+  assert(hostD?.commit?.ok === true && Boolean(hostD.commit.commitSha), 'runner sync must be committed');
+  const committedFiles = spawnSync('git', ['show', '--name-only', '--format=', 'HEAD'], { cwd: targetD, encoding: 'utf8' }).stdout.trim().split(/\r?\n/).sort();
+  assert(committedFiles.join(',') === '.atm/runtime/pinned-runner.json,atm.mjs', 'commit must contain only the runner sync paths');
+  const stillStaged = spawnSync('git', ['diff', '--cached', '--name-only'], { cwd: targetD, encoding: 'utf8' }).stdout.trim();
+  assert(stillStaged === 'other-work.txt', 'unrelated staged work must stay staged and out of the commit');
+
   if (!process.exitCode) {
-    console.log(`[internal-release-sync:${mode}] ok (sync, skip, dry-run, backup, and metadata verified)`);
+    console.log(`[internal-release-sync:${mode}] ok (sync, skip, dry-run, backup, metadata, regression-only verify, and commit verified)`);
   }
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
