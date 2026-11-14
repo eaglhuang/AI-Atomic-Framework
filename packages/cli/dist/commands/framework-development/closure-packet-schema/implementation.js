@@ -285,7 +285,7 @@ export function auditTasks(cwd) { const root = path.resolve(cwd); const generate
     if (transitionRequired && !lastTransitionId) {
         findings.push({ level: 'error', code: 'ATM_TASK_AUDIT_TRANSITION_EVIDENCE_MISSING', path: task.relativePath, taskId: task.taskId, detail: `Task ${task.taskId} is missing lastTransitionId; status transitions must use ATM CLI.` });
     }
-    else if (lastTransitionId && !hasTransitionEvent) {
+    else if (lastTransitionId && !hasTransitionEvent && !planningOnlyTask && !isExternalTask) {
         findings.push({ level: 'error', code: 'ATM_TASK_AUDIT_TRANSITION_EVENT_MISSING', path: task.relativePath, taskId: task.taskId, detail: `Task ${task.taskId} references missing transition event ${lastTransitionId}.` });
     }
     const claimStatus = normalizeOptionalString(task.status)?.toLowerCase().replace(/-/g, '_') ?? '';
