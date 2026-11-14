@@ -103,6 +103,7 @@ export function runInternalReleaseSync(options) {
         dryRun: options.dryRun,
         verify: options.verify,
         allowVerifyFailure: options.allowVerifyFailure,
+        commit: options.commit,
         keepTemp: options.keepTemp,
         targets,
         syncedCount: targets.filter((target) => !target.skipped && target.ok).length,

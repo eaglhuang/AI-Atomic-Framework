@@ -21,7 +21,7 @@ assert.equal(
 );
 assert.match(
   result.stdout,
-  /ok \(sync, skip, dry-run, backup, and metadata verified\)/,
+  /ok \(sync, skip, dry-run, backup, metadata, regression-only verify, and commit verified\)/,
   'validator must report all internal release sync scenarios as verified'
 );
 

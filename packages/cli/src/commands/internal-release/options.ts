@@ -12,7 +12,8 @@ export function parseInternalReleaseSyncOptions(argv: string[]): InternalRelease
     verify: true,
     allowVerifyFailure: false,
     source: null as string | null,
-    keepTemp: false
+    keepTemp: false,
+    commit: false
   };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
@@ -52,6 +53,10 @@ export function parseInternalReleaseSyncOptions(argv: string[]): InternalRelease
       options.allowVerifyFailure = true;
       continue;
     }
+    if (arg === '--commit') {
+      options.commit = true;
+      continue;
+    }
     if (arg === '--keep-temp') {
       options.keepTemp = true;
       continue;
@@ -68,7 +73,8 @@ export function parseInternalReleaseSyncOptions(argv: string[]): InternalRelease
     verify: options.verify,
     allowVerifyFailure: options.allowVerifyFailure,
     source: options.source,
-    keepTemp: options.keepTemp
+    keepTemp: options.keepTemp,
+    commit: options.commit
   };
 }
 

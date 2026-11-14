@@ -16,8 +16,9 @@ export default defineCommandSpec({
         { flag: '--no-build', summary: 'Do not run npm run build before syncing.' },
         { flag: '--dry-run', summary: 'Plan sync targets without copying files.' },
         { flag: '--keep-temp', summary: 'Keep known ATM temporary scratch directories for debugging instead of cleaning them.' },
-        { flag: '--no-verify', summary: 'Do not run target doctor/framework-mode/tasks audit after copying.' },
-        { flag: '--allow-verify-failure', summary: 'Report verification failures without failing the sync command.' },
+        { flag: '--no-verify', summary: 'Do not run target doctor/framework-mode/tasks audit before and after copying.' },
+        { flag: '--commit', summary: 'Commit only atm.mjs and .atm/runtime/pinned-runner.json in each synced target; other staged work stays staged.' },
+        { flag: '--allow-verify-failure', summary: 'Report verification regressions without failing the sync command. Checks that already failed with the previous runner never fail the sync.' },
         commonJsonOption,
         commonPrettyOption,
         commonHelpOption

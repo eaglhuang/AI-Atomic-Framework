@@ -2,8 +2,10 @@ import { copyFileSync, existsSync, mkdirSync, statSync, writeFileSync } from 'no
 import path from 'node:path';
 import { readFrameworkVersion, relativePathFrom } from '../shared.ts';
 import { cleanForbiddenAdopterScratch, createEmptyScratchGuard } from './scratch.ts';
-import type { InternalReleaseSyncOptions, ScratchGuardReport, SyncTargetReport } from './types.ts';
-import { runNodeAtm, sha256File, sha256Text } from './support.ts';
+import { spawnSync } from 'node:child_process';
+import type { CommandRunRecord, InternalReleaseSyncOptions, ScratchGuardReport, SyncTargetReport, TargetCommitReport } from './types.ts';
+import { readGitScalar, runNodeAtm, sha256File, sha256Text } from './support.ts';
+import { targetRunnerSyncPaths, targetVerificationCommands } from './constants.ts';
 
 export function syncTarget(input: {
   readonly repo: string;
@@ -34,6 +36,9 @@ export function syncTarget(input: {
       newSha256: null,
       backupPath: null,
       verification: [],
+      baselineVerification: [],
+      regressions: [],
+      commit: null,
       warnings,
       scratchGuard: emptyScratchGuard
     };
@@ -62,6 +67,9 @@ export function syncTarget(input: {
     warnings.push('.atm/config.json is missing; target may not be bootstrapped');
   }
 
+  const runChecks = input.options.verify && !input.options.dryRun;
+  const baselineVerification = runChecks && previousSha256 ? runVerification(repoPath) : [];
+
   if (!input.options.dryRun) {
     if (backupPath) {
       mkdirSync(path.dirname(backupPath), { recursive: true });
@@ -86,26 +94,31 @@ export function syncTarget(input: {
     }, null, 2)}\n`, 'utf8');
   }
 
-  const verification = input.options.verify && !input.options.dryRun
-    ? [
-      runNodeAtm(repoPath, ['doctor', '--json']),
-      runNodeAtm(repoPath, ['framework-mode', 'status', '--json']),
-      runNodeAtm(repoPath, ['tasks', 'audit', '--json'])
-    ]
-    : [];
-  const verificationOk = verification.every((run) => run.ok);
+  const verification = runChecks ? runVerification(repoPath) : [];
+  const regressions = findVerificationRegressions(baselineVerification, verification);
+  const verificationOk = input.options.allowVerifyFailure || regressions.length === 0;
+  if (baselineVerification.length > 0 && verification.some((run) => !run.ok) && regressions.length === 0) {
+    warnings.push('some target checks fail with both the previous and the new runner; they are pre-existing and do not block this sync');
+  }
+  const commit = input.options.commit && !input.options.dryRun && verificationOk && previousSha256 !== input.sourceSha256
+    ? commitRunnerSync(repoPath, readFrameworkVersion(input.options.cwd))
+    : null;
+  if (commit && !commit.ok) warnings.push(`runner sync commit failed: ${commit.detail ?? 'unknown error'}`);
   return {
     repo: repoPath,
     repoName,
     skipped: false,
     skipReason: null,
-    ok: input.options.allowVerifyFailure ? true : verificationOk,
+    ok: verificationOk && (commit?.ok ?? true),
     runnerPath: relativePathFrom(repoPath, runnerPath),
     metadataPath: relativePathFrom(repoPath, metadataPath),
     previousSha256,
     newSha256: input.options.dryRun ? input.sourceSha256 : sha256File(runnerPath),
     backupPath: backupPath ? relativePathFrom(repoPath, backupPath) : null,
     verification,
+    baselineVerification,
+    regressions,
+    commit,
     warnings,
     scratchGuard
   };
@@ -131,7 +144,37 @@ function failedTarget(repoPath: string, runnerPath: string, metadataPath: string
       stderrSha256: sha256Text(''),
       ok: false
     }],
+    baselineVerification: [],
+    regressions: [],
+    commit: null,
     warnings: [reason],
     scratchGuard
   };
+}
+
+function runVerification(repoPath: string): CommandRunRecord[] {
+  return targetVerificationCommands.map((args) => runNodeAtm(repoPath, args));
+}
+
+/** A regression is a check that passed with the previous runner and fails with the new one. Without a baseline every failure counts. */
+export function findVerificationRegressions(baseline: readonly CommandRunRecord[], current: readonly CommandRunRecord[]): string[] {
+  const passedBefore = new Set(baseline.filter((run) => run.ok).map((run) => run.command));
+  const hasBaseline = baseline.length > 0;
+  return current.filter((run) => !run.ok && (!hasBaseline || passedBefore.has(run.command))).map((run) => run.command);
+}
+
+/**
+ * Commit only the runner sync paths. `git commit --only` leaves whatever else
+ * is staged in the target repository untouched and out of this commit.
+ */
+function commitRunnerSync(repoPath: string, frameworkVersion: string): TargetCommitReport {
+  const paths = targetRunnerSyncPaths.filter((entry) => readGitScalar(repoPath, ['ls-files', '--', entry]) || existsSync(path.join(repoPath, entry)));
+  const actor = process.env.ATM_ACTOR_ID?.trim() || process.env.AGENT_IDENTITY?.trim() || 'release-steward';
+  const message = `chore(atm): sync ATM runner ${frameworkVersion}
+
+ATM-Actor: ${actor}`;
+  const result = spawnSync('git', ['commit', '--only', '-m', message, '--', ...paths], { cwd: repoPath, encoding: 'utf8' });
+  const ok = !result.error && result.status === 0;
+  const detail = ok ? null : [result.stderr, result.stdout, result.error?.message].filter(Boolean).join(String.fromCharCode(10)).trim().slice(-2000) || null;
+  return { paths, commitSha: ok ? readGitScalar(repoPath, ['rev-parse', 'HEAD']) : null, exitCode: result.status ?? 1, ok, detail };
 }

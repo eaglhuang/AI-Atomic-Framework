@@ -8,6 +8,7 @@ export interface InternalReleaseSyncOptions {
   readonly allowVerifyFailure: boolean;
   readonly source: string | null;
   readonly keepTemp: boolean;
+  readonly commit: boolean;
 }
 
 export interface CommandRunRecord {
@@ -44,6 +45,9 @@ export interface SyncTargetReport {
   readonly newSha256: string | null;
   readonly backupPath: string | null;
   readonly verification: readonly CommandRunRecord[];
+  readonly baselineVerification: readonly CommandRunRecord[];
+  readonly regressions: readonly string[];
+  readonly commit: TargetCommitReport | null;
   readonly warnings: readonly string[];
   readonly scratchGuard: ScratchGuardReport;
 }
@@ -77,4 +81,12 @@ export interface ReleasePublicationReadiness {
     readonly reason: string | null;
   };
   readonly requiredCommand: string | null;
+}
+
+export interface TargetCommitReport {
+  readonly paths: readonly string[];
+  readonly commitSha: string | null;
+  readonly exitCode: number;
+  readonly ok: boolean;
+  readonly detail: string | null;
 }
