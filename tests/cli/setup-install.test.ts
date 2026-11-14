@@ -7,6 +7,7 @@ import fs, { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSy
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { runSetup } from '../../packages/cli/src/commands/setup.ts';
+import { formatPrettyResult } from '../../packages/cli/src/commands/shared/command-spec-output.ts';
 import { isSameOrWithin, validateSetupTarget } from '../../packages/cli/src/commands/setup/target.ts';
 import { compareManifestParity } from '../../packages/cli/src/commands/integration/health.ts';
 import { createIntegrationAdapter } from '../../packages/cli/src/commands/integration/adapters.ts';
@@ -59,6 +60,26 @@ test('cancelled target and malformed agent selection do not write', async t => {
   await assert.rejects(runSetup([], { ...f.input, interactive: true, ask: async () => '' }), /cancelled/);
   await assert.rejects(runSetup(['--cwd', f.project, '--agents', 'codex,unknown'], f.input), /supported adapter/);
   assert.equal(existsSync(path.join(f.project, '.atm')), false);
+});
+
+test('pretty setup output is a step summary and keeps the full evidence in --json', async t => {
+  const f = fixture(t);
+  const result = await runSetup(['--cwd', f.project, '--agents', 'none', '--dry-run'], f.input);
+  const pretty = formatPrettyResult(result);
+  assert.match(pretty, /^\[OK\] setup/);
+  assert.match(pretty, /ok\s+preflight/);
+  assert.match(pretty, /Run with --json for the full evidence\./);
+  assert.doesNotMatch(pretty, /"detection"|evidence:/);
+  assert.ok(pretty.split('\n').length < 15);
+});
+
+test('pretty help lists commands instead of dumping firstRun evidence', () => {
+  const pretty = formatPrettyResult({
+    ok: true, command: 'help', mode: 'standalone', cwd: '/x', messages: [],
+    evidence: { firstRun: { schemaId: 'atm.firstRun.v1' }, commands: [{ command: 'setup', summary: 'Set up ATM.' }, { command: 'next', summary: 'Route work.' }] }
+  } as unknown as Parameters<typeof formatPrettyResult>[0]);
+  assert.match(pretty, /commands:\n {2}setup {2}Set up ATM\.\n {2}next {3}Route work\./);
+  assert.doesNotMatch(pretty, /firstRun|schemaId/);
 });
 
 test('unsafe home, filesystem root and symlink targets are rejected', t => {
