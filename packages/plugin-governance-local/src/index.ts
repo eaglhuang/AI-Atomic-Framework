@@ -55,3 +55,5 @@ export function createLocalGovernanceAdapter(config: LocalGovernanceConfig): Gov
 
 // Export versioning helpers (Slice 1 & TASK-AAO-0071 hygiene rename)
 export * from './versioning.ts';
+export { charterUpgradePaths, compareCharterVersions, readBundledCharterVersion, upgradeCharter } from './bootstrap/charter-upgrade.ts';
+export type { CharterUpgradeOptions, CharterUpgradeReport, CharterUpgradeStatus } from './bootstrap/charter-upgrade.ts';
