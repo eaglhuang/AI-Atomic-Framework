@@ -91,12 +91,21 @@ export function upsertActorRecord(cwd, input) {
         createdAt: existing?.createdAt ?? now,
         updatedAt: now
     };
+    // Re-asserting an unchanged identity must not rewrite the tracked registry:
+    // timestamp-only churn leaves the file dirty and blocks fast-forward syncs.
+    if (existing && actorRecordContentEquals(existing, actor)) {
+        return { actor: existing, path: actorRegistryRelativePath };
+    }
     const merged = [
         ...registry.actors.filter((entry) => entry.actorId !== input.actorId),
         actor
     ];
     const registryPath = writeActorRegistry(cwd, merged);
     return { actor, path: registryPath };
+}
+function actorRecordContentEquals(left, right) {
+    const content = (record) => JSON.stringify({ ...record, createdAt: null, updatedAt: null });
+    return content(left) === content(right);
 }
 export function readRuntimeIdentityDefault(cwd) {
     const absolutePath = path.join(path.resolve(cwd), runtimeIdentityRelativePath);
