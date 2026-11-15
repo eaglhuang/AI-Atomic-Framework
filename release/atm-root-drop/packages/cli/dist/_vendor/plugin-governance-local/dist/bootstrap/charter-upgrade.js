@@ -140,7 +140,7 @@ export function upgradeCharter(options) {
         mkdirSync(path.dirname(absolute), { recursive: true });
         writeFileSync(absolute, text, 'utf8');
     }
-    const receiptPath = `.atm/history/evidence/charter-upgrade-${now.toISOString().replace(/[:.]/g, '-')}.json`;
+    const receiptPath = `.atm/history/charter-upgrades/${now.toISOString().replace(/[:.]/g, '-')}.json`;
     const receiptAbsolute = path.join(options.cwd, receiptPath);
     mkdirSync(path.dirname(receiptAbsolute), { recursive: true });
     writeFileSync(receiptAbsolute, `${JSON.stringify({
