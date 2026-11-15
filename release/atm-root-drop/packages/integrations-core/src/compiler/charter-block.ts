@@ -32,7 +32,7 @@ export function loadCharterAuthorityBundle(repositoryRoot: string): CharterAutho
   const atomicCharterPath = path.join(repositoryRoot, '.atm', 'charter', 'atomic-charter.md');
   const firstPrinciplesPath = path.join(repositoryRoot, '.atm', 'charter', 'atm-first-principles.md');
   const invariantsPath = path.join(repositoryRoot, '.atm', 'charter', 'charter-invariants.json');
-  const repairCommand = 'node atm.mjs init --adopt default --force --json';
+  const repairCommand = 'node atm.mjs charter upgrade --write --json';
   const errors: string[] = [];
   const atomicCharter = readRequiredText(atomicCharterPath, errors);
   const firstPrinciples = readRequiredText(firstPrinciplesPath, errors);
@@ -117,6 +117,7 @@ export function renderCharterInvariantsBlock(repositoryRoot: string): RenderedCh
         rule?: unknown;
         enforcement?: unknown;
         breakingChange?: unknown;
+        stagedEnforcement?: { advisoryUntilFrameworkVersion?: unknown };
       }>;
     };
     const invariants = Array.isArray(parsed.invariants)
@@ -127,7 +128,10 @@ export function renderCharterInvariantsBlock(repositoryRoot: string): RenderedCh
           title: entry.title as string,
           rule: entry.rule as string,
           enforcement: typeof entry.enforcement === 'string' ? entry.enforcement : 'unknown',
-          breakingChange: entry.breakingChange === true
+          breakingChange: entry.breakingChange === true,
+          advisoryUntil: typeof entry.stagedEnforcement?.advisoryUntilFrameworkVersion === 'string'
+            ? entry.stagedEnforcement.advisoryUntilFrameworkVersion
+            : null
         }))
       : [];
     if (invariants.length === 0) {
@@ -160,9 +164,15 @@ function renderCharterInvariantLine(entry: {
   readonly rule: string;
   readonly enforcement: string;
   readonly breakingChange: boolean;
+  readonly advisoryUntil: string | null;
 }) {
   const breakingChange = entry.breakingChange ? 'yes' : 'no';
-  return `- \`${entry.id}\` ??**${entry.title}** (enforcement: \`${entry.enforcement}\`, breaking change: ${breakingChange})\n  Rule: ${entry.rule}`;
+  // Invariants newly adopted through a charter upgrade are advisory until the
+  // recorded ATM release, then use their declared enforcement.
+  const enforcement = entry.advisoryUntil
+    ? `advisory until ATM ${entry.advisoryUntil}, then \`${entry.enforcement}\``
+    : `\`${entry.enforcement}\``;
+  return `- \`${entry.id}\` ??**${entry.title}** (enforcement: ${enforcement}, breaking change: ${breakingChange})\n  Rule: ${entry.rule}`;
 }
 
 function readRequiredText(filePath: string, errors: string[]) {

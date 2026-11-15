@@ -780,6 +780,7 @@
     "release/atm-root-drop/docs/releases/0.1.27.md",
     "release/atm-root-drop/docs/releases/0.1.28.md",
     "release/atm-root-drop/docs/releases/0.1.29.md",
+    "release/atm-root-drop/docs/releases/0.1.30.md",
     "release/atm-root-drop/docs/reports/TASK-TMP-0007-target-side-attestation.md",
     "release/atm-root-drop/docs/reports/agr-conflict-arbitration-benchmark.md",
     "release/atm-root-drop/docs/reports/atm-2-1-final-closure.md",
@@ -2257,6 +2258,8 @@
     "release/atm-root-drop/packages/cli/dist/_vendor/plugin-governance-local/dist/bootstrap/bootstrap/root-entry-patching.js",
     "release/atm-root-drop/packages/cli/dist/_vendor/plugin-governance-local/dist/bootstrap/budget.d.ts",
     "release/atm-root-drop/packages/cli/dist/_vendor/plugin-governance-local/dist/bootstrap/budget.js",
+    "release/atm-root-drop/packages/cli/dist/_vendor/plugin-governance-local/dist/bootstrap/charter-upgrade.d.ts",
+    "release/atm-root-drop/packages/cli/dist/_vendor/plugin-governance-local/dist/bootstrap/charter-upgrade.js",
     "release/atm-root-drop/packages/cli/dist/_vendor/plugin-governance-local/dist/bootstrap/prompt.d.ts",
     "release/atm-root-drop/packages/cli/dist/_vendor/plugin-governance-local/dist/bootstrap/prompt.js",
     "release/atm-root-drop/packages/cli/dist/_vendor/plugin-governance-local/dist/bootstrap/types.d.ts",
@@ -2417,6 +2420,7 @@
     "release/atm-root-drop/packages/cli/dist/commands/build-release-hygiene.js",
     "release/atm-root-drop/packages/cli/dist/commands/cache.js",
     "release/atm-root-drop/packages/cli/dist/commands/candidates.js",
+    "release/atm-root-drop/packages/cli/dist/commands/charter.js",
     "release/atm-root-drop/packages/cli/dist/commands/cleanup/index.js",
     "release/atm-root-drop/packages/cli/dist/commands/cleanup/run.js",
     "release/atm-root-drop/packages/cli/dist/commands/command-specs.js",
@@ -2434,6 +2438,7 @@
     "release/atm-root-drop/packages/cli/dist/commands/command-specs/budget.spec.js",
     "release/atm-root-drop/packages/cli/dist/commands/command-specs/cache.spec.js",
     "release/atm-root-drop/packages/cli/dist/commands/command-specs/candidates.spec.js",
+    "release/atm-root-drop/packages/cli/dist/commands/command-specs/charter.spec.js",
     "release/atm-root-drop/packages/cli/dist/commands/command-specs/cleanup.spec.js",
     "release/atm-root-drop/packages/cli/dist/commands/command-specs/create-map.spec.js",
     "release/atm-root-drop/packages/cli/dist/commands/command-specs/create.spec.js",
@@ -2677,6 +2682,7 @@
     "release/atm-root-drop/packages/cli/dist/commands/internal-release/publication.js",
     "release/atm-root-drop/packages/cli/dist/commands/internal-release/scratch.js",
     "release/atm-root-drop/packages/cli/dist/commands/internal-release/support.js",
+    "release/atm-root-drop/packages/cli/dist/commands/internal-release/target-charter.js",
     "release/atm-root-drop/packages/cli/dist/commands/internal-release/target-sync.js",
     "release/atm-root-drop/packages/cli/dist/commands/internal-release/types.js",
     "release/atm-root-drop/packages/cli/dist/commands/lane-session/adopt-rebind.js",
@@ -3249,6 +3255,7 @@
     "release/atm-root-drop/packages/cli/src/commands/build-release-hygiene.ts",
     "release/atm-root-drop/packages/cli/src/commands/cache.ts",
     "release/atm-root-drop/packages/cli/src/commands/candidates.ts",
+    "release/atm-root-drop/packages/cli/src/commands/charter.ts",
     "release/atm-root-drop/packages/cli/src/commands/cleanup/index.ts",
     "release/atm-root-drop/packages/cli/src/commands/cleanup/run.ts",
     "release/atm-root-drop/packages/cli/src/commands/command-specs.SPLIT_PLAN.md",
@@ -3267,6 +3274,7 @@
     "release/atm-root-drop/packages/cli/src/commands/command-specs/budget.spec.ts",
     "release/atm-root-drop/packages/cli/src/commands/command-specs/cache.spec.ts",
     "release/atm-root-drop/packages/cli/src/commands/command-specs/candidates.spec.ts",
+    "release/atm-root-drop/packages/cli/src/commands/command-specs/charter.spec.ts",
     "release/atm-root-drop/packages/cli/src/commands/command-specs/cleanup.spec.ts",
     "release/atm-root-drop/packages/cli/src/commands/command-specs/create-map.spec.ts",
     "release/atm-root-drop/packages/cli/src/commands/command-specs/create.spec.ts",
@@ -3564,6 +3572,7 @@
     "release/atm-root-drop/packages/cli/src/commands/internal-release/publication.ts",
     "release/atm-root-drop/packages/cli/src/commands/internal-release/scratch.ts",
     "release/atm-root-drop/packages/cli/src/commands/internal-release/support.ts",
+    "release/atm-root-drop/packages/cli/src/commands/internal-release/target-charter.ts",
     "release/atm-root-drop/packages/cli/src/commands/internal-release/target-sync.ts",
     "release/atm-root-drop/packages/cli/src/commands/internal-release/types.ts",
     "release/atm-root-drop/packages/cli/src/commands/lane-session/__tests__/claim-authority-continuity.test.ts",
@@ -5542,6 +5551,8 @@
     "release/atm-root-drop/packages/plugin-governance-local/dist/bootstrap/bootstrap/root-entry-patching.js",
     "release/atm-root-drop/packages/plugin-governance-local/dist/bootstrap/budget.d.ts",
     "release/atm-root-drop/packages/plugin-governance-local/dist/bootstrap/budget.js",
+    "release/atm-root-drop/packages/plugin-governance-local/dist/bootstrap/charter-upgrade.d.ts",
+    "release/atm-root-drop/packages/plugin-governance-local/dist/bootstrap/charter-upgrade.js",
     "release/atm-root-drop/packages/plugin-governance-local/dist/bootstrap/prompt.d.ts",
     "release/atm-root-drop/packages/plugin-governance-local/dist/bootstrap/prompt.js",
     "release/atm-root-drop/packages/plugin-governance-local/dist/bootstrap/types.d.ts",
@@ -5564,6 +5575,7 @@
     "release/atm-root-drop/packages/plugin-governance-local/src/bootstrap/bootstrap/implementation.ts",
     "release/atm-root-drop/packages/plugin-governance-local/src/bootstrap/bootstrap/root-entry-patching.ts",
     "release/atm-root-drop/packages/plugin-governance-local/src/bootstrap/budget.ts",
+    "release/atm-root-drop/packages/plugin-governance-local/src/bootstrap/charter-upgrade.ts",
     "release/atm-root-drop/packages/plugin-governance-local/src/bootstrap/prompt.ts",
     "release/atm-root-drop/packages/plugin-governance-local/src/bootstrap/types.ts",
     "release/atm-root-drop/packages/plugin-governance-local/src/default-guards.ts",
@@ -6739,6 +6751,7 @@
     "release/atm-root-drop/tests/cli/causal-validator-contract-import.test.ts",
     "release/atm-root-drop/tests/cli/causal-validator-selector.test.ts",
     "release/atm-root-drop/tests/cli/charter-bundle.test.ts",
+    "release/atm-root-drop/tests/cli/charter-upgrade.test.ts",
     "release/atm-root-drop/tests/cli/check-encoding-staged-deletion.test.ts",
     "release/atm-root-drop/tests/cli/ci-burn-in-evidence-collector.test.ts",
     "release/atm-root-drop/tests/cli/ci-product-lane-contract.test.ts",
@@ -6797,6 +6810,7 @@
     "release/atm-root-drop/tests/cli/derived-atoms-same-file-parallel.test.ts",
     "release/atm-root-drop/tests/cli/diagnostic-feedback-loop.test.ts",
     "release/atm-root-drop/tests/cli/dirty-release-wip-recovery-0258.test.ts",
+    "release/atm-root-drop/tests/cli/doctor-charter-diagnosis.test.ts",
     "release/atm-root-drop/tests/cli/doctor-commit-scope-patrol.test.ts",
     "release/atm-root-drop/tests/cli/doctor-final-600.test.ts",
     "release/atm-root-drop/tests/cli/doctor-integration-fast-health.test.ts",
@@ -7740,7 +7754,7 @@
   "copyReport": {
     "schemaId": "atm.rootDropHashCopyReport.v1",
     "copied": 0,
-    "unchanged": 7704,
+    "unchanged": 7718,
     "removed": 0
   },
   "buildMode": "full",
@@ -8620,7 +8634,7 @@
       },
       {
         "path": "compatibility-matrix.json",
-        "digest": "71359e8be95f896ac5b81bfdab2d3fd9ac13201f8c29ac554bc9a4c802b4a15d",
+        "digest": "2d2a38016f5d872156ce19a5b4dfe74f18e36f5c4ca398f8d4499b05aa3802f9",
         "origin": "source",
         "inputPaths": [
           "compatibility-matrix.json"
@@ -8800,7 +8814,7 @@
       },
       {
         "path": "docs/ERROR_CODES.md",
-        "digest": "8015829d4afcd938a73889c53ed999d6843c7c468b8b1f17b487ed7d8b232e3c",
+        "digest": "34f3e23d4b46a5dfd2b753603b6ddcea491f7d6dc1765119e73851ba3c949929",
         "origin": "source",
         "inputPaths": [
           "docs/ERROR_CODES.md"
@@ -13894,7 +13908,7 @@
       },
       {
         "path": "docs/governance/error-code-registry.json",
-        "digest": "52aa9baa5fd60b2b94e07bc6c8db87c4df9fa7278381dd05fb0984748536aaae",
+        "digest": "732d77f535434a521ade4132d3c9bcda5d8e0a639e1bd5a265942b4b26243eaa",
         "origin": "source",
         "inputPaths": [
           "docs/governance/error-code-registry.json"
@@ -14483,6 +14497,15 @@
         "origin": "source",
         "inputPaths": [
           "docs/releases/0.1.29.md"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "docs/releases/0.1.30.md",
+        "digest": "aec40a854a0381615acd13051836a83ef26927155c06b6ec0503aa630149aed4",
+        "origin": "source",
+        "inputPaths": [
+          "docs/releases/0.1.30.md"
         ],
         "replaceable": true
       },
@@ -16171,7 +16194,7 @@
       },
       {
         "path": "examples/atom-evolution-loop/package.json",
-        "digest": "302f2067e74085a4807fe4b06521eaf07009b56dff0cb2ab532447f9acd07382",
+        "digest": "7a795cdb3e6a789ad8dfb5af70edea52ad51ba22c86272eac4b5238da8caaf2c",
         "origin": "source",
         "inputPaths": [
           "examples/atom-evolution-loop/package.json"
@@ -16324,7 +16347,7 @@
       },
       {
         "path": "examples/hello-world/package.json",
-        "digest": "d768840dfb4a96b702c652567da517e745f377524677d9b65bf3248cbfcad14e",
+        "digest": "f0dd3bd58867f3aeb861174b914380b75799c3986949cbb1be334e0062854e58",
         "origin": "source",
         "inputPaths": [
           "examples/hello-world/package.json"
@@ -16369,7 +16392,7 @@
       },
       {
         "path": "examples/legacy-strangler-minimal/package.json",
-        "digest": "4f069072183a605a5347b85f8b2e65db08f073630328f4d44b6eaffecc399188",
+        "digest": "ef4635cdfea1274fdf1238ee99bd53a17e269328969d3d09ec197511a14c8533",
         "origin": "source",
         "inputPaths": [
           "examples/legacy-strangler-minimal/package.json"
@@ -18592,7 +18615,7 @@
       },
       {
         "path": "package-lock.json",
-        "digest": "f3837e821ba877d37643346acf273fce2d63ce3ffe314582f24f33d73a8f7621",
+        "digest": "8861f2e32b542e3db4d81aecf8b1531fb9002ffacaa970800124c46bd8941fb6",
         "origin": "source",
         "inputPaths": [
           "package-lock.json"
@@ -18601,7 +18624,7 @@
       },
       {
         "path": "package.json",
-        "digest": "d60af9fead395395f4c9bb2ad4baf132d9828052b6b1bdc159f0a2eea79ceea4",
+        "digest": "7a3484bb0fab43d2ff8440ee3edb164e48abf1452bdcf62ce1603674d76f9024",
         "origin": "source",
         "inputPaths": [
           "package.json"
@@ -18655,7 +18678,7 @@
       },
       {
         "path": "packages/adapter-local-git/package.json",
-        "digest": "e53a564afad12fa47d1da281d2cda0a758b22a3cf29cc714b3bd8a10a52e321f",
+        "digest": "8c704c7e12755962e7a49d7c6ad0cea4d737a76f71919d5c170ac811096485d2",
         "origin": "source",
         "inputPaths": [
           "packages/adapter-local-git/package.json"
@@ -18709,7 +18732,7 @@
       },
       {
         "path": "packages/agent-pack-claude-code/package.json",
-        "digest": "037cf5113ad8c34d1829a7e2b8a8e358a1843b3dd69bbcf38605cd31fc0d7cbf",
+        "digest": "1d205004ea4d42d5f8abe5d048aca09a0a5817563f3929dbf20f1d0183b0079e",
         "origin": "source",
         "inputPaths": [
           "packages/agent-pack-claude-code/package.json"
@@ -18808,7 +18831,7 @@
       },
       {
         "path": "packages/agent-pack-copilot/package.json",
-        "digest": "a0378b003a46390140cc356786a4bb246637c098255ca93fde27b93279ae33d7",
+        "digest": "3db1712eddb84896c81c8161d1b5ada12e5e168a136c5d8db4c11f44d765c5ac",
         "origin": "source",
         "inputPaths": [
           "packages/agent-pack-copilot/package.json"
@@ -18853,7 +18876,7 @@
       },
       {
         "path": "packages/agent-pack-cursor/package.json",
-        "digest": "e31aea741ffb7f2737be1af7c2e0c9d9e4a6f1c38be0c60b16d6f2494a538f42",
+        "digest": "3e4a624afa2ff5ff551b18cea3ae2334e350a809c339dfa06e9b385440a52805",
         "origin": "source",
         "inputPaths": [
           "packages/agent-pack-cursor/package.json"
@@ -18898,7 +18921,7 @@
       },
       {
         "path": "packages/agent-pack-gemini/package.json",
-        "digest": "490c4464b48234107b1f2cde13222e490e5c074d7ba65dc0424f79a525e9750f",
+        "digest": "c107c01f6c8aa6bf141d5fc5faffad5cc18f3eddb3bc738219c420d7867ea5dd",
         "origin": "source",
         "inputPaths": [
           "packages/agent-pack-gemini/package.json"
@@ -18979,7 +19002,7 @@
       },
       {
         "path": "packages/agent-pack-sdk/package.json",
-        "digest": "96363d3e0f4b2789aef57eb1171df9546e40c298ea8327847c8e1c95ea9b8305",
+        "digest": "cd105a9349f1b5403ba17caae1549ae7b13f30eb6eccec3504babb31f937ede1",
         "origin": "source",
         "inputPaths": [
           "packages/agent-pack-sdk/package.json"
@@ -19042,7 +19065,7 @@
       },
       {
         "path": "packages/agent-pack-windsurf/package.json",
-        "digest": "21d8435b41d5e5f9354001c579a7b0ebe0adbb9b014cd69c608d756d1ab7b73d",
+        "digest": "af3f27b8076ad67607a13d7d0996b2f3ceb872493990c12a4993e40d8cb869a5",
         "origin": "source",
         "inputPaths": [
           "packages/agent-pack-windsurf/package.json"
@@ -19123,7 +19146,7 @@
       },
       {
         "path": "packages/atm-markdown-task-source/package.json",
-        "digest": "9bfb3a6ec71c654e32eacc9dea73bb3227787999c59dcf3117691587852eead4",
+        "digest": "7504dd245adc9f5af6b6454cb0e118409178fee558e1fa5ba7c245011419d02a",
         "origin": "source",
         "inputPaths": [
           "packages/atm-markdown-task-source/package.json"
@@ -22282,7 +22305,7 @@
       },
       {
         "path": "packages/cli/dist/_vendor/core/dist/error-code-registry.generated.d.ts",
-        "digest": "3f4b898b5557e52a8d76b52990a0b8277895a56315471ea0230ea60a5d52a458",
+        "digest": "3fcd5259daa353dd8041129ab01d823fee2f21c03769c0d2ba080265c69c6d94",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/core/dist/error-code-registry.generated.d.ts"
@@ -22291,7 +22314,7 @@
       },
       {
         "path": "packages/cli/dist/_vendor/core/dist/error-code-registry.generated.js",
-        "digest": "4e6147c3edb7b4c20d5737fcf47e1dd69a0b52264bb384d29fa98f976fefc260",
+        "digest": "df84b2a09f98f5c89d9030eec492d7b770d274915fcdfe13a9b3a65d2b2715ed",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/core/dist/error-code-registry.generated.js"
@@ -26809,7 +26832,7 @@
       },
       {
         "path": "packages/cli/dist/_vendor/integrations-core/dist/compiler/charter-block.js",
-        "digest": "66652b1dad7885e78099456d68e7da67cf6d918d3de34a577980e24204942ec9",
+        "digest": "335e99434e51b371e73e47a472b983ef7c4684bcaf888fb704ad3fa2612d6747",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/integrations-core/dist/compiler/charter-block.js"
@@ -27709,7 +27732,7 @@
       },
       {
         "path": "packages/cli/dist/_vendor/plugin-governance-local/dist/bootstrap/bootstrap/bootstrap-support.d.ts",
-        "digest": "2b862e33f2bed96f458eca61613d6311e00e4d46feee61bf13378730cd1b2cb2",
+        "digest": "8229ffbe5002034955990623af953c294108e648e3c93e6852818fef5212a550",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/plugin-governance-local/dist/bootstrap/bootstrap/bootstrap-support.d.ts"
@@ -27718,7 +27741,7 @@
       },
       {
         "path": "packages/cli/dist/_vendor/plugin-governance-local/dist/bootstrap/bootstrap/bootstrap-support.js",
-        "digest": "7a9169d146f8d73cbdf84579b0ff8dfe8dd71679829cc9baac3e26fbf7779c69",
+        "digest": "b0d11b3c8d7f04b604612ac2127e62a37bd4f7e1a8f9f6acdf63aecdaea9b238",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/plugin-governance-local/dist/bootstrap/bootstrap/bootstrap-support.js"
@@ -27780,6 +27803,24 @@
         "replaceable": true
       },
       {
+        "path": "packages/cli/dist/_vendor/plugin-governance-local/dist/bootstrap/charter-upgrade.d.ts",
+        "digest": "f9eb933f623e1fea58088099b473272edb576360baa5714cf17562b85c7220cc",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/_vendor/plugin-governance-local/dist/bootstrap/charter-upgrade.d.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/_vendor/plugin-governance-local/dist/bootstrap/charter-upgrade.js",
+        "digest": "1579568e4071befcac322e17d4acb58bdece92ea965e65cda8f9bcd50364b59b",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/_vendor/plugin-governance-local/dist/bootstrap/charter-upgrade.js"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/cli/dist/_vendor/plugin-governance-local/dist/bootstrap/prompt.d.ts",
         "digest": "4f9d5e46b466b7287156b6a2605089e2480e8eed2672efff175459b9d8974867",
         "origin": "source",
@@ -27835,7 +27876,7 @@
       },
       {
         "path": "packages/cli/dist/_vendor/plugin-governance-local/dist/index.d.ts",
-        "digest": "9465a582215c05c47c535ebcc8b50177c9a904c6fd53c3372d6f5c5f9fe2b34d",
+        "digest": "3920e38757a0765fe1cdfbf0fde1f334a9d7d72a2d6eed9927c7766ad8152bd0",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/plugin-governance-local/dist/index.d.ts"
@@ -27844,7 +27885,7 @@
       },
       {
         "path": "packages/cli/dist/_vendor/plugin-governance-local/dist/index.js",
-        "digest": "bda2b3224a472f09fe77d2ae2660c77c94282f95a54b32706aac6081d894c50a",
+        "digest": "19d1e6d0736e4f1fac386925504981d6f722e03256a5817eff8b352e6cdb97de",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/_vendor/plugin-governance-local/dist/index.js"
@@ -28582,7 +28623,7 @@
       },
       {
         "path": "packages/cli/dist/atm.js",
-        "digest": "800e18f9df444aed0dee8ba49cee3ec19a1e82cb49c0369fdb0c9678c7c96b93",
+        "digest": "cf84654332e959c6e78047ddf7b59ed55a47b978ed7cf8fea8076a588dd44cf8",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/atm.js"
@@ -28600,7 +28641,7 @@
       },
       {
         "path": "packages/cli/dist/build-identity.json",
-        "digest": "ec9357b57cd50c86df895e31fab024acfbb91fd890e38113a5bb62fefd65c03f",
+        "digest": "03347bdf18cae4bc5b5dafffda79c894a6d91a0094130fd9ea4000d0332e9f4e",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/build-identity.json"
@@ -29220,6 +29261,15 @@
         "replaceable": true
       },
       {
+        "path": "packages/cli/dist/commands/charter.js",
+        "digest": "d9c5acb6a03ff6a1fa55c2ab5b5ff6f15ea903ab56565542fa3a5a77a4273583",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/commands/charter.js"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/cli/dist/commands/cleanup/index.js",
         "digest": "2a46193e66405db687a741ed07eaadd4d8df8c71fc28d6ff5b3c27431be24bd0",
         "origin": "source",
@@ -29239,7 +29289,7 @@
       },
       {
         "path": "packages/cli/dist/commands/command-specs.js",
-        "digest": "90adafb690a32cd9a97e522f7f662c2cb378cc14ae89d3ae15e05697192a3ec0",
+        "digest": "0260b3f7858ea9708c41221180b799b04608135752c6a7f70ad36aa07475b5e2",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/command-specs.js"
@@ -29369,6 +29419,15 @@
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/command-specs/candidates.spec.js"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/dist/commands/command-specs/charter.spec.js",
+        "digest": "a074e84d7244b2ef3a600769a9bb2a578a973324186e328020c279f27f65c3f0",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/commands/command-specs/charter.spec.js"
         ],
         "replaceable": true
       },
@@ -29950,7 +30009,7 @@
       },
       {
         "path": "packages/cli/dist/commands/doctor/run-doctor.js",
-        "digest": "7ea6e2e80b5c3cae7462cff27ca91387c8acad2bb64a907c2819481920b11cb0",
+        "digest": "9414d47955b07697350c731c939a6eb72a9370633b07e1522a3f0d0ee8735b98",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/doctor/run-doctor.js"
@@ -29968,7 +30027,7 @@
       },
       {
         "path": "packages/cli/dist/commands/doctor/utilities.js",
-        "digest": "e436d2dafed77738fbc93de0e4f2c569bf996925747aeddbc0df714a0714727a",
+        "digest": "9bafa9d06360f4c723d399a052e851d24043efd214cb0515473a84cea5ab2af4",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/doctor/utilities.js"
@@ -31560,8 +31619,17 @@
         "replaceable": true
       },
       {
+        "path": "packages/cli/dist/commands/internal-release/target-charter.js",
+        "digest": "615d0cbedb0e2ed40f7165bddc33487acaaa3798a99ec51cddbfd23ff2da976f",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/dist/commands/internal-release/target-charter.js"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/cli/dist/commands/internal-release/target-sync.js",
-        "digest": "202126aefca9dd7e36cf0fd336cacb9b6529e7ea43ed6f0c8e3434d0773ac3cb",
+        "digest": "3c43444407ee9a6bfb4e3269576fc31dfd70eac61994f47279e6b13d6f83cccc",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/commands/internal-release/target-sync.js"
@@ -34801,7 +34869,7 @@
       },
       {
         "path": "packages/cli/dist/index.js",
-        "digest": "4a63dfe82b6601d86abd4a47ecfcfb2cb6c3d739b1eaec958f0e238280120f24",
+        "digest": "6d55ec84c4ea9b81780034f30268480e0f2a66d5bbaf2cd20d13d74a6d4e6282",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/index.js"
@@ -34837,7 +34905,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/build-identity.json",
-        "digest": "64ad4979ab63b75b09e25026944947b946fd56fabfff7b4555e11a534837d664",
+        "digest": "9081e8fa1bcc76e91809d7b596a26408a30912a9d05d25e2975041e6380bb6ff",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/build-identity.json"
@@ -35566,7 +35634,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/manifest.json",
-        "digest": "d0cc369616eeae044269f0e984fbb64074298d5535a18de444a69e4400b43e56",
+        "digest": "3a03f1c77292a1ec11b616cba9fc844d3d9d426b9e9b7ecff867c4c99322da07",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/manifest.json"
@@ -35575,7 +35643,7 @@
       },
       {
         "path": "packages/cli/dist/npm-runtime/runtime.mjs",
-        "digest": "9d934b03d536a57cd43de66a2d51e22a1e389d8d178734457fda1898b88fa702",
+        "digest": "779399356eb35041beadb8aec117911049d87e790f28878fd39fb3adce66438d",
         "origin": "source",
         "inputPaths": [
           "packages/cli/dist/npm-runtime/runtime.mjs"
@@ -35962,7 +36030,7 @@
       },
       {
         "path": "packages/cli/package.json",
-        "digest": "fccebb4dba33939d67f45b7df4cd7e0ad8dc93567b838ef583045bf49e74cd59",
+        "digest": "0d3feea1d5fc7738b71c6d4517e24725ff3ee7225a9eba8379e75b531ae91453",
         "origin": "source",
         "inputPaths": [
           "packages/cli/package.json"
@@ -35980,7 +36048,7 @@
       },
       {
         "path": "packages/cli/src/atm.ts",
-        "digest": "ea28f2ebd8311bdbf1bd642c517b007345b6a98ad9fa6a9b63cfb1860d59fea8",
+        "digest": "a33f4132f203596276ad85533dbd57f04252dc464d40fb9f5aaaf7e018089297",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/atm.ts"
@@ -36708,6 +36776,15 @@
         "replaceable": true
       },
       {
+        "path": "packages/cli/src/commands/charter.ts",
+        "digest": "4c5825daedfb70065164bab1ad7c98f2fb01552c0659435a21d7280657b95fb0",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/src/commands/charter.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/cli/src/commands/cleanup/index.ts",
         "digest": "addd4e0b128a088f1b7e60ce0f3f243e431832c2d738263a13cb9477f7f38eec",
         "origin": "source",
@@ -36736,7 +36813,7 @@
       },
       {
         "path": "packages/cli/src/commands/command-specs.ts",
-        "digest": "99e8c9a465489beedddb1cd806a9a631f284dbb21e16c5eb6cc32ca800409fee",
+        "digest": "93c28aa3b28a7805ccdb4c7af2dd6ccb8dc1e30e70142562e48619a2c3bf7dfe",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/command-specs.ts"
@@ -36866,6 +36943,15 @@
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/command-specs/candidates.spec.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/cli/src/commands/command-specs/charter.spec.ts",
+        "digest": "6a6964a77ffd2a2cef07b7221b41fd92c389e27220ac4fd5208d615fad9a1db2",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/src/commands/command-specs/charter.spec.ts"
         ],
         "replaceable": true
       },
@@ -37447,7 +37533,7 @@
       },
       {
         "path": "packages/cli/src/commands/doctor/run-doctor.ts",
-        "digest": "34c8e340302f4189cd7fc46113098a024fbcf25fe122b8eb0679e956867a1477",
+        "digest": "e4b6c49c4995ff163d292790ad403aaf1a4212ed9369b1d6eabf8bd897d5d7d7",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/doctor/run-doctor.ts"
@@ -37465,7 +37551,7 @@
       },
       {
         "path": "packages/cli/src/commands/doctor/utilities.ts",
-        "digest": "0940aafaaee2fdad76473c691822ebc5be5bce168fc2aea47f445cffbc8d050e",
+        "digest": "39622b6de523e0cebacd98f91a1cc72985ce9a94fc772aa53b095649ef5dcbf4",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/doctor/utilities.ts"
@@ -39543,8 +39629,17 @@
         "replaceable": true
       },
       {
+        "path": "packages/cli/src/commands/internal-release/target-charter.ts",
+        "digest": "40e796fff2afc2ae7d0875e642310eb8d150eb7f4866f481c5a6843f25179856",
+        "origin": "source",
+        "inputPaths": [
+          "packages/cli/src/commands/internal-release/target-charter.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/cli/src/commands/internal-release/target-sync.ts",
-        "digest": "855a6c58da532039c07af6d68bc2e9ff1a119c9773b4ba90a8ff0feeace0573b",
+        "digest": "ab4c92311878292ff37c323be38f37a5e6a453566219fbc41eacade2713619cc",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/internal-release/target-sync.ts"
@@ -39553,7 +39648,7 @@
       },
       {
         "path": "packages/cli/src/commands/internal-release/types.ts",
-        "digest": "a9c3970eccc04e6a6bf29b1c7aee6e7be234241adac8771279d05b7cf1d69125",
+        "digest": "1af1efd61fb159e965d3d0bccb68282619152a0731da6171b07fbe05987ede32",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/commands/internal-release/types.ts"
@@ -43738,7 +43833,7 @@
       },
       {
         "path": "packages/cli/src/index.ts",
-        "digest": "4b3cd67fd7b367a31c8be379fd9d9f050fe2a45be1ea9bb854fb45c1fc8275d7",
+        "digest": "2af084a0d09da15f29c7d295439f9d88627a2cbc476487bd335054963cb41066",
         "origin": "source",
         "inputPaths": [
           "packages/cli/src/index.ts"
@@ -46654,7 +46749,7 @@
       },
       {
         "path": "packages/core/dist/error-code-registry.generated.d.ts",
-        "digest": "3f4b898b5557e52a8d76b52990a0b8277895a56315471ea0230ea60a5d52a458",
+        "digest": "3fcd5259daa353dd8041129ab01d823fee2f21c03769c0d2ba080265c69c6d94",
         "origin": "source",
         "inputPaths": [
           "packages/core/dist/error-code-registry.generated.d.ts"
@@ -46663,7 +46758,7 @@
       },
       {
         "path": "packages/core/dist/error-code-registry.generated.js",
-        "digest": "4e6147c3edb7b4c20d5737fcf47e1dd69a0b52264bb384d29fa98f976fefc260",
+        "digest": "df84b2a09f98f5c89d9030eec492d7b770d274915fcdfe13a9b3a65d2b2715ed",
         "origin": "source",
         "inputPaths": [
           "packages/core/dist/error-code-registry.generated.js"
@@ -51082,7 +51177,7 @@
       },
       {
         "path": "packages/core/package.json",
-        "digest": "d590e635cd7beee0cb6029d8a44fbd1081b106eb69204885b241b92880307ee9",
+        "digest": "9de1521b359bb42fcd6399c697508b36ba8c08447481e7f38acfde3a1c129f83",
         "origin": "source",
         "inputPaths": [
           "packages/core/package.json"
@@ -52945,7 +53040,7 @@
       },
       {
         "path": "packages/core/src/error-code-registry.generated.ts",
-        "digest": "3cbdcfc8e85eafca188451516c494a6a11ede203ec737a84571dfff20e16be48",
+        "digest": "5193ca03eb2717a3d300f3fb04a3d36761a65fc1869788e63158265ff24e82de",
         "origin": "source",
         "inputPaths": [
           "packages/core/src/error-code-registry.generated.ts"
@@ -55267,7 +55362,7 @@
       },
       {
         "path": "packages/create-atm/dist/build-identity.json",
-        "digest": "030a097ef6df29a5ad65e60959260a95bca22b03afb964ee9b90015152612889",
+        "digest": "5411e583494659c18134320d5e056f13f101e24130aab3e474f17cc92a1bd8da",
         "origin": "source",
         "inputPaths": [
           "packages/create-atm/dist/build-identity.json"
@@ -55294,7 +55389,7 @@
       },
       {
         "path": "packages/create-atm/package.json",
-        "digest": "525eecdf46de41f4a2e3e1f9a5a7136c731254f0f8758d9fdcc748e05becf123",
+        "digest": "abae5200b9b579de53b0e77aca4ea3fc0174b92abe853148f7b230c48848cccf",
         "origin": "source",
         "inputPaths": [
           "packages/create-atm/package.json"
@@ -55348,7 +55443,7 @@
       },
       {
         "path": "packages/integration-claude-code/package.json",
-        "digest": "07de1786ec5373427b8ec372ed68122a5b6a4131092c95b9c248757b7a67fd6e",
+        "digest": "7935a47677dfec2e53fe6c140efeae19374fe62f5fca8350f19368b445dab22f",
         "origin": "source",
         "inputPaths": [
           "packages/integration-claude-code/package.json"
@@ -55393,7 +55488,7 @@
       },
       {
         "path": "packages/integration-codex/package.json",
-        "digest": "21543ce1014f2214d9833d20f62a8baaeb0cd65306c71080f54a3778720981d8",
+        "digest": "dbc2b110ee6e186cab6b21b2fc3fb494766a9d4f73cbcdef6a1c340cc802ba11",
         "origin": "source",
         "inputPaths": [
           "packages/integration-codex/package.json"
@@ -55438,7 +55533,7 @@
       },
       {
         "path": "packages/integration-copilot/package.json",
-        "digest": "1688023251f6645c1dbf861184cbf35acfee7416bfdc26c3cd90fa6ca403ebb7",
+        "digest": "8978a689760412dfddfb3e32dccfe4fdffac3510d76758071eb3b8f3d8915877",
         "origin": "source",
         "inputPaths": [
           "packages/integration-copilot/package.json"
@@ -55483,7 +55578,7 @@
       },
       {
         "path": "packages/integration-cursor/package.json",
-        "digest": "c968a9015f31c66edba217ba442b080a36da8f83d6dadb1fcff370d8554e4abc",
+        "digest": "f34ccf7d3772d2c501ad86bf7e1b73ac75488bfae4a9721f2acf9fc230da3553",
         "origin": "source",
         "inputPaths": [
           "packages/integration-cursor/package.json"
@@ -55528,7 +55623,7 @@
       },
       {
         "path": "packages/integration-gemini/package.json",
-        "digest": "78d854d47695c9e036d6757d3c7b85133195c4013706be43f056eb35b16436d4",
+        "digest": "872cde2f9ac4a614774553622ad29ec0672e7c5ec57b693ef722ccc4cd5b6a53",
         "origin": "source",
         "inputPaths": [
           "packages/integration-gemini/package.json"
@@ -55573,7 +55668,7 @@
       },
       {
         "path": "packages/integrations-core/dist/compiler/charter-block.js",
-        "digest": "66652b1dad7885e78099456d68e7da67cf6d918d3de34a577980e24204942ec9",
+        "digest": "335e99434e51b371e73e47a472b983ef7c4684bcaf888fb704ad3fa2612d6747",
         "origin": "source",
         "inputPaths": [
           "packages/integrations-core/dist/compiler/charter-block.js"
@@ -55888,7 +55983,7 @@
       },
       {
         "path": "packages/integrations-core/package.json",
-        "digest": "ff5b8f41cb975aafde02d80b9b18117323c27d232509efcf7e12430a2174d2e6",
+        "digest": "4634e081a5733c1d6d6ea7ce88bf1e41ed2f854682b37f5659a5a23ea972f33a",
         "origin": "source",
         "inputPaths": [
           "packages/integrations-core/package.json"
@@ -55897,7 +55992,7 @@
       },
       {
         "path": "packages/integrations-core/src/compiler/charter-block.ts",
-        "digest": "942f4cbee4d29bb69ff1930ed0afc7ac708ea841c5ee576b114823260c35af86",
+        "digest": "0f4210c11bcf9de791da79aa6f6a1c2b87ba9f9384429dc04b3965384bd19162",
         "origin": "source",
         "inputPaths": [
           "packages/integrations-core/src/compiler/charter-block.ts"
@@ -56428,7 +56523,7 @@
       },
       {
         "path": "packages/language-csharp/package.json",
-        "digest": "b65d423beaf897d1b25cf55becfb29bb9cde21fe862adc1b80f68d98a0fe3001",
+        "digest": "581b7485b468baab7f7116b58affa2ddf99ec7883499149fedbe61cce4f79a06",
         "origin": "source",
         "inputPaths": [
           "packages/language-csharp/package.json"
@@ -56500,7 +56595,7 @@
       },
       {
         "path": "packages/language-js/package.json",
-        "digest": "9d8e98172af1bbd208dccd00516547f0eb0c1428d46026678f71da11ae23a77f",
+        "digest": "8d1cdc967d9265e057e5a6890821e5cf36d3429f0948c84c5a0d915f4e1a572c",
         "origin": "source",
         "inputPaths": [
           "packages/language-js/package.json"
@@ -56725,7 +56820,7 @@
       },
       {
         "path": "packages/language-python/package.json",
-        "digest": "544c97217cf0263203363350737b158a8cdb5e731cba942214b004f5e93b841e",
+        "digest": "45da5899f0e2fbdb638fe7cfef81bab1f3a74bfa409c9c6b430001970428e9af",
         "origin": "source",
         "inputPaths": [
           "packages/language-python/package.json"
@@ -57058,7 +57153,7 @@
       },
       {
         "path": "packages/plugin-behavior-pack/package.json",
-        "digest": "a2bfaf10392aac046c75a9c5c736ba3a5f96a306b4da1d9c4ca2c17f7dff871c",
+        "digest": "39e22f1fd777caca986e5e77a13e6eafe33b7577c3ac39ab76bfc61280fc5a32",
         "origin": "source",
         "inputPaths": [
           "packages/plugin-behavior-pack/package.json"
@@ -57193,7 +57288,7 @@
       },
       {
         "path": "packages/plugin-experience-loop/package.json",
-        "digest": "9442dc8ae4bc872593df99ed2c0fc76e7eb6e4ae6ba958358374e04d4066caf6",
+        "digest": "072463e6e869d5c8616244b8696da07f7fccfdf205dbaa77fc0bb7422480aafa",
         "origin": "source",
         "inputPaths": [
           "packages/plugin-experience-loop/package.json"
@@ -57274,7 +57369,7 @@
       },
       {
         "path": "packages/plugin-governance-local/dist/bootstrap/bootstrap/bootstrap-support.d.ts",
-        "digest": "2b862e33f2bed96f458eca61613d6311e00e4d46feee61bf13378730cd1b2cb2",
+        "digest": "8229ffbe5002034955990623af953c294108e648e3c93e6852818fef5212a550",
         "origin": "source",
         "inputPaths": [
           "packages/plugin-governance-local/dist/bootstrap/bootstrap/bootstrap-support.d.ts"
@@ -57283,7 +57378,7 @@
       },
       {
         "path": "packages/plugin-governance-local/dist/bootstrap/bootstrap/bootstrap-support.js",
-        "digest": "7a9169d146f8d73cbdf84579b0ff8dfe8dd71679829cc9baac3e26fbf7779c69",
+        "digest": "b0d11b3c8d7f04b604612ac2127e62a37bd4f7e1a8f9f6acdf63aecdaea9b238",
         "origin": "source",
         "inputPaths": [
           "packages/plugin-governance-local/dist/bootstrap/bootstrap/bootstrap-support.js"
@@ -57345,6 +57440,24 @@
         "replaceable": true
       },
       {
+        "path": "packages/plugin-governance-local/dist/bootstrap/charter-upgrade.d.ts",
+        "digest": "f9eb933f623e1fea58088099b473272edb576360baa5714cf17562b85c7220cc",
+        "origin": "source",
+        "inputPaths": [
+          "packages/plugin-governance-local/dist/bootstrap/charter-upgrade.d.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "packages/plugin-governance-local/dist/bootstrap/charter-upgrade.js",
+        "digest": "1579568e4071befcac322e17d4acb58bdece92ea965e65cda8f9bcd50364b59b",
+        "origin": "source",
+        "inputPaths": [
+          "packages/plugin-governance-local/dist/bootstrap/charter-upgrade.js"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/plugin-governance-local/dist/bootstrap/prompt.d.ts",
         "digest": "4f9d5e46b466b7287156b6a2605089e2480e8eed2672efff175459b9d8974867",
         "origin": "source",
@@ -57400,7 +57513,7 @@
       },
       {
         "path": "packages/plugin-governance-local/dist/index.d.ts",
-        "digest": "9465a582215c05c47c535ebcc8b50177c9a904c6fd53c3372d6f5c5f9fe2b34d",
+        "digest": "3920e38757a0765fe1cdfbf0fde1f334a9d7d72a2d6eed9927c7766ad8152bd0",
         "origin": "source",
         "inputPaths": [
           "packages/plugin-governance-local/dist/index.d.ts"
@@ -57409,7 +57522,7 @@
       },
       {
         "path": "packages/plugin-governance-local/dist/index.js",
-        "digest": "bda2b3224a472f09fe77d2ae2660c77c94282f95a54b32706aac6081d894c50a",
+        "digest": "19d1e6d0736e4f1fac386925504981d6f722e03256a5817eff8b352e6cdb97de",
         "origin": "source",
         "inputPaths": [
           "packages/plugin-governance-local/dist/index.js"
@@ -57490,7 +57603,7 @@
       },
       {
         "path": "packages/plugin-governance-local/package.json",
-        "digest": "27669b7cb89e8213f52847f0c29de2d2d984a7fbf959a2232ad8e82df00a19e9",
+        "digest": "b9dc9a6e644bb14b57a726ba381bf568a42fd442e22a65aaffb028e0fd981e94",
         "origin": "source",
         "inputPaths": [
           "packages/plugin-governance-local/package.json"
@@ -57508,7 +57621,7 @@
       },
       {
         "path": "packages/plugin-governance-local/src/bootstrap/bootstrap/bootstrap-support.ts",
-        "digest": "86f4b3eeef369be561d4ceab27731c2a2e53b758acb60a82b6d7a4003bc8ad7a",
+        "digest": "014d281c9df7f31ea43a3d7acc6a457d30b2fdbaa44812b4789e94e7ddc2bb78",
         "origin": "source",
         "inputPaths": [
           "packages/plugin-governance-local/src/bootstrap/bootstrap/bootstrap-support.ts"
@@ -57543,6 +57656,15 @@
         "replaceable": true
       },
       {
+        "path": "packages/plugin-governance-local/src/bootstrap/charter-upgrade.ts",
+        "digest": "bb53ae2c27bd207cf7686b22ce6a0a4ec74ddf98e86575d2998f7dd064abae44",
+        "origin": "source",
+        "inputPaths": [
+          "packages/plugin-governance-local/src/bootstrap/charter-upgrade.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "packages/plugin-governance-local/src/bootstrap/prompt.ts",
         "digest": "ddef22e8dd0658b052371579370da7dafe4e72697b003a03977b2955a385555c",
         "origin": "source",
@@ -57571,7 +57693,7 @@
       },
       {
         "path": "packages/plugin-governance-local/src/index.ts",
-        "digest": "94d237e1fd8dcc6bfe2af1e72e1378164b4d95691e5f75d5b0c10b4244e821b5",
+        "digest": "4348657434daf8ac1fb353d892b8ad2603b13aafffdac4fe079413ec0c6789cc",
         "origin": "source",
         "inputPaths": [
           "packages/plugin-governance-local/src/index.ts"
@@ -57697,7 +57819,7 @@
       },
       {
         "path": "packages/plugin-human-review/package.json",
-        "digest": "607814e5fc4967cbc776857a5ce840ca01e3b034dbc157f900592a7ea2563c2f",
+        "digest": "539214c9b232054f4d84b3afe4e74624336e3eb04fe15886ffe08db01817ef70",
         "origin": "source",
         "inputPaths": [
           "packages/plugin-human-review/package.json"
@@ -57823,7 +57945,7 @@
       },
       {
         "path": "packages/plugin-review-advisory/package.json",
-        "digest": "070ce8c92651f4284c2a28c940d51cf120310846f574ca28075b6f27dc4eab4b",
+        "digest": "cb3a8b5aae4f51bcd488f1dbbfd67f734bb73e9a0809e91b19c83a862d185e56",
         "origin": "source",
         "inputPaths": [
           "packages/plugin-review-advisory/package.json"
@@ -57949,7 +58071,7 @@
       },
       {
         "path": "packages/plugin-rule-guard/package.json",
-        "digest": "5ef5ac7ab164d6dfbc10684c3fa762f557aefe038596199cff63242e31867a82",
+        "digest": "6f348551371616d8d7e1fcf0180ed207f3b0ff8690877f3064e7bcd57ef2c1a1",
         "origin": "source",
         "inputPaths": [
           "packages/plugin-rule-guard/package.json"
@@ -58435,7 +58557,7 @@
       },
       {
         "path": "packages/plugin-sdk/package.json",
-        "digest": "ab66ef8cdac4969a72ecaba21c175a4cf0b6f6cfeb2d69676e1106a532cfd5c4",
+        "digest": "18bc5e4e6f024ac002430bd19239db9328c6b9db00299f1425a35c0a090bf7b0",
         "origin": "source",
         "inputPaths": [
           "packages/plugin-sdk/package.json"
@@ -62620,7 +62742,7 @@
       },
       {
         "path": "scripts/skew-matrix.config.json",
-        "digest": "f08495e140b4d8a56b9a469756f3ee6bf2093e38b0edc2837d0e9e9484ad95ef",
+        "digest": "9981ce26393f2f24fe966d936a0a017cb6d6459674809ca3f5a73ae255063f08",
         "origin": "source",
         "inputPaths": [
           "scripts/skew-matrix.config.json"
@@ -67363,7 +67485,7 @@
       },
       {
         "path": "tests/cli-fixtures/help-snapshots/command-list.json",
-        "digest": "9b76fcd55e1b22bd8d650b213c2275f5f24befd418c0f2daaf6663512b1fb41c",
+        "digest": "f120c2962b500bad3ec7c56c39f124875b4467e86c469ecf18e070c818030992",
         "origin": "source",
         "inputPaths": [
           "tests/cli-fixtures/help-snapshots/command-list.json"
@@ -68109,6 +68231,15 @@
         "replaceable": true
       },
       {
+        "path": "tests/cli/charter-upgrade.test.ts",
+        "digest": "77968f00a6870e59612d18af8dfc8d46e57a3a064a0ac86994e429f2f2496553",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/charter-upgrade.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
         "path": "tests/cli/check-encoding-staged-deletion.test.ts",
         "digest": "c352de5f9b48054dc628fcad9e11e9d9ef7aa84e0e40adfacedbdeeef048d244",
         "origin": "source",
@@ -68627,6 +68758,15 @@
         "origin": "source",
         "inputPaths": [
           "tests/cli/dirty-release-wip-recovery-0258.test.ts"
+        ],
+        "replaceable": true
+      },
+      {
+        "path": "tests/cli/doctor-charter-diagnosis.test.ts",
+        "digest": "784ad26da0b19a772d9f19d662cca275f8a0206019bfc35e1198eadee8c12fdb",
+        "origin": "source",
+        "inputPaths": [
+          "tests/cli/doctor-charter-diagnosis.test.ts"
         ],
         "replaceable": true
       },
@@ -77082,7 +77222,7 @@
         "replaceable": true
       }
     ],
-    "treeDigest": "sha256:5684061738794d708105aac99f8e941ecb71f3707620b7b4d1b84873d54884b4"
+    "treeDigest": "sha256:81d520de96c29f6b5bed48c58eb78b583d73ca94e27680cd122d5e4d5807a4cd"
   },
   "runnerSourceSeal": {
     "schemaId": "atm.runnerSourceSeal.v1",
@@ -77206,6 +77346,7 @@
       "packages/cli/src/commands/build-release-hygiene.ts",
       "packages/cli/src/commands/cache.ts",
       "packages/cli/src/commands/candidates.ts",
+      "packages/cli/src/commands/charter.ts",
       "packages/cli/src/commands/cleanup/index.ts",
       "packages/cli/src/commands/cleanup/run.ts",
       "packages/cli/src/commands/command-specs.SPLIT_PLAN.md",
@@ -77224,6 +77365,7 @@
       "packages/cli/src/commands/command-specs/budget.spec.ts",
       "packages/cli/src/commands/command-specs/cache.spec.ts",
       "packages/cli/src/commands/command-specs/candidates.spec.ts",
+      "packages/cli/src/commands/command-specs/charter.spec.ts",
       "packages/cli/src/commands/command-specs/cleanup.spec.ts",
       "packages/cli/src/commands/command-specs/create-map.spec.ts",
       "packages/cli/src/commands/command-specs/create.spec.ts",
@@ -77521,6 +77663,7 @@
       "packages/cli/src/commands/internal-release/publication.ts",
       "packages/cli/src/commands/internal-release/scratch.ts",
       "packages/cli/src/commands/internal-release/support.ts",
+      "packages/cli/src/commands/internal-release/target-charter.ts",
       "packages/cli/src/commands/internal-release/target-sync.ts",
       "packages/cli/src/commands/internal-release/types.ts",
       "packages/cli/src/commands/lane-session/__tests__/claim-authority-continuity.test.ts",
@@ -78474,6 +78617,7 @@
       "packages/plugin-governance-local/src/bootstrap/bootstrap/implementation.ts",
       "packages/plugin-governance-local/src/bootstrap/bootstrap/root-entry-patching.ts",
       "packages/plugin-governance-local/src/bootstrap/budget.ts",
+      "packages/plugin-governance-local/src/bootstrap/charter-upgrade.ts",
       "packages/plugin-governance-local/src/bootstrap/prompt.ts",
       "packages/plugin-governance-local/src/bootstrap/types.ts",
       "packages/plugin-governance-local/src/default-guards.ts",
@@ -78743,7 +78887,7 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "digest": "sha256:6fb50358837de1966758587cc30121a5d84ba895eaf4354fd8fdc8502a5ca7e9"
+    "digest": "sha256:20783259b5e0ac933a4a382eee008e11ef1b5630b57eca63482688d0add5a617"
   },
   "stagingContract": {
     "schemaId": "atm.generatedArtifactStaging.v1",
@@ -79497,6 +79641,7 @@
       "release/atm-root-drop/docs/releases/0.1.27.md",
       "release/atm-root-drop/docs/releases/0.1.28.md",
       "release/atm-root-drop/docs/releases/0.1.29.md",
+      "release/atm-root-drop/docs/releases/0.1.30.md",
       "release/atm-root-drop/docs/reports/TASK-TMP-0007-target-side-attestation.md",
       "release/atm-root-drop/docs/reports/agr-conflict-arbitration-benchmark.md",
       "release/atm-root-drop/docs/reports/atm-2-1-final-closure.md",
@@ -80974,6 +81119,8 @@
       "release/atm-root-drop/packages/cli/dist/_vendor/plugin-governance-local/dist/bootstrap/bootstrap/root-entry-patching.js",
       "release/atm-root-drop/packages/cli/dist/_vendor/plugin-governance-local/dist/bootstrap/budget.d.ts",
       "release/atm-root-drop/packages/cli/dist/_vendor/plugin-governance-local/dist/bootstrap/budget.js",
+      "release/atm-root-drop/packages/cli/dist/_vendor/plugin-governance-local/dist/bootstrap/charter-upgrade.d.ts",
+      "release/atm-root-drop/packages/cli/dist/_vendor/plugin-governance-local/dist/bootstrap/charter-upgrade.js",
       "release/atm-root-drop/packages/cli/dist/_vendor/plugin-governance-local/dist/bootstrap/prompt.d.ts",
       "release/atm-root-drop/packages/cli/dist/_vendor/plugin-governance-local/dist/bootstrap/prompt.js",
       "release/atm-root-drop/packages/cli/dist/_vendor/plugin-governance-local/dist/bootstrap/types.d.ts",
@@ -81134,6 +81281,7 @@
       "release/atm-root-drop/packages/cli/dist/commands/build-release-hygiene.js",
       "release/atm-root-drop/packages/cli/dist/commands/cache.js",
       "release/atm-root-drop/packages/cli/dist/commands/candidates.js",
+      "release/atm-root-drop/packages/cli/dist/commands/charter.js",
       "release/atm-root-drop/packages/cli/dist/commands/cleanup/index.js",
       "release/atm-root-drop/packages/cli/dist/commands/cleanup/run.js",
       "release/atm-root-drop/packages/cli/dist/commands/command-specs.js",
@@ -81151,6 +81299,7 @@
       "release/atm-root-drop/packages/cli/dist/commands/command-specs/budget.spec.js",
       "release/atm-root-drop/packages/cli/dist/commands/command-specs/cache.spec.js",
       "release/atm-root-drop/packages/cli/dist/commands/command-specs/candidates.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/command-specs/charter.spec.js",
       "release/atm-root-drop/packages/cli/dist/commands/command-specs/cleanup.spec.js",
       "release/atm-root-drop/packages/cli/dist/commands/command-specs/create-map.spec.js",
       "release/atm-root-drop/packages/cli/dist/commands/command-specs/create.spec.js",
@@ -81394,6 +81543,7 @@
       "release/atm-root-drop/packages/cli/dist/commands/internal-release/publication.js",
       "release/atm-root-drop/packages/cli/dist/commands/internal-release/scratch.js",
       "release/atm-root-drop/packages/cli/dist/commands/internal-release/support.js",
+      "release/atm-root-drop/packages/cli/dist/commands/internal-release/target-charter.js",
       "release/atm-root-drop/packages/cli/dist/commands/internal-release/target-sync.js",
       "release/atm-root-drop/packages/cli/dist/commands/internal-release/types.js",
       "release/atm-root-drop/packages/cli/dist/commands/lane-session/adopt-rebind.js",
@@ -81966,6 +82116,7 @@
       "release/atm-root-drop/packages/cli/src/commands/build-release-hygiene.ts",
       "release/atm-root-drop/packages/cli/src/commands/cache.ts",
       "release/atm-root-drop/packages/cli/src/commands/candidates.ts",
+      "release/atm-root-drop/packages/cli/src/commands/charter.ts",
       "release/atm-root-drop/packages/cli/src/commands/cleanup/index.ts",
       "release/atm-root-drop/packages/cli/src/commands/cleanup/run.ts",
       "release/atm-root-drop/packages/cli/src/commands/command-specs.SPLIT_PLAN.md",
@@ -81984,6 +82135,7 @@
       "release/atm-root-drop/packages/cli/src/commands/command-specs/budget.spec.ts",
       "release/atm-root-drop/packages/cli/src/commands/command-specs/cache.spec.ts",
       "release/atm-root-drop/packages/cli/src/commands/command-specs/candidates.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/command-specs/charter.spec.ts",
       "release/atm-root-drop/packages/cli/src/commands/command-specs/cleanup.spec.ts",
       "release/atm-root-drop/packages/cli/src/commands/command-specs/create-map.spec.ts",
       "release/atm-root-drop/packages/cli/src/commands/command-specs/create.spec.ts",
@@ -82281,6 +82433,7 @@
       "release/atm-root-drop/packages/cli/src/commands/internal-release/publication.ts",
       "release/atm-root-drop/packages/cli/src/commands/internal-release/scratch.ts",
       "release/atm-root-drop/packages/cli/src/commands/internal-release/support.ts",
+      "release/atm-root-drop/packages/cli/src/commands/internal-release/target-charter.ts",
       "release/atm-root-drop/packages/cli/src/commands/internal-release/target-sync.ts",
       "release/atm-root-drop/packages/cli/src/commands/internal-release/types.ts",
       "release/atm-root-drop/packages/cli/src/commands/lane-session/__tests__/claim-authority-continuity.test.ts",
@@ -84259,6 +84412,8 @@
       "release/atm-root-drop/packages/plugin-governance-local/dist/bootstrap/bootstrap/root-entry-patching.js",
       "release/atm-root-drop/packages/plugin-governance-local/dist/bootstrap/budget.d.ts",
       "release/atm-root-drop/packages/plugin-governance-local/dist/bootstrap/budget.js",
+      "release/atm-root-drop/packages/plugin-governance-local/dist/bootstrap/charter-upgrade.d.ts",
+      "release/atm-root-drop/packages/plugin-governance-local/dist/bootstrap/charter-upgrade.js",
       "release/atm-root-drop/packages/plugin-governance-local/dist/bootstrap/prompt.d.ts",
       "release/atm-root-drop/packages/plugin-governance-local/dist/bootstrap/prompt.js",
       "release/atm-root-drop/packages/plugin-governance-local/dist/bootstrap/types.d.ts",
@@ -84281,6 +84436,7 @@
       "release/atm-root-drop/packages/plugin-governance-local/src/bootstrap/bootstrap/implementation.ts",
       "release/atm-root-drop/packages/plugin-governance-local/src/bootstrap/bootstrap/root-entry-patching.ts",
       "release/atm-root-drop/packages/plugin-governance-local/src/bootstrap/budget.ts",
+      "release/atm-root-drop/packages/plugin-governance-local/src/bootstrap/charter-upgrade.ts",
       "release/atm-root-drop/packages/plugin-governance-local/src/bootstrap/prompt.ts",
       "release/atm-root-drop/packages/plugin-governance-local/src/bootstrap/types.ts",
       "release/atm-root-drop/packages/plugin-governance-local/src/default-guards.ts",
@@ -85456,6 +85612,7 @@
       "release/atm-root-drop/tests/cli/causal-validator-contract-import.test.ts",
       "release/atm-root-drop/tests/cli/causal-validator-selector.test.ts",
       "release/atm-root-drop/tests/cli/charter-bundle.test.ts",
+      "release/atm-root-drop/tests/cli/charter-upgrade.test.ts",
       "release/atm-root-drop/tests/cli/check-encoding-staged-deletion.test.ts",
       "release/atm-root-drop/tests/cli/ci-burn-in-evidence-collector.test.ts",
       "release/atm-root-drop/tests/cli/ci-product-lane-contract.test.ts",
@@ -85514,6 +85671,7 @@
       "release/atm-root-drop/tests/cli/derived-atoms-same-file-parallel.test.ts",
       "release/atm-root-drop/tests/cli/diagnostic-feedback-loop.test.ts",
       "release/atm-root-drop/tests/cli/dirty-release-wip-recovery-0258.test.ts",
+      "release/atm-root-drop/tests/cli/doctor-charter-diagnosis.test.ts",
       "release/atm-root-drop/tests/cli/doctor-commit-scope-patrol.test.ts",
       "release/atm-root-drop/tests/cli/doctor-final-600.test.ts",
       "release/atm-root-drop/tests/cli/doctor-integration-fast-health.test.ts",
@@ -86459,22 +86617,22 @@
     "contractSurface": "release-manifest.json",
     "rationale": "release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts."
   },
-  "buildInputsTreeHash": "sha256:726a5ffb2e50274328792d6c9890bc01208a0ce5e505b8f2be9ec87ff5ebc7c6",
-  "sealedSourceCommit": "08f2ca0a7e1411736e7c82d7a0cc6134c116cf10",
+  "buildInputsTreeHash": "sha256:9525c745a618cadef1ca2199e9768087451f4521bf43c46f569b48950caa0848",
+  "sealedSourceCommit": "94559606233e7c63743b151c7b13ce09790d31d4",
   "buildDecision": "incrementalBuild",
-  "buildDecisionReason": "diff planner selected 1 affected package(s)",
-  "incrementalPlanDigest": "sha256:dc14f0a72988d9fb8432c219cacaef03954f9e96852837b195ffdb4e46ab2c4b",
-  "tsBuildCacheDigest": "sha256:0b2faa105cac34ae7d03baef4e87b5bb38c21c088ca43b0b328abfc9aa6faeff",
+  "buildDecisionReason": "diff planner selected 2 affected package(s)",
+  "incrementalPlanDigest": "sha256:b8c61ba53091ff4b9d07831c90ce730df6e1a7942e806250fa8086914781e3e2",
+  "tsBuildCacheDigest": "sha256:45570885d48873ff834a0fa06f26c00d03ecf2661008942180da60b1492e6c86",
   "rawTelemetryPolicy": "gitignored-runtime-only",
   "phaseTimingsMs": {
-    "inputHashCalculation": 112,
-    "skipDecision": 486,
-    "worktreeSetup": 633515,
-    "typescriptBuild": 106577,
-    "rootDropReleaseAssembly": 171039,
-    "onefileReleaseAssembly": 289535,
-    "artifactSync": 55016,
+    "inputHashCalculation": 76,
+    "skipDecision": 88,
+    "worktreeSetup": 265247,
+    "typescriptBuild": 62673,
+    "rootDropReleaseAssembly": 81124,
+    "onefileReleaseAssembly": 78235,
+    "artifactSync": 26823,
     "cleanup": 0,
-    "totalElapsed": 1357677
+    "totalElapsed": 571102
   }
 }

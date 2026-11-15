@@ -21,3 +21,4 @@ export function createLocalGovernanceAdapter(config) {
 }
 // Export versioning helpers (Slice 1 & TASK-AAO-0071 hygiene rename)
 export * from './versioning.js';
+export { charterUpgradePaths, compareCharterVersions, readBundledCharterVersion, upgradeCharter } from './bootstrap/charter-upgrade.js';

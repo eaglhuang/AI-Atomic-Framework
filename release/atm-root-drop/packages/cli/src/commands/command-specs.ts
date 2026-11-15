@@ -46,6 +46,7 @@ import handoffSpec from './command-specs/handoff.spec.ts';
 import hookSpec from './command-specs/hook.spec.ts';
 import initSpec from './command-specs/init.spec.ts';
 import internalReleaseSpec from './command-specs/internal-release.spec.ts';
+import charterSpec from './command-specs/charter.spec.ts';
 import integrationSpec from './command-specs/integration.spec.ts';
 import laneSpec from './command-specs/lane.spec.ts';
 import lockSpec from './command-specs/lock.spec.ts';
@@ -116,6 +117,7 @@ export const commandSpecs = Object.freeze({
   identity: identitySpec,
   init: initSpec,
   'internal-release': internalReleaseSpec,
+  charter: charterSpec,
   integration: integrationSpec,
   lane: laneSpec,
   lock: lockSpec,

@@ -41,6 +41,7 @@ import { runGuide } from './commands/guide.ts';
 import { runHandoff } from './commands/handoff.ts';
 import { runInit } from './commands/init.ts';
 import { runInternalRelease } from './commands/internal-release.ts';
+import { runCharter } from './commands/charter.ts';
 import { runIntegration } from './commands/integration.ts';
 import { runLane } from './commands/lane.ts';
 import { runLock } from './commands/lock.ts';
@@ -109,6 +110,7 @@ export const cliCommandRunners: Record<string, CliRunner> = {
   handoff: runHandoff,
   init: runInit,
   'internal-release': runInternalRelease,
+  charter: runCharter,
   'git-hooks': runGitHooks,
   integration: runIntegration,
   lane: runLane,

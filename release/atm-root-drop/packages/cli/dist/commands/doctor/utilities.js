@@ -1,6 +1,7 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { loadCharterAuthorityBundle } from '../../_vendor/integrations-core/dist/compiler/charter-block.js';
+import { compareCharterVersions, readBundledCharterVersion } from '../../_vendor/plugin-governance-local/dist/index.js';
 export function createCheck(name, ok, details) {
     return {
         name,
@@ -104,7 +105,12 @@ export function checkCharterIntegrityV2(root) {
     }
     const charterDirExists = existsSync(path.join(root, '.atm', 'charter'));
     const bundle = charterDirExists ? loadCharterAuthorityBundle(root) : null;
-    const ok = !charterDirExists || (charterPresent && firstPrinciplesPresent && invariantsPresent && invariantsParseable && bundle?.ok === true);
+    // An older but intact charter is outdated, not corrupt: it is a warning with
+    // an upgrade route, while missing or unparseable charter files stay errors.
+    const bundledCharterVersion = readBundledCharterVersionSafely();
+    const outdated = charterPresent && invariantsParseable && Boolean(bundle?.charterVersion) && bundledCharterVersion !== null
+        && compareCharterVersions(bundle?.charterVersion ?? null, bundledCharterVersion) < 0;
+    const ok = !charterDirExists || outdated || (charterPresent && firstPrinciplesPresent && invariantsPresent && invariantsParseable && bundle?.ok === true);
     return {
         ok,
         charterPath: path.relative(root, charterPath).replace(/\\/g, '/'),
@@ -115,6 +121,17 @@ export function checkCharterIntegrityV2(root) {
         invariantsPresent,
         invariantsParseable,
         hashField,
-        bundle
+        bundle,
+        outdated,
+        bundledCharterVersion,
+        upgradeCommand: 'node atm.mjs charter upgrade --write --json'
     };
+}
+function readBundledCharterVersionSafely() {
+    try {
+        return readBundledCharterVersion();
+    }
+    catch {
+        return null;
+    }
 }

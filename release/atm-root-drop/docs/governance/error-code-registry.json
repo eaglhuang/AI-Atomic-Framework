@@ -2441,6 +2441,65 @@
       ],
       "sourceOwner": "packages/cli/src/commands/tasks/dependency-gate.ts",
       "registryOwner": "ATM-GOV-0406"
+    },
+    {
+      "code": "ATM_CHARTER_UPGRADE_OK",
+      "category": "charter",
+      "shortDescription": "charter upgrade planned or applied the bundled AtomicCharter, or found it already current.",
+      "commonCauses": [
+        "The adopter charter is older than the charter bundled with this ATM release.",
+        "The command ran after an ATM runner upgrade."
+      ],
+      "remediation": [
+        "Review the dry-run delta, then rerun with --write to apply.",
+        "After writing, rerun node atm.mjs integration add <editor-id> --force --json so agent skills carry the new invariants."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs charter upgrade --json",
+        "node atm.mjs charter upgrade --write --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/charter.ts"
+    },
+    {
+      "code": "ATM_CHARTER_UPGRADE_CONFLICT",
+      "category": "charter",
+      "shortDescription": "charter upgrade refused to change the AtomicCharter; no files were written.",
+      "commonCauses": [
+        ".atm/charter/charter-invariants.json is not parseable JSON.",
+        "The adopter charter version is newer than the charter bundled with this ATM release."
+      ],
+      "remediation": [
+        "Restore the charter files from version control if they were edited by hand, then rerun the upgrade.",
+        "If the adopter charter is newer, upgrade the ATM runner instead of downgrading the charter."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs charter upgrade --json",
+        "node atm.mjs --version"
+      ],
+      "sourceOwner": "packages/plugin-governance-local/src/bootstrap/charter-upgrade.ts"
+    },
+    {
+      "code": "ATM_DOCTOR_CHARTER_OUTDATED",
+      "category": "doctor",
+      "shortDescription": "The AtomicCharter is intact but older than the charter bundled with this ATM release.",
+      "commonCauses": [
+        "The repository was bootstrapped with an older ATM release and the charter was never upgraded."
+      ],
+      "remediation": [
+        "Run node atm.mjs charter upgrade --json to review the delta, then node atm.mjs charter upgrade --write --json.",
+        "Adopter-added invariants and fields are preserved; newly added invariants start advisory for one release."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs charter upgrade --write --json",
+        "node atm.mjs doctor --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/doctor/run-doctor.ts"
     }
   ],
   "prefixRules": [

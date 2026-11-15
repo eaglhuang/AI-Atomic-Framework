@@ -180,6 +180,13 @@ export const plannedCliCommands = [
         outputFormat: 'pretty+json'
     },
     {
+        commandName: 'charter',
+        summary: 'Upgrade the AtomicCharter to the bundled version',
+        implemented: true,
+        standaloneMode: true,
+        outputFormat: 'pretty+json'
+    },
+    {
         commandName: 'internal-release',
         summary: 'Build and sync the ATM runner to explicit internal repositories',
         implemented: true,

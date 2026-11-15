@@ -11,7 +11,7 @@ export function loadCharterAuthorityBundle(repositoryRoot) {
     const atomicCharterPath = path.join(repositoryRoot, '.atm', 'charter', 'atomic-charter.md');
     const firstPrinciplesPath = path.join(repositoryRoot, '.atm', 'charter', 'atm-first-principles.md');
     const invariantsPath = path.join(repositoryRoot, '.atm', 'charter', 'charter-invariants.json');
-    const repairCommand = 'node atm.mjs init --adopt default --force --json';
+    const repairCommand = 'node atm.mjs charter upgrade --write --json';
     const errors = [];
     const atomicCharter = readRequiredText(atomicCharterPath, errors);
     const firstPrinciples = readRequiredText(firstPrinciplesPath, errors);
@@ -86,7 +86,10 @@ export function renderCharterInvariantsBlock(repositoryRoot) {
                 title: entry.title,
                 rule: entry.rule,
                 enforcement: typeof entry.enforcement === 'string' ? entry.enforcement : 'unknown',
-                breakingChange: entry.breakingChange === true
+                breakingChange: entry.breakingChange === true,
+                advisoryUntil: typeof entry.stagedEnforcement?.advisoryUntilFrameworkVersion === 'string'
+                    ? entry.stagedEnforcement.advisoryUntilFrameworkVersion
+                    : null
             }))
             : [];
         if (invariants.length === 0) {
@@ -115,7 +118,12 @@ export function renderCharterInvariantsBlock(repositoryRoot) {
 }
 function renderCharterInvariantLine(entry) {
     const breakingChange = entry.breakingChange ? 'yes' : 'no';
-    return `- \`${entry.id}\` ??**${entry.title}** (enforcement: \`${entry.enforcement}\`, breaking change: ${breakingChange})\n  Rule: ${entry.rule}`;
+    // Invariants newly adopted through a charter upgrade are advisory until the
+    // recorded ATM release, then use their declared enforcement.
+    const enforcement = entry.advisoryUntil
+        ? `advisory until ATM ${entry.advisoryUntil}, then \`${entry.enforcement}\``
+        : `\`${entry.enforcement}\``;
+    return `- \`${entry.id}\` ??**${entry.title}** (enforcement: ${enforcement}, breaking change: ${breakingChange})\n  Rule: ${entry.rule}`;
 }
 function readRequiredText(filePath, errors) {
     if (!existsSync(filePath)) {

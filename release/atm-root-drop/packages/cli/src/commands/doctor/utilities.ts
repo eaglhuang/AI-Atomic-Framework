@@ -2,6 +2,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { checkIntegrationHealth } from '../integration.ts';
 import { loadCharterAuthorityBundle } from '../../../../integrations-core/src/compiler/charter-block.ts';
+import { compareCharterVersions, readBundledCharterVersion } from '../../../../plugin-governance-local/src/index.ts';
 import type { DoctorCheck } from './types.ts';
 
 export function createCheck(name: string, ok: boolean, details: unknown): DoctorCheck {
@@ -100,6 +101,9 @@ export function checkCharterIntegrityV2(root: string): {
   invariantsParseable: boolean;
   hashField: string | null;
   bundle: ReturnType<typeof loadCharterAuthorityBundle> | null;
+  outdated: boolean;
+  bundledCharterVersion: string | null;
+  upgradeCommand: string;
 } {
   const charterPath = path.join(root, '.atm', 'charter', 'atomic-charter.md');
   const firstPrinciplesPath = path.join(root, '.atm', 'charter', 'atm-first-principles.md');
@@ -120,7 +124,12 @@ export function checkCharterIntegrityV2(root: string): {
   }
   const charterDirExists = existsSync(path.join(root, '.atm', 'charter'));
   const bundle = charterDirExists ? loadCharterAuthorityBundle(root) : null;
-  const ok = !charterDirExists || (charterPresent && firstPrinciplesPresent && invariantsPresent && invariantsParseable && bundle?.ok === true);
+  // An older but intact charter is outdated, not corrupt: it is a warning with
+  // an upgrade route, while missing or unparseable charter files stay errors.
+  const bundledCharterVersion = readBundledCharterVersionSafely();
+  const outdated = charterPresent && invariantsParseable && Boolean(bundle?.charterVersion) && bundledCharterVersion !== null
+    && compareCharterVersions(bundle?.charterVersion ?? null, bundledCharterVersion) < 0;
+  const ok = !charterDirExists || outdated || (charterPresent && firstPrinciplesPresent && invariantsPresent && invariantsParseable && bundle?.ok === true);
   return {
     ok,
     charterPath: path.relative(root, charterPath).replace(/\\/g, '/'),
@@ -131,7 +140,18 @@ export function checkCharterIntegrityV2(root: string): {
     invariantsPresent,
     invariantsParseable,
     hashField,
-    bundle
+    bundle,
+    outdated,
+    bundledCharterVersion,
+    upgradeCommand: 'node atm.mjs charter upgrade --write --json'
   };
+}
+
+function readBundledCharterVersionSafely(): string | null {
+  try {
+    return readBundledCharterVersion();
+  } catch {
+    return null;
+  }
 }
 

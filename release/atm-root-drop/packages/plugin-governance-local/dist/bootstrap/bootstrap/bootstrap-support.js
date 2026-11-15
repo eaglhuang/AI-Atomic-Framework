@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { createAgentsRootEntryBlock, createReadmeRootEntryBlock, patchManagedRootEntry } from './root-entry-patching.js';
 const repoRoot = resolveBundledRepoRoot(path.dirname(fileURLToPath(import.meta.url)), '../../../../../');
 const templateRoot = path.join(repoRoot, 'templates', 'root-drop');
+export const bundledRootDropTemplateRoot = templateRoot;
 const rootDropScriptNames = [
     'atm-next',
     'atm-orient',

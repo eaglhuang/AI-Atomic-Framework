@@ -1,6 +1,7 @@
 import type { ArtifactRecord, EvidenceRecord, RegistryDocument, WorkItemRef } from '@ai-atomic-framework/core';
 import type { CapabilityResult } from '@ai-atomic-framework/plugin-sdk';
 import type { LocalGovernancePinnedRunnerResult } from '../types.js';
+export declare const bundledRootDropTemplateRoot: string;
 export declare function readProjectName(cwd: string): string | null;
 export declare function probeRepository(cwd: string, recommendedPrompt: string): {
     schemaVersion: string;
