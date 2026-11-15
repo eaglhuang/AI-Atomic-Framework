@@ -40,6 +40,7 @@ import { runGuide } from './commands/guide.js';
 import { runHandoff } from './commands/handoff.js';
 import { runInit } from './commands/init.js';
 import { runInternalRelease } from './commands/internal-release.js';
+import { runCharter } from './commands/charter.js';
 import { runIntegration } from './commands/integration.js';
 import { runLane } from './commands/lane.js';
 import { runLock } from './commands/lock.js';
@@ -106,6 +107,7 @@ export const cliCommandRunners = {
     handoff: runHandoff,
     init: runInit,
     'internal-release': runInternalRelease,
+    charter: runCharter,
     'git-hooks': runGitHooks,
     integration: runIntegration,
     lane: runLane,

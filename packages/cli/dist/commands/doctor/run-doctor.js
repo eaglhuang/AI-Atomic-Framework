@@ -198,7 +198,7 @@ export async function runDoctor(argv) {
     const recommendedAction = ok
         ? 'node atm.mjs next --json'
         : failedChecks.includes('charter-integrity')
-            ? 'node atm.mjs init --adopt default --force to reinstall the AtomicCharter, or restore .atm/charter/atomic-charter.md and .atm/charter/charter-invariants.json manually.'
+            ? 'node atm.mjs charter upgrade --write --json to install or upgrade the AtomicCharter, or restore the .atm/charter/ files from version control if they were edited by hand.'
             : failedChecks.includes('onboarding-lifecycle')
                 ? onboardingLifecycle.recommendedAction
                 : failedChecks.includes('version-compatibility')
@@ -276,6 +276,14 @@ export async function runDoctor(argv) {
             ? [message('warning', 'ATM_ATOM_FORMAL_STALE', `${formalAtomDrift.staleAtoms.length} formal atom(s) point at code paths that no longer exist. Claims and commits treat their files as file-level until the registry location is repaired.`, {
                     staleAtoms: formalAtomDrift.staleAtoms,
                     recommendedAction: 'Update the atom location through the governed registry flow (atm create / behavior proposal + review); ATM never rewrites formal atoms automatically.'
+                })]
+            : []),
+        ...(charterIntegrity.outdated
+            ? [message('warning', 'ATM_DOCTOR_CHARTER_OUTDATED', `AtomicCharter ${charterIntegrity.bundle?.charterVersion ?? 'unknown'} is older than the bundled charter ${charterIntegrity.bundledCharterVersion}. Upgrade it; adopter-added invariants are preserved and new invariants start advisory.`, {
+                    currentVersion: charterIntegrity.bundle?.charterVersion ?? null,
+                    bundledVersion: charterIntegrity.bundledCharterVersion,
+                    problems: charterIntegrity.bundle?.errors ?? [],
+                    recommendedAction: charterIntegrity.upgradeCommand
                 })]
             : []),
         ...(!backlogSyncCheck.ok

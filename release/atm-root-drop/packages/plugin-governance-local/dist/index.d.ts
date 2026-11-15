@@ -14,3 +14,5 @@ export declare const pluginGovernanceLocalPackage: {
 };
 export declare function createLocalGovernanceAdapter(config: LocalGovernanceConfig): GovernanceAdapter;
 export * from './versioning.js';
+export { charterUpgradePaths, compareCharterVersions, readBundledCharterVersion, upgradeCharter } from './bootstrap/charter-upgrade.js';
+export type { CharterUpgradeOptions, CharterUpgradeReport, CharterUpgradeStatus } from './bootstrap/charter-upgrade.js';

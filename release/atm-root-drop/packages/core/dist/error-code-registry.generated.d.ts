@@ -1,4 +1,4 @@
-export declare const ATM_ERROR_CODE_REGISTRY_DIGEST: "sha256:9c0c4fbefda2b8f3c9f6ecaa70e8d265f8a10df530e275983952443b9cf33f99";
+export declare const ATM_ERROR_CODE_REGISTRY_DIGEST: "sha256:06940c577f311dd53f15ff552ba6e2a7fbef79c0a75c65803f7cdd10650acdc4";
 export declare const ATM_ERROR_CODE_REGISTRY: {
     readonly schemaId: "atm.errorCodeRegistry.v1";
     readonly specVersion: "0.1.0";
@@ -1190,6 +1190,36 @@ export declare const ATM_ERROR_CODE_REGISTRY: {
         readonly relatedCommands: readonly ["node atm.mjs tasks import --from <plan-path> --dry-run --json", "node atm.mjs tasks status --task <task-id> --json"];
         readonly sourceOwner: "packages/cli/src/commands/tasks/dependency-gate.ts";
         readonly registryOwner: "ATM-GOV-0406";
+    }, {
+        readonly code: "ATM_CHARTER_UPGRADE_OK";
+        readonly category: "charter";
+        readonly shortDescription: "charter upgrade planned or applied the bundled AtomicCharter, or found it already current.";
+        readonly commonCauses: readonly ["The adopter charter is older than the charter bundled with this ATM release.", "The command ran after an ATM runner upgrade."];
+        readonly remediation: readonly ["Review the dry-run delta, then rerun with --write to apply.", "After writing, rerun node atm.mjs integration add <editor-id> --force --json so agent skills carry the new invariants."];
+        readonly retryable: true;
+        readonly requiresHumanApproval: false;
+        readonly relatedCommands: readonly ["node atm.mjs charter upgrade --json", "node atm.mjs charter upgrade --write --json"];
+        readonly sourceOwner: "packages/cli/src/commands/charter.ts";
+    }, {
+        readonly code: "ATM_CHARTER_UPGRADE_CONFLICT";
+        readonly category: "charter";
+        readonly shortDescription: "charter upgrade refused to change the AtomicCharter; no files were written.";
+        readonly commonCauses: readonly [".atm/charter/charter-invariants.json is not parseable JSON.", "The adopter charter version is newer than the charter bundled with this ATM release."];
+        readonly remediation: readonly ["Restore the charter files from version control if they were edited by hand, then rerun the upgrade.", "If the adopter charter is newer, upgrade the ATM runner instead of downgrading the charter."];
+        readonly retryable: true;
+        readonly requiresHumanApproval: false;
+        readonly relatedCommands: readonly ["node atm.mjs charter upgrade --json", "node atm.mjs --version"];
+        readonly sourceOwner: "packages/plugin-governance-local/src/bootstrap/charter-upgrade.ts";
+    }, {
+        readonly code: "ATM_DOCTOR_CHARTER_OUTDATED";
+        readonly category: "doctor";
+        readonly shortDescription: "The AtomicCharter is intact but older than the charter bundled with this ATM release.";
+        readonly commonCauses: readonly ["The repository was bootstrapped with an older ATM release and the charter was never upgraded."];
+        readonly remediation: readonly ["Run node atm.mjs charter upgrade --json to review the delta, then node atm.mjs charter upgrade --write --json.", "Adopter-added invariants and fields are preserved; newly added invariants start advisory for one release."];
+        readonly retryable: true;
+        readonly requiresHumanApproval: false;
+        readonly relatedCommands: readonly ["node atm.mjs charter upgrade --write --json", "node atm.mjs doctor --json"];
+        readonly sourceOwner: "packages/cli/src/commands/doctor/run-doctor.ts";
     }];
     readonly prefixRules: readonly [{
         readonly prefix: "ATM_GIT_";

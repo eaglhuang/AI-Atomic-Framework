@@ -5,6 +5,7 @@ import { cleanForbiddenAdopterScratch, createEmptyScratchGuard } from './scratch
 import { spawnSync } from 'node:child_process';
 import { readGitScalar, runNodeAtm, sha256File, sha256Text } from './support.js';
 import { targetRunnerSyncPaths, targetVerificationCommands } from './constants.js';
+import { upgradeTargetCharter } from './target-charter.js';
 export function syncTarget(input) {
     const repoPath = path.resolve(input.options.cwd, input.repo);
     const repoName = path.basename(repoPath);
@@ -28,6 +29,7 @@ export function syncTarget(input) {
             verification: [],
             baselineVerification: [],
             regressions: [],
+            charterUpgrade: null,
             commit: null,
             warnings,
             scratchGuard: emptyScratchGuard
@@ -79,14 +81,18 @@ export function syncTarget(input) {
             generatedAt: new Date().toISOString()
         }, null, 2)}\n`, 'utf8');
     }
+    const charterUpgrade = input.options.dryRun ? null : upgradeTargetCharter(repoPath);
+    if (charterUpgrade && !charterUpgrade.ok)
+        warnings.push(`charter upgrade skipped: ${charterUpgrade.detail ?? charterUpgrade.status}`);
     const verification = runChecks ? runVerification(repoPath) : [];
     const regressions = findVerificationRegressions(baselineVerification, verification);
     const verificationOk = input.options.allowVerifyFailure || regressions.length === 0;
     if (baselineVerification.length > 0 && verification.some((run) => !run.ok) && regressions.length === 0) {
         warnings.push('some target checks fail with both the previous and the new runner; they are pre-existing and do not block this sync');
     }
-    const commit = input.options.commit && !input.options.dryRun && verificationOk && previousSha256 !== input.sourceSha256
-        ? commitRunnerSync(repoPath, readFrameworkVersion(input.options.cwd))
+    const charterPaths = charterUpgrade?.paths ?? [];
+    const commit = input.options.commit && !input.options.dryRun && verificationOk && (previousSha256 !== input.sourceSha256 || charterPaths.length > 0)
+        ? commitRunnerSync(repoPath, readFrameworkVersion(input.options.cwd), charterPaths)
         : null;
     if (commit && !commit.ok)
         warnings.push(`runner sync commit failed: ${commit.detail ?? 'unknown error'}`);
@@ -104,6 +110,7 @@ export function syncTarget(input) {
         verification,
         baselineVerification,
         regressions,
+        charterUpgrade,
         commit,
         warnings,
         scratchGuard
@@ -131,6 +138,7 @@ function failedTarget(repoPath, runnerPath, metadataPath, reason, scratchGuard) 
             }],
         baselineVerification: [],
         regressions: [],
+        charterUpgrade: null,
         commit: null,
         warnings: [reason],
         scratchGuard
@@ -149,10 +157,15 @@ export function findVerificationRegressions(baseline, current) {
  * Commit only the runner sync paths. `git commit --only` leaves whatever else
  * is staged in the target repository untouched and out of this commit.
  */
-function commitRunnerSync(repoPath, frameworkVersion) {
-    const paths = targetRunnerSyncPaths.filter((entry) => readGitScalar(repoPath, ['ls-files', '--', entry]) || existsSync(path.join(repoPath, entry)));
+function commitRunnerSync(repoPath, frameworkVersion, charterPaths) {
+    const candidates = [...targetRunnerSyncPaths, ...charterPaths];
+    const paths = candidates.filter((entry) => readGitScalar(repoPath, ['ls-files', '--', entry]) || existsSync(path.join(repoPath, entry)));
+    // New files (first-principles, upgrade receipt) must be known to git before `commit --only`.
+    const untracked = charterPaths.filter((entry) => !readGitScalar(repoPath, ['ls-files', '--', entry]) && existsSync(path.join(repoPath, entry)));
+    if (untracked.length > 0)
+        spawnSync('git', ['add', '--', ...untracked], { cwd: repoPath, encoding: 'utf8' });
     const actor = process.env.ATM_ACTOR_ID?.trim() || process.env.AGENT_IDENTITY?.trim() || 'release-steward';
-    const message = `chore(atm): sync ATM runner ${frameworkVersion}
+    const message = `chore(atm): sync ATM runner ${frameworkVersion}${charterPaths.length > 0 ? ' and upgrade AtomicCharter' : ''}
 
 ATM-Actor: ${actor}`;
     const result = spawnSync('git', ['commit', '--only', '-m', message, '--', ...paths], { cwd: repoPath, encoding: 'utf8' });

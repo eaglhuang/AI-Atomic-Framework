@@ -47,6 +47,7 @@ export interface SyncTargetReport {
   readonly verification: readonly CommandRunRecord[];
   readonly baselineVerification: readonly CommandRunRecord[];
   readonly regressions: readonly string[];
+  readonly charterUpgrade: TargetCharterUpgradeReport | null;
   readonly commit: TargetCommitReport | null;
   readonly warnings: readonly string[];
   readonly scratchGuard: ScratchGuardReport;
@@ -81,6 +82,15 @@ export interface ReleasePublicationReadiness {
     readonly reason: string | null;
   };
   readonly requiredCommand: string | null;
+}
+
+export interface TargetCharterUpgradeReport {
+  readonly ok: boolean;
+  readonly status: string;
+  readonly fromVersion: string | null;
+  readonly toVersion: string | null;
+  readonly paths: readonly string[];
+  readonly detail: string | null;
 }
 
 export interface TargetCommitReport {
