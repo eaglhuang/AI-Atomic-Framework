@@ -1,0 +1,368 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0207",
+  "title": "Charter upgrade command with sync integration, staged enforcement, and accurate doctor diagnosis",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "`charter upgrade --dry-run` on a 2.0.0 fixture lists the added invariants, first-principles file, and Schedule A, and writes nothing.",
+    "`--write` brings the fixture to the bundled version; adopter-added invariants and waivers are unchanged.",
+    "An edited framework-owned invariant yields `ATM_CHARTER_UPGRADE_CONFLICT` with no file changes.",
+    "Newly added invariants are advisory until the recorded window ends; `--enforce-now` makes them enforced at once.",
+    "`internal-release sync --commit` on an outdated target commits runner and charter together; other staged work stays staged.",
+    "doctor reports outdated as a warning with a repair command that works; missing or corrupt stays an error.",
+    "3KLife upgraded through the command; `node atm.mjs doctor --json` charter-integrity passes.",
+    "Error codes registered through the canonical registry; framework source stays host-neutral."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/charter/**",
+    "packages/cli/src/commands/command-specs/charter.spec.ts",
+    "packages/cli/src/commands/doctor/run-doctor.ts",
+    "packages/cli/src/commands/doctor/utilities.ts",
+    "packages/cli/src/commands/internal-release/**",
+    "packages/cli/src/commands/init.ts",
+    "templates/root-drop/.atm/charter/**",
+    "docs/governance/error-code-registry.json",
+    "docs/ERROR_CODES.md",
+    "docs/SELF_HOSTING_ALPHA.md",
+    "scripts/validate-internal-release-sync.ts",
+    "tests/cli/charter-upgrade.test.ts",
+    "tests/cli/doctor-charter-diagnosis.test.ts",
+    "tests/cli/internal-release-sync.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/charter/**",
+    "packages/cli/src/commands/command-specs/charter.spec.ts",
+    "packages/cli/src/commands/doctor/run-doctor.ts",
+    "packages/cli/src/commands/doctor/utilities.ts",
+    "packages/cli/src/commands/internal-release/**",
+    "packages/cli/src/commands/init.ts",
+    "templates/root-drop/.atm/charter/**",
+    "docs/governance/error-code-registry.json",
+    "docs/ERROR_CODES.md",
+    "docs/SELF_HOSTING_ALPHA.md",
+    "scripts/validate-internal-release-sync.ts",
+    "tests/cli/charter-upgrade.test.ts",
+    "tests/cli/doctor-charter-diagnosis.test.ts",
+    "tests/cli/internal-release-sync.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/charter-upgrade.test.ts",
+    "node --strip-types tests/cli/doctor-charter-diagnosis.test.ts",
+    "node --strip-types tests/cli/internal-release-sync.test.ts",
+    "npm run typecheck",
+    "node atm.mjs verify --neutrality"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "planningArtifacts": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_VALIDATOR_PROJECTION",
+      "severity": "warning",
+      "field": "validators",
+      "message": "Command-only validators were projected to 5 advisory legacy case id(s) for migration. Prefer requiredTestCaseIds / testContributions for new cards."
+    },
+    {
+      "code": "ATM_TASK_IMPORT_EXTRACTION_FIRST_CANDIDATE",
+      "severity": "warning",
+      "field": "atomizationImpact",
+      "message": "Scope touches 2 module(s) over 600 lines but the card declares no atomizationImpact.extractionCandidates. Extraction-first is the ATM default: propose an atom/atom-map extraction (see .agents/skills/atm-atom-map-refactor), or record disposition \"inline\" with an inlineReason approved by a human.",
+      "candidates": [
+        "docs/governance/error-code-registry.json (2695 lines)",
+        "docs/ERROR_CODES.md (2115 lines)"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0207-charter-upgrade-command-with-sync-integration-staged-enforcement-and-accurate-doctor-diagnosis.task.md",
+    "sectionTitle": "TASK-AAO-0207",
+    "headingLine": 55,
+    "hash": "32407bfb24e23adb",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "../../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0207-charter-upgrade-command-with-sync-integration-staged-enforcement-and-accurate-doctor-diagnosis.task.md",
+      "planningCommitSha": "4ef3f31a1e6945357ac0872b7e5da2a110ca4784",
+      "contentDigest": "sha256:32407bfb24e23adb5bf096c5e77a159034e24f16657cce4e7d73e83a27accb24",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-11-16T00:46:15.555Z"
+    }
+  },
+  "importedAt": "2026-11-16T00:46:15.555Z",
+  "workAdmission": {
+    "recoveryMode": "auto",
+    "resolvedRecoveryMode": "enabled",
+    "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+  },
+  "causalGraph": {
+    "causalDependencies": [],
+    "startConditions": [],
+    "softRelations": [],
+    "changedPublicSeams": [],
+    "causalImpactEdges": [],
+    "parallelFrontierInputs": [],
+    "validatorReferences": [],
+    "phaseOwner": "null"
+  },
+  "testContributions": [],
+  "requiredTestCaseIds": [],
+  "phaseTestCaseIds": [],
+  "advisoryTestCaseIds": [],
+  "legacyValidatorProjection": [
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.charter.upgrade.test.ts",
+      "command": "node --strip-types tests/cli/charter-upgrade.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.doctor.charter.diagnosis.test.ts",
+      "command": "node --strip-types tests/cli/doctor-charter-diagnosis.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.strip.types.tests.cli.internal.release.sync.test.ts",
+      "command": "node --strip-types tests/cli/internal-release-sync.test.ts",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_npm.run.typecheck",
+      "command": "npm run typecheck",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    },
+    {
+      "schemaId": "atm.validatorExecutionContract.v1",
+      "specVersion": "0.1.0",
+      "responsibility": "advisory",
+      "caseId": "legacy_cmd_node.atm.mjs.verify.neutrality",
+      "command": "node atm.mjs verify --neutrality",
+      "legacyProjection": true,
+      "acceptanceIds": [],
+      "impactEdges": []
+    }
+  ],
+  "dependencyClassification": {
+    "schemaId": "atm.taskDependencyClassification.v1",
+    "semantics": "legacy",
+    "edges": []
+  },
+  "frontmatterFidelity": {
+    "schemaId": "atm.taskFrontmatterFidelity.v1",
+    "specVersion": "0.1.0",
+    "ok": true,
+    "checkedFields": [
+      "causalGraph",
+      "causalGraph.causalDependencies",
+      "causalGraph.startConditions",
+      "causalGraph.softRelations",
+      "causalGraph.changedPublicSeams",
+      "causalGraph.causalImpactEdges",
+      "causalGraph.parallelFrontierInputs",
+      "causalGraph.validatorReferences",
+      "causalGraph.phaseOwner",
+      "dependencies"
+    ],
+    "findings": []
+  },
+  "lastTransitionId": "2026-11-16T00-59-34-872Z-close-ac96faea8314",
+  "lastTransitionAt": "2026-11-16T00:59:34.872Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "claude-code-opus-5",
+  "reservedAt": "2026-11-16T00:48:49.287Z",
+  "promotedAt": "2026-11-16T00:48:49.295Z",
+  "claim": {
+    "actorId": "claude-code-opus-5",
+    "leaseId": "lease-92d83eb3a57f",
+    "claimedAt": "2026-11-16T00:48:49.302Z",
+    "heartbeatAt": "2026-11-16T00:59:34.853Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0207.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/error-code-registry.json",
+      "docs/SELF_HOSTING_ALPHA.md",
+      "packages/cli/src/commands/charter/**",
+      "packages/cli/src/commands/command-specs/charter.spec.ts",
+      "packages/cli/src/commands/doctor/run-doctor.ts",
+      "packages/cli/src/commands/doctor/utilities.ts",
+      "packages/cli/src/commands/init.ts",
+      "packages/cli/src/commands/internal-release/**",
+      "scripts/validate-internal-release-sync.ts",
+      "templates/root-drop/.atm/charter/**",
+      "tests/cli/charter-upgrade.test.ts",
+      "tests/cli/doctor-charter-diagnosis.test.ts",
+      "tests/cli/internal-release-sync.test.ts"
+    ],
+    "state": "released",
+    "laneSession": {
+      "laneSessionId": "lane-20261116004849-claude-code-opus-5-2af8be0c57",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261116004849-claude-code-opus-5-2af8be0c57\""
+    },
+    "reason": "PR #452 was squash-merged with the 0.1.30 release preparation (version bumps, lockfile, compatibility matrix, release notes, rebuilt frozen runner and dist); those out-of-scope files are the co-delivered release train, not TASK-AAO-0207 deliverables."
+  },
+  "startedAt": "2026-11-16T00:48:49.302Z",
+  "startedByActor": "claude-code-opus-5",
+  "workAdmissionTicket": {
+    "schemaId": "atm.workAdmissionTicket.v1",
+    "specVersion": "0.1.0",
+    "ticketId": "wat-7125462ec1ba83a4",
+    "ticketDigest": "sha256:7125462ec1ba83a4a67305920405a9dd0d1720aade0979adaa1656979dd36672",
+    "taskId": "TASK-AAO-0207",
+    "origin": "claim",
+    "actorId": "claude-code-opus-5",
+    "laneSessionId": "lane-20261116004849-claude-code-opus-5-2af8be0c57",
+    "claimGeneration": "lease-92d83eb3a57f",
+    "issuedAt": "2026-11-16T00:48:49.302Z",
+    "expiresAt": "2026-11-16T01:18:49.302Z",
+    "scopeDigest": "sha256:3e2144e09efb31f9b69d7bc354d415e7c531283984c7c0b44a3bab0f63456599",
+    "runnerSelection": {
+      "runnerKind": "frozen",
+      "runnerRef": "release/atm-onefile/atm.mjs",
+      "selectedAt": "2026-11-16T00:48:49.302Z"
+    },
+    "grants": [
+      {
+        "kind": "file-write",
+        "values": [
+          ".atm/history/evidence/TASK-AAO-0207.*",
+          ".atm/history/task-events/TASK-AAO-0207/**",
+          ".atm/history/tasks/TASK-AAO-0207.json",
+          "docs/ERROR_CODES.md",
+          "docs/SELF_HOSTING_ALPHA.md",
+          "docs/governance/error-code-registry.json",
+          "packages/cli/src/commands/charter/**",
+          "packages/cli/src/commands/command-specs/charter.spec.ts",
+          "packages/cli/src/commands/doctor/run-doctor.ts",
+          "packages/cli/src/commands/doctor/utilities.ts",
+          "packages/cli/src/commands/init.ts",
+          "packages/cli/src/commands/internal-release/**",
+          "scripts/validate-internal-release-sync.ts",
+          "templates/root-drop/.atm/charter/**",
+          "tests/cli/charter-upgrade.test.ts",
+          "tests/cli/doctor-charter-diagnosis.test.ts",
+          "tests/cli/internal-release-sync.test.ts"
+        ],
+        "digest": "sha256:82385998a83ee3fbf35eed06f95ebaa7eee961c22a193516840d0338faa75f4d"
+      },
+      {
+        "kind": "lifecycle-operation",
+        "values": [
+          "close",
+          "commit",
+          "push",
+          "stage",
+          "write"
+        ],
+        "digest": "sha256:a2f98ae20b476885ded7ed9f79b94ad99cf2b615779e9a8cc266680fc60f009f"
+      },
+      {
+        "kind": "process-manifest",
+        "values": [],
+        "digest": "sha256:706ceedd89f6ac8c08a76e915fa88ba979c4552a0890c95d8f9e01cc090afb8f"
+      }
+    ],
+    "deferredForeignResidue": [],
+    "recovery": {
+      "requestedMode": "auto",
+      "resolvedMode": "enabled",
+      "reasons": [
+        "complex-task",
+        "shared-surface"
+      ],
+      "maxSavePoints": 2,
+      "perTaskByteBudget": 16777216,
+      "repositoryByteBudget": 268435456,
+      "handoffTtlSeconds": 604800,
+      "tempRoot": ".atm/runtime/work-admission-temp",
+      "policyDigest": "sha256:eaf36ad6a795b795da2a8db5ddfea51a9da96974906f7ad48f3c61e5c2b38f8f"
+    }
+  },
+  "startedBySessionId": "session-20261116004849-claude-code-opus-5-TASK-AAO-0207-21e58df5cf",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0207",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0207.*",
+      ".atm/history/task-events/TASK-AAO-0207/**",
+      ".atm/history/tasks/TASK-AAO-0207.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/error-code-registry.json",
+      "docs/SELF_HOSTING_ALPHA.md",
+      "packages/cli/src/commands/charter/**",
+      "packages/cli/src/commands/command-specs/charter.spec.ts",
+      "packages/cli/src/commands/doctor/run-doctor.ts",
+      "packages/cli/src/commands/doctor/utilities.ts",
+      "packages/cli/src/commands/init.ts",
+      "packages/cli/src/commands/internal-release/**",
+      "scripts/validate-internal-release-sync.ts",
+      "templates/root-drop/.atm/charter/**",
+      "tests/cli/charter-upgrade.test.ts",
+      "tests/cli/doctor-charter-diagnosis.test.ts",
+      "tests/cli/internal-release-sync.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "f3267018006ef0d3e8b33ad70cbdd11b8db645290199ab3b369fa0a54fab1611",
+    "actorId": "claude-code-opus-5",
+    "sessionId": "session-20261116004849-claude-code-opus-5-TASK-AAO-0207-21e58df5cf",
+    "laneSession": {
+      "laneSessionId": "lane-20261116004849-claude-code-opus-5-2af8be0c57",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20261116004849-claude-code-opus-5-2af8be0c57\""
+    },
+    "createdAt": "2026-11-16T00:49:06.039Z",
+    "status": "active"
+  },
+  "closedAt": "2026-11-16T00:59:34.853Z",
+  "closedByActor": "claude-code-opus-5",
+  "closedBySessionId": "session-20261116004849-claude-code-opus-5-TASK-AAO-0207-21e58df5cf",
+  "closeReason": "PR #452 was squash-merged with the 0.1.30 release preparation (version bumps, lockfile, compatibility matrix, release notes, rebuilt frozen runner and dist); those out-of-scope files are the co-delivered release train, not TASK-AAO-0207 deliverables.",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0207.closure-packet.json"
+}
