@@ -1,0 +1,97 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-AAO-0207",
+  "updatedAt": "2026-11-16T00:52:41.451Z",
+  "updatedBy": "claude-code-opus-5",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/charter-upgrade.test.ts",
+    "node --strip-types tests/cli/doctor-charter-diagnosis.test.ts",
+    "node --strip-types tests/cli/internal-release-sync.test.ts",
+    "node atm.mjs verify --neutrality",
+    "typecheck"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/charter-upgrade.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:066a476b3c59964f2bd234a624b55bcc8cbac81f4e0e49f51ec94e062114b676",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/charter-upgrade.test.ts"
+      ],
+      "generatedAt": "2026-11-16T00:51:19.288Z",
+      "startedAt": "2026-11-16T00:51:18.254Z",
+      "finishedAt": "2026-11-16T00:51:19.288Z",
+      "durationMs": 1034,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "c7888ee13ce7be6fcc4e9fdc880e8084036f6421",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/doctor-charter-diagnosis.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:74de4eb721d1956fa4f4dd83feb019912d06eb97b0e3dda3f5e09d7a4aa49eea",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/doctor-charter-diagnosis.test.ts"
+      ],
+      "generatedAt": "2026-11-16T00:51:31.833Z",
+      "startedAt": "2026-11-16T00:51:30.461Z",
+      "finishedAt": "2026-11-16T00:51:31.833Z",
+      "durationMs": 1372,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "c7888ee13ce7be6fcc4e9fdc880e8084036f6421",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/internal-release-sync.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:81e714fde10c7d42c1cd75bdeeab336e1efc8b20aed4163d10b24987b9391c5d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/internal-release-sync.test.ts"
+      ],
+      "generatedAt": "2026-11-16T00:51:46.849Z",
+      "startedAt": "2026-11-16T00:51:41.791Z",
+      "finishedAt": "2026-11-16T00:51:46.849Z",
+      "durationMs": 5058,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "c7888ee13ce7be6fcc4e9fdc880e8084036f6421",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f09f77a2ac6eb5c922d7bcc211a88bc8436785a906f323e84050168ceb4136d3",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-11-16T00:52:19.983Z",
+      "startedAt": "2026-11-16T00:51:57.774Z",
+      "finishedAt": "2026-11-16T00:52:19.983Z",
+      "durationMs": 22209,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "c7888ee13ce7be6fcc4e9fdc880e8084036f6421",
+      "cached": false
+    },
+    {
+      "command": "node atm.mjs verify --neutrality",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:19e0085a9a4c21e30c12cb913c30ef0ddc9559c0c7f88f7f1dfb64ceccf006ef",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node atm.mjs verify --neutrality"
+      ],
+      "generatedAt": "2026-11-16T00:52:41.449Z",
+      "startedAt": "2026-11-16T00:52:30.130Z",
+      "finishedAt": "2026-11-16T00:52:41.449Z",
+      "durationMs": 11319,
+      "runnerKind": "frozen-runner",
+      "sourceCommit": "c7888ee13ce7be6fcc4e9fdc880e8084036f6421",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

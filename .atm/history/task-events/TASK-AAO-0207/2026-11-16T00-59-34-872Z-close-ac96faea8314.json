@@ -1,0 +1,83 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-11-16T00-59-34-872Z-close-ac96faea8314",
+  "taskId": "TASK-AAO-0207",
+  "action": "close",
+  "actorId": "claude-code-opus-5",
+  "sessionId": "session-20261116004849-claude-code-opus-5-TASK-AAO-0207-21e58df5cf",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0207.json",
+  "taskSha256": "sha256:0adc8727f13a35ff21d81a38e1a1ed387aa4319526a987a102a5c048981a5b29",
+  "createdAt": "2026-11-16T00:59:34.872Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0207 --actor claude-code-opus-5 --status done --historical-delivery 09c2a530aa",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20261116004849-claude-code-opus-5-TASK-AAO-0207-21e58df5cf",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0207.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/charter-upgrade.test.ts",
+      "node --strip-types tests/cli/doctor-charter-diagnosis.test.ts",
+      "node --strip-types tests/cli/internal-release-sync.test.ts",
+      "node atm.mjs verify --neutrality",
+      "typecheck"
+    ],
+    "requiredGates": [
+      "node --strip-types tests/cli/charter-upgrade.test.ts",
+      "node --strip-types tests/cli/doctor-charter-diagnosis.test.ts",
+      "node --strip-types tests/cli/internal-release-sync.test.ts",
+      "node atm.mjs verify --neutrality",
+      "typecheck"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-11-16T00:59:34.827Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-AAO-0207.*",
+        ".atm/history/task-events/TASK-AAO-0207/**",
+        ".atm/history/tasks/TASK-AAO-0207.json",
+        "docs/ERROR_CODES.md",
+        "docs/governance/error-code-registry.json",
+        "docs/SELF_HOSTING_ALPHA.md",
+        "packages/cli/src/commands/charter/**",
+        "packages/cli/src/commands/command-specs/charter.spec.ts",
+        "packages/cli/src/commands/doctor/run-doctor.ts",
+        "packages/cli/src/commands/doctor/utilities.ts",
+        "packages/cli/src/commands/init.ts",
+        "packages/cli/src/commands/internal-release/**",
+        "scripts/validate-internal-release-sync.ts",
+        "templates/root-drop/.atm/charter/**",
+        "tests/cli/charter-upgrade.test.ts",
+        "tests/cli/doctor-charter-diagnosis.test.ts",
+        "tests/cli/internal-release-sync.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/charter/**",
+        "packages/cli/src/commands/command-specs/charter.spec.ts",
+        "packages/cli/src/commands/doctor/run-doctor.ts",
+        "packages/cli/src/commands/doctor/utilities.ts",
+        "packages/cli/src/commands/init.ts",
+        "packages/cli/src/commands/internal-release/**",
+        "scripts/validate-internal-release-sync.ts",
+        "templates/root-drop/.atm/charter/**",
+        "tests/cli/charter-upgrade.test.ts",
+        "tests/cli/doctor-charter-diagnosis.test.ts",
+        "tests/cli/internal-release-sync.test.ts"
+      ],
+      "requiredGates": [
+        "node --strip-types tests/cli/charter-upgrade.test.ts",
+        "node --strip-types tests/cli/doctor-charter-diagnosis.test.ts",
+        "node --strip-types tests/cli/internal-release-sync.test.ts",
+        "node atm.mjs verify --neutrality",
+        "typecheck"
+      ]
+    }
+  }
+}
