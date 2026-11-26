@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "date": "2026-11-27",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "Medium",
+  "status": "Open",
+  "id": "ATM-BUG-2026-11-27-003",
+  "area": "git commit default timeout for release-size commits",
+  "finding": "A 411-file sealed runner commit exceeded the 420000 ms default git commit spawn timeout (ATM_GIT_COMMIT_TIMEOUT, spawnSync ETIMEDOUT) because pre-commit validators scale with the staged set. HEAD did not advance; retry with --timeout-ms 2400000 succeeded.",
+  "expectedBehavior": "Either scale the default timeout with staged-path count or have release:prepare / runner publication guidance pass an explicit --timeout-ms, so release commits do not fail by default.",
+  "evidenceOrRepro": "commit attempt status phase git-commit-failed, timeoutMs 420000, startedAt 18:48:29Z updatedAt 19:01:13Z; succeeded later as 5b6b2edf3d with --timeout-ms 2400000.",
+  "followUp": "Surface the --timeout-ms hint in the ATM_GIT_COMMIT_TIMEOUT recovery guidance."
+}

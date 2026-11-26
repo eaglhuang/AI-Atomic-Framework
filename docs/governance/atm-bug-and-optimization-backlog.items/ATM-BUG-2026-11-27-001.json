@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "date": "2026-11-27",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Closed - Fixed in v0.1.31 (PR 456)",
+  "id": "ATM-BUG-2026-11-27-001",
+  "area": "next active-task divergence",
+  "finding": "readActiveClaimedTasks in next playbook task-routing kept its own claim predicate that only checked claim.state === active. A committed adopter ledger whose lease expired long ago (heartbeatAt + ttlSeconds in the past) therefore stayed the current active task forever, and every clone routed unrelated prompts into ATM_NEXT_ACTIVE_TASK_DIVERGENCE_BLOCKED. In 3KLife a 14-day-expired UI-2-0121 claim blocked Codex from starting PROG-2-10056.",
+  "expectedBehavior": "Active-task divergence must use the canonical isLiveActiveClaim predicate (state plus lease freshness) from task-ledger-readers. Expired leases do not block divergent work; live claims still do.",
+  "evidenceOrRepro": "tests/cli/active-task-divergence-expired-lease.test.ts: live claim is blocked with active-task-divergence-blocked; after rewriting heartbeatAt/claimedAt 14 days back the same prompt is not blocked. Released as 0.1.31 and synced to 3KLife (3klife PR 2702).",
+  "followUp": "Audit other call sites that re-derive claim liveness from state alone; route them through isLiveActiveClaim instead of adding local predicates."
+}

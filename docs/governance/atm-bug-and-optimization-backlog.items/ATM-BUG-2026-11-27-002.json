@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "date": "2026-11-27",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Open",
+  "id": "ATM-BUG-2026-11-27-002",
+  "area": "git commit --auto-stage ignored paths",
+  "finding": "node atm.mjs git commit --auto-stage on a sealed runner rebuild staged 232 gitignored packages/cli/dist/_vendor/**/*.d.ts files (ignored by .gitignore dist/ but present after build), then the final candidate index check rejected its own staging with ATM_COMMIT_UNDECLARED_IGNORED_PATH after about 20 minutes of hook work. The wrapper rolled the index back correctly, but the attempt was wasted.",
+  "expectedBehavior": "Auto-stage must never add ignored paths unless they are explicitly declared; the ignored-path check should run before staging and before pre-commit hooks so the failure is immediate and names the offending paths.",
+  "evidenceOrRepro": "Release 0.1.31 rebuild in a clean worktree: --auto-stage attempt staged 665 paths (411 tracked + 254 extra) and failed with nested ATM_COMMIT_UNDECLARED_IGNORED_PATH; liveIndexResidueRollback listed the vendor .d.ts files. Staging tracked changes with git add -u and committing without --auto-stage succeeded with exactly 411 files.",
+  "followUp": "Fail-fast preflight in the auto-stage path; include the first N ignored paths in the error data."
+}
