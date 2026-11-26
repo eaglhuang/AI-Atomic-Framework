@@ -14,13 +14,13 @@ export declare function parseAtmUrn(value: unknown): {
     urn: string;
     nodeKind: AtmNodeKind;
     canonicalId: string;
-    version: string | null;
+    version: string;
 };
 export declare function normalizeAtmNodeRef(value: unknown, options?: NormalizeAtmNodeRefOptions): {
     urn: string;
     nodeKind: AtmNodeKind;
     canonicalId: string;
-    version: string | null;
+    version: string;
 };
 export declare function isAtmUrn(value: unknown): boolean;
 export declare function parseLegacyUri(value: unknown): {
@@ -29,8 +29,8 @@ export declare function parseLegacyUri(value: unknown): {
     repositoryAlias: string;
     relativePath: string;
     fragment: string;
-    lineStart: number | null;
-    lineEnd: number | null;
+    lineStart: any;
+    lineEnd: any;
 };
 export declare function isLegacyUri(value: unknown): boolean;
 export {};

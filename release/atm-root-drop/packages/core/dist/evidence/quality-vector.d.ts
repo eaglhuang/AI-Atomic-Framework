@@ -17,7 +17,7 @@ export declare function compileQualityVector(input: QualityVectorInput): {
     nonClaims: string[];
     status: string;
     diagnostics: string[];
-    repairCommand: string | null;
+    repairCommand: string;
 };
 export declare function validateQualityVector(r: ReturnType<typeof compileQualityVector>): {
     ok: boolean;
