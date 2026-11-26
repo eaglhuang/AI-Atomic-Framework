@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "date": "2026-11-27",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Open",
+  "id": "ATM-BUG-2026-11-27-004",
+  "area": "Framework temp claim TTL vs sealed build",
+  "finding": "Framework temp claims expire after 30 minutes with no renew or ttl option, but a full sealed runner rebuild takes about 40 minutes and runner publication re-checks that exactly one live release-surface claim exists at the end of the build. The build failed with \"Runner publication requires exactly one active release-surface claim ... found 0\" until an external keepalive loop re-claimed every 15 minutes. After expiry, re-claim returns ATM_FRAMEWORK_STALE_LOCK_CLEANUP_REQUIRED and a release is needed first.",
+  "expectedBehavior": "Provide framework-mode renew (or let a running governed build heartbeat its own claim) so long sealed builds and commits do not need ad-hoc keepalive scripts.",
+  "evidenceOrRepro": "0.1.31 build attempt 1 exited 1 with the found 0 error; attempt 2 with a 900 s re-claim loop exited 0.",
+  "followUp": "Keep fail-closed behavior for genuinely abandoned claims; only the owning running build should extend its lease."
+}
