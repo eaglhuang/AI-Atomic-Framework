@@ -14,6 +14,7 @@ import { buildPromptSuggestedRoutes, finalizeImportedTaskSummary, normalizeOptio
 import { buildNextMessages } from './message-assembly.ts';
 import { buildTaskDeliveryPrinciple } from './channel-playbook.ts';
 import { mentionsNotCurrentTask } from './active-work-summary.ts';
+import { isLiveActiveClaim, parseClaimRecord } from '../../tasks/task-ledger-readers.ts';
 
 function mapStatusToSlashCommandId(status: string): string {
   if (status === 'needs-bootstrap' || status === 'needs-onboarding-refresh') {
@@ -286,6 +287,7 @@ function canonicalPromptPath(value: string): string {
 function readActiveClaimedTasks(cwd: string): ImportedTaskSummary[] {
   const taskStorePath = path.join(cwd, '.atm', 'history', 'tasks');
   if (!existsSync(taskStorePath)) return [];
+  const nowIso = new Date().toISOString();
   return readdirSync(taskStorePath)
     .filter((entry) => entry.endsWith('.json'))
     .flatMap((entry): ImportedTaskSummary[] => {
@@ -298,6 +300,10 @@ function readActiveClaimedTasks(cwd: string): ImportedTaskSummary[] {
           ? parsed.claim as Record<string, unknown>
           : {};
         if (claimRecord.state !== 'active') return [];
+        // Lease freshness comes from the canonical lifecycle predicate: an
+        // expired lease is not a live claim and must not block other work.
+        const parsedClaim = parseClaimRecord(claimRecord);
+        if (parsedClaim && !isLiveActiveClaim(parsedClaim, nowIso)) return [];
         const source = parsed.source && typeof parsed.source === 'object' && !Array.isArray(parsed.source)
           ? parsed.source as Record<string, unknown>
           : {};

@@ -1,7 +1,7 @@
 import type { ConflictDetail, MergePlan, PatchAnchor, PatchProposal } from './types.js';
 export declare const defaultMergePlanMigration: {
     strategy: "none";
-    fromVersion: null;
+    fromVersion: any;
     notes: string;
 };
 export interface PatchHunkRange {

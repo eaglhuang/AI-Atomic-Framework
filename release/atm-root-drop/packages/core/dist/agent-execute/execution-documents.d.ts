@@ -41,7 +41,7 @@ export declare function createExecutionEvidenceDocument(context: ExecutionEviden
     specVersion: string;
     migration: Readonly<{
         strategy: "additive";
-        fromVersion: null;
+        fromVersion: any;
         notes: "Initial ExecuteAgentTask effect node evidence contract.";
     }>;
     atomId: string;
